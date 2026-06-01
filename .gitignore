@@ -27,3 +27,6 @@ __pycache__/
 *.out
 *.log
 *.pdf
+
+# Stray Meridian export tempfiles (lean-sync writes these into the project)
+/lean/meridian-dump-*.ttl
