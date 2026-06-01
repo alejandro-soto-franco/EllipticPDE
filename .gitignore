@@ -1,0 +1,29 @@
+# Lean
+/lean/.lake
+/lean/.lake/
+/lean/lake-manifest.json
+
+# Rust
+/numerics/rust/target
+/numerics/rust/target/
+Cargo.lock
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# LaTeX build artefacts
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.run.xml
+*.synctex.gz
+*.xdv
+*.toc
+*.out
+*.log
+*.pdf

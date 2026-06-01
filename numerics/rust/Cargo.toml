@@ -1,0 +1,13 @@
+[workspace]
+resolver = "2"
+members = ["crates/elliptic-fem"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+# The numerics layer builds on the local `cartan` stack (cartan-dec for the
+# DEC/FEM assembly and solver ladder, cartan-remesh for box-domain meshing).
+# Wired at milestone M7; left out of the scaffold so `cargo check` resolves
+# without pulling the cartan workspace.

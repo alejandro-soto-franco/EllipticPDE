@@ -1,0 +1,10 @@
+[package]
+name = "elliptic-fem"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "P1 FEM Dirichlet solve and analytic-estimate verification for the elliptic-dirichlet formalisation."
+
+[dependencies]
+# TODO(M7): cartan-dec, cartan-remesh (path deps into ~/cartan) once the
+# constants-verification and FEM cross-check are implemented.

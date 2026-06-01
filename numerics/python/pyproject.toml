@@ -1,0 +1,8 @@
+[project]
+name = "elliptic-dirichlet-numerics"
+version = "0.1.0"
+description = "SymPy cross-checks for the elliptic-dirichlet formalisation (1D Poincaré constant, Fubini averaging)."
+requires-python = ">=3.11"
+dependencies = ["sympy>=1.12", "numpy>=1.26"]
+
+[tool.pyrefly]
