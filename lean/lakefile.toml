@@ -15,5 +15,12 @@ weak.linter.mathlibStandardSet = true
 name = "mathlib"
 path = "../../mathlib4-fork-stable"
 
+# Meridian (dev/analysis dependency): enables `stratum cite lean-sync` to export
+# this project's environment into the bridge oxigraph store for SPARQL
+# traversal. Shares the same mathlib worktree, so no second mathlib instance.
+[[require]]
+name = "Meridian"
+path = "../../Meridian"
+
 [[lean_lib]]
 name = "EllipticDirichlet"

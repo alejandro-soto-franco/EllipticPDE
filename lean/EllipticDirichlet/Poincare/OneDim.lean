@@ -1,3 +1,5 @@
+import Mathlib
+
 /-!
 # One-dimensional Poincaré inequality (dependency-chain step 1)
 
@@ -5,7 +7,6 @@ For a compactly supported `u` on an interval, the `L²` norm of `u` is bounded b
 a constant times the `L²` norm of `u'`. Proof: fundamental theorem of calculus,
 then Cauchy-Schwarz. This is the first standalone Mathlib pull request (M2).
 -/
-import Mathlib
 
 namespace EllipticDirichlet.Poincare
 
