@@ -27,36 +27,50 @@ open MeasureTheory intervalIntegral Set
 
 namespace EllipticDirichlet.Poincare
 
-/-- Cauchy-Schwarz with one factor constant: on `[a, x]` the square of the
-integral of `f` is at most `(x - a)` times the integral of `f ^ 2`. Proved from
-`0 ≤ ∫ t in a..x, (f t - λ) ^ 2`, read as a nonnegative quadratic in `λ` whose
-discriminant must therefore be nonpositive. -/
-theorem sq_intervalIntegral_le {a x : ℝ} (hax : a ≤ x) {f : ℝ → ℝ}
-    (hf : ContinuousOn f (uIcc a x)) :
-    (∫ t in a..x, f t) ^ 2 ≤ (x - a) * ∫ t in a..x, (f t) ^ 2 := by
-  have hfI : IntervalIntegrable f volume a x := hf.intervalIntegrable
-  have hf2 : ContinuousOn (fun t => (f t) ^ 2) (uIcc a x) := hf.pow 2
-  have hf2I : IntervalIntegrable (fun t => (f t) ^ 2) volume a x := hf2.intervalIntegrable
-  -- The quadratic `λ ↦ (x - a) λ² - 2 (∫ f) λ + ∫ f²` is nonnegative.
+/-- Cauchy-Schwarz for the interval integral: the square of `∫ f g` is at most
+the product of `∫ f ^ 2` and `∫ g ^ 2`. Proved from `0 ≤ ∫ (f - λ g) ^ 2`, read
+as a nonnegative quadratic in `λ` whose discriminant must therefore be
+nonpositive. The continuity bound on the divergence-form bilinear form (the
+`L²` estimate `B[u, v] ≤ β ‖u‖ ‖v‖`) rests on this. -/
+theorem intervalIntegral_mul_sq_le {a b : ℝ} (hab : a ≤ b) {f g : ℝ → ℝ}
+    (hf : ContinuousOn f (uIcc a b)) (hg : ContinuousOn g (uIcc a b)) :
+    (∫ t in a..b, f t * g t) ^ 2 ≤ (∫ t in a..b, (f t) ^ 2) * ∫ t in a..b, (g t) ^ 2 := by
+  have hf2I : IntervalIntegrable (fun t => (f t) ^ 2) volume a b := (hf.pow 2).intervalIntegrable
+  have hg2I : IntervalIntegrable (fun t => (g t) ^ 2) volume a b := (hg.pow 2).intervalIntegrable
+  have hfgI : IntervalIntegrable (fun t => f t * g t) volume a b := (hf.mul hg).intervalIntegrable
+  -- The quadratic `λ ↦ (∫ g²) λ² - 2 (∫ f g) λ + ∫ f²` is nonnegative.
   have key : ∀ lam : ℝ,
-      0 ≤ (x - a) * (lam * lam) + (-(2 * ∫ t in a..x, f t)) * lam + ∫ t in a..x, (f t) ^ 2 := by
+      0 ≤ (∫ t in a..b, (g t) ^ 2) * (lam * lam)
+          + (-(2 * ∫ t in a..b, f t * g t)) * lam + ∫ t in a..b, (f t) ^ 2 := by
     intro lam
-    have hnn : 0 ≤ ∫ t in a..x, (f t - lam) ^ 2 :=
-      integral_nonneg hax (fun t _ => by positivity)
-    have hexp : (∫ t in a..x, (f t - lam) ^ 2)
-        = (x - a) * (lam * lam) + (-(2 * ∫ t in a..x, f t)) * lam + ∫ t in a..x, (f t) ^ 2 := by
-      have hrw : (fun t => (f t - lam) ^ 2)
-          = (fun t => (f t) ^ 2 - (2 * lam) * f t + lam ^ 2) := by
+    have hnn : 0 ≤ ∫ t in a..b, (f t - lam * g t) ^ 2 :=
+      integral_nonneg hab (fun t _ => by positivity)
+    have hexp : (∫ t in a..b, (f t - lam * g t) ^ 2)
+        = (∫ t in a..b, (g t) ^ 2) * (lam * lam)
+          + (-(2 * ∫ t in a..b, f t * g t)) * lam + ∫ t in a..b, (f t) ^ 2 := by
+      have hrw : (fun t => (f t - lam * g t) ^ 2)
+          = (fun t => (f t) ^ 2 - (2 * lam) * (f t * g t) + lam ^ 2 * (g t) ^ 2) := by
         funext t; ring
       rw [hrw,
-        integral_add (hf2I.sub (hfI.const_mul (2 * lam))) intervalIntegrable_const,
-        integral_sub hf2I (hfI.const_mul (2 * lam)),
-        intervalIntegral.integral_const_mul, intervalIntegral.integral_const, smul_eq_mul]
+        integral_add (hf2I.sub (hfgI.const_mul (2 * lam))) (hg2I.const_mul (lam ^ 2)),
+        integral_sub hf2I (hfgI.const_mul (2 * lam)),
+        intervalIntegral.integral_const_mul, intervalIntegral.integral_const_mul]
       ring
     rw [← hexp]; exact hnn
   have hdisc := discrim_le_zero key
   rw [discrim] at hdisc
   nlinarith [hdisc]
+
+/-- Cauchy-Schwarz with one factor constant: on `[a, x]` the square of the
+integral of `f` is at most `(x - a)` times the integral of `f ^ 2`. The `g = 1`
+case of [`intervalIntegral_mul_sq_le`]. -/
+theorem sq_intervalIntegral_le {a x : ℝ} (hax : a ≤ x) {f : ℝ → ℝ}
+    (hf : ContinuousOn f (uIcc a x)) :
+    (∫ t in a..x, f t) ^ 2 ≤ (x - a) * ∫ t in a..x, (f t) ^ 2 := by
+  have h := intervalIntegral_mul_sq_le hax hf (continuousOn_const (c := (1 : ℝ)))
+  simp only [mul_one, one_pow] at h
+  rw [intervalIntegral.integral_const, smul_eq_mul, mul_one, mul_comm] at h
+  exact h
 
 /-- One-dimensional Poincaré inequality. If `u` has derivative `u'` at every
 point of `[a, b]` with `u'` continuous there, and `u a = 0`, then
