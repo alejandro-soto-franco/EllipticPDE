@@ -124,7 +124,13 @@ theorem poincare_oneDim {a b : ℝ} (hab : a ≤ b) {u u' : ℝ → ℝ}
       intro y _
       have hg : HasDerivAt (fun z : ℝ => z - a) 1 y := (hasDerivAt_id y).sub_const a
       have h1 : HasDerivAt (fun z => (z - a) ^ 2) (2 * (y - a)) y := by
-        simpa using HasDerivAt.pow hg 2
+        -- v4.31: `simpa` rewrites `fun z => (z-a)^2` into the pointwise function
+        -- power `(fun z => z-a)^2` (changed simp normal form), breaking the match.
+        -- `convert` matches structurally and bridges the instance diamond by defeq;
+        -- only the numeric coefficient `↑2 * (y-a)^(2-1) * 1 = 2*(y-a)` remains.
+        have h := hg.pow 2
+        convert h using 1
+        norm_num
       have h2 := HasDerivAt.div_const h1 2
       rw [show y - a = 2 * (y - a) / 2 by ring]; exact h2
     rw [integral_eq_sub_of_hasDerivAt hd

@@ -8,7 +8,7 @@ pp.unicode.fun = true
 relaxedAutoImplicit = false
 weak.linter.mathlibStandardSet = true
 
-# Shared mathlib worktree (toolchain v4.29.1, tracks upstream/stable). Build
+# Shared mathlib worktree (toolchain v4.31.0-rc1, tracks upstream/stable). Build
 # artifacts live at ~/mathlib4-fork-stable/.lake and are reused across every
 # downstream Lean project on this toolchain, so no multi-GB rebuild here.
 [[require]]
