@@ -7,7 +7,7 @@ version = "0.1.0"
 edition = "2021"
 license = "MIT"
 
-# The numerics layer builds on the local `cartan` stack (cartan-dec for the
-# DEC/FEM assembly and solver ladder, cartan-remesh for box-domain meshing).
-# Wired at milestone M7; left out of the scaffold so `cargo check` resolves
-# without pulling the cartan workspace.
+# The numerics layer takes its box meshes from the local `cartan-dec` DEC stack
+# (path dependency into ~/cartan). The P1 stiffness and mass are assembled in
+# `elliptic-fem` itself, since the unit-square grid is right-angled and so not
+# well-centred for cartan-dec's circumcentric Hodge star.

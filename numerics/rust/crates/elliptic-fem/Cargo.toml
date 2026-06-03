@@ -6,5 +6,9 @@ license.workspace = true
 description = "P1 FEM Dirichlet solve and analytic-estimate verification for the elliptic-dirichlet formalisation."
 
 [dependencies]
-# TODO(M7): cartan-dec, cartan-remesh (path deps into ~/cartan) once the
-# constants-verification and FEM cross-check are implemented.
+# The box mesh comes from the local cartan-dec DEC stack; the P1 stiffness and
+# mass are assembled here (the unit-square grid is right-angled, so cartan's
+# circumcentric Hodge is not well-centred for it). nalgebra is pinned to match
+# cartan-dec so the matrix types unify.
+nalgebra = "0.35"
+cartan-dec = { path = "../../../../../cartan/cartan-dec" }

@@ -26,12 +26,16 @@ Authors: Alejandro José Soto Franco and Kobe Marshall-Stevens.
 
 ## Layout
 
-- `lean/` standalone lake project pinned to Lean `v4.29.1`, depending on
+- `lean/` standalone lake project pinned to Lean `v4.31.0-rc1`, depending on
   Mathlib through the shared `mathlib4-fork-stable` worktree. Build artefacts
   live under `/home/lean-caches/elliptic-dirichlet` via the `.lake` symlink.
 - `latex/` manuscript in the kms-latex standard (XeLaTeX + biber).
-- `numerics/rust/` P1 finite-element Dirichlet solver and analytic-estimate
-  verification, built on `cartan-dec` and `cartan-remesh`.
+- `numerics/rust/` analytic-constant verification plus a P1 finite-element
+  cross-check on `cartan-dec` box meshes: the assembled stiffness/mass
+  generalised eigenproblem gives the sharp Poincare constant `1/sqrt(lambda_1)`
+  (confirmed against the exact `2 pi^2`), and a manufactured-solution study
+  confirms first-order `H^1` convergence. Run `cargo run --bin report` for the
+  full verdict.
 - `numerics/python/` SymPy cross-checks, managed by uv.
 
 ## Dependency chain
