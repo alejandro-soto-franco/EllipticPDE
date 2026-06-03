@@ -58,6 +58,27 @@ def partialD (i : Fin d) (φ : EuclideanSpace ℝ (Fin d) → ℝ) :
     EuclideanSpace ℝ (Fin d) → ℝ :=
   fun x => (fderiv ℝ φ x) (EuclideanSpace.single i 1)
 
+/-- `partialD` is additive on differentiable functions. -/
+lemma partialD_add {φ ψ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hφ : Differentiable ℝ φ) (hψ : Differentiable ℝ ψ) (i : Fin d) :
+    partialD i (φ + ψ) = partialD i φ + partialD i ψ := by
+  funext x
+  simp only [partialD, Pi.add_apply]
+  rw [fderiv_add (hφ x) (hψ x), ContinuousLinearMap.add_apply]
+
+/-- `partialD` commutes with scalar multiplication on differentiable functions. -/
+lemma partialD_const_smul {φ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hφ : Differentiable ℝ φ) (c : ℝ) (i : Fin d) :
+    partialD i (c • φ) = c • partialD i φ := by
+  funext x
+  simp only [partialD, Pi.smul_apply]
+  rw [fderiv_const_smul (hφ x) c, ContinuousLinearMap.smul_apply]
+
+/-- The classical partial of the zero function is zero. -/
+lemma partialD_zero (i : Fin d) :
+    partialD i (0 : EuclideanSpace ℝ (Fin d) → ℝ) = 0 := by
+  funext x; simp [partialD]
+
 /-- A smooth, compactly supported test function whose support sits inside `Ω`. -/
 def IsTestFn (Ω : Set (EuclideanSpace ℝ (Fin d))) (φ : EuclideanSpace ℝ (Fin d) → ℝ) :
     Prop :=
@@ -75,6 +96,25 @@ lemma continuous_partialD (h : IsTestFn Ω φ) (i : Fin d) : Continuous (partial
 lemma hasCompactSupport_partialD (h : IsTestFn Ω φ) (i : Fin d) :
     HasCompactSupport (partialD i φ) := by
   exact h.2.1.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single i 1)
+
+/-- `φ` being a test function is preserved under sums. -/
+lemma add (h : IsTestFn Ω φ) {ψ : EuclideanSpace ℝ (Fin d) → ℝ} (h' : IsTestFn Ω ψ) :
+    IsTestFn Ω (φ + ψ) :=
+  ⟨h.1.add h'.1, h.2.1.add h'.2.1, by
+    refine Set.Subset.trans ?_ (Set.union_subset h.2.2 h'.2.2)
+    refine (closure_mono (Function.support_add φ ψ)).trans ?_
+    rw [closure_union]
+    exact subset_rfl⟩
+
+/-- `φ` being a test function is preserved under scalar multiplication. -/
+lemma const_smul (h : IsTestFn Ω φ) (c : ℝ) : IsTestFn Ω (c • φ) :=
+  ⟨h.1.const_smul c,
+    h.2.1.of_isClosed_subset isClosed_closure (tsupport_smul_subset_right (fun _ => c) φ),
+    (tsupport_smul_subset_right (fun _ => c) φ).trans h.2.2⟩
+
+/-- The zero function is a test function. -/
+lemma zero : IsTestFn Ω (0 : EuclideanSpace ℝ (Fin d) → ℝ) :=
+  ⟨contDiff_const, HasCompactSupport.zero, by simp [tsupport]⟩
 
 /-- A test function lies in `L²(Ω)`. -/
 lemma memLp (h : IsTestFn Ω φ) : MemLp φ 2 (volume.restrict Ω) :=
@@ -114,6 +154,46 @@ def testGraph (h : IsTestFn Ω φ) : H1amb Ω :=
 @[simp] lemma testGraph_succ (h : IsTestFn Ω φ) (i : Fin d) :
     h.testGraph i.succ = h.partialCls i := by
   rw [testGraph, PiLp.toLp_apply, Fin.cons_succ]
+
+/-- The graph embedding is additive: `(φ + ψ)` graphs to the sum of the graphs. -/
+lemma testGraph_add (h : IsTestFn Ω φ) {ψ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (h' : IsTestFn Ω ψ) :
+    h.testGraph + h'.testGraph = (h.add h').testGraph := by
+  apply PiLp.ext
+  intro j
+  rw [PiLp.add_apply]
+  refine Fin.cases ?_ (fun i => ?_) j
+  · simp only [testGraph_zero, testCls]
+    rw [← MemLp.toLp_add]
+  · simp only [testGraph_succ, partialCls]
+    rw [← MemLp.toLp_add]
+    exact MemLp.toLp_congr _ _ (Filter.EventuallyEq.of_eq
+      (partialD_add (h.1.differentiable (by simp)) (h'.1.differentiable (by simp)) i).symm)
+
+/-- The graph embedding commutes with scalar multiplication. -/
+lemma testGraph_const_smul (h : IsTestFn Ω φ) (c : ℝ) :
+    c • h.testGraph = (h.const_smul c).testGraph := by
+  apply PiLp.ext
+  intro j
+  rw [PiLp.smul_apply]
+  refine Fin.cases ?_ (fun i => ?_) j
+  · simp only [testGraph_zero, testCls]
+    rw [← MemLp.toLp_const_smul]
+  · simp only [testGraph_succ, partialCls]
+    rw [← MemLp.toLp_const_smul]
+    exact MemLp.toLp_congr _ _ (Filter.EventuallyEq.of_eq
+      (partialD_const_smul (h.1.differentiable (by simp)) c i).symm)
+
+/-- The graph of the zero function is the zero vector. -/
+lemma testGraph_zero_fn : (IsTestFn.zero (Ω := Ω)).testGraph = 0 := by
+  apply PiLp.ext
+  intro j
+  rw [PiLp.zero_apply]
+  refine Fin.cases ?_ (fun i => ?_) j
+  · simp only [testGraph_zero, testCls, MemLp.toLp_zero]
+  · simp only [testGraph_succ, partialCls]
+    rw [MemLp.toLp_congr (IsTestFn.zero.memLp_partialD i) MemLp.zero
+        (Filter.EventuallyEq.of_eq (partialD_zero i)), MemLp.toLp_zero]
 
 end IsTestFn
 
@@ -170,6 +250,24 @@ lemma mem_W12_iff {Ω : Set (EuclideanSpace ℝ (Fin d))} (U : H1amb Ω) :
 /-- The set of test-function graphs over `Ω`. -/
 def testGraphSet (Ω : Set (EuclideanSpace ℝ (Fin d))) : Set (H1amb Ω) :=
   { U | ∃ (φ : EuclideanSpace ℝ (Fin d) → ℝ) (h : IsTestFn Ω φ), U = h.testGraph }
+
+/-- The test-function graphs already form a submodule: smooth compactly supported
+functions are closed under sums and scalar multiples, and the graph embedding is linear.
+This identifies `Submodule.span ℝ (testGraphSet Ω)` with `testGraphSet Ω` itself. -/
+def testGraphSubmodule (Ω : Set (EuclideanSpace ℝ (Fin d))) : Submodule ℝ (H1amb Ω) where
+  carrier := testGraphSet Ω
+  add_mem' := by
+    rintro _ _ ⟨φ, h, rfl⟩ ⟨ψ, h', rfl⟩
+    exact ⟨φ + ψ, h.add h', h.testGraph_add h'⟩
+  zero_mem' := ⟨0, IsTestFn.zero, IsTestFn.testGraph_zero_fn.symm⟩
+  smul_mem' := by
+    rintro c _ ⟨φ, h, rfl⟩
+    exact ⟨c • φ, h.const_smul c, h.testGraph_const_smul c⟩
+
+/-- The span of the test-function graphs equals the test-function graphs. -/
+lemma span_testGraphSet (Ω : Set (EuclideanSpace ℝ (Fin d))) :
+    Submodule.span ℝ (testGraphSet Ω) = testGraphSubmodule Ω :=
+  Submodule.span_eq (testGraphSubmodule Ω)
 
 /-- `H₀¹(Ω) = W₀^{1,2}(Ω)`: the closure of the smooth compactly supported functions
 inside the ambient `H¹` space. As a topological closure it is automatically a closed,
