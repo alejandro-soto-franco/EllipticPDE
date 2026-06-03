@@ -1,10 +1,14 @@
 import EllipticDirichlet.Sobolev.Basic
+import EllipticDirichlet.Sobolev.Coefficients
 import EllipticDirichlet.Poincare.OneDim
 import EllipticDirichlet.Poincare.Fubini
 import EllipticDirichlet.Poincare.Domain
 import EllipticDirichlet.Poincare.Density
+import EllipticDirichlet.Poincare.Geometry
 import EllipticDirichlet.BilinearForm
 import EllipticDirichlet.Existence
+import EllipticDirichlet.GeneralForm
+import EllipticDirichlet.Garding
 
 /-!
 # EllipticDirichlet
