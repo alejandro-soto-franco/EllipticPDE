@@ -10,6 +10,7 @@ import EllipticDirichlet.BilinearForm
 import EllipticDirichlet.Existence
 import EllipticDirichlet.GeneralForm
 import EllipticDirichlet.Garding
+import EllipticDirichlet.Fredholm
 
 /-!
 # EllipticDirichlet
