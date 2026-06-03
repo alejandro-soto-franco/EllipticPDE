@@ -1,6 +1,8 @@
 import Mathlib.Analysis.FunctionalSpaces.PoincareInequality
 import Mathlib.MeasureTheory.Integral.Prod
 import Mathlib.MeasureTheory.Integral.Bochner.Set
+import Mathlib.MeasureTheory.Constructions.Pi
+import Mathlib.Data.Fin.Tuple.Basic
 
 /-!
 # Per-coordinate-direction bound via Fubini (dependency-chain step 2)
@@ -130,5 +132,74 @@ theorem poincare_slice_box_fst
     exact h hΦ'2
   exact poincare_slice_box (Φ := fun q => Φ (Prod.swap q)) (Φ' := fun q => Φ' (Prod.swap q))
     hab hs (fun y x hx => hderiv y x hx) (fun y => hcont y) (fun y => hzero y) hΨ2 hΨ'2
+
+/-- **Per-direction Poincaré bound on a box in `Fin (n+1) → ℝ`.** Isolating
+coordinate `i`, the slice through any point `y` of the remaining coordinates,
+varying coordinate `i` over `[a i, b i]`, is `C¹` with derivative `u'` and
+vanishes at the left face `i`-th coordinate `= a i`. Then
+`∫_Ω u² ≤ (b i - a i)² / 2 * ∫_Ω (u')²` over the box `Ω = ∏ₖ (a k, b k)`.
+
+The box integral is transported through `MeasurableEquiv.piFinSuccAbove`, which
+isolates coordinate `i` as the first factor of `ℝ × (Fin n → ℝ)`, and the result
+follows from `poincare_slice_box_fst`. -/
+theorem poincare_box_dir {n : ℕ} (i : Fin (n + 1)) {a b : Fin (n + 1) → ℝ}
+    (hab : a i ≤ b i) {u u' : (Fin (n + 1) → ℝ) → ℝ}
+    (hderiv : ∀ y : Fin n → ℝ, ∀ t ∈ uIcc (a i) (b i),
+        HasDerivAt (fun s => u (i.insertNth s y)) (u' (i.insertNth t y)) t)
+    (hcont : ∀ y : Fin n → ℝ, ContinuousOn (fun s => u' (i.insertNth s y)) (uIcc (a i) (b i)))
+    (hzero : ∀ y : Fin n → ℝ, u (i.insertNth (a i) y) = 0)
+    (hu2 : IntegrableOn (fun x => (u x) ^ 2) (Set.univ.pi fun k => Ioo (a k) (b k)) volume)
+    (hu'2 : IntegrableOn (fun x => (u' x) ^ 2) (Set.univ.pi fun k => Ioo (a k) (b k)) volume) :
+    (∫ x in Set.univ.pi fun k => Ioo (a k) (b k), (u x) ^ 2)
+      ≤ (b i - a i) ^ 2 / 2 * ∫ x in Set.univ.pi fun k => Ioo (a k) (b k), (u' x) ^ 2 := by
+  classical
+  set box : Set (Fin (n + 1) → ℝ) := Set.univ.pi fun k => Ioo (a k) (b k) with hbox
+  set rest : Set (Fin n → ℝ) := Set.univ.pi fun j => Ioo (a (i.succAbove j)) (b (i.succAbove j))
+    with hrest
+  set e := MeasurableEquiv.piFinSuccAbove (fun _ : Fin (n + 1) => ℝ) i with he
+  set ν : Measure (Fin n → ℝ) := Measure.pi fun _ => (volume : Measure ℝ) with hν
+  have hmp : MeasurePreserving e (volume : Measure (Fin (n + 1) → ℝ)) (volume.prod ν) :=
+    volume_preserving_piFinSuccAbove (fun _ => ℝ) i
+  have hme : MeasurableEmbedding e := e.measurableEmbedding
+  have hsymm : ∀ (s : ℝ) (y : Fin n → ℝ), e.symm (s, y) = i.insertNth s y := by
+    intro s y; rw [he]; rfl
+  -- The image of the box under `e` is the slice box `(a i, b i) ×ˢ rest`.
+  have himg : e '' box = Ioo (a i) (b i) ×ˢ rest := by
+    rw [e.image_eq_preimage_symm]
+    ext p
+    obtain ⟨s, y⟩ := p
+    simp only [Set.mem_preimage, hsymm, hbox, hrest, Set.mem_pi, Set.mem_univ, true_implies,
+      Set.mem_prod]
+    rw [Fin.forall_iff_succAbove i, Fin.insertNth_apply_same]
+    simp only [Fin.insertNth_apply_succAbove]
+  -- Transport any integral over the box to the slice box.
+  have htr : ∀ F : (Fin (n + 1) → ℝ) → ℝ,
+      (∫ x in box, F x) = ∫ p in Ioo (a i) (b i) ×ˢ rest, F (e.symm p) ∂(volume.prod ν) := by
+    intro F
+    rw [← himg, hmp.setIntegral_image_emb hme (fun p => F (e.symm p)) box]
+    simp only [MeasurableEquiv.symm_apply_apply]
+  rw [htr (fun x => (u x) ^ 2), htr (fun x => (u' x) ^ 2)]
+  -- Integrability transfer through the same equivalence.
+  have hI2 : IntegrableOn (fun p => (u (e.symm p)) ^ 2)
+      (Ioo (a i) (b i) ×ˢ rest) (volume.prod ν) := by
+    rw [← himg, hmp.integrableOn_image hme]
+    have hfun : (fun p => (u (e.symm p)) ^ 2) ∘ ⇑e = fun x => (u x) ^ 2 := by
+      funext x; simp only [Function.comp_apply, MeasurableEquiv.symm_apply_apply]
+    rw [hfun]; exact hu2
+  have hI'2 : IntegrableOn (fun p => (u' (e.symm p)) ^ 2)
+      (Ioo (a i) (b i) ×ˢ rest) (volume.prod ν) := by
+    rw [← himg, hmp.integrableOn_image hme]
+    have hfun : (fun p => (u' (e.symm p)) ^ 2) ∘ ⇑e = fun x => (u' x) ^ 2 := by
+      funext x; simp only [Function.comp_apply, MeasurableEquiv.symm_apply_apply]
+    rw [hfun]; exact hu'2
+  -- The remaining-coordinate box is measurable.
+  have hrest_meas : MeasurableSet rest :=
+    MeasurableSet.univ_pi fun j => measurableSet_Ioo
+  exact poincare_slice_box_fst (Φ := fun p => u (e.symm p)) (Φ' := fun p => u' (e.symm p))
+    hab hrest_meas
+    (fun y t ht => by simp only [hsymm]; exact hderiv y t ht)
+    (fun y => by simp only [hsymm]; exact hcont y)
+    (fun y => by simp only [hsymm]; exact hzero y)
+    hI2 hI'2
 
 end EllipticDirichlet.Poincare
