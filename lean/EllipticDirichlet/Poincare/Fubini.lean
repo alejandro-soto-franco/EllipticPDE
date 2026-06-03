@@ -93,4 +93,42 @@ theorem poincare_slice_box
     _ = (b - a) ^ 2 / 2 * ∫ y in s, (∫ x in Ioo a b, (Φ' (y, x)) ^ 2) ∂ν :=
         MeasureTheory.integral_const_mul _ _
 
+/-- The per-direction Poincaré bound on a box `(a, b) ×ˢ B ⊆ ℝ × β`, with the
+Poincaré direction the **first** coordinate. This is `poincare_slice_box` with
+the two factors swapped; it lets either coordinate of a binary product be the
+distinguished Poincaré direction. -/
+theorem poincare_slice_box_fst
+    {β : Type*} [MeasurableSpace β] {ν : Measure β} [SFinite ν]
+    {a b : ℝ} (hab : a ≤ b) {s : Set β} (hs : MeasurableSet s) {Φ Φ' : ℝ × β → ℝ}
+    (hderiv : ∀ y, ∀ x ∈ uIcc a b, HasDerivAt (fun t => Φ (t, y)) (Φ' (x, y)) x)
+    (hcont : ∀ y, ContinuousOn (fun t => Φ' (t, y)) (uIcc a b))
+    (hzero : ∀ y, Φ (a, y) = 0)
+    (hΦ2 : IntegrableOn (fun p => (Φ p) ^ 2) (Ioo a b ×ˢ s) (volume.prod ν))
+    (hΦ'2 : IntegrableOn (fun p => (Φ' p) ^ 2) (Ioo a b ×ˢ s) (volume.prod ν)) :
+    (∫ p in Ioo a b ×ˢ s, (Φ p) ^ 2 ∂(volume.prod ν))
+      ≤ (b - a) ^ 2 / 2 * ∫ p in Ioo a b ×ˢ s, (Φ' p) ^ 2 ∂(volume.prod ν) := by
+  have hmp : MeasurePreserving (Prod.swap : β × ℝ → ℝ × β) (ν.prod volume) (volume.prod ν) :=
+    Measure.measurePreserving_swap
+  have hme : MeasurableEmbedding (Prod.swap : β × ℝ → ℝ × β) :=
+    MeasurableEquiv.prodComm.measurableEmbedding
+  -- Transport an integral over `(a,b) ×ˢ s` to one over `s ×ˢ (a,b)` by swapping.
+  have htr : ∀ F : ℝ × β → ℝ,
+      (∫ p in Ioo a b ×ˢ s, F p ∂(volume.prod ν))
+        = ∫ q in s ×ˢ Ioo a b, F (Prod.swap q) ∂(ν.prod volume) := by
+    intro F
+    rw [← Set.image_swap_prod s (Ioo a b)]
+    exact hmp.setIntegral_image_emb hme F (s ×ˢ Ioo a b)
+  rw [htr (fun p => (Φ p) ^ 2), htr (fun p => (Φ' p) ^ 2)]
+  -- Integrability of the swapped integrands.
+  have hΨ2 : IntegrableOn (fun q => (Φ (Prod.swap q)) ^ 2) (s ×ˢ Ioo a b) (ν.prod volume) := by
+    have h := (hmp.integrableOn_image hme (f := fun p => (Φ p) ^ 2) (s := s ×ˢ Ioo a b)).mp
+    rw [Set.image_swap_prod] at h
+    exact h hΦ2
+  have hΨ'2 : IntegrableOn (fun q => (Φ' (Prod.swap q)) ^ 2) (s ×ˢ Ioo a b) (ν.prod volume) := by
+    have h := (hmp.integrableOn_image hme (f := fun p => (Φ' p) ^ 2) (s := s ×ˢ Ioo a b)).mp
+    rw [Set.image_swap_prod] at h
+    exact h hΦ'2
+  exact poincare_slice_box (Φ := fun q => Φ (Prod.swap q)) (Φ' := fun q => Φ' (Prod.swap q))
+    hab hs (fun y x hx => hderiv y x hx) (fun y => hcont y) (fun y => hzero y) hΨ2 hΨ'2
+
 end EllipticDirichlet.Poincare
