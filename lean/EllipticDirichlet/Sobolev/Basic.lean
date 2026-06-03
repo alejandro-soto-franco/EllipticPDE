@@ -1,16 +1,227 @@
-import Mathlib
+import Mathlib.MeasureTheory.Function.L2Space
+import Mathlib.MeasureTheory.Function.LpSpace.Indicator
+import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
+import Mathlib.Analysis.InnerProductSpace.PiL2
+import Mathlib.Analysis.InnerProductSpace.Orthogonal
+import Mathlib.Analysis.InnerProductSpace.Subspace
+import Mathlib.Topology.UniformSpace.UniformEmbedding
+import Mathlib.Analysis.Calculus.LineDeriv.IntegrationByParts
 
 /-!
-# Sobolev interface
+# Sobolev interface (M4): H¹ / H₀¹ as concrete weak-derivative Hilbert spaces
 
-The `H¹ / H₀¹` interface this project needs: thin wrappers or re-exports over
-what Mathlib (`MeasureTheory.MemWlp`) and the De Giorgi-Nash-Moser Sobolev layer
-already provide. The exact delta is fixed by the audit
-(`docs/superpowers/notes/sobolev-poincare-audit.md`, milestone M1).
+We realise `W^{1,2}(Ω)` as the **graph of the weak-gradient operator** inside the
+Hilbert space `L²(Ω) × (L²(Ω))ᵈ` (encoded as `PiLp 2` over `Fin (d+1)`: coordinate `0`
+is the function, coordinate `i.succ` the `i`-th weak partial). The weak-gradient
+relation is orthogonality to a family of explicit "constraint vectors", so `W^{1,2}` is
+an orthogonal complement: closed, complete, and a real Hilbert space for free.
+
+See `docs/superpowers/notes/m4-m6-existence-strategy.md`.
 -/
+
+open MeasureTheory
+open scoped RealInnerProductSpace ENNReal
+
+noncomputable section
 
 namespace EllipticDirichlet.Sobolev
 
--- TODO(M1/M2): pin down the H₀¹ interface over Mathlib `MemWlp` after the audit.
+variable {d : ℕ}
+
+/-- The real `L²` space on a domain `Ω ⊆ ℝ^d` (restricted Lebesgue measure). -/
+abbrev L2D (Ω : Set (EuclideanSpace ℝ (Fin d))) : Type :=
+  Lp ℝ 2 (volume.restrict Ω)
+
+/-- Ambient Hilbert space for the graph encoding: a function value together with `d`
+gradient components, carrying the ℓ² (H¹) inner product. Coordinate `0` is the function;
+coordinate `i.succ` is the `i`-th weak partial derivative. -/
+abbrev H1amb (Ω : Set (EuclideanSpace ℝ (Fin d))) : Type :=
+  PiLp 2 (fun _ : Fin (d + 1) => L2D Ω)
+
+/-- Inner product of a single-coordinate vector against an ambient vector picks out the
+coordinate: `⟪single j a, U⟫ = ⟪a, U j⟫`. -/
+lemma inner_single_left {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    (j : Fin (d + 1)) (a : L2D Ω) (U : H1amb Ω) :
+    ⟪PiLp.single 2 j a, U⟫ = ⟪a, U j⟫ := by
+  rw [PiLp.inner_apply]
+  rw [Finset.sum_eq_single j]
+  · rw [PiLp.single_eq_same]
+  · intro b _ hb
+    rw [PiLp.single_eq_of_ne (p := 2) hb]
+    simp
+  · simp
+
+/-! ### Test functions and their `L²` classes -/
+
+/-- The `i`-th classical partial derivative of `φ` (a directional `fderiv`). -/
+def partialD (i : Fin d) (φ : EuclideanSpace ℝ (Fin d) → ℝ) :
+    EuclideanSpace ℝ (Fin d) → ℝ :=
+  fun x => (fderiv ℝ φ x) (EuclideanSpace.single i 1)
+
+/-- A smooth, compactly supported test function whose support sits inside `Ω`. -/
+def IsTestFn (Ω : Set (EuclideanSpace ℝ (Fin d))) (φ : EuclideanSpace ℝ (Fin d) → ℝ) :
+    Prop :=
+  ContDiff ℝ (⊤ : ℕ∞) φ ∧ HasCompactSupport φ ∧ tsupport φ ⊆ Ω
+
+namespace IsTestFn
+
+variable {Ω : Set (EuclideanSpace ℝ (Fin d))} {φ : EuclideanSpace ℝ (Fin d) → ℝ}
+
+lemma continuous (h : IsTestFn Ω φ) : Continuous φ := h.1.continuous
+
+lemma continuous_partialD (h : IsTestFn Ω φ) (i : Fin d) : Continuous (partialD i φ) :=
+  ((h.1.continuous_fderiv (by simp)).clm_apply continuous_const)
+
+lemma hasCompactSupport_partialD (h : IsTestFn Ω φ) (i : Fin d) :
+    HasCompactSupport (partialD i φ) := by
+  exact h.2.1.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single i 1)
+
+/-- A test function lies in `L²(Ω)`. -/
+lemma memLp (h : IsTestFn Ω φ) : MemLp φ 2 (volume.restrict Ω) :=
+  h.continuous.memLp_of_hasCompactSupport h.2.1
+
+/-- Each partial derivative of a test function lies in `L²(Ω)`. -/
+lemma memLp_partialD (h : IsTestFn Ω φ) (i : Fin d) :
+    MemLp (partialD i φ) 2 (volume.restrict Ω) :=
+  (h.continuous_partialD i).memLp_of_hasCompactSupport (h.hasCompactSupport_partialD i)
+
+/-- The `L²(Ω)` class of a test function. -/
+def testCls (h : IsTestFn Ω φ) : L2D Ω := h.memLp.toLp φ
+
+/-- The `L²(Ω)` class of the `i`-th partial derivative of a test function. -/
+def partialCls (h : IsTestFn Ω φ) (i : Fin d) : L2D Ω :=
+  (h.memLp_partialD i).toLp (partialD i φ)
+
+/-- Constraint vector: orthogonality to it expresses one instance of the weak-gradient
+relation `⟪U₀, [∂ᵢφ]⟫ + ⟪U_{i+1}, [φ]⟫ = 0` (coordinate `0` is the function, coordinate
+`i.succ` the `i`-th weak partial). -/
+def constraintVec (h : IsTestFn Ω φ) (i : Fin d) : H1amb Ω :=
+  PiLp.single 2 0 (h.partialCls i) + PiLp.single 2 i.succ h.testCls
+
+/-- Pairing a constraint vector against `U` extracts the weak-gradient relation. -/
+lemma inner_constraintVec (h : IsTestFn Ω φ) (i : Fin d) (U : H1amb Ω) :
+    ⟪h.constraintVec i, U⟫ = ⟪h.partialCls i, U 0⟫ + ⟪h.testCls, U i.succ⟫ := by
+  rw [constraintVec, inner_add_left, inner_single_left, inner_single_left]
+
+/-- A test function embedded as its graph `(φ, ∇φ)` in the ambient space: coordinate `0`
+is the function, coordinate `i.succ` its `i`-th classical (= weak) partial. -/
+def testGraph (h : IsTestFn Ω φ) : H1amb Ω :=
+  WithLp.toLp 2 (Fin.cons h.testCls (fun i => h.partialCls i))
+
+@[simp] lemma testGraph_zero (h : IsTestFn Ω φ) : h.testGraph 0 = h.testCls := by
+  rw [testGraph, PiLp.toLp_apply, Fin.cons_zero]
+
+@[simp] lemma testGraph_succ (h : IsTestFn Ω φ) (i : Fin d) :
+    h.testGraph i.succ = h.partialCls i := by
+  rw [testGraph, PiLp.toLp_apply, Fin.cons_succ]
+
+end IsTestFn
+
+/-- The real `L²(Ω)` inner product of two `MemLp.toLp` classes is the integral of the
+product over `Ω`. -/
+lemma inner_toLp_eq {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    {f g : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hf : MemLp f 2 (volume.restrict Ω)) (hg : MemLp g 2 (volume.restrict Ω)) :
+    ⟪hf.toLp f, hg.toLp g⟫ = ∫ x in Ω, f x * g x := by
+  rw [L2.inner_def]
+  refine integral_congr_ae ?_
+  filter_upwards [hf.coeFn_toLp, hg.coeFn_toLp] with a ha hb
+  rw [Real.inner_apply, ha, hb]
+
+/-! ### The weak-gradient graph space `W^{1,2}(Ω)` -/
+
+/-- The set of all constraint vectors over `Ω`. -/
+def constraintSet (Ω : Set (EuclideanSpace ℝ (Fin d))) : Set (H1amb Ω) :=
+  { w | ∃ (φ : EuclideanSpace ℝ (Fin d) → ℝ) (h : IsTestFn Ω φ) (i : Fin d),
+      w = h.constraintVec i }
+
+/-- `W^{1,2}(Ω)`: functions paired with their weak `L²` gradient, realised as the
+orthogonal complement of the constraint vectors inside the ambient Hilbert space. As an
+orthogonal complement it is automatically a closed, complete, real Hilbert space. -/
+def W12 (Ω : Set (EuclideanSpace ℝ (Fin d))) : Submodule ℝ (H1amb Ω) :=
+  (Submodule.span ℝ (constraintSet Ω))ᗮ
+
+instance instCompleteSpaceW12 (Ω : Set (EuclideanSpace ℝ (Fin d))) :
+    CompleteSpace (W12 Ω) :=
+  inferInstanceAs (CompleteSpace (Submodule.span ℝ (constraintSet Ω))ᗮ)
+
+/-- Membership in `W^{1,2}(Ω)` is exactly the weak-gradient relation tested against every
+test function: `⟪U₀, [∂ᵢφ]⟫ + ⟪U_{i+1}, [φ]⟫ = 0`. This is what makes an element of `W12`
+a genuine function (`U 0`) together with its weak `L²` gradient (`U ∘ Fin.succ`). -/
+lemma mem_W12_iff {Ω : Set (EuclideanSpace ℝ (Fin d))} (U : H1amb Ω) :
+    U ∈ W12 Ω ↔ ∀ (φ : EuclideanSpace ℝ (Fin d) → ℝ) (h : IsTestFn Ω φ) (i : Fin d),
+      ⟪h.partialCls i, U 0⟫ + ⟪h.testCls, U i.succ⟫ = 0 := by
+  rw [W12, Submodule.mem_orthogonal]
+  constructor
+  · intro hU φ h i
+    have hmem := hU (h.constraintVec i) (Submodule.subset_span ⟨φ, h, i, rfl⟩)
+    rwa [h.inner_constraintVec] at hmem
+  · intro hU u hu
+    induction hu using Submodule.span_induction with
+    | mem x hx =>
+        obtain ⟨φ, h, i, rfl⟩ := hx
+        rw [h.inner_constraintVec]; exact hU φ h i
+    | zero => simp
+    | add x y _ _ ihx ihy => rw [inner_add_left, ihx, ihy, add_zero]
+    | smul c x _ ih => rw [inner_smul_left]; simp [ih]
+
+/-! ### H₀¹(Ω): the closure of the test functions -/
+
+/-- The set of test-function graphs over `Ω`. -/
+def testGraphSet (Ω : Set (EuclideanSpace ℝ (Fin d))) : Set (H1amb Ω) :=
+  { U | ∃ (φ : EuclideanSpace ℝ (Fin d) → ℝ) (h : IsTestFn Ω φ), U = h.testGraph }
+
+/-- `H₀¹(Ω) = W₀^{1,2}(Ω)`: the closure of the smooth compactly supported functions
+inside the ambient `H¹` space. As a topological closure it is automatically a closed,
+complete, real Hilbert space. -/
+def H01 (Ω : Set (EuclideanSpace ℝ (Fin d))) : Submodule ℝ (H1amb Ω) :=
+  (Submodule.span ℝ (testGraphSet Ω)).topologicalClosure
+
+instance instCompleteSpaceH01 (Ω : Set (EuclideanSpace ℝ (Fin d))) :
+    CompleteSpace (H01 Ω) :=
+  inferInstanceAs (CompleteSpace (Submodule.span ℝ (testGraphSet Ω)).topologicalClosure)
+
+/-- Integrability of a product where one factor is a continuous compactly supported map. -/
+private lemma integrable_mul_of_compactSupport
+    {u w : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hu : Continuous u) (hw : Continuous w) (hws : HasCompactSupport w) :
+    Integrable (fun x => u x * w x) volume :=
+  (hu.mul hw).integrable_of_hasCompactSupport (hws.mul_left)
+
+/-- **The classical gradient of a test function is a weak gradient.** Hence every test
+function's graph lies in `W^{1,2}(Ω)`. This is the integration-by-parts step (no boundary
+term, by compact support). -/
+lemma testGraph_mem_W12 {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ) :
+    h.testGraph ∈ W12 Ω := by
+  rw [mem_W12_iff]
+  intro ψ g i
+  simp only [IsTestFn.testGraph_zero, IsTestFn.testGraph_succ,
+    IsTestFn.partialCls, IsTestFn.testCls]
+  rw [inner_toLp_eq, inner_toLp_eq]
+  -- Pass from `∫ … in Ω` to `∫ … ` over the whole space (both integrands vanish off `Ω`).
+  rw [setIntegral_eq_integral_of_forall_compl_eq_zero (fun x hx => by
+        rw [image_eq_zero_of_notMem_tsupport (fun hc => hx (h.2.2 hc)), mul_zero]),
+      setIntegral_eq_integral_of_forall_compl_eq_zero (fun x hx => by
+        rw [image_eq_zero_of_notMem_tsupport (fun hc => hx (g.2.2 hc)), zero_mul])]
+  -- Integration by parts: `∫ ψ · ∂ᵢφ = - ∫ ∂ᵢψ · φ`, so the two terms cancel.
+  simp only [partialD]
+  rw [integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable
+        (integrable_mul_of_compactSupport (g.continuous_partialD i) h.continuous h.2.1)
+        (integrable_mul_of_compactSupport g.continuous (h.continuous_partialD i)
+          (h.hasCompactSupport_partialD i))
+        (integrable_mul_of_compactSupport g.continuous h.continuous h.2.1)
+        (fun x _ => (g.1.differentiable (by simp)).differentiableAt)
+        (fun x _ => (h.1.differentiable (by simp)).differentiableAt)]
+  rw [add_neg_cancel]
+
+/-- `H₀¹(Ω) ⊆ W^{1,2}(Ω)`: every element of `H₀¹` is genuinely a function with a weak
+`L²` gradient. -/
+lemma H01_le_W12 (Ω : Set (EuclideanSpace ℝ (Fin d))) : H01 Ω ≤ W12 Ω := by
+  apply Submodule.topologicalClosure_minimal
+  · rw [Submodule.span_le]
+    rintro U ⟨φ, h, rfl⟩
+    exact testGraph_mem_W12 h
+  · exact (Submodule.span ℝ (constraintSet Ω)).isClosed_orthogonal
 
 end EllipticDirichlet.Sobolev
