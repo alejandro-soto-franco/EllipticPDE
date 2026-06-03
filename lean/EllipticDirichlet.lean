@@ -5,6 +5,7 @@ import EllipticDirichlet.Poincare.Fubini
 import EllipticDirichlet.Poincare.Domain
 import EllipticDirichlet.Poincare.Density
 import EllipticDirichlet.Poincare.Geometry
+import EllipticDirichlet.Poincare.BoxSlice
 import EllipticDirichlet.BilinearForm
 import EllipticDirichlet.Existence
 import EllipticDirichlet.GeneralForm

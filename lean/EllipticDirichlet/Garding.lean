@@ -299,6 +299,61 @@ theorem weak_solution (Ω : Set (EuclideanSpace ℝ (Fin d))) {μ : ℝ}
     refine ext_inner_right (𝕜 := ℝ) (fun w => ?_)
     rw [hco.continuousLinearEquivOfBilin_apply, hu w, ← hgrep w]
 
+/-! ### The transport-free, nonnegative-zeroth coercive case (Guo §VII.3.5) -/
+
+/-- **The lower-order form is nonnegative** when the transport field vanishes (`b ≡ 0`) and
+the zeroth coefficient is nonnegative (`c ≥ 0`): the transport terms `⟪bᵢ ∂ᵢu, u₀⟫` are zero
+and `⟪c u₀, u₀⟫ = ∫_Ω c u₀² ≥ 0`. -/
+lemma lowerBilin_self_nonneg (Ω : Set (EuclideanSpace ℝ (Fin d)))
+    (hb : ∀ x i, Op.b x i = 0) (hc : ∀ x, 0 ≤ Op.c x) (U : H01 Ω) :
+    0 ≤ Op.lowerBilin Ω U U := by
+  rw [Op.lowerBilin_apply]
+  have htrans : (∑ i : Fin d, ⟪Op.bAct i ((U : H1amb Ω) i.succ), ((U : H1amb Ω) 0)⟫) = 0 := by
+    refine Finset.sum_eq_zero (fun i _ => ?_)
+    simp only [FullEllipticOp.bAct]
+    rw [inner_mulCoeffL_eq]
+    simp only [hb, zero_mul, integral_zero]
+  rw [htrans, zero_add]
+  simp only [FullEllipticOp.cAct]
+  rw [inner_mulCoeffL_eq]
+  refine integral_nonneg (fun x => ?_)
+  simp only [Pi.zero_apply]
+  nlinarith [hc x, sq_nonneg ((U : H1amb Ω) 0 x)]
+
+/-- **Coercivity for the transport-free, nonnegative-zeroth case** (Guo §VII.3.5). If the
+transport field vanishes (`b ≡ 0`) and the zeroth coefficient is nonnegative (`c ≥ 0`), the
+full divergence form `B = B_A + c` is coercive on `H₀¹(Ω)` *without a spectral shift*: the
+zeroth term only helps, ellipticity controls the gradient, and the Poincaré inequality lifts
+that to the full `H¹` norm (the `γ = 0` Gårding case, with constant `λ / (C_P + 1)`). -/
+theorem fullBilin_coercive_of_nonneg_zeroth (Ω : Set (EuclideanSpace ℝ (Fin d)))
+    (hb : ∀ x i, Op.b x i = 0) (hc : ∀ x, 0 ≤ Op.c x) (CP : ℝ) (hCP : 0 ≤ CP)
+    (hbase : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ),
+      ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2) :
+    IsCoercive (Op.fullBilin Ω) := by
+  have hpos : (0 : ℝ) < CP + 1 := by linarith
+  have hne : (CP : ℝ) + 1 ≠ 0 := hpos.ne'
+  refine ⟨Op.lam / (CP + 1), div_pos Op.lam_pos hpos, ?_⟩
+  intro U
+  set S : ℝ := ∑ i : Fin d, ‖(U : H1amb Ω) i.succ‖ ^ 2 with hS
+  have hA : Op.lam * S ≤ Op.toEllipticCoeff.bilin Ω U U := Op.toEllipticCoeff.bilin_self_ge U
+  have hlow : 0 ≤ Op.lowerBilin Ω U U := Op.lowerBilin_self_nonneg Ω hb hc U
+  have hBUU : Op.lam * S ≤ Op.fullBilin Ω U U := by
+    rw [Op.fullBilin_apply]; linarith
+  have hnorm : ‖U‖ ^ 2 = ‖(U : H1amb Ω) 0‖ ^ 2 + S := by
+    rw [show ‖U‖ = ‖(U : H1amb Ω)‖ from rfl, PiLp.norm_sq_eq_of_L2, Fin.sum_univ_succ]
+  have hpoin : ‖(U : H1amb Ω) 0‖ ^ 2 ≤ CP * S :=
+    EllipticDirichlet.Poincare.poincare_H01 CP hbase U.2
+  have hSnonneg : 0 ≤ S := Finset.sum_nonneg (fun i _ => sq_nonneg _)
+  have hkey : ‖U‖ * ‖U‖ ≤ (CP + 1) * S := by
+    have : ‖U‖ ^ 2 ≤ (CP + 1) * S := by rw [hnorm]; nlinarith [hpoin]
+    nlinarith [this]
+  rw [mul_assoc]
+  calc Op.lam / (CP + 1) * (‖U‖ * ‖U‖)
+      ≤ Op.lam / (CP + 1) * ((CP + 1) * S) :=
+        mul_le_mul_of_nonneg_left hkey (div_pos Op.lam_pos hpos).le
+    _ = Op.lam * S := by field_simp
+    _ ≤ Op.fullBilin Ω U U := hBUU
+
 end FullEllipticOp
 
 end EllipticDirichlet.Sobolev
