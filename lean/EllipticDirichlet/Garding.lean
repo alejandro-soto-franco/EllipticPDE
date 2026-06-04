@@ -354,6 +354,30 @@ theorem fullBilin_coercive_of_nonneg_zeroth (Ω : Set (EuclideanSpace ℝ (Fin d
     _ = Op.lam * S := by field_simp
     _ ≤ Op.fullBilin Ω U U := hBUU
 
+/-- **Existence and uniqueness for the transport-free, nonnegative-zeroth operator**
+(Guo §VII.3.4). With `b ≡ 0`, `c ≥ 0`, and the test-function Poincaré bound, the full
+divergence form `B = B_A + c` is coercive with no spectral shift, so Lax-Milgram yields, for
+every continuous functional `f` on `H₀¹(Ω)`, a unique weak solution `u` of `Lu = f`. This is
+the existence theorem for `Lu = -Dⱼ(aᵢⱼ Dᵢu) + cu` with general uniformly elliptic `A`. -/
+theorem weak_solution_of_nonneg_zeroth (Ω : Set (EuclideanSpace ℝ (Fin d)))
+    (hb : ∀ x i, Op.b x i = 0) (hc : ∀ x, 0 ≤ Op.c x) (CP : ℝ) (hCP : 0 ≤ CP)
+    (hbase : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ),
+      ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2)
+    (f : H01 Ω →L[ℝ] ℝ) :
+    ∃! u : H01 Ω, ∀ v : H01 Ω, Op.fullBilin Ω u v = f v := by
+  have hco : IsCoercive (Op.fullBilin Ω) :=
+    Op.fullBilin_coercive_of_nonneg_zeroth Ω hb hc CP hCP hbase
+  set g : H01 Ω := (InnerProductSpace.toDual ℝ (H01 Ω)).symm f with hg
+  have hgrep : ∀ w : H01 Ω, ⟪g, w⟫ = f w := fun w => InnerProductSpace.toDual_symm_apply
+  refine ⟨hco.continuousLinearEquivOfBilin.symm g, ?_, ?_⟩
+  · intro v
+    rw [← hco.continuousLinearEquivOfBilin_apply, ContinuousLinearEquiv.apply_symm_apply, hgrep]
+  · intro u hu
+    apply hco.continuousLinearEquivOfBilin.injective
+    rw [ContinuousLinearEquiv.apply_symm_apply]
+    refine ext_inner_right (𝕜 := ℝ) (fun w => ?_)
+    rw [hco.continuousLinearEquivOfBilin_apply, hu w, ← hgrep w]
+
 end FullEllipticOp
 
 end EllipticDirichlet.Sobolev
