@@ -7,6 +7,7 @@
 //! this geometry.
 
 use crate::constants::BoxDomain;
+use crate::rng::SplitMix64;
 use cartan_dec::mesh::FlatMesh;
 
 /// A uniform triangulation of the rectangle `(0, Lx) x (0, Ly)` with `n`
@@ -57,6 +58,58 @@ impl BoxMesh {
     /// The unit square `(0, 1)^2` with `n` divisions per side.
     pub fn unit_square(n: usize) -> Self {
         Self::rectangle(1.0, 1.0, n)
+    }
+
+    /// A grid on `(0, Lx) x (0, Ly)` whose interior vertices are randomly
+    /// displaced by up to `jitter_frac` of the cell size in each axis; boundary
+    /// vertices stay fixed so the domain shape and the Dirichlet condition are
+    /// preserved. Used to build a mesh ensemble for error bars on the otherwise
+    /// deterministic finite-element quantities.
+    pub fn rectangle_jittered(
+        lx: f64,
+        ly: f64,
+        n: usize,
+        jitter_frac: f64,
+        rng: &mut SplitMix64,
+    ) -> Self {
+        assert!(n >= 1, "mesh needs at least one division");
+        assert!(lx > 0.0 && ly > 0.0, "side lengths must be positive");
+        assert!(
+            (0.0..0.5).contains(&jitter_frac),
+            "jitter must stay below half a cell"
+        );
+        let (amp_x, amp_y) = (jitter_frac * lx / n as f64, jitter_frac * ly / n as f64);
+        let mut vertices: Vec<[f64; 2]> = Vec::with_capacity((n + 1) * (n + 1));
+        let mut boundary: Vec<bool> = Vec::with_capacity((n + 1) * (n + 1));
+        for j in 0..=n {
+            for i in 0..=n {
+                let on_bd = i == 0 || i == n || j == 0 || j == n;
+                let mut x = i as f64 / n as f64 * lx;
+                let mut y = j as f64 / n as f64 * ly;
+                if !on_bd {
+                    x += amp_x * rng.next_signed();
+                    y += amp_y * rng.next_signed();
+                }
+                vertices.push([x, y]);
+                boundary.push(on_bd);
+            }
+        }
+        let idx = |i: usize, j: usize| j * (n + 1) + i;
+        let mut triangles: Vec<[usize; 3]> = Vec::with_capacity(2 * n * n);
+        for j in 0..n {
+            for i in 0..n {
+                let (v00, v10, v01, v11) =
+                    (idx(i, j), idx(i + 1, j), idx(i, j + 1), idx(i + 1, j + 1));
+                triangles.push([v00, v10, v01]);
+                triangles.push([v10, v11, v01]);
+            }
+        }
+        Self {
+            mesh: FlatMesh::from_triangles(vertices, triangles),
+            sides: [lx, ly],
+            n,
+            boundary,
+        }
     }
 
     /// Number of vertices `(n+1)^2`.

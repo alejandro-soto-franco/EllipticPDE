@@ -15,5 +15,7 @@ pub mod assemble;
 pub mod constants;
 pub mod convergence;
 pub mod eig;
+pub mod ensemble;
 pub mod mesh;
+pub mod rng;
 pub mod verify;

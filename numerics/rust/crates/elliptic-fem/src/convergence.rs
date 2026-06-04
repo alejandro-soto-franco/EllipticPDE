@@ -86,9 +86,11 @@ pub struct Convergence {
     pub rate: f64,
 }
 
-/// Run the manufactured-solution convergence study on the unit square over the
-/// given refinement levels `ns` (divisions per side).
-pub fn unit_square_study(ns: &[usize]) -> Convergence {
+/// The `H^1` seminorm error of the P1 solution of the manufactured problem
+/// `u = sin(pi x) sin(pi y)` (with `f = 2 pi^2 u`) on a given mesh of the unit
+/// square. Works on any mesh whose boundary lies on the square, including the
+/// jittered ensemble meshes.
+pub fn manufactured_h1_error(mesh: &BoxMesh) -> f64 {
     let u_exact = |x: [f64; 2]| (PI * x[0]).sin() * (PI * x[1]).sin();
     let grad_u = |x: [f64; 2]| {
         [
@@ -97,14 +99,19 @@ pub fn unit_square_study(ns: &[usize]) -> Convergence {
         ]
     };
     let f = move |x: [f64; 2]| 2.0 * PI * PI * u_exact(x);
+    let u_h = solve_dirichlet(mesh, f);
+    h1_seminorm_error(mesh, &u_h, grad_u)
+}
 
+/// Run the manufactured-solution convergence study on the unit square over the
+/// given refinement levels `ns` (divisions per side).
+pub fn unit_square_study(ns: &[usize]) -> Convergence {
     let mut samples = Vec::new();
     for &n in ns {
         let mesh = BoxMesh::unit_square(n);
-        let u_h = solve_dirichlet(&mesh, f);
         samples.push(Sample {
             h: mesh.h(),
-            error: h1_seminorm_error(&mesh, &u_h, grad_u),
+            error: manufactured_h1_error(&mesh),
         });
     }
     let rate = fit_rate(&samples);
