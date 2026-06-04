@@ -6,7 +6,7 @@ import Mathlib.Analysis.Normed.Operator.Compact.Basic
 # The Rellich-Kondrachov reduction: from the compact embedding to a compact `opK`
 
 The Fredholm alternative of `Fredholm.lean` is conditioned on the abstract hypothesis
-`IsCompactOperator (opK)`. Here we trace that hypothesis to its single canonical analytic
+`IsCompactOperator (opK)`. Here we trace that hypothesis to its single analytic
 source: the **Rellich-Kondrachov compact embedding** `H₀¹(Ω) ↪ L²(Ω)`, encoded as the
 coordinate-`0` map `embL2 Ω : H₀¹(Ω) →L[ℝ] L²(Ω)`.
 
@@ -17,7 +17,7 @@ coordinate-`0` map `embL2 Ω : H₀¹(Ω) →L[ℝ] L²(Ω)`.
 * `opT_isCompact` / `opK_isCompact`: given `IsCompactOperator (embL2 Ω)`, both `opT` and
   `opK = γ·opE⁻¹·opT` are compact, by composing the compact embedding with bounded operators.
 * `fredholm_alternative_rellich` / `fredholm_unique_imp_exists_rellich`: the Fredholm theorems
-  re-stated to take the single canonical hypothesis `IsCompactOperator (embL2 Ω)` in place of
+  re-stated to take the single hypothesis `IsCompactOperator (embL2 Ω)` in place of
   the opaque operator-level `IsCompactOperator (opK)`. The compact embedding for bounded `Ω` is
   the one analytic input (Rellich-Kondrachov), threaded as a hypothesis exactly as the Poincaré
   geometry input was, and deliberately not discharged here.
@@ -69,7 +69,7 @@ lemma opK_isCompact (hRellich : IsCompactOperator (embL2 Ω)) :
   have hT : IsCompactOperator (FullEllipticOp.opT Ω) := opT_isCompact Ω hRellich
   exact (hT.clm_comp ((Op.opE Ω).symm : H01 Ω →L[ℝ] H01 Ω)).smul Op.gardingγ
 
-/-- **The Fredholm alternative on the canonical Rellich hypothesis** (Guo §VII.4). Identical to
+/-- **The Fredholm alternative on the Rellich embedding hypothesis** (Guo §VII.4). Identical to
 `fredholm_alternative`, but conditioned on the single analytic input `IsCompactOperator (embL2 Ω)`
 (the Rellich-Kondrachov compact embedding for bounded `Ω`) rather than the opaque
 `IsCompactOperator (opK)`: either `Lu = 0` has a nontrivial weak solution, or `Lu = f` has a
@@ -79,7 +79,7 @@ theorem fredholm_alternative_rellich (hRellich : IsCompactOperator (embL2 Ω)) :
       ∨ (∀ f : H01 Ω →L[ℝ] ℝ, ∃! u : H01 Ω, ∀ v : H01 Ω, Op.fullBilin Ω u v = f v) :=
   Op.fredholm_alternative Ω (Op.opK_isCompact Ω hRellich)
 
-/-- **Fredholm corollary on the canonical Rellich hypothesis**: if the homogeneous problem
+/-- **Fredholm corollary on the Rellich embedding hypothesis**: if the homogeneous problem
 `Lu = 0` has only the trivial weak solution, then `Lu = f` has a unique weak solution for every
 `f`, assuming the Rellich-Kondrachov compact embedding. -/
 theorem fredholm_unique_imp_exists_rellich (hRellich : IsCompactOperator (embL2 Ω))
