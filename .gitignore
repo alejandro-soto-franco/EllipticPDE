@@ -32,3 +32,10 @@ __pycache__/
 
 # Stray Meridian export tempfiles (lean-sync writes these into the project)
 /lean/meridian-dump-*.ttl
+
+# Stratum local workspace state (the citation library is global at ~/.stratum;
+# cite drift/status auto-discover this project without it). Render-layout dirs too.
+/latex/.stratum/
+/latex/latex/
+/latex/summaries/
+/latex/literature/
