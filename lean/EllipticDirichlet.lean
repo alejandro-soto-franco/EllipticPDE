@@ -13,6 +13,7 @@ import EllipticDirichlet.Garding
 import EllipticDirichlet.Fredholm
 import EllipticDirichlet.Compactness
 import EllipticDirichlet.Spectrum
+import EllipticDirichlet.RellichDischarge
 
 /-!
 # EllipticDirichlet
