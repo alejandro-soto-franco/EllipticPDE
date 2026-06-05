@@ -1,7 +1,6 @@
 # Lean
 /lean/.lake
 /lean/.lake/
-/lean/lake-manifest.json
 
 # Rust
 /numerics/rust/target

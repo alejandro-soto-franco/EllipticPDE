@@ -8,19 +8,22 @@ pp.unicode.fun = true
 relaxedAutoImplicit = false
 weak.linter.mathlibStandardSet = true
 
-# Shared mathlib worktree (toolchain v4.31.0-rc1, tracks upstream/stable). Build
-# artifacts live at ~/mathlib4-fork-stable/.lake and are reused across every
-# downstream Lean project on this toolchain, so no multi-GB rebuild here.
+# Personal mathlib fork (toolchain v4.31.0-rc1, tracks upstream/stable plus the
+# project's own additions, including the Frechet-Kolmogorov / Rellich engine). A
+# git require so CI and remote clones can resolve it; the fork adds only a few
+# files on top of upstream, so `lake exe cache get` still hits the
+# content-addressed upstream cache for every unchanged module.
 [[require]]
 name = "mathlib"
-path = "../../mathlib4-fork-stable"
+git = "https://github.com/alejandro-soto-franco/mathlib4.git"
+rev = "16a297f1108035c3a8174d68b052f92a991ea7bf"
 
-# Meridian (dev/analysis dependency): enables `stratum cite lean-sync` to export
-# this project's environment into the bridge oxigraph store for SPARQL
-# traversal. Shares the same mathlib worktree, so no second mathlib instance.
+# `Meridian` is required so this project can be ingested by
+# `stratum cite lean-sync` (RDF Turtle dump of the Lean Environment).
 [[require]]
 name = "Meridian"
-path = "../../Meridian"
+git = "https://github.com/alejandro-soto-franco/Meridian.git"
+rev = "062e48db13f4b9a21249ec63222ae2adeaad9124"
 
 [[lean_lib]]
 name = "EllipticDirichlet"
