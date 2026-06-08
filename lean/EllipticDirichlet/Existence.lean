@@ -1,4 +1,5 @@
 import EllipticDirichlet.BilinearForm
+import EllipticDirichlet.Poincare.BoxSlice
 
 /-!
 # Existence and uniqueness via Lax-Milgram (dependency-chain step 6)
@@ -49,6 +50,33 @@ theorem dirichlet_weak_solution
     rw [← hco.continuousLinearEquivOfBilin_apply, ContinuousLinearEquiv.apply_symm_apply, hgrep]
   · -- uniqueness: any solution `u` has `⟪equiv u, w⟫ = f w = ⟪g, w⟫`, so `equiv u = g`.
     intro u hu
+    apply hco.continuousLinearEquivOfBilin.injective
+    rw [ContinuousLinearEquiv.apply_symm_apply]
+    refine ext_inner_right (𝕜 := ℝ) (fun w => ?_)
+    rw [hco.continuousLinearEquivOfBilin_apply, hu w, ← hgrep w]
+
+/-- **Unconditional existence and uniqueness on an open coordinate box.** Specialising
+`dirichlet_weak_solution` to the box `∏ₖ (aₖ, bₖ)`, the test-function Poincaré hypothesis is
+discharged from the box geometry by `Poincare.dirichletBilin_coercive_euclBox`, which rests on the
+one-dimensional/Fubini bound `Poincare.poincare_box_dir`. So for every continuous functional `f`
+on `H₀¹` of the box there is a unique weak solution of `B[u, v] = f v`, carrying no abstract
+Poincaré input. This is the box instance of Theorem `thm: main`. -/
+theorem dirichlet_weak_solution_euclBox {n : ℕ} (a b : Fin (n + 1) → ℝ)
+    (hab : ∀ k, a k ≤ b k) (C : ℝ) (hC : ∀ i, (b i - a i) ^ 2 / 2 ≤ C)
+    (f : H01 (euclBox a b) →L[ℝ] ℝ) :
+    ∃! u : H01 (euclBox a b),
+      ∀ v : H01 (euclBox a b), dirichletBilin (euclBox a b) u v = f v := by
+  have hco : IsCoercive (dirichletBilin (euclBox a b)) :=
+    dirichletBilin_coercive_euclBox a b hab C hC
+  have hgrep : ∀ w : H01 (euclBox a b),
+      ⟪(InnerProductSpace.toDual ℝ (H01 (euclBox a b))).symm f, w⟫ = f w :=
+    fun w => InnerProductSpace.toDual_symm_apply
+  set g : H01 (euclBox a b) :=
+    (InnerProductSpace.toDual ℝ (H01 (euclBox a b))).symm f with hg
+  refine ⟨hco.continuousLinearEquivOfBilin.symm g, ?_, ?_⟩
+  · intro v
+    rw [← hco.continuousLinearEquivOfBilin_apply, ContinuousLinearEquiv.apply_symm_apply, hgrep]
+  · intro u hu
     apply hco.continuousLinearEquivOfBilin.injective
     rw [ContinuousLinearEquiv.apply_symm_apply]
     refine ext_inner_right (𝕜 := ℝ) (fun w => ?_)
