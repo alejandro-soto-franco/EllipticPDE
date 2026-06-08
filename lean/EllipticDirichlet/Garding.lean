@@ -1,4 +1,5 @@
 import EllipticDirichlet.GeneralForm
+import EllipticDirichlet.Poincare.BoxSlice
 
 /-!
 # Transport, zeroth-order term, the Gårding inequality, and shifted existence
@@ -377,6 +378,32 @@ theorem weak_solution_of_nonneg_zeroth (Ω : Set (EuclideanSpace ℝ (Fin d)))
     rw [ContinuousLinearEquiv.apply_symm_apply]
     refine ext_inner_right (𝕜 := ℝ) (fun w => ?_)
     rw [hco.continuousLinearEquivOfBilin_apply, hu w, ← hgrep w]
+
+/-- **Unconditional existence and uniqueness on an open box, general uniformly elliptic operator.**
+The box specialisation of `weak_solution_of_nonneg_zeroth`: on the coordinate box `∏ₖ (aₖ, bₖ)`,
+with `b ≡ 0` and `c ≥ 0`, the test-function Poincaré hypothesis is discharged from the box
+geometry. The per-direction slice bound `Poincare.slice_bound_euclBox` (which rests on
+`Poincare.poincare_box_dir`) is averaged by `Poincare.poincare_testfn` into the graph-coordinate
+bound, so for every continuous functional `f` on `H₀¹` of the box there is a unique weak solution
+of `Lu = -Dⱼ(aᵢⱼ Dᵢu) + cu = f`, with no abstract Poincaré input. This is Theorem `thm: main`. -/
+theorem weak_solution_of_nonneg_zeroth_euclBox {n : ℕ} (Op : FullEllipticOp (n + 1))
+    (a b : Fin (n + 1) → ℝ) (hab : ∀ k, a k ≤ b k) (C : ℝ) (hC : ∀ i, (b i - a i) ^ 2 / 2 ≤ C)
+    (hb : ∀ x i, Op.b x i = 0) (hc : ∀ x, 0 ≤ Op.c x)
+    (f : H01 (Poincare.euclBox a b) →L[ℝ] ℝ) :
+    ∃! u : H01 (Poincare.euclBox a b),
+      ∀ v : H01 (Poincare.euclBox a b), Op.fullBilin (Poincare.euclBox a b) u v = f v := by
+  have hCnonneg : 0 ≤ C := le_trans (by positivity) (hC 0)
+  have hslice : ∀ {φ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ}
+      (h : IsTestFn (Poincare.euclBox a b) φ) (i : Fin (n + 1)),
+      ∫ x in Poincare.euclBox a b, (φ x) ^ 2
+        ≤ C * ∫ x in Poincare.euclBox a b, (partialD i φ x) ^ 2 := by
+    intro φ h i
+    exact le_trans (Poincare.slice_bound_euclBox a b hab h i)
+      (mul_le_mul_of_nonneg_right (hC i) (integral_nonneg fun x => sq_nonneg _))
+  refine Op.weak_solution_of_nonneg_zeroth (Poincare.euclBox a b) hb hc _ ?_
+    (fun {_φ} h => Poincare.poincare_testfn (Nat.succ_pos n) C
+      (fun {_ψ} h' i => hslice h' i) h) f
+  exact div_nonneg hCnonneg (by positivity)
 
 end FullEllipticOp
 
