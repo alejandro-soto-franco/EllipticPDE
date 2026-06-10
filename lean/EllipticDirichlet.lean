@@ -6,6 +6,7 @@ import EllipticDirichlet.Poincare.Domain
 import EllipticDirichlet.Poincare.Density
 import EllipticDirichlet.Poincare.Geometry
 import EllipticDirichlet.Poincare.BoxSlice
+import EllipticDirichlet.Poincare.BoundedDomain
 import EllipticDirichlet.BilinearForm
 import EllipticDirichlet.Hneg
 import EllipticDirichlet.Existence
