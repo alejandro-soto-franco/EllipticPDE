@@ -158,7 +158,7 @@ theorem isClosed_range_one_sub (hK : IsCompactOperator K) :
       have hn0 : (1 - K : E →L[ℝ] E) n = 0 := by
         rw [hN, LinearMap.mem_ker, ContinuousLinearMap.coe_coe] at hn
         exact hn
-      show (1 - K : E →L[ℝ] E) m = (1 - K : E →L[ℝ] E) (n + m)
+      change (1 - K : E →L[ℝ] E) m = (1 - K : E →L[ℝ] E) (n + m)
       rw [map_add, hn0, zero_add]
     · rintro ⟨m, rfl⟩
       exact ⟨(m : E), rfl⟩
@@ -180,6 +180,261 @@ lemma range_eq_orthogonal_ker_adjoint (A : E →L[ℝ] E)
   refine (IsClosed.submodule_topologicalClosure_eq ?_).symm
   rw [LinearMap.coe_range]
   exact hA
+
+/-- **Schauder's theorem** on a real Hilbert space: the adjoint of a compact operator
+is compact. The Hilbert-space proof:
+`‖K†x - K†y‖² = ⟪x - y, KK†(x - y)⟫ ≤ ‖x - y‖ ‖KK†x - KK†y‖`, so an `ε²/8`-net for
+the relatively compact image `KK†(B)` of the unit ball pulls back to an `ε`-net for
+`K†(B)`, making `K†(B)` totally bounded. -/
+theorem isCompactOperator_adjoint (hK : IsCompactOperator K) :
+    IsCompactOperator (ContinuousLinearMap.adjoint K) := by
+  classical
+  set Kd : E →L[ℝ] E := ContinuousLinearMap.adjoint K with hKddef
+  -- the composition `K ∘ K†` is compact
+  have hKKd : IsCompactOperator (K.comp Kd).toLinearMap := hK.comp_clm Kd
+  -- the image of the unit ball under `K†` is totally bounded
+  have key : TotallyBounded (Kd '' Metric.ball 0 1) := by
+    rw [Metric.totallyBounded_iff]
+    intro ε hε
+    set δ : ℝ := ε ^ 2 / 8 with hδdef
+    have hδ : 0 < δ := by positivity
+    -- a `δ`-net for `KK†(B)` from compactness
+    have htbKK : TotallyBounded ((K.comp Kd).toLinearMap '' Metric.ball 0 1) :=
+      (hKKd.isCompact_closure_image_ball 1).totallyBounded.subset subset_closure
+    rw [Metric.totallyBounded_iff] at htbKK
+    obtain ⟨t, htfin, htcover⟩ := htbKK δ hδ
+    -- choose a representative preimage for each useful net centre
+    set pick : E → E := fun c =>
+      if h : ∃ x, x ∈ Metric.ball (0 : E) 1 ∧ (K.comp Kd) x ∈ Metric.ball c δ
+      then h.choose else 0 with hpickdef
+    refine ⟨(fun c => Kd (pick c)) '' t, htfin.image _, ?_⟩
+    rintro w ⟨x, hx, rfl⟩
+    have hKx : (K.comp Kd).toLinearMap x ∈ ⋃ c ∈ t, Metric.ball c δ :=
+      htcover ⟨x, hx, rfl⟩
+    rw [Set.mem_iUnion₂] at hKx
+    obtain ⟨c, hct, hcball⟩ := hKx
+    have hex : ∃ x', x' ∈ Metric.ball (0 : E) 1 ∧ (K.comp Kd) x' ∈ Metric.ball c δ :=
+      ⟨x, hx, hcball⟩
+    have hpc : pick c ∈ Metric.ball (0 : E) 1 ∧ (K.comp Kd) (pick c) ∈ Metric.ball c δ := by
+      rw [hpickdef]
+      simp only [dif_pos hex]
+      exact hex.choose_spec
+    rw [Set.mem_iUnion₂]
+    refine ⟨Kd (pick c), ⟨c, hct, rfl⟩, ?_⟩
+    rw [Metric.mem_ball, dist_eq_norm]
+    -- the inner-product estimate
+    set z : E := x - pick c with hzdef
+    have hsq : ‖Kd x - Kd (pick c)‖ ^ 2
+        ≤ ‖z‖ * ‖(K.comp Kd) x - (K.comp Kd) (pick c)‖ := by
+      have h1 : ‖Kd x - Kd (pick c)‖ ^ 2 = ⟪z, (K.comp Kd) z⟫ := by
+        rw [← map_sub, ← real_inner_self_eq_norm_sq]
+        rw [show (K.comp Kd) z = K (Kd z) from rfl]
+        exact ContinuousLinearMap.adjoint_inner_left K (Kd z) z
+      have h2 : ⟪z, (K.comp Kd) z⟫ ≤ ‖z‖ * ‖(K.comp Kd) z‖ := real_inner_le_norm _ _
+      have h3 : (K.comp Kd) z = (K.comp Kd) x - (K.comp Kd) (pick c) := map_sub _ _ _
+      rw [h1, ← h3]
+      exact h2
+    have hz2 : ‖z‖ ≤ 2 := by
+      calc ‖z‖ ≤ ‖x‖ + ‖pick c‖ := norm_sub_le _ _
+        _ ≤ 1 + 1 := add_le_add (mem_ball_zero_iff.mp hx).le (mem_ball_zero_iff.mp hpc.1).le
+        _ = 2 := by norm_num
+    have hKK2 : ‖(K.comp Kd) x - (K.comp Kd) (pick c)‖ < 2 * δ := by
+      calc ‖(K.comp Kd) x - (K.comp Kd) (pick c)‖
+          ≤ dist ((K.comp Kd) x) c + dist c ((K.comp Kd) (pick c)) := by
+            rw [← dist_eq_norm]
+            exact dist_triangle _ _ _
+        _ < δ + δ := add_lt_add (Metric.mem_ball.mp hcball)
+            (by rw [dist_comm]; exact Metric.mem_ball.mp hpc.2)
+        _ = 2 * δ := by ring
+    -- conclude `‖K†x - K†(pick c)‖ < ε`
+    have hfinal : ‖Kd x - Kd (pick c)‖ ^ 2 < ε ^ 2 := by
+      have hb : ‖z‖ * ‖(K.comp Kd) x - (K.comp Kd) (pick c)‖ ≤ 2 * (2 * δ) := by
+        have hnn : (0 : ℝ) ≤ ‖(K.comp Kd) x - (K.comp Kd) (pick c)‖ := norm_nonneg _
+        nlinarith [hz2, hKK2.le, hnn, norm_nonneg z]
+      have : ‖Kd x - Kd (pick c)‖ ^ 2 ≤ 2 * (2 * δ) := le_trans hsq hb
+      have hδε : 2 * (2 * δ) < ε ^ 2 := by
+        rw [hδdef]; nlinarith [hε]
+      linarith
+    exact lt_of_pow_lt_pow_left₀ 2 hε.le hfinal
+  -- totally bounded + complete codomain: the closure is compact
+  have hcompact : IsCompact (closure (Kd.toLinearMap '' Metric.ball 0 1)) :=
+    key.closure.isCompact_of_isComplete isClosed_closure.isComplete
+  exact (isCompactOperator_iff_isCompact_closure_image_ball
+    Kd.toLinearMap one_pos).mpr hcompact
+
+/-- The adjoint of `1 - K` is `1 - K†`. -/
+lemma adjoint_one_sub (K : E →L[ℝ] E) :
+    ContinuousLinearMap.adjoint (1 - K : E →L[ℝ] E)
+      = 1 - ContinuousLinearMap.adjoint K := by
+  rw [map_sub, ContinuousLinearMap.adjoint_one]
+
+/-- **The two kernels have equal (finite) dimension** -- one inequality. If
+`dim ker(1-K) < dim ker(1-K†)` then an injective, non-surjective linear map
+`Λ : ker(1-K) → ker(1-K†)` composed with the orthogonal projection gives a finite-rank
+perturbation `S = K + Λ∘P` with `1 - S` injective; the Fredholm alternative makes
+`1 - S` surjective, yet nothing outside `range Λ` is attained -- a contradiction
+(Brezis Thm 6.6 adapted to the Hilbert setting). -/
+theorem finrank_ker_one_sub_adjoint_le (hK : IsCompactOperator K) :
+    Module.finrank ℝ
+      (LinearMap.ker ((1 - ContinuousLinearMap.adjoint K : E →L[ℝ] E)).toLinearMap)
+      ≤ Module.finrank ℝ (LinearMap.ker ((1 - K : E →L[ℝ] E)).toLinearMap) := by
+  set N := LinearMap.ker ((1 - K : E →L[ℝ] E)).toLinearMap with hN
+  set Nstar := LinearMap.ker
+    ((1 - ContinuousLinearMap.adjoint K : E →L[ℝ] E)).toLinearMap with hNstar
+  haveI hNfin : FiniteDimensional ℝ N := finiteDimensional_ker_one_sub hK
+  haveI hNstarfin : FiniteDimensional ℝ Nstar :=
+    finiteDimensional_ker_one_sub (isCompactOperator_adjoint hK)
+  by_contra hcon
+  push Not at hcon
+  -- an injective, non-surjective linear map `N → N*`
+  have hrank : Module.rank ℝ N < Module.rank ℝ Nstar := by
+    rw [← Module.finrank_eq_rank ℝ N, ← Module.finrank_eq_rank ℝ Nstar]
+    exact_mod_cast hcon
+  obtain ⟨Λ, hΛinj⟩ := Module.Free.exists_linearMap_injective_of_rank_lt hrank
+  have hΛrange : LinearMap.range Λ ≠ ⊤ := by
+    intro htop
+    have h1 : Module.finrank ℝ (LinearMap.range Λ) ≤ Module.finrank ℝ N :=
+      LinearMap.finrank_range_le Λ
+    rw [htop, finrank_top] at h1
+    exact absurd (lt_of_lt_of_le hcon h1) (lt_irrefl _)
+  obtain ⟨ystar, hystar⟩ : ∃ y : Nstar, y ∉ LinearMap.range Λ := by
+    by_contra hall
+    push Not at hall
+    exact hΛrange (Submodule.eq_top_iff'.mpr hall)
+  -- the finite-rank perturbation `Φ = incl ∘ Λ ∘ P`
+  set Φ : E →L[ℝ] E :=
+    Nstar.subtypeL.comp
+      ((LinearMap.toContinuousLinearMap Λ).comp N.orthogonalProjection) with hΦdef
+  have hΦmem : ∀ u : E, Φ u ∈ Nstar := fun u => SetLike.coe_mem _
+  have hΦcompact : IsCompactOperator Φ := by
+    have hg : IsCompactOperator
+        ((LinearMap.toContinuousLinearMap Λ).comp N.orthogonalProjection) :=
+      isCompactOperator_of_locallyCompactSpace_dom _
+    exact hg.clm_comp Nstar.subtypeL
+  set S : E →L[ℝ] E := K + Φ with hSdef
+  have hScompact : IsCompactOperator S := hK.add hΦcompact
+  -- the range identity for `1 - K`
+  have hrangeNstar : LinearMap.range ((1 - K : E →L[ℝ] E)).toLinearMap = Nstarᗮ := by
+    rw [hNstar, ← adjoint_one_sub K]
+    exact range_eq_orthogonal_ker_adjoint _ (isClosed_range_one_sub hK)
+  -- `1 - S` is injective
+  have hSker : ∀ u : E, (1 - S) u = 0 → u = 0 := by
+    intro u hu
+    have hsplit : (1 - K : E →L[ℝ] E) u = Φ u := by
+      have h1 : (1 - S) u = (1 - K : E →L[ℝ] E) u - Φ u := by
+        simp only [hSdef, ContinuousLinearMap.sub_apply, ContinuousLinearMap.one_apply,
+          ContinuousLinearMap.add_apply]
+        abel
+      rw [h1, sub_eq_zero] at hu
+      exact hu
+    -- the common value lies in `Nstar ⊓ Nstarᗮ = ⊥`
+    have hmem1 : (1 - K : E →L[ℝ] E) u ∈ Nstarᗮ := by
+      rw [← hrangeNstar]
+      exact ⟨u, rfl⟩
+    have hmem2 : (1 - K : E →L[ℝ] E) u ∈ Nstar := hsplit ▸ hΦmem u
+    have hzero : (1 - K : E →L[ℝ] E) u = 0 := (Submodule.mem_bot ℝ).mp
+      (Nstar.orthogonal_disjoint.le_bot (Submodule.mem_inf.mpr ⟨hmem2, hmem1⟩))
+    -- hence `u ∈ N` and `Φ u = 0`, so `Λ (P u) = 0`, so `P u = 0`, so `u = 0`
+    have huN : u ∈ N := by
+      rw [hN, LinearMap.mem_ker, ContinuousLinearMap.coe_coe]
+      exact hzero
+    have hΦzero : Φ u = 0 := by rw [← hsplit, hzero]
+    have hΛzero : Λ (N.orthogonalProjection u) = 0 := by
+      have : (↑(Λ (N.orthogonalProjection u)) : E) = 0 := hΦzero
+      exact_mod_cast this
+    have hPzero : N.orthogonalProjection u = 0 := by
+      apply hΛinj
+      rw [hΛzero, map_zero]
+    have hPu : (↑(N.orthogonalProjection u) : E) = u := by
+      rw [← Submodule.starProjection_apply]
+      exact N.starProjection_eq_self_iff.mpr huN
+    rw [← hPu, hPzero, Submodule.coe_zero]
+  -- the Fredholm alternative makes `1 - S` surjective
+  have hnoteig : ¬ Module.End.HasEigenvalue (S : Module.End ℝ E) 1 := by
+    rw [Module.End.hasEigenvalue_iff]
+    intro hne
+    apply hne
+    rw [← ker_one_sub_eq_eigenspace S, Submodule.eq_bot_iff]
+    intro u hu
+    rw [LinearMap.mem_ker, ContinuousLinearMap.coe_coe] at hu
+    exact hSker u hu
+  have hsurj : Function.Surjective (1 - S : E →L[ℝ] E) := by
+    rcases hScompact.hasEigenvalue_or_mem_resolventSet (μ := (1 : ℝ)) one_ne_zero with
+      he | hr
+    · exact absurd he hnoteig
+    · have hunit : IsUnit ((1 : E →L[ℝ] E) - S) := by
+        have h := spectrum.mem_resolventSet_iff.mp hr
+        rwa [map_one] at h
+      exact (ContinuousLinearMap.isUnit_iff_bijective.mp hunit).2
+  -- yet nothing outside `range Λ` is attained: contradiction
+  obtain ⟨u, hu⟩ := hsurj (↑ystar : E)
+  have hsplit : (1 - K : E →L[ℝ] E) u = ↑ystar + Φ u := by
+    have h1 : (1 - S) u = (1 - K : E →L[ℝ] E) u - Φ u := by
+      simp only [hSdef, ContinuousLinearMap.sub_apply, ContinuousLinearMap.one_apply,
+        ContinuousLinearMap.add_apply]
+      abel
+    rw [h1] at hu
+    exact sub_eq_iff_eq_add.mp hu
+  have hmem1' : (1 - K : E →L[ℝ] E) u ∈ Nstarᗮ := by
+    rw [← hrangeNstar]
+    exact ⟨u, rfl⟩
+  have hmem2' : (1 - K : E →L[ℝ] E) u ∈ Nstar := by
+    rw [hsplit]
+    exact Nstar.add_mem (SetLike.coe_mem ystar) (hΦmem u)
+  have hzero : (1 - K : E →L[ℝ] E) u = 0 := (Submodule.mem_bot ℝ).mp
+    (Nstar.orthogonal_disjoint.le_bot (Submodule.mem_inf.mpr ⟨hmem2', hmem1'⟩))
+  have hy : (↑ystar : E) = -(Φ u) := by
+    have h2 := hsplit
+    rw [hzero] at h2
+    exact add_eq_zero_iff_eq_neg.mp h2.symm
+  have hΦu : Φ u = ↑(Λ (N.orthogonalProjection u)) := by
+    simp only [hΦdef, ContinuousLinearMap.comp_apply, Submodule.subtypeL_apply,
+      LinearMap.coe_toContinuousLinearMap']
+  have hyrange : ystar ∈ LinearMap.range Λ := by
+    refine ⟨-(N.orthogonalProjection u), ?_⟩
+    refine Subtype.coe_injective ?_
+    rw [map_neg]
+    simp only [Submodule.coe_neg]
+    rw [← hΦu, ← hy]
+  exact hystar hyrange
+
+/-- **`dim ker(1 - K) = dim ker(1 - K†)`** for a compact operator on a real Hilbert
+space (Guo Thm VII.4.4): the index of `1 - K` is zero. Both inequalities are
+`finrank_ker_one_sub_adjoint_le`, the reverse one applied to `K†` through Schauder's
+theorem and `K†† = K`. -/
+theorem finrank_ker_one_sub_adjoint_eq (hK : IsCompactOperator K) :
+    Module.finrank ℝ
+      (LinearMap.ker ((1 - ContinuousLinearMap.adjoint K : E →L[ℝ] E)).toLinearMap)
+      = Module.finrank ℝ (LinearMap.ker ((1 - K : E →L[ℝ] E)).toLinearMap) := by
+  refine le_antisymm (finrank_ker_one_sub_adjoint_le hK) ?_
+  have h := finrank_ker_one_sub_adjoint_le (isCompactOperator_adjoint hK)
+  rwa [ContinuousLinearMap.adjoint_adjoint] at h
+
+/-- The adjoint of (the underlying map of) a continuous linear equivalence is
+bijective: the adjoint of the inverse is a two-sided inverse. -/
+lemma bijective_adjoint_of_equiv (e : E ≃L[ℝ] E) :
+    Function.Bijective (ContinuousLinearMap.adjoint (e : E →L[ℝ] E)) := by
+  have h1 : (ContinuousLinearMap.adjoint (e : E →L[ℝ] E)).comp
+      (ContinuousLinearMap.adjoint (e.symm : E →L[ℝ] E)) = 1 := by
+    rw [← ContinuousLinearMap.adjoint_comp]
+    have hcomp : (e.symm : E →L[ℝ] E).comp (e : E →L[ℝ] E) = 1 := by
+      ext x
+      simp
+    rw [hcomp, ContinuousLinearMap.adjoint_one]
+  have h2 : (ContinuousLinearMap.adjoint (e.symm : E →L[ℝ] E)).comp
+      (ContinuousLinearMap.adjoint (e : E →L[ℝ] E)) = 1 := by
+    rw [← ContinuousLinearMap.adjoint_comp]
+    have hcomp : (e : E →L[ℝ] E).comp (e.symm : E →L[ℝ] E) = 1 := by
+      ext x
+      simp
+    rw [hcomp, ContinuousLinearMap.adjoint_one]
+  have hl : Function.LeftInverse (ContinuousLinearMap.adjoint (e.symm : E →L[ℝ] E))
+      (ContinuousLinearMap.adjoint (e : E →L[ℝ] E)) := fun x => by
+    rw [← ContinuousLinearMap.comp_apply, h2, ContinuousLinearMap.one_apply]
+  have hr : Function.RightInverse (ContinuousLinearMap.adjoint (e.symm : E →L[ℝ] E))
+      (ContinuousLinearMap.adjoint (e : E →L[ℝ] E)) := fun x => by
+    rw [← ContinuousLinearMap.comp_apply, h1, ContinuousLinearMap.one_apply]
+  exact ⟨hl.injective, hr.surjective⟩
 
 end RieszTheory
 
@@ -294,7 +549,7 @@ theorem solvable_iff_orthogonal_solSpaceStar (hK : IsCompactOperator (Op.opK Ω)
     constructor
     · rintro ⟨u, hu⟩
       refine ⟨u, ?_⟩
-      show Op.opA Ω u = g
+      change Op.opA Ω u = g
       refine ext_inner_right (𝕜 := ℝ) (fun v => ?_)
       rw [Op.inner_opA Ω u v, hu v, hgrep v]
     · rintro ⟨u, hu⟩
@@ -309,6 +564,58 @@ theorem solvable_iff_orthogonal_solSpaceStar (hK : IsCompactOperator (Op.opK Ω)
   · intro h w hw
     rw [real_inner_comm, hgrep w]
     exact h w hw
+
+set_option maxHeartbeats 1600000 in
+/-- **`dim N = dim N*` for the elliptic problem (Guo Thm VII.4.4).** The space of weak
+solutions of the homogeneous problem and the space of weak solutions of the transpose
+problem have the same (finite) dimension. The factorisation `opA = opE ∘ (1 - opK)`
+carries `solSpaceStar = ker(opA†)` onto `ker(1 - opK†)` along the bijection `(opE)†`,
+and the abstract index theorem `finrank_ker_one_sub_adjoint_eq` applies. -/
+theorem finrank_solSpaceStar_eq_finrank_solSpace (hK : IsCompactOperator (Op.opK Ω)) :
+    Module.finrank ℝ (Op.solSpaceStar Ω) = Module.finrank ℝ (Op.solSpace Ω) := by
+  set T : H01 Ω →L[ℝ] H01 Ω :=
+    ContinuousLinearMap.adjoint (Op.opE Ω : H01 Ω →L[ℝ] H01 Ω) with hTdef
+  set Q := LinearMap.ker ((1 - ContinuousLinearMap.adjoint (Op.opK Ω) :
+    H01 Ω →L[ℝ] H01 Ω)).toLinearMap with hQdef
+  -- `opA† = (1 - opK†) ∘ T`, then pointwise
+  have hadj : ContinuousLinearMap.adjoint (Op.opA Ω)
+      = ((1 : H01 Ω →L[ℝ] H01 Ω) - ContinuousLinearMap.adjoint (Op.opK Ω)).comp T := by
+    rw [Op.opA_factor Ω, ContinuousLinearMap.adjoint_comp, adjoint_one_sub]
+  have hadjpt : ∀ u : H01 Ω, ContinuousLinearMap.adjoint (Op.opA Ω) u
+      = ((1 : H01 Ω →L[ℝ] H01 Ω) - ContinuousLinearMap.adjoint (Op.opK Ω)) (T u) := by
+    intro u
+    rw [hadj, ContinuousLinearMap.comp_apply]
+  have hTbij : Function.Bijective T := bijective_adjoint_of_equiv (Op.opE Ω)
+  -- `T` restricts to a linear equivalence `solSpaceStar ≃ ker(1 - opK†)`
+  have hrestrict : ∀ u : H01 Ω, u ∈ Op.solSpaceStar Ω → T u ∈ Q := by
+    intro u hu
+    rw [solSpaceStar, LinearMap.mem_ker, ContinuousLinearMap.coe_coe] at hu
+    rw [hQdef, LinearMap.mem_ker, ContinuousLinearMap.coe_coe, ← hadjpt u]
+    exact hu
+  set Trest : Op.solSpaceStar Ω →ₗ[ℝ] Q := T.toLinearMap.restrict hrestrict with hTrest
+  have hinj : Function.Injective Trest := by
+    intro a b hab
+    apply Subtype.coe_injective
+    apply hTbij.1
+    have h := congrArg (Subtype.val) hab
+    simpa [hTrest, LinearMap.coe_restrict_apply] using h
+  have hsurj : Function.Surjective Trest := by
+    intro w
+    obtain ⟨u, hu⟩ := hTbij.2 (↑w : H01 Ω)
+    have humem : u ∈ Op.solSpaceStar Ω := by
+      rw [solSpaceStar, LinearMap.mem_ker, ContinuousLinearMap.coe_coe, hadjpt u, hu]
+      have hw : ((1 - ContinuousLinearMap.adjoint (Op.opK Ω) : H01 Ω →L[ℝ] H01 Ω))
+          (↑w : H01 Ω) = 0 := LinearMap.mem_ker.mp w.2
+      exact hw
+    refine ⟨⟨u, humem⟩, ?_⟩
+    apply Subtype.coe_injective
+    simpa [hTrest, LinearMap.coe_restrict_apply] using hu
+  have heq : Module.finrank ℝ (Op.solSpaceStar Ω) = Module.finrank ℝ Q :=
+    (LinearEquiv.ofBijective Trest ⟨hinj, hsurj⟩).finrank_eq
+  have hNs : LinearMap.ker ((1 - Op.opK Ω : H01 Ω →L[ℝ] H01 Ω)).toLinearMap
+      = Op.solSpace Ω := by
+    rw [ker_one_sub_eq_eigenspace, ← Op.solSpace_eq_eigenspace Ω]
+  rw [heq, hQdef, finrank_ker_one_sub_adjoint_eq hK, hNs]
 
 end FullEllipticOp
 
