@@ -63,7 +63,7 @@ theorem exists_pos_bound_on_orthogonal_ker (hK : IsCompactOperator K) :
       c * ‖x‖ ≤ ‖(1 - K : E →L[ℝ] E) x‖ := by
   set N := LinearMap.ker ((1 - K : E →L[ℝ] E)).toLinearMap with hN
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   have hseq : ∀ n : ℕ, ∃ x : E,
       x ∈ Nᗮ ∧ ‖x‖ = 1 ∧ ‖(1 - K : E →L[ℝ] E) x‖ < 1 / (n + 1) := by
     intro n
@@ -165,6 +165,22 @@ theorem isClosed_range_one_sub (hK : IsCompactOperator K) :
   rw [hrange]
   exact hTclosed
 
+/-- A closed-range operator on a real Hilbert space has range exactly the orthogonal
+complement of the kernel of its adjoint: `range A = (ker A†)ᗮ`. With
+`isClosed_range_one_sub` this yields the solvability half of the Fredholm
+alternative. -/
+lemma range_eq_orthogonal_ker_adjoint (A : E →L[ℝ] E)
+    (hA : IsClosed (Set.range A)) :
+    LinearMap.range A.toLinearMap
+      = (LinearMap.ker (ContinuousLinearMap.adjoint A).toLinearMap)ᗮ := by
+  have h1 : (LinearMap.range A.toLinearMap)ᗮ
+      = LinearMap.ker (ContinuousLinearMap.adjoint A).toLinearMap :=
+    ContinuousLinearMap.orthogonal_range A
+  rw [← h1, Submodule.orthogonal_orthogonal_eq_closure]
+  refine (IsClosed.submodule_topologicalClosure_eq ?_).symm
+  rw [LinearMap.coe_range]
+  exact hA
+
 end RieszTheory
 
 variable {d : ℕ}
@@ -237,6 +253,62 @@ theorem isClosed_range_opA (hK : IsCompactOperator (Op.opK Ω)) :
     rfl
   rw [h2]
   exact (Op.opE Ω).toHomeomorph.isClosedMap _ h1
+
+/-- The **adjoint solution space** `N*`: the kernel of the Hilbert adjoint of `opA`,
+which is exactly the space of weak solutions of the **transpose problem**
+`B[v, u] = 0` for all `v` (Guo Remark VII.4.6: the adjoint problem is the transpose
+form, with no differentiability demanded of the coefficients). -/
+def solSpaceStar : Submodule ℝ (H01 Ω) :=
+  LinearMap.ker (ContinuousLinearMap.adjoint (Op.opA Ω)).toLinearMap
+
+/-- Membership in `solSpaceStar` is exactly being a weak solution of the transpose
+problem: `B[v, u] = 0` against every `v ∈ H₀¹(Ω)`. -/
+lemma mem_solSpaceStar_iff (u : H01 Ω) :
+    u ∈ Op.solSpaceStar Ω ↔ ∀ v : H01 Ω, Op.fullBilin Ω v u = 0 := by
+  rw [solSpaceStar, LinearMap.mem_ker, ContinuousLinearMap.coe_coe]
+  constructor
+  · intro hu v
+    rw [← Op.inner_opA Ω v u, ← ContinuousLinearMap.adjoint_inner_right, hu,
+      inner_zero_right]
+  · intro hu
+    refine ext_inner_right (𝕜 := ℝ) (fun v => ?_)
+    rw [ContinuousLinearMap.adjoint_inner_left, inner_zero_left, real_inner_comm,
+      Op.inner_opA Ω v u]
+    exact hu v
+
+/-- **Solvability criterion (Guo Thm VII.4.7, solvability part).** Under the
+Rellich-Kondrachov input, the weak problem `Lu = f` is solvable exactly when `f`
+annihilates the adjoint solution space: `∃u ∀v, B[u, v] = f(v)` iff `f(w) = 0` for
+every weak solution `w` of the transpose problem `B[v, w] = 0`. The proof is closed
+range (`isClosed_range_opA`) plus the Hilbert-space duality
+`range A = (ker A†)ᗮ`. -/
+theorem solvable_iff_orthogonal_solSpaceStar (hK : IsCompactOperator (Op.opK Ω))
+    (f : H01 Ω →L[ℝ] ℝ) :
+    (∃ u : H01 Ω, ∀ v : H01 Ω, Op.fullBilin Ω u v = f v)
+      ↔ ∀ w ∈ Op.solSpaceStar Ω, f w = 0 := by
+  set g : H01 Ω := (InnerProductSpace.toDual ℝ (H01 Ω)).symm f with hg
+  have hgrep : ∀ v : H01 Ω, ⟪g, v⟫ = f v := fun v => InnerProductSpace.toDual_symm_apply
+  have hiff : (∃ u : H01 Ω, ∀ v : H01 Ω, Op.fullBilin Ω u v = f v)
+      ↔ g ∈ LinearMap.range (Op.opA Ω).toLinearMap := by
+    rw [LinearMap.mem_range]
+    constructor
+    · rintro ⟨u, hu⟩
+      refine ⟨u, ?_⟩
+      show Op.opA Ω u = g
+      refine ext_inner_right (𝕜 := ℝ) (fun v => ?_)
+      rw [Op.inner_opA Ω u v, hu v, hgrep v]
+    · rintro ⟨u, hu⟩
+      have hu' : Op.opA Ω u = g := hu
+      exact ⟨u, fun v => by rw [← Op.inner_opA Ω u v, hu', hgrep v]⟩
+  rw [hiff, range_eq_orthogonal_ker_adjoint _ (Op.isClosed_range_opA Ω hK),
+    Submodule.mem_orthogonal]
+  constructor
+  · intro h w hw
+    rw [← hgrep w, real_inner_comm]
+    exact h w hw
+  · intro h w hw
+    rw [real_inner_comm, hgrep w]
+    exact h w hw
 
 end FullEllipticOp
 
