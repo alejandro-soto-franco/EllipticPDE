@@ -17,7 +17,6 @@ as the closure of the test-function graphs.
 -/
 
 open MeasureTheory Set
-open scoped RealInnerProductSpace
 
 noncomputable section
 
@@ -110,7 +109,7 @@ theorem exists_euclBox_superset {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))}
     ∃ (a b : Fin (n + 1) → ℝ) (L : ℝ), (∀ k, a k ≤ b k) ∧ Ω ⊆ euclBox a b
       ∧ ∀ i, b i - a i ≤ L := by
   obtain ⟨R, hR⟩ := hΩb.subset_closedBall 0
-  set M : ℝ := max R 0 + 1 with hM
+  set M : ℝ := max R 0 + 1
   have hM0 : 0 < M := by
     have : (0 : ℝ) ≤ max R 0 := le_max_right R 0
     linarith
