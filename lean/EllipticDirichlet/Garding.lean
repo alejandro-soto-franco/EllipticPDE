@@ -488,9 +488,15 @@ theorem weak_solution_L2_of_nonneg_zeroth_euclBox {n : ℕ} (Op : FullEllipticOp
     div_nonneg (by linarith) Op.lam_pos.le
   exact mul_le_mul_of_nonneg_left (norm_l2Functional_le _ f) hK
 
-/-- Existence, uniqueness, and the a-priori bound for `Lu = -Dⱼ(aᵢⱼ Dᵢu) + cu`, `c ≥ 0`,
-on ANY domain inside a coordinate box: the Poincaré input is discharged from the box
-geometry of a superset. -/
+/-- **Existence, uniqueness, and the a-priori bound on any domain inside a coordinate
+box, `H⁻¹` right-hand side.** For the uniformly elliptic operator
+`Lu = -Dⱼ(aᵢⱼ Dᵢu) + cu` with `c ≥ 0` on a domain `Ω` contained in the open box
+`∏ₖ (aₖ, bₖ)`, the test-function Poincaré hypothesis is discharged by
+[`Poincare.testfn_bound_of_subset_euclBox`] from the geometry of the bounding box, with
+side contributions `(bᵢ - aᵢ)² / 2 ≤ C`. Every continuous functional `f` on `H₀¹(Ω)`
+admits a unique weak solution, obeying the Lax-Milgram estimate with coercivity
+constant `α = λ / (C / (n + 1) + 1)`. The `L²` instance is
+[`weak_solution_L2_of_nonneg_zeroth_of_subset_euclBox`]. -/
 theorem weak_solution_of_nonneg_zeroth_of_subset_euclBox {n : ℕ}
     (Op : FullEllipticOp (n + 1)) {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))}
     (a b : Fin (n + 1) → ℝ) (hab : ∀ k, a k ≤ b k) (hsub : Ω ⊆ Poincare.euclBox a b)
@@ -511,7 +517,11 @@ theorem weak_solution_of_nonneg_zeroth_of_subset_euclBox {n : ℕ}
     fun u hu =>
       Op.weak_solution_of_nonneg_zeroth_bound Ω hb hc _ hCP hbase hu⟩
 
-/-- The `L²` right-hand-side instance on any domain inside a coordinate box. -/
+/-- **The `L²` right-hand-side instance on any domain inside a coordinate box.** For
+`f ∈ L²(Ω)` entering through the pairing `⟨f, v⟩ = ∫_Ω f · v₀` ([`l2Functional`]), the
+weak problem has a unique solution with `‖u‖_{H₀¹} ≤ α⁻¹ ‖f‖_{L²}`,
+`α = λ / (C / (n + 1) + 1)`. Derived from
+[`weak_solution_of_nonneg_zeroth_of_subset_euclBox`]. -/
 theorem weak_solution_L2_of_nonneg_zeroth_of_subset_euclBox {n : ℕ}
     (Op : FullEllipticOp (n + 1)) {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))}
     (a b : Fin (n + 1) → ℝ) (hab : ∀ k, a k ≤ b k) (hsub : Ω ⊆ Poincare.euclBox a b)
@@ -563,6 +573,7 @@ theorem weak_solution_L2_of_nonneg_zeroth_of_bounded {n : ℕ}
   have hexist := Op.weak_solution_of_nonneg_zeroth Ω hb hc CP hCP hbase (l2Functional Ω f)
   simp only [l2Functional_eq_integral] at hexist
   refine ⟨hexist, fun u hu => ?_⟩
+  -- Refold to `l2Functional` form: `_bound` expects the functional, while `hu` carries the unfolded integral.
   have hhu : ∀ v : H01 Ω, Op.fullBilin Ω u v = l2Functional Ω f v := by
     intro v; rw [l2Functional_eq_integral]; exact hu v
   have hbound := Op.weak_solution_of_nonneg_zeroth_bound Ω hb hc CP hCP hbase hhu
