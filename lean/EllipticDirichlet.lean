@@ -13,6 +13,7 @@ import EllipticDirichlet.GeneralForm
 import EllipticDirichlet.Garding
 import EllipticDirichlet.Fredholm
 import EllipticDirichlet.FredholmComplete
+import EllipticDirichlet.SpectrumSigma
 import EllipticDirichlet.Compactness
 import EllipticDirichlet.Spectrum
 import EllipticDirichlet.RellichDischarge
