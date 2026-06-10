@@ -1,5 +1,6 @@
 import EllipticDirichlet.GeneralForm
 import EllipticDirichlet.Poincare.BoxSlice
+import EllipticDirichlet.Poincare.BoundedDomain
 
 /-!
 # Transport, zeroth-order term, the Gårding inequality, and shifted existence
@@ -485,6 +486,88 @@ theorem weak_solution_L2_of_nonneg_zeroth_euclBox {n : ℕ} (Op : FullEllipticOp
   have hCP : (0 : ℝ) ≤ C / (n + 1) := div_nonneg hCnonneg (by positivity)
   have hK : (0 : ℝ) ≤ (C / (n + 1) + 1) / Op.lam :=
     div_nonneg (by linarith) Op.lam_pos.le
+  exact mul_le_mul_of_nonneg_left (norm_l2Functional_le _ f) hK
+
+/-- Existence, uniqueness, and the a-priori bound for `Lu = -Dⱼ(aᵢⱼ Dᵢu) + cu`, `c ≥ 0`,
+on ANY domain inside a coordinate box: the Poincaré input is discharged from the box
+geometry of a superset. -/
+theorem weak_solution_of_nonneg_zeroth_of_subset_euclBox {n : ℕ}
+    (Op : FullEllipticOp (n + 1)) {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))}
+    (a b : Fin (n + 1) → ℝ) (hab : ∀ k, a k ≤ b k) (hsub : Ω ⊆ Poincare.euclBox a b)
+    (C : ℝ) (hC : ∀ i, (b i - a i) ^ 2 / 2 ≤ C)
+    (hb : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
+    (hc : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x)
+    (f : H01 Ω →L[ℝ] ℝ) :
+    (∃! u : H01 Ω, ∀ v : H01 Ω, Op.fullBilin Ω u v = f v)
+    ∧ ∀ u : H01 Ω, (∀ v : H01 Ω, Op.fullBilin Ω u v = f v) →
+        ‖u‖ ≤ (C / (n + 1) + 1) / Op.lam * ‖f‖ := by
+  have hCnonneg : 0 ≤ C := le_trans (by positivity) (hC 0)
+  have hbase : ∀ {φ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ} (h : IsTestFn Ω φ),
+      ‖(h.testGraph 0 : L2D Ω)‖ ^ 2
+        ≤ C / (n + 1) * ∑ i : Fin (n + 1), ‖h.testGraph i.succ‖ ^ 2 :=
+    fun {_φ} h => Poincare.testfn_bound_of_subset_euclBox hab hsub hC h
+  have hCP : (0 : ℝ) ≤ C / (n + 1) := div_nonneg hCnonneg (by positivity)
+  exact ⟨Op.weak_solution_of_nonneg_zeroth Ω hb hc _ hCP hbase f,
+    fun u hu =>
+      Op.weak_solution_of_nonneg_zeroth_bound Ω hb hc _ hCP hbase hu⟩
+
+/-- The `L²` right-hand-side instance on any domain inside a coordinate box. -/
+theorem weak_solution_L2_of_nonneg_zeroth_of_subset_euclBox {n : ℕ}
+    (Op : FullEllipticOp (n + 1)) {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))}
+    (a b : Fin (n + 1) → ℝ) (hab : ∀ k, a k ≤ b k) (hsub : Ω ⊆ Poincare.euclBox a b)
+    (C : ℝ) (hC : ∀ i, (b i - a i) ^ 2 / 2 ≤ C)
+    (hb : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
+    (hc : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x)
+    (f : L2D Ω) :
+    (∃! u : H01 Ω, ∀ v : H01 Ω,
+      Op.fullBilin Ω u v = ∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ))
+    ∧ ∀ u : H01 Ω,
+        (∀ v : H01 Ω,
+          Op.fullBilin Ω u v = ∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ)) →
+          ‖u‖ ≤ (C / (n + 1) + 1) / Op.lam * ‖f‖ := by
+  have h := Op.weak_solution_of_nonneg_zeroth_of_subset_euclBox a b hab hsub C hC hb hc
+    (l2Functional Ω f)
+  simp only [l2Functional_eq_integral] at h
+  refine ⟨h.1, fun u hu => ?_⟩
+  refine le_trans (h.2 u hu) ?_
+  have hCnonneg : 0 ≤ C := le_trans (by positivity) (hC 0)
+  have hCP : (0 : ℝ) ≤ C / (n + 1) := div_nonneg hCnonneg (by positivity)
+  have hK : (0 : ℝ) ≤ (C / (n + 1) + 1) / Op.lam :=
+    div_nonneg (by linarith) Op.lam_pos.le
+  exact mul_le_mul_of_nonneg_left (norm_l2Functional_le _ f) hK
+
+/-- **Existence, uniqueness, and the a-priori bound on an arbitrary bounded domain,
+`L²` right-hand side** (Theorem `thm: main` in full generality). The Poincaré constant
+`CP` is supplied by `poincare_H01_of_bounded`; the solution obeys
+`‖u‖_{H₀¹} ≤ (CP + 1)/λ · ‖f‖_{L²}`. -/
+theorem weak_solution_L2_of_nonneg_zeroth_of_bounded {n : ℕ}
+    (Op : FullEllipticOp (n + 1)) {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))}
+    (hΩb : Bornology.IsBounded Ω)
+    (hb : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
+    (hc : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x)
+    (f : L2D Ω) :
+    ∃ CP : ℝ, 0 ≤ CP ∧
+      ((∃! u : H01 Ω, ∀ v : H01 Ω,
+        Op.fullBilin Ω u v = ∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ))
+      ∧ ∀ u : H01 Ω,
+          (∀ v : H01 Ω,
+            Op.fullBilin Ω u v = ∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ)) →
+            ‖u‖ ≤ (CP + 1) / Op.lam * ‖f‖) := by
+  obtain ⟨CP, hCP, hpoin⟩ := Poincare.poincare_H01_of_bounded hΩb
+  have hbase : ∀ {φ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ} (h : IsTestFn Ω φ),
+      ‖(h.testGraph 0 : L2D Ω)‖ ^ 2
+        ≤ CP * ∑ i : Fin (n + 1), ‖h.testGraph i.succ‖ ^ 2 :=
+    fun {φ} h => hpoin h.testGraph
+      ((Submodule.le_topologicalClosure _) (Submodule.subset_span ⟨φ, h, rfl⟩))
+  refine ⟨CP, hCP, ?_⟩
+  have hexist := Op.weak_solution_of_nonneg_zeroth Ω hb hc CP hCP hbase (l2Functional Ω f)
+  simp only [l2Functional_eq_integral] at hexist
+  refine ⟨hexist, fun u hu => ?_⟩
+  have hhu : ∀ v : H01 Ω, Op.fullBilin Ω u v = l2Functional Ω f v := by
+    intro v; rw [l2Functional_eq_integral]; exact hu v
+  have hbound := Op.weak_solution_of_nonneg_zeroth_bound Ω hb hc CP hCP hbase hhu
+  refine le_trans hbound ?_
+  have hK : (0 : ℝ) ≤ (CP + 1) / Op.lam := div_nonneg (by linarith) Op.lam_pos.le
   exact mul_le_mul_of_nonneg_left (norm_l2Functional_le _ f) hK
 
 end FullEllipticOp
