@@ -61,8 +61,8 @@ structure FullEllipticOp (d : ℕ) extends EllipticCoeff d where
   Csup_nonneg : 0 ≤ Csup
   b_meas : ∀ i, Measurable (fun x => b x i)
   c_meas : Measurable c
-  b_bdd : ∀ x i, |b x i| ≤ Bsup
-  c_bdd : ∀ x, |c x| ≤ Csup
+  b_bdd : ∀ i, ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |b x i| ≤ Bsup
+  c_bdd : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |c x| ≤ Csup
 
 namespace FullEllipticOp
 
@@ -70,11 +70,11 @@ variable (Op : FullEllipticOp d)
 
 /-- The transport coefficient `bᵢ` acting on `L²(Ω)`. -/
 def bAct {Ω : Set (EuclideanSpace ℝ (Fin d))} (i : Fin d) : L2D Ω →L[ℝ] L2D Ω :=
-  mulCoeffL (Op.b_meas i) (fun x => Op.b_bdd x i)
+  mulCoeffL (Op.b_meas i) (ae_restrict_of_ae (Op.b_bdd i))
 
 /-- The zeroth-order coefficient `c` acting on `L²(Ω)`. -/
 def cAct {Ω : Set (EuclideanSpace ℝ (Fin d))} : L2D Ω →L[ℝ] L2D Ω :=
-  mulCoeffL Op.c_meas (fun x => Op.c_bdd x)
+  mulCoeffL Op.c_meas (ae_restrict_of_ae Op.c_bdd)
 
 lemma norm_bAct_le {Ω : Set (EuclideanSpace ℝ (Fin d))} (i : Fin d) (g : L2D Ω) :
     ‖Op.bAct i g‖ ≤ Op.Bsup * ‖g‖ :=
@@ -302,39 +302,47 @@ theorem weak_solution (Ω : Set (EuclideanSpace ℝ (Fin d))) {μ : ℝ}
 
 /-! ### The transport-free, nonnegative-zeroth coercive case (Guo §VII.3.5) -/
 
-/-- **The lower-order form is nonnegative** when the transport field vanishes (`b ≡ 0`) and
-the zeroth coefficient is nonnegative (`c ≥ 0`): the transport terms `⟪bᵢ ∂ᵢu, u₀⟫` are zero
-and `⟪c u₀, u₀⟫ = ∫_Ω c u₀² ≥ 0`. -/
+/-- **The lower-order form is nonnegative** when the transport field vanishes (`b = 0`
+a.e. on `Ω`) and the zeroth coefficient is nonnegative (`c ≥ 0` a.e. on `Ω`): the
+transport terms `⟪bᵢ ∂ᵢu, u₀⟫` are zero and `⟪c u₀, u₀⟫ = ∫_Ω c u₀² ≥ 0`. -/
 lemma lowerBilin_self_nonneg (Ω : Set (EuclideanSpace ℝ (Fin d)))
-    (hb : ∀ x i, Op.b x i = 0) (hc : ∀ x, 0 ≤ Op.c x) (U : H01 Ω) :
+    (hb : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
+    (hc : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x) (U : H01 Ω) :
     0 ≤ Op.lowerBilin Ω U U := by
   rw [Op.lowerBilin_apply]
   have htrans : (∑ i : Fin d, ⟪Op.bAct i ((U : H1amb Ω) i.succ), ((U : H1amb Ω) 0)⟫) = 0 := by
     refine Finset.sum_eq_zero (fun i _ => ?_)
     simp only [FullEllipticOp.bAct]
     rw [inner_mulCoeffL_eq]
-    simp only [hb, zero_mul, integral_zero]
+    have hzero : ∀ᵐ x ∂(volume.restrict Ω),
+        Op.b x i * ((U : H1amb Ω) i.succ x : ℝ) * ((U : H1amb Ω) 0 x : ℝ) = 0 :=
+      (hb i).mono fun x hx => by rw [hx, zero_mul, zero_mul]
+    calc (∫ x in Ω, Op.b x i * ((U : H1amb Ω) i.succ x : ℝ) * ((U : H1amb Ω) 0 x : ℝ))
+        = ∫ _x in Ω, (0 : ℝ) := integral_congr_ae hzero
+      _ = 0 := integral_zero _ _
   rw [htrans, zero_add]
   simp only [FullEllipticOp.cAct]
   rw [inner_mulCoeffL_eq]
-  refine integral_nonneg (fun x => ?_)
+  refine integral_nonneg_of_ae (hc.mono fun x hx => ?_)
   simp only [Pi.zero_apply]
-  nlinarith [hc x, sq_nonneg ((U : H1amb Ω) 0 x)]
+  nlinarith [hx, sq_nonneg ((U : H1amb Ω) 0 x : ℝ)]
 
-/-- **Coercivity for the transport-free, nonnegative-zeroth case** (Guo §VII.3.5). If the
-transport field vanishes (`b ≡ 0`) and the zeroth coefficient is nonnegative (`c ≥ 0`), the
-full divergence form `B = B_A + c` is coercive on `H₀¹(Ω)` *without a spectral shift*: the
-zeroth term only helps, ellipticity controls the gradient, and the Poincaré inequality lifts
-that to the full `H¹` norm (the `γ = 0` Gårding case, with constant `λ / (C_P + 1)`). -/
-theorem fullBilin_coercive_of_nonneg_zeroth (Ω : Set (EuclideanSpace ℝ (Fin d)))
-    (hb : ∀ x i, Op.b x i = 0) (hc : ∀ x, 0 ≤ Op.c x) (CP : ℝ) (hCP : 0 ≤ CP)
+/-- **Quantitative coercivity for the transport-free, nonnegative-zeroth case**
+(Guo §VII.3.5). If the transport field vanishes (`b ≡ 0`) and the zeroth coefficient is
+nonnegative (`c ≥ 0`), the full divergence form `B = B_A + c` dominates the full `H¹`
+norm with the explicit constant `λ / (C_P + 1)`: the zeroth term only helps, ellipticity
+controls the gradient, and the Poincaré inequality lifts that to the full `H¹` norm.
+This is the constant-level form of [`fullBilin_coercive_of_nonneg_zeroth`]; the explicit
+constant feeds the Lax-Milgram a-priori estimate. -/
+theorem fullBilin_coercive_const_of_nonneg_zeroth (Ω : Set (EuclideanSpace ℝ (Fin d)))
+    (hb : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
+    (hc : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x) (CP : ℝ) (hCP : 0 ≤ CP)
     (hbase : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ),
-      ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2) :
-    IsCoercive (Op.fullBilin Ω) := by
+      ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2)
+    (U : H01 Ω) :
+    Op.lam / (CP + 1) * ‖U‖ * ‖U‖ ≤ Op.fullBilin Ω U U := by
   have hpos : (0 : ℝ) < CP + 1 := by linarith
   have hne : (CP : ℝ) + 1 ≠ 0 := hpos.ne'
-  refine ⟨Op.lam / (CP + 1), div_pos Op.lam_pos hpos, ?_⟩
-  intro U
   set S : ℝ := ∑ i : Fin d, ‖(U : H1amb Ω) i.succ‖ ^ 2 with hS
   have hA : Op.lam * S ≤ Op.toEllipticCoeff.bilin Ω U U := Op.toEllipticCoeff.bilin_self_ge U
   have hlow : 0 ≤ Op.lowerBilin Ω U U := Op.lowerBilin_self_nonneg Ω hb hc U
@@ -355,13 +363,28 @@ theorem fullBilin_coercive_of_nonneg_zeroth (Ω : Set (EuclideanSpace ℝ (Fin d
     _ = Op.lam * S := by field_simp
     _ ≤ Op.fullBilin Ω U U := hBUU
 
+/-- **Coercivity for the transport-free, nonnegative-zeroth case** (Guo §VII.3.5). If the
+transport field vanishes (`b ≡ 0`) and the zeroth coefficient is nonnegative (`c ≥ 0`), the
+full divergence form `B = B_A + c` is coercive on `H₀¹(Ω)` *without a spectral shift*: the
+zeroth term only helps, ellipticity controls the gradient, and the Poincaré inequality lifts
+that to the full `H¹` norm (the `γ = 0` Gårding case, with constant `λ / (C_P + 1)`). -/
+theorem fullBilin_coercive_of_nonneg_zeroth (Ω : Set (EuclideanSpace ℝ (Fin d)))
+    (hb : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
+    (hc : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x) (CP : ℝ) (hCP : 0 ≤ CP)
+    (hbase : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ),
+      ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2) :
+    IsCoercive (Op.fullBilin Ω) :=
+  ⟨Op.lam / (CP + 1), div_pos Op.lam_pos (by linarith),
+    Op.fullBilin_coercive_const_of_nonneg_zeroth Ω hb hc CP hCP hbase⟩
+
 /-- **Existence and uniqueness for the transport-free, nonnegative-zeroth operator**
 (Guo §VII.3.4). With `b ≡ 0`, `c ≥ 0`, and the test-function Poincaré bound, the full
 divergence form `B = B_A + c` is coercive with no spectral shift, so Lax-Milgram yields, for
 every continuous functional `f` on `H₀¹(Ω)`, a unique weak solution `u` of `Lu = f`. This is
 the existence theorem for `Lu = -Dⱼ(aᵢⱼ Dᵢu) + cu` with general uniformly elliptic `A`. -/
 theorem weak_solution_of_nonneg_zeroth (Ω : Set (EuclideanSpace ℝ (Fin d)))
-    (hb : ∀ x i, Op.b x i = 0) (hc : ∀ x, 0 ≤ Op.c x) (CP : ℝ) (hCP : 0 ≤ CP)
+    (hb : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
+    (hc : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x) (CP : ℝ) (hCP : 0 ≤ CP)
     (hbase : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ),
       ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2)
     (f : H01 Ω →L[ℝ] ℝ) :
@@ -379,31 +402,90 @@ theorem weak_solution_of_nonneg_zeroth (Ω : Set (EuclideanSpace ℝ (Fin d)))
     refine ext_inner_right (𝕜 := ℝ) (fun w => ?_)
     rw [hco.continuousLinearEquivOfBilin_apply, hu w, ← hgrep w]
 
-/-- **Unconditional existence and uniqueness on an open box, general uniformly elliptic operator.**
-The box specialisation of `weak_solution_of_nonneg_zeroth`: on the coordinate box `∏ₖ (aₖ, bₖ)`,
-with `b ≡ 0` and `c ≥ 0`, the test-function Poincaré hypothesis is discharged from the box
-geometry. The per-direction slice bound `Poincare.slice_bound_euclBox` (which rests on
-`Poincare.poincare_box_dir`) is averaged by `Poincare.poincare_testfn` into the graph-coordinate
-bound, so for every continuous functional `f` on `H₀¹` of the box there is a unique weak solution
-of `Lu = -Dⱼ(aᵢⱼ Dᵢu) + cu = f`, with no abstract Poincaré input. This is Theorem `thm: main`. -/
+/-- **The a-priori estimate for the weak solution** (general uniformly elliptic operator,
+`b ≡ 0`, `c ≥ 0`, Guo §VII.4). Under the hypotheses of
+[`weak_solution_of_nonneg_zeroth`], any weak solution obeys the Lax-Milgram estimate
+`‖u‖_{H₀¹} ≤ α⁻¹ ‖f‖` with the coercivity constant `α = λ / (C_P + 1)` of the form,
+i.e. `‖u‖_{H₀¹} ≤ (C_P + 1) / λ · ‖f‖`. -/
+theorem weak_solution_of_nonneg_zeroth_bound (Ω : Set (EuclideanSpace ℝ (Fin d)))
+    (hb : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
+    (hc : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x) (CP : ℝ) (hCP : 0 ≤ CP)
+    (hbase : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ),
+      ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2)
+    {f : H01 Ω →L[ℝ] ℝ} {u : H01 Ω}
+    (hu : ∀ v : H01 Ω, Op.fullBilin Ω u v = f v) :
+    ‖u‖ ≤ (CP + 1) / Op.lam * ‖f‖ := by
+  have h := norm_weak_solution_le
+    (div_pos Op.lam_pos (by linarith : (0 : ℝ) < CP + 1))
+    (Op.fullBilin_coercive_const_of_nonneg_zeroth Ω hb hc CP hCP hbase) hu
+  rwa [inv_div] at h
+
+/-- **Unconditional existence, uniqueness, and a-priori bound on an open box, general
+uniformly elliptic operator.** The box specialisation of `weak_solution_of_nonneg_zeroth`:
+on the coordinate box `∏ₖ (aₖ, bₖ)`, with `b ≡ 0` and `c ≥ 0`, the test-function Poincaré
+hypothesis is discharged from the box geometry. The per-direction slice bound
+`Poincare.slice_bound_euclBox` (which rests on `Poincare.poincare_box_dir`) is averaged by
+`Poincare.poincare_testfn` into the graph-coordinate bound with constant
+`C_P = C / (n + 1)`, so for every continuous functional `f` on `H₀¹` of the box there is a
+unique weak solution of `Lu = -Dⱼ(aᵢⱼ Dᵢu) + cu = f`, obeying the Lax-Milgram estimate
+`‖u‖_{H₀¹} ≤ α⁻¹ ‖f‖` with coercivity constant `α = λ / (C / (n + 1) + 1)`, with no
+abstract Poincaré input. This is Theorem `thm: main` with an `H⁻¹` right-hand side; the
+`L²` instance is [`weak_solution_L2_of_nonneg_zeroth_euclBox`]. -/
 theorem weak_solution_of_nonneg_zeroth_euclBox {n : ℕ} (Op : FullEllipticOp (n + 1))
     (a b : Fin (n + 1) → ℝ) (hab : ∀ k, a k ≤ b k) (C : ℝ) (hC : ∀ i, (b i - a i) ^ 2 / 2 ≤ C)
-    (hb : ∀ x i, Op.b x i = 0) (hc : ∀ x, 0 ≤ Op.c x)
+    (hb : ∀ i, ∀ᵐ x ∂(volume.restrict (Poincare.euclBox a b)), Op.b x i = 0)
+    (hc : ∀ᵐ x ∂(volume.restrict (Poincare.euclBox a b)), 0 ≤ Op.c x)
     (f : H01 (Poincare.euclBox a b) →L[ℝ] ℝ) :
-    ∃! u : H01 (Poincare.euclBox a b),
-      ∀ v : H01 (Poincare.euclBox a b), Op.fullBilin (Poincare.euclBox a b) u v = f v := by
+    (∃! u : H01 (Poincare.euclBox a b),
+      ∀ v : H01 (Poincare.euclBox a b), Op.fullBilin (Poincare.euclBox a b) u v = f v)
+    ∧ ∀ u : H01 (Poincare.euclBox a b),
+        (∀ v : H01 (Poincare.euclBox a b), Op.fullBilin (Poincare.euclBox a b) u v = f v) →
+          ‖u‖ ≤ (C / (n + 1) + 1) / Op.lam * ‖f‖ := by
   have hCnonneg : 0 ≤ C := le_trans (by positivity) (hC 0)
-  have hslice : ∀ {φ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ}
-      (h : IsTestFn (Poincare.euclBox a b) φ) (i : Fin (n + 1)),
-      ∫ x in Poincare.euclBox a b, (φ x) ^ 2
-        ≤ C * ∫ x in Poincare.euclBox a b, (partialD i φ x) ^ 2 := by
-    intro φ h i
-    exact le_trans (Poincare.slice_bound_euclBox a b hab h i)
-      (mul_le_mul_of_nonneg_right (hC i) (integral_nonneg fun x => sq_nonneg _))
-  refine Op.weak_solution_of_nonneg_zeroth (Poincare.euclBox a b) hb hc _ ?_
-    (fun {_φ} h => Poincare.poincare_testfn (Nat.succ_pos n) C
-      (fun {_ψ} h' i => hslice h' i) h) f
-  exact div_nonneg hCnonneg (by positivity)
+  have hbase : ∀ {φ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ}
+      (h : IsTestFn (Poincare.euclBox a b) φ),
+      ‖(h.testGraph 0 : L2D (Poincare.euclBox a b))‖ ^ 2
+        ≤ C / (n + 1) * ∑ i : Fin (n + 1), ‖h.testGraph i.succ‖ ^ 2 :=
+    fun {_φ} h => Poincare.testfn_bound_euclBox hab hC h
+  have hCP : (0 : ℝ) ≤ C / (n + 1) := div_nonneg hCnonneg (by positivity)
+  exact ⟨Op.weak_solution_of_nonneg_zeroth (Poincare.euclBox a b) hb hc _ hCP hbase f,
+    fun u hu =>
+      Op.weak_solution_of_nonneg_zeroth_bound (Poincare.euclBox a b) hb hc _ hCP hbase hu⟩
+
+/-- **Theorem `thm: main`: existence, uniqueness, and the a-priori bound on an open box,
+`L²` right-hand side.** For the general uniformly elliptic operator
+`Lu = -Dⱼ(aᵢⱼ Dᵢu) + cu` with `c ≥ 0` on the coordinate box `∏ₖ (aₖ, bₖ)`, and for every
+`f ∈ L²(Ω)` entering through the pairing `⟨f, v⟩ = ∫_Ω f · v₀` (the embedding
+`L²(Ω) ⊆ H⁻¹(Ω)`, [`l2Functional`]), there is a unique weak solution `u ∈ H₀¹(Ω)` of
+`B[u, v] = ⟨f, v⟩`, and every weak solution obeys `‖u‖_{H₀¹} ≤ α⁻¹ ‖f‖_{L²}` with the
+coercivity constant `α = λ / (C / (n + 1) + 1)` of the form. The Poincaré input is
+discharged from the box geometry; no abstract hypothesis remains. -/
+theorem weak_solution_L2_of_nonneg_zeroth_euclBox {n : ℕ} (Op : FullEllipticOp (n + 1))
+    (a b : Fin (n + 1) → ℝ) (hab : ∀ k, a k ≤ b k) (C : ℝ) (hC : ∀ i, (b i - a i) ^ 2 / 2 ≤ C)
+    (hb : ∀ i, ∀ᵐ x ∂(volume.restrict (Poincare.euclBox a b)), Op.b x i = 0)
+    (hc : ∀ᵐ x ∂(volume.restrict (Poincare.euclBox a b)), 0 ≤ Op.c x)
+    (f : L2D (Poincare.euclBox a b)) :
+    (∃! u : H01 (Poincare.euclBox a b),
+      ∀ v : H01 (Poincare.euclBox a b),
+        Op.fullBilin (Poincare.euclBox a b) u v
+          = ∫ x in Poincare.euclBox a b,
+              (f x : ℝ) * ((v : H1amb (Poincare.euclBox a b)) 0 x : ℝ))
+    ∧ ∀ u : H01 (Poincare.euclBox a b),
+        (∀ v : H01 (Poincare.euclBox a b),
+          Op.fullBilin (Poincare.euclBox a b) u v
+            = ∫ x in Poincare.euclBox a b,
+                (f x : ℝ) * ((v : H1amb (Poincare.euclBox a b)) 0 x : ℝ)) →
+          ‖u‖ ≤ (C / (n + 1) + 1) / Op.lam * ‖f‖ := by
+  have h := Op.weak_solution_of_nonneg_zeroth_euclBox a b hab C hC hb hc
+    (l2Functional (Poincare.euclBox a b) f)
+  simp only [l2Functional_eq_integral] at h
+  refine ⟨h.1, fun u hu => ?_⟩
+  refine le_trans (h.2 u hu) ?_
+  have hCnonneg : 0 ≤ C := le_trans (by positivity) (hC 0)
+  have hCP : (0 : ℝ) ≤ C / (n + 1) := div_nonneg hCnonneg (by positivity)
+  have hK : (0 : ℝ) ≤ (C / (n + 1) + 1) / Op.lam :=
+    div_nonneg (by linarith) Op.lam_pos.le
+  exact mul_le_mul_of_nonneg_left (norm_l2Functional_le _ f) hK
 
 end FullEllipticOp
 

@@ -269,8 +269,9 @@ theorem dirichlet_spectral_of_bounded (Ω : Set (EuclideanSpace ℝ (Fin d)))
 domain**, with the Rellich compact embedding discharged. -/
 theorem symmetric_fullElliptic_spectral_of_bounded (Op : FullEllipticOp d)
     (Ω : Set (EuclideanSpace ℝ (Fin d))) (hΩm : MeasurableSet Ω) (hΩb : Bornology.IsBounded Ω)
-    (hb : ∀ x i, Op.b x i = 0) (hc : ∀ x, 0 ≤ Op.c x)
-    (hAsymm : ∀ x i j, Op.a x i j = Op.a x j i)
+    (hb : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
+    (hc : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x)
+    (hAsymm : ∀ᵐ x ∂(volume.restrict Ω), ∀ i j, Op.a x i j = Op.a x j i)
     (CP : ℝ) (hCP : 0 ≤ CP)
     (hbase : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ),
       ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2) :

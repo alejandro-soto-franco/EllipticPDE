@@ -165,28 +165,32 @@ theorem dirichlet_spectral (Ω : Set (EuclideanSpace ℝ (Fin d))) (CP : ℝ) (h
 /-! ### Instantiation: the general symmetric divergence-form operator `-Dⱼ(aᵢⱼ Dᵢ·) + c` -/
 
 /-- The principal-part form `B_A` is symmetric when the coefficient matrix is symmetric
-(`aᵢⱼ = aⱼᵢ`): swap the summation order and use `a` symmetry plus commutativity of the product. -/
+(`aᵢⱼ = aⱼᵢ` a.e. on `Ω`): swap the summation order and use `a` symmetry plus
+commutativity of the product. -/
 lemma EllipticCoeff.bilin_symm (A : EllipticCoeff d)
-    (hAsymm : ∀ x i j, A.a x i j = A.a x j i) (Ω : Set (EuclideanSpace ℝ (Fin d)))
+    (Ω : Set (EuclideanSpace ℝ (Fin d)))
+    (hAsymm : ∀ᵐ x ∂(volume.restrict Ω), ∀ i j, A.a x i j = A.a x j i)
     (U V : H01 Ω) : A.bilin Ω U V = A.bilin Ω V U := by
   rw [EllipticCoeff.bilin_apply, EllipticCoeff.bilin_apply, Finset.sum_comm]
   refine Finset.sum_congr rfl (fun a _ => Finset.sum_congr rfl (fun b _ => ?_))
   rw [A.inner_actL_eq, A.inner_actL_eq]
-  refine integral_congr_ae (Filter.Eventually.of_forall (fun x => ?_))
+  refine integral_congr_ae (hAsymm.mono (fun x hx => ?_))
   dsimp only
-  rw [hAsymm x b a]; ring
+  rw [hx b a]; ring
 
 /-- The full divergence form `B = B_A + (transport + zeroth)` is symmetric when the transport
 field vanishes (`b ≡ 0`) and the matrix is symmetric: the principal part is symmetric by
 `EllipticCoeff.bilin_symm`, the transport terms vanish, and the zeroth term `⟪c u₀, v₀⟫` is
 symmetric. -/
 lemma FullEllipticOp.fullBilin_symm (Op : FullEllipticOp d)
-    (hb : ∀ x i, Op.b x i = 0) (hAsymm : ∀ x i j, Op.a x i j = Op.a x j i)
-    (Ω : Set (EuclideanSpace ℝ (Fin d))) (U V : H01 Ω) :
+    (Ω : Set (EuclideanSpace ℝ (Fin d)))
+    (hb : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
+    (hAsymm : ∀ᵐ x ∂(volume.restrict Ω), ∀ i j, Op.a x i j = Op.a x j i)
+    (U V : H01 Ω) :
     Op.fullBilin Ω U V = Op.fullBilin Ω V U := by
   rw [Op.fullBilin_apply, Op.fullBilin_apply]
   congr 1
-  · exact Op.toEllipticCoeff.bilin_symm hAsymm Ω U V
+  · exact Op.toEllipticCoeff.bilin_symm Ω hAsymm U V
   · rw [Op.lowerBilin_apply, Op.lowerBilin_apply]
     have hz : ∀ P Q : H01 Ω,
         (∑ i : Fin d, ⟪Op.bAct i ((P : H1amb Ω) i.succ), ((Q : H1amb Ω) 0)⟫) = 0 := by
@@ -194,7 +198,12 @@ lemma FullEllipticOp.fullBilin_symm (Op : FullEllipticOp d)
       refine Finset.sum_eq_zero (fun i _ => ?_)
       simp only [FullEllipticOp.bAct]
       rw [inner_mulCoeffL_eq]
-      simp only [hb, zero_mul, integral_zero]
+      have hzero : ∀ᵐ x ∂(volume.restrict Ω),
+          Op.b x i * ((P : H1amb Ω) i.succ x : ℝ) * ((Q : H1amb Ω) 0 x : ℝ) = 0 :=
+        (hb i).mono fun x hx => by rw [hx, zero_mul, zero_mul]
+      calc (∫ x in Ω, Op.b x i * ((P : H1amb Ω) i.succ x : ℝ) * ((Q : H1amb Ω) 0 x : ℝ))
+          = ∫ _x in Ω, (0 : ℝ) := integral_congr_ae hzero
+        _ = 0 := integral_zero _ _
     rw [hz U V, hz V U, zero_add, zero_add]
     simp only [FullEllipticOp.cAct]
     rw [inner_mulCoeffL_eq, inner_mulCoeffL_eq]
@@ -208,8 +217,9 @@ test-function Poincaré bound and the Rellich compact embedding, the eigenfuncti
 solution operator form a complete orthogonal family in `L²(Ω)`. -/
 theorem symmetric_fullElliptic_spectral (Op : FullEllipticOp d)
     (Ω : Set (EuclideanSpace ℝ (Fin d)))
-    (hb : ∀ x i, Op.b x i = 0) (hc : ∀ x, 0 ≤ Op.c x)
-    (hAsymm : ∀ x i j, Op.a x i j = Op.a x j i)
+    (hb : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
+    (hc : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x)
+    (hAsymm : ∀ᵐ x ∂(volume.restrict Ω), ∀ i j, Op.a x i j = Op.a x j i)
     (CP : ℝ) (hCP : 0 ≤ CP)
     (hbase : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ),
       ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2)
@@ -217,6 +227,6 @@ theorem symmetric_fullElliptic_spectral (Op : FullEllipticOp d)
     (⨆ μ : ℝ, Module.End.eigenspace
         (solOp (Op.fullBilin Ω) (Op.fullBilin_coercive_of_nonneg_zeroth Ω hb hc CP hCP hbase)
           : Module.End ℝ (L2D Ω)) μ)ᗮ = ⊥ :=
-  solOp_spectral _ (Op.fullBilin_symm hb hAsymm Ω) hRellich
+  solOp_spectral _ (Op.fullBilin_symm Ω hb hAsymm) hRellich
 
 end EllipticDirichlet.Sobolev

@@ -141,7 +141,7 @@ lemma EllipticCoeff.bilin_self_ge (A : EllipticCoeff d)
   have hpoint : (fun x => A.lam * ∑ i : Fin d, (g i x : ℝ) ^ 2)
       ≤ᵐ[volume.restrict Ω] fun x => ∑ i : Fin d, ∑ j : Fin d,
         A.a x i j * (g i x : ℝ) * (g j x : ℝ) :=
-    Filter.Eventually.of_forall (fun x => A.elliptic x (fun i => g i x))
+    (ae_restrict_of_ae A.elliptic).mono (fun x hx => hx (fun i => g i x))
   have hlamS : ∫ x in Ω, A.lam * ∑ i : Fin d, (g i x : ℝ) ^ 2
       = A.lam * ∑ i : Fin d, ‖g i‖ ^ 2 := by
     rw [integral_const_mul, integral_finsetSum _ (fun i _ => integrable_sq (g i))]

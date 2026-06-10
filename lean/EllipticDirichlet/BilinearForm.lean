@@ -78,18 +78,19 @@ lemma dirichletBilin_self (Ω : Set (EuclideanSpace ℝ (Fin d))) (U : H01 Ω) :
   rw [dirichletBilin_apply]
   exact Finset.sum_congr rfl (fun i _ => real_inner_self_eq_norm_sq _)
 
-/-- **Coercivity of the Dirichlet form.** Given the test-function Poincaré bound with
-constant `C_P ≥ 0`, the Dirichlet form is coercive on `H₀¹(Ω)` with constant
-`1 / (C_P + 1)`: the density Poincaré inequality controls the function part by the
-Dirichlet energy, so `B[U, U]` dominates the full `H¹` norm. -/
-theorem dirichletBilin_coercive (Ω : Set (EuclideanSpace ℝ (Fin d)))
+/-- **Quantitative coercivity of the Dirichlet form.** Given the test-function Poincaré
+bound with constant `C_P ≥ 0`, the Dirichlet form dominates the full `H¹` norm with the
+explicit constant `1 / (C_P + 1)`: the density Poincaré inequality controls the function
+part by the Dirichlet energy. This is the constant-level form of
+[`dirichletBilin_coercive`]; the explicit constant feeds the Lax-Milgram a-priori
+estimate [`norm_weak_solution_le`]. -/
+theorem dirichletBilin_coercive_const (Ω : Set (EuclideanSpace ℝ (Fin d)))
     (CP : ℝ) (hCP : 0 ≤ CP)
     (hbase : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ),
-      ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2) :
-    IsCoercive (dirichletBilin Ω) := by
+      ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2)
+    (U : H01 Ω) :
+    1 / (CP + 1) * ‖U‖ * ‖U‖ ≤ dirichletBilin Ω U U := by
   have hpos : (0 : ℝ) < CP + 1 := by linarith
-  refine ⟨1 / (CP + 1), by positivity, ?_⟩
-  intro U
   set S : ℝ := ∑ i : Fin d, ‖(U : H1amb Ω) i.succ‖ ^ 2 with hS
   -- The Dirichlet energy is `S`.
   have hBUU : dirichletBilin Ω U U = S := dirichletBilin_self Ω U
@@ -107,5 +108,72 @@ theorem dirichletBilin_coercive (Ω : Set (EuclideanSpace ℝ (Fin d)))
   calc 1 / (CP + 1) * (‖U‖ * ‖U‖)
       ≤ 1 / (CP + 1) * ((CP + 1) * S) := mul_le_mul_of_nonneg_left hkey (by positivity)
     _ = S := by rw [← mul_assoc, one_div_mul_cancel hpos.ne', one_mul]
+
+/-- **Coercivity of the Dirichlet form.** Given the test-function Poincaré bound with
+constant `C_P ≥ 0`, the Dirichlet form is coercive on `H₀¹(Ω)` with constant
+`1 / (C_P + 1)`: the density Poincaré inequality controls the function part by the
+Dirichlet energy, so `B[U, U]` dominates the full `H¹` norm. -/
+theorem dirichletBilin_coercive (Ω : Set (EuclideanSpace ℝ (Fin d)))
+    (CP : ℝ) (hCP : 0 ≤ CP)
+    (hbase : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ),
+      ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2) :
+    IsCoercive (dirichletBilin Ω) :=
+  ⟨1 / (CP + 1), by positivity, dirichletBilin_coercive_const Ω CP hCP hbase⟩
+
+/-! ### The Lax-Milgram a-priori estimate -/
+
+/-- **The Lax-Milgram a-priori estimate.** If the bilinear form `B` satisfies the
+quantitative coercivity bound `α ‖U‖² ≤ B[U, U]` with `α > 0`, then any weak solution
+`u` of `B[u, v] = f v` obeys `‖u‖ ≤ α⁻¹ ‖f‖`: coercivity gives
+`α ‖u‖² ≤ B[u, u] = f u ≤ ‖f‖ ‖u‖`, and dividing by `‖u‖` gives the bound (Guo §VII.4,
+the estimate `β ‖u‖_{H₀¹} ≤ ‖B_μ(u, ·)‖_{H⁻¹}`). -/
+theorem norm_weak_solution_le {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    {B : (H01 Ω) →L[ℝ] (H01 Ω) →L[ℝ] ℝ} {α : ℝ} (hα : 0 < α)
+    (hcoer : ∀ U : H01 Ω, α * ‖U‖ * ‖U‖ ≤ B U U)
+    {f : H01 Ω →L[ℝ] ℝ} {u : H01 Ω} (hu : ∀ v : H01 Ω, B u v = f v) :
+    ‖u‖ ≤ α⁻¹ * ‖f‖ := by
+  rcases eq_or_lt_of_le (norm_nonneg u) with h0 | h0
+  · rw [← h0]
+    positivity
+  · have h1 : α * ‖u‖ * ‖u‖ ≤ ‖f‖ * ‖u‖ :=
+      calc α * ‖u‖ * ‖u‖ ≤ B u u := hcoer u
+        _ = f u := hu u
+        _ ≤ ‖f u‖ := Real.le_norm_self _
+        _ ≤ ‖f‖ * ‖u‖ := f.le_opNorm u
+    have h2 : α * ‖u‖ ≤ ‖f‖ := le_of_mul_le_mul_right h1 h0
+    rw [inv_mul_eq_div, le_div_iff₀ hα]
+    linarith
+
+/-! ### `L²` right-hand sides as functionals on `H₀¹` -/
+
+/-- A right-hand side `f ∈ L²(Ω)` as a continuous linear functional on `H₀¹(Ω)`:
+`v ↦ ⟪f, v₀⟫_{L²}`, the weak pairing `⟨f, v⟩ = ∫_Ω f · v₀`. This is the embedding
+`L²(Ω) ⊆ H⁻¹(Ω)` (Guo Remark VII.1.5) through which the classical Dirichlet problem
+`Lu = f`, `f ∈ L²(Ω)`, enters the abstract Lax-Milgram statement. -/
+def l2Functional (Ω : Set (EuclideanSpace ℝ (Fin d))) (f : L2D Ω) : (H01 Ω) →L[ℝ] ℝ :=
+  ((innerSL ℝ f).comp
+    (PiLp.proj (𝕜 := ℝ) 2 (fun _ : Fin (d + 1) => L2D Ω) (0 : Fin (d + 1)))).comp
+    (H01 Ω).subtypeL
+
+@[simp] lemma l2Functional_apply (Ω : Set (EuclideanSpace ℝ (Fin d))) (f : L2D Ω)
+    (V : H01 Ω) : l2Functional Ω f V = ⟪f, (V : H1amb Ω) 0⟫ := rfl
+
+/-- The `L²` pairing is the integral `⟨f, v⟩ = ∫_Ω f · v₀`. -/
+lemma l2Functional_eq_integral (Ω : Set (EuclideanSpace ℝ (Fin d))) (f : L2D Ω)
+    (V : H01 Ω) :
+    l2Functional Ω f V = ∫ x in Ω, (f x : ℝ) * ((V : H1amb Ω) 0 x : ℝ) := by
+  rw [l2Functional_apply, L2.inner_def]
+  exact integral_congr_ae (Filter.Eventually.of_forall fun x => Real.inner_apply _ _)
+
+/-- The embedding `L²(Ω) ⊆ H⁻¹(Ω)` is a contraction: `‖⟨f, ·⟩‖_{H⁻¹} ≤ ‖f‖_{L²}`,
+since `‖v₀‖_{L²} ≤ ‖V‖_{H¹}` in the graph encoding. -/
+lemma norm_l2Functional_le (Ω : Set (EuclideanSpace ℝ (Fin d))) (f : L2D Ω) :
+    ‖l2Functional Ω f‖ ≤ ‖f‖ := by
+  refine ContinuousLinearMap.opNorm_le_bound _ (norm_nonneg f) (fun V => ?_)
+  rw [l2Functional_apply]
+  calc ‖⟪f, (V : H1amb Ω) 0⟫‖ ≤ ‖f‖ * ‖(V : H1amb Ω) 0‖ := norm_inner_le_norm _ _
+    _ ≤ ‖f‖ * ‖V‖ := by
+        gcongr
+        exact PiLp.norm_apply_le _ _
 
 end EllipticDirichlet

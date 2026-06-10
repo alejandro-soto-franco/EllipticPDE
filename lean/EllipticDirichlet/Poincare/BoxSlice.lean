@@ -162,4 +162,67 @@ theorem dirichletBilin_coercive_euclBox (a b : Fin (n + 1) → ℝ) (hab : ∀ k
     _ ≤ C * ∫ x in euclBox a b, (partialD i φ x) ^ 2 :=
         mul_le_mul_of_nonneg_right (hC i) (integral_nonneg (fun x => sq_nonneg _))
 
+/-- **The Poincaré inequality on a box** (Theorem `thm: poincare`). For every
+`U ∈ H₀¹(Ω)` of the open coordinate box `Ω = ∏ₖ (aₖ, bₖ)` whose side lengths are bounded
+by `L`,
+
+  `‖u‖²_{L²(Ω)} ≤ L² / (2 (n + 1)) · ‖∇u‖²_{L²(Ω)}`,
+
+i.e. `‖u‖_{L²} ≤ C_P ‖∇u‖_{L²}` with `C_P = L / √(2 (n + 1))`; taking `L` the maximal
+side length gives the diameter-based constant. In the graph encoding the function part is
+`U 0` and the gradient components are `U i.succ`. The chain is fully discharged from the
+box geometry: the one-dimensional/Fubini slice bound (`slice_bound_euclBox`, resting on
+`poincare_box_dir`) is averaged over the `n + 1` directions (`poincare_testfn`) and
+extended from the test functions to `H₀¹` by density (`poincare_H01`); no abstract
+Poincaré hypothesis remains. -/
+theorem poincare_H01_euclBox {a b : Fin (n + 1) → ℝ} (hab : ∀ k, a k ≤ b k)
+    {L : ℝ} (hL : ∀ i, b i - a i ≤ L)
+    {U : H1amb (euclBox a b)} (hU : U ∈ H01 (euclBox a b)) :
+    ‖U 0‖ ^ 2 ≤ L ^ 2 / (2 * (n + 1)) * ∑ i : Fin (n + 1), ‖U i.succ‖ ^ 2 := by
+  have hL0 : 0 ≤ L := le_trans (sub_nonneg.mpr (hab 0)) (hL 0)
+  -- The per-direction slice bound, with every side contribution bounded by `L² / 2`.
+  have hslice : ∀ {φ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ}
+      (h : IsTestFn (euclBox a b) φ) (i : Fin (n + 1)),
+      ∫ x in euclBox a b, (φ x) ^ 2
+        ≤ L ^ 2 / 2 * ∫ x in euclBox a b, (partialD i φ x) ^ 2 := by
+    intro φ h i
+    refine le_trans (slice_bound_euclBox a b hab h i)
+      (mul_le_mul_of_nonneg_right ?_ (integral_nonneg fun x => sq_nonneg _))
+    have hside : (b i - a i) ^ 2 ≤ L ^ 2 := by
+      have h1 : 0 ≤ b i - a i := sub_nonneg.mpr (hab i)
+      nlinarith [hL i]
+    linarith
+  -- Average over the directions, then extend to `H₀¹` by density.
+  have h := poincare_H01 (Ω := euclBox a b) _
+    (fun {_φ} hφ => poincare_testfn (Nat.succ_pos n) (L ^ 2 / 2)
+      (fun {_ψ} h' i => hslice h' i) hφ) hU
+  refine le_trans h (le_of_eq ?_)
+  rw [div_div]
+  norm_cast
+
+/-- The test-function instance of the box Poincaré inequality, in the slice-constant form
+the coercivity layer consumes: with every side contribution `(bᵢ - aᵢ)² / 2` bounded by
+`C`, every test function on the box obeys the graph-coordinate bound with constant
+`C / (n + 1)`. Derived from the box Poincaré inequality `poincare_H01_euclBox` applied to
+the test-function graph (which lies in `H₀¹`), with `L = √(2C)` bounding the sides. -/
+theorem testfn_bound_euclBox {a b : Fin (n + 1) → ℝ} (hab : ∀ k, a k ≤ b k)
+    {C : ℝ} (hC : ∀ i, (b i - a i) ^ 2 / 2 ≤ C)
+    {φ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ} (h : IsTestFn (euclBox a b) φ) :
+    ‖(h.testGraph 0 : L2D (euclBox a b))‖ ^ 2
+      ≤ C / (n + 1) * ∑ i : Fin (n + 1), ‖h.testGraph i.succ‖ ^ 2 := by
+  have hC0 : 0 ≤ C := le_trans (by positivity) (hC 0)
+  have h2C : (0 : ℝ) ≤ 2 * C := by linarith
+  have hL : ∀ i, b i - a i ≤ Real.sqrt (2 * C) := by
+    intro i
+    have h1 : 0 ≤ b i - a i := sub_nonneg.mpr (hab i)
+    have h2 : (b i - a i) ^ 2 ≤ 2 * C := by linarith [hC i]
+    calc b i - a i = Real.sqrt ((b i - a i) ^ 2) := (Real.sqrt_sq h1).symm
+      _ ≤ Real.sqrt (2 * C) := Real.sqrt_le_sqrt h2
+  have hmem : h.testGraph ∈ H01 (euclBox a b) :=
+    (Submodule.le_topologicalClosure _) (Submodule.subset_span ⟨φ, h, rfl⟩)
+  have hp := poincare_H01_euclBox hab hL hmem
+  rw [Real.sq_sqrt h2C] at hp
+  refine le_trans hp (le_of_eq ?_)
+  rw [mul_div_mul_left C ((n : ℝ) + 1) two_ne_zero]
+
 end EllipticDirichlet.Poincare

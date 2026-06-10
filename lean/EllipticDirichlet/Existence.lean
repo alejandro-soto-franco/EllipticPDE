@@ -55,31 +55,46 @@ theorem dirichlet_weak_solution
     refine ext_inner_right (𝕜 := ℝ) (fun w => ?_)
     rw [hco.continuousLinearEquivOfBilin_apply, hu w, ← hgrep w]
 
-/-- **Unconditional existence and uniqueness on an open coordinate box.** Specialising
-`dirichlet_weak_solution` to the box `∏ₖ (aₖ, bₖ)`, the test-function Poincaré hypothesis is
-discharged from the box geometry by `Poincare.dirichletBilin_coercive_euclBox`, which rests on the
-one-dimensional/Fubini bound `Poincare.poincare_box_dir`. So for every continuous functional `f`
-on `H₀¹` of the box there is a unique weak solution of `B[u, v] = f v`, carrying no abstract
-Poincaré input. This is the box instance of Theorem `thm: main`. -/
+/-- **The a-priori estimate for the weak solution (Poisson form).** Under the hypotheses
+of [`dirichlet_weak_solution`], any weak solution obeys `‖u‖_{H₀¹} ≤ α⁻¹ ‖f‖` with the
+coercivity constant `α = 1 / (C_P + 1)`, i.e. `‖u‖_{H₀¹} ≤ (C_P + 1) ‖f‖`. -/
+theorem dirichlet_weak_solution_bound
+    (Ω : Set (EuclideanSpace ℝ (Fin d))) (CP : ℝ) (hCP : 0 ≤ CP)
+    (hbase : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ),
+      ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2)
+    {f : H01 Ω →L[ℝ] ℝ} {u : H01 Ω}
+    (hu : ∀ v : H01 Ω, dirichletBilin Ω u v = f v) :
+    ‖u‖ ≤ (CP + 1) * ‖f‖ := by
+  have h := norm_weak_solution_le (α := 1 / (CP + 1)) (by positivity)
+    (dirichletBilin_coercive_const Ω CP hCP hbase) hu
+  rwa [one_div, inv_inv] at h
+
+/-- **Unconditional existence, uniqueness, and a-priori bound on an open coordinate
+box.** Specialising `dirichlet_weak_solution` to the box `∏ₖ (aₖ, bₖ)`, the test-function
+Poincaré hypothesis is discharged from the box geometry: the per-direction slice bound
+`Poincare.slice_bound_euclBox` (which rests on the one-dimensional/Fubini bound
+`Poincare.poincare_box_dir`) is averaged by `Poincare.poincare_testfn` into the
+graph-coordinate bound with constant `C_P = C / (n + 1)`. So for every continuous
+functional `f` on `H₀¹` of the box there is a unique weak solution of `B[u, v] = f v`,
+satisfying the Lax-Milgram estimate `‖u‖_{H₀¹} ≤ α⁻¹ ‖f‖` with coercivity constant
+`α = 1 / (C / (n + 1) + 1)`, all carrying no abstract Poincaré input. This is the box
+instance of Theorem `thm: main` for the Poisson form. -/
 theorem dirichlet_weak_solution_euclBox {n : ℕ} (a b : Fin (n + 1) → ℝ)
     (hab : ∀ k, a k ≤ b k) (C : ℝ) (hC : ∀ i, (b i - a i) ^ 2 / 2 ≤ C)
     (f : H01 (euclBox a b) →L[ℝ] ℝ) :
-    ∃! u : H01 (euclBox a b),
-      ∀ v : H01 (euclBox a b), dirichletBilin (euclBox a b) u v = f v := by
-  have hco : IsCoercive (dirichletBilin (euclBox a b)) :=
-    dirichletBilin_coercive_euclBox a b hab C hC
-  have hgrep : ∀ w : H01 (euclBox a b),
-      ⟪(InnerProductSpace.toDual ℝ (H01 (euclBox a b))).symm f, w⟫ = f w :=
-    fun w => InnerProductSpace.toDual_symm_apply
-  set g : H01 (euclBox a b) :=
-    (InnerProductSpace.toDual ℝ (H01 (euclBox a b))).symm f with hg
-  refine ⟨hco.continuousLinearEquivOfBilin.symm g, ?_, ?_⟩
-  · intro v
-    rw [← hco.continuousLinearEquivOfBilin_apply, ContinuousLinearEquiv.apply_symm_apply, hgrep]
-  · intro u hu
-    apply hco.continuousLinearEquivOfBilin.injective
-    rw [ContinuousLinearEquiv.apply_symm_apply]
-    refine ext_inner_right (𝕜 := ℝ) (fun w => ?_)
-    rw [hco.continuousLinearEquivOfBilin_apply, hu w, ← hgrep w]
+    (∃! u : H01 (euclBox a b),
+      ∀ v : H01 (euclBox a b), dirichletBilin (euclBox a b) u v = f v)
+    ∧ ∀ u : H01 (euclBox a b),
+        (∀ v : H01 (euclBox a b), dirichletBilin (euclBox a b) u v = f v) →
+          ‖u‖ ≤ (C / (n + 1) + 1) * ‖f‖ := by
+  have hCnonneg : 0 ≤ C := le_trans (by positivity) (hC 0)
+  have hbase : ∀ {φ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ} (h : IsTestFn (euclBox a b) φ),
+      ‖(h.testGraph 0 : L2D (euclBox a b))‖ ^ 2
+        ≤ C / (n + 1) * ∑ i : Fin (n + 1), ‖h.testGraph i.succ‖ ^ 2 :=
+    fun {_φ} h => testfn_bound_euclBox hab hC h
+  have hCP : 0 ≤ C / (n + 1) := div_nonneg hCnonneg (by positivity)
+  refine ⟨dirichlet_weak_solution (euclBox a b) (C / (n + 1)) hCP hbase f, ?_⟩
+  intro u hu
+  exact dirichlet_weak_solution_bound (euclBox a b) (C / (n + 1)) hCP hbase hu
 
 end EllipticDirichlet

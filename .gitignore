@@ -34,7 +34,10 @@ __pycache__/
 
 # Stratum local workspace state (the citation library is global at ~/.stratum;
 # cite drift/status auto-discover this project without it). Render-layout dirs too.
-/latex/.stratum/
+# The signed formalization drift lock IS version-controlled: it records the
+# human sign-off that `stratum formalize check` verifies against.
+/latex/.stratum/*
+!/latex/.stratum/formalization.lock.toml
 /latex/latex/
 /latex/summaries/
 /latex/literature/
