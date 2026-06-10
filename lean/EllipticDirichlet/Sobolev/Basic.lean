@@ -79,6 +79,12 @@ lemma partialD_zero (i : Fin d) :
     partialD i (0 : EuclideanSpace ℝ (Fin d) → ℝ) = 0 := by
   funext x; simp [partialD]
 
+/-- The topological support of a partial derivative sits inside the support of the
+function: off `tsupport φ` the function is locally zero, so `fderiv` vanishes. -/
+lemma tsupport_partialD_subset (i : Fin d) (φ : EuclideanSpace ℝ (Fin d) → ℝ) :
+    tsupport (partialD i φ) ⊆ tsupport φ :=
+  tsupport_fderiv_apply_subset (𝕜 := ℝ) (f := φ) (EuclideanSpace.single i 1)
+
 /-- A smooth, compactly supported test function whose support sits inside `Ω`. -/
 def IsTestFn (Ω : Set (EuclideanSpace ℝ (Fin d))) (φ : EuclideanSpace ℝ (Fin d) → ℝ) :
     Prop :=
@@ -89,6 +95,12 @@ namespace IsTestFn
 variable {Ω : Set (EuclideanSpace ℝ (Fin d))} {φ : EuclideanSpace ℝ (Fin d) → ℝ}
 
 lemma continuous (h : IsTestFn Ω φ) : Continuous φ := h.1.continuous
+
+/-- Test functions are monotone in the domain: a test function of `Ω` is a test
+function of any superset. -/
+lemma mono {Ω Ω' : Set (EuclideanSpace ℝ (Fin d))} (hsub : Ω ⊆ Ω')
+    (h : IsTestFn Ω φ) : IsTestFn Ω' φ :=
+  ⟨h.1, h.2.1, h.2.2.trans hsub⟩
 
 lemma continuous_partialD (h : IsTestFn Ω φ) (i : Fin d) : Continuous (partialD i φ) :=
   ((h.1.continuous_fderiv (by simp)).clm_apply continuous_const)
