@@ -45,6 +45,17 @@ variable {n : ℕ}
 def euclBox (a b : Fin (n + 1) → ℝ) : Set (EuclideanSpace ℝ (Fin (n + 1))) :=
   {x | ∀ k, x k ∈ Set.Ioo (a k) (b k)}
 
+/-- The open coordinate box is open: it is a finite intersection of coordinate
+preimages of open intervals. -/
+lemma isOpen_euclBox (a b : Fin (n + 1) → ℝ) : IsOpen (euclBox a b) := by
+  have h : euclBox a b
+      = ⋂ k, (fun x : EuclideanSpace ℝ (Fin (n + 1)) => x k) ⁻¹' Set.Ioo (a k) (b k) := by
+    ext x
+    simp [euclBox, Set.mem_iInter]
+  rw [h]
+  exact isOpen_iInter_of_finite fun k =>
+    isOpen_Ioo.preimage ((EuclideanSpace.proj (𝕜 := ℝ) k).continuous)
+
 /-- A coordinate slice `s ↦ i.insertNth s y`, transported into `EuclideanSpace` by `toLp`, is the
 affine line `toLp (i.insertNth 0 y) + s • eᵢ`. -/
 lemma toLp_insertNth_eq (i : Fin (n + 1)) (y : Fin n → ℝ) (s : ℝ) :
