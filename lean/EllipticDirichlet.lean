@@ -7,10 +7,12 @@ import EllipticDirichlet.Poincare.Density
 import EllipticDirichlet.Poincare.Geometry
 import EllipticDirichlet.Poincare.BoxSlice
 import EllipticDirichlet.BilinearForm
+import EllipticDirichlet.Hneg
 import EllipticDirichlet.Existence
 import EllipticDirichlet.GeneralForm
 import EllipticDirichlet.Garding
 import EllipticDirichlet.Fredholm
+import EllipticDirichlet.FredholmComplete
 import EllipticDirichlet.Compactness
 import EllipticDirichlet.Spectrum
 import EllipticDirichlet.RellichDischarge
