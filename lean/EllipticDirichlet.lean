@@ -18,6 +18,7 @@ import EllipticDirichlet.SpectrumSigma
 import EllipticDirichlet.Compactness
 import EllipticDirichlet.Spectrum
 import EllipticDirichlet.RellichDischarge
+import EllipticDirichlet.BoundedInstances
 
 /-!
 # EllipticDirichlet
