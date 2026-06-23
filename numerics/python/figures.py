@@ -2,7 +2,7 @@
 
 Renders, in the ermak-planning report figure style (usetex serif, gridless, the
 same blue/orange/pink/gray palette, error bars over the mesh ensemble), two
-figures into ``latex/figures/``:
+figures into ``latex/manuscript/figures/``:
 
   * ``poincare_validation.pdf`` -- the discrete first Dirichlet eigenvalue
     converging to the exact ``2 pi^2``, and the sharp Poincare constant
@@ -40,7 +40,7 @@ GRAY = "#9aa0a6"
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 RUST_DIR = os.path.normpath(os.path.join(HERE, "..", "rust"))
-FIG_DIR = os.path.normpath(os.path.join(HERE, "..", "..", "latex", "figures"))
+FIG_DIR = os.path.normpath(os.path.join(HERE, "..", "..", "latex", "manuscript", "figures"))
 DATA_DIR = os.path.join(HERE, "data")
 
 # Shared error-bar style (ermak): hollow caps, gray bars, markers on top.

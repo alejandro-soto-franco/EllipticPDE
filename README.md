@@ -53,7 +53,7 @@ slated as a standalone Mathlib pull request.
 cd lean && lake build
 
 # Paper
-cd latex && latexmk -xelatex main.tex
+cd latex/manuscript && latexmk -xelatex main.tex
 
 # Rust numerics
 cd numerics/rust && cargo test
