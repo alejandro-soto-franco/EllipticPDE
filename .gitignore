@@ -41,3 +41,6 @@ __pycache__/
 /latex/manuscript/latex/
 /latex/manuscript/summaries/
 /latex/manuscript/literature/
+
+# committed manuscript label snapshot read by the litreview via xr-hyper
+!/latex/litreview/manuscript.aux
