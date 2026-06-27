@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Alejandro Soto Franco
+-/
 import EllipticDirichlet.Garding
 import Mathlib.Analysis.Normed.Operator.Compact.FredholmAlternative
 
@@ -52,12 +57,15 @@ def opT : H01 Ω →L[ℝ] H01 Ω := continuousLinearMapOfBilin (zerothForm Ω)
 def opE : H01 Ω ≃L[ℝ] H01 Ω :=
   (Op.shiftedBilin_coercive Ω (le_refl Op.gardingγ)).continuousLinearEquivOfBilin
 
+/-- Riesz identity: `⟪Op.opA Ω u, v⟫ = Op.fullBilin Ω u v`. -/
 lemma inner_opA (u v : H01 Ω) : ⟪Op.opA Ω u, v⟫ = Op.fullBilin Ω u v :=
   continuousLinearMapOfBilin_apply (Op.fullBilin Ω) u v
 
+/-- Riesz identity: `⟪opT Ω u, v⟫ = zerothForm Ω u v = ⟨u₀, v₀⟩_{L²}`. -/
 lemma inner_opT (u v : H01 Ω) : ⟪opT Ω u, v⟫ = zerothForm Ω u v :=
   continuousLinearMapOfBilin_apply (zerothForm Ω) u v
 
+/-- Riesz identity: `⟪Op.opE Ω u, v⟫ = Op.shiftedBilin Ω Op.gardingγ u v`. -/
 lemma inner_opE (u v : H01 Ω) :
     ⟪Op.opE Ω u, v⟫ = Op.shiftedBilin Ω Op.gardingγ u v :=
   (Op.shiftedBilin_coercive Ω (le_refl Op.gardingγ)).continuousLinearEquivOfBilin_apply u v

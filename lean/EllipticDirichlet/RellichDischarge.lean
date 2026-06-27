@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Alejandro Soto Franco
+-/
 import EllipticDirichlet.Spectrum
 import Mathlib.Analysis.FunctionalSpaces.FrechetKolmogorov
 import Mathlib.Analysis.FunctionalSpaces.LpExtendByZero
@@ -41,10 +46,9 @@ lemma extCls_ae {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩm : MeasurableSet Ω
     {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ) :
     (lpExtendByZero volume 2 Ω hΩm h.testCls : EuclideanSpace ℝ (Fin d) → ℝ) =ᵐ[volume] φ := by
   have h1 := coeFn_lpExtendByZero hΩm h.testCls
-  have h2 : (h.testCls : EuclideanSpace ℝ (Fin d) → ℝ) =ᵐ[volume.restrict Ω] φ := h.memLp.coeFn_toLp
   have h3 : Ω.indicator (h.testCls : EuclideanSpace ℝ (Fin d) → ℝ) =ᵐ[volume] Ω.indicator φ := by
     have hr : ∀ᵐ x ∂volume, x ∈ Ω → (h.testCls : EuclideanSpace ℝ (Fin d) → ℝ) x = φ x :=
-      (ae_restrict_iff' hΩm).mp h2
+      (ae_restrict_iff' hΩm).mp h.mem_lp.coeFn_toLp
     filter_upwards [hr] with x hx
     by_cases hxΩ : x ∈ Ω
     · rw [Set.indicator_of_mem hxΩ, Set.indicator_of_mem hxΩ, hx hxΩ]
@@ -100,7 +104,7 @@ lemma integral_grad_norm_sq_eq {Ω : Set (EuclideanSpace ℝ (Fin d))}
 squared `L²(ℝᵈ)` translation increment of a test class is controlled by `‖hvec‖²` times the sum of
 its partial-derivative class norms. This is `integral_sq_sub_translation_le` transported to the
 extended class. -/
-lemma modSq {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩm : MeasurableSet Ω)
+lemma mod_sq {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩm : MeasurableSet Ω)
     {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ) (hvec : EuclideanSpace ℝ (Fin d)) :
     ‖transL2 hvec (lpExtendByZero volume 2 Ω hΩm h.testCls)
         - lpExtendByZero volume 2 Ω hΩm h.testCls‖ ^ 2
@@ -125,7 +129,7 @@ lemma modSq {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩm : MeasurableSet Ω)
 /-- **The translation modulus of an `H₀¹` element.** For `U ∈ H₀¹(Ω)`, the extension by zero of
 `embL2 Ω U = U 0` is Lipschitz under translation with modulus `‖U‖`. The bound comes from the smooth
 approximants of `U` (density of test graphs) through `transL2_sub_le_of_tendsto'`. -/
-lemma transMod {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩm : MeasurableSet Ω) (U : H01 Ω)
+lemma trans_mod {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩm : MeasurableSet Ω) (U : H01 Ω)
     (hvec : EuclideanSpace ℝ (Fin d)) :
     ‖transL2 hvec (lpExtendByZero volume 2 Ω hΩm (embL2 Ω U))
         - lpExtendByZero volume 2 Ω hΩm (embL2 Ω U)‖ ≤ ‖U‖ * ‖hvec‖ := by
@@ -174,7 +178,7 @@ lemma transMod {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩm : MeasurableSet Ω)
   -- per-k modulus
   have hmod : ∀ k, ∀ hv, ‖transL2 hv (gk k) - gk k‖ ≤ Λk k * ‖hv‖ := by
     intro k hv
-    have hb := modSq hΩm (hk k) hv
+    have hb := mod_sq hΩm (hk k) hv
     rw [show ‖transL2 hv (gk k) - gk k‖ = Real.sqrt (‖transL2 hv (gk k) - gk k‖ ^ 2)
           from (Real.sqrt_sq (norm_nonneg _)).symm]
     calc Real.sqrt (‖transL2 hv (gk k) - gk k‖ ^ 2)
@@ -220,7 +224,7 @@ theorem embL2_isCompact {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩm : Measurab
       exact hx (fun hxΩ => hxR (hR hxΩ))
     · rintro g ⟨U, hU, rfl⟩ hvec
       rw [Metric.mem_closedBall, dist_zero_right] at hU
-      exact (transMod hΩm U hvec).trans (mul_le_mul_of_nonneg_right hU (norm_nonneg _))
+      exact (trans_mod hΩm U hvec).trans (mul_le_mul_of_nonneg_right hU (norm_nonneg _))
   have hpre : (lpExtendByZero volume 2 Ω hΩm) ⁻¹' S = embL2 Ω '' Metric.closedBall 0 1 := by
     rw [hS, ← Set.image_image (lpExtendByZero volume 2 Ω hΩm) (embL2 Ω),
       Set.preimage_image_eq _ (lpExtendByZero volume 2 Ω hΩm).injective]

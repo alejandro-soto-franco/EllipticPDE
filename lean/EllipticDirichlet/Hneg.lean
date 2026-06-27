@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Alejandro Soto Franco
+-/
 import EllipticDirichlet.BilinearForm
 
 /-!
@@ -46,10 +51,12 @@ ambient space. -/
 def gradFlip {Ω : Set (EuclideanSpace ℝ (Fin d))} (F : H1amb Ω) : H1amb Ω :=
   WithLp.toLp 2 (Fin.cons (F 0) (fun i => -(F i.succ)))
 
+/-- Simp lemma: the gradient flip fixes the function coordinate, `(gradFlip F) 0 = F 0`. -/
 @[simp] lemma gradFlip_zero {Ω : Set (EuclideanSpace ℝ (Fin d))} (F : H1amb Ω) :
     gradFlip F 0 = F 0 := by
   rw [gradFlip, PiLp.toLp_apply, Fin.cons_zero]
 
+/-- Simp lemma: `(gradFlip F) i.succ = -(F i.succ)`. -/
 @[simp] lemma gradFlip_succ {Ω : Set (EuclideanSpace ℝ (Fin d))} (F : H1amb Ω)
     (i : Fin d) : gradFlip F i.succ = -(F i.succ) := by
   rw [gradFlip, PiLp.toLp_apply, Fin.cons_succ]

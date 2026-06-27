@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Alejandro Soto Franco
+-/
 import EllipticDirichlet.Sobolev.Basic
 import Mathlib.MeasureTheory.Function.LpSeminorm.Monotonicity
 
@@ -47,6 +52,7 @@ def mulCoeffCls {Ω : Set (EuclideanSpace ℝ (Fin d))}
     (hM : ∀ᵐ x ∂(volume.restrict Ω), |f x| ≤ M) (g : L2D Ω) : L2D Ω :=
   (memLp_mul_of_bdd hf hM g).toLp _
 
+/-- The class `mulCoeffCls hf hM g` has pointwise representative `x ↦ f x · g x` a.e. -/
 lemma mulCoeffCls_coeFn {Ω : Set (EuclideanSpace ℝ (Fin d))}
     {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : Measurable f) {M : ℝ}
     (hM : ∀ᵐ x ∂(volume.restrict Ω), |f x| ≤ M) (g : L2D Ω) :
@@ -75,6 +81,7 @@ def mulCoeffLM {Ω : Set (EuclideanSpace ℝ (Fin d))}
     simp only [h1, h2, h3, h4, Pi.smul_apply, smul_eq_mul, RingHom.id_apply]
     ring
 
+/-- Simp lemma: `mulCoeffLM hf hM g = mulCoeffCls hf hM g`. -/
 @[simp] lemma mulCoeffLM_apply {Ω : Set (EuclideanSpace ℝ (Fin d))}
     {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : Measurable f) {M : ℝ}
     (hM : ∀ᵐ x ∂(volume.restrict Ω), |f x| ≤ M) (g : L2D Ω) :
@@ -93,6 +100,7 @@ def mulCoeffL {Ω : Set (EuclideanSpace ℝ (Fin d))}
       Real.norm_eq_abs, Real.norm_eq_abs, abs_mul]
     exact mul_le_mul_of_nonneg_right hMx (abs_nonneg _))
 
+/-- Simp lemma: `mulCoeffL hf hM g = mulCoeffCls hf hM g`. -/
 @[simp] lemma mulCoeffL_apply {Ω : Set (EuclideanSpace ℝ (Fin d))}
     {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : Measurable f) {M : ℝ}
     (hM : ∀ᵐ x ∂(volume.restrict Ω), |f x| ≤ M) (g : L2D Ω) :
@@ -157,14 +165,17 @@ variable (A : EllipticCoeff d)
 def actL {Ω : Set (EuclideanSpace ℝ (Fin d))} (i j : Fin d) : L2D Ω →L[ℝ] L2D Ω :=
   mulCoeffL (A.measurable i j) (ae_restrict_of_ae (A.bdd i j))
 
+/-- Simp lemma: `A.actL i j g` has pointwise representative `x ↦ A.a x i j · g x` a.e. -/
 @[simp] lemma actL_coeFn {Ω : Set (EuclideanSpace ℝ (Fin d))} (i j : Fin d) (g : L2D Ω) :
     A.actL i j g =ᵐ[volume.restrict Ω] fun x => A.a x i j * (g x : ℝ) :=
   mulCoeffL_coeFn _ _ g
 
+/-- `⟪A.actL i j g, h⟫ = ∫_Ω A.a x i j · g x · h x`. -/
 lemma inner_actL_eq {Ω : Set (EuclideanSpace ℝ (Fin d))} (i j : Fin d) (g h : L2D Ω) :
     ⟪A.actL i j g, h⟫ = ∫ x in Ω, A.a x i j * (g x : ℝ) * (h x : ℝ) :=
   inner_mulCoeffL_eq _ _ g h
 
+/-- Operator-norm bound: `‖A.actL i j g‖ ≤ Λ · ‖g‖`. -/
 lemma norm_actL_le {Ω : Set (EuclideanSpace ℝ (Fin d))} (i j : Fin d) (g : L2D Ω) :
     ‖A.actL i j g‖ ≤ A.Λ * ‖g‖ :=
   norm_mulCoeffL_le _ _ g

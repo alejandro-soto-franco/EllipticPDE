@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Alejandro Soto Franco
+-/
 import EllipticDirichlet.Poincare.Density
 import Mathlib.Analysis.InnerProductSpace.LaxMilgram
 
@@ -68,6 +73,7 @@ def dirichletBilin (Ω : Set (EuclideanSpace ℝ (Fin d))) :
       _ = (d : ℝ) * ‖U‖ * ‖V‖ := by
           rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_assoc])
 
+/-- Simp lemma: `dirichletBilin Ω U V = ∑ i, ⟪(U : H1amb Ω) i.succ, (V : H1amb Ω) i.succ⟫`. -/
 @[simp] lemma dirichletBilin_apply (Ω : Set (EuclideanSpace ℝ (Fin d))) (U V : H01 Ω) :
     dirichletBilin Ω U V = ∑ i : Fin d, ⟪(U : H1amb Ω) i.succ, (V : H1amb Ω) i.succ⟫ := by
   simp only [dirichletBilin, LinearMap.mkContinuous₂_apply, dirichletBilinₗ, LinearMap.mk₂_apply]
@@ -155,6 +161,7 @@ def l2Functional (Ω : Set (EuclideanSpace ℝ (Fin d))) (f : L2D Ω) : (H01 Ω)
     (PiLp.proj (𝕜 := ℝ) 2 (fun _ : Fin (d + 1) => L2D Ω) (0 : Fin (d + 1)))).comp
     (H01 Ω).subtypeL
 
+/-- Simp lemma: `l2Functional Ω f V = ⟪f, (V : H1amb Ω) 0⟫`. -/
 @[simp] lemma l2Functional_apply (Ω : Set (EuclideanSpace ℝ (Fin d))) (f : L2D Ω)
     (V : H01 Ω) : l2Functional Ω f V = ⟪f, (V : H1amb Ω) 0⟫ := rfl
 

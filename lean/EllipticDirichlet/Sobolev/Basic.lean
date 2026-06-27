@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Alejandro Soto Franco
+-/
 import Mathlib.MeasureTheory.Function.L2Space
 import Mathlib.MeasureTheory.Function.LpSpace.Indicator
 import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
@@ -94,6 +99,7 @@ namespace IsTestFn
 
 variable {Ω : Set (EuclideanSpace ℝ (Fin d))} {φ : EuclideanSpace ℝ (Fin d) → ℝ}
 
+/-- A test function is continuous. -/
 lemma continuous (h : IsTestFn Ω φ) : Continuous φ := h.1.continuous
 
 /-- Test functions are monotone in the domain: a test function of `Ω` is a test
@@ -102,9 +108,11 @@ lemma mono {Ω Ω' : Set (EuclideanSpace ℝ (Fin d))} (hsub : Ω ⊆ Ω')
     (h : IsTestFn Ω φ) : IsTestFn Ω' φ :=
   ⟨h.1, h.2.1, h.2.2.trans hsub⟩
 
+/-- Each partial derivative of a test function is continuous. -/
 lemma continuous_partialD (h : IsTestFn Ω φ) (i : Fin d) : Continuous (partialD i φ) :=
   ((h.1.continuous_fderiv (by simp)).clm_apply continuous_const)
 
+/-- Each partial derivative of a test function has compact support. -/
 lemma hasCompactSupport_partialD (h : IsTestFn Ω φ) (i : Fin d) :
     HasCompactSupport (partialD i φ) := by
   exact h.2.1.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single i 1)
@@ -129,7 +137,7 @@ lemma zero : IsTestFn Ω (0 : EuclideanSpace ℝ (Fin d) → ℝ) :=
   ⟨contDiff_const, HasCompactSupport.zero, by simp [tsupport]⟩
 
 /-- A test function lies in `L²(Ω)`. -/
-lemma memLp (h : IsTestFn Ω φ) : MemLp φ 2 (volume.restrict Ω) :=
+lemma mem_lp (h : IsTestFn Ω φ) : MemLp φ 2 (volume.restrict Ω) :=
   h.continuous.memLp_of_hasCompactSupport h.2.1
 
 /-- Each partial derivative of a test function lies in `L²(Ω)`. -/
@@ -138,7 +146,7 @@ lemma memLp_partialD (h : IsTestFn Ω φ) (i : Fin d) :
   (h.continuous_partialD i).memLp_of_hasCompactSupport (h.hasCompactSupport_partialD i)
 
 /-- The `L²(Ω)` class of a test function. -/
-def testCls (h : IsTestFn Ω φ) : L2D Ω := h.memLp.toLp φ
+def testCls (h : IsTestFn Ω φ) : L2D Ω := h.mem_lp.toLp φ
 
 /-- The `L²(Ω)` class of the `i`-th partial derivative of a test function. -/
 def partialCls (h : IsTestFn Ω φ) (i : Fin d) : L2D Ω :=
@@ -160,9 +168,11 @@ is the function, coordinate `i.succ` its `i`-th classical (= weak) partial. -/
 def testGraph (h : IsTestFn Ω φ) : H1amb Ω :=
   WithLp.toLp 2 (Fin.cons h.testCls (fun i => h.partialCls i))
 
+/-- Simp lemma: `testGraph h 0 = testCls h`. -/
 @[simp] lemma testGraph_zero (h : IsTestFn Ω φ) : h.testGraph 0 = h.testCls := by
   rw [testGraph, PiLp.toLp_apply, Fin.cons_zero]
 
+/-- Simp lemma: `testGraph h i.succ = partialCls h i`. -/
 @[simp] lemma testGraph_succ (h : IsTestFn Ω φ) (i : Fin d) :
     h.testGraph i.succ = h.partialCls i := by
   rw [testGraph, PiLp.toLp_apply, Fin.cons_succ]

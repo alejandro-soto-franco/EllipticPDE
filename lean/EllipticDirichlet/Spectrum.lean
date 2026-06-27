@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Alejandro Soto Franco
+-/
 import EllipticDirichlet.Compactness
 import EllipticDirichlet.BilinearForm
 import Mathlib.Analysis.InnerProductSpace.Spectrum
@@ -46,6 +51,7 @@ def solOp (B : H01 Ω →L[ℝ] H01 Ω →L[ℝ] ℝ) (hco : IsCoercive B) : L2D
 
 variable {B : H01 Ω →L[ℝ] H01 Ω →L[ℝ] ℝ}
 
+/-- Evaluation: `solOp B hco f = embL2 Ω ((B♯)⁻¹ ((embL2 Ω)† f))`. -/
 lemma solOp_apply (hco : IsCoercive B) (f : L2D Ω) :
     solOp B hco f
       = embL2 Ω (hco.continuousLinearEquivOfBilin.symm ((embL2 Ω).adjoint f)) := by

@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Alejandro Soto Franco
+-/
 import EllipticDirichlet.GeneralForm
 import EllipticDirichlet.Poincare.BoxSlice
 import EllipticDirichlet.Poincare.BoundedDomain
@@ -77,10 +82,12 @@ def bAct {Ω : Set (EuclideanSpace ℝ (Fin d))} (i : Fin d) : L2D Ω →L[ℝ] 
 def cAct {Ω : Set (EuclideanSpace ℝ (Fin d))} : L2D Ω →L[ℝ] L2D Ω :=
   mulCoeffL Op.c_meas (ae_restrict_of_ae Op.c_bdd)
 
+/-- Operator-norm bound for the transport action: `‖Op.bAct i g‖ ≤ Bsup · ‖g‖`. -/
 lemma norm_bAct_le {Ω : Set (EuclideanSpace ℝ (Fin d))} (i : Fin d) (g : L2D Ω) :
     ‖Op.bAct i g‖ ≤ Op.Bsup * ‖g‖ :=
   norm_mulCoeffL_le _ _ g
 
+/-- Operator-norm bound for the zeroth-order action: `‖Op.cAct g‖ ≤ Csup · ‖g‖`. -/
 lemma norm_cAct_le {Ω : Set (EuclideanSpace ℝ (Fin d))} (g : L2D Ω) :
     ‖Op.cAct g‖ ≤ Op.Csup * ‖g‖ :=
   norm_mulCoeffL_le _ _ g
@@ -141,6 +148,7 @@ def lowerBilin (Ω : Set (EuclideanSpace ℝ (Fin d))) :
       _ ≤ (d : ℝ) * Op.Bsup * ‖U‖ * ‖V‖ + Op.Csup * ‖U‖ * ‖V‖ := add_le_add hb hc
       _ = ((d : ℝ) * Op.Bsup + Op.Csup) * ‖U‖ * ‖V‖ := by ring)
 
+/-- Simp lemma: unfolds `lowerBilin Ω U V` to the transport and zeroth-order inner products. -/
 @[simp] lemma lowerBilin_apply (Ω : Set (EuclideanSpace ℝ (Fin d))) (U V : H01 Ω) :
     Op.lowerBilin Ω U V
       = (∑ i : Fin d, ⟪Op.bAct i ((U : H1amb Ω) i.succ), ((V : H1amb Ω) 0)⟫)
@@ -153,6 +161,7 @@ def fullBilin (Ω : Set (EuclideanSpace ℝ (Fin d))) :
     (H01 Ω) →L[ℝ] (H01 Ω) →L[ℝ] ℝ :=
   Op.toEllipticCoeff.bilin Ω + Op.lowerBilin Ω
 
+/-- `fullBilin = B_A + lowerBilin`: principal part plus transport and zeroth-order. -/
 lemma fullBilin_apply (Ω : Set (EuclideanSpace ℝ (Fin d))) (U V : H01 Ω) :
     Op.fullBilin Ω U V = Op.toEllipticCoeff.bilin Ω U V + Op.lowerBilin Ω U V := by
   simp only [FullEllipticOp.fullBilin, ContinuousLinearMap.add_apply]
@@ -163,6 +172,7 @@ lemma fullBilin_apply (Ω : Set (EuclideanSpace ℝ (Fin d))) (U V : H01 Ω) :
 def gardingγ : ℝ :=
   Op.lam / 2 + Op.Csup + (d : ℝ) * Op.Bsup ^ 2 / (2 * Op.lam)
 
+/-- The Gårding shift constant `γ` is non-negative. -/
 lemma gardingγ_nonneg : 0 ≤ Op.gardingγ := by
   have : (0 : ℝ) < 2 * Op.lam := by have := Op.lam_pos; linarith
   unfold gardingγ
@@ -247,6 +257,7 @@ def zerothForm (Ω : Set (EuclideanSpace ℝ (Fin d))) :
           (norm_nonneg _) (norm_nonneg _)
       _ = 1 * ‖U‖ * ‖V‖ := by ring)
 
+/-- Simp lemma: `zerothForm Ω U V = ⟪(U : H1amb Ω) 0, (V : H1amb Ω) 0⟫`. -/
 @[simp] lemma zerothForm_apply (Ω : Set (EuclideanSpace ℝ (Fin d))) (U V : H01 Ω) :
     zerothForm Ω U V = ⟪(U : H1amb Ω) 0, ((V : H1amb Ω) 0)⟫ := by
   simp only [FullEllipticOp.zerothForm, LinearMap.mkContinuous₂_apply, LinearMap.mk₂_apply]
@@ -256,6 +267,7 @@ def shiftedBilin (Ω : Set (EuclideanSpace ℝ (Fin d))) (μ : ℝ) :
     (H01 Ω) →L[ℝ] (H01 Ω) →L[ℝ] ℝ :=
   Op.fullBilin Ω + μ • zerothForm Ω
 
+/-- `shiftedBilin Ω μ U V = fullBilin Ω U V + μ · ⟪u₀, v₀⟫`. -/
 lemma shiftedBilin_apply (Ω : Set (EuclideanSpace ℝ (Fin d))) (μ : ℝ) (U V : H01 Ω) :
     Op.shiftedBilin Ω μ U V = Op.fullBilin Ω U V + μ * ⟪(U : H1amb Ω) 0, ((V : H1amb Ω) 0)⟫ := by
   simp only [FullEllipticOp.shiftedBilin, ContinuousLinearMap.add_apply,
@@ -573,7 +585,8 @@ theorem weak_solution_L2_of_nonneg_zeroth_of_bounded {n : ℕ}
   have hexist := Op.weak_solution_of_nonneg_zeroth Ω hb hc CP hCP hbase (l2Functional Ω f)
   simp only [l2Functional_eq_integral] at hexist
   refine ⟨hexist, fun u hu => ?_⟩
-  -- Refold to `l2Functional` form: `_bound` expects the functional, while `hu` carries the unfolded integral.
+  -- Refold to `l2Functional` form: `_bound` expects the functional,
+  -- while `hu` carries the unfolded integral.
   have hhu : ∀ v : H01 Ω, Op.fullBilin Ω u v = l2Functional Ω f v := by
     intro v; rw [l2Functional_eq_integral]; exact hu v
   have hbound := Op.weak_solution_of_nonneg_zeroth_bound Ω hb hc CP hCP hbase hhu

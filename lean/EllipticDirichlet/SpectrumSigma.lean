@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Alejandro Soto Franco
+-/
 import EllipticDirichlet.FredholmComplete
 import Mathlib.Analysis.Normed.Operator.Compact.FiniteDimension
 
@@ -270,6 +275,7 @@ namespace FullEllipticOp
 
 variable {d : ℕ} (Op : FullEllipticOp d) (Ω : Set (EuclideanSpace ℝ (Fin d)))
 
+/-- The Gårding shift constant `γ` is strictly positive. -/
 lemma gardingγ_pos : 0 < Op.gardingγ := by
   have h1 := Op.lam_pos
   have h2 := Op.Csup_nonneg
@@ -333,6 +339,7 @@ lemma opK_eigenvalue_pos {μ : ℝ}
 def opAlam (lam : ℝ) : H01 Ω →L[ℝ] H01 Ω :=
   (Op.opE Ω : H01 Ω →L[ℝ] H01 Ω) - (Op.gardingγ + lam) • opT Ω
 
+/-- Riesz identity: `⟪Op.opAlam Ω lam u, v⟫ = B[u, v] - lam · zerothForm Ω u v`. -/
 lemma inner_opAlam (lam : ℝ) (u v : H01 Ω) :
     ⟪Op.opAlam Ω lam u, v⟫ = Op.fullBilin Ω u v - lam * zerothForm Ω u v := by
   rw [opAlam, ContinuousLinearMap.sub_apply, ContinuousLinearMap.smul_apply,
@@ -523,6 +530,7 @@ theorem sigmaSet_inter_Iic_finite (hK : IsCompactOperator (Op.opK Ω)) (C : ℝ)
     have h2 := mul_left_cancel₀ hγ.ne' heq
     linarith
 
+/-- The exceptional set `Σ` is countable: finite on each bounded slice `Σ ∩ (-∞, n]`. -/
 theorem sigmaSet_countable (hK : IsCompactOperator (Op.opK Ω)) :
     (Op.sigmaSet Ω).Countable := by
   have hsub : Op.sigmaSet Ω ⊆ ⋃ n : ℕ, (Op.sigmaSet Ω ∩ Set.Iic (n : ℝ)) := by

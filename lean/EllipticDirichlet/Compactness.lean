@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Alejandro Soto Franco
+-/
 import EllipticDirichlet.Fredholm
 import Mathlib.Analysis.InnerProductSpace.Adjoint
 import Mathlib.Analysis.Normed.Operator.Compact.Basic
@@ -37,6 +42,7 @@ the `PiLp` projection onto coordinate `0` precomposed with the submodule inclusi
 def embL2 (Ω : Set (EuclideanSpace ℝ (Fin d))) : H01 Ω →L[ℝ] L2D Ω :=
   (PiLp.proj (𝕜 := ℝ) 2 (fun _ : Fin (d + 1) => L2D Ω) (0 : Fin (d + 1))).comp (H01 Ω).subtypeL
 
+/-- Simp lemma: `embL2 Ω U = (U : H1amb Ω) 0`, the function coordinate of `U`. -/
 @[simp] lemma embL2_apply (Ω : Set (EuclideanSpace ℝ (Fin d))) (U : H01 Ω) :
     embL2 Ω U = (U : H1amb Ω) 0 := by
   simp only [embL2, ContinuousLinearMap.comp_apply, Submodule.subtypeL_apply, PiLp.proj_apply]

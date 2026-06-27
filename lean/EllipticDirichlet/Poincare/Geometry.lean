@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Alejandro Soto Franco
+-/
 import EllipticDirichlet.Poincare.Domain
 import EllipticDirichlet.Sobolev.Basic
 import EllipticDirichlet.BilinearForm
@@ -45,7 +50,7 @@ lemma norm_testGraph_zero_sq_eq {Ω : Set (EuclideanSpace ℝ (Fin d))}
     ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 = ∫ x in Ω, (φ x) ^ 2 := by
   rw [IsTestFn.testGraph_zero]
   simp only [IsTestFn.testCls]
-  rw [← real_inner_self_eq_norm_sq, inner_toLp_eq h.memLp h.memLp]
+  rw [← real_inner_self_eq_norm_sq, inner_toLp_eq h.mem_lp h.mem_lp]
   exact integral_congr_ae (Filter.Eventually.of_forall fun x => (pow_two _).symm)
 
 /-- The squared `L²` norm of the `i`-th gradient coordinate of a test-function graph is the

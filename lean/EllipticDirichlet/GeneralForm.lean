@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Alejandro Soto Franco
+-/
 import EllipticDirichlet.Sobolev.Coefficients
 import EllipticDirichlet.Poincare.Density
 import Mathlib.Analysis.InnerProductSpace.LaxMilgram
@@ -107,6 +112,7 @@ def EllipticCoeff.bilin (A : EllipticCoeff d)
           simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
           ring)
 
+/-- Simp lemma: `A.bilin Ω U V = ∑ i, ∑ j, ⟪A.actL i j (∂ᵢu), (∂ⱼv)⟫`. -/
 @[simp] lemma EllipticCoeff.bilin_apply (A : EllipticCoeff d)
     (Ω : Set (EuclideanSpace ℝ (Fin d))) (U V : H01 Ω) :
     A.bilin Ω U V = ∑ i : Fin d, ∑ j : Fin d,
@@ -170,7 +176,6 @@ theorem EllipticCoeff.bilin_coercive (A : EllipticCoeff d)
   have hnorm : ‖U‖ ^ 2 = ‖(U : H1amb Ω) 0‖ ^ 2 + S := by
     rw [show ‖U‖ = ‖(U : H1amb Ω)‖ from rfl, PiLp.norm_sq_eq_of_L2, Fin.sum_univ_succ]
   have hpoin : ‖(U : H1amb Ω) 0‖ ^ 2 ≤ CP * S := poincare_H01 CP hbase U.2
-  have hSnonneg : 0 ≤ S := Finset.sum_nonneg (fun i _ => sq_nonneg _)
   have hkey : ‖U‖ * ‖U‖ ≤ (CP + 1) * S := by
     have : ‖U‖ ^ 2 ≤ (CP + 1) * S := by rw [hnorm]; nlinarith [hpoin]
     nlinarith [this]
