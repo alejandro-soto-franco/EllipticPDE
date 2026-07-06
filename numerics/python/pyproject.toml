@@ -1,7 +1,7 @@
 [project]
-name = "elliptic-dirichlet-numerics"
+name = "elliptic-pdes-numerics"
 version = "0.1.0"
-description = "SymPy cross-checks and manuscript figures for the elliptic-dirichlet formalisation (1D Poincaré constant, Fubini averaging, FEM cross-validation plots)."
+description = "SymPy cross-checks and manuscript figures for the elliptic-pdes formalisation (1D Poincaré constant, Fubini averaging, FEM cross-validation plots)."
 requires-python = ">=3.11"
 dependencies = ["sympy>=1.12", "numpy>=1.26", "matplotlib>=3.8"]
 
