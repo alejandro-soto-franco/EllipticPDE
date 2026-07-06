@@ -32,12 +32,12 @@ __pycache__/
 # Stray Meridian export tempfiles (lean-sync writes these into the project)
 /lean/meridian-dump-*.ttl
 
-# Stratum local workspace state (the citation library is global at ~/.stratum;
+# Adduce local workspace state (the citation library is global at ~/.adduce;
 # cite drift/status auto-discover this project without it). Render-layout dirs too.
 # The signed formalization drift lock IS version-controlled: it records the
-# human sign-off that `stratum formalize check` verifies against.
-/latex/manuscript/.stratum/*
-!/latex/manuscript/.stratum/formalization.lock.toml
+# human sign-off that `adduce formalize check` verifies against.
+/latex/.adduce/*
+!/latex/.adduce/formalization.lock.toml
 /latex/manuscript/latex/
 /latex/manuscript/summaries/
 /latex/manuscript/literature/
