@@ -12,7 +12,8 @@ import Mathlib.Analysis.InnerProductSpace.LaxMilgram
 
 We generalise the Poisson form `∑ᵢ ⟪∂ᵢu, ∂ᵢv⟫` of `BilinearForm.lean` to the symmetric
 second-order divergence-form operator `L u = -Dⱼ(aᵢⱼ Dᵢu)` with a measurable, bounded,
-uniformly elliptic coefficient matrix `A` (Guo §VII.1.1, §VII.2.1):
+uniformly elliptic coefficient matrix `A` (Evans §6.1.1: the divergence-form operator
+and the uniform ellipticity condition):
 
   `B_A[U, V] = ∑ᵢ ∑ⱼ ⟪aᵢⱼ ∂ᵢu, ∂ⱼv⟫_{L²}`.
 
@@ -23,8 +24,9 @@ uniformly elliptic coefficient matrix `A` (Guo §VII.1.1, §VII.2.1):
 * **Coercivity** (`α = λ / (C_P + 1)`): the density Poincaré inequality `poincare_H01`
   controls the function part, so `B_A` dominates the full `H¹` norm.
 
-This is Guo §VII.3.4/§VII.3.5: the symmetric, transport-free, `c = 0` case where `γ = 0` in
-the Gårding inequality and coercivity is immediate from ellipticity plus Poincaré. It mirrors
+This is the closing Examples remark of Evans §6.2.2: the symmetric, transport-free,
+`c = 0` case where `γ = 0` in the Gårding inequality and coercivity is immediate from
+ellipticity plus Poincaré. It mirrors
 the technique of DeGiorgi `WeakFormulation/CoefficientOperator.lean`
 (`coeffBilinSubmodule_coercive`) on our scalar `PiLp` Sobolev encoding.
 -/
@@ -159,7 +161,8 @@ lemma EllipticCoeff.bilin_self_ge (A : EllipticCoeff d)
           A.a x i j * (g i x : ℝ) * (g j x : ℝ) := integral_mono_ae hPint hQint hpoint
     _ = A.bilin Ω U U := (A.bilin_self_eq_integral U).symm
 
-/-- **Coercivity of the general elliptic form** (Guo §VII.3.4/§VII.3.5, `γ = 0`). Given the
+/-- **Coercivity of the general elliptic form** (the closing Examples remark of Evans
+§6.2.2, `γ = 0`). Given the
 test-function Poincaré bound with constant `C_P ≥ 0`, the symmetric uniformly elliptic
 divergence form `B_A` is coercive on `H₀¹(Ω)` with constant `λ / (C_P + 1)`. -/
 theorem EllipticCoeff.bilin_coercive (A : EllipticCoeff d)

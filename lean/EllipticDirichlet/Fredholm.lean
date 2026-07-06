@@ -7,7 +7,7 @@ import EllipticDirichlet.Garding
 import Mathlib.Analysis.Normed.Operator.Compact.FredholmAlternative
 
 /-!
-# The Fredholm alternative for the elliptic Dirichlet problem (Guo §VII.4)
+# The Fredholm alternative for the elliptic Dirichlet problem (Evans §6.2.3, Theorem 4)
 
 For the full divergence-form operator `Lu = -Dⱼ(aᵢⱼDᵢu) + bᵢDᵢu + cu` the Gårding inequality
 makes the shifted form `B_γ = B + γ⟨·,·⟩_{L²}` coercive (`shiftedBilin_coercive`), so `L + γ` is
@@ -99,7 +99,8 @@ lemma opA_factor :
 
 /-! ### The Fredholm alternative -/
 
-/-- **The Fredholm alternative for the elliptic Dirichlet problem** (Guo §VII.4). Assume the
+/-- **The Fredholm alternative for the elliptic Dirichlet problem** (Evans §6.2.3,
+Theorem 4). Assume the
 operator `opK` is compact -- the Rellich-Kondrachov input, that `H₀¹(Ω) ↪ L²(Ω)` is a compact
 embedding. Then exactly one of two alternatives holds: either the homogeneous problem `Lu = 0`
 has a nontrivial weak solution `u ≠ 0` (`∀ v, B[u, v] = 0`), or the inhomogeneous problem
@@ -145,7 +146,7 @@ theorem fredholm_alternative (hK : IsCompactOperator (Op.opK Ω)) :
         rw [Op.inner_opA Ω u v, hu v, hg]
     exact (existsUnique_congr hiff).mp (hbij.existsUnique g)
 
-/-- **Fredholm corollary** (the usual working form, Guo §VII.4): if the homogeneous problem
+/-- **Fredholm corollary** (the usual working form, Evans §6.2.3): if the homogeneous problem
 `Lu = 0` has only the trivial weak solution, then `Lu = f` has a unique weak solution for every
 `f`. Uniqueness of the homogeneous problem rules out the eigenvalue alternative. -/
 theorem fredholm_unique_imp_exists (hK : IsCompactOperator (Op.opK Ω))

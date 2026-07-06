@@ -8,7 +8,7 @@ import EllipticDirichlet.BilinearForm
 import Mathlib.Analysis.InnerProductSpace.Spectrum
 
 /-!
-# Eigenvalue theory for the symmetric elliptic Dirichlet problem (Guo §VII.4, Evans §6.5)
+# Eigenvalue theory for the symmetric elliptic Dirichlet problem (Evans §6.5.1, Theorem 1)
 
 For a **symmetric coercive** bilinear form `B` on `H₀¹(Ω)` we build the solution operator on
 `L²(Ω)` and apply Mathlib's spectral theorem for compact self-adjoint operators to obtain a

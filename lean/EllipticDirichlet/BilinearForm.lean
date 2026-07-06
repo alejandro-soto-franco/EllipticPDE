@@ -21,8 +21,9 @@ partial of `U ∈ H₀¹(Ω)` is the coordinate `U (i.succ)`, so
   and the density Poincaré inequality `poincare_H01` controls the function part `‖u‖²`
   by that energy, so `B` dominates the full `H¹` norm.
 
-This is the `γ = 0` case of Guo §VII.3.4: coercivity is immediate from the energy
-identity plus Poincaré, with no Gårding absorption. It is exactly the hypothesis the
+This is the `γ = 0` case of the coercivity examples closing Evans §6.2.2: coercivity is
+immediate from the energy identity plus Poincaré, with no Gårding absorption. It is
+exactly the hypothesis the
 Lax-Milgram theorem (M6) consumes. The general elliptic matrix `A` and `c ≥ 0` follow the
 same shape with `A`'s ellipticity constant in place of `1` (cf. DeGiorgi
 `WeakFormulation/CoefficientOperator.lean`).
@@ -131,8 +132,9 @@ theorem dirichletBilin_coercive (Ω : Set (EuclideanSpace ℝ (Fin d)))
 /-- **The Lax-Milgram a-priori estimate.** If the bilinear form `B` satisfies the
 quantitative coercivity bound `α ‖U‖² ≤ B[U, U]` with `α > 0`, then any weak solution
 `u` of `B[u, v] = f v` obeys `‖u‖ ≤ α⁻¹ ‖f‖`: coercivity gives
-`α ‖u‖² ≤ B[u, u] = f u ≤ ‖f‖ ‖u‖`, and dividing by `‖u‖` gives the bound (Guo §VII.4,
-the estimate `β ‖u‖_{H₀¹} ≤ ‖B_μ(u, ·)‖_{H⁻¹}`). -/
+`α ‖u‖² ≤ B[u, u] = f u ≤ ‖f‖ ‖u‖`, and dividing by `‖u‖` gives the bound. This is the
+Hilbert-space a-priori estimate underlying the Lax-Milgram theorem (Evans §6.2.1,
+Theorem 1, step 3): `β ‖u‖ ≤ ‖Au‖`. -/
 theorem norm_weak_solution_le {Ω : Set (EuclideanSpace ℝ (Fin d))}
     {B : (H01 Ω) →L[ℝ] (H01 Ω) →L[ℝ] ℝ} {α : ℝ} (hα : 0 < α)
     (hcoer : ∀ U : H01 Ω, α * ‖U‖ * ‖U‖ ≤ B U U)
@@ -154,7 +156,8 @@ theorem norm_weak_solution_le {Ω : Set (EuclideanSpace ℝ (Fin d))}
 
 /-- A right-hand side `f ∈ L²(Ω)` as a continuous linear functional on `H₀¹(Ω)`:
 `v ↦ ⟪f, v₀⟫_{L²}`, the weak pairing `⟨f, v⟩ = ∫_Ω f · v₀`. This is the embedding
-`L²(Ω) ⊆ H⁻¹(Ω)` (Guo Remark VII.1.5) through which the classical Dirichlet problem
+`L²(Ω) ⊆ H⁻¹(Ω)` (Evans §5.9.1, Theorem 1(iii)) through which the classical Dirichlet
+problem
 `Lu = f`, `f ∈ L²(Ω)`, enters the abstract Lax-Milgram statement. -/
 def l2Functional (Ω : Set (EuclideanSpace ℝ (Fin d))) (f : L2D Ω) : (H01 Ω) →L[ℝ] ℝ :=
   ((innerSL ℝ f).comp

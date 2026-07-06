@@ -162,7 +162,8 @@ theorem slice_bound_euclBox (a b : Fin (n + 1) → ℝ) (hab : ∀ k, a k ≤ b 
     (u' := fun x => partialD i φ (WithLp.toLp 2 x)) i (hab i)
     (fun y t _ => hasDerivAt_slice hφd i y t) hcont hzero hu2 hu'2
 
-/-- **Unconditional Dirichlet coercivity on an open box** (Guo §VII.3.4, geometry supplied). With
+/-- **Unconditional Dirichlet coercivity on an open box** (the closing Examples remark
+of Evans §6.2.2, geometry supplied). With
 `C` an upper bound for every side contribution `(bᵢ - aᵢ)² / 2`, the Poisson (Dirichlet) form is
 coercive on `H₀¹` of the open box `∏ₖ (aₖ, bₖ)`, with no abstract Poincaré hypothesis: the slice
 bound is discharged from the box geometry by `slice_bound_euclBox`. -/

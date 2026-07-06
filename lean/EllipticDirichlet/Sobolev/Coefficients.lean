@@ -17,7 +17,7 @@ bounded measurable coefficient and still land in `L²`. This file provides
   continuous linear map `g ↦ [f · g]`, with operator-norm bound `M`;
 * `mulCoeffL_coeFn` : its pointwise a.e. representative `x ↦ f x · g x`;
 * `EllipticCoeff` : the bundle of a measurable, bounded, uniformly elliptic coefficient
-  matrix `a` (Guo §VII.2.1: `∑ aᵢⱼ ξᵢ ξⱼ ≥ λ |ξ|²`).
+  matrix `a` (Evans §6.1.1: `∑ aᵢⱼ ξᵢ ξⱼ ≥ λ |ξ|²`).
 
 This mirrors, on the scalar `PiLp` encoding of `Sobolev/Basic.lean`, the coefficient action
 `coeffMulLpL` that DeGiorgi (`WeakFormulation/CoefficientOperator.lean`) builds on the
@@ -134,12 +134,12 @@ lemma inner_mulCoeffL_eq {Ω : Set (EuclideanSpace ℝ (Fin d))}
   filter_upwards [mulCoeffL_coeFn hf hM g] with a ha
   rw [Real.inner_apply, ha]
 
-/-! ### Uniformly elliptic coefficient matrices (Guo §VII.2.1) -/
+/-! ### Uniformly elliptic coefficient matrices (Evans §6.1.1) -/
 
 /-- A measurable, bounded, symmetric-or-not coefficient matrix `a` that is **uniformly
 elliptic** with ellipticity constant `lam > 0` and sup bound `Λ`:
-`∑ᵢⱼ aᵢⱼ(x) ξᵢ ξⱼ ≥ lam · |ξ|²` and `|aᵢⱼ(x)| ≤ Λ` for almost every `x` (Guo §VII.2.1
-states ellipticity for almost every `x ∈ Ω`; the bundle carries a measurable
+`∑ᵢⱼ aᵢⱼ(x) ξᵢ ξⱼ ≥ lam · |ξ|²` and `|aᵢⱼ(x)| ≤ Λ` for almost every `x` (Evans §6.1.1
+states ellipticity pointwise for a.e. `x ∈ U`; the bundle carries a measurable
 representative on `ℝᵈ` with the bounds holding `volume`-a.e., which restricts to a.e. on
 every domain `Ω`). This is exactly the data the divergence-form operator
 `Lu = -Dⱼ(aᵢⱼ Dᵢu)` needs for the energy estimate. -/

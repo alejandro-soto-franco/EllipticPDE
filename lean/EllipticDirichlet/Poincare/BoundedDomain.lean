@@ -15,8 +15,8 @@ the slice bound, because a test function of `Ω` is a test function of the box
 `tsupport φ ⊆ Ω`). Averaging (`poincare_testfn`) and density (`poincare_H01`) are already
 domain-general, so the Poincaré inequality follows on every bounded domain
 (`poincare_H01_of_bounded`), with the closed-form constant `L²/(2(n+1))` from any
-bounding box of side `L`. This is the `p = q = 2` Friedrichs case of Guo
-Theorem III.4.6; the limit passage that Guo performs by mollification is the
+bounding box of side `L`. This is the `p = q = 2` Friedrichs (Poincaré) inequality
+for `H₀¹`; the limit passage from test functions to `H₀¹(Ω)` by density is the
 density step `poincare_H01`, which is architectural here because `H₀¹` is defined
 as the closure of the test-function graphs.
 -/
@@ -130,9 +130,9 @@ theorem exists_euclBox_superset {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))}
     linarith [le_trans habs hxR]
   exact ⟨by simpa using (abs_lt.mp hlt).1, (abs_lt.mp hlt).2⟩
 
-/-- **The Poincaré inequality on `H₀¹` of an arbitrary bounded domain** (Guo
-Theorem III.4.6, `p = q = 2`): some constant `C ≥ 0` controls the function part by the
-gradient part, uniformly over `H₀¹(Ω)`. -/
+/-- **The Poincaré inequality on `H₀¹` of an arbitrary bounded domain** (the
+Friedrichs inequality, `p = q = 2`): some constant `C ≥ 0` controls the function part
+by the gradient part, uniformly over `H₀¹(Ω)`. -/
 theorem poincare_H01_of_bounded {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))}
     (hΩb : Bornology.IsBounded Ω) :
     ∃ C : ℝ, 0 ≤ C ∧ ∀ (U : H1amb Ω), U ∈ H01 Ω →

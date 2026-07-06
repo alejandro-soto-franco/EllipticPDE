@@ -7,27 +7,28 @@ import EllipticDirichlet.FredholmComplete
 import Mathlib.Analysis.Normed.Operator.Compact.FiniteDimension
 
 /-!
-# The spectrum of compact operators and Existence III (Guo §VII.5)
+# The spectrum of compact operators and Existence III
 
 Two layers.
 
-**Generic** (Guo Theorem VII.5.3, real spectrum of a compact operator `K` on a real
-Hilbert space): `0 ∈ σ(K)` when the space is infinite-dimensional; away from zero the
-spectrum consists of eigenvalues (mathlib's Fredholm alternative); and the eigenvalues
-cannot accumulate away from zero -- for every `δ > 0` only finitely many eigenvalues
-have `|μ| ≥ δ`, so `σ(K) \ {0}` is countable. The accumulation argument is the
-classical eigenvector chain: distinct eigenvalues give a strictly increasing chain of
-spans `Eₙ`, Hilbert geometry provides unit vectors `uₙ ∈ Eₙ₊₁ ∩ Eₙᗮ`, and
+**Generic** (Evans Appendix D.5, Theorem 6: the spectrum of a compact operator `K` on a
+real Hilbert space): `0 ∈ σ(K)` when the space is infinite-dimensional; away from zero
+the spectrum consists of eigenvalues (mathlib's Fredholm alternative); and the
+eigenvalues cannot accumulate away from zero -- for every `δ > 0` only finitely many
+eigenvalues have `|μ| ≥ δ`, so `σ(K) \ {0}` is countable. The accumulation argument is
+the classical eigenvector chain: distinct eigenvalues give a strictly increasing chain
+of spans `Eₙ`, Hilbert geometry provides unit vectors `uₙ ∈ Eₙ₊₁ ∩ Eₙᗮ`, and
 `(μₙ - K)Eₙ₊₁ ⊆ Eₙ` forces `‖K(uₙ/μₙ) - K(uₘ/μₘ)‖ ≥ 1` for `m < n`, contradicting
 the compactness of `K` on the bounded sequence `uₙ/μₙ`.
 
-**Elliptic** (Guo Theorem VII.5.4, Existence III): the set
-`Σ = {λ : γ/(γ+λ) is an eigenvalue of opK}` is countable with finite intersections
-with every `Set.Iic C` (so an infinite `Σ` is a sequence increasing to `+∞`), and
-`λ ∉ Σ` holds exactly when the weak problem `Lu = λu + f` is uniquely solvable for
-every right-hand side. The reduction is the `opK` factorisation of `Fredholm.lean`,
-shifted: `opAlam = opE ∘ (1 - ((γ+λ)/γ)·opK)`. Eigenvalues of `opK` are positive
-(coercivity of the shifted form), which bounds `Σ` inside `(-γ, ∞)`.
+**Elliptic** (`Existence III`, obtained by parametrising the Fredholm alternative of
+Evans §6.2.3 by the shift `λ` and invoking the spectral theorem of Evans Appendix D.5):
+the set `Σ = {λ : γ/(γ+λ) is an eigenvalue of opK}` is countable with finite
+intersections with every `Set.Iic C` (so an infinite `Σ` is a sequence increasing to
+`+∞`), and `λ ∉ Σ` holds exactly when the weak problem `Lu = λu + f` is uniquely
+solvable for every right-hand side. The reduction is the `opK` factorisation of
+`Fredholm.lean`, shifted: `opAlam = opE ∘ (1 - ((γ+λ)/γ)·opK)`. Eigenvalues of `opK`
+are positive (coercivity of the shifted form), which bounds `Σ` inside `(-γ, ∞)`.
 -/
 
 open MeasureTheory InnerProductSpace
@@ -37,7 +38,7 @@ noncomputable section
 
 namespace EllipticDirichlet.Sobolev
 
-/-! ### The spectrum of a compact operator (Guo Thm VII.5.3) -/
+/-! ### The spectrum of a compact operator (Evans Appendix D.5, Theorem 6) -/
 
 section CompactSpectrum
 
@@ -203,7 +204,7 @@ theorem countable_setOf_hasEigenvalue_ne_zero (hK : IsCompactOperator K) :
 
 omit [CompleteSpace E] in
 /-- `0` lies in the (real) spectrum of a compact operator on an infinite-dimensional
-space: an inverse would make the identity compact (Guo Thm VII.5.3(i)). -/
+space: an inverse would make the identity compact (Evans Appendix D.5, Theorem 6(i)). -/
 theorem zero_mem_spectrum_of_compact (hK : IsCompactOperator K)
     (hinf : ¬ FiniteDimensional ℝ E) : (0 : ℝ) ∈ spectrum ℝ K := by
   rw [spectrum.mem_iff]
@@ -225,7 +226,8 @@ theorem zero_mem_spectrum_of_compact (hK : IsCompactOperator K)
   exact hone
 
 /-- Away from zero the spectrum of a compact operator consists exactly of the
-eigenvalues (Guo Thm VII.5.3(ii)), mathlib's Fredholm alternative as a set identity. -/
+eigenvalues (Evans Appendix D.5, Theorem 6(ii)), mathlib's Fredholm alternative as a
+set identity. -/
 theorem spectrum_diff_eq_eigenvalues (hK : IsCompactOperator K) :
     spectrum ℝ K \ {0}
       = {μ : ℝ | Module.End.HasEigenvalue (K.toLinearMap) μ} \ {0} := by
@@ -237,7 +239,7 @@ theorem spectrum_diff_eq_eigenvalues (hK : IsCompactOperator K) :
   · rintro ⟨heig, h0⟩
     exact ⟨(hK.hasEigenvalue_iff_mem_spectrum h0).mp heig, h0⟩
 
-/-- **The spectrum of a compact operator (Guo Theorem VII.5.3).** On an
+/-- **The spectrum of a compact operator (Evans Appendix D.5, Theorem 6).** On an
 infinite-dimensional real Hilbert space, a compact operator `K` has `0` in its real
 spectrum; away from zero the spectrum consists exactly of the eigenvalues; the nonzero
 spectrum is countable; and only finitely many spectral points have `|μ| ≥ δ` for each
@@ -269,7 +271,7 @@ theorem spectrum_compact_operator (hK : IsCompactOperator K)
 
 end CompactSpectrum
 
-/-! ### Existence III for the elliptic problem (Guo Thm VII.5.4) -/
+/-! ### Existence III for the elliptic problem -/
 
 namespace FullEllipticOp
 
@@ -284,7 +286,7 @@ lemma gardingγ_pos : 0 < Op.gardingγ := by
   unfold gardingγ
   linarith
 
-/-- **The set `Σ` of Guo Theorem VII.5.4**: the real `λ` for which `γ/(γ+λ)` is an
+/-- **The set `Σ` of Existence III**: the real `λ` for which `γ/(γ+λ)` is an
 eigenvalue of the compact part `opK` of the reduction -- equivalently (see
 `notMem_sigmaSet_iff_solvable`), the `λ` for which the weak problem `Lu = λu + f`
 fails to be uniquely solvable for every right-hand side. -/
@@ -466,7 +468,7 @@ theorem solvable_of_notMem_sigmaSet (hK : IsCompactOperator (Op.opK Ω)) {lam : 
     (Op.opAlam_solves_iff Ω lam f u).symm)).mp
     (hbij.existsUnique ((InnerProductSpace.toDual ℝ (H01 Ω)).symm f))
 
-/-- The membership characterization of `Σ` (the `H⁻¹` form of Guo Thm VII.5.4(i)):
+/-- The membership characterization of `Σ` (the `H⁻¹` form of Existence III(i)):
 `λ ∉ Σ` exactly when `B[u,v] = λ⟨u₀,v₀⟩ + f(v)` is uniquely solvable for every `f`. -/
 theorem notMem_sigmaSet_iff_solvable (hK : IsCompactOperator (Op.opK Ω)) (lam : ℝ) :
     lam ∉ Op.sigmaSet Ω
@@ -551,7 +553,7 @@ private lemma integral_zero_rhs (v : H01 Ω) :
     simp
   rw [h1, integral_zero]
 
-/-- **Existence III (Guo Theorem VII.5.4).** There is a set `Σ ⊆ ℝ`, countable and with
+/-- **Existence III.** There is a set `Σ ⊆ ℝ`, countable and with
 finite intersection with every `(-∞, C]` (so an infinite `Σ` is a nondecreasing
 sequence diverging to `+∞`), such that for every `λ ∉ Σ` and every `f ∈ L²(Ω)` the
 weak problem `Lu = λu + f` -- `B[u,v] = λ⟨u₀,v₀⟩ + ∫_Ω f v₀` for all `v` -- has a
@@ -576,7 +578,7 @@ theorem existence_three (hK : IsCompactOperator (Op.opK Ω)) :
     refine (existsUnique_congr (fun u => forall_congr' (fun v => ?_))).mp h0
     rw [integral_zero_rhs Ω v, add_zero, zerothForm_apply]
 
-/-- **Boundedness of the resolvent (Guo Theorem VII.5.6).** For `λ ∉ Σ` there is a
+/-- **Boundedness of the resolvent.** For `λ ∉ Σ` there is a
 constant `C > 0` such that every weak solution of `Lu = λu + f` with `f ∈ L²(Ω)`
 satisfies `‖u‖_{L²} ≤ C ‖f‖_{L²}`. The constant is the operator norm of the
 continuous inverse of the `λ`-shifted Riesz operator. -/

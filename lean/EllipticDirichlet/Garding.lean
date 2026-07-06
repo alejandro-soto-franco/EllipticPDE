@@ -15,13 +15,14 @@ We add to the principal part `B_A` of `GeneralForm.lean` a **transport** term `b
 
   `B[U, V] = ∑ᵢⱼ ⟪aᵢⱼ ∂ᵢu, ∂ⱼv⟫ + ∑ᵢ ⟪bᵢ ∂ᵢu, v₀⟫ + ⟪c u₀, v₀⟫`.
 
-This is Guo §VII.1.1's full divergence-form operator `Lu = -Dⱼ(aᵢⱼDᵢu) + bᵢDᵢu + cu`.
+This is Evans §6.1.1's full divergence-form operator `Lu = -Dⱼ(aᵢⱼDᵢu) + bᵢDᵢu + cu`.
 
-* **Gårding inequality** (`FullEllipticOp.garding`, Guo §VII.2.5(ii)): there are `β > 0`,
-  `γ ≥ 0` with `β ‖U‖²_{H¹} ≤ B[U, U] + γ ‖u₀‖²_{L²}` for all `U ∈ H₀¹(Ω)`. We take
-  `β = λ/2` and `γ = λ/2 + ‖c‖∞ + d ‖b‖∞² / (2λ)`. The transport term is absorbed into the
-  ellipticity gap by the Peter-Paul (Young) inequality.
-* **Shifted existence** (`FullEllipticOp.weak_solution`, Guo §VII.3.3): for any shift
+* **Gårding inequality** (`FullEllipticOp.garding`, Evans §6.2.2, Theorem 2(ii)): there
+  are `β > 0`, `γ ≥ 0` with `β ‖U‖²_{H¹} ≤ B[U, U] + γ ‖u₀‖²_{L²}` for all `U ∈ H₀¹(Ω)`.
+  We take `β = λ/2` and `γ = λ/2 + ‖c‖∞ + d ‖b‖∞² / (2λ)`. The transport term is absorbed
+  into the ellipticity gap by the Peter-Paul (Young) inequality.
+* **Shifted existence** (`FullEllipticOp.weak_solution`, Evans §6.2.2, Theorem 3): for
+  any shift
   `μ ≥ γ` the shifted form `B_μ[U, V] = B[U, V] + μ ⟪u₀, v₀⟫` is coercive (Gårding already
   controls the full `H¹` norm, so **no Poincaré inequality is needed** here), and Lax-Milgram
   yields a unique weak solution `u ∈ H₀¹(Ω)` of `Lu + μu = f` for every `f ∈ H⁻¹(Ω)`.
@@ -181,7 +182,8 @@ lemma gardingγ_nonneg : 0 ≤ Op.gardingγ := by
     div_nonneg (by positivity) this.le
   linarith [Op.Csup_nonneg]
 
-/-- **The Gårding inequality** (Guo §VII.2.5(ii)). With `β = λ/2` and `γ = gardingγ`,
+/-- **The Gårding inequality** (Evans §6.2.2, Theorem 2(ii)). With `β = λ/2` and
+`γ = gardingγ`,
 `β ‖U‖²_{H¹} ≤ B[U, U] + γ ‖u₀‖²_{L²}` for every `U ∈ H₀¹(Ω)`. -/
 theorem garding (Ω : Set (EuclideanSpace ℝ (Fin d))) (U : H01 Ω) :
     Op.lam / 2 * ‖U‖ ^ 2
@@ -237,7 +239,7 @@ theorem garding (Ω : Set (EuclideanSpace ℝ (Fin d))) (U : H01 Ω) :
   rw [Op.fullBilin_apply, Op.lowerBilin_apply, gardingγ, ← hK, hnorm]
   linarith [hA, hT, hC]
 
-/-! ### Shifted coercivity and existence (Guo §VII.3.3) -/
+/-! ### Shifted coercivity and existence (Evans §6.2.2, Theorem 3) -/
 
 /-- The zeroth `L²` form `⟪u₀, v₀⟫` on `H₀¹(Ω)`, used for the spectral shift. -/
 def zerothForm (Ω : Set (EuclideanSpace ℝ (Fin d))) :
@@ -273,7 +275,8 @@ lemma shiftedBilin_apply (Ω : Set (EuclideanSpace ℝ (Fin d))) (μ : ℝ) (U V
   simp only [FullEllipticOp.shiftedBilin, ContinuousLinearMap.add_apply,
     ContinuousLinearMap.smul_apply, zerothForm_apply, smul_eq_mul]
 
-/-- **Shifted coercivity** (Guo §VII.3.3). For any shift `μ ≥ γ`, the shifted form `B_μ` is
+/-- **Shifted coercivity** (Evans §6.2.2, Theorem 3). For any shift `μ ≥ γ`, the shifted
+form `B_μ` is
 coercive with constant `λ/2`. The Gårding inequality already controls the full `H¹` norm,
 so no Poincaré inequality is needed. -/
 theorem shiftedBilin_coercive (Ω : Set (EuclideanSpace ℝ (Fin d))) {μ : ℝ}
@@ -293,7 +296,8 @@ theorem shiftedBilin_coercive (Ω : Set (EuclideanSpace ℝ (Fin d))) {μ : ℝ}
   calc Op.lam / 2 * ‖U‖ * ‖U‖ = Op.lam / 2 * ‖U‖ ^ 2 := by ring
     _ ≤ Op.fullBilin Ω U U + μ * ‖(U : H1amb Ω) 0‖ ^ 2 := this
 
-/-- **Existence and uniqueness for `Lu + μu = f`** (Guo §VII.3.3). For a shift `μ ≥ γ` and
+/-- **Existence and uniqueness for `Lu + μu = f`** (Evans §6.2.2, Theorem 3). For a
+shift `μ ≥ γ` and
 any continuous functional `f` on `H₀¹(Ω)`, there is a unique `u ∈ H₀¹(Ω)` solving the shifted
 weak problem `B_μ[u, v] = f v` for all `v`. -/
 theorem weak_solution (Ω : Set (EuclideanSpace ℝ (Fin d))) {μ : ℝ}
@@ -313,7 +317,8 @@ theorem weak_solution (Ω : Set (EuclideanSpace ℝ (Fin d))) {μ : ℝ}
     refine ext_inner_right (𝕜 := ℝ) (fun w => ?_)
     rw [hco.continuousLinearEquivOfBilin_apply, hu w, ← hgrep w]
 
-/-! ### The transport-free, nonnegative-zeroth coercive case (Guo §VII.3.5) -/
+/-! ### The transport-free, nonnegative-zeroth coercive case (Evans §6.2.2, closing
+Examples remark) -/
 
 /-- **The lower-order form is nonnegative** when the transport field vanishes (`b = 0`
 a.e. on `Ω`) and the zeroth coefficient is nonnegative (`c ≥ 0` a.e. on `Ω`): the
@@ -341,7 +346,8 @@ lemma lowerBilin_self_nonneg (Ω : Set (EuclideanSpace ℝ (Fin d)))
   nlinarith [hx, sq_nonneg ((U : H1amb Ω) 0 x : ℝ)]
 
 /-- **Quantitative coercivity for the transport-free, nonnegative-zeroth case**
-(Guo §VII.3.5). If the transport field vanishes (`b ≡ 0`) and the zeroth coefficient is
+(Evans §6.2.2, closing Examples remark). If the transport field vanishes (`b ≡ 0`) and
+the zeroth coefficient is
 nonnegative (`c ≥ 0`), the full divergence form `B = B_A + c` dominates the full `H¹`
 norm with the explicit constant `λ / (C_P + 1)`: the zeroth term only helps, ellipticity
 controls the gradient, and the Poincaré inequality lifts that to the full `H¹` norm.
@@ -376,7 +382,8 @@ theorem fullBilin_coercive_const_of_nonneg_zeroth (Ω : Set (EuclideanSpace ℝ 
     _ = Op.lam * S := by field_simp
     _ ≤ Op.fullBilin Ω U U := hBUU
 
-/-- **Coercivity for the transport-free, nonnegative-zeroth case** (Guo §VII.3.5). If the
+/-- **Coercivity for the transport-free, nonnegative-zeroth case** (Evans §6.2.2,
+closing Examples remark). If the
 transport field vanishes (`b ≡ 0`) and the zeroth coefficient is nonnegative (`c ≥ 0`), the
 full divergence form `B = B_A + c` is coercive on `H₀¹(Ω)` *without a spectral shift*: the
 zeroth term only helps, ellipticity controls the gradient, and the Poincaré inequality lifts
@@ -391,7 +398,8 @@ theorem fullBilin_coercive_of_nonneg_zeroth (Ω : Set (EuclideanSpace ℝ (Fin d
     Op.fullBilin_coercive_const_of_nonneg_zeroth Ω hb hc CP hCP hbase⟩
 
 /-- **Existence and uniqueness for the transport-free, nonnegative-zeroth operator**
-(Guo §VII.3.4). With `b ≡ 0`, `c ≥ 0`, and the test-function Poincaré bound, the full
+(the `γ = 0` specialisation of Evans's First Existence Theorem, §6.2.2). With `b ≡ 0`,
+`c ≥ 0`, and the test-function Poincaré bound, the full
 divergence form `B = B_A + c` is coercive with no spectral shift, so Lax-Milgram yields, for
 every continuous functional `f` on `H₀¹(Ω)`, a unique weak solution `u` of `Lu = f`. This is
 the existence theorem for `Lu = -Dⱼ(aᵢⱼ Dᵢu) + cu` with general uniformly elliptic `A`. -/
@@ -416,7 +424,8 @@ theorem weak_solution_of_nonneg_zeroth (Ω : Set (EuclideanSpace ℝ (Fin d)))
     rw [hco.continuousLinearEquivOfBilin_apply, hu w, ← hgrep w]
 
 /-- **The a-priori estimate for the weak solution** (general uniformly elliptic operator,
-`b ≡ 0`, `c ≥ 0`, Guo §VII.4). Under the hypotheses of
+`b ≡ 0`, `c ≥ 0`; the Lax-Milgram a-priori bound of Evans §6.2.1, Theorem 1). Under the
+hypotheses of
 [`weak_solution_of_nonneg_zeroth`], any weak solution obeys the Lax-Milgram estimate
 `‖u‖_{H₀¹} ≤ α⁻¹ ‖f‖` with the coercivity constant `α = λ / (C_P + 1)` of the form,
 i.e. `‖u‖_{H₀¹} ≤ (C_P + 1) / λ · ‖f‖`. -/

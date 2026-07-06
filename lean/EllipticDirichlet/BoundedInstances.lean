@@ -10,8 +10,9 @@ import EllipticDirichlet.RellichDischarge
 /-!
 # Bounded-domain instances of the Σ-spectrum results
 
-`SpectrumSigma.lean` proves Guo VII.5.4 and VII.5.6 for the FULL operator (nonzero
-`bⁱ`, arbitrary sign of `c`) on any `Ω`, under the single hypothesis that the compact
+`SpectrumSigma.lean` proves Existence III and the boundedness of the resolvent for the
+FULL operator (nonzero `bⁱ`, arbitrary sign of `c`) on any `Ω`, under the single
+hypothesis that the compact
 part `opK` is a compact operator. On a bounded measurable domain that hypothesis is a
 theorem (`embL2_isCompact` + `opK_isCompact`), so each result holds with no analytic
 hypotheses at all. These are the paper-facing statements.
@@ -26,7 +27,7 @@ namespace FullEllipticOp
 
 variable {d : ℕ} (Op : FullEllipticOp d) (Ω : Set (EuclideanSpace ℝ (Fin d)))
 
-/-- **Existence III on a bounded measurable domain (Guo Theorem VII.5.4).** -/
+/-- **Existence III on a bounded measurable domain.** -/
 theorem existence_three_of_bounded (hΩm : MeasurableSet Ω)
     (hΩb : Bornology.IsBounded Ω) :
     ∃ S : Set ℝ, S.Countable ∧ (∀ C : ℝ, (S ∩ Set.Iic C).Finite) ∧
@@ -50,7 +51,7 @@ theorem sigmaSet_inter_Iic_finite_of_bounded (hΩm : MeasurableSet Ω)
     (Op.sigmaSet Ω ∩ Set.Iic C).Finite :=
   Op.sigmaSet_inter_Iic_finite Ω (Op.opK_isCompact Ω (embL2_isCompact hΩm hΩb)) C
 
-/-- **Resolvent bound on a bounded measurable domain (Guo Theorem VII.5.6).** -/
+/-- **Resolvent bound on a bounded measurable domain.** -/
 theorem resolvent_bound_of_bounded (hΩm : MeasurableSet Ω)
     (hΩb : Bornology.IsBounded Ω) {lam : ℝ} (hlam : lam ∉ Op.sigmaSet Ω) :
     ∃ C : ℝ, 0 < C ∧ ∀ f : L2D Ω, ∀ u : H01 Ω,

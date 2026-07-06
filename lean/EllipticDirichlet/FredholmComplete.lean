@@ -7,11 +7,12 @@ import EllipticDirichlet.Fredholm
 import Mathlib.Analysis.InnerProductSpace.Spectrum
 
 /-!
-# Towards the complete Fredholm theory (Guo Theorem VII.4.4)
+# Towards the complete Fredholm theory (Evans §6.2.3, Theorem 4)
 
 `Fredholm.lean` reduces the weak problem `Lu = f` to the compact-operator equation
 `(1 - opK)u = h` through the factorisation `opA = opE ∘ (1 - opK)` and derives the
-dichotomy. This module begins the *quantitative* part of Guo Theorem VII.4.4: the space
+dichotomy. This module begins the *quantitative* part of Evans's Theorem 4(ii)
+(§6.2.3): the space
 
   `N = {u ∈ H₀¹(Ω) : B[u, v] = 0 for all v}`
 
@@ -21,7 +22,7 @@ compact operator `opK` at the eigenvalue `1`, and eigenspaces of compact operato
 nonzero eigenvalues are finite-dimensional
 (`ContinuousLinearMap.finite_dimensional_eigenspace`, the Riesz theory input).
 
-Remaining for the full VII.4.4/VII.4.7 statement (planned here): closed range of
+Remaining for the full Theorem 4(ii)/(iii) statement (planned here): closed range of
 `1 - opK`, the adjoint problem via the transpose form `B(·, v)`, the solvability
 criterion `Lu = f` solvable ⟺ `f ⊥ N*`, and `dim N = dim N*`.
 -/
@@ -135,8 +136,8 @@ theorem exists_pos_bound_on_orthogonal_ker (hK : IsCompactOperator K) :
 /-- **Closed range (Riesz theory).** For a compact operator `K` on a real Hilbert
 space the range of `1 - K` is closed: `1 - K` is bounded below -- hence antilipschitz
 with closed range -- on the orthogonal complement of its finite-dimensional kernel, and
-the full range is the image of that complement. This is the geometric half of the
-Fredholm alternative (Guo Thm VII.4.4). -/
+the full range is the image of that complement. This is the geometric half towards
+Evans's Theorem 4(ii) (§6.2.3). -/
 theorem isClosed_range_one_sub (hK : IsCompactOperator K) :
     IsClosed (Set.range (1 - K : E →L[ℝ] E)) := by
   obtain ⟨c, hc, hbdd⟩ := exists_pos_bound_on_orthogonal_ker hK
@@ -404,7 +405,8 @@ theorem finrank_ker_one_sub_adjoint_le (hK : IsCompactOperator K) :
   exact hystar hyrange
 
 /-- **`dim ker(1 - K) = dim ker(1 - K†)`** for a compact operator on a real Hilbert
-space (Guo Thm VII.4.4): the index of `1 - K` is zero. Both inequalities are
+space (the abstract form of Evans §6.2.3, Theorem 4(ii)): the index of `1 - K` is
+zero. Both inequalities are
 `finrank_ker_one_sub_adjoint_le`, the reverse one applied to `K†` through Schauder's
 theorem and `K†† = K`. -/
 theorem finrank_ker_one_sub_adjoint_eq (hK : IsCompactOperator K) :
@@ -488,7 +490,8 @@ lemma solSpace_eq_eigenspace :
         show Op.opK Ω u = u from hu, sub_self]
     rw [hfac, h0, map_zero]
 
-/-- **Finite-dimensionality of the homogeneous solution space (Guo Thm VII.4.4(i)).**
+/-- **Finite-dimensionality of the homogeneous solution space** (the finite-dimensionality
+half of Evans §6.2.3, Theorem 4(ii)).
 Under the Rellich-Kondrachov input (`opK` compact), the space of weak solutions of the
 homogeneous problem `Lu = 0` is finite-dimensional: it is the eigenspace of the compact
 operator `opK` at the nonzero eigenvalue `1`, and Riesz theory makes such eigenspaces
@@ -498,7 +501,8 @@ theorem finiteDimensional_solSpace (hK : IsCompactOperator (Op.opK Ω)) :
   rw [solSpace_eq_eigenspace]
   exact ContinuousLinearMap.finite_dimensional_eigenspace hK 1 one_ne_zero
 
-/-- **Closed range of the elliptic operator (towards Guo Thm VII.4.4/VII.4.7).** Under
+/-- **Closed range of the elliptic operator** (towards Evans §6.2.3, Theorem
+4(ii)-(iii)). Under
 the Rellich-Kondrachov input the range of `opA` -- the set of Riesz representatives of
 solvable right-hand sides -- is closed: `opA = opE ∘ (1 - opK)` with `opE` a
 homeomorphism, and `1 - opK` has closed range by Riesz theory. This is the geometric
@@ -516,8 +520,9 @@ theorem isClosed_range_opA (hK : IsCompactOperator (Op.opK Ω)) :
 
 /-- The **adjoint solution space** `N*`: the kernel of the Hilbert adjoint of `opA`,
 which is exactly the space of weak solutions of the **transpose problem**
-`B[v, u] = 0` for all `v` (Guo Remark VII.4.6: the adjoint problem is the transpose
-form, with no differentiability demanded of the coefficients). -/
+`B[v, u] = 0` for all `v` (the adjoint bilinear form and adjoint problem defined ahead
+of Evans §6.2.3, Theorem 4: the adjoint problem is the transpose form, with no
+differentiability demanded of the coefficients). -/
 def solSpaceStar : Submodule ℝ (H01 Ω) :=
   LinearMap.ker (ContinuousLinearMap.adjoint (Op.opA Ω)).toLinearMap
 
@@ -536,7 +541,7 @@ lemma mem_solSpaceStar_iff (u : H01 Ω) :
       Op.inner_opA Ω v u]
     exact hu v
 
-/-- **Solvability criterion (Guo Thm VII.4.7, solvability part).** Under the
+/-- **Solvability criterion** (Evans §6.2.3, Theorem 4(iii)). Under the
 Rellich-Kondrachov input, the weak problem `Lu = f` is solvable exactly when `f`
 annihilates the adjoint solution space: `∃u ∀v, B[u, v] = f(v)` iff `f(w) = 0` for
 every weak solution `w` of the transpose problem `B[v, w] = 0`. The proof is closed
@@ -571,7 +576,8 @@ theorem solvable_iff_orthogonal_solSpaceStar (hK : IsCompactOperator (Op.opK Ω)
     exact h w hw
 
 set_option maxHeartbeats 1600000 in
-/-- **`dim N = dim N*` for the elliptic problem (Guo Thm VII.4.4).** The space of weak
+/-- **`dim N = dim N*` for the elliptic problem** (Evans §6.2.3, Theorem 4(ii)). The
+space of weak
 solutions of the homogeneous problem and the space of weak solutions of the transpose
 problem have the same (finite) dimension. The factorisation `opA = opE ∘ (1 - opK)`
 carries `solSpaceStar = ker(opA†)` onto `ker(1 - opK†)` along the bijection `(opE)†`,

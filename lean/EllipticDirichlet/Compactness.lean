@@ -75,7 +75,8 @@ lemma opK_isCompact (hRellich : IsCompactOperator (embL2 Ω)) :
   have hT : IsCompactOperator (FullEllipticOp.opT Ω) := opT_isCompact Ω hRellich
   exact (hT.clm_comp ((Op.opE Ω).symm : H01 Ω →L[ℝ] H01 Ω)).smul Op.gardingγ
 
-/-- **The Fredholm alternative on the Rellich embedding hypothesis** (Guo §VII.4). Identical to
+/-- **The Fredholm alternative on the Rellich embedding hypothesis** (Evans §6.2.3,
+Theorem 4). Identical to
 `fredholm_alternative`, but conditioned on the single analytic input `IsCompactOperator (embL2 Ω)`
 (the Rellich-Kondrachov compact embedding for bounded `Ω`) rather than the opaque
 `IsCompactOperator (opK)`: either `Lu = 0` has a nontrivial weak solution, or `Lu = f` has a
