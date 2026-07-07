@@ -509,4 +509,105 @@ theorem tendsto_diffQuot_partialD (k : Fin d) {φ : EuclideanSpace ℝ (Fin d) �
   refine hfinal.congr (fun m => ?_)
   rw [Real.sqrt_sq (norm_nonneg _)]
 
+/-! ### Weak sequential compactness and the converse -/
+
+/-- **Weak sequential compactness of bounded sequences in `L²`.** A sequence bounded by `M` in
+the separable Hilbert space `EucL2 d` has a subsequence converging weakly to a limit `g'` with
+`‖g'‖ ≤ M`. Assembled from the sequential Banach-Alaoglu theorem on the weak dual
+(`WeakDual.isSeqCompact_closedBall`), the Riesz self-duality of the Hilbert space
+(`InnerProductSpace.toDual`), and the closed-ball membership of the weak-\* limit. -/
+theorem exists_weak_limit_of_bounded {x : ℕ → EucL2 d} {M : ℝ} (hx : ∀ m, ‖x m‖ ≤ M) :
+    ∃ (g' : EucL2 d) (σ : ℕ → ℕ), StrictMono σ ∧ ‖g'‖ ≤ M ∧
+      ∀ y : EucL2 d, Filter.Tendsto (fun m => ⟪x (σ m), y⟫) Filter.atTop (nhds ⟪g', y⟫) := by
+  haveI : Fact ((2 : ENNReal) ≠ ⊤) := ⟨by norm_num⟩
+  set F : ℕ → WeakDual ℝ (EucL2 d) :=
+    fun m => WeakDual.toStrongDual.symm (InnerProductSpace.toDual ℝ (EucL2 d) (x m)) with hFdef
+  have hFtoS : ∀ m, WeakDual.toStrongDual (F m) = InnerProductSpace.toDual ℝ (EucL2 d) (x m) :=
+    fun m => WeakDual.toStrongDual.apply_symm_apply _
+  have hFmem : ∀ m, F m ∈ WeakDual.toStrongDual ⁻¹' Metric.closedBall
+      (0 : StrongDual ℝ (EucL2 d)) M := by
+    intro m
+    simp only [Set.mem_preimage, hFtoS m, Metric.mem_closedBall, dist_zero_right]
+    rw [(InnerProductSpace.toDual ℝ (EucL2 d)).norm_map]
+    exact hx m
+  obtain ⟨L, hLmem, σ, hσmono, hLtend⟩ :=
+    WeakDual.isSeqCompact_closedBall ℝ (EucL2 d) 0 M hFmem
+  refine ⟨(InnerProductSpace.toDual ℝ (EucL2 d)).symm (WeakDual.toStrongDual L), σ, hσmono, ?_, ?_⟩
+  · rw [(InnerProductSpace.toDual ℝ (EucL2 d)).symm.norm_map]
+    simpa only [Set.mem_preimage, Metric.mem_closedBall, dist_zero_right] using hLmem
+  · intro y
+    have heval := (tendsto_iff_forall_eval_tendsto_topDualPairing.mp hLtend) y
+    have hL1 : ∀ m, topDualPairing ℝ (EucL2 d) (F (σ m)) y = ⟪x (σ m), y⟫ := by
+      intro m
+      change (F (σ m)) y = ⟪x (σ m), y⟫
+      rw [show (F (σ m)) y = (InnerProductSpace.toDual ℝ (EucL2 d) (x (σ m))) y from rfl,
+        InnerProductSpace.toDual_apply_apply]
+    have hL2 : topDualPairing ℝ (EucL2 d) L y
+        = ⟪(InnerProductSpace.toDual ℝ (EucL2 d)).symm (WeakDual.toStrongDual L), y⟫ := by
+      change L y = ⟪(InnerProductSpace.toDual ℝ (EucL2 d)).symm (WeakDual.toStrongDual L), y⟫
+      rw [InnerProductSpace.toDual_symm_apply]
+      exact (WeakDual.toStrongDual_apply L y).symm
+    rw [hL2] at heval
+    exact heval.congr (fun m => hL1 m)
+
+/-- **Difference-quotient weak-limit converse (Evans §5.8.2, direction ii).** If the
+difference quotients `Dₖʰ g` are uniformly `L²`-bounded by `M` over all `h ≠ 0`, then `g` has a
+weak `k`-derivative `g'` in `L²` with `‖g'‖ ≤ M`. The sequence `Dₖ^{1/(m+1)} g` is bounded, so
+by weak sequential compactness a subsequence converges weakly to some `g'` with `‖g'‖ ≤ M`;
+passing to the limit in the discrete integration-by-parts identity
+`⟪Dₖʰ g, ζ⟫ = -⟪g, Dₖ^{-h} ζ⟫`, using the strong `L²` convergence `Dₖ^{-hₘ} ζ → ∂ₖζ` for a
+test function `ζ`, identifies `g'` as the weak derivative (Evans, *Partial Differential
+Equations* (2nd ed.), §5.8.2, Theorem 3). -/
+theorem weakDeriv_of_diffQuot_bounded (k : Fin d) (g : EucL2 d) (M : ℝ)
+    (hM : 0 ≤ M) (hb : ∀ h : ℝ, h ≠ 0 → ‖diffQuot k h g‖ ≤ M) :
+    ∃ g' : EucL2 d, HasWeakDeriv k g g' ∧ ‖g'‖ ≤ M := by
+  set hseq : ℕ → ℝ := fun m => 1 / (m + 1) with hhseq
+  have hseq_ne : ∀ m, hseq m ≠ 0 := fun m => by positivity
+  have hseq_lim : Filter.Tendsto hseq Filter.atTop (nhds 0) :=
+    tendsto_one_div_add_atTop_nhds_zero_nat
+  set X : ℕ → EucL2 d := fun m => diffQuot k (hseq m) g with hX
+  have hXb : ∀ m, ‖X m‖ ≤ M := fun m => hb (hseq m) (hseq_ne m)
+  obtain ⟨g', σ, hσmono, hg'norm, hg'weak⟩ := exists_weak_limit_of_bounded hXb
+  refine ⟨g', ?_, hg'norm⟩
+  intro ζ hζc hζcs
+  -- `L²` classes of the test function and its `k`-th derivative.
+  have hζMemLp : MemLp ζ 2 volume := hζc.continuous.memLp_of_hasCompactSupport (μ := volume) hζcs
+  have hζpc : Continuous (partialD k ζ) :=
+    (hζc.continuous_fderiv (by simp)).clm_apply continuous_const
+  have hζpcs : HasCompactSupport (partialD k ζ) :=
+    hζcs.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single k (1 : ℝ))
+  have hζpMemLp : MemLp (partialD k ζ) 2 volume :=
+    hζpc.memLp_of_hasCompactSupport (μ := volume) hζpcs
+  set ζLp := hζMemLp.toLp ζ with hζLp
+  set ζpLp := hζpMemLp.toLp (partialD k ζ) with hζpLp
+  -- The negated step sequence tends to `0` through nonzero values.
+  have hη0 : ∀ m, -(hseq (σ m)) ≠ 0 := fun m => neg_ne_zero.mpr (hseq_ne (σ m))
+  have hηlim : Filter.Tendsto (fun m => -(hseq (σ m))) Filter.atTop (nhds 0) := by
+    simpa using (hseq_lim.comp hσmono.tendsto_atTop).neg
+  -- Weak convergence along the subsequence, and strong convergence of the adjoint quotient.
+  have hlimA : Filter.Tendsto (fun m => ⟪X (σ m), ζLp⟫) Filter.atTop (nhds ⟪g', ζLp⟫) :=
+    hg'weak ζLp
+  have hstrong : Filter.Tendsto (fun m => diffQuot k (-(hseq (σ m))) ζLp) Filter.atTop
+      (nhds ζpLp) :=
+    tendsto_diffQuot_partialD k hζc hζcs hζMemLp hζpMemLp _ hη0 hηlim
+  have hinner : Filter.Tendsto (fun m => ⟪g, diffQuot k (-(hseq (σ m))) ζLp⟫) Filter.atTop
+      (nhds ⟪g, ζpLp⟫) := tendsto_const_nhds.inner hstrong
+  have hlimB : Filter.Tendsto (fun m => ⟪X (σ m), ζLp⟫) Filter.atTop (nhds (-⟪g, ζpLp⟫)) := by
+    refine hinner.neg.congr (fun m => ?_)
+    exact (diffQuot_inner_adjoint k (hseq (σ m)) g ζLp).symm
+  have hkey : ⟪g', ζLp⟫ = -⟪g, ζpLp⟫ := tendsto_nhds_unique hlimA hlimB
+  -- Translate the inner products back to integrals.
+  have hinnerG' : ⟪g', ζLp⟫ = ∫ x, g' x * ζ x := by
+    rw [L2.inner_def]
+    refine integral_congr_ae ?_
+    filter_upwards [hζMemLp.coeFn_toLp] with x hx
+    rw [RCLike.inner_apply, conj_trivial, hx, mul_comm]
+  have hinnerG : ⟪g, ζpLp⟫ = ∫ x, g x * partialD k ζ x := by
+    rw [L2.inner_def]
+    refine integral_congr_ae ?_
+    filter_upwards [hζpMemLp.coeFn_toLp] with x hx
+    rw [RCLike.inner_apply, conj_trivial, hx, mul_comm]
+  rw [hinnerG', hinnerG] at hkey
+  linarith [hkey]
+
 end EllipticDirichlet.Regularity
