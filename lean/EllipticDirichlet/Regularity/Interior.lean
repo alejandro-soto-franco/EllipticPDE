@@ -586,7 +586,7 @@ private lemma sq_norm_diffQuotD_u0_le (hΩm : MeasurableSet Ω) (k : Fin d) (h :
   exact le_trans key2 hsum
 
 
-set_option maxHeartbeats 3200000 in
+set_option maxHeartbeats 500000 in
 -- The final Young-absorption assembly chains the full D2 toolkit (bilinear identity,
 -- ellipticity lower bound, four Cauchy-Schwarz/Peter-Paul term families) in one term, whose
 -- elaboration exceeds the default heartbeat budget.
@@ -1501,7 +1501,7 @@ private lemma firstOrder_gradNorm_le (Op : FullEllipticOp d) (hΩm : MeasurableS
     (Real.sqrt_sq (norm_nonneg _)).symm, ← hval]
   exact Real.sqrt_le_sqrt hdiP
 
-set_option maxHeartbeats 1000000 in
+set_option maxHeartbeats 400000 in
 -- The final assembly loops the per-`(k, i)` localised second-derivative statement over the
 -- finite index square and threads the cutoff-tower construction, whose elaboration (unfolding
 -- the tower definition and the difference-quotient bounds) exceeds the default budget.
