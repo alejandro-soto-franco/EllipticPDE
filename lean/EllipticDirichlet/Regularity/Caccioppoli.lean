@@ -239,4 +239,312 @@ lemma energy_ge (A : EllipticCoeff d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
           integrable_finsetSum _ (fun j _ => A.integrable_triple i j _ _))) hpoint
     _ = ∑ i : Fin d, ∑ j : Fin d, ⟪A.actL i j (g i), g j⟫ := hRHS.symm
 
+/-! ### Operator-norm bounds and regrouping identities for the cutoff -/
+
+/-- Operator-norm bound for the cutoff multiplier: `‖η · g‖ ≤ ‖η‖∞ · ‖g‖`. -/
+private lemma norm_mulTest_le {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    {η : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω η) (g : L2D Ω) :
+    ‖mulTest h g‖ ≤ (exists_abs_bound h).choose * ‖g‖ :=
+  norm_mulCoeffL_le _ _ g
+
+/-- Operator-norm bound for the partial-cutoff multiplier: `‖∂ᵢη · g‖ ≤ ‖∂ᵢη‖∞ · ‖g‖`. -/
+private lemma norm_mulTestPartial_le {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    {η : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω η) (i : Fin d) (g : L2D Ω) :
+    ‖mulTestPartial h i g‖ ≤ (exists_abs_bound_partialD h i).choose * ‖g‖ :=
+  norm_mulCoeffL_le _ _ g
+
+/-- Regrouping one `ζ` factor across the coefficient action, principal part:
+`⟪aᵢⱼ (ζ p), ζ q⟫ = ⟪aᵢⱼ p, ζ² q⟫`. -/
+private lemma actL_mulTest_regroup (A : EllipticCoeff d)
+    {Ω : Set (EuclideanSpace ℝ (Fin d))} {ζ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hζ : IsTestFn Ω ζ) (i j : Fin d) (p q : L2D Ω) :
+    ⟪A.actL i j (mulTest hζ p), mulTest hζ q⟫
+      = ⟪A.actL i j p, mulTest (isTestFn_mul hζ hζ) q⟫ := by
+  rw [A.inner_actL_eq, A.inner_actL_eq]
+  refine integral_congr_ae ?_
+  filter_upwards [mulTest_coeFn hζ p, mulTest_coeFn hζ q,
+    mulTest_coeFn (isTestFn_mul hζ hζ) q] with x hp hq hpq
+  rw [hp, hq, hpq]
+  ring
+
+/-- Regrouping the cross term: moving one `ζ` off `∂ⱼ(ζ²) = 2 ζ ∂ⱼζ` onto `p`,
+`⟪aᵢⱼ p, ∂ⱼ(ζ²) q⟫ = 2 ⟪aᵢⱼ (ζ p), ∂ⱼζ q⟫`. -/
+private lemma actL_cross_regroup (A : EllipticCoeff d)
+    {Ω : Set (EuclideanSpace ℝ (Fin d))} {ζ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hζ : IsTestFn Ω ζ) (i j : Fin d) (p q : L2D Ω) :
+    ⟪A.actL i j p, mulTestPartial (isTestFn_mul hζ hζ) j q⟫
+      = 2 * ⟪A.actL i j (mulTest hζ p), mulTestPartial hζ j q⟫ := by
+  rw [A.inner_actL_eq, A.inner_actL_eq, ← integral_const_mul]
+  refine integral_congr_ae ?_
+  filter_upwards [mulTestPartial_coeFn (isTestFn_mul hζ hζ) j q,
+    mulTest_coeFn hζ p, mulTestPartial_coeFn hζ j q] with x hpart hp hq
+  rw [hpart, hp, hq,
+    congrFun (partialD_mul (hζ.1.differentiable (by simp))
+      (hζ.1.differentiable (by simp)) j) x]
+  ring
+
+/-- Regrouping the transport term: `⟪bᵢ p, ζ² q⟫ = ⟪bᵢ (ζ p), ζ q⟫`. -/
+private lemma bAct_transport_regroup (Op : FullEllipticOp d)
+    {Ω : Set (EuclideanSpace ℝ (Fin d))} {ζ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hζ : IsTestFn Ω ζ) (i : Fin d) (p q : L2D Ω) :
+    ⟪Op.bAct i p, mulTest (isTestFn_mul hζ hζ) q⟫
+      = ⟪Op.bAct i (mulTest hζ p), mulTest hζ q⟫ := by
+  simp only [FullEllipticOp.bAct]
+  rw [inner_mulCoeffL_eq, inner_mulCoeffL_eq]
+  refine integral_congr_ae ?_
+  filter_upwards [mulTest_coeFn (isTestFn_mul hζ hζ) q, mulTest_coeFn hζ p,
+    mulTest_coeFn hζ q] with x hq2 hp hq
+  rw [hq2, hp, hq]
+  ring
+
+/-! ### The interior energy (Caccioppoli) estimate -/
+
+/-- **The interior energy (Caccioppoli) estimate.** For a weak solution `u ∈ H₀¹(Ω)` of
+`L u = f` and a cutoff `ζ` (a test function), the cutoff-weighted gradient energy
+`(λ/2) ∫_Ω ζ² |∇u|²` is bounded by `C · (‖f‖²_{L²} + ‖u₀‖²_{L²})`, with `C` depending only
+on `λ`, `Λ`, `‖b‖∞`, `‖c‖∞`, `‖ζ‖∞`, and `‖∇ζ‖∞`. Testing the weak formulation with
+`ζ² u` (admissible by [`cutoffMul_mem_H01`]), the ellipticity lower bound [`energy_ge`]
+controls the principal part from below, and Cauchy-Schwarz together with the Peter-Paul
+(Young) inequality absorbs the cross, transport, zeroth-order, and right-hand terms into a
+`(λ/2) ∫_Ω ζ² |∇u|²` share. Since `ζ ≡ 1` on an interior set `V`, a consumer obtains
+`‖∇u‖_{L²(V)} ≤ C' (‖f‖ + ‖u₀‖)`. See Gilbarg-Trudinger, *Elliptic PDE of Second Order*,
+Theorem 8.8, and Evans, *Partial Differential Equations* (2nd ed.), §6.3.1. -/
+theorem caccioppoli (Op : FullEllipticOp d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    {ζ : EuclideanSpace ℝ (Fin d) → ℝ} (hζ : IsTestFn Ω ζ) (u : H01 Ω) (f : L2D Ω)
+    (hu : ∀ v : H01 Ω, Op.fullBilin Ω u v
+      = ∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ)) :
+    ∃ C : ℝ, 0 ≤ C ∧
+      Op.lam / 2 * ∑ i : Fin d, ‖mulTest hζ ((u : H1amb Ω) i.succ)‖ ^ 2
+        ≤ C * (‖f‖ ^ 2 + ‖(u : H1amb Ω) 0‖ ^ 2) := by
+  classical
+  set A := Op.toEllipticCoeff with hA
+  set v : H01 Ω := ⟨cutoffMul (isTestFn_mul hζ hζ) (u : H1amb Ω),
+    cutoffMul_mem_H01 (isTestFn_mul hζ hζ) u.2⟩ with hvdef
+  set E : ℝ := ∑ i : Fin d, ‖mulTest hζ ((u : H1amb Ω) i.succ)‖ ^ 2 with hE
+  set Z : ℝ := (exists_abs_bound hζ).choose with hZ
+  set Z2 : ℝ := (exists_abs_bound (isTestFn_mul hζ hζ)).choose with hZ2
+  set SW : ℝ := ∑ j : Fin d, (exists_abs_bound_partialD hζ j).choose with hSW
+  set β : ℝ := 2 * A.Λ * SW + Op.Bsup * Z with hβ
+  have hZ2n : (0 : ℝ) ≤ Z2 :=
+    le_trans (abs_nonneg _) ((exists_abs_bound (isTestFn_mul hζ hζ)).choose_spec 0)
+  -- Coordinate values of the test element `ζ² u`.
+  have hv0 : (v : H1amb Ω) 0 = mulTest (isTestFn_mul hζ hζ) ((u : H1amb Ω) 0) := by
+    change cutoffMul (isTestFn_mul hζ hζ) (u : H1amb Ω) 0 = _
+    rw [cutoffMul_apply_zero]
+  have hv0succ : ∀ j : Fin d, (v : H1amb Ω) j.succ
+      = mulTest (isTestFn_mul hζ hζ) ((u : H1amb Ω) j.succ)
+        + mulTestPartial (isTestFn_mul hζ hζ) j ((u : H1amb Ω) 0) := by
+    intro j
+    change cutoffMul (isTestFn_mul hζ hζ) (u : H1amb Ω) j.succ = _
+    rw [cutoffMul_apply_succ]
+  -- Principal expansion of the bilinear form on `ζ² u`.
+  have hbil : A.bilin Ω u v
+      = (∑ i : Fin d, ∑ j : Fin d,
+          ⟪A.actL i j ((u : H1amb Ω) i.succ),
+            mulTest (isTestFn_mul hζ hζ) ((u : H1amb Ω) j.succ)⟫)
+        + ∑ i : Fin d, ∑ j : Fin d,
+          ⟪A.actL i j ((u : H1amb Ω) i.succ),
+            mulTestPartial (isTestFn_mul hζ hζ) j ((u : H1amb Ω) 0)⟫ := by
+    rw [EllipticCoeff.bilin_apply, ← Finset.sum_add_distrib]
+    refine Finset.sum_congr rfl (fun i _ => ?_)
+    rw [← Finset.sum_add_distrib]
+    refine Finset.sum_congr rfl (fun j _ => ?_)
+    rw [hv0succ j, inner_add_right]
+  -- Ellipticity lower bound for the principal part after regrouping one `ζ`.
+  have hen : A.lam * E
+      ≤ ∑ i : Fin d, ∑ j : Fin d,
+          ⟪A.actL i j ((u : H1amb Ω) i.succ),
+            mulTest (isTestFn_mul hζ hζ) ((u : H1amb Ω) j.succ)⟫ := by
+    calc A.lam * E
+        = A.lam * ∑ i : Fin d, ‖mulTest hζ ((u : H1amb Ω) i.succ)‖ ^ 2 := by rw [hE]
+      _ ≤ ∑ i : Fin d, ∑ j : Fin d,
+            ⟪A.actL i j (mulTest hζ ((u : H1amb Ω) i.succ)),
+              mulTest hζ ((u : H1amb Ω) j.succ)⟫ := by
+          have h := energy_ge A (fun i => mulTest hζ ((u : H1amb Ω) i.succ))
+          simpa using h
+      _ = ∑ i : Fin d, ∑ j : Fin d,
+            ⟪A.actL i j ((u : H1amb Ω) i.succ),
+              mulTest (isTestFn_mul hζ hζ) ((u : H1amb Ω) j.succ)⟫ :=
+          Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl
+            (fun j _ => actL_mulTest_regroup A hζ i j _ _))
+  -- Weak equation: the principal part equals data minus the lower-order form.
+  have hweak : A.bilin Ω u v
+      = (∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ))
+        - ((∑ i : Fin d, ⟪Op.bAct i ((u : H1amb Ω) i.succ),
+              mulTest (isTestFn_mul hζ hζ) ((u : H1amb Ω) 0)⟫)
+          + ⟪Op.cAct ((u : H1amb Ω) 0),
+              mulTest (isTestFn_mul hζ hζ) ((u : H1amb Ω) 0)⟫) := by
+    have hfb := Op.fullBilin_apply Ω u v
+    rw [hu v] at hfb
+    have hlow : Op.lowerBilin Ω u v
+        = (∑ i : Fin d, ⟪Op.bAct i ((u : H1amb Ω) i.succ),
+              mulTest (isTestFn_mul hζ hζ) ((u : H1amb Ω) 0)⟫)
+          + ⟪Op.cAct ((u : H1amb Ω) 0),
+              mulTest (isTestFn_mul hζ hζ) ((u : H1amb Ω) 0)⟫ := by
+      rw [Op.lowerBilin_apply]
+      simp only [hv0]
+    linarith [hfb, hlow]
+  -- Right-hand side as an inner product, bounded by Cauchy-Schwarz and Young.
+  have hRHSeq : (∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ))
+      = ⟪f, mulTest (isTestFn_mul hζ hζ) ((u : H1amb Ω) 0)⟫ := by
+    rw [hv0, L2.inner_def]
+    refine integral_congr_ae (Filter.Eventually.of_forall (fun x => ?_))
+    simp only [Real.inner_apply]
+  have hRHSf : (∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ))
+      ≤ 1 / 2 * ‖f‖ ^ 2 + Z2 ^ 2 / 2 * ‖(u : H1amb Ω) 0‖ ^ 2 := by
+    rw [hRHSeq]
+    calc ⟪f, mulTest (isTestFn_mul hζ hζ) ((u : H1amb Ω) 0)⟫
+        ≤ ‖f‖ * ‖mulTest (isTestFn_mul hζ hζ) ((u : H1amb Ω) 0)‖ := real_inner_le_norm _ _
+      _ ≤ ‖f‖ * (Z2 * ‖(u : H1amb Ω) 0‖) :=
+          mul_le_mul_of_nonneg_left (norm_mulTest_le (isTestFn_mul hζ hζ) _) (norm_nonneg _)
+      _ = Z2 * ‖f‖ * ‖(u : H1amb Ω) 0‖ := by ring
+      _ ≤ 1 / 2 * ‖f‖ ^ 2 + Z2 ^ 2 / 2 * ‖(u : H1amb Ω) 0‖ ^ 2 := by
+          have hy := young_peterPaul (lam := 1) (B := Z2) (x := ‖f‖)
+            (y := ‖(u : H1amb Ω) 0‖) one_pos
+          have h2l : (2 : ℝ) * 1 = 2 := by norm_num
+          rw [h2l] at hy
+          linarith [hy]
+  -- Zeroth-order term bounded (no absorption needed).
+  have hZthbound :
+      -(⟪Op.cAct ((u : H1amb Ω) 0),
+          mulTest (isTestFn_mul hζ hζ) ((u : H1amb Ω) 0)⟫)
+        ≤ Op.Csup * Z2 * ‖(u : H1amb Ω) 0‖ ^ 2 :=
+    calc -(⟪Op.cAct ((u : H1amb Ω) 0),
+            mulTest (isTestFn_mul hζ hζ) ((u : H1amb Ω) 0)⟫)
+        ≤ |⟪Op.cAct ((u : H1amb Ω) 0),
+            mulTest (isTestFn_mul hζ hζ) ((u : H1amb Ω) 0)⟫| := neg_le_abs _
+      _ ≤ ‖Op.cAct ((u : H1amb Ω) 0)‖
+            * ‖mulTest (isTestFn_mul hζ hζ) ((u : H1amb Ω) 0)‖ := abs_real_inner_le_norm _ _
+      _ ≤ (Op.Csup * ‖(u : H1amb Ω) 0‖) * (Z2 * ‖(u : H1amb Ω) 0‖) :=
+          mul_le_mul (Op.norm_cAct_le _) (norm_mulTest_le (isTestFn_mul hζ hζ) _)
+            (norm_nonneg _) (mul_nonneg Op.Csup_nonneg (norm_nonneg _))
+      _ = Op.Csup * Z2 * ‖(u : H1amb Ω) 0‖ ^ 2 := by ring
+  -- Per-index absorption bound for the cross and transport terms.
+  have hbnd : ∀ i : Fin d, (0 : ℝ) ≤
+      (A.lam / 2 * ‖mulTest hζ ((u : H1amb Ω) i.succ)‖ ^ 2
+        + β ^ 2 / (2 * A.lam) * ‖(u : H1amb Ω) 0‖ ^ 2)
+      + ((∑ j : Fin d,
+          ⟪A.actL i j ((u : H1amb Ω) i.succ),
+            mulTestPartial (isTestFn_mul hζ hζ) j ((u : H1amb Ω) 0)⟫)
+        + ⟪Op.bAct i ((u : H1amb Ω) i.succ),
+            mulTest (isTestFn_mul hζ hζ) ((u : H1amb Ω) 0)⟫) := by
+    intro i
+    have hcross_ij : ∀ j : Fin d,
+        |⟪A.actL i j ((u : H1amb Ω) i.succ),
+            mulTestPartial (isTestFn_mul hζ hζ) j ((u : H1amb Ω) 0)⟫|
+        ≤ 2 * A.Λ * ‖mulTest hζ ((u : H1amb Ω) i.succ)‖
+            * (exists_abs_bound_partialD hζ j).choose * ‖(u : H1amb Ω) 0‖ := by
+      intro j
+      rw [actL_cross_regroup A hζ i j ((u : H1amb Ω) i.succ) ((u : H1amb Ω) 0),
+        abs_mul, abs_of_nonneg (by norm_num : (0 : ℝ) ≤ 2)]
+      have hcs : |⟪A.actL i j (mulTest hζ ((u : H1amb Ω) i.succ)),
+            mulTestPartial hζ j ((u : H1amb Ω) 0)⟫|
+          ≤ A.Λ * ‖mulTest hζ ((u : H1amb Ω) i.succ)‖
+              * ((exists_abs_bound_partialD hζ j).choose * ‖(u : H1amb Ω) 0‖) :=
+        calc |⟪A.actL i j (mulTest hζ ((u : H1amb Ω) i.succ)),
+              mulTestPartial hζ j ((u : H1amb Ω) 0)⟫|
+            ≤ ‖A.actL i j (mulTest hζ ((u : H1amb Ω) i.succ))‖
+                * ‖mulTestPartial hζ j ((u : H1amb Ω) 0)‖ := abs_real_inner_le_norm _ _
+          _ ≤ (A.Λ * ‖mulTest hζ ((u : H1amb Ω) i.succ)‖)
+                * ((exists_abs_bound_partialD hζ j).choose * ‖(u : H1amb Ω) 0‖) :=
+              mul_le_mul (A.norm_actL_le i j _) (norm_mulTestPartial_le hζ j _)
+                (norm_nonneg _) (mul_nonneg A.Λ_nonneg (norm_nonneg _))
+          _ = A.Λ * ‖mulTest hζ ((u : H1amb Ω) i.succ)‖
+                * ((exists_abs_bound_partialD hζ j).choose * ‖(u : H1amb Ω) 0‖) := by ring
+      calc 2 * |⟪A.actL i j (mulTest hζ ((u : H1amb Ω) i.succ)),
+            mulTestPartial hζ j ((u : H1amb Ω) 0)⟫|
+          ≤ 2 * (A.Λ * ‖mulTest hζ ((u : H1amb Ω) i.succ)‖
+              * ((exists_abs_bound_partialD hζ j).choose * ‖(u : H1amb Ω) 0‖)) := by
+            linarith [hcs]
+        _ = 2 * A.Λ * ‖mulTest hζ ((u : H1amb Ω) i.succ)‖
+              * (exists_abs_bound_partialD hζ j).choose * ‖(u : H1amb Ω) 0‖ := by ring
+    have hcross : |∑ j : Fin d,
+          ⟪A.actL i j ((u : H1amb Ω) i.succ),
+            mulTestPartial (isTestFn_mul hζ hζ) j ((u : H1amb Ω) 0)⟫|
+        ≤ 2 * A.Λ * SW * ‖mulTest hζ ((u : H1amb Ω) i.succ)‖ * ‖(u : H1amb Ω) 0‖ := by
+      calc |∑ j : Fin d, ⟪A.actL i j ((u : H1amb Ω) i.succ),
+            mulTestPartial (isTestFn_mul hζ hζ) j ((u : H1amb Ω) 0)⟫|
+          ≤ ∑ j : Fin d, |⟪A.actL i j ((u : H1amb Ω) i.succ),
+              mulTestPartial (isTestFn_mul hζ hζ) j ((u : H1amb Ω) 0)⟫| :=
+            Finset.abs_sum_le_sum_abs _ _
+        _ ≤ ∑ j : Fin d, 2 * A.Λ * ‖mulTest hζ ((u : H1amb Ω) i.succ)‖
+              * (exists_abs_bound_partialD hζ j).choose * ‖(u : H1amb Ω) 0‖ :=
+            Finset.sum_le_sum (fun j _ => hcross_ij j)
+        _ = 2 * A.Λ * ‖mulTest hζ ((u : H1amb Ω) i.succ)‖ * ‖(u : H1amb Ω) 0‖
+              * ∑ j : Fin d, (exists_abs_bound_partialD hζ j).choose := by
+            rw [Finset.mul_sum]; exact Finset.sum_congr rfl (fun j _ => by ring)
+        _ = 2 * A.Λ * SW * ‖mulTest hζ ((u : H1amb Ω) i.succ)‖ * ‖(u : H1amb Ω) 0‖ := by
+            rw [hSW]; ring
+    have htrans : |⟪Op.bAct i ((u : H1amb Ω) i.succ),
+          mulTest (isTestFn_mul hζ hζ) ((u : H1amb Ω) 0)⟫|
+        ≤ Op.Bsup * Z * ‖mulTest hζ ((u : H1amb Ω) i.succ)‖ * ‖(u : H1amb Ω) 0‖ := by
+      rw [bAct_transport_regroup Op hζ i ((u : H1amb Ω) i.succ) ((u : H1amb Ω) 0)]
+      calc |⟪Op.bAct i (mulTest hζ ((u : H1amb Ω) i.succ)),
+            mulTest hζ ((u : H1amb Ω) 0)⟫|
+          ≤ ‖Op.bAct i (mulTest hζ ((u : H1amb Ω) i.succ))‖
+              * ‖mulTest hζ ((u : H1amb Ω) 0)‖ := abs_real_inner_le_norm _ _
+        _ ≤ (Op.Bsup * ‖mulTest hζ ((u : H1amb Ω) i.succ)‖) * (Z * ‖(u : H1amb Ω) 0‖) :=
+            mul_le_mul (Op.norm_bAct_le i _) (norm_mulTest_le hζ _) (norm_nonneg _)
+              (mul_nonneg Op.Bsup_nonneg (norm_nonneg _))
+        _ = Op.Bsup * Z * ‖mulTest hζ ((u : H1amb Ω) i.succ)‖ * ‖(u : H1amb Ω) 0‖ := by ring
+    have hbridge : β * ‖mulTest hζ ((u : H1amb Ω) i.succ)‖ * ‖(u : H1amb Ω) 0‖
+        = 2 * A.Λ * SW * ‖mulTest hζ ((u : H1amb Ω) i.succ)‖ * ‖(u : H1amb Ω) 0‖
+          + Op.Bsup * Z * ‖mulTest hζ ((u : H1amb Ω) i.succ)‖ * ‖(u : H1amb Ω) 0‖ := by
+      rw [hβ]; ring
+    have hyoung := young_peterPaul (lam := A.lam) (B := β)
+      (x := ‖mulTest hζ ((u : H1amb Ω) i.succ)‖) (y := ‖(u : H1amb Ω) 0‖) A.lam_pos
+    linarith [hcross, htrans, hbridge, hyoung,
+      neg_le_abs ((∑ j : Fin d, ⟪A.actL i j ((u : H1amb Ω) i.succ),
+          mulTestPartial (isTestFn_mul hζ hζ) j ((u : H1amb Ω) 0)⟫)
+        + ⟪Op.bAct i ((u : H1amb Ω) i.succ),
+            mulTest (isTestFn_mul hζ hζ) ((u : H1amb Ω) 0)⟫),
+      abs_add_le (∑ j : Fin d, ⟪A.actL i j ((u : H1amb Ω) i.succ),
+          mulTestPartial (isTestFn_mul hζ hζ) j ((u : H1amb Ω) 0)⟫)
+        (⟪Op.bAct i ((u : H1amb Ω) i.succ),
+            mulTest (isTestFn_mul hζ hζ) ((u : H1amb Ω) 0)⟫)]
+  -- Sum the per-index bound to absorb the cross and transport totals.
+  have hTsum : (0 : ℝ)
+      ≤ (A.lam / 2 * E + (d : ℝ) * β ^ 2 / (2 * A.lam) * ‖(u : H1amb Ω) 0‖ ^ 2)
+        + ((∑ i : Fin d, ∑ j : Fin d,
+            ⟪A.actL i j ((u : H1amb Ω) i.succ),
+              mulTestPartial (isTestFn_mul hζ hζ) j ((u : H1amb Ω) 0)⟫)
+          + ∑ i : Fin d, ⟪Op.bAct i ((u : H1amb Ω) i.succ),
+              mulTest (isTestFn_mul hζ hζ) ((u : H1amb Ω) 0)⟫) := by
+    have hsum := Finset.sum_le_sum
+      (fun i (_ : i ∈ (Finset.univ : Finset (Fin d))) => hbnd i)
+    rw [Finset.sum_const_zero] at hsum
+    calc (0 : ℝ)
+        ≤ ∑ i : Fin d, ((A.lam / 2 * ‖mulTest hζ ((u : H1amb Ω) i.succ)‖ ^ 2
+            + β ^ 2 / (2 * A.lam) * ‖(u : H1amb Ω) 0‖ ^ 2)
+          + ((∑ j : Fin d,
+              ⟪A.actL i j ((u : H1amb Ω) i.succ),
+                mulTestPartial (isTestFn_mul hζ hζ) j ((u : H1amb Ω) 0)⟫)
+            + ⟪Op.bAct i ((u : H1amb Ω) i.succ),
+                mulTest (isTestFn_mul hζ hζ) ((u : H1amb Ω) 0)⟫)) := hsum
+      _ = (A.lam / 2 * E + (d : ℝ) * β ^ 2 / (2 * A.lam) * ‖(u : H1amb Ω) 0‖ ^ 2)
+          + ((∑ i : Fin d, ∑ j : Fin d,
+              ⟪A.actL i j ((u : H1amb Ω) i.succ),
+                mulTestPartial (isTestFn_mul hζ hζ) j ((u : H1amb Ω) 0)⟫)
+            + ∑ i : Fin d, ⟪Op.bAct i ((u : H1amb Ω) i.succ),
+                mulTest (isTestFn_mul hζ hζ) ((u : H1amb Ω) 0)⟫) := by
+          rw [Finset.sum_add_distrib, Finset.sum_add_distrib, Finset.sum_add_distrib,
+            ← Finset.mul_sum, Finset.sum_const, Finset.card_univ, Fintype.card_fin,
+            nsmul_eq_mul, ← hE]
+          ring
+  -- Assemble: the absorbed energy leaves the desired estimate.
+  have hrel : A.lam * E = 2 * (A.lam / 2 * E) := by ring
+  have hfin : A.lam / 2 * E
+      ≤ 1 / 2 * ‖f‖ ^ 2 + Z2 ^ 2 / 2 * ‖(u : H1amb Ω) 0‖ ^ 2
+        + (d : ℝ) * β ^ 2 / (2 * A.lam) * ‖(u : H1amb Ω) 0‖ ^ 2
+        + Op.Csup * Z2 * ‖(u : H1amb Ω) 0‖ ^ 2 := by
+    linarith [hen, hbil, hweak, hRHSf, hTsum, hZthbound, hrel]
+  have hβn : (0 : ℝ) ≤ (d : ℝ) * β ^ 2 / (2 * A.lam) :=
+    div_nonneg (by positivity) (by have := A.lam_pos; linarith)
+  have hCu : (0 : ℝ) ≤ Z2 ^ 2 / 2 + (d : ℝ) * β ^ 2 / (2 * A.lam) + Op.Csup * Z2 :=
+    by linarith [hβn, mul_nonneg Op.Csup_nonneg hZ2n, sq_nonneg Z2]
+  refine ⟨1 / 2 + Z2 ^ 2 / 2 + (d : ℝ) * β ^ 2 / (2 * A.lam) + Op.Csup * Z2,
+    by linarith, ?_⟩
+  nlinarith [hfin, sq_nonneg ‖(u : H1amb Ω) 0‖, sq_nonneg ‖f‖,
+    mul_nonneg hCu (sq_nonneg ‖f‖)]
+
 end EllipticDirichlet.Regularity
