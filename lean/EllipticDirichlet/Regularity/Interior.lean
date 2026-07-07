@@ -103,6 +103,48 @@ private lemma diffQuotD_ae_eq_zero_off (hΩm : MeasurableSet Ω) (k : Fin d) {h 
     rw [hext, Set.indicator_of_mem hmem]; exact hne
   rw [h1, h2, sub_zero, zero_div]
 
+/-- **θ-chop invisibility.** If `g`'s extension is a.e. supported in `S` and the outer cutoff
+`θ ≡ 1` on the part of `Ω` reachable into `S` by the shift, then multiplying `θ` onto the
+interior difference quotient of `g` is invisible: `θ · Dₖʰ g = Dₖʰ g`. This is what lets the
+outer cutoff of the Evans test element drop out of the energy identity (Evans, *Partial
+Differential Equations* (2nd ed.), §6.3.1). -/
+private lemma mulTest_theta_diffQuotD (hΩm : MeasurableSet Ω) (hθ : IsTestFn Ω θ)
+    (k : Fin d) {h : ℝ} (g : L2D Ω) {S : Set (EuclideanSpace ℝ (Fin d))}
+    (hgS : ∀ᵐ x ∂volume, (extendL2 hΩm g : EuclideanSpace ℝ (Fin d) → ℝ) x ≠ 0 → x ∈ S)
+    (hθ1 : ∀ x ∈ Ω, x ∈ S ∨ x + hshift k h ∈ S → θ x = 1) :
+    mulTest hθ (diffQuotD k h hΩm g) = diffQuotD k h hΩm g := by
+  apply Lp.ext
+  filter_upwards [mulTest_coeFn hθ (diffQuotD k h hΩm g),
+    diffQuotD_ae_eq_zero_off hΩm k g hgS, ae_restrict_mem hΩm] with x hmt hzero hmem
+  rw [hmt]
+  by_cases hd : (diffQuotD k h hΩm g x : ℝ) = 0
+  · rw [hd, mul_zero]
+  · have hmemS : x ∈ S ∨ x + hshift k h ∈ S := by
+      by_contra hc; exact hd (hzero (not_or.mp hc).1 (not_or.mp hc).2)
+    rw [hθ1 x hmem hmemS, one_mul]
+
+/-- **θ-cross-term vanishing.** Under the same support and `θ ≡ 1` conditions (so that
+`∂ⱼθ = 0` on the reachable part of `Ω`), the partial-cutoff multiplier annihilates the
+interior difference quotient: `(∂ⱼθ) · Dₖʰ g = 0`. This kills the outer-cutoff cross term of
+the Evans test element, which would otherwise be a second-order (double difference-quotient)
+object beyond the reach of the data bound (Evans, *Partial Differential Equations* (2nd ed.),
+§6.3.1). -/
+private lemma mulTestPartial_theta_diffQuotD (hΩm : MeasurableSet Ω) (hθ : IsTestFn Ω θ)
+    (j k : Fin d) {h : ℝ} (g : L2D Ω) {S : Set (EuclideanSpace ℝ (Fin d))}
+    (hgS : ∀ᵐ x ∂volume, (extendL2 hΩm g : EuclideanSpace ℝ (Fin d) → ℝ) x ≠ 0 → x ∈ S)
+    (hθ0 : ∀ x ∈ Ω, x ∈ S ∨ x + hshift k h ∈ S → partialD j θ x = 0) :
+    mulTestPartial hθ j (diffQuotD k h hΩm g) = 0 := by
+  apply Lp.ext
+  filter_upwards [mulTestPartial_coeFn hθ j (diffQuotD k h hΩm g),
+    Lp.coeFn_zero (E := ℝ) (p := 2) (μ := volume.restrict Ω),
+    diffQuotD_ae_eq_zero_off hΩm k g hgS, ae_restrict_mem hΩm] with x hmtp hz hzero hmem
+  rw [hmtp, hz, Pi.zero_apply]
+  by_cases hd : (diffQuotD k h hΩm g x : ℝ) = 0
+  · rw [hd, mul_zero]
+  · have hmemS : x ∈ S ∨ x + hshift k h ∈ S := by
+      by_contra hc; exact hd (hzero (not_or.mp hc).1 (not_or.mp hc).2)
+    rw [hθ0 x hmem hmemS, zero_mul]
+
 /-! ### D2 core: discrete integration by parts -/
 
 /-- **Discrete integration by parts, principal term.** For a class `p` whose whole-space
