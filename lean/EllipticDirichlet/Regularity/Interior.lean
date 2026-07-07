@@ -166,4 +166,151 @@ private lemma actL_diffQuotD_ibp (A : EllipticCoeff d) (hΩm : MeasurableSet Ω)
     diffQuot_inner_adjoint k h (extendL2 hΩm (A.actL i j g)) (extendL2 hΩm p)]
   exact (neg_neg _).symm
 
+/-! ### D2 core: the extension-by-zero weak derivative and the first-order global energy -/
+
+/-- **Extension by zero of an `H₀¹` element carries the weak gradient.** For `u ∈ H₀¹(Ω)`,
+the whole-space extension by zero of the function value `u₀` has whole-space `L²` weak
+`k`-derivative equal to the extension by zero of the gradient component `u_{k+1}`. Because
+`u` vanishes at the boundary (it lies in the closure of the compactly supported test
+functions), no boundary term appears when integrating against an arbitrary whole-space test
+function `φ`: the identity `∫ (extendL2 u₀) ∂ₖφ = -∫ (extendL2 u_{k+1}) φ` is closed under
+`L²` limits and holds on every test-function graph by classical integration by parts, hence
+on the whole of `H₀¹(Ω)` (Evans, *Partial Differential Equations* (2nd ed.), §5.8.2). -/
+theorem hasWeakDeriv_extendL2_of_mem_H01 (hΩm : MeasurableSet Ω) (k : Fin d)
+    {U : H1amb Ω} (hU : U ∈ H01 Ω) :
+    HasWeakDeriv k (extendL2 hΩm (U 0)) (extendL2 hΩm (U k.succ)) := by
+  intro φ hφcd hφcs
+  have hφL2 : MemLp φ 2 volume := hφcd.continuous.memLp_of_hasCompactSupport hφcs
+  have hφpc : Continuous (partialD k φ) :=
+    (hφcd.continuous_fderiv (by simp)).clm_apply continuous_const
+  have hφpcs : HasCompactSupport (partialD k φ) :=
+    hφcs.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single k (1 : ℝ))
+  have hφpL2 : MemLp (partialD k φ) 2 volume := hφpc.memLp_of_hasCompactSupport hφpcs
+  set a : EucL2 d := hφpL2.toLp (partialD k φ) with ha
+  set b : EucL2 d := hφL2.toLp φ with hb
+  set w₀ : H1amb Ω := PiLp.single 2 (0 : Fin (d + 1)) (restrictL2 hΩm a)
+      + PiLp.single 2 k.succ (restrictL2 hΩm b) with hw₀
+  -- The inner product against `w₀` extracts the two extension-by-zero pairings.
+  have hΦ : ∀ V : H1amb Ω, ⟪w₀, V⟫
+      = ⟪extendL2 hΩm (V 0), a⟫ + ⟪extendL2 hΩm (V k.succ), b⟫ := by
+    intro V
+    rw [extendL2_inner_restrictL2 hΩm (V 0) a, extendL2_inner_restrictL2 hΩm (V k.succ) b,
+      hw₀, inner_add_left, inner_single_left, inner_single_left]
+    congr 1 <;> exact real_inner_comm _ _
+  -- On a test-function graph `w₀` is orthogonal: classical integration by parts.
+  have hbase : ∀ V ∈ testGraphSet Ω, ⟪w₀, V⟫ = 0 := by
+    rintro _ ⟨ψ, hψ, rfl⟩
+    rw [hΦ, IsTestFn.testGraph_zero, IsTestFn.testGraph_succ]
+    have hext0 : (extendL2 hΩm hψ.testCls : EuclideanSpace ℝ (Fin d) → ℝ) =ᵐ[volume] ψ := by
+      filter_upwards [coeFn_extendL2 hΩm hψ.testCls,
+        ae_imp_of_ae_restrict hψ.mem_lp.coeFn_toLp] with x hx himp
+      rw [hx]
+      by_cases hxΩ : x ∈ Ω
+      · rw [Set.indicator_of_mem hxΩ]; exact himp hxΩ
+      · rw [Set.indicator_of_notMem hxΩ,
+          image_eq_zero_of_notMem_tsupport (fun hc => hxΩ (hψ.2.2 hc))]
+    have hextk : (extendL2 hΩm (hψ.partialCls k) : EuclideanSpace ℝ (Fin d) → ℝ)
+        =ᵐ[volume] partialD k ψ := by
+      filter_upwards [coeFn_extendL2 hΩm (hψ.partialCls k),
+        ae_imp_of_ae_restrict (hψ.memLp_partialD k).coeFn_toLp] with x hx himp
+      rw [hx]
+      by_cases hxΩ : x ∈ Ω
+      · rw [Set.indicator_of_mem hxΩ]; exact himp hxΩ
+      · rw [Set.indicator_of_notMem hxΩ,
+          image_eq_zero_of_notMem_tsupport
+            (fun hc => hxΩ (hψ.2.2 (tsupport_partialD_subset k ψ hc)))]
+    have hI0 : ⟪extendL2 hΩm hψ.testCls, a⟫ = ∫ x, ψ x * partialD k φ x := by
+      rw [L2.inner_def]; refine integral_congr_ae ?_
+      filter_upwards [hext0, hφpL2.coeFn_toLp] with x hx hax
+      rw [Real.inner_apply, hx, hax]
+    have hIk : ⟪extendL2 hΩm (hψ.partialCls k), b⟫ = ∫ x, partialD k ψ x * φ x := by
+      rw [L2.inner_def]; refine integral_congr_ae ?_
+      filter_upwards [hextk, hφL2.coeFn_toLp] with x hx hbx
+      rw [Real.inner_apply, hx, hbx]
+    rw [hI0, hIk]
+    have hIBP : (∫ x, φ x * partialD k ψ x) = -∫ x, partialD k φ x * ψ x :=
+      integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable
+        (μ := (volume : Measure (EuclideanSpace ℝ (Fin d))))
+        (f := φ) (g := ψ) (v := EuclideanSpace.single k (1 : ℝ))
+        ((hφpc.mul hψ.continuous).integrable_of_hasCompactSupport hφpcs.mul_right)
+        ((hφcd.continuous.mul (hψ.continuous_partialD k)).integrable_of_hasCompactSupport
+          hφcs.mul_right)
+        ((hφcd.continuous.mul hψ.continuous).integrable_of_hasCompactSupport hφcs.mul_right)
+        (fun x _ => (hφcd.differentiable (by simp)).differentiableAt)
+        (fun x _ => (hψ.1.differentiable (by simp)).differentiableAt)
+    rw [show (∫ x, ψ x * partialD k φ x) = ∫ x, partialD k φ x * ψ x from
+          integral_congr_ae (Filter.Eventually.of_forall fun x => mul_comm _ _),
+      show (∫ x, partialD k ψ x * φ x) = ∫ x, φ x * partialD k ψ x from
+          integral_congr_ae (Filter.Eventually.of_forall fun x => mul_comm _ _),
+      hIBP]
+    ring
+  -- `w₀` is orthogonal to the span, hence to its closure `H₀¹(Ω)`.
+  have hUperp : U ∈ (Submodule.span ℝ {w₀})ᗮ := by
+    have hle : Submodule.span ℝ (testGraphSet Ω) ≤ (Submodule.span ℝ {w₀})ᗮ := by
+      rw [Submodule.span_le]
+      intro V hV
+      rw [SetLike.mem_coe, Submodule.mem_orthogonal]
+      intro u hu
+      rw [Submodule.mem_span_singleton] at hu
+      obtain ⟨c, rfl⟩ := hu
+      rw [inner_smul_left, hbase V hV, mul_zero]
+    exact (Submodule.span ℝ (testGraphSet Ω)).topologicalClosure_minimal hle
+      (Submodule.isClosed_orthogonal _) hU
+  rw [Submodule.mem_orthogonal] at hUperp
+  have hzero := hUperp w₀ (Submodule.mem_span_singleton_self w₀)
+  rw [hΦ] at hzero
+  -- Convert the two extension pairings back to integrals to match `HasWeakDeriv`.
+  have hLconv : ⟪extendL2 hΩm (U 0), a⟫
+      = ∫ x, ((extendL2 hΩm (U 0)) x : ℝ) * partialD k φ x := by
+    rw [L2.inner_def]; refine integral_congr_ae ?_
+    filter_upwards [hφpL2.coeFn_toLp] with x hax
+    rw [Real.inner_apply, hax]
+  have hRconv : ⟪extendL2 hΩm (U k.succ), b⟫
+      = ∫ x, ((extendL2 hΩm (U k.succ)) x : ℝ) * φ x := by
+    rw [L2.inner_def]; refine integral_congr_ae ?_
+    filter_upwards [hφL2.coeFn_toLp] with x hbx
+    rw [Real.inner_apply, hbx]
+  rw [hLconv, hRconv] at hzero
+  linarith [hzero]
+
+/-- **The first-order global energy estimate.** For a weak solution `u ∈ H₀¹(Ω)` of
+`L u = f` whose transport field `b` vanishes and whose zeroth-order coefficient `c` is
+nonnegative (a.e. on `Ω`), the full gradient energy is bounded by the data:
+`λ ∑ᵢ ‖u_{i+1}‖² ≤ ‖f‖ · ‖u₀‖`. Testing the weak formulation with `u` itself, ellipticity
+bounds the principal part from below, the transport term drops (`b = 0`) and the
+zeroth-order term has a sign (`c ≥ 0`), so only the right-hand pairing `⟪f, u₀⟫` survives
+(Evans, *Partial Differential Equations* (2nd ed.), §6.2.2). -/
+theorem firstOrder_energy_le (Op : FullEllipticOp d)
+    (hb0 : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
+    (hc0 : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x) (u : H01 Ω) (f : L2D Ω)
+    (hu : ∀ v : H01 Ω, Op.fullBilin Ω u v
+      = ∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ)) :
+    Op.lam * ∑ i : Fin d, ‖(u : H1amb Ω) i.succ‖ ^ 2 ≤ ‖f‖ * ‖(u : H1amb Ω) 0‖ := by
+  have hbz : ∀ i : Fin d,
+      ⟪Op.bAct i ((u : H1amb Ω) i.succ), ((u : H1amb Ω) 0)⟫ = 0 := by
+    intro i
+    rw [FullEllipticOp.bAct, inner_mulCoeffL_eq]
+    have hz : (fun x => Op.b x i * ((u : H1amb Ω) i.succ x : ℝ) * ((u : H1amb Ω) 0 x : ℝ))
+        =ᵐ[volume.restrict Ω] 0 := by
+      filter_upwards [hb0 i] with x hx; simp [hx]
+    rw [integral_congr_ae hz]; simp
+  have hcnn : 0 ≤ ⟪Op.cAct ((u : H1amb Ω) 0), ((u : H1amb Ω) 0)⟫ := by
+    rw [FullEllipticOp.cAct, inner_mulCoeffL_eq]
+    refine integral_nonneg_of_ae ?_
+    filter_upwards [hc0] with x hx
+    have hsq : Op.c x * ((u : H1amb Ω) 0 x : ℝ) * ((u : H1amb Ω) 0 x : ℝ)
+        = Op.c x * ((u : H1amb Ω) 0 x : ℝ) ^ 2 := by ring
+    rw [Pi.zero_apply, hsq]; positivity
+  have hfull := hu u
+  rw [Op.fullBilin_apply, Op.lowerBilin_apply,
+    Finset.sum_eq_zero (fun i _ => hbz i), zero_add] at hfull
+  have hge : Op.lam * ∑ i : Fin d, ‖(u : H1amb Ω) i.succ‖ ^ 2
+      ≤ Op.toEllipticCoeff.bilin Ω u u := Op.toEllipticCoeff.bilin_self_ge u
+  have hfu : (∫ x in Ω, (f x : ℝ) * ((u : H1amb Ω) 0 x : ℝ)) ≤ ‖f‖ * ‖(u : H1amb Ω) 0‖ := by
+    have heq : (∫ x in Ω, (f x : ℝ) * ((u : H1amb Ω) 0 x : ℝ)) = ⟪f, (u : H1amb Ω) 0⟫ := by
+      rw [L2.inner_def]; refine integral_congr_ae ?_
+      filter_upwards with x; rw [Real.inner_apply]
+    rw [heq]; exact real_inner_le_norm _ _
+  linarith [hge, hcnn, hfu, hfull]
+
 end EllipticDirichlet.Regularity
