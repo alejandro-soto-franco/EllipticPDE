@@ -51,4 +51,50 @@ theorem coeFn_diffQuot (k : Fin d) (h : ℝ) (u : EucL2 d) :
       Lp.coeFn_sub (transL2 (hshift k h) u) u, htrans] with x hx1 hx2 hx3
   simp only [hx1, Pi.smul_apply, hx2, Pi.sub_apply, hx3, smul_eq_mul, div_eq_inv_mul]
 
+/-- Translation by `v` is adjoint to translation by `-v` in the real `L²` inner product:
+`⟪τ_v u, w⟫ = ⟪u, τ_{-v} w⟫`. This is the continuous shadow of discrete summation by
+parts, and rests on translation invariance of Lebesgue measure (Evans, *Partial
+Differential Equations* (2nd ed.), §5.8.2). -/
+theorem transL2_inner_adjoint (v : EuclideanSpace ℝ (Fin d)) (u w : EucL2 d) :
+    ⟪transL2 v u, w⟫ = ⟪u, transL2 (-v) w⟫ := by
+  have hL : ⟪transL2 v u, w⟫ = ∫ x, w x * u (x + v) := by
+    rw [L2.inner_def]
+    refine integral_congr_ae ?_
+    filter_upwards [coeFn_transL2 v u] with x hx
+    rw [RCLike.inner_apply, conj_trivial, hx]
+  have hR : ⟪u, transL2 (-v) w⟫ = ∫ y, u y * w (y + -v) := by
+    rw [L2.inner_def]
+    refine integral_congr_ae ?_
+    filter_upwards [coeFn_transL2 (-v) w] with x hx
+    rw [RCLike.inner_apply, conj_trivial, hx]
+    ring
+  rw [hL, hR]
+  have hshift := integral_add_right_eq_self (μ := volume) (fun x => w x * u (x + v)) (-v)
+  rw [← hshift]
+  refine integral_congr_ae (Filter.Eventually.of_forall fun x => ?_)
+  change w (x + -v) * u (x + -v + v) = u x * w (x + -v)
+  rw [show x + -v + v = x by abel]
+  ring
+
+/-- The shift vector negates under negation of the step: `h eₖ ↦ -(h eₖ)` as `h ↦ -h`. -/
+theorem hshift_neg (k : Fin d) (h : ℝ) : hshift k (-h) = - hshift k h := by
+  simp [hshift, neg_smul]
+
+/-- **Discrete integration by parts.** The difference quotient `Dₖʰ` is adjoint, up to a
+sign, to the backward difference quotient `Dₖ⁻ʰ`: `⟪Dₖʰ u, w⟫ = -⟪u, Dₖ⁻ʰ w⟫`. This is
+the discretised analogue of integration by parts underlying the Caccioppoli-type interior
+estimate (Evans, *Partial Differential Equations* (2nd ed.), §5.8.2, proof of Theorem 3). -/
+theorem diffQuot_inner_adjoint (k : Fin d) (h : ℝ) (u w : EucL2 d) :
+    ⟪diffQuot k h u, w⟫ = -⟪u, diffQuot k (-h) w⟫ := by
+  have hu : diffQuot k h u = h⁻¹ • (transL2 (hshift k h) u - u) := by
+    simp [diffQuot, ContinuousLinearMap.smul_apply, ContinuousLinearMap.sub_apply,
+      LinearIsometry.coe_toContinuousLinearMap]
+  have hw : diffQuot k (-h) w = (-h)⁻¹ • (transL2 (hshift k (-h)) w - w) := by
+    simp [diffQuot, ContinuousLinearMap.smul_apply, ContinuousLinearMap.sub_apply,
+      LinearIsometry.coe_toContinuousLinearMap]
+  rw [hu, hw, real_inner_smul_left, real_inner_smul_right,
+    inner_sub_left, inner_sub_right, transL2_inner_adjoint (hshift k h) u w,
+    ← hshift_neg k h]
+  ring
+
 end EllipticDirichlet.Regularity
