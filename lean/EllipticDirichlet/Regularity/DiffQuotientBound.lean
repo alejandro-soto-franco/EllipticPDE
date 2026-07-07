@@ -238,13 +238,19 @@ theorem norm_diffQuot_le_of_contDiff (k : Fin d) (h : ℝ) (φ : EuclideanSpace 
 
 /-! ### Strong `L²` convergence of the difference quotient to the derivative -/
 
-/-- **Continuity of translation in `L²`.** As the shift `w → 0`, the translated function
-`τ_w ψ` converges to `ψ` in `L²`. This is the strong continuity of the translation group on
-`L²(ℝⁿ)`, obtained from joint continuity of composition with a measure-preserving family
-(Evans, *Partial Differential Equations* (2nd ed.), §5.8.2). -/
-theorem tendsto_transL2_zero (ψ : EucL2 d) :
-    Filter.Tendsto (fun w : EuclideanSpace ℝ (Fin d) => transL2 w ψ)
-      (nhds 0) (nhds ψ) := by
+/-- The translation `transL2 (0) ψ = ψ`. -/
+private theorem transL2_zero_apply (ψ : EucL2 d) :
+    transL2 (0 : EuclideanSpace ℝ (Fin d)) ψ = ψ := by
+  refine Lp.ext ?_
+  filter_upwards [coeFn_transL2 (0 : EuclideanSpace ℝ (Fin d)) ψ] with x hx
+  rw [hx]; simp
+
+/-- **Continuity of translation in `L²`.** The map `w ↦ τ_w ψ` is continuous from the space of
+shifts into `L²(ℝⁿ)`. This is the strong continuity of the translation group on `L²(ℝⁿ)`,
+obtained from joint continuity of composition with a measure-preserving family (Evans,
+*Partial Differential Equations* (2nd ed.), §5.8.2). -/
+theorem continuous_transL2 (ψ : EucL2 d) :
+    Continuous (fun w : EuclideanSpace ℝ (Fin d) => transL2 w ψ) := by
   set X := EuclideanSpace ℝ (Fin d) with hX
   -- The curried translation family `w ↦ (· + w)` is a continuous map into `C(X, X)`.
   have hcont : Continuous (fun p : X × X => p.2 + p.1) := by fun_prop
@@ -254,25 +260,253 @@ theorem tendsto_transL2_zero (ψ : EucL2 d) :
   have hgm : ∀ w : X, MeasurePreserving (⇑(G w)) volume volume := by
     intro w
     rw [hGw w]; exact measurePreserving_add_right volume w
-  have hgm0 : MeasurePreserving (⇑(G 0)) volume volume := hgm 0
-  have hkey := Filter.Tendsto.compMeasurePreservingLp (μ := (volume : Measure X))
-    (ν := (volume : Measure X)) (E := ℝ) (p := 2)
-    (f := fun _ : X => ψ) (f₀ := ψ) (g := fun w => G w) (g₀ := G 0)
-    tendsto_const_nhds (G.continuous.tendsto 0) hgm hgm0 (by norm_num)
-  -- Identify each term with `transL2 w ψ` and the limit with `ψ`.
+  -- Identify each composition term with `transL2 w ψ`.
   have hterm : ∀ w : X, Lp.compMeasurePreserving (⇑(G w)) (hgm w) ψ = transL2 w ψ := by
     intro w
     refine Lp.ext ?_
     filter_upwards [Lp.coeFn_compMeasurePreserving ψ (hgm w), coeFn_transL2 w ψ]
       with x hx1 hx2
     rw [hx1, hx2, hGw w]; rfl
-  have hlim : Lp.compMeasurePreserving (⇑(G 0)) hgm0 ψ = ψ := by
-    rw [hterm 0]
-    refine Lp.ext ?_
-    filter_upwards [coeFn_transL2 (0 : X) ψ] with x hx
-    rw [hx]; simp
-  rw [hlim] at hkey
-  refine hkey.congr' ?_
+  rw [continuous_iff_continuousAt]
+  intro w₀
+  have hcAt := ContinuousAt.compMeasurePreservingLp (μ := (volume : Measure X))
+    (ν := (volume : Measure X)) (E := ℝ) (p := 2)
+    (f := fun _ : X => ψ) (g := fun w => G w) (z := w₀)
+    continuousAt_const G.continuous.continuousAt hgm (by norm_num)
+  refine hcAt.congr ?_
   filter_upwards with w using hterm w
+
+/-- **Strong `L²` continuity of translation at the origin.** As the shift `w → 0`, the
+translated function `τ_w ψ` converges to `ψ` in `L²`. -/
+theorem tendsto_transL2_zero (ψ : EucL2 d) :
+    Filter.Tendsto (fun w : EuclideanSpace ℝ (Fin d) => transL2 w ψ)
+      (nhds 0) (nhds ψ) :=
+  (continuous_transL2 ψ).tendsto' 0 ψ (transL2_zero_apply ψ)
+
+/-- The uncurried translate-difference `(x, t) ↦ (ψ (x + t v) - ψ x) ^ 2` is integrable for the
+product of Lebesgue measure with the unit-interval slice, for `ψ` continuous with compact
+support. Its joint support sits in the bounded slab `closedBall 0 (R + ‖v‖) × Icc 0 1`. -/
+private theorem integrable_uncurry_transDiff {ψ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hψc : Continuous ψ) (hψcs : HasCompactSupport ψ) (v : EuclideanSpace ℝ (Fin d)) :
+    Integrable (Function.uncurry fun (x : EuclideanSpace ℝ (Fin d)) (t : ℝ) =>
+        (ψ (x + t • v) - ψ x) ^ 2)
+      (volume.prod (volume.restrict (Ioc (0 : ℝ) 1))) := by
+  set g : EuclideanSpace ℝ (Fin d) × ℝ → ℝ :=
+    Function.uncurry fun (x : EuclideanSpace ℝ (Fin d)) (t : ℝ) =>
+      (ψ (x + t • v) - ψ x) ^ 2 with hg
+  set ρ : Measure (EuclideanSpace ℝ (Fin d) × ℝ) :=
+    volume.prod (volume.restrict (Ioc (0 : ℝ) 1)) with hρ
+  have hcont : Continuous g :=
+    ((hψc.comp (by fun_prop : Continuous fun p : EuclideanSpace ℝ (Fin d) × ℝ =>
+      p.1 + p.2 • v)).sub (hψc.comp continuous_fst)).pow 2
+  obtain ⟨R, hR⟩ := hψcs.isCompact.isBounded.subset_closedBall 0
+  set C : Set (EuclideanSpace ℝ (Fin d) × ℝ) := closedBall 0 (R + ‖v‖) ×ˢ Icc 0 1 with hC
+  have hCcomp : IsCompact C := (isCompact_closedBall _ _).prod isCompact_Icc
+  have hIntOn : IntegrableOn g C ρ := hcont.locallyIntegrable.integrableOn_isCompact hCcomp
+  have hzero : ∀ p : EuclideanSpace ℝ (Fin d) × ℝ, p.2 ∈ Ioc (0 : ℝ) 1 → p ∉ C → g p = 0 := by
+    rintro ⟨x, t⟩ ht hpC
+    have hxball : x ∉ closedBall (0 : EuclideanSpace ℝ (Fin d)) (R + ‖v‖) := by
+      intro hx; exact hpC ⟨hx, ⟨le_of_lt ht.1, ht.2⟩⟩
+    have hxnorm : R + ‖v‖ < ‖x‖ :=
+      lt_of_not_ge fun hle => hxball (by simpa [mem_closedBall, dist_eq_norm] using hle)
+    have htnorm : ‖t • v‖ ≤ ‖v‖ := by
+      rw [norm_smul]
+      have htle : ‖t‖ ≤ 1 := by rw [Real.norm_eq_abs, abs_of_pos ht.1]; exact ht.2
+      nlinarith [norm_nonneg v, htle]
+    have hψx : ψ x = 0 := by
+      apply image_eq_zero_of_notMem_tsupport
+      intro hmem
+      have hle : ‖x‖ ≤ R := by simpa [mem_closedBall, dist_eq_norm] using hR hmem
+      nlinarith [norm_nonneg v]
+    have hψxv : ψ (x + t • v) = 0 := by
+      apply image_eq_zero_of_notMem_tsupport
+      intro hmem
+      have hxvR : ‖x + t • v‖ ≤ R := by simpa [mem_closedBall, dist_eq_norm] using hR hmem
+      have hxle : ‖x‖ ≤ R + ‖v‖ := by
+        calc ‖x‖ = ‖(x + t • v) - t • v‖ := by congr 1; abel
+          _ ≤ ‖x + t • v‖ + ‖t • v‖ := norm_sub_le _ _
+          _ ≤ R + ‖v‖ := by linarith
+      linarith
+    simp only [hg, Function.uncurry_apply_pair, hψx, hψxv, sub_self]
+    norm_num
+  have htioc : ∀ᵐ p ∂ρ, p.2 ∈ Ioc (0 : ℝ) 1 := by
+    rw [ae_iff]
+    have hset : {p : EuclideanSpace ℝ (Fin d) × ℝ | p.2 ∉ Ioc (0 : ℝ) 1}
+        = univ ×ˢ (Ioc (0 : ℝ) 1)ᶜ := by ext p; simp
+    rw [hset, hρ, Measure.prod_prod, Measure.restrict_apply' measurableSet_Ioc,
+      compl_inter_self, measure_empty, mul_zero]
+  have hae : g =ᵐ[ρ] C.indicator g := by
+    filter_upwards [htioc] with p hp
+    by_cases hpC : p ∈ C
+    · rw [indicator_of_mem hpC]
+    · rw [indicator_of_notMem hpC, hzero p hp hpC]
+  rw [integrable_congr hae]
+  exact (integrable_indicator_iff hCcomp.measurableSet).mpr hIntOn
+
+/-- **Difference-quotient minus derivative, squared `L²` bound.** For `φ` smooth with compact
+support and `h ≠ 0`, the squared `L²` distance from the difference quotient `Dₖʰφ` to the
+partial derivative `∂ₖφ` is bounded by the integral over `t ∈ [0, 1]` of the squared `L²`
+translation defects `‖τ_{t h eₖ} ∂ₖφ - ∂ₖφ‖²`. This is the fundamental-theorem-of-calculus
+representation `Dₖʰφ(x) - ∂ₖφ(x) = ∫₀¹ (∂ₖφ(x + t h eₖ) - ∂ₖφ(x)) dt` squared through the
+one-variable Cauchy-Schwarz bound and integrated with a Tonelli swap (Evans, *Partial
+Differential Equations* (2nd ed.), §5.8.2). -/
+private theorem sq_norm_diffQuot_sub_le (k : Fin d) {φ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (hcs : HasCompactSupport φ)
+    (hL2φ : MemLp φ 2 volume) (hL2p : MemLp (partialD k φ) 2 volume)
+    (hψc : Continuous (partialD k φ)) (hψcs : HasCompactSupport (partialD k φ))
+    {h : ℝ} (hh : h ≠ 0) :
+    ‖diffQuot k h (hL2φ.toLp φ) - hL2p.toLp (partialD k φ)‖ ^ 2
+      ≤ ∫ t in (0 : ℝ)..1,
+          ‖transL2 (t • hshift k h) (hL2p.toLp (partialD k φ))
+            - hL2p.toLp (partialD k φ)‖ ^ 2 := by
+  set ψ := partialD k φ with hψdef
+  set v : EuclideanSpace ℝ (Fin d) := hshift k h with hv
+  set ψLp := hL2p.toLp (partialD k φ) with hψLp
+  set φLp := hL2φ.toLp φ with hφLp
+  have h01 : (0 : ℝ) ≤ 1 := by norm_num
+  have hInt := integrable_uncurry_transDiff hψc hψcs v
+  -- Pointwise directional derivative identity: `(fderiv φ y) v = h • ∂ₖφ y`.
+  have hfv : ∀ y, (fderiv ℝ φ y) v = h * ψ y := fun y => by
+    simp [hv, hshift, hψdef, partialD]
+  -- Fundamental theorem of calculus, then division by `h`.
+  have hHeq : ∀ x, (φ (x + v) - φ x) / h - ψ x
+      = ∫ t in (0 : ℝ)..1, (ψ (x + t • v) - ψ x) := by
+    intro x
+    have hI1 : IntervalIntegrable (fun t => ψ (x + t • v)) volume 0 1 :=
+      (hψc.comp (by fun_prop)).intervalIntegrable _ _
+    have hI2 : IntervalIntegrable (fun _ : ℝ => ψ x) volume 0 1 := intervalIntegrable_const
+    have hnum : φ (x + v) - φ x = h * ∫ t in (0 : ℝ)..1, ψ (x + t • v) := by
+      rw [sub_translation_eq_integral hφ x v,
+          show (fun t : ℝ => (fderiv ℝ φ (x + t • v)) v) = fun t => h * ψ (x + t • v) from
+            funext fun t => hfv (x + t • v),
+          intervalIntegral.integral_const_mul]
+    rw [intervalIntegral.integral_sub hI1 hI2, intervalIntegral.integral_const, hnum]
+    rw [mul_comm h, mul_div_assoc, div_self hh, mul_one]
+    simp
+  -- Pointwise square bound via one-variable Cauchy-Schwarz on `[0, 1]`.
+  have hsqle : ∀ x, ((φ (x + v) - φ x) / h - ψ x) ^ 2
+      ≤ ∫ t in (0 : ℝ)..1, (ψ (x + t • v) - ψ x) ^ 2 := by
+    intro x
+    rw [hHeq x]
+    have hcx : ContinuousOn (fun t : ℝ => ψ (x + t • v) - ψ x) (Set.uIcc 0 1) :=
+      ((hψc.comp (by fun_prop)).sub continuous_const).continuousOn
+    simpa using MeasureTheory.sq_intervalIntegral_le h01 hcx
+  -- Integrability of the left- and right-hand integrands in `x`.
+  have hHcont : Continuous (fun x => (φ (x + v) - φ x) / h - ψ x) :=
+    (((hφ.continuous.comp (by fun_prop)).sub hφ.continuous).div_const h).sub hψc
+  have hcs1 : HasCompactSupport (fun x => (φ (x + v) - φ x) / h) := by
+    have hrw : (fun x => (φ (x + v) - φ x) / h)
+        = (fun x => φ (x + v) - φ x) * (fun _ => h⁻¹) := by
+      funext x; simp [div_eq_mul_inv]
+    rw [hrw]
+    exact ((hcs.comp_homeomorph (Homeomorph.addRight v)).sub hcs).mul_right
+  have hHcs : HasCompactSupport (fun x => (φ (x + v) - φ x) / h - ψ x) := hcs1.sub hψcs
+  have hLHS_int : Integrable (fun x => ((φ (x + v) - φ x) / h - ψ x) ^ 2) :=
+    (hHcont.pow 2).integrable_of_hasCompactSupport
+      (hHcs.comp_left (g := fun r : ℝ => r ^ 2) (by norm_num))
+  have hRHS_int : Integrable (fun x => ∫ t in (0 : ℝ)..1, (ψ (x + t • v) - ψ x) ^ 2) := by
+    simp_rw [intervalIntegral.integral_of_le h01]
+    exact hInt.integral_prod_left
+  -- Integrate the pointwise bound and swap the order of integration.
+  have hmono : ∫ x, ((φ (x + v) - φ x) / h - ψ x) ^ 2
+      ≤ ∫ x, ∫ t in (0 : ℝ)..1, (ψ (x + t • v) - ψ x) ^ 2 :=
+    integral_mono hLHS_int hRHS_int hsqle
+  have hswap : (∫ x, ∫ t in (0 : ℝ)..1, (ψ (x + t • v) - ψ x) ^ 2)
+      = ∫ t in (0 : ℝ)..1, ∫ x, (ψ (x + t • v) - ψ x) ^ 2 := by
+    simp_rw [intervalIntegral.integral_of_le h01]
+    exact integral_integral_swap hInt
+  -- The inner `x`-integral is the squared `L²` translation defect.
+  have hnormsq : ∀ t : ℝ, (∫ x, (ψ (x + t • v) - ψ x) ^ 2)
+      = ‖transL2 (t • v) ψLp - ψLp‖ ^ 2 := by
+    intro t
+    rw [norm_sq_transL2_sub]
+    refine integral_congr_ae ?_
+    have hqmp : MeasureTheory.Measure.QuasiMeasurePreserving (· + t • v) volume volume :=
+      (measurePreserving_add_right volume (t • v)).quasiMeasurePreserving
+    have hshiftAE : (fun x => ψLp (x + t • v)) =ᵐ[volume] fun x => ψ (x + t • v) :=
+      hqmp.ae_eq hL2p.coeFn_toLp
+    filter_upwards [hL2p.coeFn_toLp, hshiftAE] with x hx1 hx2
+    rw [hx2, hx1]
+  -- Assemble.
+  have hlhs : ‖diffQuot k h φLp - ψLp‖ ^ 2 = ∫ x, ((φ (x + v) - φ x) / h - ψ x) ^ 2 := by
+    rw [norm_sq_eq_integral_sq]
+    refine integral_congr_ae ?_
+    have hqmp : MeasureTheory.Measure.QuasiMeasurePreserving (· + v) volume volume :=
+      (measurePreserving_add_right volume v).quasiMeasurePreserving
+    have hshiftAE : (fun x => φLp (x + v)) =ᵐ[volume] fun x => φ (x + v) :=
+      hqmp.ae_eq hL2φ.coeFn_toLp
+    filter_upwards [Lp.coeFn_sub (diffQuot k h φLp) ψLp, coeFn_diffQuot k h φLp,
+      hL2φ.coeFn_toLp, hshiftAE, hL2p.coeFn_toLp] with x hx0 hx1 hx2 hx3 hx4
+    rw [hx0, Pi.sub_apply, hx1, hx2, hx3, hx4]
+  rw [hlhs]
+  refine le_trans hmono ?_
+  rw [hswap, intervalIntegral.integral_congr (g := fun t => ‖transL2 (t • v) ψLp - ψLp‖ ^ 2)
+    (fun t _ => hnormsq t)]
+
+/-- **Strong `L²` convergence of the difference quotient to the derivative.** For `φ` smooth
+with compact support and a sequence of nonzero steps `η m → 0`, the difference quotients
+`Dₖ^{η m} φ` converge in `L²` to the classical partial derivative `∂ₖφ`. This is the strong
+convergence input passed to the limit in the weak-derivative identification (Evans, *Partial
+Differential Equations* (2nd ed.), §5.8.2). -/
+theorem tendsto_diffQuot_partialD (k : Fin d) {φ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (hcs : HasCompactSupport φ)
+    (hL2φ : MemLp φ 2 volume) (hL2p : MemLp (partialD k φ) 2 volume)
+    (η : ℕ → ℝ) (hη0 : ∀ m, η m ≠ 0) (hηlim : Filter.Tendsto η Filter.atTop (nhds 0)) :
+    Filter.Tendsto (fun m => diffQuot k (η m) (hL2φ.toLp φ)) Filter.atTop
+      (nhds (hL2p.toLp (partialD k φ))) := by
+  set ψLp := hL2p.toLp (partialD k φ) with hψLp
+  set φLp := hL2φ.toLp φ with hφLp
+  have hψc : Continuous (partialD k φ) :=
+    (hφ.continuous_fderiv (by simp)).clm_apply continuous_const
+  have hψcs : HasCompactSupport (partialD k φ) :=
+    hcs.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single k (1 : ℝ))
+  haveI hfin : IsFiniteMeasure (volume.restrict (Ioc (0 : ℝ) 1)) :=
+    ⟨by rw [Measure.restrict_apply_univ, Real.volume_Ioc]; exact ENNReal.ofReal_lt_top⟩
+  -- Dominated convergence: the integrated squared translation defects tend to `0`.
+  set F : ℕ → ℝ → ℝ := fun m t => ‖transL2 (t • hshift k (η m)) ψLp - ψLp‖ ^ 2 with hF
+  have hB : Filter.Tendsto (fun m => ∫ t, F m t ∂(volume.restrict (Ioc (0 : ℝ) 1)))
+      Filter.atTop (nhds (∫ _t, (0 : ℝ) ∂(volume.restrict (Ioc (0 : ℝ) 1)))) := by
+    refine tendsto_integral_of_dominated_convergence (fun _ => (2 * ‖ψLp‖) ^ 2) ?_ ?_ ?_ ?_
+    · intro m
+      refine Continuous.aestronglyMeasurable ?_
+      exact ((((continuous_transL2 ψLp).comp
+        (by fun_prop : Continuous fun t : ℝ => t • hshift k (η m))).sub
+          continuous_const).norm.pow 2)
+    · exact integrable_const _
+    · intro m
+      refine Filter.Eventually.of_forall (fun t => ?_)
+      have hb : ‖transL2 (t • hshift k (η m)) ψLp - ψLp‖ ≤ 2 * ‖ψLp‖ := by
+        calc ‖transL2 (t • hshift k (η m)) ψLp - ψLp‖
+            ≤ ‖transL2 (t • hshift k (η m)) ψLp‖ + ‖ψLp‖ := norm_sub_le _ _
+          _ = ‖ψLp‖ + ‖ψLp‖ := by rw [(transL2 _).norm_map]
+          _ = 2 * ‖ψLp‖ := by ring
+      have hnormF : ‖F m t‖ = ‖transL2 (t • hshift k (η m)) ψLp - ψLp‖ ^ 2 := by
+        rw [hF]; exact Real.norm_of_nonneg (sq_nonneg _)
+      rw [hnormF]
+      exact pow_le_pow_left₀ (norm_nonneg _) hb 2
+    · refine Filter.Eventually.of_forall (fun t => ?_)
+      have hsm : Filter.Tendsto (fun m => t • hshift k (η m)) Filter.atTop (nhds 0) := by
+        have hc : Filter.Tendsto (fun m => (t * η m) • EuclideanSpace.single k (1 : ℝ))
+            Filter.atTop (nhds ((0 : ℝ) • EuclideanSpace.single k (1 : ℝ))) :=
+          Filter.Tendsto.smul_const (by simpa using hηlim.const_mul t) _
+        simpa [hshift, smul_smul] using hc
+      have hconv : Filter.Tendsto (fun m => transL2 (t • hshift k (η m)) ψLp)
+          Filter.atTop (nhds ψLp) := (tendsto_transL2_zero ψLp).comp hsm
+      have hsub : Filter.Tendsto (fun m => transL2 (t • hshift k (η m)) ψLp - ψLp)
+          Filter.atTop (nhds 0) := by
+        have hc : Filter.Tendsto (fun _ : ℕ => ψLp) Filter.atTop (nhds ψLp) := tendsto_const_nhds
+        simpa using hconv.sub hc
+      simpa [hF] using (hsub.norm.pow 2)
+  -- Reduce to squared-norm convergence and squeeze.
+  rw [tendsto_iff_norm_sub_tendsto_zero]
+  have hsq : Filter.Tendsto (fun m => ‖diffQuot k (η m) φLp - ψLp‖ ^ 2)
+      Filter.atTop (nhds 0) := by
+    refine squeeze_zero (fun m => sq_nonneg _) (fun m => ?_) (by simpa using hB)
+    have hle := sq_norm_diffQuot_sub_le k hφ hcs hL2φ hL2p hψc hψcs (hη0 m)
+    rwa [intervalIntegral.integral_of_le (by norm_num : (0 : ℝ) ≤ 1)] at hle
+  have hfinal := (Real.continuous_sqrt.tendsto 0).comp hsq
+  simp only [Real.sqrt_zero, Function.comp_def] at hfinal
+  refine hfinal.congr (fun m => ?_)
+  rw [Real.sqrt_sq (norm_nonneg _)]
 
 end EllipticDirichlet.Regularity
