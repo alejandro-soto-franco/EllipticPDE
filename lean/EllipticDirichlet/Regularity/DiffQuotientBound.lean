@@ -7,6 +7,11 @@ import EllipticDirichlet.Regularity.DifferenceQuotient
 import EllipticDirichlet.Sobolev.Basic
 import Mathlib.MeasureTheory.Measure.QuasiMeasurePreserving
 import Mathlib.Dynamics.Ergodic.MeasurePreserving
+import Mathlib.MeasureTheory.Function.LpSpace.ContinuousCompMeasurePreserving
+import Mathlib.MeasureTheory.Measure.SeparableMeasure
+import Mathlib.Analysis.InnerProductSpace.Dual
+import Mathlib.Analysis.Normed.Module.WeakDual
+import Mathlib.Topology.CompactOpen
 
 /-!
 # Difference-quotient norm bounds
@@ -230,5 +235,44 @@ theorem norm_diffQuot_le_of_contDiff (k : Fin d) (h : ℝ) (φ : EuclideanSpace 
       _ ≥ ∫ x, (φ (x + v) - φ x) ^ 2 := hmain
   have hnorm := Real.sqrt_le_sqrt hsq
   rwa [Real.sqrt_sq (norm_nonneg _), Real.sqrt_sq (norm_nonneg _)] at hnorm
+
+/-! ### Strong `L²` convergence of the difference quotient to the derivative -/
+
+/-- **Continuity of translation in `L²`.** As the shift `w → 0`, the translated function
+`τ_w ψ` converges to `ψ` in `L²`. This is the strong continuity of the translation group on
+`L²(ℝⁿ)`, obtained from joint continuity of composition with a measure-preserving family
+(Evans, *Partial Differential Equations* (2nd ed.), §5.8.2). -/
+theorem tendsto_transL2_zero (ψ : EucL2 d) :
+    Filter.Tendsto (fun w : EuclideanSpace ℝ (Fin d) => transL2 w ψ)
+      (nhds 0) (nhds ψ) := by
+  set X := EuclideanSpace ℝ (Fin d) with hX
+  -- The curried translation family `w ↦ (· + w)` is a continuous map into `C(X, X)`.
+  have hcont : Continuous (fun p : X × X => p.2 + p.1) := by fun_prop
+  set F : C(X × X, X) := ⟨fun p => p.2 + p.1, hcont⟩ with hF
+  set G : C(X, C(X, X)) := F.curry with hG
+  have hGw : ∀ w : X, (⇑(G w) : X → X) = fun x => x + w := fun w => rfl
+  have hgm : ∀ w : X, MeasurePreserving (⇑(G w)) volume volume := by
+    intro w
+    rw [hGw w]; exact measurePreserving_add_right volume w
+  have hgm0 : MeasurePreserving (⇑(G 0)) volume volume := hgm 0
+  have hkey := Filter.Tendsto.compMeasurePreservingLp (μ := (volume : Measure X))
+    (ν := (volume : Measure X)) (E := ℝ) (p := 2)
+    (f := fun _ : X => ψ) (f₀ := ψ) (g := fun w => G w) (g₀ := G 0)
+    tendsto_const_nhds (G.continuous.tendsto 0) hgm hgm0 (by norm_num)
+  -- Identify each term with `transL2 w ψ` and the limit with `ψ`.
+  have hterm : ∀ w : X, Lp.compMeasurePreserving (⇑(G w)) (hgm w) ψ = transL2 w ψ := by
+    intro w
+    refine Lp.ext ?_
+    filter_upwards [Lp.coeFn_compMeasurePreserving ψ (hgm w), coeFn_transL2 w ψ]
+      with x hx1 hx2
+    rw [hx1, hx2, hGw w]; rfl
+  have hlim : Lp.compMeasurePreserving (⇑(G 0)) hgm0 ψ = ψ := by
+    rw [hterm 0]
+    refine Lp.ext ?_
+    filter_upwards [coeFn_transL2 (0 : X) ψ] with x hx
+    rw [hx]; simp
+  rw [hlim] at hkey
+  refine hkey.congr' ?_
+  filter_upwards with w using hterm w
 
 end EllipticDirichlet.Regularity
