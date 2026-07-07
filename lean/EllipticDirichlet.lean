@@ -6,6 +6,7 @@ Authors: Alejandro Soto Franco
 import EllipticDirichlet.Sobolev.Basic
 import EllipticDirichlet.Sobolev.Coefficients
 import EllipticDirichlet.Regularity.DifferenceQuotient
+import EllipticDirichlet.Regularity.DiffQuotientBound
 import EllipticDirichlet.Poincare.OneDim
 import EllipticDirichlet.Poincare.Fubini
 import EllipticDirichlet.Poincare.Domain
