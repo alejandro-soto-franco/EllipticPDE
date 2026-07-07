@@ -12,6 +12,8 @@ import Mathlib.MeasureTheory.Measure.SeparableMeasure
 import Mathlib.Analysis.InnerProductSpace.Dual
 import Mathlib.Analysis.Normed.Module.WeakDual
 import Mathlib.Topology.CompactOpen
+import Mathlib.Analysis.Normed.Lp.SmoothApprox
+import Mathlib.MeasureTheory.Integral.Prod
 
 /-!
 # Difference-quotient norm bounds
@@ -609,5 +611,237 @@ theorem weakDeriv_of_diffQuot_bounded (k : Fin d) (g : EucL2 d) (M : ℝ)
     rw [RCLike.inner_apply, conj_trivial, hx, mul_comm]
   rw [hinnerG', hinnerG] at hkey
   linarith [hkey]
+
+/-! ### The general weak-derivative direction-i bound -/
+
+/-- The uncurried product `(x, t) ↦ g(x) · ψ(x - t v)` of an `L²` class `g` with a translate
+of a continuous compactly supported `ψ` is integrable for the product of Lebesgue measure with
+the unit-interval slice. Off the compact slab `closedBall 0 (R + ‖v‖) × Icc 0 1` the translate
+`ψ(x - t v)` vanishes, and on the slab the `L²` factor `g` is locally integrable, so the product
+is dominated by the integrable indicator `M · ‖g‖ · 1_ball` (Evans, *Partial Differential
+Equations* (2nd ed.), §5.8.2). -/
+private theorem integrable_uncurry_weak (g : EucL2 d) {ψ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hψc : Continuous ψ) (hψcs : HasCompactSupport ψ) (v : EuclideanSpace ℝ (Fin d)) :
+    Integrable (Function.uncurry fun (x : EuclideanSpace ℝ (Fin d)) (t : ℝ) => g x * ψ (x - t • v))
+      (volume.prod (volume.restrict (Ioc (0 : ℝ) 1))) := by
+  set ρ : Measure (EuclideanSpace ℝ (Fin d) × ℝ) :=
+    volume.prod (volume.restrict (Ioc (0 : ℝ) 1)) with hρ
+  change Integrable (fun p : EuclideanSpace ℝ (Fin d) × ℝ => g p.1 * ψ (p.1 - p.2 • v)) ρ
+  obtain ⟨M, hM⟩ := hψc.bounded_above_of_compact_support hψcs
+  obtain ⟨R, hR⟩ := hψcs.isCompact.isBounded.subset_closedBall 0
+  set B : Set (EuclideanSpace ℝ (Fin d)) := closedBall 0 (R + ‖v‖) with hB
+  haveI hBfin : IsFiniteMeasure (volume.restrict B) :=
+    isFiniteMeasure_restrict.mpr measure_closedBall_lt_top.ne
+  -- The `L²` factor is integrable on the ball.
+  have hgB : Integrable (fun x => ‖g x‖) (volume.restrict B) := by
+    have h1 : MemLp (⇑g) 1 (volume.restrict B) :=
+      ((Lp.memLp g).restrict B).mono_exponent (by norm_num)
+    exact (memLp_one_iff_integrable.mp h1).norm
+  -- The dominating indicator function is integrable on the product.
+  set Dx : EuclideanSpace ℝ (Fin d) → ℝ := B.indicator (fun x => M * ‖g x‖) with hDx
+  have hDxint : Integrable Dx volume :=
+    (integrable_indicator_iff measurableSet_closedBall).mpr (hgB.const_mul M)
+  have hDint : Integrable (fun p : EuclideanSpace ℝ (Fin d) × ℝ => Dx p.1) ρ :=
+    hDxint.comp_fst (volume.restrict (Ioc (0 : ℝ) 1))
+  -- Joint measurability of the integrand.
+  have haesm : AEStronglyMeasurable
+      (fun p : EuclideanSpace ℝ (Fin d) × ℝ => g p.1 * ψ (p.1 - p.2 • v)) ρ := by
+    refine (Lp.aestronglyMeasurable g).comp_fst.mul ?_
+    exact (hψc.comp (by fun_prop : Continuous
+      fun p : EuclideanSpace ℝ (Fin d) × ℝ => p.1 - p.2 • v)).aestronglyMeasurable
+  -- Almost every point has `t ∈ Ioc 0 1`, where the slab support argument applies.
+  have htioc : ∀ᵐ p ∂ρ, p.2 ∈ Ioc (0 : ℝ) 1 := by
+    rw [ae_iff]
+    have hset : {p : EuclideanSpace ℝ (Fin d) × ℝ | p.2 ∉ Ioc (0 : ℝ) 1}
+        = univ ×ˢ (Ioc (0 : ℝ) 1)ᶜ := by ext p; simp
+    rw [hset, hρ, Measure.prod_prod, Measure.restrict_apply' measurableSet_Ioc,
+      compl_inter_self, measure_empty, mul_zero]
+  refine Integrable.mono' hDint haesm ?_
+  filter_upwards [htioc] with p hp
+  by_cases hpB : p.1 ∈ B
+  · rw [hDx, indicator_of_mem hpB]
+    calc ‖g p.1 * ψ (p.1 - p.2 • v)‖ = ‖g p.1‖ * ‖ψ (p.1 - p.2 • v)‖ := norm_mul _ _
+      _ ≤ ‖g p.1‖ * M := by gcongr; exact hM _
+      _ = M * ‖g p.1‖ := by ring
+  · rw [hDx, indicator_of_notMem hpB]
+    have hzero : ψ (p.1 - p.2 • v) = 0 := by
+      apply image_eq_zero_of_notMem_tsupport
+      intro hmem
+      apply hpB
+      have hxK : ‖p.1 - p.2 • v‖ ≤ R := by simpa [mem_closedBall, dist_eq_norm] using hR hmem
+      have htnorm : ‖p.2 • v‖ ≤ ‖v‖ := by
+        rw [norm_smul]
+        have htle : ‖p.2‖ ≤ 1 := by rw [Real.norm_eq_abs, abs_of_pos hp.1]; exact hp.2
+        nlinarith [norm_nonneg v, htle]
+      have hxle : ‖p.1‖ ≤ R + ‖v‖ := by
+        calc ‖p.1‖ = ‖(p.1 - p.2 • v) + p.2 • v‖ := by congr 1; abel
+          _ ≤ ‖p.1 - p.2 • v‖ + ‖p.2 • v‖ := norm_add_le _ _
+          _ ≤ R + ‖v‖ := by linarith
+      simpa [hB, mem_closedBall, dist_eq_norm] using hxle
+    rw [hzero, mul_zero, norm_zero]
+
+/-- **Segment-integral representation of the difference quotient (weak derivative).** For `g`
+with `L²` weak `k`-derivative `g'` and a smooth compactly supported test function `ζ`, the inner
+product of `Dₖʰ g` against `ζ` is the `[0, 1]` integral of the inner products of `g'` against the
+translates `τ_{-t h eₖ} ζ`. This is the `L²`-tested form of the fundamental-theorem representation
+`Dₖʰ g(x) = ∫₀¹ g'(x + t h eₖ) dt`, obtained by moving `Dₖʰ` onto `ζ` (discrete integration by
+parts), the classical fundamental theorem of calculus along the segment, a Tonelli swap, and the
+weak-derivative identity applied to each translated test function (Evans, *Partial Differential
+Equations* (2nd ed.), §5.8.2). -/
+private theorem inner_diffQuot_eq_integral_smooth (k : Fin d) (g g' : EucL2 d)
+    (hg : HasWeakDeriv k g g') {h : ℝ} (hh : h ≠ 0)
+    {ζ : EuclideanSpace ℝ (Fin d) → ℝ} (hζcd : ContDiff ℝ (⊤ : ℕ∞) ζ)
+    (hζcs : HasCompactSupport ζ) (hζ : MemLp ζ 2 volume) :
+    ⟪diffQuot k h g, hζ.toLp ζ⟫
+      = ∫ t in (0 : ℝ)..1, ⟪g', transL2 (-(t • hshift k h)) (hζ.toLp ζ)⟫ := by
+  set v : EuclideanSpace ℝ (Fin d) := hshift k h with hv
+  set ζLp := hζ.toLp ζ with hζLp
+  have hψc : Continuous (partialD k ζ) :=
+    (hζcd.continuous_fderiv (by simp)).clm_apply continuous_const
+  have hψcs : HasCompactSupport (partialD k ζ) :=
+    hζcs.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single k (1 : ℝ))
+  -- The directional derivative of `ζ` along `-v` is `(-h) · ∂ₖζ`.
+  have hlin : ∀ y, (fderiv ℝ ζ y) (-v) = (-h) * partialD k ζ y := by
+    intro y
+    have hneg : (-v) = (-h) • EuclideanSpace.single k (1 : ℝ) := by
+      rw [hv, hshift]; exact (neg_smul h _).symm
+    rw [hneg, map_smul, smul_eq_mul]; rfl
+  -- Fundamental theorem of calculus, divided by `-h`.
+  have hFTC : ∀ x, (ζ (x + (-v)) - ζ x) / (-h)
+      = ∫ t in (0 : ℝ)..1, partialD k ζ (x - t • v) := by
+    intro x
+    have h1 : ζ (x + (-v)) - ζ x = ∫ t in (0 : ℝ)..1, (-h) * partialD k ζ (x - t • v) := by
+      rw [sub_translation_eq_integral hζcd x (-v)]
+      refine intervalIntegral.integral_congr (fun t _ => ?_)
+      rw [hlin (x + t • (-v))]
+      congr 2
+      rw [smul_neg, sub_eq_add_neg]
+    rw [h1, intervalIntegral.integral_const_mul, mul_comm, mul_div_assoc,
+      div_self (neg_ne_zero.mpr hh), mul_one]
+  -- Move `Dₖʰ` onto `ζ` and expand the resulting inner product as an `x`-integral.
+  have hshkneg : hshift k (-h) = -v := by rw [hshift_neg, hv]
+  have hstep2 : ⟪g, diffQuot k (-h) ζLp⟫
+      = ∫ x, g x * (∫ t in (0 : ℝ)..1, partialD k ζ (x - t • v)) := by
+    rw [L2.inner_def]
+    refine integral_congr_ae ?_
+    have hqmp : MeasureTheory.Measure.QuasiMeasurePreserving (· + hshift k (-h)) volume volume :=
+      (measurePreserving_add_right volume _).quasiMeasurePreserving
+    have hshiftAE : (fun x => ζLp (x + hshift k (-h))) =ᵐ[volume]
+        fun x => ζ (x + hshift k (-h)) := hqmp.ae_eq hζ.coeFn_toLp
+    filter_upwards [coeFn_diffQuot k (-h) ζLp, hζ.coeFn_toLp, hshiftAE] with x hx1 hx2 hx3
+    rw [RCLike.inner_apply, conj_trivial, hx1, hx2, hx3, hshkneg, hFTC x]; ring
+  -- Tonelli swap.
+  have hswap : (∫ x, g x * (∫ t in (0 : ℝ)..1, partialD k ζ (x - t • v)))
+      = ∫ t in (0 : ℝ)..1, ∫ x, g x * partialD k ζ (x - t • v) := by
+    have hInt := integrable_uncurry_weak g hψc hψcs v
+    simp_rw [intervalIntegral.integral_of_le (show (0 : ℝ) ≤ 1 by norm_num)]
+    rw [← integral_integral_swap hInt]
+    refine integral_congr_ae (Filter.Eventually.of_forall (fun x => ?_))
+    exact (integral_const_mul _ _).symm
+  -- The weak-derivative identity for each translated test function.
+  have hpert : ∀ t : ℝ, (∫ x, g x * partialD k ζ (x - t • v))
+      = -⟪g', transL2 (-(t • v)) ζLp⟫ := by
+    intro t
+    set φt : EuclideanSpace ℝ (Fin d) → ℝ := fun y => ζ (y - t • v) with hφt
+    have hφtcd : ContDiff ℝ (⊤ : ℕ∞) φt :=
+      hζcd.comp (by fun_prop : ContDiff ℝ (⊤ : ℕ∞)
+        fun y : EuclideanSpace ℝ (Fin d) => y - t • v)
+    have hφtcs : HasCompactSupport φt := by
+      simpa only [hφt, Function.comp_def, Homeomorph.coe_addRight, sub_eq_add_neg] using
+        hζcs.comp_homeomorph (Homeomorph.addRight (-(t • v)))
+    have hpd : ∀ x, partialD k φt x = partialD k ζ (x - t • v) := by
+      intro x
+      have hτ : HasFDerivAt (fun y : EuclideanSpace ℝ (Fin d) => y - t • v)
+          (ContinuousLinearMap.id ℝ (EuclideanSpace ℝ (Fin d))) x := by
+        simpa using (hasFDerivAt_id x).sub_const (t • v)
+      have hcomp : HasFDerivAt φt
+          ((fderiv ℝ ζ (x - t • v)).comp (ContinuousLinearMap.id ℝ _)) x :=
+        ((hζcd.differentiable (by simp)).differentiableAt.hasFDerivAt).comp x hτ
+      simp only [partialD, hcomp.fderiv, ContinuousLinearMap.comp_apply,
+        ContinuousLinearMap.id_apply]
+    have hR : ⟪g', transL2 (-(t • v)) ζLp⟫ = ∫ x, g' x * ζ (x - t • v) := by
+      rw [L2.inner_def]
+      refine integral_congr_ae ?_
+      have hqmp : MeasureTheory.Measure.QuasiMeasurePreserving
+          (· + (-(t • v))) volume volume :=
+        (measurePreserving_add_right volume _).quasiMeasurePreserving
+      have hae : (fun x => ζLp (x + (-(t • v)))) =ᵐ[volume]
+          fun x => ζ (x + (-(t • v))) := hqmp.ae_eq hζ.coeFn_toLp
+      filter_upwards [coeFn_transL2 (-(t • v)) ζLp, hae] with x hx1 hx2
+      rw [RCLike.inner_apply, conj_trivial, hx1, hx2, sub_eq_add_neg]; ring
+    calc ∫ x, g x * partialD k ζ (x - t • v)
+        = ∫ x, g x * partialD k φt x := by
+          refine integral_congr_ae (Filter.Eventually.of_forall (fun x => ?_)); simp only [hpd]
+      _ = -∫ x, g' x * φt x := hg φt hφtcd hφtcs
+      _ = -⟪g', transL2 (-(t • v)) ζLp⟫ := by rw [← hR]
+  -- Assemble.
+  rw [diffQuot_inner_adjoint k h g ζLp, hstep2, hswap,
+    intervalIntegral.integral_congr
+      (g := fun t => -⟪g', transL2 (-(t • v)) ζLp⟫) (fun t _ => hpert t),
+    intervalIntegral.integral_neg, neg_neg]
+
+/-- **Difference-quotient bound against a smooth compactly supported test element.** For `g` with
+`L²` weak `k`-derivative `g'`, the inner product of `Dₖʰ g` against the `L²` class of a smooth
+compactly supported `ζ` is bounded by `‖g'‖ · ‖ζ‖`. This follows from the segment-integral
+representation by the Cauchy-Schwarz inequality and the translation isometry, integrated over the
+unit interval (Evans, *Partial Differential Equations* (2nd ed.), §5.8.2). -/
+private theorem inner_diffQuot_le_smooth (k : Fin d) (g g' : EucL2 d)
+    (hg : HasWeakDeriv k g g') {h : ℝ} (hh : h ≠ 0)
+    {ζ : EuclideanSpace ℝ (Fin d) → ℝ} (hζcd : ContDiff ℝ (⊤ : ℕ∞) ζ)
+    (hζcs : HasCompactSupport ζ) (hζ : MemLp ζ 2 volume) :
+    ⟪diffQuot k h g, hζ.toLp ζ⟫ ≤ ‖g'‖ * ‖hζ.toLp ζ‖ := by
+  set v : EuclideanSpace ℝ (Fin d) := hshift k h with hv
+  set ζLp := hζ.toLp ζ with hζLp
+  rw [inner_diffQuot_eq_integral_smooth k g g' hg hh hζcd hζcs hζ]
+  have hcont : Continuous (fun t : ℝ => ⟪g', transL2 (-(t • v)) ζLp⟫) :=
+    continuous_const.inner ((continuous_transL2 ζLp).comp (by fun_prop))
+  have hbd : ∀ t ∈ Icc (0 : ℝ) 1, ⟪g', transL2 (-(t • v)) ζLp⟫ ≤ ‖g'‖ * ‖ζLp‖ := by
+    intro t _
+    calc ⟪g', transL2 (-(t • v)) ζLp⟫ ≤ ‖g'‖ * ‖transL2 (-(t • v)) ζLp‖ := real_inner_le_norm _ _
+      _ = ‖g'‖ * ‖ζLp‖ := by rw [(transL2 _).norm_map]
+  calc ∫ t in (0 : ℝ)..1, ⟪g', transL2 (-(t • v)) ζLp⟫
+      ≤ ∫ _t in (0 : ℝ)..1, ‖g'‖ * ‖ζLp‖ :=
+        intervalIntegral.integral_mono_on (by norm_num) (hcont.intervalIntegrable 0 1)
+          intervalIntegrable_const hbd
+    _ = ‖g'‖ * ‖ζLp‖ := by rw [intervalIntegral.integral_const]; simp
+
+/-- **Difference-quotient bound, weak-derivative case (Evans §5.8.2, direction i).** A function `g`
+with `L²` weak `k`-derivative `g'` has difference quotients bounded in `L²` by the derivative:
+`‖Dₖʰ g‖ ≤ ‖g'‖`, uniformly in the step `h`. This is the general form of the tight single-direction
+bound `norm_diffQuot_le_of_contDiff`, obtained by testing `Dₖʰ g` against the smooth compactly
+supported functions (dense in `L²`), where the segment-integral representation gives the bound
+`⟪Dₖʰ g, ζ⟫ ≤ ‖g'‖ · ‖ζ‖`, then passing to the limit along a smooth sequence converging to
+`Dₖʰ g` itself (Evans, *Partial Differential Equations* (2nd ed.), §5.8.2, Theorem 3). -/
+theorem norm_diffQuot_le_of_hasWeakDeriv (k : Fin d) (g g' : EucL2 d)
+    (hg : HasWeakDeriv k g g') (h : ℝ) : ‖diffQuot k h g‖ ≤ ‖g'‖ := by
+  rcases eq_or_ne h 0 with rfl | hh
+  · rw [diffQuot_zero, ContinuousLinearMap.zero_apply, norm_zero]
+    exact norm_nonneg _
+  -- Smooth compactly supported functions are dense in `L²`.
+  set S : Set (EucL2 d) := {f : EucL2 d | ∃ ρ : EuclideanSpace ℝ (Fin d) → ℝ,
+    f =ᵐ[volume] ρ ∧ HasCompactSupport ρ ∧ ContDiff ℝ (⊤ : ℕ∞) ρ} with hS
+  have hdense : Dense S :=
+    MeasureTheory.Lp.dense_hasCompactSupport_contDiff
+      (F := ℝ) (μ := (volume : Measure (EuclideanSpace ℝ (Fin d)))) (by norm_num)
+  -- The inner-product bound holds against every smooth compactly supported test element.
+  have hbound : ∀ f : EucL2 d, f ∈ S → ⟪diffQuot k h g, f⟫ ≤ ‖g'‖ * ‖f‖ := by
+    rintro f ⟨ρ, hfρ, hρcs, hρcd⟩
+    have hρL2 : MemLp ρ 2 volume := hρcd.continuous.memLp_of_hasCompactSupport hρcs
+    have hfeq : f = hρL2.toLp ρ := Lp.ext (hfρ.trans hρL2.coeFn_toLp.symm)
+    rw [hfeq]
+    exact inner_diffQuot_le_smooth k g g' hg hh hρcd hρcs hρL2
+  -- A smooth sequence converges to `Dₖʰ g`; pass the bound to the limit.
+  have hmem : diffQuot k h g ∈ closure S := by rw [hdense.closure_eq]; trivial
+  obtain ⟨u, hu_mem, hu_lim⟩ := mem_closure_iff_seq_limit.mp hmem
+  have h1 : Filter.Tendsto (fun n => ⟪diffQuot k h g, u n⟫) Filter.atTop
+      (nhds ⟪diffQuot k h g, diffQuot k h g⟫) := tendsto_const_nhds.inner hu_lim
+  have h2 : Filter.Tendsto (fun n => ‖g'‖ * ‖u n‖) Filter.atTop
+      (nhds (‖g'‖ * ‖diffQuot k h g‖)) := hu_lim.norm.const_mul ‖g'‖
+  have h3 : ⟪diffQuot k h g, diffQuot k h g⟫ ≤ ‖g'‖ * ‖diffQuot k h g‖ :=
+    le_of_tendsto_of_tendsto' h1 h2 (fun n => hbound (u n) (hu_mem n))
+  rw [real_inner_self_eq_norm_mul_norm] at h3
+  rcases eq_or_lt_of_le (norm_nonneg (diffQuot k h g)) with hzero | hpos
+  · rw [← hzero]; exact norm_nonneg _
+  · exact le_of_mul_le_mul_right h3 hpos
 
 end EllipticDirichlet.Regularity
