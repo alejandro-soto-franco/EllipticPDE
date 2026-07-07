@@ -166,6 +166,83 @@ private lemma actL_diffQuotD_ibp (A : EllipticCoeff d) (hΩm : MeasurableSet Ω)
     diffQuot_inner_adjoint k h (extendL2 hΩm (A.actL i j g)) (extendL2 hΩm p)]
   exact (neg_neg _).symm
 
+/-! ### D2 core: support of the inner cutoff data and the Evans coordinate reduction -/
+
+/-- If a class `g` vanishes a.e. (on `Ω`) off a set `S`, then its extension by zero to the
+whole space is a.e. supported in `S`. -/
+private lemma extendL2_supp_of_ae_restrict (hΩm : MeasurableSet Ω) (g : L2D Ω)
+    {S : Set (EuclideanSpace ℝ (Fin d))}
+    (hg : ∀ᵐ x ∂(volume.restrict Ω), x ∉ S → (g x : ℝ) = 0) :
+    ∀ᵐ x ∂volume, (extendL2 hΩm g : EuclideanSpace ℝ (Fin d) → ℝ) x ≠ 0 → x ∈ S := by
+  filter_upwards [coeFn_extendL2 hΩm g, ae_imp_of_ae_restrict hg] with x hx himp
+  rw [hx]; intro hne
+  by_cases hxΩ : x ∈ Ω
+  · by_contra hxS
+    rw [Set.indicator_of_mem hxΩ] at hne
+    exact hne (himp hxΩ hxS)
+  · rw [Set.indicator_of_notMem hxΩ] at hne; exact absurd rfl hne
+
+/-- **Support of the inner cutoff data.** Every ambient coordinate of the inner block
+`ξ² · Dₖ^h u` has whole-space extension a.e. supported in `tsupport ξ²`: the zeroth
+coordinate is `ξ² · Dₖ^h u₀`, and the `i+1` coordinate is
+`ξ² · Dₖ^h ∂ᵢu + (∂ᵢξ²) · Dₖ^h u₀`, both of which carry the factor `ξ²` (or its partial,
+whose support is smaller). -/
+private lemma diffQuotG_cutoffSq_supp (hξ : IsTestFn Ω ξ) (hΩm : MeasurableSet Ω)
+    (k : Fin d) (h : ℝ) (u : H1amb Ω) (j : Fin (d + 1)) :
+    ∀ᵐ x ∂volume,
+      (extendL2 hΩm ((cutoffMul (isTestFn_mul hξ hξ) (diffQuotG k h hΩm u)) j)
+          : EuclideanSpace ℝ (Fin d) → ℝ) x ≠ 0
+        → x ∈ tsupport (fun y => ξ y * ξ y) := by
+  apply extendL2_supp_of_ae_restrict
+  refine Fin.cases ?_ (fun i => ?_) j
+  · rw [cutoffMul_apply_zero, diffQuotG_apply]
+    exact mulTest_ae_eq_zero_off_tsupport (isTestFn_mul hξ hξ) _
+  · rw [cutoffMul_apply_succ, diffQuotG_apply, diffQuotG_apply]
+    filter_upwards [Lp.coeFn_add
+        (mulTest (isTestFn_mul hξ hξ) (diffQuotD k h hΩm (u i.succ)))
+        (mulTestPartial (isTestFn_mul hξ hξ) i (diffQuotD k h hΩm (u 0))),
+      mulTest_coeFn (isTestFn_mul hξ hξ) (diffQuotD k h hΩm (u i.succ)),
+      mulTestPartial_coeFn (isTestFn_mul hξ hξ) i (diffQuotD k h hΩm (u 0))]
+      with x hadd hmt hmtp hxS
+    have hsq : ξ x * ξ x = 0 :=
+      image_eq_zero_of_notMem_tsupport (f := fun y => ξ y * ξ y) hxS
+    have hpsq : partialD i (fun y => ξ y * ξ y) x = 0 :=
+      image_eq_zero_of_notMem_tsupport (f := partialD i (fun y => ξ y * ξ y))
+        (fun hc => hxS (tsupport_partialD_subset i _ hc))
+    rw [hadd, Pi.add_apply, hmt, hmtp, hsq, hpsq, zero_mul, zero_mul, add_zero]
+
+/-- **Evans test element, successor coordinate.** Under the outer-cutoff reachability
+conditions (`θ ≡ 1`, hence `∂θ = 0`, on the shift-reachable part of `tsupport ξ²`), the
+`j+1` coordinate of the admissible test element reduces to a single backward difference
+quotient of the inner block: `(v_h)_{j+1} = -Dₖ^{-h}((ξ²·Dₖ^h u)_{j+1})`. This is the
+θ-chop invisibility together with the vanishing of the outer-cutoff cross term (Evans,
+*Partial Differential Equations* (2nd ed.), §6.3.1). -/
+private lemma evansTest_succ_eq (hΩm : MeasurableSet Ω) (hξ : IsTestFn Ω ξ) (hθ : IsTestFn Ω θ)
+    (k : Fin d) (h : ℝ)
+    (hsm_in : ∀ x ∈ tsupport (fun y => ξ y * ξ y), x + hshift k h ∈ Ω)
+    (hsm_out : ∀ x ∈ tsupport θ, x + hshift k (-h) ∈ Ω) (u : H01 Ω) (j : Fin d)
+    (hθ1 : ∀ x ∈ Ω,
+      x ∈ tsupport (fun y => ξ y * ξ y) ∨ x + hshift k (-h) ∈ tsupport (fun y => ξ y * ξ y)
+        → θ x = 1)
+    (hθ0 : ∀ x ∈ Ω,
+      x ∈ tsupport (fun y => ξ y * ξ y) ∨ x + hshift k (-h) ∈ tsupport (fun y => ξ y * ξ y)
+        → partialD j θ x = 0) :
+    (evansTest hΩm hξ hθ k h hsm_in hsm_out u : H1amb Ω) j.succ
+      = -diffQuotD k (-h) hΩm
+          ((cutoffMul (isTestFn_mul hξ hξ) (diffQuotG k h hΩm (u : H1amb Ω))) j.succ) := by
+  set Z : H1amb Ω := cutoffMul (isTestFn_mul hξ hξ) (diffQuotG k h hΩm (u : H1amb Ω)) with hZ
+  have hcoe : (evansTest hΩm hξ hθ k h hsm_in hsm_out u : H1amb Ω) j.succ
+      = -(cutoffMul hθ (diffQuotG k (-h) hΩm Z)) j.succ := by
+    rw [evansTest_coe]; rfl
+  rw [hcoe, cutoffMul_apply_succ, diffQuotG_apply, diffQuotG_apply]
+  have hvis : mulTest hθ (diffQuotD k (-h) hΩm (Z j.succ)) = diffQuotD k (-h) hΩm (Z j.succ) :=
+    mulTest_theta_diffQuotD hΩm hθ k (Z j.succ)
+      (diffQuotG_cutoffSq_supp hξ hΩm k h (u : H1amb Ω) j.succ) hθ1
+  have hcross : mulTestPartial hθ j (diffQuotD k (-h) hΩm (Z 0)) = 0 :=
+    mulTestPartial_theta_diffQuotD hΩm hθ j k (Z 0)
+      (diffQuotG_cutoffSq_supp hξ hΩm k h (u : H1amb Ω) 0) hθ0
+  rw [hvis, hcross, add_zero]
+
 /-! ### D2 core: the extension-by-zero weak derivative and the first-order global energy -/
 
 /-- **Extension by zero of an `H₀¹` element carries the weak gradient.** For `u ∈ H₀¹(Ω)`,
