@@ -19,6 +19,7 @@ import EllipticDirichlet.Hneg
 import EllipticDirichlet.Existence
 import EllipticDirichlet.GeneralForm
 import EllipticDirichlet.Garding
+import EllipticDirichlet.Regularity.Caccioppoli
 import EllipticDirichlet.Fredholm
 import EllipticDirichlet.FredholmComplete
 import EllipticDirichlet.SpectrumSigma
