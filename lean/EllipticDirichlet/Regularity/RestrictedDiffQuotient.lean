@@ -144,4 +144,33 @@ def diffQuotG (k : Fin d) (h : ℝ) (hΩm : MeasurableSet Ω) : H1amb Ω →L[�
     PiLp.coe_continuousLinearEquiv, PiLp.toLp_apply, ContinuousLinearMap.pi_apply,
     ContinuousLinearMap.proj_apply]
 
+/-! ### B4: Whole-space compatibility — the integration-by-parts bridge -/
+
+/-- **Whole-space compatibility.** On classes whose whole-space translate stays supported
+in `Ω`, the interior difference quotient's extension by zero equals the honest whole-space
+difference quotient of the extension: `extendL2 (Dₖʰ g) = Dₖʰ (extendL2 g)`. This lets the
+whole-space adjoint relation `diffQuot_inner_adjoint` act on restricted-domain difference
+quotients (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, proof of Theorem 3). -/
+theorem extendL2_diffQuotD_eq (k : Fin d) (h : ℝ) (hΩm : MeasurableSet Ω) (g : L2D Ω)
+    (hsupp : ∀ᵐ x ∂volume, (extendL2 hΩm g) (x + hshift k h) ≠ 0 → x ∈ Ω) :
+    extendL2 hΩm (diffQuotD k h hΩm g) = diffQuot k h (extendL2 hΩm g) := by
+  have hDQ : ∀ᵐ x ∂volume, x ∈ Ω →
+      (diffQuotD k h hΩm g : EuclideanSpace ℝ (Fin d) → ℝ) x
+        = ((extendL2 hΩm g) (x + hshift k h) - g x) / h :=
+    ae_imp_of_ae_restrict (coeFn_diffQuotD k h hΩm g)
+  apply Lp.ext
+  filter_upwards [coeFn_extendL2 hΩm (diffQuotD k h hΩm g), coeFn_diffQuot k h (extendL2 hΩm g),
+      extendL2_ae_eq_zero hΩm (diffQuotD k h hΩm g), extendL2_ae_eq_zero hΩm g,
+      coeFn_extendL2 hΩm g, hsupp, hDQ]
+    with x hx1 hx2 hx3 hx4 hx7 hx5 hx6
+  rw [hx1, hx2]
+  by_cases hxΩ : x ∈ Ω
+  · rw [Set.indicator_of_mem hxΩ, hx6 hxΩ, hx7, Set.indicator_of_mem hxΩ]
+  · rw [Set.indicator_of_notMem hxΩ, hx4 hxΩ]
+    have h0 : (extendL2 hΩm g) (x + hshift k h) = 0 := by
+      by_contra hne
+      exact hxΩ (hx5 hne)
+    rw [h0]
+    ring
+
 end EllipticDirichlet.Regularity
