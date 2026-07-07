@@ -242,20 +242,20 @@ lemma energy_ge (A : EllipticCoeff d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
 /-! ### Operator-norm bounds and regrouping identities for the cutoff -/
 
 /-- Operator-norm bound for the cutoff multiplier: `‖η · g‖ ≤ ‖η‖∞ · ‖g‖`. -/
-private lemma norm_mulTest_le {Ω : Set (EuclideanSpace ℝ (Fin d))}
+lemma norm_mulTest_le {Ω : Set (EuclideanSpace ℝ (Fin d))}
     {η : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω η) (g : L2D Ω) :
     ‖mulTest h g‖ ≤ (exists_abs_bound h).choose * ‖g‖ :=
   norm_mulCoeffL_le _ _ g
 
 /-- Operator-norm bound for the partial-cutoff multiplier: `‖∂ᵢη · g‖ ≤ ‖∂ᵢη‖∞ · ‖g‖`. -/
-private lemma norm_mulTestPartial_le {Ω : Set (EuclideanSpace ℝ (Fin d))}
+lemma norm_mulTestPartial_le {Ω : Set (EuclideanSpace ℝ (Fin d))}
     {η : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω η) (i : Fin d) (g : L2D Ω) :
     ‖mulTestPartial h i g‖ ≤ (exists_abs_bound_partialD h i).choose * ‖g‖ :=
   norm_mulCoeffL_le _ _ g
 
 /-- Regrouping one `ζ` factor across the coefficient action, principal part:
 `⟪aᵢⱼ (ζ p), ζ q⟫ = ⟪aᵢⱼ p, ζ² q⟫`. -/
-private lemma actL_mulTest_regroup (A : EllipticCoeff d)
+lemma actL_mulTest_regroup (A : EllipticCoeff d)
     {Ω : Set (EuclideanSpace ℝ (Fin d))} {ζ : EuclideanSpace ℝ (Fin d) → ℝ}
     (hζ : IsTestFn Ω ζ) (i j : Fin d) (p q : L2D Ω) :
     ⟪A.actL i j (mulTest hζ p), mulTest hζ q⟫
@@ -269,7 +269,7 @@ private lemma actL_mulTest_regroup (A : EllipticCoeff d)
 
 /-- Regrouping the cross term: moving one `ζ` off `∂ⱼ(ζ²) = 2 ζ ∂ⱼζ` onto `p`,
 `⟪aᵢⱼ p, ∂ⱼ(ζ²) q⟫ = 2 ⟪aᵢⱼ (ζ p), ∂ⱼζ q⟫`. -/
-private lemma actL_cross_regroup (A : EllipticCoeff d)
+lemma actL_cross_regroup (A : EllipticCoeff d)
     {Ω : Set (EuclideanSpace ℝ (Fin d))} {ζ : EuclideanSpace ℝ (Fin d) → ℝ}
     (hζ : IsTestFn Ω ζ) (i j : Fin d) (p q : L2D Ω) :
     ⟪A.actL i j p, mulTestPartial (isTestFn_mul hζ hζ) j q⟫

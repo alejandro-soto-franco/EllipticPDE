@@ -512,43 +512,6 @@ private lemma norm_diffQuotD_u0_le (hΩm : MeasurableSet Ω) (k : Fin d) (h : �
 
 /-! ### D2 core: the master assembly toolkit -/
 
-/-- Operator-norm bound for the cutoff multiplier: `‖ξ · g‖ ≤ ‖ξ‖∞ · ‖g‖`. -/
-private lemma norm_mulTest_le (hξ : IsTestFn Ω ξ) (g : L2D Ω) :
-    ‖mulTest hξ g‖ ≤ (exists_abs_bound hξ).choose * ‖g‖ :=
-  norm_mulCoeffL_le _ _ g
-
-/-- Operator-norm bound for the partial-cutoff multiplier: `‖(∂ᵢξ) · g‖ ≤ ‖∂ᵢξ‖∞ · ‖g‖`. -/
-private lemma norm_mulTestPartial_le (hξ : IsTestFn Ω ξ) (i : Fin d) (g : L2D Ω) :
-    ‖mulTestPartial hξ i g‖ ≤ (exists_abs_bound_partialD hξ i).choose * ‖g‖ :=
-  norm_mulCoeffL_le _ _ g
-
-/-- Regrouping one `ξ` factor across the coefficient action, principal part:
-`⟪aᵢⱼ (ξ p), ξ q⟫ = ⟪aᵢⱼ p, ξ² q⟫`. -/
-private lemma actL_mulTest_regroup (A : EllipticCoeff d) (hξ : IsTestFn Ω ξ)
-    (i j : Fin d) (p q : L2D Ω) :
-    ⟪A.actL i j (mulTest hξ p), mulTest hξ q⟫
-      = ⟪A.actL i j p, mulTest (isTestFn_mul hξ hξ) q⟫ := by
-  rw [A.inner_actL_eq, A.inner_actL_eq]
-  refine integral_congr_ae ?_
-  filter_upwards [mulTest_coeFn hξ p, mulTest_coeFn hξ q,
-    mulTest_coeFn (isTestFn_mul hξ hξ) q] with x hp hq hpq
-  rw [hp, hq, hpq]; ring
-
-/-- Regrouping the cross term: moving one `ξ` off `∂ⱼ(ξ²) = 2 ξ ∂ⱼξ` onto `p`,
-`⟪aᵢⱼ p, ∂ⱼ(ξ²) q⟫ = 2 ⟪aᵢⱼ (ξ p), ∂ⱼξ q⟫`. -/
-private lemma actL_cross_regroup (A : EllipticCoeff d) (hξ : IsTestFn Ω ξ)
-    (i j : Fin d) (p q : L2D Ω) :
-    ⟪A.actL i j p, mulTestPartial (isTestFn_mul hξ hξ) j q⟫
-      = 2 * ⟪A.actL i j (mulTest hξ p), mulTestPartial hξ j q⟫ := by
-  rw [A.inner_actL_eq, A.inner_actL_eq, ← integral_const_mul]
-  refine integral_congr_ae ?_
-  filter_upwards [mulTestPartial_coeFn (isTestFn_mul hξ hξ) j q,
-    mulTest_coeFn hξ p, mulTestPartial_coeFn hξ j q] with x hpart hp hq
-  rw [hpart, hp, hq,
-    congrFun (partialD_mul (hξ.1.differentiable (by simp))
-      (hξ.1.differentiable (by simp)) j) x]
-  ring
-
 /-- Multiplying by `ξ²` is multiplying by `ξ` twice: `[ξ² · g] = [ξ · (ξ · g)]`. -/
 private lemma mulTest_mul_eq (hξ : IsTestFn Ω ξ) (g : L2D Ω) :
     mulTest (isTestFn_mul hξ hξ) g = mulTest hξ (mulTest hξ g) := by
