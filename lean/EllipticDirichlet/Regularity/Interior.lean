@@ -284,6 +284,67 @@ private lemma evansTest_bilin_ibp (A : EllipticCoeff d) (hΩm : MeasurableSet Ω
     inner_neg_right, actL_diffQuotD_ibp A hΩm i j k ((u : H1amb Ω) i.succ) (Z j.succ) hsupp_j,
     neg_neg]
 
+/-- Restriction to `Ω` is non-expansive on `L²`: `‖restrictL2 w‖ ≤ ‖w‖`. -/
+private lemma norm_restrictL2_le (hΩm : MeasurableSet Ω) (w : EucL2 d) :
+    ‖restrictL2 hΩm w‖ ≤ ‖w‖ :=
+  norm_Lp_toLp_restrict_le Ω w
+
+/-- The interior difference quotient is the restriction of the whole-space difference
+quotient of the extension: `Dₖʰ g = restrict (Dₖʰ (extendL2 g))`. -/
+private lemma diffQuotD_eq_restrictL2_diffQuot (hΩm : MeasurableSet Ω) (k : Fin d) (h : ℝ)
+    (g : L2D Ω) :
+    diffQuotD k h hΩm g = restrictL2 hΩm (diffQuot k h (extendL2 hΩm g)) := by
+  apply Lp.ext
+  filter_upwards [coeFn_diffQuotD k h hΩm g,
+    coeFn_restrictL2 hΩm (diffQuot k h (extendL2 hΩm g)),
+    ae_restrict_of_ae (coeFn_diffQuot k h (extendL2 hΩm g)),
+    ae_restrict_of_ae (coeFn_extendL2 hΩm g), ae_restrict_mem hΩm] with x hx1 hx2 hx3 hx4 hx5
+  rw [hx1, hx2, hx3, hx4, Set.indicator_of_mem hx5]
+
+/-- **Evans test element, zeroth coordinate.** The function value of the test element is a
+single backward difference quotient of the inner block, `(v_h)₀ = -Dₖ^{-h}((ξ²·Dₖ^h u)₀)`,
+by θ-chop invisibility (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1). -/
+private lemma evansTest_zero_eq (hΩm : MeasurableSet Ω) (hξ : IsTestFn Ω ξ) (hθ : IsTestFn Ω θ)
+    (k : Fin d) (h : ℝ)
+    (hsm_in : ∀ x ∈ tsupport (fun y => ξ y * ξ y), x + hshift k h ∈ Ω)
+    (hsm_out : ∀ x ∈ tsupport θ, x + hshift k (-h) ∈ Ω) (u : H01 Ω)
+    (hθ1 : ∀ x ∈ Ω,
+      x ∈ tsupport (fun y => ξ y * ξ y) ∨ x + hshift k (-h) ∈ tsupport (fun y => ξ y * ξ y)
+        → θ x = 1) :
+    (evansTest hΩm hξ hθ k h hsm_in hsm_out u : H1amb Ω) 0
+      = -diffQuotD k (-h) hΩm
+          ((cutoffMul (isTestFn_mul hξ hξ) (diffQuotG k h hΩm (u : H1amb Ω))) 0) := by
+  set Z : H1amb Ω := cutoffMul (isTestFn_mul hξ hξ) (diffQuotG k h hΩm (u : H1amb Ω)) with hZ
+  have hcoe : (evansTest hΩm hξ hθ k h hsm_in hsm_out u : H1amb Ω) 0
+      = -(cutoffMul hθ (diffQuotG k (-h) hΩm Z)) 0 := by rw [evansTest_coe]; rfl
+  rw [hcoe, cutoffMul_apply_zero, diffQuotG_apply]
+  rw [mulTest_theta_diffQuotD hΩm hθ k (Z 0)
+    (diffQuotG_cutoffSq_supp hξ hΩm k h (u : H1amb Ω) 0) hθ1]
+
+/-- **Evans bilinear identity, restricted-domain form.** Bringing the whole-space pairing of
+`evansTest_bilin_ibp` back to `L²(Ω)` through the extension adjoint and the identity
+`diffQuotD = restrict ∘ diffQuot ∘ extendL2`, the principal form testing against the Evans
+element is the restricted-domain pairing of the inner cutoff block against the interior
+difference quotient of the coefficient action (Evans, *Partial Differential Equations*
+(2nd ed.), §6.3.1). -/
+private lemma evansTest_bilin_L2D (A : EllipticCoeff d) (hΩm : MeasurableSet Ω)
+    (hξ : IsTestFn Ω ξ) (hθ : IsTestFn Ω θ) (k : Fin d) (h : ℝ)
+    (hsm_in : ∀ x ∈ tsupport (fun y => ξ y * ξ y), x + hshift k h ∈ Ω)
+    (hsm_out : ∀ x ∈ tsupport θ, x + hshift k (-h) ∈ Ω)
+    (hθ1 : ∀ x ∈ Ω,
+      x ∈ tsupport (fun y => ξ y * ξ y) ∨ x + hshift k (-h) ∈ tsupport (fun y => ξ y * ξ y)
+        → θ x = 1)
+    (hθ0 : ∀ (j : Fin d), ∀ x ∈ Ω,
+      x ∈ tsupport (fun y => ξ y * ξ y) ∨ x + hshift k (-h) ∈ tsupport (fun y => ξ y * ξ y)
+        → partialD j θ x = 0) (u : H01 Ω) :
+    A.bilin Ω u (evansTest hΩm hξ hθ k h hsm_in hsm_out u)
+      = ∑ i : Fin d, ∑ j : Fin d,
+        ⟪(cutoffMul (isTestFn_mul hξ hξ) (diffQuotG k h hΩm (u : H1amb Ω))) j.succ,
+          diffQuotD k h hΩm (A.actL i j ((u : H1amb Ω) i.succ))⟫ := by
+  rw [evansTest_bilin_ibp A hΩm hξ hθ k h hsm_in hsm_out hθ1 hθ0 u]
+  refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
+  rw [real_inner_comm, extendL2_inner_restrictL2, ← diffQuotD_eq_restrictL2_diffQuot]
+
 /-! ### D2 core: the extension-by-zero weak derivative and the first-order global energy -/
 
 /-- **Extension by zero of an `H₀¹` element carries the weak gradient.** For `u ∈ H₀¹(Ω)`,
@@ -430,23 +491,6 @@ theorem firstOrder_energy_le (Op : FullEllipticOp d)
       filter_upwards with x; rw [Real.inner_apply]
     rw [heq]; exact real_inner_le_norm _ _
   linarith [hge, hcnn, hfu, hfull]
-
-/-- Restriction to `Ω` is non-expansive on `L²`: `‖restrictL2 w‖ ≤ ‖w‖`. -/
-private lemma norm_restrictL2_le (hΩm : MeasurableSet Ω) (w : EucL2 d) :
-    ‖restrictL2 hΩm w‖ ≤ ‖w‖ :=
-  norm_Lp_toLp_restrict_le Ω w
-
-/-- The interior difference quotient is the restriction of the whole-space difference
-quotient of the extension: `Dₖʰ g = restrict (Dₖʰ (extendL2 g))`. -/
-private lemma diffQuotD_eq_restrictL2_diffQuot (hΩm : MeasurableSet Ω) (k : Fin d) (h : ℝ)
-    (g : L2D Ω) :
-    diffQuotD k h hΩm g = restrictL2 hΩm (diffQuot k h (extendL2 hΩm g)) := by
-  apply Lp.ext
-  filter_upwards [coeFn_diffQuotD k h hΩm g,
-    coeFn_restrictL2 hΩm (diffQuot k h (extendL2 hΩm g)),
-    ae_restrict_of_ae (coeFn_diffQuot k h (extendL2 hΩm g)),
-    ae_restrict_of_ae (coeFn_extendL2 hΩm g), ae_restrict_mem hΩm] with x hx1 hx2 hx3 hx4 hx5
-  rw [hx1, hx2, hx3, hx4, Set.indicator_of_mem hx5]
 
 /-- **The difference quotient of `u₀` is controlled by the gradient.** For `u ∈ H₀¹(Ω)`,
 the interior difference quotient of the function value is bounded in `L²` by the `k`-th
