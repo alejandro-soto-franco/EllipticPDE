@@ -431,4 +431,39 @@ theorem firstOrder_energy_le (Op : FullEllipticOp d)
     rw [heq]; exact real_inner_le_norm _ _
   linarith [hge, hcnn, hfu, hfull]
 
+/-- Restriction to `Ω` is non-expansive on `L²`: `‖restrictL2 w‖ ≤ ‖w‖`. -/
+private lemma norm_restrictL2_le (hΩm : MeasurableSet Ω) (w : EucL2 d) :
+    ‖restrictL2 hΩm w‖ ≤ ‖w‖ :=
+  norm_Lp_toLp_restrict_le Ω w
+
+/-- The interior difference quotient is the restriction of the whole-space difference
+quotient of the extension: `Dₖʰ g = restrict (Dₖʰ (extendL2 g))`. -/
+private lemma diffQuotD_eq_restrictL2_diffQuot (hΩm : MeasurableSet Ω) (k : Fin d) (h : ℝ)
+    (g : L2D Ω) :
+    diffQuotD k h hΩm g = restrictL2 hΩm (diffQuot k h (extendL2 hΩm g)) := by
+  apply Lp.ext
+  filter_upwards [coeFn_diffQuotD k h hΩm g,
+    coeFn_restrictL2 hΩm (diffQuot k h (extendL2 hΩm g)),
+    ae_restrict_of_ae (coeFn_diffQuot k h (extendL2 hΩm g)),
+    ae_restrict_of_ae (coeFn_extendL2 hΩm g), ae_restrict_mem hΩm] with x hx1 hx2 hx3 hx4 hx5
+  rw [hx1, hx2, hx3, hx4, Set.indicator_of_mem hx5]
+
+/-- **The difference quotient of `u₀` is controlled by the gradient.** For `u ∈ H₀¹(Ω)`,
+the interior difference quotient of the function value is bounded in `L²` by the `k`-th
+gradient component, uniformly in the step `h`: `‖Dₖ^h u₀‖ ≤ ‖u_{k+1}‖`. This composes the
+weak-derivative difference-quotient bound `norm_diffQuot_le_of_hasWeakDeriv` with the
+extension-by-zero weak gradient `hasWeakDeriv_extendL2_of_mem_H01`, through the non-expansive
+restriction (Evans, *Partial Differential Equations* (2nd ed.), §5.8.2). -/
+private lemma norm_diffQuotD_u0_le (hΩm : MeasurableSet Ω) (k : Fin d) (h : ℝ) (u : H01 Ω) :
+    ‖diffQuotD k h hΩm ((u : H1amb Ω) 0)‖ ≤ ‖(u : H1amb Ω) k.succ‖ :=
+  calc ‖diffQuotD k h hΩm ((u : H1amb Ω) 0)‖
+      = ‖restrictL2 hΩm (diffQuot k h (extendL2 hΩm ((u : H1amb Ω) 0)))‖ := by
+        rw [diffQuotD_eq_restrictL2_diffQuot]
+    _ ≤ ‖diffQuot k h (extendL2 hΩm ((u : H1amb Ω) 0))‖ := norm_restrictL2_le hΩm _
+    _ ≤ ‖extendL2 hΩm ((u : H1amb Ω) k.succ)‖ :=
+        norm_diffQuot_le_of_hasWeakDeriv k (extendL2 hΩm ((u : H1amb Ω) 0))
+          (extendL2 hΩm ((u : H1amb Ω) k.succ))
+          (hasWeakDeriv_extendL2_of_mem_H01 hΩm k u.2) h
+    _ = ‖(u : H1amb Ω) k.succ‖ := norm_extendL2 hΩm _
+
 end EllipticDirichlet.Regularity
