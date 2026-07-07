@@ -243,6 +243,47 @@ private lemma evansTest_succ_eq (hΩm : MeasurableSet Ω) (hξ : IsTestFn Ω ξ)
       (diffQuotG_cutoffSq_supp hξ hΩm k h (u : H1amb Ω) 0) hθ0
   rw [hvis, hcross, add_zero]
 
+/-- **Evans bilinear identity after discrete integration by parts.** Testing the principal
+bilinear form with the Evans test element, the coordinate reduction `evansTest_succ_eq`
+followed by the discrete integration-by-parts identity `actL_diffQuotD_ibp` moves the
+backward difference quotient off the test factor onto the coefficient action, yielding the
+whole-space pairing of the forward difference quotient of the coefficient-weighted gradient
+against the inner cutoff block (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1). -/
+private lemma evansTest_bilin_ibp (A : EllipticCoeff d) (hΩm : MeasurableSet Ω)
+    (hξ : IsTestFn Ω ξ) (hθ : IsTestFn Ω θ) (k : Fin d) (h : ℝ)
+    (hsm_in : ∀ x ∈ tsupport (fun y => ξ y * ξ y), x + hshift k h ∈ Ω)
+    (hsm_out : ∀ x ∈ tsupport θ, x + hshift k (-h) ∈ Ω)
+    (hθ1 : ∀ x ∈ Ω,
+      x ∈ tsupport (fun y => ξ y * ξ y) ∨ x + hshift k (-h) ∈ tsupport (fun y => ξ y * ξ y)
+        → θ x = 1)
+    (hθ0 : ∀ (j : Fin d), ∀ x ∈ Ω,
+      x ∈ tsupport (fun y => ξ y * ξ y) ∨ x + hshift k (-h) ∈ tsupport (fun y => ξ y * ξ y)
+        → partialD j θ x = 0) (u : H01 Ω) :
+    A.bilin Ω u (evansTest hΩm hξ hθ k h hsm_in hsm_out u)
+      = ∑ i : Fin d, ∑ j : Fin d,
+        ⟪diffQuot k h (extendL2 hΩm (A.actL i j ((u : H1amb Ω) i.succ))),
+          extendL2 hΩm
+            ((cutoffMul (isTestFn_mul hξ hξ) (diffQuotG k h hΩm (u : H1amb Ω))) j.succ)⟫ := by
+  rw [EllipticCoeff.bilin_apply]
+  refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
+  set Z : H1amb Ω := cutoffMul (isTestFn_mul hξ hξ) (diffQuotG k h hΩm (u : H1amb Ω)) with hZ
+  have hsupp_j : ∀ᵐ x ∂volume,
+      (extendL2 hΩm (Z j.succ) : EuclideanSpace ℝ (Fin d) → ℝ) (x + hshift k (-h)) ≠ 0
+        → x ∈ Ω := by
+    have hqmp : MeasureTheory.Measure.QuasiMeasurePreserving
+        (· + hshift k (-h)) volume volume :=
+      (measurePreserving_add_right volume (hshift k (-h))).quasiMeasurePreserving
+    filter_upwards [hqmp.ae (diffQuotG_cutoffSq_supp hξ hΩm k h (u : H1amb Ω) j.succ)]
+      with x hx hne
+    have hxS : x + hshift k (-h) ∈ tsupport (fun y => ξ y * ξ y) := hx hne
+    have hxeq : x = (x + hshift k (-h)) + hshift k h := by rw [hshift_neg]; abel
+    rw [hxeq]; exact hsm_in _ hxS
+  rw [show ((evansTest hΩm hξ hθ k h hsm_in hsm_out u : H1amb Ω) j.succ)
+        = -diffQuotD k (-h) hΩm (Z j.succ) from
+      evansTest_succ_eq hΩm hξ hθ k h hsm_in hsm_out u j hθ1 (hθ0 j),
+    inner_neg_right, actL_diffQuotD_ibp A hΩm i j k ((u : H1amb Ω) i.succ) (Z j.succ) hsupp_j,
+    neg_neg]
+
 /-! ### D2 core: the extension-by-zero weak derivative and the first-order global energy -/
 
 /-- **Extension by zero of an `H₀¹` element carries the weak gradient.** For `u ∈ H₀¹(Ω)`,
