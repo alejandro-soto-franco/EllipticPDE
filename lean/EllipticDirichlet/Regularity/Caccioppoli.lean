@@ -199,4 +199,44 @@ lemma cutoffMul_mem_H01 {Ω : Set (EuclideanSpace ℝ (Fin d))}
         (Submodule.isClosed_topologicalClosure _)
   exact Submodule.mem_comap.mp (hle hU)
 
+/-! ### Weighted energy lower bound from ellipticity -/
+
+/-- **Ellipticity energy bound for an arbitrary `L²` gradient family.** The lower bound of
+[`EllipticCoeff.bilin_self_ge`] uses only the `L²` classes, not the weak-gradient
+relation, so it holds for any family `g : Fin d → L²(Ω)`:
+`λ ∑ᵢ ‖gᵢ‖² ≤ ∑ᵢⱼ ⟪aᵢⱼ gᵢ, gⱼ⟫`. Applied to `gᵢ = ζ · ∂ᵢu` this is the cutoff-weighted
+energy lower bound `λ ∫_Ω ζ² |∇u|² ≤ ∫_Ω ζ² ∑ᵢⱼ aᵢⱼ ∂ᵢu ∂ⱼu` driving the Caccioppoli
+estimate (Evans, *PDE* 2nd ed., §6.3.1). -/
+lemma energy_ge (A : EllipticCoeff d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    (g : Fin d → L2D Ω) :
+    A.lam * ∑ i : Fin d, ‖g i‖ ^ 2
+      ≤ ∑ i : Fin d, ∑ j : Fin d, ⟪A.actL i j (g i), g j⟫ := by
+  have hPint : Integrable (fun x => A.lam * ∑ i : Fin d, (g i x : ℝ) ^ 2)
+      (volume.restrict Ω) :=
+    (integrable_finsetSum _ (fun i _ => integrable_sq (g i))).const_mul A.lam
+  have hpoint : (fun x => A.lam * ∑ i : Fin d, (g i x : ℝ) ^ 2)
+      ≤ᵐ[volume.restrict Ω] fun x => ∑ i : Fin d, ∑ j : Fin d,
+        A.a x i j * (g i x : ℝ) * (g j x : ℝ) :=
+    (ae_restrict_of_ae A.elliptic).mono (fun x hx => hx (fun i => g i x))
+  have hlamS : ∫ x in Ω, A.lam * ∑ i : Fin d, (g i x : ℝ) ^ 2
+      = A.lam * ∑ i : Fin d, ‖g i‖ ^ 2 := by
+    rw [integral_const_mul, integral_finsetSum _ (fun i _ => integrable_sq (g i))]
+    congr 1
+    exact Finset.sum_congr rfl (fun i _ => sq_integral_eq_norm_sq (g i))
+  have hRHS : ∑ i : Fin d, ∑ j : Fin d, ⟪A.actL i j (g i), g j⟫
+      = ∫ x in Ω, ∑ i : Fin d, ∑ j : Fin d,
+        A.a x i j * (g i x : ℝ) * (g j x : ℝ) := by
+    rw [integral_finsetSum _ (fun i _ => integrable_finsetSum _
+      (fun j _ => A.integrable_triple i j _ _))]
+    refine Finset.sum_congr rfl (fun i _ => ?_)
+    rw [integral_finsetSum _ (fun j _ => A.integrable_triple i j _ _)]
+    exact Finset.sum_congr rfl (fun j _ => A.inner_actL_eq i j _ _)
+  calc A.lam * ∑ i : Fin d, ‖g i‖ ^ 2
+      = ∫ x in Ω, A.lam * ∑ i : Fin d, (g i x : ℝ) ^ 2 := hlamS.symm
+    _ ≤ ∫ x in Ω, ∑ i : Fin d, ∑ j : Fin d,
+          A.a x i j * (g i x : ℝ) * (g j x : ℝ) :=
+        integral_mono_ae hPint (integrable_finsetSum _ (fun i _ =>
+          integrable_finsetSum _ (fun j _ => A.integrable_triple i j _ _))) hpoint
+    _ = ∑ i : Fin d, ∑ j : Fin d, ⟪A.actL i j (g i), g j⟫ := hRHS.symm
+
 end EllipticDirichlet.Regularity
