@@ -224,4 +224,50 @@ theorem exists_kernel_bound (hd : 0 < d) {p : ℝ} (hp : (d : ℝ) < p) :
     _ = ((d : ℝ) * ω / (s + (d : ℝ))) ^ (1 / q) * R ^ (1 - (d : ℝ) / p)
           * (eLpNorm g (ENNReal.ofReal p) (volume.restrict (ball x R))).toReal := by ring
 
+/-- **Gradient norm is `Lᵖ` on a ball.** For a smooth `φ` the map `y ↦ ‖fderiv ℝ φ y‖` is
+continuous, hence bounded on the compact closed ball, hence `Lᵖ` on the finite-measure
+restricted ball. This is the `MemLp` witness fed to `exists_kernel_bound`. -/
+private theorem memLp_norm_fderiv {φ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) {p : ℝ} (z : EuclideanSpace ℝ (Fin d)) {r : ℝ} (_hr : 0 < r) :
+    MemLp (fun y => ‖fderiv ℝ φ y‖) (ENNReal.ofReal p) (volume.restrict (Metric.ball z r)) := by
+  haveI : IsFiniteMeasure (volume.restrict (Metric.ball z r)) :=
+    ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
+  have hcont : Continuous (fun y : EuclideanSpace ℝ (Fin d) => ‖fderiv ℝ φ y‖) :=
+    (hφ.continuous_fderiv (by simp)).norm
+  obtain ⟨C, hC⟩ := (isCompact_closedBall z r).exists_bound_of_continuousOn hcont.continuousOn
+  refine MemLp.of_bound hcont.aestronglyMeasurable C ?_
+  filter_upwards [ae_restrict_mem measurableSet_ball] with y hy
+  exact hC y (ball_subset_closedBall hy)
+
+/-- **Centred oscillation bound (Task 4 ∘ Task 5).** For `p > d` there is a
+dimensional/exponent constant `C` such that for every smooth `φ`, at the centre of any ball
+the oscillation of `φ` about its ball average is controlled by `C · R^{1-d/p} · ‖∇φ‖_{Lᵖ}`.
+This fuses the potential estimate with the Riesz-kernel bound; it is the mechanical core of
+the Morrey Hölder estimate. -/
+private theorem exists_oscillation_bound (hd : 0 < d) {p : ℝ} (hp : (d : ℝ) < p) :
+    ∃ C : ℝ≥0, ∀ (φ : EuclideanSpace ℝ (Fin d) → ℝ), ContDiff ℝ (⊤ : ℕ∞) φ →
+      ∀ (z : EuclideanSpace ℝ (Fin d)) {r : ℝ}, 0 < r →
+        |φ z - ⨍ y in Metric.ball z r, φ y|
+          ≤ (C : ℝ) * r ^ (1 - (d : ℝ) / p)
+              * (eLpNorm (fun y => ‖fderiv ℝ φ y‖) (ENNReal.ofReal p)
+                  (volume.restrict (Metric.ball z r))).toReal := by
+  obtain ⟨Cd, hCd⟩ := exists_potential_bound hd
+  obtain ⟨Cdp, hCdp⟩ := exists_kernel_bound hd hp
+  refine ⟨Cd * Cdp, ?_⟩
+  intro φ hφ z r hr
+  have hpot := hCd φ hφ z hr z (mem_ball_self hr)
+  have hmem := memLp_norm_fderiv (p := p) hφ z hr
+  have hker := hCdp z hr (fun y => ‖fderiv ℝ φ y‖) hmem
+  simp only [norm_norm] at hker
+  have hCd0 : (0 : ℝ) ≤ (Cd : ℝ) := Cd.coe_nonneg
+  calc |φ z - ⨍ y in Metric.ball z r, φ y|
+      ≤ (Cd : ℝ) * ∫ y in Metric.ball z r, ‖fderiv ℝ φ y‖ / dist z y ^ (d - 1) := hpot
+    _ ≤ (Cd : ℝ) * ((Cdp : ℝ) * r ^ (1 - (d : ℝ) / p)
+          * (eLpNorm (fun y => ‖fderiv ℝ φ y‖) (ENNReal.ofReal p)
+              (volume.restrict (Metric.ball z r))).toReal) :=
+        mul_le_mul_of_nonneg_left hker hCd0
+    _ = ((Cd * Cdp : ℝ≥0) : ℝ) * r ^ (1 - (d : ℝ) / p)
+          * (eLpNorm (fun y => ‖fderiv ℝ φ y‖) (ENNReal.ofReal p)
+              (volume.restrict (Metric.ball z r))).toReal := by push_cast; ring
+
 end EllipticDirichlet.Embedding
