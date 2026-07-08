@@ -28,6 +28,7 @@ import EllipticDirichlet.Regularity.RestrictedDiffQuotientMem
 import EllipticDirichlet.Regularity.Interior
 import EllipticDirichlet.Embedding.WeakGradient
 import EllipticDirichlet.Embedding.MorreyOneDim
+import EllipticDirichlet.Embedding.RayIntegral
 import EllipticDirichlet.Fredholm
 import EllipticDirichlet.FredholmComplete
 import EllipticDirichlet.SpectrumSigma
