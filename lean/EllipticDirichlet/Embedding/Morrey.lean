@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
 import EllipticDirichlet.Embedding.RayIntegral
+import EllipticDirichlet.Embedding.Convolution
 import Mathlib.MeasureTheory.Integral.MeanInequalities
 import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
 import Mathlib.MeasureTheory.Function.LpSeminorm.Indicator
@@ -30,7 +31,7 @@ singularity, valid for `s > -d`.
 -/
 
 open MeasureTheory Set Metric
-open scoped NNReal ENNReal Convolution
+open scoped NNReal ENNReal Convolution Topology
 
 noncomputable section
 
@@ -696,5 +697,96 @@ private theorem partialD_convolution_eq_of_hasWeakGradOn
   rw [MeasureTheory.integral_neg] at hibp
   rw [step2, conv_setInt u (partialD k ρ), conv_setInt (g k) ρ]
   exact neg_inj.mp hibp
+
+/-- **Uniform-limit engine.** A sequence `U n` that is eventually (in `n`) `γ`-Hölder with a common
+constant `M` on each pair of points of an open set `B`, and converges pointwise almost everywhere
+on `B` to `u`, admits a limit `u'` that is genuinely `HolderOnWith M γ` on all of `B` and agrees
+with `u` almost everywhere. No Arzelà–Ascoli or continuous-extension machinery is needed: the
+Hölder bound provides equicontinuity, density of the almost-everywhere convergence set forces
+`U · x` to be Cauchy at every point of `B`, and the closed-ness of `≤` passes the Hölder
+inequality to the pointwise limit. -/
+private theorem exists_holderOnWith_of_ae_tendsto
+    {B : Set (EuclideanSpace ℝ (Fin d))} (hB : IsOpen B) {M γ : ℝ≥0} (hγ : 0 < γ)
+    {U : ℕ → EuclideanSpace ℝ (Fin d) → ℝ} {u : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hHol : ∀ x ∈ B, ∀ y ∈ B, ∀ᶠ n in Filter.atTop,
+        edist (U n x) (U n y) ≤ (M : ℝ≥0∞) * edist x y ^ (γ : ℝ))
+    (hae : ∀ᵐ x ∂(volume.restrict B),
+        Filter.Tendsto (fun n => U n x) Filter.atTop (𝓝 (u x))) :
+    ∃ u' : EuclideanSpace ℝ (Fin d) → ℝ,
+      HolderOnWith M γ u' B ∧ u' =ᵐ[volume.restrict B] u := by
+  have hγR : (0 : ℝ) < (γ : ℝ) := by exact_mod_cast hγ
+  -- The pointwise-convergence set `G` and the fact that its complement is null inside `B`.
+  set G : Set (EuclideanSpace ℝ (Fin d)) :=
+    {x | Filter.Tendsto (fun n => U n x) Filter.atTop (𝓝 (u x))} with hG_def
+  have hbad : volume (Gᶜ ∩ B) = 0 := by
+    have h0 := ae_iff.mp hae
+    rwa [Measure.restrict_apply' hB.measurableSet] at h0
+  -- `G` is dense in every open subset of `B`, because its complement is null.
+  have hdense : ∀ A : Set (EuclideanSpace ℝ (Fin d)), IsOpen A → A ⊆ B →
+      ∀ x ∈ A, ∃ p ∈ A, p ∈ G := by
+    intro A hA hAB x hxA
+    obtain ⟨δ, hδ, hball⟩ := Metric.isOpen_iff.mp hA x hxA
+    have hpos : 0 < volume A :=
+      lt_of_lt_of_le (measure_ball_pos volume x hδ) (measure_mono hball)
+    have hnull : volume (A \ G) = 0 :=
+      measure_mono_null (t := Gᶜ ∩ B)
+        (fun z hz => ⟨hz.2, hAB hz.1⟩) hbad
+    have hAG : 0 < volume (A ∩ G) := by
+      have hle : volume A ≤ volume (A ∩ G) + volume (A \ G) := by
+        conv_lhs => rw [← Set.inter_union_diff A G]
+        exact measure_union_le _ _
+      rw [hnull, add_zero] at hle
+      exact lt_of_lt_of_le hpos hle
+    obtain ⟨p, hp⟩ := nonempty_of_measure_ne_zero hAG.ne'
+    exact ⟨p, hp.1, hp.2⟩
+  -- Every point of `B` yields a Cauchy, hence convergent, sequence.
+  have hconv : ∀ x ∈ B, ∃ ℓ : ℝ, Filter.Tendsto (fun n => U n x) Filter.atTop (𝓝 ℓ) := by
+    intro x hxB
+    refine cauchySeq_tendsto_of_complete (Metric.cauchySeq_iff.mpr fun ε hε => ?_)
+    set f : EuclideanSpace ℝ (Fin d) → ℝ := fun y => (M : ℝ) * dist x y ^ (γ : ℝ) with hf_def
+    have hfval : ∀ y, f y = (M : ℝ) * dist x y ^ (γ : ℝ) := fun _ => rfl
+    have hfnonneg : ∀ y, 0 ≤ f y :=
+      fun y => mul_nonneg M.coe_nonneg (Real.rpow_nonneg dist_nonneg _)
+    have hfcont : Continuous f :=
+      continuous_const.mul ((continuous_const.dist continuous_id).rpow_const
+        fun y => Or.inr γ.coe_nonneg)
+    set W : Set (EuclideanSpace ℝ (Fin d)) := {y | f y < ε / 3} ∩ B with hW_def
+    have hWopen : IsOpen W := (isOpen_lt hfcont continuous_const).inter hB
+    have hxW : x ∈ W :=
+      ⟨by rw [Set.mem_setOf_eq, hfval, dist_self, Real.zero_rpow hγR.ne', mul_zero]
+          exact div_pos hε (by norm_num), hxB⟩
+    obtain ⟨p, hpW, hpG⟩ := hdense W hWopen Set.inter_subset_right x hxW
+    have hpB : p ∈ B := hpW.2
+    have hpf : f p < ε / 3 := hpW.1
+    -- Eventually the sequence at `x` stays within `f p` of the sequence at `p`.
+    have hev : ∀ᶠ n in Filter.atTop, dist (U n x) (U n p) ≤ f p := by
+      filter_upwards [hHol x hxB p hpB] with n hn
+      have hrhs : (M : ℝ≥0∞) * edist x p ^ (γ : ℝ) = ENNReal.ofReal (f p) := by
+        rw [hfval, edist_dist, ENNReal.ofReal_mul M.coe_nonneg, ENNReal.ofReal_coe_nnreal,
+          ENNReal.ofReal_rpow_of_nonneg dist_nonneg γ.coe_nonneg]
+      rw [hrhs, edist_dist] at hn
+      exact (ENNReal.ofReal_le_ofReal_iff (hfnonneg p)).mp hn
+    obtain ⟨N1, hN1⟩ := Metric.cauchySeq_iff.mp hpG.cauchySeq (ε / 3) (div_pos hε (by norm_num))
+    obtain ⟨N2, hN2⟩ := Filter.eventually_atTop.mp hev
+    refine ⟨max N1 N2, fun m hm n hn => ?_⟩
+    have e1 : dist (U m x) (U m p) ≤ f p := hN2 m (le_trans (le_max_right N1 N2) hm)
+    have e2 : dist (U n p) (U n x) ≤ f p := by
+      rw [dist_comm]; exact hN2 n (le_trans (le_max_right N1 N2) hn)
+    have e3 : dist (U m p) (U n p) < ε / 3 :=
+      hN1 m (le_trans (le_max_left N1 N2) hm) n (le_trans (le_max_left N1 N2) hn)
+    calc dist (U m x) (U n x)
+        ≤ dist (U m x) (U m p) + dist (U m p) (U n p) + dist (U n p) (U n x) :=
+          dist_triangle4 _ _ _ _
+      _ < ε := by linarith
+  -- The pointwise limit and its defining tendsto.
+  set u' : EuclideanSpace ℝ (Fin d) → ℝ := fun x => Filter.limUnder Filter.atTop (fun n => U n x)
+    with hu'_def
+  have hu'lim : ∀ x ∈ B, Filter.Tendsto (fun n => U n x) Filter.atTop (𝓝 (u' x)) :=
+    fun x hxB => tendsto_nhds_limUnder (hconv x hxB)
+  refine ⟨u', ?_, ?_⟩
+  · intro x hxB y hyB
+    exact le_of_tendsto ((hu'lim x hxB).edist (hu'lim y hyB)) (hHol x hxB y hyB)
+  · filter_upwards [hae, ae_restrict_mem hB.measurableSet] with x hxtend hxB
+    exact tendsto_nhds_unique (hu'lim x hxB) hxtend
 
 end EllipticDirichlet.Embedding
