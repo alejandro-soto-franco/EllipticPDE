@@ -215,4 +215,28 @@ private theorem potential_inner_cov {φ : EuclideanSpace ℝ (Fin d) → ℝ}
     rw [mul_assoc, ← pow_succ, ← zpow_natCast t (d + 1), ← zpow_add₀ ht.ne', hz, zpow_zero]
   rw [harith, ENNReal.ofReal_one, one_mul]
 
+/-- **Tail bound, `lintegral` form.** The ENNReal integral of the singular kernel over `Ioc a 1`
+is bounded by `ofReal (a^{-d}/d)`. This is `tail_integral_bound` transported to `ℝ≥0∞`, ready to
+feed the per-point Riesz estimate in the kernel bound. -/
+private theorem tail_lintegral_bound (hd : 0 < d) {a : ℝ} (ha : 0 < a) :
+    ∫⁻ t in Ioc a (1 : ℝ), ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) ∂volume
+      ≤ ENNReal.ofReal (a ^ (-(d : ℤ)) / d) := by
+  rcases le_or_gt a 1 with hle | hgt
+  · have hcont : ContinuousOn (fun t : ℝ => t ^ (-((d : ℤ) + 1))) (Set.Icc a 1) :=
+      (continuous_id.continuousOn).zpow₀ _
+        (fun t ht => Or.inl (lt_of_lt_of_le ha ht.1).ne')
+    have hint : IntegrableOn (fun t : ℝ => t ^ (-((d : ℤ) + 1))) (Ioc a 1) volume :=
+      (hcont.integrableOn_Icc).mono_set Set.Ioc_subset_Icc_self
+    have hnn : 0 ≤ᵐ[volume.restrict (Ioc a 1)] fun t : ℝ => t ^ (-((d : ℤ) + 1)) := by
+      filter_upwards [ae_restrict_mem measurableSet_Ioc] with t ht
+      have : 0 < t := lt_of_lt_of_le ha ht.1.le
+      positivity
+    rw [← ofReal_integral_eq_lintegral_ofReal hint hnn]
+    apply ENNReal.ofReal_le_ofReal
+    rw [← intervalIntegral.integral_of_le hle]
+    exact tail_integral_bound hd ha
+  · have hempty : Ioc a (1 : ℝ) = ∅ := Ioc_eq_empty (by linarith)
+    rw [hempty, Measure.restrict_empty, lintegral_zero_measure]
+    exact bot_le
+
 end EllipticDirichlet.Embedding
