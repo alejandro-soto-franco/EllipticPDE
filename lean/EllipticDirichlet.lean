@@ -26,6 +26,7 @@ import EllipticDirichlet.Regularity.CutoffTower
 import EllipticDirichlet.Regularity.RestrictedDiffQuotient
 import EllipticDirichlet.Regularity.RestrictedDiffQuotientMem
 import EllipticDirichlet.Regularity.Interior
+import EllipticDirichlet.Embedding.WeakGradient
 import EllipticDirichlet.Fredholm
 import EllipticDirichlet.FredholmComplete
 import EllipticDirichlet.SpectrumSigma
