@@ -9,6 +9,12 @@ import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
 import Mathlib.MeasureTheory.Function.LpSeminorm.Indicator
 import Mathlib.Topology.MetricSpace.HolderNorm
 import Mathlib.Tactic.Module
+import Mathlib.Analysis.Convolution
+import Mathlib.Analysis.Calculus.ContDiff.Convolution
+import Mathlib.Analysis.Calculus.BumpFunction.Normed
+import Mathlib.Analysis.Calculus.BumpFunction.FiniteDimension
+import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
+import Mathlib.MeasureTheory.Measure.Haar.Unique
 
 /-!
 # Riesz-kernel `Lᵖ` bound for the Morrey embedding
@@ -24,7 +30,7 @@ singularity, valid for `s > -d`.
 -/
 
 open MeasureTheory Set Metric
-open scoped NNReal ENNReal
+open scoped NNReal ENNReal Convolution
 
 noncomputable section
 
@@ -589,5 +595,106 @@ theorem morrey_ball_contDiff (hd : 0 < d) {p : ℝ} (hp : (d : ℝ) < p)
   intro x hx y hy
   exact (hC u hu c hr x hx y hy).trans
     (mul_le_mul_left (ENNReal.coe_le_coe.mpr hconst) _)
+
+/-- **Gradient-convolution bridge.** If `g` is the honest weak gradient of `u` on `ball c r`
+and `ρ` is a normalised bump of outer radius `ε` centred at `0`, then at every interior point
+`x` with `Metric.closedBall x ε ⊆ Metric.ball c r` the `k`-th partial of the mollification
+equals the mollified gradient component:
+`partialD k (uB ⋆ ρ) x = (gBk ⋆ ρ) x`, where `uB`, `gBk` are the ball-indicator extensions. -/
+private theorem partialD_convolution_eq_of_hasWeakGradOn
+    {c : EuclideanSpace ℝ (Fin d)} {r : ℝ} (_hr : 0 < r)
+    {u : EuclideanSpace ℝ (Fin d) → ℝ} {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
+    (hu : IntegrableOn u (Metric.ball c r) volume)
+    (hg : HasWeakGradOn (Metric.ball c r) u g)
+    (φ : ContDiffBump (0 : EuclideanSpace ℝ (Fin d))) (k : Fin d)
+    {x : EuclideanSpace ℝ (Fin d)}
+    (hx : Metric.closedBall x φ.rOut ⊆ Metric.ball c r) :
+    partialD k
+        ((Metric.ball c r).indicator u ⋆[ContinuousLinearMap.lsmul ℝ ℝ (E := ℝ), volume]
+          (φ.normed volume)) x
+      = ((Metric.ball c r).indicator (g k)
+          ⋆[ContinuousLinearMap.lsmul ℝ ℝ (E := ℝ), volume] (φ.normed volume)) x := by
+  -- Abbreviations for the bilinear form, the normalised kernel and the indicator extension.
+  set L := ContinuousLinearMap.lsmul ℝ ℝ (E := ℝ) with hL_def
+  set ρ := φ.normed volume with hρ_def
+  have hρ_cs : HasCompactSupport ρ := φ.hasCompactSupport_normed
+  have hρ_cd : ContDiff ℝ (⊤ : ℕ∞) ρ := φ.contDiff_normed
+  have hρ_cd1 : ContDiff ℝ 1 ρ := hρ_cd.of_le (by exact_mod_cast le_top)
+  have hρ_diff : Differentiable ℝ ρ := hρ_cd.differentiable (by simp)
+  have hρ_tsup : tsupport ρ = Metric.closedBall (0 : EuclideanSpace ℝ (Fin d)) φ.rOut :=
+    φ.tsupport_normed_eq
+  -- The indicator extension of `u` is integrable, hence locally integrable.
+  have huB_int : Integrable ((Metric.ball c r).indicator u) volume :=
+    hu.integrable_indicator measurableSet_ball
+  have huB_li : LocallyIntegrable ((Metric.ball c r).indicator u) volume :=
+    huB_int.locallyIntegrable
+  -- The scalar bilinear form is ordinary multiplication on the reals.
+  have hLmul : ∀ a b : ℝ, L a b = a * b := fun a b => by
+    rw [hL_def, ContinuousLinearMap.lsmul_apply, smul_eq_mul]
+  -- Rewrite an indicator-kernel convolution at `x` as a set integral over the ball.
+  have conv_setInt : ∀ (w f : EuclideanSpace ℝ (Fin d) → ℝ),
+      ((Metric.ball c r).indicator w ⋆[L, volume] f) x
+        = ∫ y in Metric.ball c r, w y * f (x - y) := by
+    intro w f
+    rw [convolution_def, ← MeasureTheory.integral_indicator measurableSet_ball]
+    refine integral_congr_ae (Filter.Eventually.of_forall fun y => ?_)
+    change L ((Metric.ball c r).indicator w y) (f (x - y))
+        = (Metric.ball c r).indicator (fun z => w z * f (x - z)) y
+    rw [hLmul]
+    exact (Set.indicator_mul_left (Metric.ball c r) w (fun z => f (x - z))).symm
+  -- Step 2: differentiate the mollification, reducing the `precompR` convolution.
+  have hderiv := hρ_cs.hasFDerivAt_convolution_right (L := L) huB_li hρ_cd1 x
+  have step2 : partialD k ((Metric.ball c r).indicator u ⋆[L, volume] ρ) x
+      = ((Metric.ball c r).indicator u ⋆[L, volume] partialD k ρ) x := by
+    have hpd : partialD k ((Metric.ball c r).indicator u ⋆[L, volume] ρ) x
+        = (fderiv ℝ ((Metric.ball c r).indicator u ⋆[L, volume] ρ) x)
+            (EuclideanSpace.single k 1) := rfl
+    have hprec :
+        ((Metric.ball c r).indicator u ⋆[L.precompR (EuclideanSpace ℝ (Fin d)), volume]
+            fderiv ℝ ρ) x (EuclideanSpace.single k 1)
+          = ((Metric.ball c r).indicator u ⋆[L, volume]
+              fun a => (fderiv ℝ ρ a) (EuclideanSpace.single k 1)) x :=
+      convolution_precompR_apply (𝕜 := ℝ) (L := L) huB_li (hρ_cs.fderiv (𝕜 := ℝ))
+        (hρ_cd.continuous_fderiv (by simp)) x (EuclideanSpace.single k 1)
+    rw [hpd, hderiv.fderiv, hprec]
+    rfl
+  -- Step 3: the test function `ψ y = ρ (x - y)` and its analytic properties.
+  set ψ : EuclideanSpace ℝ (Fin d) → ℝ := fun y => ρ (x - y) with hψ_def
+  have hpsi_eval : ∀ y, ψ y = ρ (x - y) := fun y => by rw [hψ_def]
+  have hψ_cd : ContDiff ℝ (⊤ : ℕ∞) ψ := hρ_cd.comp (contDiff_const.sub contDiff_id)
+  have hsupp_sub : Function.support ψ ⊆ Metric.closedBall x φ.rOut := by
+    intro y hy
+    have hne : ρ (x - y) ≠ 0 := by
+      have hy' := Function.mem_support.mp hy
+      rwa [hpsi_eval] at hy'
+    have hxy : x - y ∈ tsupport ρ := subset_tsupport ρ (Function.mem_support.mpr hne)
+    rw [hρ_tsup, Metric.mem_closedBall, dist_zero_right] at hxy
+    rw [Metric.mem_closedBall, dist_eq_norm, norm_sub_rev]
+    exact hxy
+  have hsub_tsup : tsupport ψ ⊆ Metric.closedBall x φ.rOut :=
+    closure_minimal hsupp_sub isClosed_closedBall
+  have hψ_cs : HasCompactSupport ψ :=
+    IsCompact.of_isClosed_subset (isCompact_closedBall x φ.rOut)
+      (isClosed_tsupport ψ) hsub_tsup
+  have htsup : tsupport ψ ⊆ Metric.ball c r := hsub_tsup.trans hx
+  -- The `k`-th partial of `ψ` is the reflected partial of `ρ`.
+  have hpsi_partial : ∀ y, partialD k ψ y = -(partialD k ρ) (x - y) := by
+    intro y
+    have hfd : HasFDerivAt ψ ((fderiv ℝ ρ (x - y)).comp
+        (-ContinuousLinearMap.id ℝ (EuclideanSpace ℝ (Fin d)))) y := by
+      have h1 : HasFDerivAt (fun z => x - z)
+          (-ContinuousLinearMap.id ℝ (EuclideanSpace ℝ (Fin d))) y :=
+        (hasFDerivAt_id y).const_sub x
+      exact (hρ_diff (x - y)).hasFDerivAt.comp y h1
+    have heval : partialD k ψ y = (fderiv ℝ ψ y) (EuclideanSpace.single k 1) := rfl
+    rw [heval, hfd.fderiv]
+    simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.neg_apply,
+      ContinuousLinearMap.id_apply, map_neg, partialD]
+  -- Step 4: integrate by parts against `ψ` and cancel the signs.
+  have hibp := hg ψ hψ_cd hψ_cs htsup k
+  simp only [hpsi_partial, hpsi_eval, mul_neg] at hibp
+  rw [MeasureTheory.integral_neg] at hibp
+  rw [step2, conv_setInt u (partialD k ρ), conv_setInt (g k) ρ]
+  exact neg_inj.mp hibp
 
 end EllipticDirichlet.Embedding
