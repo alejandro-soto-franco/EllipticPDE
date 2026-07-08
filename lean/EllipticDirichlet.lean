@@ -31,6 +31,7 @@ import EllipticDirichlet.Embedding.Convolution
 import EllipticDirichlet.Embedding.MorreyOneDim
 import EllipticDirichlet.Embedding.RayIntegral
 import EllipticDirichlet.Embedding.Morrey
+import EllipticDirichlet.Embedding.WeakDerivBridge
 import EllipticDirichlet.Fredholm
 import EllipticDirichlet.FredholmComplete
 import EllipticDirichlet.SpectrumSigma
