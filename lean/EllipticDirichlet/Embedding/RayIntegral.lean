@@ -103,4 +103,27 @@ private theorem norm_smul_sub_lt_two_mul {c x y : EuclideanSpace ℝ (Fin d)} {r
   calc t * ‖y - x‖ < t * (2 * r) := by exact mul_lt_mul_of_pos_left hyx ht
     _ = 2 * r * t := by ring
 
+/-- **Tail bound.** For `a > 0` and dimension `d ≥ 1`, the interval integral of the singular
+kernel `t ^ (-(d+1))` from `a` to `1` is bounded by `a^{-d} / d`. Applied with
+`a = ‖z - x‖ / (2 r)` this produces the Riesz-kernel factor `(2 r)^d / (d ‖z - x‖^d)`. -/
+private theorem tail_integral_bound (hd : 0 < d) {a : ℝ} (ha : 0 < a) :
+    ∫ t in a..(1 : ℝ), t ^ (-((d : ℤ) + 1)) ≤ a ^ (-(d : ℤ)) / d := by
+  have hne : (-((d : ℤ) + 1)) ≠ -1 := by
+    have : (1 : ℤ) ≤ (d : ℤ) := by exact_mod_cast hd
+    omega
+  have h0 : (0 : ℝ) ∉ Set.uIcc a 1 := by
+    intro h
+    rw [Set.mem_uIcc] at h
+    rcases h with ⟨h1, _⟩ | ⟨h1, _⟩ <;> linarith
+  rw [integral_zpow (Or.inr ⟨hne, h0⟩)]
+  have hexp : (-((d : ℤ) + 1)) + 1 = -(d : ℤ) := by ring
+  rw [hexp]
+  have hA : (0 : ℝ) < a ^ (-(d : ℤ)) := by positivity
+  have hdR : (0 : ℝ) < (d : ℝ) := by exact_mod_cast hd
+  have hden : (((-((d : ℤ) + 1)) : ℤ) : ℝ) + 1 = -(d : ℝ) := by push_cast; ring
+  have key : (1 - a ^ (-(d : ℤ))) / (-(d : ℝ)) = (a ^ (-(d : ℤ)) - 1) / (d : ℝ) := by
+    rw [div_neg]; ring
+  rw [hden, one_zpow, key, div_le_div_iff_of_pos_right hdR]
+  linarith
+
 end EllipticDirichlet.Embedding
