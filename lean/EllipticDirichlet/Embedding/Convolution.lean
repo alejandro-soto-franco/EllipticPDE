@@ -11,6 +11,10 @@ import Mathlib.MeasureTheory.Integral.MeanInequalities
 import Mathlib.MeasureTheory.Function.LpSeminorm.Basic
 import Mathlib.MeasureTheory.Group.LIntegral
 import Mathlib.Analysis.Calculus.BumpFunction.Normed
+import Mathlib.Analysis.Calculus.BumpFunction.Convolution
+import Mathlib.Analysis.Normed.Lp.SmoothApprox
+import Mathlib.MeasureTheory.Function.LpSeminorm.TriangleInequality
+import Mathlib.MeasureTheory.Function.LocallyIntegrable
 
 /-!
 # Young's `Lᵖ` inequality for a probability kernel
@@ -25,10 +29,18 @@ with Tonelli, so no Minkowski inequality is required.
 The mollifier kernel `φ.normed volume` is the intended instance (non-negative by
 `ContDiffBump.nonneg_normed`, unit mass by `ContDiffBump.integral_normed`), and the restricted
 corollary `eLpNorm_convolution_restrict_le` is the form consumed downstream.
+
+The second result `tendsto_eLpNorm_convolution_sub` records the `Lᵖ` convergence of the
+mollifications `h ⋆ ρ_ε` to `h` as the bump radii shrink. It is proved by a density `3ε`
+argument: approximate `h` in `Lᵖ` by a smooth compactly supported `w`
+(`MeasureTheory.MemLp.exist_eLpNorm_sub_le`), control the tail `(h - w) ⋆ ρ_ε` by the Young
+bound above, and drive the middle term `w ⋆ ρ_ε - w` to zero using the uniform convergence
+supplied by `ContDiffBump.dist_normed_convolution_le` on the fixed compact support. No
+`Lᵖ`-continuity of translation is required, and the argument is valid along an arbitrary filter.
 -/
 
 open MeasureTheory Set Metric
-open scoped NNReal ENNReal Convolution
+open scoped NNReal ENNReal Convolution Topology Pointwise
 
 noncomputable section
 
@@ -149,5 +161,216 @@ theorem eLpNorm_convolution_restrict_le {p : ℝ} (hp : 1 ≤ p)
       ≤ eLpNorm h (ENNReal.ofReal p) volume :=
   le_trans (eLpNorm_mono_measure _ Measure.restrict_le_self)
     (eLpNorm_convolution_le hp hρ0 hρm hρ1 hh)
+
+/-- **Middle `3ε` term.** For a continuous compactly supported `w`, the mollifications
+`w ⋆ ρ_ε` converge to `w` in `Lᵖ` as the outer bump radii shrink. The convolutions are
+uniformly close to `w` on the fixed compact `closedBall 0 1 + tsupport w` (uniform continuity
+of `w` plus `ContDiffBump.dist_normed_convolution_le`), and the `Lᵖ` seminorm of a uniformly
+small function on a fixed finite-measure set is small. This needs only `rOut → 0`, not the
+inner/outer ratio bound. -/
+private theorem tendsto_eLpNorm_bump_convolution_sub {p : ℝ} (hp : 1 ≤ p)
+    {w : EuclideanSpace ℝ (Fin d) → ℝ} (hwc : Continuous w) (hwcs : HasCompactSupport w)
+    {ι : Type*} {l : Filter ι} {φ : ι → ContDiffBump (0 : EuclideanSpace ℝ (Fin d))}
+    (hφ : Filter.Tendsto (fun i => (φ i).rOut) l (𝓝 0)) :
+    Filter.Tendsto
+      (fun i => eLpNorm
+          (w ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ i).normed volume) - w)
+          (ENNReal.ofReal p) volume) l (𝓝 0) := by
+  have hp0 : 0 < p := lt_of_lt_of_le one_pos hp
+  -- the scalar convolution operator is symmetric
+  have hflip : (ContinuousLinearMap.lsmul ℝ ℝ).flip = ContinuousLinearMap.lsmul ℝ ℝ := by
+    refine ContinuousLinearMap.ext fun a => ContinuousLinearMap.ext fun b => ?_
+    simp only [ContinuousLinearMap.flip_apply, ContinuousLinearMap.lsmul_apply, smul_eq_mul]
+    exact mul_comm b a
+  have hunif : UniformContinuous w := hwcs.uniformContinuous_of_continuous hwc
+  -- the fixed compact set that contains every `w ⋆ ρ_i - w`
+  set S1 := Metric.closedBall (0 : EuclideanSpace ℝ (Fin d)) 1 + tsupport w with hS1def
+  have hS1cpt : IsCompact S1 := (isCompact_closedBall _ _).add hwcs
+  have hS1fin : volume S1 ≠ ∞ := hS1cpt.measure_lt_top.ne
+  have hAtop : volume S1 ^ p⁻¹ ≠ ∞ := ENNReal.rpow_ne_top_of_nonneg (by positivity) hS1fin
+  have htsuppS1 : tsupport w ⊆ S1 := by
+    intro y hy
+    rw [hS1def]
+    have h0 : (0 : EuclideanSpace ℝ (Fin d)) ∈ Metric.closedBall (0 : EuclideanSpace ℝ (Fin d)) 1 :=
+      Metric.mem_closedBall_self zero_le_one
+    simpa using Set.add_mem_add h0 hy
+  rw [ENNReal.tendsto_nhds_zero]
+  intro η hη
+  rcases eq_or_ne η ∞ with rfl | hηtop
+  · exact Filter.Eventually.of_forall fun _ => le_top
+  -- choose the sup tolerance `ε`
+  have hA1top : volume S1 ^ p⁻¹ + 1 ≠ ∞ := by simp [hAtop]
+  have hA1pos : volume S1 ^ p⁻¹ + 1 ≠ 0 := by positivity
+  set ε := (η / (volume S1 ^ p⁻¹ + 1)).toReal with hεdef
+  have hε0 : 0 < ε := by
+    rw [hεdef]
+    exact ENNReal.toReal_pos (ENNReal.div_pos hη.ne' hA1top).ne'
+      (ENNReal.div_ne_top hηtop hA1pos)
+  have hofε : ENNReal.ofReal ε = η / (volume S1 ^ p⁻¹ + 1) := by
+    rw [hεdef, ENNReal.ofReal_toReal (ENNReal.div_ne_top hηtop hA1pos)]
+  have hAε : volume S1 ^ p⁻¹ * ENNReal.ofReal ε ≤ η := by
+    rw [hofε]
+    calc volume S1 ^ p⁻¹ * (η / (volume S1 ^ p⁻¹ + 1))
+        ≤ (volume S1 ^ p⁻¹ + 1) * (η / (volume S1 ^ p⁻¹ + 1)) := by gcongr; exact le_self_add
+      _ ≤ η := ENNReal.mul_div_le
+  obtain ⟨δ, hδ0, hδ⟩ := Metric.uniformContinuous_iff.mp hunif ε hε0
+  filter_upwards [Metric.tendsto_nhds.mp hφ δ hδ0, Metric.tendsto_nhds.mp hφ 1 one_pos]
+    with i hiδ hi1
+  have hrδ : (φ i).rOut < δ := by
+    rwa [Real.dist_0_eq_abs, abs_of_pos (φ i).rOut_pos] at hiδ
+  have hr1 : (φ i).rOut < 1 := by
+    rwa [Real.dist_0_eq_abs, abs_of_pos (φ i).rOut_pos] at hi1
+  -- swap the convolution so the bump is on the left
+  have hcomm : w ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ i).normed volume)
+      = ((φ i).normed volume) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] w := by
+    rw [← convolution_flip, hflip]
+  -- uniform closeness on the whole space
+  have hpt : ∀ x₀, dist ((((φ i).normed volume)
+      ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] w) x₀) (w x₀) ≤ ε := by
+    intro x₀
+    refine (φ i).dist_normed_convolution_le hwc.aestronglyMeasurable ?_
+    intro x hx
+    rw [mem_ball] at hx
+    exact (hδ (lt_trans hx hrδ)).le
+  -- support of the difference lies in the fixed compact `S1`
+  have hsuppconv : Function.support (((φ i).normed volume)
+      ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] w) ⊆ S1 := by
+    refine (support_convolution_subset _).trans ?_
+    rw [hS1def]
+    refine Set.add_subset_add ?_ (subset_tsupport w)
+    rw [(φ i).support_normed_eq]
+    exact Metric.ball_subset_closedBall.trans (Metric.closedBall_subset_closedBall hr1.le)
+  have hsupp : Function.support ((((φ i).normed volume)
+      ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] w) - w) ⊆ S1 := by
+    intro x hx
+    by_contra hxS1
+    refine Function.mem_support.mp hx ?_
+    have hwx : w x = 0 := image_eq_zero_of_notMem_tsupport fun hxt => hxS1 (htsuppS1 hxt)
+    have hcx : (((φ i).normed volume) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] w) x = 0 :=
+      Function.notMem_support.mp fun hxs => hxS1 (hsuppconv hxs)
+    rw [Pi.sub_apply, hwx, hcx, sub_zero]
+  -- assemble the `Lᵖ` bound
+  rw [hcomm]
+  calc eLpNorm ((((φ i).normed volume) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] w) - w)
+        (ENNReal.ofReal p) volume
+      = eLpNorm ((((φ i).normed volume) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] w) - w)
+          (ENNReal.ofReal p) (volume.restrict S1) :=
+        (eLpNorm_restrict_eq_of_support_subset hsupp).symm
+    _ ≤ (volume.restrict S1) Set.univ ^ ((ENNReal.ofReal p).toReal⁻¹) * ENNReal.ofReal ε :=
+        eLpNorm_le_of_ae_bound (Filter.Eventually.of_forall fun x => by
+          rw [Pi.sub_apply, ← dist_eq_norm]; exact hpt x)
+    _ = volume S1 ^ p⁻¹ * ENNReal.ofReal ε := by
+        rw [Measure.restrict_apply_univ, ENNReal.toReal_ofReal hp0.le]
+    _ ≤ η := hAε
+
+/-- **`Lᵖ` convergence of mollifications.** For `1 ≤ p`, an `Lᵖ` function `h`, and a family of
+normalised bumps whose outer radii tend to `0` (with a bounded inner/outer ratio), the
+mollifications `h ⋆ ρ_ε` converge to `h` in `Lᵖ`. Proved by a density `3ε` argument: approximate
+`h` in `Lᵖ` by a smooth compactly supported `w` (`MeasureTheory.MemLp.exist_eLpNorm_sub_le`),
+bound the tail `(h - w) ⋆ ρ_ε` by `eLpNorm_convolution_le`, and send `w ⋆ ρ_ε - w` to zero with
+`tendsto_eLpNorm_bump_convolution_sub`. No `Lᵖ`-continuity of translation is used. -/
+theorem tendsto_eLpNorm_convolution_sub {p : ℝ} (hp : 1 ≤ p)
+    {h : EuclideanSpace ℝ (Fin d) → ℝ} (hh : MemLp h (ENNReal.ofReal p) volume)
+    {ι : Type*} {l : Filter ι} {φ : ι → ContDiffBump (0 : EuclideanSpace ℝ (Fin d))} {K : ℝ}
+    (hφ : Filter.Tendsto (fun i => (φ i).rOut) l (𝓝 0))
+    (_hK : ∀ᶠ i in l, (φ i).rOut ≤ K * (φ i).rIn) :
+    Filter.Tendsto
+      (fun i => eLpNorm
+          (h ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ i).normed volume) - h)
+          (ENNReal.ofReal p) volume) l (𝓝 0) := by
+  have hp0 : 0 < p := lt_of_lt_of_le one_pos hp
+  have hq1 : (1 : ℝ≥0∞) ≤ ENNReal.ofReal p := by
+    rw [← ENNReal.ofReal_one]; exact ENNReal.ofReal_le_ofReal hp
+  have hqtop : ENNReal.ofReal p ≠ ∞ := ENNReal.ofReal_ne_top
+  rw [ENNReal.tendsto_nhds_zero]
+  intro η hη
+  rcases eq_or_ne η ∞ with rfl | hηtop
+  · exact Filter.Eventually.of_forall fun _ => le_top
+  -- density: pick a smooth compactly supported `w` within `δ = η/3` of `h`
+  set δ : ℝ := η.toReal / 3 with hδdef
+  have hηpos : 0 < η.toReal := ENNReal.toReal_pos hη.ne' hηtop
+  have hδ0 : 0 < δ := by positivity
+  obtain ⟨w, hwcs, hwsmooth, hwle⟩ := hh.exist_eLpNorm_sub_le hqtop hq1 hδ0
+  have hwc : Continuous w := hwsmooth.continuous
+  have hwml : MemLp w (ENNReal.ofReal p) volume := hwc.memLp_of_hasCompactSupport hwcs
+  have hlocw : LocallyIntegrable w volume := hwml.locallyIntegrable hq1
+  have hlochw : LocallyIntegrable (h - w) volume := (hh.sub hwml).locallyIntegrable hq1
+  -- third term of the triangle inequality is `≤ δ`
+  have ha3 : eLpNorm (w - h) (ENNReal.ofReal p) volume ≤ ENNReal.ofReal δ := by
+    rw [eLpNorm_sub_comm]; exact hwle
+  -- middle term tends to zero, hence is eventually `≤ δ`
+  have hmid := tendsto_eLpNorm_bump_convolution_sub hp hwc hwcs hφ
+  have hmid_ev : ∀ᶠ i in l,
+      eLpNorm (w ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ i).normed volume) - w)
+        (ENNReal.ofReal p) volume ≤ ENNReal.ofReal δ :=
+    ENNReal.tendsto_nhds_zero.mp hmid (ENNReal.ofReal δ) (ENNReal.ofReal_pos.mpr hδ0)
+  filter_upwards [hmid_ev] with i hi
+  -- abbreviations for the fixed bump `ρ`
+  have hρnn : (0 : EuclideanSpace ℝ (Fin d) → ℝ) ≤ (φ i).normed volume :=
+    fun x => (φ i).nonneg_normed x
+  have hρcont : Continuous ((φ i).normed volume) := ((φ i).contDiff_normed (n := 1)).continuous
+  have hρm : AEStronglyMeasurable ((φ i).normed volume) volume := hρcont.aestronglyMeasurable
+  have hρ1 : ∫ y, (φ i).normed volume y ∂volume = 1 := (φ i).integral_normed
+  have hρcs : HasCompactSupport ((φ i).normed volume) := (φ i).hasCompactSupport_normed
+  -- first term `≤ δ` by the Young bound applied to `h - w`
+  have ha1 : eLpNorm ((h - w) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ i).normed volume))
+      (ENNReal.ofReal p) volume ≤ ENNReal.ofReal δ :=
+    le_trans (eLpNorm_convolution_le hp hρnn hρm hρ1 (hh.sub hwml)) hwle
+  -- left linearity of the convolution
+  have hCE1 : ConvolutionExists (h - w) ((φ i).normed volume) (ContinuousLinearMap.lsmul ℝ ℝ)
+      volume :=
+    HasCompactSupport.convolutionExists_right (L := ContinuousLinearMap.lsmul ℝ ℝ) hρcs hlochw
+      hρcont
+  have hCE2 : ConvolutionExists w ((φ i).normed volume) (ContinuousLinearMap.lsmul ℝ ℝ) volume :=
+    HasCompactSupport.convolutionExists_right (L := ContinuousLinearMap.lsmul ℝ ℝ) hρcs hlocw
+      hρcont
+  have key_add : h ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ i).normed volume)
+      = (h - w) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ i).normed volume)
+        + w ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ i).normed volume) := by
+    have hd := ConvolutionExists.add_distrib hCE1 hCE2
+    rwa [show (h - w) + w = h from by funext x; simp] at hd
+  -- rewrite the target function as a sum of the three `3ε` pieces
+  have hfun : h ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ i).normed volume) - h
+      = (h - w) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ i).normed volume)
+        + ((w ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ i).normed volume) - w) + (w - h)) := by
+    funext x
+    have hpt := congrFun key_add x
+    simp only [Pi.sub_apply, Pi.add_apply] at hpt ⊢
+    rw [hpt]; ring
+  -- measurability of each piece
+  have ha1m : AEStronglyMeasurable ((h - w)
+      ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ i).normed volume)) volume :=
+    (HasCompactSupport.continuous_convolution_right (L := ContinuousLinearMap.lsmul ℝ ℝ)
+      hρcs hlochw hρcont).aestronglyMeasurable
+  have hwconvm : AEStronglyMeasurable (w
+      ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ i).normed volume)) volume :=
+    (HasCompactSupport.continuous_convolution_right (L := ContinuousLinearMap.lsmul ℝ ℝ)
+      hρcs hlocw hρcont).aestronglyMeasurable
+  have ha2m : AEStronglyMeasurable (w
+      ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ i).normed volume) - w) volume :=
+    hwconvm.sub hwc.aestronglyMeasurable
+  have ha3m : AEStronglyMeasurable (w - h) volume :=
+    hwc.aestronglyMeasurable.sub hh.aestronglyMeasurable
+  rw [hfun]
+  calc eLpNorm ((h - w) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ i).normed volume)
+        + ((w ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ i).normed volume) - w) + (w - h)))
+        (ENNReal.ofReal p) volume
+      ≤ eLpNorm ((h - w) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ i).normed volume))
+          (ENNReal.ofReal p) volume
+        + eLpNorm ((w ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ i).normed volume) - w)
+            + (w - h)) (ENNReal.ofReal p) volume :=
+        eLpNorm_add_le ha1m (ha2m.add ha3m) hq1
+    _ ≤ eLpNorm ((h - w) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ i).normed volume))
+          (ENNReal.ofReal p) volume
+        + (eLpNorm (w ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ i).normed volume) - w)
+            (ENNReal.ofReal p) volume + eLpNorm (w - h) (ENNReal.ofReal p) volume) := by
+        gcongr
+        exact eLpNorm_add_le ha2m ha3m hq1
+    _ ≤ ENNReal.ofReal δ + (ENNReal.ofReal δ + ENNReal.ofReal δ) := by
+        gcongr
+    _ = η := by
+        rw [← ENNReal.ofReal_add hδ0.le (by positivity),
+          ← ENNReal.ofReal_add hδ0.le (by positivity : (0 : ℝ) ≤ δ + δ),
+          show δ + (δ + δ) = η.toReal from by rw [hδdef]; ring, ENNReal.ofReal_toReal hηtop]
 
 end EllipticDirichlet.Embedding
