@@ -6,7 +6,7 @@ Authors: Alejandro Soto Franco
 import EllipticDirichlet.BilinearForm
 
 /-!
-# Characterization of `H⁻¹(Ω)` (Evans §5.9.1, Theorem 1)
+# Characterisation of `H⁻¹(Ω)` (Evans §5.9.1, Theorem 1)
 
 `H⁻¹(Ω)` is the topological dual of `H₀¹(Ω)`; in the graph encoding it is the type
 `H01 Ω →L[ℝ] ℝ`. The characterization theorem says every `f ∈ H⁻¹(Ω)` is represented by
@@ -173,7 +173,7 @@ theorem hneg_norm_eq_sInf (Ω : Set (EuclideanSpace ℝ (Fin d))) (f : H01 Ω �
     ‖f‖ = sInf {r : ℝ | ∃ F : H1amb Ω, IsHnegRepr Ω F f ∧ ‖F‖ = r} :=
   ((hneg_norm_isLeast Ω f).csInf_eq).symm
 
-/-- **Characterization of `H⁻¹(Ω)`** (Evans §5.9.1, Theorem 1, in the sign convention
+/-- **Characterisation of `H⁻¹(Ω)`** (Evans §5.9.1, Theorem 1, in the sign convention
 adopted here). Every continuous linear
 functional `f` on `H₀¹(Ω)` is represented by a tuple `F = (f₀, f₁, …, fₙ)` of `L²(Ω)`
 functions through `⟨f, v⟩ = ∫_Ω f₀ v - ∑ᵢ ∫_Ω fᵢ ∂ᵢv`, whose
