@@ -9,6 +9,7 @@ import Mathlib.Analysis.Calculus.FDeriv.Comp
 import Mathlib.MeasureTheory.Constructions.HaarToSphere
 import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
 import Mathlib.MeasureTheory.Integral.Average
+import Mathlib.Analysis.SpecialFunctions.Pow.Integral
 
 /-!
 # Ray fundamental theorem of calculus
@@ -424,5 +425,72 @@ private theorem kernel_bound {φ : EuclideanSpace ℝ (Fin d) → ℝ}
           (hfd.enorm.measurable).div
             (((continuous_id.sub continuous_const).enorm).measurable.pow_const _)
         rw [lintegral_const_mul _ hg]
+
+/-- **The Riesz potential is integrable.** For smooth `φ` and `x` in the ball, the singular
+integrand `‖∇φ‖ / dist x ·^{d-1}` is integrable on the ball: the singularity `dist x ·^{-(d-1)}`
+has exponent `d - 1 < d`, and `‖∇φ‖` is bounded on the compact closure. This is what makes the
+right-hand side of the potential estimate finite (hence the estimate meaningful). -/
+private theorem riesz_potential_integrableOn {φ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (hd : 0 < d) (c x : EuclideanSpace ℝ (Fin d)) {r : ℝ}
+    (hr : 0 < r) (hx : x ∈ ball c r) :
+    IntegrableOn (fun z => ‖fderiv ℝ φ z‖ / dist x z ^ (d - 1)) (ball c r) volume := by
+  have hfd : Continuous (fun z : EuclideanSpace ℝ (Fin d) => fderiv ℝ φ z) :=
+    hφ.continuous_fderiv (by simp)
+  have hfrk : 1 ≤ Module.finrank ℝ (EuclideanSpace ℝ (Fin d)) := by
+    rw [finrank_euclideanSpace_fin]; exact hd
+  obtain ⟨M, hM⟩ :=
+    (((isCompact_closedBall c (3 * r)).image hfd.norm).bddAbove)
+  have hMbound : ∀ z ∈ closedBall c (3 * r), ‖fderiv ℝ φ z‖ ≤ M :=
+    fun z hz => hM ⟨z, hz, rfl⟩
+  -- The translated integrand `f w = ‖∇φ (x + w)‖ / ‖w‖^{d-1}` is integrable on `ball 0 (2 r)`.
+  haveI : Nontrivial (EuclideanSpace ℝ (Fin d)) :=
+    Module.nontrivial_of_finrank_pos (R := ℝ) (by rw [finrank_euclideanSpace_fin]; exact hd)
+  have hne0 : ∀ᵐ w ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), w ≠ 0 := by
+    rw [ae_iff, show {w : EuclideanSpace ℝ (Fin d) | ¬ w ≠ 0} = {0} from by ext w; simp]
+    exact measure_singleton 0
+  have hf : IntegrableOn (fun w => ‖fderiv ℝ φ (x + w)‖ / ‖w‖ ^ (d - 1))
+      (ball 0 (2 * r)) volume := by
+    apply MeasureTheory.integrableOn_ball_of_norm_le_rpow (C := M) (α := ((d - 1 : ℕ) : ℝ)) hfrk
+    · rw [finrank_euclideanSpace_fin]
+      exact_mod_cast Nat.sub_lt hd Nat.one_pos
+    · filter_upwards [ae_restrict_mem measurableSet_ball, ae_restrict_of_ae hne0] with w hw hw0
+      have hwpos : 0 < ‖w‖ := by rw [norm_pos_iff]; exact hw0
+      have hxw : x + w ∈ closedBall c (3 * r) := by
+        rw [mem_closedBall, dist_eq_norm]
+        have : ‖x + w - c‖ ≤ ‖x - c‖ + ‖w‖ := by
+          rw [show x + w - c = (x - c) + w from by abel]; exact norm_add_le _ _
+        have hxc : ‖x - c‖ < r := by rw [← dist_eq_norm]; rwa [mem_ball] at hx
+        have hwlt : ‖w‖ < 2 * r := by rw [← dist_zero_right, ← mem_ball]; exact hw
+        linarith
+      have hnn : (0 : ℝ) ≤ ‖fderiv ℝ φ (x + w)‖ / ‖w‖ ^ (d - 1) := by positivity
+      rw [Real.norm_eq_abs, abs_of_nonneg hnn, Real.rpow_neg (norm_nonneg _), Real.rpow_natCast,
+        div_le_iff₀ (by positivity), mul_assoc, inv_mul_cancel₀ (by positivity), mul_one]
+      exact hMbound _ hxw
+    · refine Measurable.aestronglyMeasurable ?_
+      exact ((hfd.comp (continuous_const.add continuous_id)).norm.measurable).div
+        ((continuous_norm.pow (d - 1)).measurable)
+  -- Transfer back along the translation `w ↦ x + w`.
+  have hpre : (fun z => ‖fderiv ℝ φ z‖ / dist x z ^ (d - 1)) ∘ (fun w => x + w)
+      = fun w => ‖fderiv ℝ φ (x + w)‖ / ‖w‖ ^ (d - 1) := by
+    funext w
+    simp only [Function.comp_apply, dist_eq_norm, show x - (x + w) = -w from by abel, norm_neg]
+  have hmp : MeasurePreserving (fun w : EuclideanSpace ℝ (Fin d) => x + w) volume volume :=
+    measurePreserving_add_left volume x
+  rw [← hmp.integrableOn_comp_preimage (measurableEmbedding_addLeft x)]
+  rw [show (fun w => x + w) ⁻¹' ball c r = ball (c - x) r from by
+    ext w
+    simp only [Set.mem_preimage, mem_ball, dist_eq_norm,
+      show x + w - c = w - (c - x) from by abel]]
+  rw [hpre]
+  exact hf.mono_set (by
+    intro w hw
+    rw [mem_ball, dist_zero_right]
+    have : dist w (c - x) < r := by rwa [mem_ball] at hw
+    rw [dist_eq_norm] at this
+    have hcx : ‖c - x‖ < r := by rw [← dist_eq_norm, dist_comm]; rwa [mem_ball] at hx
+    have htri : ‖w‖ ≤ ‖w - (c - x)‖ + ‖c - x‖ := by
+      have := norm_add_le (w - (c - x)) (c - x)
+      rwa [sub_add_cancel] at this
+    linarith)
 
 end EllipticDirichlet.Embedding
