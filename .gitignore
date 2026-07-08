@@ -32,6 +32,9 @@ __pycache__/
 # Stray Meridian export tempfiles (lean-sync writes these into the project)
 /lean/meridian-dump-*.ttl
 
+# tstex tool scratch (writes into the project root)
+/tstex_modules/
+
 # Adduce local workspace state (the citation library is global at ~/.adduce;
 # cite drift/status auto-discover this project without it). Render-layout dirs too.
 # The signed formalization drift lock IS version-controlled: it records the
