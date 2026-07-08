@@ -260,4 +260,169 @@ private theorem inner_t_bound (hd : 0 < d) {r w : ℝ} (hr : 0 < r) (hw : 0 < w)
   congr 1
   rw [ha_def, zpow_neg, zpow_natCast, div_pow, inv_div, div_div, mul_comm (w ^ d) (d : ℝ)]
 
+/-- **Morrey kernel bound.** The double gradient line integral over the ball is controlled by the
+Riesz potential of the gradient. Proof: Tonelli swap, the affine change of variables
+`potential_inner_cov` for each scale `t`, the region containment `B_t ⊆ B ∩ ball x (2 r t)`, a
+second Tonelli swap, and the per-point Riesz factor `inner_t_bound`. -/
+private theorem kernel_bound {φ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (hd : 0 < d) (c x : EuclideanSpace ℝ (Fin d))
+    {r : ℝ} (hr : 0 < r) (hx : x ∈ ball c r) :
+    ∫⁻ y in ball c r, ∫⁻ t in Ioc (0 : ℝ) 1,
+        ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂volume ∂volume
+      ≤ ENNReal.ofReal ((2 * r) ^ d / d)
+          * ∫⁻ z in ball c r, ‖fderiv ℝ φ z‖ₑ / ‖z - x‖ₑ ^ (d - 1) ∂volume := by
+  have hB : MeasurableSet (ball c r) := measurableSet_ball
+  have hfd : Continuous (fun z : EuclideanSpace ℝ (Fin d) => fderiv ℝ φ z) :=
+    hφ.continuous_fderiv (by simp)
+  set h : EuclideanSpace ℝ (Fin d) → ℝ≥0∞ := fun z => ‖fderiv ℝ φ z‖ₑ * ‖z - x‖ₑ with hh_def
+  have hhmeas : Measurable h :=
+    (hfd.enorm.measurable).mul ((continuous_id.sub continuous_const).enorm.measurable)
+  -- The transformed region is contained in the ball intersected with a Euclidean ball at `x`.
+  have hregion : ∀ t ∈ Ioc (0 : ℝ) 1,
+      (fun y => x + t • (y - x)) '' (ball c r) ⊆ ball c r ∩ ball x (2 * r * t) := by
+    intro t ht z hz
+    obtain ⟨y, hy, rfl⟩ := hz
+    refine ⟨?_, ?_⟩
+    · have hcombo := (convex_ball c r) hx hy (by linarith [ht.2] : (0 : ℝ) ≤ 1 - t)
+        ht.1.le (by ring)
+      have : (1 - t) • x + t • y = x + t • (y - x) := by rw [sub_smul, one_smul, smul_sub]; abel
+      rwa [this] at hcombo
+    · rw [mem_ball, dist_eq_norm, add_sub_cancel_left]
+      exact norm_smul_sub_lt_two_mul hx hy ht.1
+  -- Step 1: Tonelli swap.
+  rw [show (∫⁻ y in ball c r, ∫⁻ t in Ioc (0 : ℝ) 1,
+        ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂volume ∂volume)
+      = ∫⁻ t in Ioc (0 : ℝ) 1, ∫⁻ y in ball c r,
+        ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂volume ∂volume from by
+    apply lintegral_lintegral_swap
+    apply Measurable.aemeasurable
+    apply Measurable.mul
+    · exact ((hfd.comp (by fun_prop)).enorm).measurable
+    · exact ((show Continuous (fun p : EuclideanSpace ℝ (Fin d) × ℝ => p.1 - x) by
+        fun_prop).enorm).measurable]
+  -- Step 2: change of variables for each `t`, then bound the region.
+  have hbound : ∀ t ∈ Ioc (0 : ℝ) 1,
+      ∫⁻ y in ball c r, ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂volume
+        ≤ ∫⁻ z in ball c r,
+            ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) * (ball x (2 * r * t)).indicator h z ∂volume := by
+    intro t ht
+    rw [potential_inner_cov hφ x ht.1 hB,
+      lintegral_const_mul _ (hhmeas.indicator (measurableSet_ball))]
+    refine mul_le_mul' le_rfl ?_
+    calc ∫⁻ z in (fun y => x + t • (y - x)) '' (ball c r), h z ∂volume
+        ≤ ∫⁻ z in ball c r ∩ ball x (2 * r * t), h z ∂volume :=
+          lintegral_mono_set (hregion t ht)
+      _ = ∫⁻ z in ball c r, (ball x (2 * r * t)).indicator h z ∂volume := by
+          rw [← lintegral_indicator (hB.inter measurableSet_ball), ← lintegral_indicator hB,
+            Set.indicator_indicator]
+  have hzpow_meas : Measurable (fun t : ℝ => t ^ (-((d : ℤ) + 1))) := by
+    have hrw : (fun t : ℝ => t ^ (-((d : ℤ) + 1))) = fun t : ℝ => (t ^ (d + 1))⁻¹ := by
+      funext t
+      rw [zpow_neg, show ((d : ℤ) + 1) = ((d + 1 : ℕ) : ℤ) by push_cast; ring, zpow_natCast]
+    rw [hrw]; exact (measurable_id.pow_const (d + 1)).inv
+  -- Per-point Riesz bound (holds for every `z`; at `z = x` the left side vanishes).
+  have hper : ∀ z : EuclideanSpace ℝ (Fin d),
+      ∫⁻ t in Ioc (0 : ℝ) 1,
+          ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) * (ball x (2 * r * t)).indicator h z ∂volume
+        ≤ ENNReal.ofReal ((2 * r) ^ d / d) * (‖fderiv ℝ φ z‖ₑ / ‖z - x‖ₑ ^ (d - 1)) := by
+    intro z
+    by_cases hzx : z = x
+    · subst hzx
+      have h0 : h z = 0 := by rw [hh_def]; simp
+      have hzero : ∀ t : ℝ,
+          ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) * (ball z (2 * r * t)).indicator h z = 0 := by
+        intro t; simp [h0]
+      calc ∫⁻ t in Ioc (0 : ℝ) 1,
+              ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) * (ball z (2 * r * t)).indicator h z ∂volume
+          = ∫⁻ _t in Ioc (0 : ℝ) 1, (0 : ℝ≥0∞) ∂volume :=
+            setLIntegral_congr_fun measurableSet_Ioc (fun t _ => hzero t)
+        _ = 0 := by simp
+        _ ≤ _ := bot_le
+    · have hw : 0 < ‖z - x‖ := by rw [norm_pos_iff]; exact sub_ne_zero.mpr hzx
+      have hd1 : d - 1 + 1 = d := Nat.succ_pred_eq_of_pos hd
+      have hwe : ‖z - x‖ₑ = ENNReal.ofReal ‖z - x‖ := (ofReal_norm (z - x)).symm
+      have hNe : ‖fderiv ℝ φ z‖ₑ = ENNReal.ofReal ‖fderiv ℝ φ z‖ := (ofReal_norm _).symm
+      have hne : ‖z - x‖ ^ (d - 1) ≠ 0 := by positivity
+      have hreal : ‖fderiv ℝ φ z‖ * ‖z - x‖ * ((2 * r) ^ d / (d * ‖z - x‖ ^ d))
+          = (2 * r) ^ d / d * (‖fderiv ℝ φ z‖ / ‖z - x‖ ^ (d - 1)) := by
+        rw [show ‖z - x‖ ^ d = ‖z - x‖ ^ (d - 1) * ‖z - x‖ from by rw [← pow_succ, hd1]]
+        field_simp
+      have hL : h z * ENNReal.ofReal ((2 * r) ^ d / (d * ‖z - x‖ ^ d))
+          = ENNReal.ofReal (‖fderiv ℝ φ z‖ * ‖z - x‖ * ((2 * r) ^ d / (d * ‖z - x‖ ^ d))) := by
+        simp only [hh_def]
+        rw [hwe, hNe, ← ENNReal.ofReal_mul (norm_nonneg _), ← ENNReal.ofReal_mul (by positivity)]
+      have hR : ENNReal.ofReal ((2 * r) ^ d / d) * (‖fderiv ℝ φ z‖ₑ / ‖z - x‖ₑ ^ (d - 1))
+          = ENNReal.ofReal ((2 * r) ^ d / d * (‖fderiv ℝ φ z‖ / ‖z - x‖ ^ (d - 1))) := by
+        rw [hNe, hwe, ← ENNReal.ofReal_pow (norm_nonneg _),
+          ← ENNReal.ofReal_div_of_pos (by positivity), ← ENNReal.ofReal_mul (by positivity)]
+      have hzeq : h z * ENNReal.ofReal ((2 * r) ^ d / (d * ‖z - x‖ ^ d))
+          = ENNReal.ofReal ((2 * r) ^ d / d) * (‖fderiv ℝ φ z‖ₑ / ‖z - x‖ₑ ^ (d - 1)) := by
+        rw [hL, hR, hreal]
+      have hstep1 : ∀ t : ℝ,
+          ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) * (ball x (2 * r * t)).indicator h z
+            = h z * {p : ℝ | ‖z - x‖ < 2 * r * p}.indicator
+                (fun p => ENNReal.ofReal (p ^ (-((d : ℤ) + 1)))) t := by
+        intro t
+        by_cases hc : ‖z - x‖ < 2 * r * t
+        · rw [Set.indicator_of_mem (by rw [mem_ball, dist_eq_norm]; exact hc) h,
+            Set.indicator_of_mem (show t ∈ {p : ℝ | ‖z - x‖ < 2 * r * p} from hc), mul_comm]
+        · rw [Set.indicator_of_notMem (by rw [mem_ball, dist_eq_norm]; exact hc) h,
+            Set.indicator_of_notMem (show t ∉ {p : ℝ | ‖z - x‖ < 2 * r * p} from hc),
+            mul_zero, mul_zero]
+      calc ∫⁻ t in Ioc (0 : ℝ) 1,
+              ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) * (ball x (2 * r * t)).indicator h z ∂volume
+          = ∫⁻ t in Ioc (0 : ℝ) 1, h z * {p : ℝ | ‖z - x‖ < 2 * r * p}.indicator
+              (fun p => ENNReal.ofReal (p ^ (-((d : ℤ) + 1)))) t ∂volume :=
+            setLIntegral_congr_fun measurableSet_Ioc (fun t _ => hstep1 t)
+        _ = h z * ∫⁻ t in Ioc (0 : ℝ) 1, {p : ℝ | ‖z - x‖ < 2 * r * p}.indicator
+              (fun p => ENNReal.ofReal (p ^ (-((d : ℤ) + 1)))) t ∂volume :=
+            lintegral_const_mul _ ((ENNReal.continuous_ofReal.measurable.comp hzpow_meas).indicator
+              (measurableSet_lt measurable_const (by fun_prop)))
+        _ ≤ h z * ENNReal.ofReal ((2 * r) ^ d / (d * ‖z - x‖ ^ d)) :=
+            mul_le_mul' le_rfl (inner_t_bound hd hr hw)
+        _ = _ := hzeq
+  calc ∫⁻ t in Ioc (0 : ℝ) 1, ∫⁻ y in ball c r,
+          ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂volume ∂volume
+      ≤ ∫⁻ t in Ioc (0 : ℝ) 1, ∫⁻ z in ball c r,
+          ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) * (ball x (2 * r * t)).indicator h z
+          ∂volume ∂volume :=
+        lintegral_mono_ae (by
+          filter_upwards [ae_restrict_mem measurableSet_Ioc] with t ht
+          exact hbound t ht)
+    -- Step 3: second Tonelli swap.
+    _ = ∫⁻ z in ball c r, ∫⁻ t in Ioc (0 : ℝ) 1,
+          ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) * (ball x (2 * r * t)).indicator h z
+          ∂volume ∂volume := by
+        apply lintegral_lintegral_swap
+        apply Measurable.aemeasurable
+        apply Measurable.mul
+        · exact (ENNReal.continuous_ofReal.measurable.comp hzpow_meas).comp measurable_fst
+        · have hrw : (fun p : ℝ × EuclideanSpace ℝ (Fin d) =>
+              (ball x (2 * r * p.1)).indicator h p.2)
+              = {q : ℝ × EuclideanSpace ℝ (Fin d) | dist q.2 x < 2 * r * q.1}.indicator
+                (fun q => h q.2) := by
+            funext p
+            by_cases hc : dist p.2 x < 2 * r * p.1
+            · rw [Set.indicator_of_mem (show p.2 ∈ ball x (2 * r * p.1) from mem_ball.mpr hc) h,
+                Set.indicator_of_mem
+                  (show p ∈ {q : ℝ × EuclideanSpace ℝ (Fin d) | dist q.2 x < 2 * r * q.1} from hc)]
+            · rw [Set.indicator_of_notMem
+                  (show p.2 ∉ ball x (2 * r * p.1) from fun hm => hc (mem_ball.mp hm)) h,
+                Set.indicator_of_notMem
+                  (show p ∉ {q : ℝ × EuclideanSpace ℝ (Fin d) | dist q.2 x < 2 * r * q.1} from hc)]
+          rw [hrw]
+          exact (hhmeas.comp measurable_snd).indicator
+            (measurableSet_lt (by fun_prop) (by fun_prop))
+    -- Step 4: per-point Riesz bound and reassembly.
+    _ ≤ ∫⁻ z in ball c r,
+          ENNReal.ofReal ((2 * r) ^ d / d) * (‖fderiv ℝ φ z‖ₑ / ‖z - x‖ₑ ^ (d - 1)) ∂volume :=
+        setLIntegral_mono' hB (fun z _ => hper z)
+    _ = ENNReal.ofReal ((2 * r) ^ d / d)
+          * ∫⁻ z in ball c r, ‖fderiv ℝ φ z‖ₑ / ‖z - x‖ₑ ^ (d - 1) ∂volume := by
+        have hg : Measurable (fun z : EuclideanSpace ℝ (Fin d) =>
+            ‖fderiv ℝ φ z‖ₑ / ‖z - x‖ₑ ^ (d - 1)) :=
+          (hfd.enorm.measurable).div
+            (((continuous_id.sub continuous_const).enorm).measurable.pow_const _)
+        rw [lintegral_const_mul _ hg]
+
 end EllipticDirichlet.Embedding
