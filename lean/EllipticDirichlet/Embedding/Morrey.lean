@@ -300,4 +300,86 @@ private theorem exists_kernel_bound_subset (hd : 0 < d) {p : ℝ} (hp : (d : ℝ
     Measure.restrict_restrict_of_subset hSsub] at key
   exact key
 
+/-- **Lens measure lower bound.** For `x, x'` in `ball c r` with `ρ = dist x x' > 0`, the convex
+lens `ball x (2ρ) ∩ ball x' (2ρ) ∩ ball c r` — which contains both points and lies inside the
+domain — has volume at least `(ρ/4)^d · ω_d`, where `ω_d` is the unit-ball volume. Proof: exhibit
+an inscribed ball `ball q (ρ/4)`, with `q` the midpoint pushed towards the centre `c` when the
+midpoint sits near the boundary, contained in all three balls, and compare volumes. -/
+private theorem lens_volume_lower_bound (_hd : 0 < d) (c x x' : EuclideanSpace ℝ (Fin d))
+    {r : ℝ} (_hr : 0 < r) (hx : x ∈ ball c r) (hx' : x' ∈ ball c r) (hne : x ≠ x') :
+    (dist x x' / 4) ^ d * volume.real (ball (0 : EuclideanSpace ℝ (Fin d)) 1)
+      ≤ volume.real (ball x (2 * dist x x') ∩ ball x' (2 * dist x x') ∩ ball c r) := by
+  set ρ := dist x x' with hρ_def
+  have hρ_pos : 0 < ρ := dist_pos.mpr hne
+  have hρ4 : (0 : ℝ) < ρ / 4 := by linarith
+  set m := midpoint ℝ x x' with hm_def
+  have hmc : dist m c < r := by
+    have hmem : m ∈ ball c r := (convex_ball c r).midpoint_mem hx hx'
+    rwa [mem_ball] at hmem
+  have hdmx : dist m x = ρ / 2 := by
+    rw [hm_def, dist_midpoint_left, Real.norm_eq_abs, abs_of_nonneg (by norm_num : (0:ℝ) ≤ 2),
+      ← hρ_def]
+    ring
+  have hdmx' : dist m x' = ρ / 2 := by
+    rw [hm_def, dist_midpoint_right, Real.norm_eq_abs, abs_of_nonneg (by norm_num : (0:ℝ) ≤ 2),
+      ← hρ_def]
+    ring
+  have hρ_lt : ρ < 2 * r := by
+    have h1 : dist x c < r := by rwa [mem_ball] at hx
+    have h2 : dist x' c < r := by rwa [mem_ball] at hx'
+    calc ρ = dist x x' := hρ_def
+      _ ≤ dist x c + dist c x' := dist_triangle x c x'
+      _ = dist x c + dist x' c := by rw [dist_comm c x']
+      _ < 2 * r := by linarith
+  have hr2 : (0 : ℝ) < r - ρ / 2 := by linarith
+  -- Choose an inscribed centre `q` with `dist q c ≤ r - ρ/2` and `dist q m ≤ ρ/2`.
+  obtain ⟨q, hqc, hqm⟩ : ∃ q : EuclideanSpace ℝ (Fin d),
+      dist q c ≤ r - ρ / 2 ∧ dist q m ≤ ρ / 2 := by
+    by_cases hcase : dist m c ≤ r - ρ / 2
+    · exact ⟨m, hcase, by rw [dist_self]; linarith⟩
+    · replace hcase : r - ρ / 2 < dist m c := not_le.mp hcase
+      have hDpos : 0 < dist m c := lt_trans hr2 hcase
+      set lam := (r - ρ / 2) / dist m c with hlam
+      have hlam_nn : 0 ≤ lam := by rw [hlam]; exact div_nonneg hr2.le hDpos.le
+      have hlam_lt : lam < 1 := by rw [hlam, div_lt_one hDpos]; exact hcase
+      refine ⟨c + lam • (m - c), le_of_eq ?_, ?_⟩
+      · rw [dist_eq_norm, add_sub_cancel_left, norm_smul, Real.norm_eq_abs,
+          abs_of_nonneg hlam_nn, ← dist_eq_norm, hlam, div_eq_mul_inv, mul_assoc,
+          inv_mul_cancel₀ (ne_of_gt hDpos), mul_one]
+      · have heq : (c + lam • (m - c)) - m = (1 - lam) • (c - m) := by module
+        have hval : dist (c + lam • (m - c)) m = dist m c - (r - ρ / 2) := by
+          rw [dist_eq_norm, heq, norm_smul, Real.norm_eq_abs,
+            abs_of_nonneg (by linarith : (0:ℝ) ≤ 1 - lam), ← dist_eq_norm, dist_comm c m,
+            sub_mul, one_mul, hlam, div_eq_mul_inv, mul_assoc,
+            inv_mul_cancel₀ (ne_of_gt hDpos), mul_one]
+        rw [hval]; linarith
+  -- The inscribed ball lies inside all three balls.
+  have hsub : ball q (ρ / 4) ⊆ ball x (2 * ρ) ∩ ball x' (2 * ρ) ∩ ball c r := by
+    refine subset_inter (subset_inter ?_ ?_) ?_
+    · refine ball_subset_ball' ?_
+      have hqx : dist q x ≤ ρ := by
+        calc dist q x ≤ dist q m + dist m x := dist_triangle q m x
+          _ ≤ ρ / 2 + ρ / 2 := by rw [hdmx]; linarith
+          _ = ρ := by ring
+      linarith
+    · refine ball_subset_ball' ?_
+      have hqx' : dist q x' ≤ ρ := by
+        calc dist q x' ≤ dist q m + dist m x' := dist_triangle q m x'
+          _ ≤ ρ / 2 + ρ / 2 := by rw [hdmx']; linarith
+          _ = ρ := by ring
+      linarith
+    · refine ball_subset_ball' ?_
+      linarith
+  -- Compare volumes.
+  have hWtop : volume (ball x (2 * ρ) ∩ ball x' (2 * ρ) ∩ ball c r) ≠ ⊤ :=
+    ne_top_of_le_ne_top measure_ball_lt_top.ne (measure_mono (fun z hz => hz.2))
+  have hvolq : volume.real (ball q (ρ / 4))
+      = (ρ / 4) ^ d * volume.real (ball (0 : EuclideanSpace ℝ (Fin d)) 1) := by
+    rw [measureReal_def, Measure.addHaar_ball_of_pos volume q hρ4, ENNReal.toReal_mul,
+      ENNReal.toReal_ofReal (pow_nonneg hρ4.le _), finrank_euclideanSpace_fin, measureReal_def]
+  calc (ρ / 4) ^ d * volume.real (ball (0 : EuclideanSpace ℝ (Fin d)) 1)
+      = volume.real (ball q (ρ / 4)) := hvolq.symm
+    _ ≤ volume.real (ball x (2 * ρ) ∩ ball x' (2 * ρ) ∩ ball c r) :=
+        ENNReal.toReal_mono hWtop (measure_mono hsub)
+
 end EllipticDirichlet.Embedding
