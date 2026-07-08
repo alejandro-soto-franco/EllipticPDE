@@ -20,7 +20,7 @@ of the Morrey embedding.
 -/
 
 open MeasureTheory Set Metric
-open scoped NNReal
+open scoped NNReal ENNReal
 
 noncomputable section
 
@@ -145,5 +145,74 @@ private theorem map_affine_dilation (x : EuclideanSpace ℝ (Fin d)) {t : ℝ} (
   rw [hmapC, Measure.map_addHaar_smul volume ht.ne', Measure.map_smul, map_add_left_eq_self]
   congr 1
   rw [finrank_euclideanSpace_fin, abs_of_nonneg (by positivity)]
+
+/-- **Affine change of variables (the crux).** For `0 < t`, the singular line integrand over
+the ball transforms, under `z = x + t • (y - x)`, into the same integrand over the contracted
+region `x + t • (ball c r - x)`, with Jacobian factor `t^{-(d+1)}`. This is the change of
+variables at the level of the (nonnegative) `lintegral`, built from the pushforward Jacobian
+`map_affine_dilation` together with translation invariance. -/
+private theorem potential_inner_cov {φ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (x : EuclideanSpace ℝ (Fin d)) {t : ℝ} (ht : 0 < t)
+    {s : Set (EuclideanSpace ℝ (Fin d))} (hs : MeasurableSet s) :
+    ∫⁻ y in s, ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂volume
+      = ENNReal.ofReal (t ^ (-((d : ℤ) + 1)))
+          * ∫⁻ z in (fun y => x + t • (y - x)) '' s, ‖fderiv ℝ φ z‖ₑ * ‖z - x‖ₑ ∂volume := by
+  set e : EuclideanSpace ℝ (Fin d) → EuclideanSpace ℝ (Fin d) := fun y => x + t • (y - x) with he
+  set h : EuclideanSpace ℝ (Fin d) → ℝ≥0∞ := fun z => ‖fderiv ℝ φ z‖ₑ * ‖z - x‖ₑ with hh_def
+  have hemb : MeasurableEmbedding e := by
+    have h1 : MeasurableEmbedding (fun u : EuclideanSpace ℝ (Fin d) => x + u) :=
+      measurableEmbedding_addLeft x
+    have h2 : MeasurableEmbedding (fun w : EuclideanSpace ℝ (Fin d) => t • w) :=
+      measurableEmbedding_const_smul₀ ht.ne'
+    have h3 : MeasurableEmbedding (fun y : EuclideanSpace ℝ (Fin d) => y - x) := by
+      have hrw : (fun y : EuclideanSpace ℝ (Fin d) => y - x) = (fun y => y + (-x)) := by
+        funext y; rw [sub_eq_add_neg]
+      rw [hrw]; exact measurableEmbedding_addRight (-x)
+    exact (h1.comp h2).comp h3
+  have hhmeas : Measurable h := by
+    refine Measurable.mul ?_ ?_
+    · exact ((hφ.continuous_fderiv (by simp)).enorm).measurable
+    · exact ((continuous_id.sub continuous_const).enorm).measurable
+  have hGmeas : Measurable
+      (fun y : EuclideanSpace ℝ (Fin d) => ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ) := by
+    refine Measurable.mul ?_ ?_
+    · exact (((hφ.continuous_fderiv (by simp)).comp (by fun_prop)).enorm).measurable
+    · exact ((continuous_id.sub continuous_const).enorm).measurable
+  have huimg : MeasurableSet (e '' s) := hemb.measurableSet_image.mpr hs
+  have hmap : Measure.map e volume = ENNReal.ofReal ((t ^ d)⁻¹) • volume := by
+    rw [he]; exact map_affine_dilation x ht
+  -- Change of variables: `∫ over image = t^d * ∫ (h ∘ e) over s`.
+  have hset := setLIntegral_map (μ := (volume : Measure (EuclideanSpace ℝ (Fin d))))
+    huimg hhmeas hemb.measurable
+  rw [hmap, setLIntegral_smul_measure,
+    Set.preimage_image_eq s hemb.injective] at hset
+  -- `hset : ofReal ((t^d)⁻¹) • ∫ z in e '' s, h z = ∫ y in s, h (e y)`.
+  have hcov : ∫⁻ z in e '' s, h z ∂volume
+      = ENNReal.ofReal (t ^ d) * ∫⁻ y in s, h (e y) ∂volume := by
+    calc ∫⁻ z in e '' s, h z ∂volume
+        = ENNReal.ofReal (t ^ d)
+            * (ENNReal.ofReal ((t ^ d)⁻¹) • ∫⁻ z in e '' s, h z ∂volume) := by
+          rw [smul_eq_mul, ← mul_assoc, ← ENNReal.ofReal_mul (by positivity),
+            mul_inv_cancel₀ (by positivity), ENNReal.ofReal_one, one_mul]
+      _ = ENNReal.ofReal (t ^ d) * ∫⁻ y in s, h (e y) ∂volume := by rw [hset]
+  -- Pointwise `h (e y) = ofReal t * (target integrand)`.
+  have hpt : ∀ y : EuclideanSpace ℝ (Fin d),
+      h (e y) = ENNReal.ofReal t * (‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ) := by
+    intro y
+    simp only [he, hh_def]
+    have hsub : x + t • (y - x) - x = t • (y - x) := by abel
+    rw [hsub, enorm_smul, Real.enorm_eq_ofReal ht.le]
+    ring
+  have hstep : ∫⁻ y in s, h (e y) ∂volume
+      = ENNReal.ofReal t
+          * ∫⁻ y in s, ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂volume := by
+    rw [setLIntegral_congr_fun hs (fun y _ => hpt y), lintegral_const_mul _ hGmeas]
+  -- Solve for the target LHS.
+  rw [hcov, hstep, ← mul_assoc, ← mul_assoc, ← ENNReal.ofReal_mul (by positivity),
+    ← ENNReal.ofReal_mul (by positivity)]
+  have hz : (-((d : ℤ) + 1)) + ((d + 1 : ℕ) : ℤ) = 0 := by push_cast; ring
+  have harith : t ^ (-((d : ℤ) + 1)) * t ^ d * t = 1 := by
+    rw [mul_assoc, ← pow_succ, ← zpow_natCast t (d + 1), ← zpow_add₀ ht.ne', hz, zpow_zero]
+  rw [harith, ENNReal.ofReal_one, one_mul]
 
 end EllipticDirichlet.Embedding
