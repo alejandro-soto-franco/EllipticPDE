@@ -239,4 +239,25 @@ private theorem tail_lintegral_bound (hd : 0 < d) {a : ℝ} (ha : 0 < a) :
     rw [hempty, Measure.restrict_empty, lintegral_zero_measure]
     exact bot_le
 
+/-- **Per-point Riesz factor.** Integrating the singular kernel over the admissible cone of
+scales `{t : ‖z - x‖ < 2 r t}` produces the Riesz weight `(2 r)^d / (d ‖z - x‖^d)`. This packages
+the change of the indicator region into `Ioc a 1` and applies `tail_lintegral_bound`. -/
+private theorem inner_t_bound (hd : 0 < d) {r w : ℝ} (hr : 0 < r) (hw : 0 < w) :
+    ∫⁻ t in Ioc (0 : ℝ) 1, {p : ℝ | w < 2 * r * p}.indicator
+        (fun p => ENNReal.ofReal (p ^ (-((d : ℤ) + 1)))) t ∂volume
+      ≤ ENNReal.ofReal ((2 * r) ^ d / (d * w ^ d)) := by
+  set a := w / (2 * r) with ha_def
+  have ha : 0 < a := by rw [ha_def]; positivity
+  have h2r : (0 : ℝ) < 2 * r := by positivity
+  have hset : {p : ℝ | w < 2 * r * p} = Ioi a := by
+    ext p
+    rw [Set.mem_setOf_eq, Set.mem_Ioi, ha_def, div_lt_iff₀ h2r, mul_comm p (2 * r)]
+  rw [hset, ← lintegral_indicator measurableSet_Ioc]
+  simp only [Set.indicator_indicator]
+  rw [show Ioc (0 : ℝ) 1 ∩ Ioi a = Ioc a 1 by rw [Set.Ioc_inter_Ioi, max_eq_right ha.le],
+    lintegral_indicator measurableSet_Ioc]
+  refine (tail_lintegral_bound hd ha).trans (le_of_eq ?_)
+  congr 1
+  rw [ha_def, zpow_neg, zpow_natCast, div_pow, inv_div, div_div, mul_comm (w ^ d) (d : ℝ)]
+
 end EllipticDirichlet.Embedding
