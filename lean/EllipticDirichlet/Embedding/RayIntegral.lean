@@ -86,4 +86,21 @@ theorem oscillation_eq_average_ray [Nontrivial (EuclideanSpace ℝ (Fin d))]
       exact ⟨hpos, htop⟩)
   rw [hk, one_smul]
 
+/-- **Region fact.** If `x, y` both lie in `ball c r` and `0 < t`, then the segment point
+`x + t • (y - x)` is within distance `2 r t` of `x`. This is the geometric input feeding the
+Riesz-kernel tail bound: after the affine change of variables the transformed region
+`B_t = x + t • (ball c r - x)` sits inside the ball `‖z - x‖ < 2 r t`. -/
+private theorem norm_smul_sub_lt_two_mul {c x y : EuclideanSpace ℝ (Fin d)} {r t : ℝ}
+    (hx : x ∈ ball c r) (hy : y ∈ ball c r) (ht : 0 < t) :
+    ‖t • (y - x)‖ < 2 * r * t := by
+  have hyx : ‖y - x‖ < 2 * r := by
+    have htri : dist y x ≤ dist y c + dist c x := dist_triangle y c x
+    have h1 : dist y c < r := by rwa [mem_ball] at hy
+    have h2 : dist c x < r := by rw [dist_comm]; rwa [mem_ball] at hx
+    have : dist y x < 2 * r := by linarith
+    rwa [dist_eq_norm] at this
+  rw [norm_smul, Real.norm_eq_abs, abs_of_pos ht]
+  calc t * ‖y - x‖ < t * (2 * r) := by exact mul_lt_mul_of_pos_left hyx ht
+    _ = 2 * r * t := by ring
+
 end EllipticDirichlet.Embedding
