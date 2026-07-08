@@ -126,4 +126,24 @@ private theorem tail_integral_bound (hd : 0 < d) {a : ℝ} (ha : 0 < a) :
   rw [hden, one_zpow, key, div_le_div_iff_of_pos_right hdR]
   linarith
 
+/-- **Pushforward of Lebesgue measure under the affine contraction** `y ↦ x + t • (y - x)`.
+Being the composition of a translation, a dilation by `t`, and a translation, it scales the
+Haar measure by `t^{-d}`. This is the Jacobian input to the change of variables. -/
+private theorem map_affine_dilation (x : EuclideanSpace ℝ (Fin d)) {t : ℝ} (ht : 0 < t) :
+    Measure.map (fun y => x + t • (y - x)) (volume : Measure (EuclideanSpace ℝ (Fin d)))
+      = ENNReal.ofReal ((t ^ d)⁻¹) • volume := by
+  have hC : Measurable (fun y : EuclideanSpace ℝ (Fin d) => y - x) := measurable_id.sub_const x
+  have hB : Measurable (fun w : EuclideanSpace ℝ (Fin d) => t • w) := measurable_id.const_smul t
+  have hA : Measurable (fun u : EuclideanSpace ℝ (Fin d) => x + u) := measurable_id.const_add x
+  have hcomp : (fun y : EuclideanSpace ℝ (Fin d) => x + t • (y - x))
+      = (fun u => x + u) ∘ ((fun w => t • w) ∘ (fun y => y - x)) := by funext y; rfl
+  rw [hcomp, ← Measure.map_map hA (hB.comp hC), ← Measure.map_map hB hC]
+  have hmapC : Measure.map (fun y : EuclideanSpace ℝ (Fin d) => y - x) volume = volume := by
+    have hrw : (fun y : EuclideanSpace ℝ (Fin d) => y - x) = (fun y => y + (-x)) := by
+      funext y; rw [sub_eq_add_neg]
+    rw [hrw, map_add_right_eq_self]
+  rw [hmapC, Measure.map_addHaar_smul volume ht.ne', Measure.map_smul, map_add_left_eq_self]
+  congr 1
+  rw [finrank_euclideanSpace_fin, abs_of_nonneg (by positivity)]
+
 end EllipticDirichlet.Embedding
