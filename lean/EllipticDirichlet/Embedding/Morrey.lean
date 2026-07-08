@@ -6,7 +6,9 @@ Authors: Alejandro Soto Franco
 import EllipticDirichlet.Embedding.RayIntegral
 import Mathlib.MeasureTheory.Integral.MeanInequalities
 import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
+import Mathlib.MeasureTheory.Function.LpSeminorm.Indicator
 import Mathlib.Topology.MetricSpace.HolderNorm
+import Mathlib.Tactic.Module
 
 /-!
 # Riesz-kernel `Lᵖ` bound for the Morrey embedding
@@ -269,5 +271,33 @@ private theorem exists_oscillation_bound (hd : 0 < d) {p : ℝ} (hp : (d : ℝ) 
     _ = ((Cd * Cdp : ℝ≥0) : ℝ) * r ^ (1 - (d : ℝ) / p)
           * (eLpNorm (fun y => ‖fderiv ℝ φ y‖) (ENNReal.ofReal p)
               (volume.restrict (Metric.ball z r))).toReal := by push_cast; ring
+
+/-- **Subset Riesz-kernel bound.** The indicator corollary of `exists_kernel_bound`: for a
+measurable subset `S` of the ball `ball x R` (singularity at the centre `x`), the `(d-1)`-Riesz
+potential of an `Lᵖ` function `g` over `S` is bounded by `Cdp · R^{1-d/p} · ‖g‖_{Lᵖ(S)}`, the
+`Lᵖ` norm being taken over `S`. This lets the averaging domain of the Morrey estimate shrink to a
+convex lens while retaining the correct radial scaling. -/
+private theorem exists_kernel_bound_subset (hd : 0 < d) {p : ℝ} (hp : (d : ℝ) < p) :
+    ∃ Cdp : ℝ≥0, ∀ (x : EuclideanSpace ℝ (Fin d)) {R : ℝ}, 0 < R →
+      ∀ (g : EuclideanSpace ℝ (Fin d) → ℝ),
+        MemLp g (ENNReal.ofReal p) (volume.restrict (Metric.ball x R)) →
+        ∀ {S : Set (EuclideanSpace ℝ (Fin d))}, MeasurableSet S → S ⊆ Metric.ball x R →
+          ∫ y in S, ‖g y‖ / dist x y ^ (d - 1)
+            ≤ (Cdp : ℝ) * R ^ (1 - (d : ℝ) / p)
+                * (eLpNorm g (ENNReal.ofReal p) (volume.restrict S)).toReal := by
+  obtain ⟨Cdp, hCdp⟩ := exists_kernel_bound hd hp
+  refine ⟨Cdp, ?_⟩
+  intro x R hR g hg S hSmeas hSsub
+  have key := hCdp x hR (S.indicator g) (hg.indicator hSmeas)
+  have hfun : (fun y => ‖(S.indicator g) y‖ / dist x y ^ (d - 1))
+      = S.indicator (fun y => ‖g y‖ / dist x y ^ (d - 1)) := by
+    funext y
+    by_cases hy : y ∈ S
+    · rw [Set.indicator_of_mem hy, Set.indicator_of_mem hy]
+    · rw [Set.indicator_of_notMem hy, Set.indicator_of_notMem hy, norm_zero, zero_div]
+  rw [hfun, setIntegral_indicator hSmeas, Set.inter_eq_right.mpr hSsub,
+    eLpNorm_indicator_eq_eLpNorm_restrict hSmeas,
+    Measure.restrict_restrict_of_subset hSsub] at key
+  exact key
 
 end EllipticDirichlet.Embedding
