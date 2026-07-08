@@ -5,7 +5,6 @@ Authors: Alejandro Soto Franco
 -/
 import EllipticDirichlet.Embedding.RayIntegral
 import EllipticDirichlet.Embedding.Convolution
-import Mathlib.MeasureTheory.Integral.MeanInequalities
 import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
 import Mathlib.MeasureTheory.Function.LpSeminorm.Indicator
 import Mathlib.Topology.MetricSpace.HolderNorm
@@ -250,37 +249,6 @@ private theorem memLp_norm_fderiv {φ : EuclideanSpace ℝ (Fin d) → ℝ}
   filter_upwards [ae_restrict_mem measurableSet_ball] with y hy
   exact hC y (ball_subset_closedBall hy)
 
-/-- **Centred oscillation bound (Task 4 ∘ Task 5).** For `p > d` there is a
-dimensional/exponent constant `C` such that for every smooth `φ`, at the centre of any ball
-the oscillation of `φ` about its ball average is controlled by `C · R^{1-d/p} · ‖∇φ‖_{Lᵖ}`.
-This fuses the potential estimate with the Riesz-kernel bound; it is the mechanical core of
-the Morrey Hölder estimate. -/
-private theorem exists_oscillation_bound (hd : 0 < d) {p : ℝ} (hp : (d : ℝ) < p) :
-    ∃ C : ℝ≥0, ∀ (φ : EuclideanSpace ℝ (Fin d) → ℝ), ContDiff ℝ (⊤ : ℕ∞) φ →
-      ∀ (z : EuclideanSpace ℝ (Fin d)) {r : ℝ}, 0 < r →
-        |φ z - ⨍ y in Metric.ball z r, φ y|
-          ≤ (C : ℝ) * r ^ (1 - (d : ℝ) / p)
-              * (eLpNorm (fun y => ‖fderiv ℝ φ y‖) (ENNReal.ofReal p)
-                  (volume.restrict (Metric.ball z r))).toReal := by
-  obtain ⟨Cd, hCd⟩ := exists_potential_bound hd
-  obtain ⟨Cdp, hCdp⟩ := exists_kernel_bound hd hp
-  refine ⟨Cd * Cdp, ?_⟩
-  intro φ hφ z r hr
-  have hpot := hCd φ hφ z hr z (mem_ball_self hr)
-  have hmem := memLp_norm_fderiv (p := p) hφ z hr
-  have hker := hCdp z hr (fun y => ‖fderiv ℝ φ y‖) hmem
-  simp only [norm_norm] at hker
-  have hCd0 : (0 : ℝ) ≤ (Cd : ℝ) := Cd.coe_nonneg
-  calc |φ z - ⨍ y in Metric.ball z r, φ y|
-      ≤ (Cd : ℝ) * ∫ y in Metric.ball z r, ‖fderiv ℝ φ y‖ / dist z y ^ (d - 1) := hpot
-    _ ≤ (Cd : ℝ) * ((Cdp : ℝ) * r ^ (1 - (d : ℝ) / p)
-          * (eLpNorm (fun y => ‖fderiv ℝ φ y‖) (ENNReal.ofReal p)
-              (volume.restrict (Metric.ball z r))).toReal) :=
-        mul_le_mul_of_nonneg_left hker hCd0
-    _ = ((Cd * Cdp : ℝ≥0) : ℝ) * r ^ (1 - (d : ℝ) / p)
-          * (eLpNorm (fun y => ‖fderiv ℝ φ y‖) (ENNReal.ofReal p)
-              (volume.restrict (Metric.ball z r))).toReal := by push_cast; ring
-
 /-- **Subset Riesz-kernel bound.** The indicator corollary of `exists_kernel_bound`: for a
 measurable subset `S` of the ball `ball x R` (singularity at the centre `x`), the `(d-1)`-Riesz
 potential of an `Lᵖ` function `g` over `S` is bounded by `Cdp · R^{1-d/p} · ‖g‖_{Lᵖ(S)}`, the
@@ -310,8 +278,8 @@ private theorem exists_kernel_bound_subset (hd : 0 < d) {p : ℝ} (hp : (d : ℝ
   exact key
 
 /-- **Lens measure lower bound.** For `x, x'` in `ball c r` with `ρ = dist x x' > 0`, the convex
-lens `ball x (2ρ) ∩ ball x' (2ρ) ∩ ball c r` — which contains both points and lies inside the
-domain — has volume at least `(ρ/4)^d · ω_d`, where `ω_d` is the unit-ball volume. Proof: exhibit
+lens `ball x (2ρ) ∩ ball x' (2ρ) ∩ ball c r`, which contains both points and lies inside the
+domain, has volume at least `(ρ/4)^d · ω_d`, where `ω_d` is the unit-ball volume. Proof: exhibit
 an inscribed ball `ball q (ρ/4)`, with `q` the midpoint pushed towards the centre `c` when the
 midpoint sits near the boundary, contained in all three balls, and compare volumes. -/
 private theorem lens_volume_lower_bound (_hd : 0 < d) (c x x' : EuclideanSpace ℝ (Fin d))

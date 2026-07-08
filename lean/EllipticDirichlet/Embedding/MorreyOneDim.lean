@@ -4,7 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
 import EllipticDirichlet.Embedding.WeakGradient
-import EllipticDirichlet.Poincare.OneDim
 import Mathlib.Analysis.Calculus.BumpFunction.Normed
 import Mathlib.Analysis.Distribution.AEEqOfIntegralContDiff
 import Mathlib.Analysis.Normed.Lp.MeasurableSpace
