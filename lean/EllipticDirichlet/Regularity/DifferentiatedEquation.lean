@@ -10,6 +10,8 @@ import Mathlib.Analysis.Calculus.BumpFunction.Normed
 import Mathlib.Analysis.Calculus.BumpFunction.Convolution
 import Mathlib.Analysis.Calculus.ContDiff.Convolution
 import Mathlib.Analysis.Calculus.LineDeriv.IntegrationByParts
+import Mathlib.Analysis.Calculus.FDeriv.Symmetric
+import Mathlib.Analysis.Calculus.FDeriv.CompCLM
 import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
 import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
 import Mathlib.MeasureTheory.Measure.Haar.Unique
@@ -517,5 +519,246 @@ theorem datum_move {V : Set (EuclideanSpace ℝ (Fin d))} (ℓ : Fin d)
     (hφcs : HasCompactSupport φ) (hφV : tsupport φ ⊆ V) :
     ∫ x in V, (f_V x : ℝ) * partialD ℓ φ x = - ∫ x in V, (Df x : ℝ) * φ x :=
   hf φ hφc hφcs hφV
+
+/-! ### Assembly of the differentiated identity -/
+
+/-- **Mixed-partial symmetry for test functions.** For a `C^∞` function the two classical
+second partials agree: `∂_ℓ ∂ⱼφ = ∂ⱼ ∂_ℓφ`. This is `mathlib`'s symmetry of the second Fréchet
+derivative (`second_derivative_symmetric`), transported through the `partialD`-as-directional-
+`fderiv` notation via `fderiv_clm_apply`. -/
+private lemma partialD_partialD_swap {φ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (j ℓ : Fin d) :
+    partialD ℓ (partialD j φ) = partialD j (partialD ℓ φ) := by
+  have hcf : ContDiff ℝ (⊤ : ℕ∞) (fderiv ℝ φ) := (contDiff_infty_iff_fderiv.mp hφ).2
+  have hdiff2 : Differentiable ℝ (fderiv ℝ φ) := hcf.differentiable (by simp)
+  have hdiff1 : Differentiable ℝ φ := hφ.differentiable (by simp)
+  funext x
+  have key : ∀ a b : Fin d, partialD b (partialD a φ) x
+      = fderiv ℝ (fderiv ℝ φ) x (EuclideanSpace.single b 1) (EuclideanSpace.single a 1) := by
+    intro a b
+    have hcl := fderiv_clm_apply (𝕜 := ℝ) (x := x) (c := fderiv ℝ φ)
+      (u := fun _ : EuclideanSpace ℝ (Fin d) => EuclideanSpace.single a (1 : ℝ))
+      (hdiff2 x) (differentiableAt_const _)
+    calc partialD b (partialD a φ) x
+        = fderiv ℝ (fun y => (fderiv ℝ φ y) (EuclideanSpace.single a 1)) x
+            (EuclideanSpace.single b 1) := rfl
+      _ = ((fderiv ℝ φ x).comp
+              (fderiv ℝ (fun _ : EuclideanSpace ℝ (Fin d) => EuclideanSpace.single a (1 : ℝ)) x)
+            + (fderiv ℝ (fderiv ℝ φ) x).flip (EuclideanSpace.single a 1))
+            (EuclideanSpace.single b 1) := by rw [hcl]
+      _ = fderiv ℝ (fderiv ℝ φ) x (EuclideanSpace.single b 1) (EuclideanSpace.single a 1) := by
+          simp [ContinuousLinearMap.flip_apply]
+  rw [key j ℓ, key ℓ j]
+  exact second_derivative_symmetric (f := φ) (fun y => (hdiff1 y).hasFDerivAt)
+    (hdiff2 x).hasFDerivAt (EuclideanSpace.single ℓ 1) (EuclideanSpace.single j 1)
+
+/-- **Differentiated weak formulation (divergence-datum form), Evans, *Partial Differential
+Equations* (2nd ed.), §6.3.2, Theorem 4.** Given the local weak identity `hLoc` for `u` on `V`
+together with the first/second weak-derivative data, for a fixed direction `ℓ` and every
+admissible test `φ` with `tsupport φ ⊆ V`, the difference quotient `∂_ℓu` satisfies
+`∑ ∫_V a_{ij}(∂ₗ∂ᵢu) ∂ⱼφ + ∑ ∫_V (∂_ℓ a_{ij})(∂ᵢu) ∂ⱼφ
+   = ∫_V (∂_ℓf) φ - ∑ ∫_V [(∂_ℓ b_i)(∂ᵢu)+b_i(∂ₗ∂ᵢu)] φ - ∫_V [(∂_ℓ c)u + c(∂_ℓu)] φ`.
+The local weak formulation `hLoc` on plain integrals is a hypothesis: deriving it from the
+divergence-form bilinear pairing is the repackaging the milestone defers, and is not done here. -/
+theorem differentiated_weakForm_div {V : Set (EuclideanSpace ℝ (Fin d))}
+    (hVm : MeasurableSet V) (Op : FullEllipticOp d) (hA : IsC2Coeff Op.toEllipticCoeff)
+    (ℓ : Fin d)
+    (hb : ∀ i, ContDiff ℝ 1 (fun x => Op.b x i)) (hc : ContDiff ℝ 1 Op.c)
+    (Mdb : Fin d → ℝ)
+    (hbdM : ∀ i, ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))),
+      |partialD ℓ (fun y => Op.b y i) x| ≤ Mdb i)
+    (Mdc : ℝ)
+    (hcdM : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |partialD ℓ Op.c x| ≤ Mdc)
+    (u_V : Lp ℝ 2 (volume.restrict V))
+    (Du : Fin d → Lp ℝ 2 (volume.restrict V))
+    (D2 : Fin d → Fin d → Lp ℝ 2 (volume.restrict V))
+    (f_V Df : Lp ℝ 2 (volume.restrict V))
+    (hu_Du : ∀ i, HasWeakDerivOn V i u_V (Du i))
+    (hDu_D2 : ∀ i, HasWeakDerivOn V ℓ (Du i) (D2 ℓ i))
+    (hf_Df : HasWeakDerivOn V ℓ f_V Df)
+    (hLoc : ∀ v : EuclideanSpace ℝ (Fin d) → ℝ, ContDiff ℝ (⊤ : ℕ∞) v →
+        HasCompactSupport v → tsupport v ⊆ V →
+        (∑ i, ∑ j, ∫ x in V, Op.a x i j * (Du i x : ℝ) * partialD j v x)
+          + (∑ i, ∫ x in V, Op.b x i * (Du i x : ℝ) * v x)
+          + (∫ x in V, Op.c x * (u_V x : ℝ) * v x)
+          = ∫ x in V, (f_V x : ℝ) * v x)
+    {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφc : ContDiff ℝ (⊤ : ℕ∞) φ)
+    (hφcs : HasCompactSupport φ) (hφV : tsupport φ ⊆ V) :
+    (∑ i, ∑ j, ∫ x in V, Op.a x i j * (D2 ℓ i x : ℝ) * partialD j φ x)
+      + (∑ i, ∑ j, ∫ x in V,
+          partialD ℓ (fun y => Op.a y i j) x * (Du i x : ℝ) * partialD j φ x)
+    = (∫ x in V, (Df x : ℝ) * φ x)
+      - (∑ i, ∫ x in V, (partialD ℓ (fun y => Op.b y i) x * (Du i x : ℝ)
+                          + Op.b x i * (D2 ℓ i x : ℝ)) * φ x)
+      - (∫ x in V, (partialD ℓ Op.c x * (u_V x : ℝ) + Op.c x * (Du ℓ x : ℝ)) * φ x) := by
+  classical
+  haveI : ENNReal.HolderTriple (2 : ℝ≥0∞) 2 1 := ⟨by rw [ENNReal.inv_two_add_inv_two, inv_one]⟩
+  set A := Op.toEllipticCoeff with hAeq
+  -- continuity and pointwise bounds for the coefficient derivatives
+  have hda_cont : ∀ i j, Continuous (partialD ℓ (fun y => A.a y i j)) :=
+    fun i j => (hA.contDiff_partialD_coeff i j ℓ).continuous
+  have hda_bnd : ∀ i j (x : EuclideanSpace ℝ (Fin d)),
+      |partialD ℓ (fun y => A.a y i j) x| ≤ hA.A1 := by
+    intro i j x
+    have heq : partialD ℓ (fun y => A.a y i j) x
+        = fderiv ℝ (fun y => A.a y i j) x (EuclideanSpace.single ℓ 1) := rfl
+    rw [heq, ← Real.norm_eq_abs]
+    calc ‖fderiv ℝ (fun y => A.a y i j) x (EuclideanSpace.single ℓ 1)‖
+        ≤ ‖fderiv ℝ (fun y => A.a y i j) x‖ * ‖EuclideanSpace.single ℓ (1 : ℝ)‖ :=
+          (fderiv ℝ (fun y => A.a y i j) x).le_opNorm _
+      _ = ‖fderiv ℝ (fun y => A.a y i j) x‖ := by simp
+      _ ≤ hA.A1 := hA.grad_bdd i j x
+  have hdb_cont : ∀ i, Continuous (partialD ℓ (fun y => Op.b y i)) :=
+    fun i => ((hb i).continuous_fderiv one_ne_zero).clm_apply continuous_const
+  have hdc_cont : Continuous (partialD ℓ Op.c) :=
+    (hc.continuous_fderiv one_ne_zero).clm_apply continuous_const
+  -- integrability of the two split summands of the principal term
+  have hInt1 : ∀ i j, Integrable
+      (fun x => partialD ℓ (fun y => A.a y i j) x * (Du i x : ℝ) * partialD j φ x)
+      (volume.restrict V) := by
+    intro i j
+    have hbase : Integrable
+        (fun x => (Du i x : ℝ) * (partialD ℓ (fun y => A.a y i j) x * partialD j φ x))
+        (volume.restrict V) :=
+      (Lp.memLp (Du i)).integrable_mul
+        ((((hda_cont i j).mul (contDiff_partialD hφc j).continuous).memLp_of_hasCompactSupport
+          (p := 2) (μ := volume) (hasCompactSupport_partialD hφcs j).mul_left).restrict V)
+    exact hbase.congr (Filter.Eventually.of_forall fun x => by ring)
+  have hInt2 : ∀ i j, Integrable
+      (fun x => A.a x i j * (D2 ℓ i x : ℝ) * partialD j φ x) (volume.restrict V) := by
+    intro i j
+    have hbase : Integrable
+        (fun x => (D2 ℓ i x : ℝ) * (A.a x i j * partialD j φ x)) (volume.restrict V) :=
+      (Lp.memLp (D2 ℓ i)).integrable_mul
+        ((((hA.contDiff i j).continuous.mul
+            (contDiff_partialD hφc j).continuous).memLp_of_hasCompactSupport
+          (p := 2) (μ := volume) (hasCompactSupport_partialD hφcs j).mul_left).restrict V)
+    exact hbase.congr (Filter.Eventually.of_forall fun x => by ring)
+  -- names for the four running integrals of the localised weak form and the datum blocks
+  set Sa := ∑ i, ∑ j, ∫ x in V, A.a x i j * (Du i x : ℝ) * partialD j (partialD ℓ φ) x
+    with hSa_def
+  set Sb := ∑ i, ∫ x in V, Op.b x i * (Du i x : ℝ) * partialD ℓ φ x with hSb_def
+  set Sc := ∫ x in V, Op.c x * (u_V x : ℝ) * partialD ℓ φ x with hSc_def
+  set Sf := ∫ x in V, (f_V x : ℝ) * partialD ℓ φ x with hSf_def
+  set G1 := ∑ i, ∑ j, ∫ x in V,
+      partialD ℓ (fun y => A.a y i j) x * (Du i x : ℝ) * partialD j φ x with hG1_def
+  set G2 := ∑ i, ∑ j, ∫ x in V, A.a x i j * (D2 ℓ i x : ℝ) * partialD j φ x with hG2_def
+  set Tterm := ∑ i, ∫ x in V, (partialD ℓ (fun y => Op.b y i) x * (Du i x : ℝ)
+      + Op.b x i * (D2 ℓ i x : ℝ)) * φ x with hT_def
+  set Zterm := ∫ x in V, (partialD ℓ Op.c x * (u_V x : ℝ) + Op.c x * (Du ℓ x : ℝ)) * φ x
+    with hZ_def
+  set Dterm := ∫ x in V, (Df x : ℝ) * φ x with hD_def
+  -- the localised weak form tested against the admissible `∂_ℓφ`
+  have hstar : Sa + Sb + Sc = Sf := by
+    rw [hSa_def, hSb_def, hSc_def, hSf_def]
+    exact hLoc (partialD ℓ φ) (contDiff_partialD hφc ℓ) (hasCompactSupport_partialD hφcs ℓ)
+      ((tsupport_partialD_subset ℓ φ).trans hφV)
+  -- principal term via `principal_move`, symmetry, and the two-way split
+  have hprin : Sa = -(G1 + G2) := by
+    have hP := principal_move hVm A hA ℓ Du D2 hDu_D2
+      (fun i j => A.actL i j (Du i)) (fun i j => A.actL_coeFn i j (Du i))
+      (fun i j => mulCoeffL (hda_cont i j).measurable
+          (Filter.Eventually.of_forall (hda_bnd i j)) (Du i) + A.actL i j (D2 ℓ i))
+      (fun i j => by
+        filter_upwards [Lp.coeFn_add (mulCoeffL (hda_cont i j).measurable
+            (Filter.Eventually.of_forall (hda_bnd i j)) (Du i)) (A.actL i j (D2 ℓ i)),
+          mulCoeffL_coeFn (hda_cont i j).measurable
+            (Filter.Eventually.of_forall (hda_bnd i j)) (Du i),
+          A.actL_coeFn i j (D2 ℓ i)] with x hadd h1 h2
+        simp only [hadd, h1, h2, Pi.add_apply]) hφc hφcs hφV
+    have hLHS : (∑ i, ∑ j, ∫ x in V, (A.actL i j (Du i) x : ℝ) * partialD ℓ (partialD j φ) x)
+        = ∑ i, ∑ j, ∫ x in V, A.a x i j * (Du i x : ℝ) * partialD j (partialD ℓ φ) x := by
+      refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
+      refine integral_congr_ae ?_
+      filter_upwards [A.actL_coeFn i j (Du i)] with x hx
+      rw [hx, congrFun (partialD_partialD_swap hφc j ℓ) x]
+    have hRHS : (∑ i, ∑ j, ∫ x in V,
+          ((mulCoeffL (hda_cont i j).measurable (Filter.Eventually.of_forall (hda_bnd i j)) (Du i)
+              + A.actL i j (D2 ℓ i)) x : ℝ) * partialD j φ x)
+        = (∑ i, ∑ j, ∫ x in V,
+              partialD ℓ (fun y => A.a y i j) x * (Du i x : ℝ) * partialD j φ x)
+          + (∑ i, ∑ j, ∫ x in V, A.a x i j * (D2 ℓ i x : ℝ) * partialD j φ x) := by
+      rw [← Finset.sum_add_distrib]
+      refine Finset.sum_congr rfl fun i _ => ?_
+      rw [← Finset.sum_add_distrib]
+      refine Finset.sum_congr rfl fun j _ => ?_
+      rw [← integral_add (hInt1 i j) (hInt2 i j)]
+      refine integral_congr_ae ?_
+      filter_upwards [Lp.coeFn_add (mulCoeffL (hda_cont i j).measurable
+          (Filter.Eventually.of_forall (hda_bnd i j)) (Du i)) (A.actL i j (D2 ℓ i)),
+        mulCoeffL_coeFn (hda_cont i j).measurable
+          (Filter.Eventually.of_forall (hda_bnd i j)) (Du i),
+        A.actL_coeFn i j (D2 ℓ i)] with x hadd h1 h2
+      simp only [hadd, h1, h2, Pi.add_apply]; ring
+    rw [hSa_def, hG1_def, hG2_def, ← hLHS, hP, hRHS]
+  -- transport term via `transport_move`, summed over the coordinate directions
+  have htrans : Sb = -Tterm := by
+    rw [hSb_def, hT_def, ← Finset.sum_neg_distrib]
+    refine Finset.sum_congr rfl fun i _ => ?_
+    have hbrep : (mulCoeffL (Op.b_meas i) (ae_restrict_of_ae (Op.b_bdd i)) (Du i))
+        =ᵐ[volume.restrict V] fun x => Op.b x i * (Du i x : ℝ) :=
+      mulCoeffL_coeFn (Op.b_meas i) (ae_restrict_of_ae (Op.b_bdd i)) (Du i)
+    have hcommBrep : (mulCoeffL (hdb_cont i).measurable (ae_restrict_of_ae (hbdM i)) (Du i)
+          + mulCoeffL (Op.b_meas i) (ae_restrict_of_ae (Op.b_bdd i)) (D2 ℓ i))
+        =ᵐ[volume.restrict V] fun x => partialD ℓ (fun y => Op.b y i) x * (Du i x : ℝ)
+          + Op.b x i * (D2 ℓ i x : ℝ) := by
+      filter_upwards [Lp.coeFn_add (mulCoeffL (hdb_cont i).measurable
+          (ae_restrict_of_ae (hbdM i)) (Du i))
+          (mulCoeffL (Op.b_meas i) (ae_restrict_of_ae (Op.b_bdd i)) (D2 ℓ i)),
+        mulCoeffL_coeFn (hdb_cont i).measurable (ae_restrict_of_ae (hbdM i)) (Du i),
+        mulCoeffL_coeFn (Op.b_meas i) (ae_restrict_of_ae (Op.b_bdd i)) (D2 ℓ i)] with x hadd h1 h2
+      simp only [hadd, h1, h2, Pi.add_apply]
+    have hmove := transport_move hVm ℓ i (hb i) (Op.b_bdd i) (hbdM i) (Du i) (D2 ℓ i) (hDu_D2 i)
+      _ hbrep _ hcommBrep hφc hφcs hφV
+    calc (∫ x in V, Op.b x i * (Du i x : ℝ) * partialD ℓ φ x)
+        = ∫ x in V, ((mulCoeffL (Op.b_meas i) (ae_restrict_of_ae (Op.b_bdd i)) (Du i) x : ℝ))
+            * partialD ℓ φ x := by
+          refine integral_congr_ae ?_
+          filter_upwards [hbrep] with x hx
+          rw [hx]
+      _ = -∫ x in V, ((mulCoeffL (hdb_cont i).measurable (ae_restrict_of_ae (hbdM i)) (Du i)
+              + mulCoeffL (Op.b_meas i) (ae_restrict_of_ae (Op.b_bdd i)) (D2 ℓ i)) x : ℝ) * φ x :=
+          hmove
+      _ = -∫ x in V, (partialD ℓ (fun y => Op.b y i) x * (Du i x : ℝ)
+              + Op.b x i * (D2 ℓ i x : ℝ)) * φ x := by
+          rw [neg_inj]
+          refine integral_congr_ae ?_
+          filter_upwards [hcommBrep] with x hx
+          rw [hx]
+  -- zeroth-order term via `zeroth_move`
+  have hzero : Sc = -Zterm := by
+    rw [hSc_def, hZ_def]
+    have hcrep : (mulCoeffL Op.c_meas (ae_restrict_of_ae Op.c_bdd) u_V)
+        =ᵐ[volume.restrict V] fun x => Op.c x * (u_V x : ℝ) :=
+      mulCoeffL_coeFn Op.c_meas (ae_restrict_of_ae Op.c_bdd) u_V
+    have hcommCrep : (mulCoeffL hdc_cont.measurable (ae_restrict_of_ae hcdM) u_V
+          + mulCoeffL Op.c_meas (ae_restrict_of_ae Op.c_bdd) (Du ℓ))
+        =ᵐ[volume.restrict V] fun x => partialD ℓ Op.c x * (u_V x : ℝ)
+          + Op.c x * (Du ℓ x : ℝ) := by
+      filter_upwards [Lp.coeFn_add (mulCoeffL hdc_cont.measurable (ae_restrict_of_ae hcdM) u_V)
+          (mulCoeffL Op.c_meas (ae_restrict_of_ae Op.c_bdd) (Du ℓ)),
+        mulCoeffL_coeFn hdc_cont.measurable (ae_restrict_of_ae hcdM) u_V,
+        mulCoeffL_coeFn Op.c_meas (ae_restrict_of_ae Op.c_bdd) (Du ℓ)] with x hadd h1 h2
+      simp only [hadd, h1, h2, Pi.add_apply]
+    have hmove := zeroth_move hVm ℓ hc Op.c_bdd hcdM u_V (Du ℓ) (hu_Du ℓ)
+      _ hcrep _ hcommCrep hφc hφcs hφV
+    calc (∫ x in V, Op.c x * (u_V x : ℝ) * partialD ℓ φ x)
+        = ∫ x in V, ((mulCoeffL Op.c_meas (ae_restrict_of_ae Op.c_bdd) u_V x : ℝ))
+            * partialD ℓ φ x := by
+          refine integral_congr_ae ?_
+          filter_upwards [hcrep] with x hx
+          rw [hx]
+      _ = -∫ x in V, ((mulCoeffL hdc_cont.measurable (ae_restrict_of_ae hcdM) u_V
+              + mulCoeffL Op.c_meas (ae_restrict_of_ae Op.c_bdd) (Du ℓ)) x : ℝ) * φ x := hmove
+      _ = -∫ x in V, (partialD ℓ Op.c x * (u_V x : ℝ) + Op.c x * (Du ℓ x : ℝ)) * φ x := by
+          rw [neg_inj]
+          refine integral_congr_ae ?_
+          filter_upwards [hcommCrep] with x hx
+          rw [hx]
+  -- datum term is the defining property of the weak `ℓ`-derivative of `f`
+  have hdat : Sf = -Dterm := by
+    rw [hSf_def, hD_def]
+    exact datum_move ℓ hf_Df hφc hφcs hφV
+  linarith [hstar, hprin, htrans, hzero, hdat]
 
 end EllipticDirichlet.Regularity
