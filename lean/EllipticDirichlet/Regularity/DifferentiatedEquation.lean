@@ -26,7 +26,7 @@ Equations* (2nd ed.), §6.3.2, Theorem 4: for a fixed direction `ℓ` and every 
 compactly-supported test `φ` with `tsupport φ ⊆ V`,
 
 ```
-∑_{i,j} ∫_V a_{ij} (∂ₖ∂ᵢu) ∂ⱼφ  +  ∑_{i,j} ∫_V (∂_ℓ a_{ij})(∂ᵢu) ∂ⱼφ  =  ∫_V f_ℓ · φ
+∑_{i,j} ∫_V a_{ij} (∂_ℓ∂ᵢu) ∂ⱼφ  +  ∑_{i,j} ∫_V (∂_ℓ a_{ij})(∂ᵢu) ∂ⱼφ  =  ∫_V f_ℓ · φ
 ```
 
 with `f_ℓ` an explicit lower-order datum. The identity is stated in `HasWeakDerivOn`-style
@@ -421,7 +421,7 @@ theorem HasWeakDerivOn.mul_contDiff_left {V : Set (EuclideanSpace ℝ (Fin d))}
 
 /-- Moving `∂_ℓ` from the test function onto `u` in the principal term. For every direction
 pair the coefficient-weighted first derivative `a_{ij}·∂ᵢu` has weak `ℓ`-derivative
-`(∂_ℓ a_{ij})·∂ᵢu + a_{ij}·∂ₖ∂ᵢu`; testing against `∂ⱼφ` yields, summed over `i,j`,
+`(∂_ℓ a_{ij})·∂ᵢu + a_{ij}·∂_ℓ∂ᵢu`; testing against `∂ⱼφ` yields, summed over `i,j`,
 `∑ ∫_V a_{ij}(∂ᵢu) ∂_ℓ∂ⱼφ = -∑ ∫_V [(∂_ℓ a_{ij})(∂ᵢu) + a_{ij}(∂ₗ∂ᵢu)] ∂ⱼφ`. -/
 theorem principal_move {V : Set (EuclideanSpace ℝ (Fin d))} (hVm : MeasurableSet V)
     (A : EllipticCoeff d) (hA : IsC2Coeff A) (ℓ : Fin d)
@@ -886,6 +886,9 @@ theorem differentiated_weakForm {V : Set (EuclideanSpace ℝ (Fin d))}
     (D2 : Fin d → Fin d → Lp ℝ 2 (volume.restrict V))
     (f_V Df : Lp ℝ 2 (volume.restrict V))
     (hu_Du : ∀ i, HasWeakDerivOn V i u_V (Du i))
+    -- `hDu_D2` is the `ℓ`-direction specialisation of `hD2_j` (i.e. `hD2_j i ℓ`); it is kept
+    -- as a separate hypothesis only so this theorem can consume `differentiated_weakForm_div`
+    -- verbatim, whose signature predates the general `hD2_j`.
     (hDu_D2 : ∀ i, HasWeakDerivOn V ℓ (Du i) (D2 ℓ i))
     (hD2_j : ∀ i j, HasWeakDerivOn V j (Du i) (D2 j i))
     (hf_Df : HasWeakDerivOn V ℓ f_V Df)

@@ -44,8 +44,8 @@ structure IsC2Coeff (A : EllipticCoeff d) where
   A2 : ℝ
   /-- `A2` is nonnegative. -/
   A2_nonneg : 0 ≤ A2
-  /-- The iterated Fréchet derivative of every coefficient entry is bounded by `A2` at every
-  point. -/
+  /-- The nested Fréchet derivative (the second derivative, taken as `fderiv` of `fderiv`)
+  of every coefficient entry is bounded by `A2` at every point. -/
   hess_bdd : ∀ i j, ∀ x,
     ‖fderiv ℝ (fun y => fderiv ℝ (fun z => A.a z i j) y) x‖ ≤ A2
 
