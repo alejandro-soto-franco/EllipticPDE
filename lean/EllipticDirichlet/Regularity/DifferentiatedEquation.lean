@@ -415,4 +415,53 @@ theorem HasWeakDerivOn.mul_contDiff_left {V : Set (EuclideanSpace ℝ (Fin d))}
   rw [hLHS, hRHS]
   linarith [hkey]
 
+/-! ### Principal term: moving `∂_ℓ` onto `u` -/
+
+/-- Moving `∂_ℓ` from the test function onto `u` in the principal term. For every direction
+pair the coefficient-weighted first derivative `a_{ij}·∂ᵢu` has weak `ℓ`-derivative
+`(∂_ℓ a_{ij})·∂ᵢu + a_{ij}·∂ₖ∂ᵢu`; testing against `∂ⱼφ` yields, summed over `i,j`,
+`∑ ∫_V a_{ij}(∂ᵢu) ∂_ℓ∂ⱼφ = -∑ ∫_V [(∂_ℓ a_{ij})(∂ᵢu) + a_{ij}(∂ₗ∂ᵢu)] ∂ⱼφ`. -/
+theorem principal_move {V : Set (EuclideanSpace ℝ (Fin d))} (hVm : MeasurableSet V)
+    (A : EllipticCoeff d) (hA : IsC2Coeff A) (ℓ : Fin d)
+    (Du : Fin d → Lp ℝ 2 (volume.restrict V))
+    (D2 : Fin d → Fin d → Lp ℝ 2 (volume.restrict V))
+    (hD2 : ∀ i, HasWeakDerivOn V ℓ (Du i) (D2 ℓ i))
+    (aDu : Fin d → Fin d → Lp ℝ 2 (volume.restrict V))
+    (haDu : ∀ i j, aDu i j =ᵐ[volume.restrict V] fun x => A.a x i j * (Du i x : ℝ))
+    (comm : Fin d → Fin d → Lp ℝ 2 (volume.restrict V))
+    (hcomm : ∀ i j, comm i j =ᵐ[volume.restrict V] fun x =>
+      partialD ℓ (fun y => A.a y i j) x * (Du i x : ℝ) + A.a x i j * (D2 ℓ i x : ℝ))
+    {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφc : ContDiff ℝ (⊤ : ℕ∞) φ)
+    (hφcs : HasCompactSupport φ) (hφV : tsupport φ ⊆ V) :
+    ∑ i, ∑ j, ∫ x in V, (aDu i j x : ℝ) * partialD ℓ (partialD j φ) x
+      = - ∑ i, ∑ j, ∫ x in V, (comm i j x : ℝ) * partialD j φ x := by
+  -- the pointwise gradient bound, restated for `partialD` via the operator-norm inequality
+  have hbound : ∀ (i j : Fin d) (x : EuclideanSpace ℝ (Fin d)),
+      |partialD ℓ (fun y => A.a y i j) x| ≤ hA.A1 := by
+    intro i j x
+    have heq : partialD ℓ (fun y => A.a y i j) x
+        = fderiv ℝ (fun y => A.a y i j) x (EuclideanSpace.single ℓ 1) := rfl
+    rw [heq, ← Real.norm_eq_abs]
+    calc ‖fderiv ℝ (fun y => A.a y i j) x (EuclideanSpace.single ℓ 1)‖
+        ≤ ‖fderiv ℝ (fun y => A.a y i j) x‖ * ‖EuclideanSpace.single ℓ (1 : ℝ)‖ :=
+          (fderiv ℝ (fun y => A.a y i j) x).le_opNorm _
+      _ = ‖fderiv ℝ (fun y => A.a y i j) x‖ := by simp
+      _ ≤ hA.A1 := hA.grad_bdd i j x
+  -- the crux, specialised to the `(i, j)` coefficient and tested against `∂ⱼφ`
+  have hstep : ∀ i j : Fin d,
+      ∫ x in V, (aDu i j x : ℝ) * partialD ℓ (partialD j φ) x
+        = - ∫ x in V, (comm i j x : ℝ) * partialD j φ x := by
+    intro i j
+    have hmove := HasWeakDerivOn.mul_contDiff_left hVm ℓ (hD2 i)
+      (hA.toIsC1Coeff.contDiff i j) (A.bdd i j) (Filter.Eventually.of_forall (hbound i j))
+      (aDu i j) (haDu i j) (comm i j) (hcomm i j)
+    obtain ⟨hψc, hψcs, hψV⟩ := isTest_partialD hφc hφcs hφV j
+    exact hmove (partialD j φ) hψc hψcs hψV
+  -- sum the per-`(i, j)` identity and push the sign out of the double sum
+  calc ∑ i, ∑ j, ∫ x in V, (aDu i j x : ℝ) * partialD ℓ (partialD j φ) x
+      = ∑ i : Fin d, ∑ j : Fin d, - ∫ x in V, (comm i j x : ℝ) * partialD j φ x :=
+        Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => hstep i j))
+    _ = - ∑ i, ∑ j, ∫ x in V, (comm i j x : ℝ) * partialD j φ x := by
+        simp only [Finset.sum_neg_distrib]
+
 end EllipticDirichlet.Regularity
