@@ -464,4 +464,58 @@ theorem principal_move {V : Set (EuclideanSpace ℝ (Fin d))} (hVm : MeasurableS
     _ = - ∑ i, ∑ j, ∫ x in V, (comm i j x : ℝ) * partialD j φ x := by
         simp only [Finset.sum_neg_distrib]
 
+/-! ### Lower-order terms: transport, zeroth-order, and datum -/
+
+/-- **Transport term.** Moving `∂_ℓ` from the test function onto `∂ᵢu` weighted by the transport
+coefficient `b_i`: `∫_V b_i(∂ᵢu) ∂_ℓφ = -∫_V [(∂_ℓ b_i)(∂ᵢu) + b_i(∂ₗ∂ᵢu)] φ`. A direct
+specialisation of `HasWeakDerivOn.mul_contDiff_left` at weight `b_i` and `g := ∂ᵢu`, tested
+against `φ` itself, which is already `C^∞`, compactly supported, with `tsupport φ ⊆ V`. -/
+theorem transport_move {V : Set (EuclideanSpace ℝ (Fin d))} (hVm : MeasurableSet V)
+    (ℓ : Fin d) (_i : Fin d)
+    {bi : EuclideanSpace ℝ (Fin d) → ℝ} (hbi : ContDiff ℝ 1 bi)
+    {Mbi Mdbi : ℝ}
+    (hbiM : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |bi x| ≤ Mbi)
+    (hdbiM : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |partialD ℓ bi x| ≤ Mdbi)
+    (Du_i D2_ℓi : Lp ℝ 2 (volume.restrict V)) (hD2 : HasWeakDerivOn V ℓ Du_i D2_ℓi)
+    (bDu : Lp ℝ 2 (volume.restrict V))
+    (hbDu : bDu =ᵐ[volume.restrict V] fun x => bi x * (Du_i x : ℝ))
+    (comm : Lp ℝ 2 (volume.restrict V))
+    (hcomm : comm =ᵐ[volume.restrict V]
+      fun x => partialD ℓ bi x * (Du_i x : ℝ) + bi x * (D2_ℓi x : ℝ))
+    {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφc : ContDiff ℝ (⊤ : ℕ∞) φ)
+    (hφcs : HasCompactSupport φ) (hφV : tsupport φ ⊆ V) :
+    ∫ x in V, (bDu x : ℝ) * partialD ℓ φ x = - ∫ x in V, (comm x : ℝ) * φ x :=
+  HasWeakDerivOn.mul_contDiff_left hVm ℓ hD2 hbi hbiM hdbiM bDu hbDu comm hcomm φ hφc hφcs hφV
+
+/-- **Zeroth-order term.** Moving `∂_ℓ` from the test function onto `u` weighted by the
+zeroth-order coefficient `c`: `∫_V c·u·∂_ℓφ = -∫_V [(∂_ℓ c)·u + c·(∂ₗu)] φ`. The same
+specialisation of `HasWeakDerivOn.mul_contDiff_left` at weight `c` and `g := u`. -/
+theorem zeroth_move {V : Set (EuclideanSpace ℝ (Fin d))} (hVm : MeasurableSet V) (ℓ : Fin d)
+    {c : EuclideanSpace ℝ (Fin d) → ℝ} (hc : ContDiff ℝ 1 c)
+    {Mc Mdc : ℝ}
+    (hcM : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |c x| ≤ Mc)
+    (hdcM : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |partialD ℓ c x| ≤ Mdc)
+    (u_V Du_ℓ : Lp ℝ 2 (volume.restrict V)) (hDu : HasWeakDerivOn V ℓ u_V Du_ℓ)
+    (cu : Lp ℝ 2 (volume.restrict V))
+    (hcu : cu =ᵐ[volume.restrict V] fun x => c x * (u_V x : ℝ))
+    (comm : Lp ℝ 2 (volume.restrict V))
+    (hcomm : comm =ᵐ[volume.restrict V]
+      fun x => partialD ℓ c x * (u_V x : ℝ) + c x * (Du_ℓ x : ℝ))
+    {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφc : ContDiff ℝ (⊤ : ℕ∞) φ)
+    (hφcs : HasCompactSupport φ) (hφV : tsupport φ ⊆ V) :
+    ∫ x in V, (cu x : ℝ) * partialD ℓ φ x = - ∫ x in V, (comm x : ℝ) * φ x :=
+  HasWeakDerivOn.mul_contDiff_left hVm ℓ hDu hc hcM hdcM cu hcu comm hcomm φ hφc hφcs hφV
+
+/-- **Datum term.** Given that `f` has weak `ℓ`-derivative `Df` on `V`, moving `∂_ℓ` off the test
+function is literally the defining property of `HasWeakDerivOn`: `∫_V f·∂_ℓφ = -∫_V (∂_ℓf)·φ`.
+This is where the milestone assumes `f ∈ H¹_loc(V)`, strictly stronger than the `f ∈ L²` already
+available from `interior_H2_estimate`, and is what makes `∂_ℓ f` a genuine `L²(V)` class feeding
+the datum `f_ℓ`. -/
+theorem datum_move {V : Set (EuclideanSpace ℝ (Fin d))} (ℓ : Fin d)
+    {f_V Df : Lp ℝ 2 (volume.restrict V)} (hf : HasWeakDerivOn V ℓ f_V Df)
+    {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφc : ContDiff ℝ (⊤ : ℕ∞) φ)
+    (hφcs : HasCompactSupport φ) (hφV : tsupport φ ⊆ V) :
+    ∫ x in V, (f_V x : ℝ) * partialD ℓ φ x = - ∫ x in V, (Df x : ℝ) * φ x :=
+  hf φ hφc hφcs hφV
+
 end EllipticDirichlet.Regularity
