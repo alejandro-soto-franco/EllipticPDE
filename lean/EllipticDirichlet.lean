@@ -27,6 +27,7 @@ import EllipticDirichlet.Regularity.CutoffTower
 import EllipticDirichlet.Regularity.RestrictedDiffQuotient
 import EllipticDirichlet.Regularity.RestrictedDiffQuotientMem
 import EllipticDirichlet.Regularity.Interior
+import EllipticDirichlet.Regularity.DifferentiatedEquation
 import EllipticDirichlet.Embedding.WeakGradient
 import EllipticDirichlet.Embedding.Convolution
 import EllipticDirichlet.Embedding.MorreyOneDim
