@@ -22,6 +22,7 @@ import EllipticDirichlet.Garding
 import EllipticDirichlet.Regularity.Caccioppoli
 import EllipticDirichlet.Regularity.InteriorCompactSupport
 import EllipticDirichlet.Regularity.CoeffC1
+import EllipticDirichlet.Regularity.CoeffC2
 import EllipticDirichlet.Regularity.CutoffTower
 import EllipticDirichlet.Regularity.RestrictedDiffQuotient
 import EllipticDirichlet.Regularity.RestrictedDiffQuotientMem
