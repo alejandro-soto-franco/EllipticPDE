@@ -59,15 +59,6 @@ lemma extCls_ae {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩm : MeasurableSet Ω
     · rw [Set.indicator_of_notMem hxΩ, image_eq_zero_of_notMem_tsupport (fun hc => hxΩ (h.2.2 hc))]
   exact (h1.trans h3).trans (Filter.EventuallyEq.of_eq h4)
 
-/-- **Coordinate decomposition.** The squared `L²` norms of the partial-derivative classes sum to at
-most the squared `H¹` norm of the test graph (the missing term is `‖φ‖²_{L²}`). -/
-private lemma sum_partialCls_norm_sq_le {Ω : Set (EuclideanSpace ℝ (Fin d))}
-    {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ) :
-    ∑ i, ‖h.partialCls i‖ ^ 2 ≤ ‖h.testGraph‖ ^ 2 := by
-  rw [PiLp.norm_sq_eq_of_L2 (fun _ : Fin (d + 1) => L2D Ω) h.testGraph, Fin.sum_univ_succ]
-  simp only [IsTestFn.testGraph_zero, IsTestFn.testGraph_succ]
-  linarith [sq_nonneg ‖h.testCls‖]
-
 /-- The squared `L²(Ω)` norm of a partial-derivative class is the integral of the squared partial
 over `Ω`. -/
 lemma partialCls_norm_sq_eq {Ω : Set (EuclideanSpace ℝ (Fin d))}
