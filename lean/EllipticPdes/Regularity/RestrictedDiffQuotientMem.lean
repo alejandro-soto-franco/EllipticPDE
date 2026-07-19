@@ -55,12 +55,12 @@ theorem mulTest_diffQuotD_eq_of_small (hζ : IsTestFn Ω ζ) (k : Fin d) {h : �
     (hΩm : MeasurableSet Ω)
     (_hsmall : h ≠ 0 ∧ ∀ x ∈ tsupport ζ, x + hshift k h ∈ Ω) (g : L2D Ω) :
     mulTest hζ (diffQuotD k h hΩm g)
-      = mulTest hζ (restrictL2 hΩm (diffQuot k h (extendL2 hΩm g))) := by
+      = mulTest hζ (restrictL2 (diffQuot k h (extendL2 hΩm g))) := by
   apply Lp.ext
   filter_upwards [mulTest_coeFn hζ (diffQuotD k h hΩm g),
-      mulTest_coeFn hζ (restrictL2 hΩm (diffQuot k h (extendL2 hΩm g))),
+      mulTest_coeFn hζ (restrictL2 (diffQuot k h (extendL2 hΩm g))),
       coeFn_diffQuotD k h hΩm g,
-      coeFn_restrictL2 hΩm (diffQuot k h (extendL2 hΩm g)),
+      coeFn_restrictL2 (diffQuot k h (extendL2 hΩm g)),
       ae_restrict_of_ae (coeFn_diffQuot k h (extendL2 hΩm g)),
       ae_restrict_of_ae (coeFn_extendL2 hΩm g), ae_restrict_mem hΩm]
     with x hlhs hrhs hdqd hrestr hdq hext hmem

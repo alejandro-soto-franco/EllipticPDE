@@ -285,18 +285,18 @@ private lemma evansTest_bilin_ibp (A : EllipticCoeff d) (hΩm : MeasurableSet Ω
     neg_neg]
 
 /-- Restriction to `Ω` is non-expansive on `L²`: `‖restrictL2 w‖ ≤ ‖w‖`. -/
-private lemma norm_restrictL2_le (hΩm : MeasurableSet Ω) (w : EucL2 d) :
-    ‖restrictL2 hΩm w‖ ≤ ‖w‖ :=
+private lemma norm_restrictL2_le (w : EucL2 d) :
+    ‖restrictL2 (Ω := Ω) w‖ ≤ ‖w‖ :=
   norm_Lp_toLp_restrict_le Ω w
 
 /-- The interior difference quotient is the restriction of the whole-space difference
 quotient of the extension: `Dₖʰ g = restrict (Dₖʰ (extendL2 g))`. -/
 private lemma diffQuotD_eq_restrictL2_diffQuot (hΩm : MeasurableSet Ω) (k : Fin d) (h : ℝ)
     (g : L2D Ω) :
-    diffQuotD k h hΩm g = restrictL2 hΩm (diffQuot k h (extendL2 hΩm g)) := by
+    diffQuotD k h hΩm g = restrictL2 (diffQuot k h (extendL2 hΩm g)) := by
   apply Lp.ext
   filter_upwards [coeFn_diffQuotD k h hΩm g,
-    coeFn_restrictL2 hΩm (diffQuot k h (extendL2 hΩm g)),
+    coeFn_restrictL2 (diffQuot k h (extendL2 hΩm g)),
     ae_restrict_of_ae (coeFn_diffQuot k h (extendL2 hΩm g)),
     ae_restrict_of_ae (coeFn_extendL2 hΩm g), ae_restrict_mem hΩm] with x hx1 hx2 hx3 hx4 hx5
   rw [hx1, hx2, hx3, hx4, Set.indicator_of_mem hx5]
@@ -367,8 +367,8 @@ theorem hasWeakDeriv_extendL2_of_mem_H01 (hΩm : MeasurableSet Ω) (k : Fin d)
   have hφpL2 : MemLp (partialD k φ) 2 volume := hφpc.memLp_of_hasCompactSupport hφpcs
   set a : EucL2 d := hφpL2.toLp (partialD k φ) with ha
   set b : EucL2 d := hφL2.toLp φ with hb
-  set w₀ : H1amb Ω := PiLp.single 2 (0 : Fin (d + 1)) (restrictL2 hΩm a)
-      + PiLp.single 2 k.succ (restrictL2 hΩm b) with hw₀
+  set w₀ : H1amb Ω := PiLp.single 2 (0 : Fin (d + 1)) (restrictL2 a)
+      + PiLp.single 2 k.succ (restrictL2 b) with hw₀
   -- The inner product against `w₀` extracts the two extension-by-zero pairings.
   have hΦ : ∀ V : H1amb Ω, ⟪w₀, V⟫
       = ⟪extendL2 hΩm (V 0), a⟫ + ⟪extendL2 hΩm (V k.succ), b⟫ := by
@@ -501,9 +501,9 @@ restriction (Evans, *Partial Differential Equations* (2nd ed.), §5.8.2). -/
 private lemma norm_diffQuotD_u0_le (hΩm : MeasurableSet Ω) (k : Fin d) (h : ℝ) (u : H01 Ω) :
     ‖diffQuotD k h hΩm ((u : H1amb Ω) 0)‖ ≤ ‖(u : H1amb Ω) k.succ‖ :=
   calc ‖diffQuotD k h hΩm ((u : H1amb Ω) 0)‖
-      = ‖restrictL2 hΩm (diffQuot k h (extendL2 hΩm ((u : H1amb Ω) 0)))‖ := by
+      = ‖restrictL2 (Ω := Ω) (diffQuot k h (extendL2 hΩm ((u : H1amb Ω) 0)))‖ := by
         rw [diffQuotD_eq_restrictL2_diffQuot]
-    _ ≤ ‖diffQuot k h (extendL2 hΩm ((u : H1amb Ω) 0))‖ := norm_restrictL2_le hΩm _
+    _ ≤ ‖diffQuot k h (extendL2 hΩm ((u : H1amb Ω) 0))‖ := norm_restrictL2_le _
     _ ≤ ‖extendL2 hΩm ((u : H1amb Ω) k.succ)‖ :=
         norm_diffQuot_le_of_hasWeakDeriv k (extendL2 hΩm ((u : H1amb Ω) 0))
           (extendL2 hΩm ((u : H1amb Ω) k.succ))
@@ -1446,8 +1446,8 @@ def HasWeakDerivOn (V : Set (EuclideanSpace ℝ (Fin d))) (k : Fin d)
 functions supported in `V` see only the restricted classes, and the whole-space
 integration-by-parts identity localises because both integrands vanish off `V`. -/
 theorem hasWeakDerivOn_of_hasWeakDeriv {V : Set (EuclideanSpace ℝ (Fin d))}
-    (hVm : MeasurableSet V) (k : Fin d) {g w : EucL2 d} (h : HasWeakDeriv k g w) :
-    HasWeakDerivOn V k (restrictL2 hVm g) (restrictL2 hVm w) := by
+    (k : Fin d) {g w : EucL2 d} (h : HasWeakDeriv k g w) :
+    HasWeakDerivOn V k (restrictL2 g) (restrictL2 w) := by
   intro φ hφc hφcs hφV
   have hzero_dk : ∀ x ∉ V, (g x : ℝ) * partialD k φ x = 0 := by
     intro x hx
@@ -1456,18 +1456,18 @@ theorem hasWeakDerivOn_of_hasWeakDeriv {V : Set (EuclideanSpace ℝ (Fin d))}
   have hzero_phi : ∀ x ∉ V, (w x : ℝ) * φ x = 0 := by
     intro x hx
     rw [show φ x = 0 from image_eq_zero_of_notMem_tsupport (fun hc => hx (hφV hc)), mul_zero]
-  calc ∫ x in V, (restrictL2 hVm g x : ℝ) * partialD k φ x
+  calc ∫ x in V, (restrictL2 g x : ℝ) * partialD k φ x
       = ∫ x in V, (g x : ℝ) * partialD k φ x := by
         refine integral_congr_ae ?_
-        filter_upwards [coeFn_restrictL2 hVm g] with x hx; rw [hx]
+        filter_upwards [coeFn_restrictL2 g] with x hx; rw [hx]
     _ = ∫ x, (g x : ℝ) * partialD k φ x :=
         setIntegral_eq_integral_of_forall_compl_eq_zero hzero_dk
     _ = - ∫ x, (w x : ℝ) * φ x := h φ hφc hφcs
     _ = - ∫ x in V, (w x : ℝ) * φ x := by
         rw [setIntegral_eq_integral_of_forall_compl_eq_zero hzero_phi]
-    _ = - ∫ x in V, (restrictL2 hVm w x : ℝ) * φ x := by
+    _ = - ∫ x in V, (restrictL2 w x : ℝ) * φ x := by
         refine congrArg Neg.neg (integral_congr_ae ?_)
-        filter_upwards [coeFn_restrictL2 hVm w] with x hx; rw [hx]
+        filter_upwards [coeFn_restrictL2 w] with x hx; rw [hx]
 
 /-- **First-order gradient bound.** Each gradient component of a weak solution with vanishing
 transport and nonnegative zeroth-order coefficient is bounded in `L²` by the data:
@@ -1526,10 +1526,10 @@ theorem interior_H2_estimate {n : ℕ} (Op : FullEllipticOp (n + 1))
     ∃ C : ℝ, 0 ≤ C ∧ ∀ k i : Fin (n + 1),
       ∃ wki : Lp ℝ 2 (volume.restrict V),
         HasWeakDerivOn V k
-            (restrictL2 hVc.isClosed.measurableSet (extendL2 hΩm ((u : H1amb Ω) i.succ))) wki ∧
+            (restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ))) wki ∧
           ‖wki‖
-            + ‖restrictL2 hVc.isClosed.measurableSet (extendL2 hΩm ((u : H1amb Ω) i.succ))‖
-            + ‖restrictL2 hVc.isClosed.measurableSet (extendL2 hΩm ((u : H1amb Ω) 0))‖
+            + ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ))‖
+            + ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) 0))‖
           ≤ C * (‖f‖ + ‖(u : H1amb Ω) 0‖) := by
   classical
   have hVm : MeasurableSet V := hVc.isClosed.measurableSet
@@ -1543,9 +1543,9 @@ theorem interior_H2_estimate {n : ℕ} (Op : FullEllipticOp (n + 1))
   -- Per-`(k, i)` localised statement with a data-only growth constant. The `V`-restriction of
   -- the cutoff class `ζ · ∂ᵢu` coincides with that of `∂ᵢu`, because `ζ ≡ 1` on `V`.
   have hstep : ∀ k i : Fin (n + 1), ∃ G : ℝ, ∃ wki : Lp ℝ 2 (volume.restrict V),
-      HasWeakDerivOn V k (restrictL2 hVm (extendL2 hΩm ((u : H1amb Ω) i.succ))) wki ∧
-      ‖wki‖ + ‖restrictL2 hVm (extendL2 hΩm ((u : H1amb Ω) i.succ))‖
-          + ‖restrictL2 hVm (extendL2 hΩm ((u : H1amb Ω) 0))‖ ≤ G * P := by
+      HasWeakDerivOn V k (restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ))) wki ∧
+      ‖wki‖ + ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ))‖
+          + ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) 0))‖ ≤ G * P := by
     intro k i
     obtain ⟨w, hw, Cd, hwCd⟩ := interior_secondWeakDeriv Op hΩm hA hb hc T u f hu k i
     have hAB : (extendL2 hΩm (mulTest T.hζ ((u : H1amb Ω) i.succ))
@@ -1563,24 +1563,25 @@ theorem interior_H2_estimate {n : ℕ} (Op : FullEllipticOp (n + 1))
         ae_restrict_mem hVm] with x he1 he2 hmtx hxV
       rw [he1, he2, Set.indicator_of_mem (hVΩ hxV), Set.indicator_of_mem (hVΩ hxV), hmtx]
       simp [T.zeta_eqOn_one hxV]
-    have hDiuEq : restrictL2 hVm (extendL2 hΩm (mulTest T.hζ ((u : H1amb Ω) i.succ)))
-        = restrictL2 hVm (extendL2 hΩm ((u : H1amb Ω) i.succ)) := by
+    have hDiuEq : restrictL2 (Ω := V) (extendL2 hΩm (mulTest T.hζ ((u : H1amb Ω) i.succ)))
+        = restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ)) := by
       apply Lp.ext
-      filter_upwards [coeFn_restrictL2 hVm (extendL2 hΩm (mulTest T.hζ ((u : H1amb Ω) i.succ))),
-        coeFn_restrictL2 hVm (extendL2 hΩm ((u : H1amb Ω) i.succ)), hAB] with x h1 h2 h3
+      filter_upwards [coeFn_restrictL2 (Ω := V)
+          (extendL2 hΩm (mulTest T.hζ ((u : H1amb Ω) i.succ))),
+        coeFn_restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ)), hAB] with x h1 h2 h3
       rw [h1, h2, h3]
-    refine ⟨Cd + dcoef + 1, restrictL2 hVm w, ?_, ?_⟩
-    · rw [← hDiuEq]; exact hasWeakDerivOn_of_hasWeakDeriv hVm k hw
-    · have h1 : ‖restrictL2 hVm w‖ ≤ Cd * P := le_trans (norm_restrictL2_le hVm w) hwCd
-      have h2 : ‖restrictL2 hVm (extendL2 hΩm ((u : H1amb Ω) i.succ))‖ ≤ dcoef * P := by
-        refine le_trans (norm_restrictL2_le hVm _) ?_
+    refine ⟨Cd + dcoef + 1, restrictL2 w, ?_, ?_⟩
+    · rw [← hDiuEq]; exact hasWeakDerivOn_of_hasWeakDeriv k hw
+    · have h1 : ‖restrictL2 (Ω := V) w‖ ≤ Cd * P := le_trans (norm_restrictL2_le w) hwCd
+      have h2 : ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ))‖ ≤ dcoef * P := by
+        refine le_trans (norm_restrictL2_le _) ?_
         rw [norm_extendL2]; exact hdiu i
-      have h3 : ‖restrictL2 hVm (extendL2 hΩm ((u : H1amb Ω) 0))‖ ≤ 1 * P := by
-        refine le_trans (norm_restrictL2_le hVm _) ?_
+      have h3 : ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) 0))‖ ≤ 1 * P := by
+        refine le_trans (norm_restrictL2_le _) ?_
         rw [norm_extendL2, one_mul, hPdef]
         linarith only [norm_nonneg f]
-      calc ‖restrictL2 hVm w‖ + ‖restrictL2 hVm (extendL2 hΩm ((u : H1amb Ω) i.succ))‖
-              + ‖restrictL2 hVm (extendL2 hΩm ((u : H1amb Ω) 0))‖
+      calc ‖restrictL2 (Ω := V) w‖ + ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ))‖
+              + ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) 0))‖
           ≤ Cd * P + dcoef * P + 1 * P := add_le_add (add_le_add h1 h2) h3
         _ = (Cd + dcoef + 1) * P := by ring
   choose G wki hHWD hbound using hstep

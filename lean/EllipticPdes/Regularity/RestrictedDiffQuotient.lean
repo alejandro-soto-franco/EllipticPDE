@@ -49,30 +49,30 @@ variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))}
 `extendL2`. Built from the Mathlib restriction of `Lp` classes to a restricted measure
 (`MeasureTheory.LpToLpRestrictCLM`), non-expansive since `volume.restrict Ω ≤ volume`
 (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1). -/
-def restrictL2 (hΩm : MeasurableSet Ω) : EucL2 d →L[ℝ] L2D Ω :=
+def restrictL2 : EucL2 d →L[ℝ] L2D Ω :=
   LpToLpRestrictCLM (EuclideanSpace ℝ (Fin d)) ℝ ℝ volume 2 Ω
 
-/-- The a.e. representative of the restriction: `restrictL2 hΩm g =ᵐ g` on `volume.restrict Ω`. -/
-theorem coeFn_restrictL2 (hΩm : MeasurableSet Ω) (g : EucL2 d) :
-    (restrictL2 hΩm g : EuclideanSpace ℝ (Fin d) → ℝ)
+/-- The a.e. representative of the restriction: `restrictL2 g =ᵐ g` on `volume.restrict Ω`. -/
+theorem coeFn_restrictL2 (g : EucL2 d) :
+    (restrictL2 (Ω := Ω) g : EuclideanSpace ℝ (Fin d) → ℝ)
       =ᵐ[volume.restrict Ω] (g : EuclideanSpace ℝ (Fin d) → ℝ) :=
   LpToLpRestrictCLM_coeFn ℝ Ω g
 
 /-- **Restriction is a left inverse of extension by zero.** Extending a class by zero to
 the whole space and restricting back to `Ω` recovers the original class. -/
 theorem restrictL2_extendL2 (hΩm : MeasurableSet Ω) (g : L2D Ω) :
-    restrictL2 hΩm (extendL2 hΩm g) = g := by
+    restrictL2 (extendL2 hΩm g) = g := by
   refine Lp.ext ?_
-  filter_upwards [coeFn_restrictL2 hΩm (extendL2 hΩm g),
+  filter_upwards [coeFn_restrictL2 (extendL2 hΩm g),
       ae_restrict_of_ae (coeFn_extendL2 hΩm g), ae_restrict_mem hΩm] with x hx1 hx2 hx3
   rw [hx1, hx2, Set.indicator_of_mem hx3]
 
 /-- **`restrictL2` is the adjoint of `extendL2`.** Every restricted inner product against
-`restrictL2 hΩm w` equals the whole-space inner product of `extendL2 hΩm g` against `w`,
+`restrictL2 w` equals the whole-space inner product of `extendL2 hΩm g` against `w`,
 turning restricted-domain inner products into whole-space ones so that
 `diffQuot_inner_adjoint` can be applied directly. -/
 theorem extendL2_inner_restrictL2 (hΩm : MeasurableSet Ω) (g : L2D Ω) (w : EucL2 d) :
-    ⟪extendL2 hΩm g, w⟫ = ⟪g, restrictL2 hΩm w⟫ := by
+    ⟪extendL2 hΩm g, w⟫ = ⟪g, restrictL2 w⟫ := by
   have hLHS : ⟪extendL2 hΩm g, w⟫ = ∫ x in Ω, (g x : ℝ) * (w x : ℝ) ∂volume := by
     rw [L2.inner_def, ← integral_indicator hΩm]
     refine integral_congr_ae ?_
@@ -81,10 +81,10 @@ theorem extendL2_inner_restrictL2 (hΩm : MeasurableSet Ω) (g : L2D Ω) (w : Eu
     by_cases hxΩ : x ∈ Ω
     · simp [Set.indicator_of_mem hxΩ, mul_comm]
     · simp [Set.indicator_of_notMem hxΩ]
-  have hRHS : ⟪g, restrictL2 hΩm w⟫ = ∫ x in Ω, (g x : ℝ) * (w x : ℝ) ∂volume := by
+  have hRHS : ⟪g, restrictL2 w⟫ = ∫ x in Ω, (g x : ℝ) * (w x : ℝ) ∂volume := by
     rw [L2.inner_def]
     refine integral_congr_ae ?_
-    filter_upwards [coeFn_restrictL2 hΩm w] with x hx
+    filter_upwards [coeFn_restrictL2 w] with x hx
     rw [RCLike.inner_apply, conj_trivial, hx, mul_comm]
   exact hLHS.trans hRHS.symm
 
@@ -96,7 +96,7 @@ for boundedness; the identity with the honest whole-space difference quotient ne
 support condition, see `extendL2_diffQuotD_eq`). Evans, *Partial Differential Equations*
 (2nd ed.), §6.3.1. -/
 def diffQuotD (k : Fin d) (h : ℝ) (hΩm : MeasurableSet Ω) : L2D Ω →L[ℝ] L2D Ω :=
-  h⁻¹ • ((restrictL2 hΩm).comp
+  h⁻¹ • ((restrictL2).comp
       ((transL2 (hshift k h)).toContinuousLinearMap.comp (extendL2 hΩm).toContinuousLinearMap)
     - ContinuousLinearMap.id ℝ (L2D Ω))
 
@@ -105,19 +105,19 @@ def diffQuotD (k : Fin d) (h : ℝ) (hΩm : MeasurableSet Ω) : L2D Ω →L[ℝ]
 theorem coeFn_diffQuotD (k : Fin d) (h : ℝ) (hΩm : MeasurableSet Ω) (g : L2D Ω) :
     (diffQuotD k h hΩm g : EuclideanSpace ℝ (Fin d) → ℝ)
       =ᵐ[volume.restrict Ω] fun x => ((extendL2 hΩm g) (x + hshift k h) - g x) / h := by
-  have htrans : (restrictL2 hΩm (transL2 (hshift k h) (extendL2 hΩm g))
+  have htrans : (restrictL2 (Ω := Ω) (transL2 (hshift k h) (extendL2 hΩm g))
         : EuclideanSpace ℝ (Fin d) → ℝ)
       =ᵐ[volume.restrict Ω] fun x => (extendL2 hΩm g) (x + hshift k h) := by
-    filter_upwards [coeFn_restrictL2 hΩm (transL2 (hshift k h) (extendL2 hΩm g)),
+    filter_upwards [coeFn_restrictL2 (transL2 (hshift k h) (extendL2 hΩm g)),
         ae_restrict_of_ae (coeFn_transL2 (hshift k h) (extendL2 hΩm g))] with x hx1 hx2
     rw [hx1, hx2]
   have hval : diffQuotD k h hΩm g
-      = h⁻¹ • (restrictL2 hΩm (transL2 (hshift k h) (extendL2 hΩm g)) - g) := by
+      = h⁻¹ • (restrictL2 (transL2 (hshift k h) (extendL2 hΩm g)) - g) := by
     simp [diffQuotD, ContinuousLinearMap.smul_apply, ContinuousLinearMap.sub_apply,
       ContinuousLinearMap.comp_apply, LinearIsometry.coe_toContinuousLinearMap]
   rw [hval]
-  filter_upwards [Lp.coeFn_smul h⁻¹ (restrictL2 hΩm (transL2 (hshift k h) (extendL2 hΩm g)) - g),
-      Lp.coeFn_sub (restrictL2 hΩm (transL2 (hshift k h) (extendL2 hΩm g))) g, htrans]
+  filter_upwards [Lp.coeFn_smul h⁻¹ (restrictL2 (transL2 (hshift k h) (extendL2 hΩm g)) - g),
+      Lp.coeFn_sub (restrictL2 (transL2 (hshift k h) (extendL2 hΩm g))) g, htrans]
     with x hx1 hx2 hx3
   simp only [hx1, Pi.smul_apply, hx2, Pi.sub_apply, hx3, smul_eq_mul, div_eq_inv_mul]
 
