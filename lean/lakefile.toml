@@ -3,6 +3,13 @@ version = "0.1.0"
 keywords = ["math", "pde", "elliptic"]
 defaultTargets = ["EllipticDirichlet"]
 
+# Environment-level lint gate, mirroring Mathlib's own configuration. `lake lint`
+# runs Batteries' linter frontend over the elaborated `Environment`, covering the
+# checks a text-based linter cannot reach: docBlame, unusedArguments, simpNF,
+# synTaut and unusedHavesSuffices.
+lintDriver = "batteries/runLinter"
+lintDriverArgs = ["EllipticDirichlet"]
+
 [leanOptions]
 pp.unicode.fun = true
 relaxedAutoImplicit = false
