@@ -10,7 +10,7 @@ formulation seeks $u\in H_0^1(\Omega)$ with $B[u,v]=\langle f,v\rangle$ for all
 $v\in H_0^1(\Omega)$, where $B$ is the associated bilinear form.
 
 The development machine-verifies, `sorry`-free, for the general operator
-`EllipticDirichlet.Sobolev.FullEllipticOp`:
+`EllipticPdes.Sobolev.FullEllipticOp`:
 
 - existence and uniqueness of the weak solution,
 - the Gårding inequality,
