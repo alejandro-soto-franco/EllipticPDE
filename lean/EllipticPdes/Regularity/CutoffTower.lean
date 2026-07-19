@@ -33,7 +33,7 @@ This file provides:
 * `exists_margin_of_isCompact_subset_isOpen`: the positive-margin fact for a compact-in-open
   pair, from `IsCompact.exists_cthickening_subset_open`.
 * `CutoffTower`: the bundle of the three nested cutoffs and the margin.
-* `cutoffTower_of_isCompact_subset_isOpen`: existence of a `CutoffTower` for every compact `V`
+* `cutoffTowerOfIsCompactSubsetIsOpen`: existence of a `CutoffTower` for every compact `V`
   inside an open `Ω`, built by three applications of the Urysohn-type cutoff lemma followed by
   one application of the margin lemma.
 -/
@@ -164,7 +164,7 @@ based at `V` exists: three applications of `exists_isTestFn_one_nhdsSet_of_isCom
 `ζ`, `ξ`, `θ` in turn (each new cutoff's compact set is the topological support of the
 previous one, which stays inside `Ω`), and `exists_margin_of_isCompact_subset_isOpen` supplies
 the final margin on `tsupport θ`. -/
-noncomputable def cutoffTower_of_isCompact_subset_isOpen {Ω V : Set (EuclideanSpace ℝ (Fin d))}
+noncomputable def cutoffTowerOfIsCompactSubsetIsOpen {Ω V : Set (EuclideanSpace ℝ (Fin d))}
     (hV : IsCompact V) (hΩ : IsOpen Ω) (hVΩ : V ⊆ Ω) : CutoffTower Ω V := by
   choose ζ hζ hζ_one hζ_Icc using
     exists_isTestFn_one_nhdsSet_of_isCompact hV hΩ hVΩ

@@ -1533,7 +1533,7 @@ theorem interior_H2_estimate {n : ℕ} (Op : FullEllipticOp (n + 1))
           ≤ C * (‖f‖ + ‖(u : H1amb Ω) 0‖) := by
   classical
   have hVm : MeasurableSet V := hVc.isClosed.measurableSet
-  set T := cutoffTower_of_isCompact_subset_isOpen hVc hΩo hVΩ with hT
+  set T := cutoffTowerOfIsCompactSubsetIsOpen hVc hΩo hVΩ with hT
   set P : ℝ := ‖f‖ + ‖(u : H1amb Ω) 0‖ with hPdef
   have hP0 : (0 : ℝ) ≤ P := by rw [hPdef]; positivity
   set dcoef : ℝ := 1 / (2 * Real.sqrt Op.lam) with hdcoefdef
