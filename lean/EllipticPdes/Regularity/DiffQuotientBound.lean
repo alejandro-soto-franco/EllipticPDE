@@ -561,7 +561,7 @@ passing to the limit in the discrete integration-by-parts identity
 test function `ζ`, identifies `g'` as the weak derivative (Evans, *Partial Differential
 Equations* (2nd ed.), §5.8.2, Theorem 3). -/
 theorem weakDeriv_of_diffQuot_bounded (k : Fin d) (g : EucL2 d) (M : ℝ)
-    (hM : 0 ≤ M) (hb : ∀ h : ℝ, h ≠ 0 → ‖diffQuot k h g‖ ≤ M) :
+    (hb : ∀ h : ℝ, h ≠ 0 → ‖diffQuot k h g‖ ≤ M) :
     ∃ g' : EucL2 d, HasWeakDeriv k g g' ∧ ‖g'‖ ≤ M := by
   set hseq : ℕ → ℝ := fun m => 1 / (m + 1) with hhseq
   have hseq_ne : ∀ m, hseq m ≠ 0 := fun m => by positivity

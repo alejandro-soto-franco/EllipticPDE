@@ -576,6 +576,10 @@ theorem solvable_iff_orthogonal_solSpaceStar (hK : IsCompactOperator (Op.opK Ω)
     exact h w hw
 
 set_option maxHeartbeats 1600000 in
+-- The bijectivity proof for the restricted adjoint `Trest` unfolds nested
+-- `ContinuousLinearMap.adjoint` and `LinearMap.restrict` coercions through `simpa`, each
+-- re-resolving the Hilbert-space instance chain on `H01 Ω`; the default budget is
+-- insufficient for the combined injectivity and surjectivity arguments.
 /-- **`dim N = dim N*` for the elliptic problem** (Evans §6.2.3, Theorem 4(ii)). The
 space of weak
 solutions of the homogeneous problem and the space of weak solutions of the transpose

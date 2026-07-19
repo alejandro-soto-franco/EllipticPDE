@@ -1424,10 +1424,10 @@ theorem interior_secondWeakDeriv (Op : FullEllipticOp d) (hΩm : MeasurableSet �
     ∃ w : EucL2 d,
       HasWeakDeriv k (extendL2 hΩm (mulTest T.hζ ((u : H1amb Ω) i.succ))) w
       ∧ ∃ Cd : ℝ, ‖w‖ ≤ Cd * (‖f‖ + ‖(u : H1amb Ω) 0‖) := by
-  obtain ⟨M, hM0, hMbd, Cd, hMCd⟩ :=
+  obtain ⟨M, _hM0, hMbd, Cd, hMCd⟩ :=
     interior_diffQuot_norm_bound Op hΩm hA hb0 hc0 T u f hu k i
   obtain ⟨w, hw, hwn⟩ :=
-    weakDeriv_of_diffQuot_bounded k (extendL2 hΩm (mulTest T.hζ ((u : H1amb Ω) i.succ))) M hM0 hMbd
+    weakDeriv_of_diffQuot_bounded k (extendL2 hΩm (mulTest T.hζ ((u : H1amb Ω) i.succ))) M hMbd
   exact ⟨w, hw, Cd, le_trans hwn hMCd⟩
 
 /-! ### §4: the interior H² estimate -/
@@ -1473,7 +1473,7 @@ theorem hasWeakDerivOn_of_hasWeakDeriv {V : Set (EuclideanSpace ℝ (Fin d))}
 transport and nonnegative zeroth-order coefficient is bounded in `L²` by the data:
 `‖∂ᵢu‖ ≤ (1 / (2 √λ)) (‖f‖ + ‖u₀‖)`. This is the first-order energy estimate
 `firstOrder_energy_le` combined with the arithmetic-geometric mean inequality. -/
-private lemma firstOrder_gradNorm_le (Op : FullEllipticOp d) (hΩm : MeasurableSet Ω)
+private lemma firstOrder_gradNorm_le (Op : FullEllipticOp d)
     (hb0 : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
     (hc0 : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x) (u : H01 Ω) (f : L2D Ω)
     (hu : ∀ w : H01 Ω, Op.fullBilin Ω u w
@@ -1539,7 +1539,7 @@ theorem interior_H2_estimate {n : ℕ} (Op : FullEllipticOp (n + 1))
   set dcoef : ℝ := 1 / (2 * Real.sqrt Op.lam) with hdcoefdef
   have hdcoef0 : (0 : ℝ) ≤ dcoef := by rw [hdcoefdef]; positivity
   have hdiu : ∀ i : Fin (n + 1), ‖(u : H1amb Ω) i.succ‖ ≤ dcoef * P := fun i =>
-    firstOrder_gradNorm_le Op hΩm hb hc u f hu i
+    firstOrder_gradNorm_le Op hb hc u f hu i
   -- Per-`(k, i)` localised statement with a data-only growth constant. The `V`-restriction of
   -- the cutoff class `ζ · ∂ᵢu` coincides with that of `∂ᵢu`, because `ζ ≡ 1` on `V`.
   have hstep : ∀ k i : Fin (n + 1), ∃ G : ℝ, ∃ wki : Lp ℝ 2 (volume.restrict V),

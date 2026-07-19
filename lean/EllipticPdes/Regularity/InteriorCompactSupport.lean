@@ -131,7 +131,7 @@ and the commutator term (the coefficient's own difference quotient, times the fi
 `volume`-a.e.: `Dₖʰ(a · w) = (τ_{h eₖ} a) · Dₖʰw + (Dₖʰa) · w` for `w = extendL2 g` (Evans,
 *Partial Differential Equations* (2nd ed.), §6.3.1). -/
 theorem coeFn_diffQuot_mul_coeff {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩm : MeasurableSet Ω)
-    (A : EllipticCoeff d) (i j k : Fin d) {h : ℝ} (hh : h ≠ 0) (g : L2D Ω) :
+    (A : EllipticCoeff d) (i j k : Fin d) {h : ℝ} (g : L2D Ω) :
     (diffQuot k h (extendL2 hΩm (A.actL i j g)) : EuclideanSpace ℝ (Fin d) → ℝ)
       =ᵐ[volume] fun x =>
         A.a (x + hshift k h) i j * (diffQuot k h (extendL2 hΩm g) x)
