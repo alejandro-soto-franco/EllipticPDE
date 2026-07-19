@@ -202,7 +202,7 @@ theorem hneg_characterization (Ω : Set (EuclideanSpace ℝ (Fin d)))
 /-- The `L² ⊆ H⁻¹` embedding (Evans §5.9.1, Theorem 1(iii)) is the representation by
 the tuple
 `(f, 0, …, 0)`: a single `L²` function with no gradient terms. -/
-lemma isHnegRepr_single_l2Functional (Ω : Set (EuclideanSpace ℝ (Fin d))) (f : L2D Ω) :
+private lemma isHnegRepr_single_l2Functional (Ω : Set (EuclideanSpace ℝ (Fin d))) (f : L2D Ω) :
     IsHnegRepr Ω (PiLp.single 2 (0 : Fin (d + 1)) f) (l2Functional Ω f) := by
   intro v
   rw [l2Functional_apply, PiLp.single_eq_same]

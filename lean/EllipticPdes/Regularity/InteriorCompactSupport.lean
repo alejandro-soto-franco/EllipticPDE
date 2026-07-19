@@ -77,7 +77,7 @@ whole-space `EucL2 d` classes `extendL2 hΩm (ζ · ∂ᵢu)`, is bounded by the
 gradient data on which the difference-quotient method of the interior second-derivative
 estimate operates (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1;
 Gilbarg-Trudinger, *Elliptic PDE of Second Order*, Theorem 8.8). -/
-theorem extendL2_cutoffGrad_energy_le (Op : FullEllipticOp d)
+private theorem extendL2_cutoffGrad_energy_le (Op : FullEllipticOp d)
     {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩm : MeasurableSet Ω)
     {ζ : EuclideanSpace ℝ (Fin d) → ℝ} (hζ : IsTestFn Ω ζ) (u : H01 Ω) (f : L2D Ω)
     (hu : ∀ v : H01 Ω, Op.fullBilin Ω u v

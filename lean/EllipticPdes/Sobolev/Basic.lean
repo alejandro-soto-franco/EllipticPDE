@@ -337,7 +337,7 @@ lemma testGraph_mem_W12 {Ω : Set (EuclideanSpace ℝ (Fin d))}
 
 /-- `H₀¹(Ω) ⊆ W^{1,2}(Ω)`: every element of `H₀¹` is genuinely a function with a weak
 `L²` gradient. -/
-lemma H01_le_W12 (Ω : Set (EuclideanSpace ℝ (Fin d))) : H01 Ω ≤ W12 Ω := by
+private lemma H01_le_W12 (Ω : Set (EuclideanSpace ℝ (Fin d))) : H01 Ω ≤ W12 Ω := by
   apply Submodule.topologicalClosure_minimal
   · rw [Submodule.span_le]
     rintro U ⟨φ, h, rfl⟩

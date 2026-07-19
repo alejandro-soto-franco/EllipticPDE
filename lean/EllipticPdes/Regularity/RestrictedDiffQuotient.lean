@@ -60,7 +60,7 @@ theorem coeFn_restrictL2 (g : EucL2 d) :
 
 /-- **Restriction is a left inverse of extension by zero.** Extending a class by zero to
 the whole space and restricting back to `Ω` recovers the original class. -/
-theorem restrictL2_extendL2 (hΩm : MeasurableSet Ω) (g : L2D Ω) :
+private theorem restrictL2_extendL2 (hΩm : MeasurableSet Ω) (g : L2D Ω) :
     restrictL2 (extendL2 hΩm g) = g := by
   refine Lp.ext ?_
   filter_upwards [coeFn_restrictL2 (extendL2 hΩm g),

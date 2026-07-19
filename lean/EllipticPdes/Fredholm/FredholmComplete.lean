@@ -457,7 +457,7 @@ def solSpace : Submodule ℝ (H01 Ω) := LinearMap.ker (Op.opA Ω).toLinearMap
 
 /-- Membership in `solSpace` is exactly being a weak solution of the homogeneous
 problem: `B[u, v] = 0` against every `v ∈ H₀¹(Ω)`. -/
-lemma mem_solSpace_iff (u : H01 Ω) :
+private lemma mem_solSpace_iff (u : H01 Ω) :
     u ∈ Op.solSpace Ω ↔ ∀ v : H01 Ω, Op.fullBilin Ω u v = 0 := by
   rw [solSpace, LinearMap.mem_ker, ContinuousLinearMap.coe_coe]
   constructor
@@ -528,7 +528,7 @@ def solSpaceStar : Submodule ℝ (H01 Ω) :=
 
 /-- Membership in `solSpaceStar` is exactly being a weak solution of the transpose
 problem: `B[v, u] = 0` against every `v ∈ H₀¹(Ω)`. -/
-lemma mem_solSpaceStar_iff (u : H01 Ω) :
+private lemma mem_solSpaceStar_iff (u : H01 Ω) :
     u ∈ Op.solSpaceStar Ω ↔ ∀ v : H01 Ω, Op.fullBilin Ω v u = 0 := by
   rw [solSpaceStar, LinearMap.mem_ker, ContinuousLinearMap.coe_coe]
   constructor

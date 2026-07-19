@@ -188,7 +188,7 @@ lemma EllipticCoeff.bilin_symm (A : EllipticCoeff d)
 field vanishes (`b ≡ 0`) and the matrix is symmetric: the principal part is symmetric by
 `EllipticCoeff.bilin_symm`, the transport terms vanish, and the zeroth term `⟪c u₀, v₀⟫` is
 symmetric. -/
-lemma FullEllipticOp.fullBilin_symm (Op : FullEllipticOp d)
+private lemma FullEllipticOp.fullBilin_symm (Op : FullEllipticOp d)
     (Ω : Set (EuclideanSpace ℝ (Fin d)))
     (hb : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
     (hAsymm : ∀ᵐ x ∂(volume.restrict Ω), ∀ i j, Op.a x i j = Op.a x j i)

@@ -174,7 +174,7 @@ def gardingγ : ℝ :=
   Op.lam / 2 + Op.Csup + (d : ℝ) * Op.Bsup ^ 2 / (2 * Op.lam)
 
 /-- The Gårding shift constant `γ` is non-negative. -/
-lemma gardingγ_nonneg : 0 ≤ Op.gardingγ := by
+private lemma gardingγ_nonneg : 0 ≤ Op.gardingγ := by
   have : (0 : ℝ) < 2 * Op.lam := by have := Op.lam_pos; linarith
   unfold gardingγ
   have h1 : (0 : ℝ) ≤ Op.lam / 2 := by have := Op.lam_pos; linarith

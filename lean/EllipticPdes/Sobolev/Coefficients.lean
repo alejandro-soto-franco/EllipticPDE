@@ -82,7 +82,7 @@ def mulCoeffLM {Ω : Set (EuclideanSpace ℝ (Fin d))}
     ring
 
 /-- Simp lemma: `mulCoeffLM hf hM g = mulCoeffCls hf hM g`. -/
-@[simp] lemma mulCoeffLM_apply {Ω : Set (EuclideanSpace ℝ (Fin d))}
+@[simp] private lemma mulCoeffLM_apply {Ω : Set (EuclideanSpace ℝ (Fin d))}
     {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : Measurable f) {M : ℝ}
     (hM : ∀ᵐ x ∂(volume.restrict Ω), |f x| ≤ M) (g : L2D Ω) :
     mulCoeffLM hf hM g = mulCoeffCls hf hM g := rfl
