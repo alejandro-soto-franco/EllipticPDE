@@ -3,7 +3,7 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.BilinearForm
+import EllipticPdes.Form.BilinearForm
 import EllipticPdes.Poincare.BoxSlice
 
 /-!

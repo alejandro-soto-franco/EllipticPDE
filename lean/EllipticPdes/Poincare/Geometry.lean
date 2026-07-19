@@ -5,7 +5,7 @@ Authors: Alejandro Soto Franco
 -/
 import EllipticPdes.Poincare.Domain
 import EllipticPdes.Sobolev.Basic
-import EllipticPdes.BilinearForm
+import EllipticPdes.Form.BilinearForm
 
 /-!
 # Wiring the test-function Poincaré bound from the box geometry

@@ -14,11 +14,11 @@ import EllipticPdes.Poincare.Density
 import EllipticPdes.Poincare.Geometry
 import EllipticPdes.Poincare.BoxSlice
 import EllipticPdes.Poincare.BoundedDomain
-import EllipticPdes.BilinearForm
-import EllipticPdes.Hneg
-import EllipticPdes.Existence
-import EllipticPdes.GeneralForm
-import EllipticPdes.Garding
+import EllipticPdes.Form.BilinearForm
+import EllipticPdes.Form.Hneg
+import EllipticPdes.Existence.Existence
+import EllipticPdes.Form.GeneralForm
+import EllipticPdes.Existence.Garding
 import EllipticPdes.Regularity.Caccioppoli
 import EllipticPdes.Regularity.InteriorCompactSupport
 import EllipticPdes.Regularity.CoeffC1
@@ -34,12 +34,12 @@ import EllipticPdes.Embedding.MorreyOneDim
 import EllipticPdes.Embedding.RayIntegral
 import EllipticPdes.Embedding.Morrey
 import EllipticPdes.Embedding.WeakDerivBridge
-import EllipticPdes.Fredholm
-import EllipticPdes.FredholmComplete
-import EllipticPdes.SpectrumSigma
-import EllipticPdes.Compactness
-import EllipticPdes.Spectrum
-import EllipticPdes.RellichDischarge
+import EllipticPdes.Fredholm.Fredholm
+import EllipticPdes.Fredholm.FredholmComplete
+import EllipticPdes.Spectrum.SpectrumSigma
+import EllipticPdes.Fredholm.Compactness
+import EllipticPdes.Spectrum.Spectrum
+import EllipticPdes.Spectrum.RellichDischarge
 import EllipticPdes.BoundedInstances
 
 /-!

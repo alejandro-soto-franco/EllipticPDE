@@ -3,9 +3,9 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.SpectrumSigma
-import EllipticPdes.Compactness
-import EllipticPdes.RellichDischarge
+import EllipticPdes.Spectrum.SpectrumSigma
+import EllipticPdes.Fredholm.Compactness
+import EllipticPdes.Spectrum.RellichDischarge
 
 /-!
 # Bounded-domain instances of the Σ-spectrum results
