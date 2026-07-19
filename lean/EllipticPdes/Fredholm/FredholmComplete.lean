@@ -24,7 +24,7 @@ nonzero eigenvalues are finite-dimensional
 
 Remaining for the full Theorem 4(ii)/(iii) statement (planned here): closed range of
 `1 - opK`, the adjoint problem via the transpose form `B(·, v)`, the solvability
-criterion `Lu = f` solvable ⟺ `f ⊥ N*`, and `dim N = dim N*`.
+criterion `Lu = f` solvable ↔ `f ⊥ N*`, and `dim N = dim N*`.
 -/
 
 open MeasureTheory InnerProductSpace
@@ -469,7 +469,7 @@ lemma mem_solSpace_iff (u : H01 Ω) :
 
 /-- The homogeneous solution space is the eigenspace of the compact part `opK` at the
 eigenvalue `1`: since `opA = opE ∘ (1 - opK)` with `opE` an equivalence,
-`opA u = 0 ⟺ opK u = u`. -/
+`opA u = 0 ↔ opK u = u`. -/
 lemma solSpace_eq_eigenspace :
     Op.solSpace Ω = Module.End.eigenspace (Op.opK Ω).toLinearMap 1 := by
   ext u
@@ -506,7 +506,7 @@ theorem finiteDimensional_solSpace (hK : IsCompactOperator (Op.opK Ω)) :
 the Rellich-Kondrachov input the range of `opA` -- the set of Riesz representatives of
 solvable right-hand sides -- is closed: `opA = opE ∘ (1 - opK)` with `opE` a
 homeomorphism, and `1 - opK` has closed range by Riesz theory. This is the geometric
-input for the solvability criterion `Lu = f solvable ⟺ f ⊥ N*`. -/
+input for the solvability criterion `Lu = f solvable ↔ f ⊥ N*`. -/
 theorem isClosed_range_opA (hK : IsCompactOperator (Op.opK Ω)) :
     IsClosed (Set.range (Op.opA Ω)) := by
   have h1 : IsClosed (Set.range (1 - Op.opK Ω : H01 Ω →L[ℝ] H01 Ω)) :=

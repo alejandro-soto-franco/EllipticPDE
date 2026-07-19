@@ -105,9 +105,9 @@ theorem exists_margin_of_isCompact_subset_isOpen {K Ω : Set (EuclideanSpace ℝ
 /-- **The nested cutoff tower.** Three test functions on `Ω`: `ζ` equal to `1` on the base
 compact set `V`, `ξ` equal to `1` on the support of `ζ`, `θ` equal to `1` on the support of
 `ξ`, together with a positive coordinate-shift margin valid on the support of `θ`. This is
-exactly the tower `ζ ⪯ ξ ⪯ θ` that localises the difference-quotient method of the interior
-`H²` estimate (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1; Gilbarg-Trudinger,
-*Elliptic PDE of Second Order*, Theorem 8.8). -/
+exactly the tower `ζ`, `ξ`, `θ` nested in that support-inclusion order, localising the
+difference-quotient method of the interior `H²` estimate (Evans, *Partial Differential
+Equations* (2nd ed.), §6.3.1; Gilbarg-Trudinger, *Elliptic PDE of Second Order*, Theorem 8.8). -/
 structure CutoffTower (Ω V : Set (EuclideanSpace ℝ (Fin d))) where
   /-- The innermost cutoff, equal to `1` on `V`. -/
   ζ : EuclideanSpace ℝ (Fin d) → ℝ

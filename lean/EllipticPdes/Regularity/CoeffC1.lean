@@ -33,7 +33,8 @@ variable {d : ℕ}
 
 /-- A `C¹` ellipticity bundle: the coefficient matrix is continuously differentiable with a
 global bound `A₁` on the first derivatives of every entry. Faithful to `aᵢⱼ ∈ C¹` for the
-interior estimate, where only `a ∈ C¹(W̄)` with `W ⋐ Ω` bounded matters, so `A₁ < ∞`. -/
+interior estimate, where only `a ∈ C¹(closure W)` with `W ⋐ Ω` bounded matters, so
+`A₁ < ∞`. -/
 structure IsC1Coeff (A : EllipticCoeff d) where
   /-- Every coefficient entry is continuously differentiable. -/
   contDiff : ∀ i j, ContDiff ℝ 1 (fun x => A.a x i j)
