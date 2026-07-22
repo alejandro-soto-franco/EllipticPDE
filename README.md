@@ -21,8 +21,9 @@ The development machine-verifies, `sorry`-free, for the general operator
 The analytic content reduces to the one-dimensional Poincaré inequality,
 lifted to a box by Fubini's theorem and averaging.
 
-Regularity of the weak solution (interior $H^2$, higher $H^k$, and Schauder
-$C^{k,\alpha}$ estimates) is a roadmap item, not yet formalised.
+Interior $H^2$ regularity of the weak solution is formalised, as
+`EllipticPdes.Regularity.interior_H2_estimate`. Higher $H^k$ regularity and
+Schauder $C^{k,\alpha}$ estimates are roadmap items, not yet formalised.
 
 Authors: Alejandro José Soto Franco and Kobe Marshall-Stevens.
 

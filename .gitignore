@@ -47,3 +47,6 @@ __pycache__/
 
 # committed manuscript label snapshot read by the litreview via xr-hyper
 !/latex/litreview/manuscript.aux
+
+# Local direnv (machine-specific venv paths)
+.envrc

@@ -14,9 +14,9 @@ Upstreamed to Mathlib as
 This file re-exports the Mathlib declarations under the
 `EllipticPdes.Poincare` namespace for backward compatibility.
 
-* `intervalIntegral_mul_sq_le` — Cauchy-Schwarz for `∫ f g`.
-* `sq_intervalIntegral_le`     — the `g = 1` special case.
-* `poincare_oneDim`            — the one-dimensional Poincaré inequality.
+* `intervalIntegral_mul_sq_le`: Cauchy-Schwarz for `∫ f g`.
+* `sq_intervalIntegral_le`: the `g = 1` special case.
+* `poincare_oneDim`: the one-dimensional Poincaré inequality.
 -/
 
 namespace EllipticPdes.Poincare

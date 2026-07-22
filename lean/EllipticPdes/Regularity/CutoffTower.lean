@@ -25,7 +25,7 @@ losing mass.
 This file provides:
 
 * `exists_isTestFn_one_nhdsSet_of_isCompact`: the underlying smooth Urysohn-type cutoff
-  lemma — for `K` compact inside an open `U`, a test function on `U` valued in `[0,1]` and
+  lemma: for `K` compact inside an open `U`, a test function on `U` valued in `[0,1]` and
   equal to `1` on a neighbourhood of `K`. This specialises the classical smooth-partition-of-
   unity construction (`Mathlib.Geometry.Manifold.PartitionOfUnity`) to the trivial self-chart
   manifold structure that `EuclideanSpace ℝ (Fin d)` carries as a finite-dimensional normed

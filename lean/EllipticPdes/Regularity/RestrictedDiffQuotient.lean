@@ -144,7 +144,7 @@ def diffQuotG (k : Fin d) (h : ℝ) (hΩm : MeasurableSet Ω) : H1amb Ω →L[�
     PiLp.coe_continuousLinearEquiv, PiLp.toLp_apply, ContinuousLinearMap.pi_apply,
     ContinuousLinearMap.proj_apply]
 
-/-! ### B4: Whole-space compatibility — the integration-by-parts bridge -/
+/-! ### B4: Whole-space compatibility, the integration-by-parts bridge -/
 
 /-- **Whole-space compatibility.** On classes whose whole-space translate stays supported
 in `Ω`, the interior difference quotient's extension by zero equals the honest whole-space
