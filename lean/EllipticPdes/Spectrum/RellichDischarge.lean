@@ -4,9 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
 import EllipticPdes.Spectrum.Spectrum
-import Mathlib.Analysis.FunctionalSpaces.FrechetKolmogorov
-import Mathlib.Analysis.FunctionalSpaces.LpExtendByZero
-import Mathlib.Analysis.FunctionalSpaces.EuclideanFunctionalNorm
+import EllipticPdes.Analysis.FrechetKolmogorov
+import EllipticPdes.Analysis.LpExtendByZero
+import EllipticPdes.Analysis.EuclideanFunctionalNorm
 
 /-!
 # Discharging the Rellich-Kondrachov compact embedding
@@ -14,7 +14,7 @@ import Mathlib.Analysis.FunctionalSpaces.EuclideanFunctionalNorm
 `Compactness.lean` reduces the Fredholm theory to the single analytic hypothesis
 `IsCompactOperator (embL2 Ω)`, the Rellich-Kondrachov compact embedding `H₀¹(Ω) ↪ L²(Ω)`. Here we
 prove it for bounded measurable `Ω`, consuming the Fréchet-Kolmogorov engine built in the author's
-Mathlib fork (`Mathlib.Analysis.FunctionalSpaces.*`).
+`EllipticPdes.Analysis.*`.
 
 The argument carries `embL2 Ω U = U 0 ∈ L²(Ω)` to its extension by zero in `L²(ℝᵈ)`, where the
 Fréchet-Kolmogorov criterion `totallyBounded_of_lipschitz_translation` applies: the family is

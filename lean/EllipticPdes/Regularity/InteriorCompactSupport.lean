@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
 import EllipticPdes.Regularity.Caccioppoli
-import Mathlib.Analysis.FunctionalSpaces.LpExtendByZero
+import EllipticPdes.Analysis.LpExtendByZero
 
 /-!
 # The whole-space extension bridge for the interior `H²` estimate

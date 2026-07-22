@@ -3,13 +3,13 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import Mathlib.Analysis.FunctionalSpaces.PoincareInequality
+import EllipticPdes.Analysis.PoincareInequality
 
 /-!
 # One-dimensional Poincaré inequality
 
 Upstreamed to Mathlib as
-`Mathlib.Analysis.FunctionalSpaces.PoincareInequality` (commit 4ed4090c46).
+`EllipticPdes.Analysis.PoincareInequality`.
 
 This file re-exports the Mathlib declarations under the
 `EllipticPdes.Poincare` namespace for backward compatibility.

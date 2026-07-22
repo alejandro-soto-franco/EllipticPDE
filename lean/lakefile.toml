@@ -15,23 +15,14 @@ pp.unicode.fun = true
 relaxedAutoImplicit = false
 weak.linter.mathlibStandardSet = true
 
-# Personal mathlib fork (toolchain v4.31.0-rc1, tracks upstream/stable plus the
-# project's own additions, including the Frechet-Kolmogorov / Rellich engine). A
-# git require so CI and remote clones can resolve it; the fork adds only a few
-# files on top of upstream, so `lake exe cache get` still hits the
-# content-addressed upstream cache for every unchanged module.
+# Upstream Mathlib, pinned to the commit this development was written against.
+# The project previously depended on a personal fork carrying five extra files;
+# those now live under EllipticPdes/Analysis/, so `lake exe cache get` serves
+# every olean and a clean clone needs no fork.
 [[require]]
 name = "mathlib"
-git = "https://github.com/alejandro-soto-franco/mathlib4.git"
-rev = "16a297f1108035c3a8174d68b052f92a991ea7bf"
-
-# `Meridian` supplies the metaprogramming toolkit used to inspect this
-# project's environment: sorry inventory, dependency graphs, and an RDF
-# Turtle dump of the Lean `Environment`.
-[[require]]
-name = "Meridian"
-git = "https://github.com/alejandro-soto-franco/Meridian.git"
-rev = "d9e36a6ab06e72ffb6a1caf349f235d6047f81a9"
+git = "https://github.com/leanprover-community/mathlib4.git"
+rev = "542645ab80a3ee3a715ad8610b8c0fdac58ba54c"
 
 [[lean_lib]]
 name = "EllipticPdes"
