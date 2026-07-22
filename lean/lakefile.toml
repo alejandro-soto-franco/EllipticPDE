@@ -31,7 +31,7 @@ rev = "16a297f1108035c3a8174d68b052f92a991ea7bf"
 [[require]]
 name = "Meridian"
 git = "https://github.com/alejandro-soto-franco/Meridian.git"
-rev = "062e48db13f4b9a21249ec63222ae2adeaad9124"
+rev = "d9e36a6ab06e72ffb6a1caf349f235d6047f81a9"
 
 [[lean_lib]]
 name = "EllipticPdes"
