@@ -85,8 +85,6 @@ operator bound `‖Dₖʰ g‖ ≤ 2‖g‖/|h|` closes it. This uniform bound i
 the weak-limit converse `weakDeriv_of_diffQuot_bounded`. -/
 theorem interior_diffQuot_norm_bound (Op : FullEllipticOp d) (hΩm : MeasurableSet Ω)
     (hA : IsC1Coeff Op.toEllipticCoeff)
-    (hb0 : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
-    (hc0 : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x)
     {V : Set (EuclideanSpace ℝ (Fin d))} (T : CutoffTower Ω V)
     (u : H01 Ω) (f : L2D Ω)
     (hu : ∀ w : H01 Ω, Op.fullBilin Ω u w
@@ -123,28 +121,37 @@ theorem interior_diffQuot_norm_bound (Op : FullEllipticOp d) (hΩm : MeasurableS
   have hδ₀θ : δ₀ ≤ δθ := le_trans (min_le_right _ _) (min_le_right _ _)
   -- The master energy constant, uniform in `h`.
   obtain ⟨CD2, hCD20, hD2⟩ :=
-    interior_diffQuot_energy_bound Op hΩm hA hb0 hc0 T.hξ T.hθ u f hu k
-  -- First-order gradient bound: `‖di‖ ≤ P / (2 √λ)`.
-  have hfo : Op.lam * ∑ i : Fin d, ‖(u : H1amb Ω) i.succ‖ ^ 2 ≤ ‖f‖ * ‖(u : H1amb Ω) 0‖ :=
-    firstOrder_energy_le Op hb0 hc0 u f hu
-  have hdisqm : ‖di‖ ^ 2 * Op.lam ≤ ‖f‖ * ‖(u : H1amb Ω) 0‖ := by
+    interior_diffQuot_energy_bound Op hΩm hA T.hξ T.hθ u f hu k
+  -- First-order gradient bound: `‖di‖ ≤ √((1 + 4γ)/(2λ)) · P`. The drift and the
+  -- zeroth-order term enter only through the Gårding shift `γ`.
+  have hγnn : (0 : ℝ) ≤ Op.gardingγ := Op.gardingγ_nonneg
+  have hfo : Op.lam / 2 * ∑ i : Fin d, ‖(u : H1amb Ω) i.succ‖ ^ 2
+      ≤ ‖f‖ * ‖(u : H1amb Ω) 0‖ + Op.gardingγ * ‖(u : H1amb Ω) 0‖ ^ 2 :=
+    firstOrder_energy_le Op u f hu
+  have hdisqm : ‖di‖ ^ 2 * (Op.lam / 2)
+      ≤ ‖f‖ * ‖(u : H1amb Ω) 0‖ + Op.gardingγ * ‖(u : H1amb Ω) 0‖ ^ 2 := by
     have hle : ‖di‖ ^ 2 ≤ ∑ i : Fin d, ‖(u : H1amb Ω) i.succ‖ ^ 2 := by
       rw [hdidef]
       exact single_le_sum_fin (fun i => ‖(u : H1amb Ω) i.succ‖ ^ 2) (fun i => sq_nonneg _) i
-    nlinarith only [mul_le_mul_of_nonneg_left hle hlam.le, hfo]
+    nlinarith only [mul_le_mul_of_nonneg_left hle (by linarith only [hlam] :
+      (0 : ℝ) ≤ Op.lam / 2), hfo]
   have hamgm : ‖f‖ * ‖(u : H1amb Ω) 0‖ ≤ P ^ 2 / 4 := by
     rw [hPdef]; nlinarith only [sq_nonneg (‖f‖ - ‖(u : H1amb Ω) 0‖)]
-  have hSpos : (0 : ℝ) < Real.sqrt Op.lam := Real.sqrt_pos.mpr hlam
-  set dcoef : ℝ := 1 / (2 * Real.sqrt Op.lam) with hdcoefdef
-  have hdcoef0 : (0 : ℝ) ≤ dcoef := by rw [hdcoefdef]; positivity
+  have hu0P : ‖(u : H1amb Ω) 0‖ ^ 2 ≤ P ^ 2 := by
+    rw [hPdef]; nlinarith only [norm_nonneg f, norm_nonneg ((u : H1amb Ω) 0)]
+  set dcoef : ℝ := Real.sqrt ((1 + 4 * Op.gardingγ) / (2 * Op.lam)) with hdcoefdef
+  have hrad : (0 : ℝ) ≤ (1 + 4 * Op.gardingγ) / (2 * Op.lam) := by positivity
+  have hdcoef0 : (0 : ℝ) ≤ dcoef := Real.sqrt_nonneg _
   have hdi : ‖di‖ ≤ dcoef * P := by
-    have hdiP : ‖di‖ ^ 2 ≤ P ^ 2 / (4 * Op.lam) := by
-      rw [le_div_iff₀ (by positivity : (0 : ℝ) < 4 * Op.lam)]
-      nlinarith only [hdisqm, hamgm]
-    have hsq : (dcoef * P) ^ 2 = P ^ 2 / (4 * Op.lam) := by
-      rw [hdcoefdef, mul_pow, div_pow, one_pow, mul_pow, Real.sq_sqrt hlam.le]; ring
-    have hval : Real.sqrt (P ^ 2 / (4 * Op.lam)) = dcoef * P := by
-      rw [← hsq]; exact Real.sqrt_sq (by rw [hdcoefdef]; positivity)
+    have hdiP : ‖di‖ ^ 2 ≤ (1 + 4 * Op.gardingγ) / (2 * Op.lam) * P ^ 2 := by
+      rw [div_mul_eq_mul_div, le_div_iff₀ (by positivity : (0 : ℝ) < 2 * Op.lam)]
+      have hprod : Op.gardingγ * ‖(u : H1amb Ω) 0‖ ^ 2 ≤ Op.gardingγ * P ^ 2 :=
+        mul_le_mul_of_nonneg_left hu0P hγnn
+      linarith only [hdisqm, hamgm, hprod]
+    have hsq : (dcoef * P) ^ 2 = (1 + 4 * Op.gardingγ) / (2 * Op.lam) * P ^ 2 := by
+      rw [hdcoefdef, mul_pow, Real.sq_sqrt hrad]
+    have hval : Real.sqrt ((1 + 4 * Op.gardingγ) / (2 * Op.lam) * P ^ 2) = dcoef * P := by
+      rw [← hsq]; exact Real.sqrt_sq (mul_nonneg hdcoef0 hP0)
     rw [show ‖di‖ = Real.sqrt (‖di‖ ^ 2) from (Real.sqrt_sq (norm_nonneg _)).symm, ← hval]
     exact Real.sqrt_le_sqrt hdiP
   -- The `h`-uniform data constant `CD2coef := √(2 CD2 / λ)`.

@@ -432,38 +432,31 @@ nonnegative (a.e. on `Ω`), the full gradient energy is bounded by the data:
 bounds the principal part from below, the transport term drops (`b = 0`) and the
 zeroth-order term has a sign (`c ≥ 0`), so only the right-hand pairing `⟪f, u₀⟫` survives
 (Evans, *Partial Differential Equations* (2nd ed.), §6.2.2). -/
-theorem firstOrder_energy_le (Op : FullEllipticOp d)
-    (hb0 : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
-    (hc0 : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x) (u : H01 Ω) (f : L2D Ω)
+theorem firstOrder_energy_le (Op : FullEllipticOp d) (u : H01 Ω) (f : L2D Ω)
     (hu : ∀ v : H01 Ω, Op.fullBilin Ω u v
       = ∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ)) :
-    Op.lam * ∑ i : Fin d, ‖(u : H1amb Ω) i.succ‖ ^ 2 ≤ ‖f‖ * ‖(u : H1amb Ω) 0‖ := by
-  have hbz : ∀ i : Fin d,
-      ⟪Op.bAct i ((u : H1amb Ω) i.succ), ((u : H1amb Ω) 0)⟫ = 0 := by
-    intro i
-    rw [FullEllipticOp.bAct, inner_mulCoeffL_eq]
-    have hz : (fun x => Op.b x i * ((u : H1amb Ω) i.succ x : ℝ) * ((u : H1amb Ω) 0 x : ℝ))
-        =ᵐ[volume.restrict Ω] 0 := by
-      filter_upwards [hb0 i] with x hx; simp [hx]
-    rw [integral_congr_ae hz]; simp
-  have hcnn : 0 ≤ ⟪Op.cAct ((u : H1amb Ω) 0), ((u : H1amb Ω) 0)⟫ := by
-    rw [FullEllipticOp.cAct, inner_mulCoeffL_eq]
-    refine integral_nonneg_of_ae ?_
-    filter_upwards [hc0] with x hx
-    have hsq : Op.c x * ((u : H1amb Ω) 0 x : ℝ) * ((u : H1amb Ω) 0 x : ℝ)
-        = Op.c x * ((u : H1amb Ω) 0 x : ℝ) ^ 2 := by ring
-    rw [Pi.zero_apply, hsq]; positivity
-  have hfull := hu u
-  rw [Op.fullBilin_apply, Op.lowerBilin_apply,
-    Finset.sum_eq_zero (fun i _ => hbz i), zero_add] at hfull
-  have hge : Op.lam * ∑ i : Fin d, ‖(u : H1amb Ω) i.succ‖ ^ 2
-      ≤ Op.toEllipticCoeff.bilin Ω u u := Op.toEllipticCoeff.bilin_self_ge u
-  have hfu : (∫ x in Ω, (f x : ℝ) * ((u : H1amb Ω) 0 x : ℝ)) ≤ ‖f‖ * ‖(u : H1amb Ω) 0‖ := by
-    have heq : (∫ x in Ω, (f x : ℝ) * ((u : H1amb Ω) 0 x : ℝ)) = ⟪f, (u : H1amb Ω) 0⟫ := by
+    Op.lam / 2 * ∑ i : Fin d, ‖(u : H1amb Ω) i.succ‖ ^ 2
+      ≤ ‖f‖ * ‖(u : H1amb Ω) 0‖ + Op.gardingγ * ‖(u : H1amb Ω) 0‖ ^ 2 := by
+  have hg := Op.garding Ω u
+  have hnorm : ‖u‖ ^ 2
+      = ‖(u : H1amb Ω) 0‖ ^ 2 + ∑ i : Fin d, ‖(u : H1amb Ω) i.succ‖ ^ 2 := by
+    rw [show ‖u‖ = ‖(u : H1amb Ω)‖ from rfl, PiLp.norm_sq_eq_of_L2, Fin.sum_univ_succ]
+  have hfu : Op.fullBilin Ω u u ≤ ‖f‖ * ‖(u : H1amb Ω) 0‖ := by
+    rw [hu u]
+    have heq : (∫ x in Ω, (f x : ℝ) * ((u : H1amb Ω) 0 x : ℝ))
+        = ⟪f, (u : H1amb Ω) 0⟫ := by
       rw [L2.inner_def]; refine integral_congr_ae ?_
       filter_upwards with x; rw [Real.inner_apply]
     rw [heq]; exact real_inner_le_norm _ _
-  linarith [hge, hcnn, hfu, hfull]
+  rw [hnorm] at hg
+  have hsplit : Op.lam / 2 * (‖(u : H1amb Ω) 0‖ ^ 2
+        + ∑ i : Fin d, ‖(u : H1amb Ω) i.succ‖ ^ 2)
+      = Op.lam / 2 * ‖(u : H1amb Ω) 0‖ ^ 2
+        + Op.lam / 2 * ∑ i : Fin d, ‖(u : H1amb Ω) i.succ‖ ^ 2 := by ring
+  rw [hsplit] at hg
+  have hdrop : (0 : ℝ) ≤ Op.lam / 2 * ‖(u : H1amb Ω) 0‖ ^ 2 :=
+    mul_nonneg (by have := Op.lam_pos; linarith) (sq_nonneg _)
+  linarith [hg, hfu, hdrop]
 
 /-- **The difference quotient of `u₀` is controlled by the gradient.** For `u ∈ H₀¹(Ω)`,
 the interior difference quotient of the function value is bounded in `L²` by the `k`-th
@@ -554,26 +547,27 @@ private lemma sq_norm_diffQuotD_u0_le (hΩm : MeasurableSet Ω) (k : Fin d) (h :
 
 set_option maxHeartbeats 500000 in
 -- The final Young-absorption assembly chains the full D2 toolkit (bilinear identity,
--- ellipticity lower bound, four Cauchy-Schwarz/Peter-Paul term families) in one term, whose
+-- ellipticity lower bound, five Cauchy-Schwarz/Peter-Paul term families) in one term, whose
 -- elaboration exceeds the default heartbeat budget.
 /-- **The master interior difference-quotient energy estimate.** For a `C¹`-coefficient
-weak solution `u ∈ H₀¹(Ω)` of `L u = f` with `b = 0` and `c ≥ 0`, an inner cutoff `ξ` and an
+weak solution `u ∈ H₀¹(Ω)` of `L u = f`, an inner cutoff `ξ` and an
 outer cutoff `θ ≡ 1` on the shift-reachable part of `tsupport ξ²`, the cutoff-weighted energy
 of the interior difference quotient of the gradient is bounded by the data, uniformly in the
 step `h`: `(λ/2) ∑ᵢ ‖ξ · Dₖ^h ∂ᵢu‖² ≤ C (‖f‖² + ‖u₀‖²)`, with `C` depending only on
-`λ, Λ, A₁, d, ‖ξ‖∞, ‖∂ξ‖∞` (and not on `‖∇u‖` or `h`). Testing the weak formulation with the
+`λ, Λ, A₁, d, γ, ‖b‖∞, ‖c‖∞, ‖ξ‖∞, ‖∂ξ‖∞` (and not on `‖∇u‖` or `h`). Testing the weak
+formulation with the
 admissible Evans element `v_h = -Dₖ^{-h}(ξ² Dₖ^h u)`, discrete integration by parts
 (`evansTest_bilin_L2D`) moves the outer difference quotient onto the coefficient action; the
 discrete Leibniz split (`norm_diffQuotD_actL_sub_le`) exposes the translated-coefficient
 leading term, controlled from below by ellipticity (`energy_ge` for the translate, same `λ`);
-Cauchy-Schwarz and the Peter-Paul inequality absorb the commutator, cross, and right-hand
-terms, the first-order energy bound `firstOrder_energy_le` supplying all gradient data
+Cauchy-Schwarz and the Peter-Paul inequality absorb the commutator, cross, transport,
+zeroth-order and right-hand terms, five families each spending an eighth of the ellipticity
+lower bound, with the first-order energy bound `firstOrder_energy_le` supplying all gradient
+data
 (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1; Gilbarg-Trudinger, *Elliptic
 PDE of Second Order*, Theorem 8.8). -/
 theorem interior_diffQuot_energy_bound (Op : FullEllipticOp d) (hΩm : MeasurableSet Ω)
     (hA : IsC1Coeff Op.toEllipticCoeff)
-    (hb0 : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
-    (hc0 : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x)
     (hξ : IsTestFn Ω ξ) (hθ : IsTestFn Ω θ)
     (u : H01 Ω) (f : L2D Ω)
     (hu : ∀ w : H01 Ω, Op.fullBilin Ω u w
@@ -594,9 +588,16 @@ theorem interior_diffQuot_energy_bound (Op : FullEllipticOp d) (hΩm : Measurabl
   rcases Nat.eq_zero_or_pos d with hd0 | hd
   · subst hd0; exact ⟨0, le_refl 0, fun h _ _ _ _ _ => k.elim0⟩
   set A := Op.toEllipticCoeff with hAdef
-  refine ⟨max 0 ((2 * (exists_abs_bound hξ).choose ^ 2 / A.lam
+  have hγnn : (0 : ℝ) ≤ Op.gardingγ := Op.gardingγ_nonneg
+  refine ⟨max 0 (4 / 3 * ((2 * (exists_abs_bound hξ).choose ^ 2 / A.lam
         + (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2
         + (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / (4 * A.lam))
+      + (((Op.Bsup * (exists_abs_bound hξ).choose) ^ 2
+            / (2 * (A.lam / (4 * (d : ℝ))))
+          + Op.Bsup * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2
+          + (d : ℝ) * (Op.Bsup
+              * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2))
+        / (2 * A.lam))
       + (2 * (Op.Csup * (exists_abs_bound hξ).choose) ^ 2 / A.lam
         + Op.Csup * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2
         + Op.Csup * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / (4 * A.lam))
@@ -606,15 +607,15 @@ theorem interior_diffQuot_energy_bound (Op : FullEllipticOp d) (hΩm : Measurabl
             + hA.A1 / 2 * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) j).choose))
           + (d : ℝ) * ∑ j : Fin d,
               hA.A1 / 2 * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) j).choose)
-          / (2 * A.lam))),
-    le_max_left _ _, ?_⟩
+          / (2 * A.lam)))) * (2 + 4 * Op.gardingγ),
+    mul_nonneg (le_max_left _ _) (by nlinarith only [hγnn]), ?_⟩
   intro h hh hsm_in hsm_out hθ1 hθ0
   set A' := A.translate (hshift k h) with hA'def
   set Dg : Fin d → L2D Ω := fun i => diffQuotD k h hΩm ((u : H1amb Ω) i.succ) with hDgdef
   set D0 : L2D Ω := diffQuotD k h hΩm ((u : H1amb Ω) 0) with hD0def
   set v : H01 Ω := evansTest hΩm hξ hθ k h hsm_in hsm_out u with hvdef
   set E : ℝ := ∑ i : Fin d, ‖mulTest hξ (Dg i)‖ ^ 2 with hEdef
-  set P : ℝ := ‖f‖ ^ 2 + ‖(u : H1amb Ω) 0‖ ^ 2 with hPdef
+  set P : ℝ := (2 + 4 * Op.gardingγ) * (‖f‖ ^ 2 + ‖(u : H1amb Ω) 0‖ ^ 2) with hPdef
   set U1 : ℝ := ∑ i : Fin d, ‖(u : H1amb Ω) i.succ‖ ^ 2 with hU1def
   -- Commutator remainder classes.
   set Sr : Fin d → Fin d → L2D Ω := fun i j =>
@@ -662,23 +663,15 @@ theorem interior_diffQuot_energy_bound (Op : FullEllipticOp d) (hΩm : Measurabl
     conv_lhs =>
       rw [cutoffMul_apply_succ, diffQuotG_apply, diffQuotG_apply, hSreq, inner_add_right,
         inner_add_left, key_lead, key_cross]
-  -- The weak equation kills the transport term (b = 0).
-  have hbz : ∀ i : Fin d, ⟪Op.bAct i ((u : H1amb Ω) i.succ), (v : H1amb Ω) 0⟫ = 0 := by
-    intro i
-    rw [FullEllipticOp.bAct, inner_mulCoeffL_eq]
-    have hz : (fun x => Op.b x i * ((u : H1amb Ω) i.succ x : ℝ) * ((v : H1amb Ω) 0 x : ℝ))
-        =ᵐ[volume.restrict Ω] 0 := by
-      filter_upwards [hb0 i] with x hx; simp [hx]
-    rw [integral_congr_ae hz]; simp
   have hRHSeq : (∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ)) = ⟪f, (v : H1amb Ω) 0⟫ := by
     rw [L2.inner_def]
     refine integral_congr_ae (Filter.Eventually.of_forall (fun x => ?_))
     simp only [Real.inner_apply]
-  have hweak : A.bilin Ω u v = ⟪f, (v : H1amb Ω) 0⟫ - ⟪Op.cAct ((u : H1amb Ω) 0),
-      (v : H1amb Ω) 0⟫ := by
+  have hweak : A.bilin Ω u v = ⟪f, (v : H1amb Ω) 0⟫
+      - (∑ i : Fin d, ⟪Op.bAct i ((u : H1amb Ω) i.succ), (v : H1amb Ω) 0⟫)
+      - ⟪Op.cAct ((u : H1amb Ω) 0), (v : H1amb Ω) 0⟫ := by
     have hfull := hu v
-    rw [Op.fullBilin_apply, Op.lowerBilin_apply,
-      Finset.sum_eq_zero (fun i _ => hbz i), zero_add, hRHSeq] at hfull
+    rw [Op.fullBilin_apply, Op.lowerBilin_apply, hRHSeq] at hfull
     linarith [hfull]
   -- LEAD lower bound from ellipticity of the translated coefficients.
   have hLE : A.lam * E ≤ LEAD := by
@@ -686,12 +679,16 @@ theorem interior_diffQuot_energy_bound (Op : FullEllipticOp d) (hΩm : Measurabl
     rw [hLEADdef, hEdef]
     exact h
   -- first-order energy: U1 ≤ P/(2λ).
-  have hU1 : A.lam * U1 ≤ ‖f‖ * ‖(u : H1amb Ω) 0‖ := by
-    rw [hU1def]; exact firstOrder_energy_le Op hb0 hc0 u f hu
+  have hU1half : A.lam / 2 * U1
+      ≤ ‖f‖ * ‖(u : H1amb Ω) 0‖ + Op.gardingγ * ‖(u : H1amb Ω) 0‖ ^ 2 := by
+    rw [hU1def]; exact firstOrder_energy_le Op u f hu
   have hfu2 : ‖f‖ * ‖(u : H1amb Ω) 0‖ ≤ P / 2 := by
     have hsq := sq_nonneg (‖f‖ - ‖(u : H1amb Ω) 0‖)
-    rw [hPdef]; nlinarith only [hsq]
-  have hU1P : A.lam * U1 ≤ P / 2 := le_trans hU1 hfu2
+    rw [hPdef]; nlinarith only [hsq, hγnn, sq_nonneg ‖f‖, sq_nonneg ‖(u : H1amb Ω) 0‖]
+  have hU1P : A.lam * U1 ≤ P / 2 := by
+    have hsq := sq_nonneg (‖f‖ - ‖(u : H1amb Ω) 0‖)
+    rw [hPdef]
+    nlinarith only [hU1half, hsq, hγnn, sq_nonneg ‖(u : H1amb Ω) 0‖, sq_nonneg ‖f‖]
   have hU1nn : (0 : ℝ) ≤ U1 := by rw [hU1def]; exact Finset.sum_nonneg (fun i _ => sq_nonneg _)
   have hnD0 : ‖D0‖ ^ 2 ≤ U1 := by
     rw [hD0def, hU1def]; exact sq_norm_diffQuotD_u0_le hΩm k h u
@@ -730,7 +727,9 @@ theorem interior_diffQuot_energy_bound (Op : FullEllipticOp d) (hΩm : Measurabl
       + (2 * (exists_abs_bound hξ).choose ^ 2 / A.lam
         + (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2
         + (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / (4 * A.lam)) * P := by
-    have hfP : ‖f‖ ^ 2 ≤ P := by rw [hPdef]; linarith only [sq_nonneg ‖(u : H1amb Ω) 0‖]
+    have hfP : ‖f‖ ^ 2 ≤ P := by
+      rw [hPdef]
+      nlinarith only [sq_nonneg ‖(u : H1amb Ω) 0‖, hγnn, sq_nonneg ‖f‖]
     have hfv1 : ⟪f, (v : H1amb Ω) 0⟫
         ≤ ‖f‖ * ((exists_abs_bound hξ).choose * ‖mulTest hξ (Dg k)‖
             + (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose * ‖D0‖) :=
@@ -771,13 +770,116 @@ theorem interior_diffQuot_energy_bound (Op : FullEllipticOp d) (hΩm : Measurabl
             + (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / (4 * A.lam)) * P := by
           field_simp
           ring
+  have hbv : -(∑ i : Fin d, ⟪Op.bAct i ((u : H1amb Ω) i.succ), (v : H1amb Ω) 0⟫)
+      ≤ A.lam / 8 * E
+        + (((Op.Bsup * (exists_abs_bound hξ).choose) ^ 2
+              / (2 * (A.lam / (4 * (d : ℝ))))
+            + Op.Bsup * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2
+            + (d : ℝ) * (Op.Bsup
+                * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2))
+          / (2 * A.lam)) * P := by
+    have hdpos : (0 : ℝ) < (d : ℝ) := by exact_mod_cast hd
+    have hlam4d : (0 : ℝ) < A.lam / (4 * (d : ℝ)) := by positivity
+    have hper : ∀ i : Fin d,
+        -⟪Op.bAct i ((u : H1amb Ω) i.succ), (v : H1amb Ω) 0⟫
+          ≤ (A.lam / (4 * (d : ℝ)) / 2 * ‖mulTest hξ (Dg k)‖ ^ 2
+              + (Op.Bsup * (exists_abs_bound hξ).choose) ^ 2
+                  / (2 * (A.lam / (4 * (d : ℝ)))) * ‖(u : H1amb Ω) i.succ‖ ^ 2)
+            + Op.Bsup * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2
+                * (‖(u : H1amb Ω) i.succ‖ ^ 2 + ‖D0‖ ^ 2) := by
+      intro i
+      have h1 : -⟪Op.bAct i ((u : H1amb Ω) i.succ), (v : H1amb Ω) 0⟫
+          ≤ ‖Op.bAct i ((u : H1amb Ω) i.succ)‖ * ‖(v : H1amb Ω) 0‖ :=
+        le_trans (neg_le_abs _) (abs_real_inner_le_norm _ _)
+      have h2 : -⟪Op.bAct i ((u : H1amb Ω) i.succ), (v : H1amb Ω) 0⟫
+          ≤ Op.Bsup * ‖(u : H1amb Ω) i.succ‖
+              * ((exists_abs_bound hξ).choose * ‖mulTest hξ (Dg k)‖
+                + (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose * ‖D0‖) :=
+        le_trans h1 (mul_le_mul (Op.norm_bAct_le i _) hv0 (norm_nonneg _)
+          (mul_nonneg Op.Bsup_nonneg (norm_nonneg _)))
+      have hy1 := young_peterPaul (lam := A.lam / (4 * (d : ℝ)))
+        (B := Op.Bsup * (exists_abs_bound hξ).choose)
+        (x := ‖mulTest hξ (Dg k)‖) (y := ‖(u : H1amb Ω) i.succ‖) hlam4d
+      have hy2 : Op.Bsup * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose
+            * ‖(u : H1amb Ω) i.succ‖ * ‖D0‖
+          ≤ Op.Bsup * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2
+              * (‖(u : H1amb Ω) i.succ‖ ^ 2 + ‖D0‖ ^ 2) := by
+        nlinarith only [sq_nonneg (‖(u : H1amb Ω) i.succ‖ - ‖D0‖),
+          mul_nonneg Op.Bsup_nonneg hWknn, norm_nonneg ((u : H1amb Ω) i.succ),
+          norm_nonneg D0]
+      nlinarith only [h2, hy1, hy2]
+    have hK2nn : (0 : ℝ) ≤ Op.Bsup
+        * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2 :=
+      div_nonneg (mul_nonneg Op.Bsup_nonneg hWknn) (by norm_num)
+    have hK1nn : (0 : ℝ) ≤ (Op.Bsup * (exists_abs_bound hξ).choose) ^ 2
+        / (2 * (A.lam / (4 * (d : ℝ)))) := div_nonneg (sq_nonneg _) (by positivity)
+    rw [← Finset.sum_neg_distrib]
+    refine le_trans (Finset.sum_le_sum (fun i (_ : i ∈ Finset.univ) => hper i)) ?_
+    have hexp : ∑ _i : Fin d, ((A.lam / (4 * (d : ℝ)) / 2 * ‖mulTest hξ (Dg k)‖ ^ 2
+          + (Op.Bsup * (exists_abs_bound hξ).choose) ^ 2
+              / (2 * (A.lam / (4 * (d : ℝ)))) * ‖(u : H1amb Ω) _i.succ‖ ^ 2)
+        + Op.Bsup * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2
+            * (‖(u : H1amb Ω) _i.succ‖ ^ 2 + ‖D0‖ ^ 2))
+      = (d : ℝ) * (A.lam / (4 * (d : ℝ)) / 2) * ‖mulTest hξ (Dg k)‖ ^ 2
+        + ((Op.Bsup * (exists_abs_bound hξ).choose) ^ 2
+              / (2 * (A.lam / (4 * (d : ℝ))))
+            + Op.Bsup * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2) * U1
+        + (d : ℝ) * (Op.Bsup
+            * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2) * ‖D0‖ ^ 2 := by
+      rw [hU1def]
+      simp only [Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ,
+        Fintype.card_fin, nsmul_eq_mul, ← Finset.mul_sum]
+      ring
+    rw [hexp]
+    have hdne : (d : ℝ) ≠ 0 := ne_of_gt hdpos
+    have hcoef : (d : ℝ) * (A.lam / (4 * (d : ℝ)) / 2) = A.lam / 8 := by
+      field_simp; ring
+    rw [hcoef]
+    have hmkE : A.lam / 8 * ‖mulTest hξ (Dg k)‖ ^ 2 ≤ A.lam / 8 * E :=
+      mul_le_mul_of_nonneg_left hmk (by linarith only [hlam])
+    have hUP : U1 ≤ P / (2 * A.lam) := hU1P2
+    have hDP : ‖D0‖ ^ 2 ≤ P / (2 * A.lam) := hD0P
+    have hdK2nn : (0 : ℝ) ≤ (d : ℝ) * (Op.Bsup
+        * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2) :=
+      mul_nonneg (le_of_lt hdpos) hK2nn
+    have e1 : ((Op.Bsup * (exists_abs_bound hξ).choose) ^ 2
+            / (2 * (A.lam / (4 * (d : ℝ))))
+          + Op.Bsup * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2) * U1
+        ≤ ((Op.Bsup * (exists_abs_bound hξ).choose) ^ 2
+            / (2 * (A.lam / (4 * (d : ℝ))))
+          + Op.Bsup * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2)
+          * (P / (2 * A.lam)) :=
+      mul_le_mul_of_nonneg_left hUP (by linarith only [hK1nn, hK2nn])
+    have e2 : (d : ℝ) * (Op.Bsup
+          * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2) * ‖D0‖ ^ 2
+        ≤ (d : ℝ) * (Op.Bsup
+          * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2)
+          * (P / (2 * A.lam)) :=
+      mul_le_mul_of_nonneg_left hDP hdK2nn
+    have hfinal : ((Op.Bsup * (exists_abs_bound hξ).choose) ^ 2
+              / (2 * (A.lam / (4 * (d : ℝ))))
+            + Op.Bsup * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2
+            + (d : ℝ) * (Op.Bsup
+                * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2))
+          / (2 * A.lam) * P
+        = ((Op.Bsup * (exists_abs_bound hξ).choose) ^ 2
+              / (2 * (A.lam / (4 * (d : ℝ))))
+            + Op.Bsup * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2)
+            * (P / (2 * A.lam))
+          + (d : ℝ) * (Op.Bsup
+              * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2)
+              * (P / (2 * A.lam)) := by
+      field_simp
+    rw [hfinal]
+    linarith only [hmkE, e1, e2]
   have hcv : -⟪Op.cAct ((u : H1amb Ω) 0), (v : H1amb Ω) 0⟫ ≤ A.lam / 8 * E
       + (2 * (Op.Csup * (exists_abs_bound hξ).choose) ^ 2 / A.lam
         + Op.Csup * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2
         + Op.Csup * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / (4 * A.lam))
         * P := by
     have hu0P : ‖(u : H1amb Ω) 0‖ ^ 2 ≤ P := by
-      rw [hPdef]; linarith only [sq_nonneg ‖f‖]
+      rw [hPdef]
+      nlinarith only [sq_nonneg ‖f‖, hγnn, sq_nonneg ‖(u : H1amb Ω) 0‖]
     have hcv1 : -⟪Op.cAct ((u : H1amb Ω) 0), (v : H1amb Ω) 0⟫
         ≤ Op.Csup * ‖(u : H1amb Ω) 0‖
             * ((exists_abs_bound hξ).choose * ‖mulTest hξ (Dg k)‖
@@ -1020,10 +1122,16 @@ theorem interior_diffQuot_energy_bound (Op : FullEllipticOp d) (hΩm : Measurabl
               + (d : ℝ) * (∑ j : Fin d, b j) * (P / (2 * A.lam)) := add_le_add h1 h2
         _ = ((∑ j : Fin d, a j) + (d : ℝ) * ∑ j : Fin d, b j) / (2 * A.lam) * P := by ring
     linarith only [hREST, hdata]
-  -- Fold the four (data-only, `h`-independent) constant expressions.
+  -- Fold the five (data-only, `h`-independent) constant expressions.
   set Cf : ℝ := 2 * (exists_abs_bound hξ).choose ^ 2 / A.lam
       + (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2
       + (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / (4 * A.lam) with hCfdef
+  set Cb : ℝ := ((Op.Bsup * (exists_abs_bound hξ).choose) ^ 2
+        / (2 * (A.lam / (4 * (d : ℝ))))
+      + Op.Bsup * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2
+      + (d : ℝ) * (Op.Bsup
+          * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2))
+    / (2 * A.lam) with hCbdef
   set Cc : ℝ := 2 * (Op.Csup * (exists_abs_bound hξ).choose) ^ 2 / A.lam
       + Op.Csup * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / 2
       + Op.Csup * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) k).choose / (4 * A.lam)
@@ -1036,13 +1144,24 @@ theorem interior_diffQuot_energy_bound (Op : FullEllipticOp d) (hΩm : Measurabl
             hA.A1 / 2 * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) j).choose)
         / (2 * A.lam) with hCredef
   have hcomb : A.lam * E ≤ ⟪f, (v : H1amb Ω) 0⟫
+      - (∑ i : Fin d, ⟪Op.bAct i ((u : H1amb Ω) i.succ), (v : H1amb Ω) 0⟫)
       - ⟪Op.cAct ((u : H1amb Ω) 0), (v : H1amb Ω) 0⟫ - CROSS - REST := by
     rw [← hweak]; linarith only [hLE, hbil]
-  change A.lam / 2 * E ≤ max 0 (Cf + Cc + Ccr + Cre) * P
-  have hsum : A.lam / 2 * E ≤ (Cf + Cc + Ccr + Cre) * P := by
-    have hdist : (Cf + Cc + Ccr + Cre) * P = Cf * P + Cc * P + Ccr * P + Cre * P := by ring
-    rw [hdist]; linarith only [hcomb, hfv, hcv, hcr, hre]
-  have hmul : (Cf + Cc + Ccr + Cre) * P ≤ max 0 (Cf + Cc + Ccr + Cre) * P :=
+  change A.lam / 2 * E
+      ≤ max 0 (4 / 3 * (Cf + Cb + Cc + Ccr + Cre)) * (2 + 4 * Op.gardingγ)
+          * (‖f‖ ^ 2 + ‖(u : H1amb Ω) 0‖ ^ 2)
+  rw [show max 0 (4 / 3 * (Cf + Cb + Cc + Ccr + Cre)) * (2 + 4 * Op.gardingγ)
+        * (‖f‖ ^ 2 + ‖(u : H1amb Ω) 0‖ ^ 2)
+      = max 0 (4 / 3 * (Cf + Cb + Cc + Ccr + Cre)) * P from by rw [hPdef]; ring]
+  -- Five Peter-Paul families each spend `λ/8` of the ellipticity lower bound `λ E`,
+  -- leaving `3λ/8 E`, so the target `λ/2 E` costs a factor `4/3` on the constant.
+  have hsum : A.lam / 2 * E ≤ (4 / 3 * (Cf + Cb + Cc + Ccr + Cre)) * P := by
+    have hdist : (4 / 3 * (Cf + Cb + Cc + Ccr + Cre)) * P
+        = 4 / 3 * (Cf * P) + 4 / 3 * (Cb * P) + 4 / 3 * (Cc * P) + 4 / 3 * (Ccr * P)
+          + 4 / 3 * (Cre * P) := by ring
+    rw [hdist]; linarith only [hcomb, hfv, hbv, hcv, hcr, hre]
+  have hmul : (4 / 3 * (Cf + Cb + Cc + Ccr + Cre)) * P
+      ≤ max 0 (4 / 3 * (Cf + Cb + Cc + Ccr + Cre)) * P :=
     mul_le_mul_of_nonneg_right (le_max_right _ _) hPnn
   linarith only [hsum, hmul]
 

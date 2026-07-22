@@ -42,8 +42,6 @@ uniform difference-quotient bound `interior_diffQuot_norm_bound`. Because `ζ �
 restriction of `w` to `V` is the genuine `∂ₖ∂ᵢu` there. -/
 theorem interior_secondWeakDeriv (Op : FullEllipticOp d) (hΩm : MeasurableSet Ω)
     (hA : IsC1Coeff Op.toEllipticCoeff)
-    (hb0 : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
-    (hc0 : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x)
     {V : Set (EuclideanSpace ℝ (Fin d))} (T : CutoffTower Ω V)
     (u : H01 Ω) (f : L2D Ω)
     (hu : ∀ w : H01 Ω, Op.fullBilin Ω u w
@@ -52,7 +50,7 @@ theorem interior_secondWeakDeriv (Op : FullEllipticOp d) (hΩm : MeasurableSet �
       HasWeakDeriv k (extendL2 hΩm (mulTest T.hζ ((u : H1amb Ω) i.succ))) w
       ∧ ∃ Cd : ℝ, ‖w‖ ≤ Cd * (‖f‖ + ‖(u : H1amb Ω) 0‖) := by
   obtain ⟨M, _hM0, hMbd, Cd, hMCd⟩ :=
-    interior_diffQuot_norm_bound Op hΩm hA hb0 hc0 T u f hu k i
+    interior_diffQuot_norm_bound Op hΩm hA T u f hu k i
   obtain ⟨w, hw, hwn⟩ :=
     weakDeriv_of_diffQuot_bounded k (extendL2 hΩm (mulTest T.hζ ((u : H1amb Ω) i.succ))) M hMbd
   exact ⟨w, hw, Cd, le_trans hwn hMCd⟩
@@ -96,34 +94,46 @@ theorem hasWeakDerivOn_of_hasWeakDeriv {V : Set (EuclideanSpace ℝ (Fin d))}
         refine congrArg Neg.neg (integral_congr_ae ?_)
         filter_upwards [coeFn_restrictL2 w] with x hx; rw [hx]
 
-/-- **First-order gradient bound.** Each gradient component of a weak solution with vanishing
-transport and nonnegative zeroth-order coefficient is bounded in `L²` by the data:
-`‖∂ᵢu‖ ≤ (1 / (2 √λ)) (‖f‖ + ‖u₀‖)`. This is the first-order energy estimate
-`firstOrder_energy_le` combined with the arithmetic-geometric mean inequality. -/
-private lemma firstOrder_gradNorm_le (Op : FullEllipticOp d)
-    (hb0 : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
-    (hc0 : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x) (u : H01 Ω) (f : L2D Ω)
+/-- **First-order gradient bound.** Each gradient component of a weak solution is bounded in
+`L²` by the data: `‖∂ᵢu‖ ≤ √((1 + 4γ) / (2λ)) (‖f‖ + ‖u₀‖)`, where `γ` is the Gårding shift
+constant, through which the transport and zeroth-order coefficients enter. This is the
+first-order energy estimate `firstOrder_energy_le` combined with the arithmetic-geometric
+mean inequality. -/
+private lemma firstOrder_gradNorm_le (Op : FullEllipticOp d) (u : H01 Ω) (f : L2D Ω)
     (hu : ∀ w : H01 Ω, Op.fullBilin Ω u w
       = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) (i : Fin d) :
     ‖(u : H1amb Ω) i.succ‖
-      ≤ 1 / (2 * Real.sqrt Op.lam) * (‖f‖ + ‖(u : H1amb Ω) 0‖) := by
+      ≤ Real.sqrt ((1 + 4 * Op.gardingγ) / (2 * Op.lam)) * (‖f‖ + ‖(u : H1amb Ω) 0‖) := by
   have hlam : (0 : ℝ) < Op.lam := Op.toEllipticCoeff.lam_pos
+  have hγnn : (0 : ℝ) ≤ Op.gardingγ := Op.gardingγ_nonneg
   set P : ℝ := ‖f‖ + ‖(u : H1amb Ω) 0‖ with hPdef
-  have hfo : Op.lam * ∑ j : Fin d, ‖(u : H1amb Ω) j.succ‖ ^ 2 ≤ ‖f‖ * ‖(u : H1amb Ω) 0‖ :=
-    firstOrder_energy_le Op hb0 hc0 u f hu
-  have hdisqm : ‖(u : H1amb Ω) i.succ‖ ^ 2 * Op.lam ≤ ‖f‖ * ‖(u : H1amb Ω) 0‖ := by
+  have hP0 : (0 : ℝ) ≤ P := by rw [hPdef]; positivity
+  have hfo : Op.lam / 2 * ∑ j : Fin d, ‖(u : H1amb Ω) j.succ‖ ^ 2
+      ≤ ‖f‖ * ‖(u : H1amb Ω) 0‖ + Op.gardingγ * ‖(u : H1amb Ω) 0‖ ^ 2 :=
+    firstOrder_energy_le Op u f hu
+  have hdisqm : ‖(u : H1amb Ω) i.succ‖ ^ 2 * (Op.lam / 2)
+      ≤ ‖f‖ * ‖(u : H1amb Ω) 0‖ + Op.gardingγ * ‖(u : H1amb Ω) 0‖ ^ 2 := by
     have hle : ‖(u : H1amb Ω) i.succ‖ ^ 2 ≤ ∑ j : Fin d, ‖(u : H1amb Ω) j.succ‖ ^ 2 :=
       single_le_sum_fin (fun j => ‖(u : H1amb Ω) j.succ‖ ^ 2) (fun j => sq_nonneg _) i
-    nlinarith only [mul_le_mul_of_nonneg_left hle hlam.le, hfo]
+    nlinarith only [mul_le_mul_of_nonneg_left hle (by linarith only [hlam] :
+      (0 : ℝ) ≤ Op.lam / 2), hfo]
   have hamgm : ‖f‖ * ‖(u : H1amb Ω) 0‖ ≤ P ^ 2 / 4 := by
     rw [hPdef]; nlinarith only [sq_nonneg (‖f‖ - ‖(u : H1amb Ω) 0‖)]
-  have hdiP : ‖(u : H1amb Ω) i.succ‖ ^ 2 ≤ P ^ 2 / (4 * Op.lam) := by
-    rw [le_div_iff₀ (by positivity : (0 : ℝ) < 4 * Op.lam)]
-    nlinarith only [hdisqm, hamgm]
-  have hsq : (1 / (2 * Real.sqrt Op.lam) * P) ^ 2 = P ^ 2 / (4 * Op.lam) := by
-    rw [mul_pow, div_pow, one_pow, mul_pow, Real.sq_sqrt hlam.le]; ring
-  have hval : Real.sqrt (P ^ 2 / (4 * Op.lam)) = 1 / (2 * Real.sqrt Op.lam) * P := by
-    rw [← hsq]; exact Real.sqrt_sq (by positivity)
+  have hu0P : ‖(u : H1amb Ω) 0‖ ^ 2 ≤ P ^ 2 := by
+    rw [hPdef]; nlinarith only [norm_nonneg f, norm_nonneg ((u : H1amb Ω) 0)]
+  have hrad : (0 : ℝ) ≤ (1 + 4 * Op.gardingγ) / (2 * Op.lam) := by positivity
+  have hdiP : ‖(u : H1amb Ω) i.succ‖ ^ 2
+      ≤ (1 + 4 * Op.gardingγ) / (2 * Op.lam) * P ^ 2 := by
+    rw [div_mul_eq_mul_div, le_div_iff₀ (by positivity : (0 : ℝ) < 2 * Op.lam)]
+    have hprod : Op.gardingγ * ‖(u : H1amb Ω) 0‖ ^ 2 ≤ Op.gardingγ * P ^ 2 :=
+      mul_le_mul_of_nonneg_left hu0P hγnn
+    linarith only [hdisqm, hamgm, hprod]
+  have hsq : (Real.sqrt ((1 + 4 * Op.gardingγ) / (2 * Op.lam)) * P) ^ 2
+      = (1 + 4 * Op.gardingγ) / (2 * Op.lam) * P ^ 2 := by
+    rw [mul_pow, Real.sq_sqrt hrad]
+  have hval : Real.sqrt ((1 + 4 * Op.gardingγ) / (2 * Op.lam) * P ^ 2)
+      = Real.sqrt ((1 + 4 * Op.gardingγ) / (2 * Op.lam)) * P := by
+    rw [← hsq]; exact Real.sqrt_sq (mul_nonneg (Real.sqrt_nonneg _) hP0)
   rw [show ‖(u : H1amb Ω) i.succ‖ = Real.sqrt (‖(u : H1amb Ω) i.succ‖ ^ 2) from
     (Real.sqrt_sq (norm_nonneg _)).symm, ← hval]
   exact Real.sqrt_le_sqrt hdiP
@@ -134,18 +144,16 @@ set_option maxHeartbeats 400000 in
 -- the tower definition and the difference-quotient bounds) exceeds the default budget.
 /-- **Interior H² estimate (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1;
 Gilbarg-Trudinger, *Elliptic Partial Differential Equations of Second Order*, Theorem 8.8).**
-For a concrete-model weak solution `u ∈ H₀¹(Ω)` of `L u = f` with `C¹` principal coefficients,
-vanishing transport, and nonnegative zeroth-order coefficient, and for any compact `V ⋐ Ω`,
+For a concrete-model weak solution `u ∈ H₀¹(Ω)` of `L u = f` with `C¹` principal coefficients
+and bounded transport and zeroth-order coefficients, and for any compact `V ⋐ Ω`,
 the second weak derivatives exist in `L²(V)` and are bounded by the data: for every direction
 pair `(k, i)` there is a weak `k`-derivative `wki` of `∂ᵢu` on `V` (that is, `∂ₖ∂ᵢu ∈ L²(V)`)
 with `‖∂ₖ∂ᵢu‖_{L²(V)} + ‖∂ᵢu‖_{L²(V)} + ‖u‖_{L²(V)} ≤ C (‖f‖ + ‖u‖)`, the constant `C`
-depending only on the data (`λ, Λ, A₁, d`, the cutoff tower for `V ⋐ Ω`), not on `∇u`. This is
-the `L²`-level statement that `u ∈ H²_loc(Ω)` with the interior estimate. -/
+depending only on the data (`λ, Λ, A₁, d, ‖b‖∞, ‖c‖∞`, the cutoff tower for `V ⋐ Ω`), not on
+`∇u`. This is the `L²`-level statement that `u ∈ H²_loc(Ω)` with the interior estimate. -/
 theorem interior_H2_estimate {n : ℕ} (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
     (hA : IsC1Coeff Op.toEllipticCoeff)
-    (hb : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
-    (hc : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x)
     {V : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hVc : IsCompact V) (hVΩ : V ⊆ Ω)
     (u : H01 Ω) (f : L2D Ω)
     (hu : ∀ w : H01 Ω, Op.fullBilin Ω u w
@@ -163,10 +171,10 @@ theorem interior_H2_estimate {n : ℕ} (Op : FullEllipticOp (n + 1))
   set T := cutoffTowerOfIsCompactSubsetIsOpen hVc hΩo hVΩ with hT
   set P : ℝ := ‖f‖ + ‖(u : H1amb Ω) 0‖ with hPdef
   have hP0 : (0 : ℝ) ≤ P := by rw [hPdef]; positivity
-  set dcoef : ℝ := 1 / (2 * Real.sqrt Op.lam) with hdcoefdef
-  have hdcoef0 : (0 : ℝ) ≤ dcoef := by rw [hdcoefdef]; positivity
+  set dcoef : ℝ := Real.sqrt ((1 + 4 * Op.gardingγ) / (2 * Op.lam)) with hdcoefdef
+  have hdcoef0 : (0 : ℝ) ≤ dcoef := Real.sqrt_nonneg _
   have hdiu : ∀ i : Fin (n + 1), ‖(u : H1amb Ω) i.succ‖ ≤ dcoef * P := fun i =>
-    firstOrder_gradNorm_le Op hb hc u f hu i
+    firstOrder_gradNorm_le Op u f hu i
   -- Per-`(k, i)` localised statement with a data-only growth constant. The `V`-restriction of
   -- the cutoff class `ζ · ∂ᵢu` coincides with that of `∂ᵢu`, because `ζ ≡ 1` on `V`.
   have hstep : ∀ k i : Fin (n + 1), ∃ G : ℝ, ∃ wki : Lp ℝ 2 (volume.restrict V),
@@ -174,7 +182,7 @@ theorem interior_H2_estimate {n : ℕ} (Op : FullEllipticOp (n + 1))
       ‖wki‖ + ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ))‖
           + ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) 0))‖ ≤ G * P := by
     intro k i
-    obtain ⟨w, hw, Cd, hwCd⟩ := interior_secondWeakDeriv Op hΩm hA hb hc T u f hu k i
+    obtain ⟨w, hw, Cd, hwCd⟩ := interior_secondWeakDeriv Op hΩm hA T u f hu k i
     have hAB : (extendL2 hΩm (mulTest T.hζ ((u : H1amb Ω) i.succ))
           : EuclideanSpace ℝ (Fin (n + 1)) → ℝ)
         =ᵐ[volume.restrict V]
