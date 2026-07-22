@@ -53,15 +53,17 @@ operator.
 ```bash
 cd lean && lake build      # includes the axiom gates in Gates.lean
 cd lean && lake lint       # environment-level linter
-
-cd numerics/rust && cargo test
 ```
 
-CI runs all of these on every push. The Lean job builds from a clean clone,
-asserts the development is free of `sorry`, and holds every headline result to
-the axioms `propext`, `Classical.choice` and `Quot.sound` through `Gates.lean`,
-where each is pinned with `#guard_msgs`. The numerics job runs `cargo fmt
---check`, `cargo clippy -- -D warnings` and the test suite.
+CI runs both on every push. It builds from a clean clone, asserts the
+development is free of `sorry`, and holds every headline result to the axioms
+`propext`, `Classical.choice` and `Quot.sound` through `Gates.lean`, where each
+is pinned with `#guard_msgs`.
+
+`numerics/rust` does not build from a clean clone: it takes its box meshes from
+`cartan-dec` through a path dependency outside this repository. It is published
+for reading, and is outside CI until that dependency is either vendored or
+dropped.
 
 ## Toolchain
 
