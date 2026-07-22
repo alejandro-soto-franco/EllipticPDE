@@ -1,0 +1,35 @@
+name: lean
+
+# Build the formalisation and assert it stays sorry-free. Both dependencies
+# (the mathlib fork and Meridian) are public, so a clean clone resolves.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elan (Lean toolchain manager)
+        run: |
+          curl -sSfL https://github.com/leanprover/elan/releases/latest/download/elan-x86_64-unknown-linux-gnu.tar.gz | tar xz
+          ./elan-init -y --default-toolchain "$(cat lean/lean-toolchain)"
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Build
+        working-directory: lean
+        run: |
+          lake exe cache get || true
+          lake build
+
+      - name: Assert the development is sorry-free
+        working-directory: lean
+        run: |
+          if grep -rn --include='*.lean' -E '(^|[^A-Za-z_.])sorry([^A-Za-z_]|$)' EllipticPdes; then
+            echo "::error::sorry found in the development"
+            exit 1
+          fi
+          echo "no sorry in EllipticPdes"
