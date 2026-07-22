@@ -41,12 +41,8 @@ operator.
 
 - `lean/` the formalisation. A standalone lake project pinned to Lean
   `v4.31.0-rc1`.
-- `numerics/rust/` analytic-constant verification and a P1 finite-element
-  cross-check on box meshes. The assembled stiffness and mass generalised
-  eigenproblem recovers the sharp Poincaré constant, and a manufactured-solution
-  study confirms first-order $H^1$ convergence. Run `cargo run --bin report` for
-  the full verdict.
-- `numerics/python/` SymPy cross-checks, managed by uv.
+- `lean/Gates.lean` axiom gates for the headline results, built as a target of
+  its own.
 
 ## Build
 
@@ -60,14 +56,9 @@ development is free of `sorry`, and holds every headline result to the axioms
 `propext`, `Classical.choice` and `Quot.sound` through `Gates.lean`, where each
 is pinned with `#guard_msgs`.
 
-`numerics/rust` does not build from a clean clone: it takes its box meshes from
-`cartan-dec` through a path dependency outside this repository. It is published
-for reading, and is outside CI until that dependency is either vendored or
-dropped.
-
 ## Toolchain
 
-Lean `v4.31.0-rc1` with Mathlib. Rust, stable toolchain. Python via uv.
+Lean `v4.31.0-rc1` with Mathlib.
 
 ## Licence
 

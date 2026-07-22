@@ -1,16 +1,5 @@
 # Lean
 /lean/.lake
 
-# Rust
-/numerics/rust/target
-
-# Python
-.venv/
-__pycache__/
-*.pyc
-
-# Local direnv (machine-specific venv paths)
-.envrc
-
 # Stray Meridian export tempfiles (lean-sync writes these into the project)
 /lean/meridian-dump-*.ttl
