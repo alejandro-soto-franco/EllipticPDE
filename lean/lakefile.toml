@@ -25,8 +25,9 @@ name = "mathlib"
 git = "https://github.com/alejandro-soto-franco/mathlib4.git"
 rev = "16a297f1108035c3a8174d68b052f92a991ea7bf"
 
-# `Meridian` is required so this project can be ingested by
-# `stratum cite lean-sync` (RDF Turtle dump of the Lean Environment).
+# `Meridian` supplies the metaprogramming toolkit used to inspect this
+# project's environment: sorry inventory, dependency graphs, and an RDF
+# Turtle dump of the Lean `Environment`.
 [[require]]
 name = "Meridian"
 git = "https://github.com/alejandro-soto-franco/Meridian.git"
