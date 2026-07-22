@@ -3,7 +3,6 @@
 
 # Rust
 /numerics/rust/target
-Cargo.lock
 
 # Python
 .venv/

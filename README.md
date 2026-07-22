@@ -51,14 +51,17 @@ operator.
 ## Build
 
 ```bash
-cd lean && lake build
+cd lean && lake build      # includes the axiom gates in Gates.lean
+cd lean && lake lint       # environment-level linter
 
 cd numerics/rust && cargo test
-
-cd numerics/python && uv run python -m pytest
 ```
 
-CI builds the formalisation and checks that it stays free of `sorry`.
+CI runs all of these on every push. The Lean job builds from a clean clone,
+asserts the development is free of `sorry`, and holds every headline result to
+the axioms `propext`, `Classical.choice` and `Quot.sound` through `Gates.lean`,
+where each is pinned with `#guard_msgs`. The numerics job runs `cargo fmt
+--check`, `cargo clippy -- -D warnings` and the test suite.
 
 ## Toolchain
 

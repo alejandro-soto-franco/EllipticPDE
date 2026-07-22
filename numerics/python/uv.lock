@@ -94,7 +94,7 @@ wheels = [
 ]
 
 [[package]]
-name = "elliptic-dirichlet-numerics"
+name = "elliptic-pdes-numerics"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
