@@ -3,7 +3,7 @@
 A Lean 4 formalisation of the solvability theory of linear
 second-order elliptic operators in divergence form on a bounded domain:
 
-$$-\nabla\cdot(A\nabla u) + b\cdot\nabla u + c\,u = f \ \text{ in } \Omega,
+$$-\nabla\cdot(A\nabla u) + b\cdot\nabla u + c u = f \ \text{ in } \Omega,
 \qquad u = 0 \ \text{ on } \partial\Omega,$$
 
 with $A$ uniformly elliptic with bounded measurable coefficients. The weak
