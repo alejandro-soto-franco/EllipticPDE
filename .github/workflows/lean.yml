@@ -1,0 +1,47 @@
+name: lean
+
+# Build the formalisation from a clean clone and hold it to what the README
+# claims: no `sorry`, no axiom beyond the classical three, and a clean pass of
+# the environment-level linter. The only dependency is upstream Mathlib at a
+# pinned revision, so a clean clone resolves without anything private.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lean:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elan (Lean toolchain manager)
+        run: |
+          curl -sSfL https://github.com/leanprover/elan/releases/latest/download/elan-x86_64-unknown-linux-gnu.tar.gz | tar xz
+          ./elan-init -y --default-toolchain "$(cat lean/lean-toolchain)"
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      # Builds `EllipticPdes` and `Gates`. The `Gates` target pins every headline
+      # result to [propext, Classical.choice, Quot.sound] with `#guard_msgs`, so a
+      # change in the axiom set fails here instead of going unnoticed.
+      - name: Build, including the axiom gates
+        working-directory: lean
+        run: |
+          lake exe cache get || true
+          lake build
+
+      - name: Assert the development is free of sorry
+        working-directory: lean
+        run: |
+          if grep -rn --include='*.lean' -E '(^|[^A-Za-z_.])sorry([^A-Za-z_]|$)' EllipticPdes; then
+            echo "::error::sorry found in the development"
+            exit 1
+          fi
+          echo "no sorry in EllipticPdes"
+
+      # Batteries' linter frontend over the elaborated environment: docBlame,
+      # unusedArguments, simpNF, synTaut and unusedHavesSuffices. These are the
+      # checks a text-based linter cannot reach.
+      - name: Environment linter
+        working-directory: lean
+        run: lake lint
