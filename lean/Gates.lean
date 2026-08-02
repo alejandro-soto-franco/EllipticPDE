@@ -69,6 +69,28 @@ import EllipticPdes
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Regularity.caccioppoli
 
+/-! ### Higher interior regularity -/
+
+/-- info: 'EllipticPdes.Regularity.HasWeakDeriv.unique' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.HasWeakDeriv.unique
+
+/-- info: 'EllipticPdes.Regularity.setIntegral_mul_partialD_cut_eq' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.setIntegral_mul_partialD_cut_eq
+
+/-- info: 'EllipticPdes.Regularity.outer_secondWeakDeriv' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.outer_secondWeakDeriv
+
+/-- info: 'EllipticPdes.Regularity.localWeakForm_of_fullBilin' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.localWeakForm_of_fullBilin
+
+/-- info: 'EllipticPdes.Regularity.differentiated_weakForm_of_weakSolution' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.differentiated_weakForm_of_weakSolution
+
 /-! ### Campanato's characterisation of Hölder continuity -/
 
 /-- info: 'EllipticPdes.Campanato.campanato_holderOnWith' depends on axioms: [propext, Classical.choice, Quot.sound] -/
@@ -99,9 +121,25 @@ import EllipticPdes
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Embedding.interior_holder_estimate
 
+/-- info: 'EllipticPdes.Embedding.interior_holder_estimate_two' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.interior_holder_estimate_two
+
+/-- info: 'EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le
+
+/-- info: 'EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_of_le' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_of_le
+
 /-- info: 'EllipticPdes.Embedding.exists_eLpNorm_six_le' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Embedding.exists_eLpNorm_six_le
+
+/-- info: 'EllipticPdes.Embedding.exists_eLpNorm_four_le' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.exists_eLpNorm_four_le
 
 /-- info: 'EllipticPdes.Embedding.interior_holder_estimate_one' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in

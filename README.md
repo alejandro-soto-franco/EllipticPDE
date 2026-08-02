@@ -25,23 +25,33 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
 - the resolvent bound,
 - spectral compactness of the operator,
 - interior $H^2$ regularity, as `EllipticPdes.Regularity.interior_H2_estimate`, and
-- interior Hölder continuity of the solution at exponent $\tfrac12$, as
-  `EllipticPdes.Embedding.interior_holder_estimate` in dimension three and
-  `interior_holder_estimate_one` in dimension one.
+- interior Hölder continuity of the solution at exponent $\tfrac12$ in dimensions
+  one, two and three, as `EllipticPdes.Embedding.interior_holder_estimate_one`,
+  `interior_holder_estimate_two` and `interior_holder_estimate`.
 
 The Hölder estimate chains the $H^2$ estimate through Morrey's inequality on a
-ball. Supporting layers carry Morrey's inequality itself, a Gagliardo-Nirenberg
-bootstrap from $L^2$ to $L^6$, Campanato's characterisation of Hölder continuity
-with its converse, and the Caccioppoli inequality.
+ball. Supporting layers carry Morrey's inequality itself, the
+Gagliardo-Nirenberg-Sobolev bootstrap `exists_eLpNorm_sobolevConj_le` in general
+dimension and at a general exponent pair, Campanato's characterisation of Hölder
+continuity with its converse, and the Caccioppoli inequality.
+
+Dimension four and above stays open. Morrey needs a gradient in $L^{p'}$ with
+$p' > d$, the interior $H^2$ estimate supplies $L^2$ second derivatives, and
+$1/p' = 1/p - 1/d$ gives $p' > d$ only for $p > d/2$, so the exponent window
+$d/2 < p \le 2$ is empty once $d \ge 4$. One Sobolev step never reaches Morrey
+there; those dimensions need iteration through the $H^k$ ladder.
 
 Two further chains have their foundations in place and their headline estimates
 open. Higher interior regularity has the admissibility step,
-`EllipticPdes.Regularity.interior_cutoffGrad_mem_H01`, which returns the cutoff of
-a first derivative to $H_0^1(\Omega)$. Boundary $H^2$ regularity has the half-ball
-geometry, tangential difference quotients with their $H_0^1$ admissibility, and
-the weak quotient rule dividing a $C^1$ weight out of a weak derivative. The
-interior $H^3$ and boundary $H^2$ estimates themselves are not reached, and
-Schauder $C^{k,\alpha}$ estimates remain a roadmap item.
+`EllipticPdes.Regularity.interior_cutoffGrad_mem_H01`, returning the cutoff of a
+first derivative to $H_0^1(\Omega)$, and the differentiated-equation identity
+`differentiated_weakForm_of_weakSolution`, which carries every hypothesis
+discharged from the weak formulation apart from a weak derivative of the datum.
+Boundary $H^2$ regularity has the half-ball geometry, tangential difference
+quotients with their $H_0^1$ admissibility, and the weak quotient rule dividing a
+$C^1$ weight out of a weak derivative. The interior $H^3$ and boundary $H^2$
+estimates themselves are not reached, and Schauder $C^{k,\alpha}$ estimates remain
+a roadmap item.
 
 ## Dependency chain
 
