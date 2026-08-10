@@ -1,0 +1,175 @@
+#!/usr/bin/env python3
+"""
+Warrant-coverage gate between Gates.lean and the proofsense manifest.
+
+`adduce formalize check` gates the LaTeX statement against the Lean declaration
+that discharges it. Nothing gates the other link: whether the Lean declaration
+states the theorem in the literature it cites. That link is proofsense's, and
+this script gates its coverage, so a result cannot be presented as checked
+against the literature when no warrant names it.
+
+Three things are asserted:
+
+  * every declaration axiom-gated in `lean/Gates.lean` either carries a warrant
+    in `proofsense/manifest.json` or appears in EXEMPT below with a reason;
+  * every warrant names a declaration that Gates.lean gates, so the manifest
+    cannot drift onto a declaration nothing pins the axioms of;
+  * every warrant's locator names a statement rather than a section, since a
+    section locator hands the judge every theorem under the heading and makes
+    the equivalent relation unreachable.
+
+The transcribed sources are copyrighted and gitignored, so this runs without
+them: it reads the manifest, not the literature. `proofsense resolve` is the
+check that every locator hits a passage, and it needs the sources.
+
+Run:  uv run python verify/proofsense_coverage.py
+Exit code 0 iff covered.
+"""
+
+import json
+import re
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+GATES = ROOT / "lean" / "Gates.lean"
+MANIFEST = ROOT / "proofsense" / "manifest.json"
+
+# Gated declarations with no warrant, and why. Adding a name here is a claim
+# that no transcribed statement matches it, which the README under
+# proofsense/ has to justify in prose.
+EXEMPT = {
+    "EllipticPdes.Regularity.caccioppoli": (
+        "states a first-derivative Caccioppoli estimate, which Evans proves "
+        "inside 6.3.1 Theorem 1 rather than stating as a numbered result; "
+        "Gilbarg and Trudinger Theorem 8.8 is the match and is not transcribed. "
+        "Guo Lemma X.3.5 carries the name but states the non-negative "
+        "subsolution form with no datum, so it is a different lemma"
+    ),
+    "EllipticPdes.Poincare.poincare_domain": (
+        "the averaging step over an arbitrary family, with no gradient and no "
+        "geometry, so there is nothing to cite; poincare_H01_of_bounded is the "
+        "Poincare inequality and is bound in the adduce lock"
+    ),
+    "EllipticPdes.Poincare.poincare_oneDim": (
+        "the one-dimensional inequality on an interval, for u continuously "
+        "differentiable with u a = 0 at the left endpoint alone, and with the "
+        "explicit constant (b - a)^2 / 2. Evans 5.6.1 Theorem 3 is the "
+        "W_0^{1,p} statement, which in one dimension asks u to vanish at both "
+        "ends and names no constant, and 5.8.1 Theorems 1 and 2 subtract the "
+        "mean over a connected C^1 domain or over a ball. The manuscript "
+        "records this lemma as the one new analytic ingredient of the Poincare "
+        "chain and prepares it for Mathlib, so no transcribed statement "
+        "matches it"
+    ),
+    "EllipticPdes.Poincare.poincare_H01": (
+        "the density step alone, carrying an abstract constant C from the test "
+        "functions to their closure in H_0^1(Omega), with no geometry and no "
+        "bound on C. Evans performs the corresponding passage inside the proof "
+        "of 5.6.1 Theorem 3, by approximating u in W_0^{1,p}(U) with "
+        "C_c^infty(U) functions, and states no separate lemma; "
+        "poincare_H01_euclBox and poincare_H01_of_bounded are the inequality "
+        "itself and carry the warrants"
+    ),
+    "EllipticPdes.Campanato.campanatoOn_of_holderOnWith": (
+        "the converse half of the Campanato characterisation; Fernandez-Real "
+        "and Ros-Oton record only the space equality, attributed to Janson, "
+        "Taibleson and Weiss, which is not transcribed, so no transcribed "
+        "statement matches the direction this declaration proves"
+    ),
+}
+
+# A statement locator names one statement, never a whole section. Three forms
+# carry that, and a bare section number carries none of them:
+#
+#   §6.3.1 Thm 1                  a numbered result inside a numbered section
+#   §1.1 Thm (Sobolev inequality) a named result in a section that numbers none
+#   App. A (H3)                   a labelled property in a lettered appendix
+#
+# The second and third forms arrived with the Fernandez-Real and Ros-Oton text,
+# which numbers its appendix properties (H1) to (H8) and leaves several chapter
+# theorems unnumbered. Restricting the rule to the first form would have forced
+# a warrant for either to cite the enclosing section, which is the failure the
+# gate exists to prevent.
+_MARKER = r"Thm|Theorem|Lem|Lemma|Cor|Corollary|Def|Definition|Rmk|Remark|Prop|Proposition"
+STATEMENT_LOCATOR = re.compile(
+    rf"""^(?:
+          §?\s*\d+(?:\.\d+)*\s+(?:{_MARKER})\s*(?:\d+|\([^)]+\))
+        | (?:App\.?|Appendix)\s*[A-Z]\s*\([^)]+\)
+      )$""",
+    re.IGNORECASE | re.VERBOSE,
+)
+
+
+def gated_declarations(path: Path) -> list[str]:
+    """Every declaration `#print axioms` pins in Gates.lean, in file order."""
+    text = path.read_text(encoding="utf-8")
+    return re.findall(r"^#print axioms\s+(\S+)\s*$", text, re.MULTILINE)
+
+
+def check(gated: list[str], warrants: list[dict], exempt: dict) -> list[str]:
+    """Every way the manifest and Gates.lean can disagree, as failure lines."""
+    warranted = {w["decl"] for w in warrants}
+    failures: list[str] = []
+
+    for decl in gated:
+        if decl not in warranted and decl not in exempt:
+            failures.append(
+                f"{decl} is axiom-gated but carries no warrant and is not exempt"
+            )
+
+    for decl in sorted(d for d in exempt if d not in gated):
+        failures.append(f"{decl} is exempt but Gates.lean no longer gates it")
+
+    for decl in sorted(warranted & set(exempt)):
+        failures.append(f"{decl} is both warranted and exempt; drop the exemption")
+
+    for decl in sorted(d for d in warranted if d not in gated):
+        failures.append(f"{decl} carries a warrant but Gates.lean does not gate it")
+
+    for w in warrants:
+        if not STATEMENT_LOCATOR.match(w["locator"]):
+            failures.append(
+                f"{w['decl']} cites {w['locator']!r}, which names a section "
+                f"rather than a statement"
+            )
+
+    return failures
+
+
+def main() -> int:
+    for path in (GATES, MANIFEST):
+        if not path.exists():
+            print(f"missing {path}", file=sys.stderr)
+            return 2
+
+    gated = gated_declarations(GATES)
+    if not gated:
+        print(f"no `#print axioms` lines found in {GATES}", file=sys.stderr)
+        return 2
+
+    warrants = json.loads(MANIFEST.read_text(encoding="utf-8")).get("warrants", [])
+    failures = check(gated, warrants, EXEMPT)
+
+    for failure in failures:
+        print(f"  FAIL  {failure}")
+
+    warranted = {w["decl"] for w in warrants}
+    exempt_count = len([d for d in gated if d in EXEMPT])
+    uncovered = len([d for d in gated if d not in warranted and d not in EXEMPT])
+    print(
+        f"\n{len(gated)} gated declarations: "
+        f"{len(gated) - exempt_count - uncovered} warranted, "
+        f"{exempt_count} exempt, {uncovered} uncovered"
+    )
+
+    if failures:
+        print(f"{len(failures)} failure(s)")
+        return 1
+
+    print("covered")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

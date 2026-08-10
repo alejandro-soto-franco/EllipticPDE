@@ -1,0 +1,254 @@
+{
+  "subject_imports": [
+    "EllipticPdes"
+  ],
+  "sources": [
+    {
+      "id": "evans-2010",
+      "content_list": "../latex/litreview/sources/transcribed-mineru/evans-2010-par-dif-equ.md"
+    },
+    {
+      "id": "fernandezreal-2023-reg-the-ell",
+      "content_list": "../latex/litreview/sources/transcribed-mineru/fernandezreal-2023-reg-the-ell.tex"
+    }
+  ],
+  "space_map": {
+    "H01": "H1_0",
+    "H1amb": "H1",
+    "L2D": "L2",
+    "EucL2": "L2",
+    "Lp": "L2",
+    "IsC1Coeff": "C1",
+    "IsC2Coeff": "C2"
+  },
+  "warrants": [
+    {
+      "decl": "EllipticPdes.Sobolev.FullEllipticOp.garding",
+      "source_id": "evans-2010",
+      "locator": "§6.2.2 Thm 2",
+      "claim": "formalises"
+    },
+    {
+      "decl": "EllipticPdes.dirichlet_weak_solution",
+      "source_id": "evans-2010",
+      "locator": "§6.2.2 Thm 3",
+      "claim": "formalises"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.FullEllipticOp.weak_solution_L2_of_nonneg_zeroth_of_bounded",
+      "source_id": "evans-2010",
+      "locator": "§6.2.2 Thm 3",
+      "claim": "formalises the theorem at the shift mu = 0, for the operator with b = 0 and c >= 0 almost everywhere on an arbitrary bounded Omega, over the solution space H_0^1(Omega) that Evans also takes: every f in L^2(Omega) admits a unique weak solution, with the a-priori bound ‖u‖_{H_0^1} <= (C_P + 1)/lambda · ‖f‖_{L^2}. Evans reaches gamma = 0 for exactly these coefficients in the Examples following the theorem, and states no bound. The Poincare constant is quantified before the datum, so it depends on Omega alone. dirichlet_weak_solution carries the same locator for the pure Dirichlet form"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.FullEllipticOp.fredholm_alternative",
+      "source_id": "evans-2010",
+      "locator": "§6.2.3 Thm 4",
+      "claim": "formalises clause (i), the dichotomy, with the compactness of opK as a hypothesis rather than as a consequence of Rellich-Kondrachov: either the homogeneous problem has a nonzero weak solution in H_0^1(Omega), or every continuous functional on H_0^1(Omega) is the datum of a unique weak solution. Evans takes f in L^2(U), where the declaration takes any element of the dual, which is the H^{-1} form Evans records under Mapping H_0^1 to H^{-1} after §6.2.2 Theorem 3. fredholm_alternative_of_bounded is the same statement with the compactness discharged"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.FullEllipticOp.solvable_iff_orthogonal_solSpaceStar",
+      "source_id": "evans-2010",
+      "locator": "§6.2.3 Thm 4",
+      "claim": "formalises"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.FullEllipticOp.fredholm_alternative_of_bounded",
+      "source_id": "evans-2010",
+      "locator": "§6.2.3 Thm 4",
+      "claim": "formalises"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.FullEllipticOp.finiteDimensional_solSpace",
+      "source_id": "evans-2010",
+      "locator": "§6.2.3 Thm 4",
+      "claim": "formalises the finite-dimensionality half of clause (ii): the space N of weak solutions of the homogeneous problem, taken in H_0^1(Omega), is finite-dimensional. Evans states it under alternative (beta); the declaration states it unconditionally, which is vacuous under (alpha), where N is trivial. The compactness of opK is a hypothesis rather than a consequence of Rellich-Kondrachov"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.FullEllipticOp.finrank_solSpaceStar_eq_finrank_solSpace",
+      "source_id": "evans-2010",
+      "locator": "§6.2.3 Thm 4",
+      "claim": "formalises the index half of clause (ii): the space N* of weak solutions of the transpose problem and the space N of weak solutions of the homogeneous problem, both taken in H_0^1(Omega), have the same finite dimension. Evans states it under alternative (beta); the declaration states it unconditionally, both ranks being zero under (alpha). The compactness of opK is a hypothesis rather than a consequence of Rellich-Kondrachov"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.FullEllipticOp.existence_three_of_bounded",
+      "source_id": "evans-2010",
+      "locator": "§6.2.3 Thm 5",
+      "claim": "formalises"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.FullEllipticOp.resolvent_bound",
+      "source_id": "evans-2010",
+      "locator": "§6.2.3 Thm 6",
+      "claim": "formalises the theorem with the compactness of opK as a hypothesis rather than as a consequence of Rellich-Kondrachov: for lambda outside Sigma there is C > 0 with ‖u‖_{L^2(Omega)} <= C · ‖f‖_{L^2(Omega)} for every f in L^2(Omega) and every u in H_0^1(Omega) satisfying the weak identity for Lu = lambda u + f. Evans quantifies over the unique weak solution, which is the same element once §6.2.3 Theorem 5 supplies uniqueness. resolvent_bound_of_bounded is the same statement with the compactness discharged"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.FullEllipticOp.resolvent_bound_of_bounded",
+      "source_id": "evans-2010",
+      "locator": "§6.2.3 Thm 6",
+      "claim": "formalises"
+    },
+    {
+      "decl": "EllipticPdes.hneg_characterization",
+      "source_id": "evans-2010",
+      "locator": "§5.9.1 Thm 1",
+      "claim": "formalises clauses (i) and (ii) together, for the dual of H_0^1(Omega) on an arbitrary Omega: every continuous linear functional f is represented by a tuple (f_0, f_1, …, f_n) of L^2(Omega) functions, and the tuple norm of the Riesz representative equals ‖f‖_{H^{-1}} and is least among all representing tuples. Evans states the norm in (ii) as an infimum without asserting attainment, though his proof produces the attaining tuple; the declaration states the attainment. The sign convention differs: the representation reads int_Omega f_0 v - sum_i int_Omega f_i D_i v, where Evans carries a plus in every term"
+    },
+    {
+      "decl": "EllipticPdes.Regularity.interior_H2_estimate",
+      "source_id": "evans-2010",
+      "locator": "§6.3.1 Thm 1",
+      "claim": "formalises"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.spectrum_compact_operator",
+      "source_id": "evans-2010",
+      "locator": "App. D (Thm 6)",
+      "claim": "formalises the theorem for a compact operator K on an infinite-dimensional real Hilbert space: 0 lies in the real spectrum, the nonzero spectrum coincides with the nonzero eigenvalues, the nonzero spectrum is countable, and for each delta > 0 only finitely many spectral points have modulus at least delta. Evans states the last of these as the disjunction that the nonzero spectrum is finite or a sequence tending to zero, which the countability and the finiteness above every delta carry between them. The manuscript cites Brezis §6.3 for this theorem; that text is not transcribed, and Evans' Appendix D Theorem 6 states it"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.solOp_spectral",
+      "source_id": "evans-2010",
+      "locator": "§6.5.1 Thm 1",
+      "claim": "formalises clause (iii) for an abstract bounded bilinear form B on H_0^1(Omega) that is symmetric and coercive, with the compactness of the embedding into L^2(Omega) as a hypothesis: the eigenspaces of the solution operator G span L^2(Omega), their orthogonal complement being trivial. Evans fixes the divergence-form operator with C^infty coefficients on a connected U and produces the orthonormal basis; clauses (i) and (ii), reality of the eigenvalues and their divergence to infinity, sit outside the declaration. symmetric_fullElliptic_spectral is the divergence-form instance"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.dirichlet_spectral",
+      "source_id": "evans-2010",
+      "locator": "§6.5.1 Thm 1",
+      "claim": "formalises"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.dirichlet_spectral_of_bounded",
+      "source_id": "evans-2010",
+      "locator": "§6.5.1 Thm 1",
+      "claim": "formalises"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.symmetric_fullElliptic_spectral",
+      "source_id": "evans-2010",
+      "locator": "§6.5.1 Thm 1",
+      "claim": "formalises clause (iii) for the divergence-form operator Lu = -D_j(a^{ij} D_i u) + c u with a^{ij} symmetric almost everywhere, b = 0 and c >= 0, over solutions in H_0^1(Omega): the eigenspaces of the solution operator span L^2(Omega). Evans takes a^{ij} in C^infty of the closure of U with U connected, where the declaration takes bounded measurable uniformly elliptic coefficients and asks neither connectedness nor smoothness, and admits the zeroth-order term c that Evans' (2) omits. The Poincare bound and the compactness of the embedding are hypotheses. As with solOp_spectral, clauses (i) and (ii) sit outside the declaration"
+    },
+    {
+      "decl": "EllipticPdes.Campanato.campanato_holderOnWith",
+      "source_id": "fernandezreal-2023-reg-the-ell",
+      "locator": "App. A (H3)",
+      "claim": "formalises"
+    },
+    {
+      "decl": "EllipticPdes.Regularity.interior_cutoffGrad_mem_H01",
+      "source_id": "evans-2010",
+      "locator": "§6.3.1 Thm 2",
+      "claim": "formalises the admissibility step of the induction, for a weak solution quantified over H_0^1(Omega) rather than H^1(U): the cutoff xi times a first derivative of the solution is again in H_0^1(Omega), carrying its weak gradient"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.interior_holder_estimate",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "formalises"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.interior_holder_estimate_one",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "formalises"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.interior_holder_estimate_two",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "formalises the concatenation of the two embeddings at d = 2, where the Sobolev conjugate of 2 degenerates: the step is taken at p = 4/3, whose conjugate is 4, and Morrey then applies at 4 > 2"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le",
+      "source_id": "evans-2010",
+      "locator": "§5.6.1 Thm 1",
+      "claim": "formalises the inequality in general dimension d and at a general exponent pair with 1/p' = 1/p - 1/d, transported from Evans' smooth compactly supported setting to a weak gradient on a ball by a cutoff and a mollification, so the bound carries the ball data ‖v‖ + sum of ‖g k‖ rather than the gradient alone"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_of_le",
+      "source_id": "evans-2010",
+      "locator": "§5.6.1 Thm 1",
+      "claim": "formalises the same inequality fed by data at an exponent q above p, the ball's finite measure supplying the factor |B|^(1/p - 1/q) that the constant absorbs"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.exists_eLpNorm_six_le",
+      "source_id": "fernandezreal-2023-reg-the-ell",
+      "locator": "§1.1 Thm (Sobolev inequality)",
+      "claim": "formalises"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.exists_eLpNorm_four_le",
+      "source_id": "evans-2010",
+      "locator": "§5.6.1 Thm 1",
+      "claim": "formalises the inequality at d = 2 and p = 4/3, whose Sobolev conjugate is 4, applied to L² data on a ball"
+    },
+    {
+      "decl": "EllipticPdes.Regularity.cutoffMulOn_tangDiffQuotG_mem_H01",
+      "source_id": "evans-2010",
+      "locator": "§6.3.2 Thm 4",
+      "claim": "formalises the admissibility of Evans' test element on a literal half-ball, for a weak solution quantified over H_0^1(halfBall d r) rather than H^1(U): the cutoff zeta times a tangential difference quotient of the solution is again in H_0^1. Evans frames tangentiality as a constraint on the step h; the formalisation shows it is unconditional in h, and that tangentiality enters through the support inclusion tsupport (D_k^h phi) subset {x | 0 < x 0} The step is proof steps 1 to 3 of that theorem."
+    },
+    {
+      "decl": "EllipticPdes.Regularity.HasWeakDerivOn.of_mul_contDiff_left",
+      "source_id": "evans-2010",
+      "locator": "§6.3.2 Thm 4",
+      "claim": "formalises the division by a^{nn} that recovers the normal second derivative. Evans performs it as pointwise algebra on functions already known to be twice differentiable; on L^2 weak derivatives the division needs the weight to be C^1 with bounded derivative, which a bounded-below bounded measurable weight does not supply The step is proof step 5 of that theorem, equation (55)."
+    },
+    {
+      "decl": "EllipticPdes.Regularity.exists_hasWeakDerivOn_of_mul_diag",
+      "source_id": "evans-2010",
+      "locator": "§6.3.2 Thm 4",
+      "claim": "formalises the L^2 form of Evans' estimate (55) at the diagonal coefficient, with the lower bound a^{nn} >= theta of (54) discharged from ellipticity at xi = e_n and the derivative bound discharged from IsC1Coeff The step is proof step 5 of that theorem, equations (54) and (55)."
+    },
+    {
+      "decl": "EllipticPdes.Regularity.HasWeakDeriv.unique",
+      "source_id": "evans-2010",
+      "locator": "§6.3.1 Thm 2",
+      "claim": "formalises the uniqueness of the L^2 weak derivative on R^d, the identification that lets a second derivative obtained as a weak limit of difference quotients be equated with the one obtained from the Leibniz rule. Evans states no such lemma and performs the identification silently. The development quantifies its weak solutions over H_0^1(Omega) rather than Evans' H^1(U); this lemma is independent of that choice, holding for any L^2 class on the whole space. The step is proof step 3 of that theorem, the passage from (34) to the reading of D^alpha u in (35)."
+    },
+    {
+      "decl": "EllipticPdes.Regularity.setIntegral_mul_partialD_cut_eq",
+      "source_id": "evans-2010",
+      "locator": "§6.3.1 Thm 2",
+      "claim": "formalises the replacement of the test function v-tilde by chi times v-tilde inside an integral whose weight vanishes almost everywhere off the set where the cutoff chi is identically 1, so that a localised integration by parts stated for test functions supported in the localisation region applies to a test function that is not itself supported there. Evans keeps v-tilde in C_c^infty(W) and never performs the replacement; it is forced by the cutoff that the H_0^1(Omega) solution space of this development, in place of Evans' H^1(U), puts into every term. The step is proof step 3 of that theorem, the integrations by parts that produce (34)."
+    },
+    {
+      "decl": "EllipticPdes.Regularity.outer_secondWeakDeriv",
+      "source_id": "evans-2010",
+      "locator": "§6.3.1 Thm 2",
+      "claim": "formalises the choice of the intermediate region W with V compactly inside W compactly inside U, as a second cutoff tower based at the topological support of the first tower's middle cutoff, together with the interior second weak derivatives of the solution on that region, as whole-space L^2 classes bounded by the data with one constant covering every direction pair. Evans fixes W and reads (31) and (32) off the induction hypothesis at m; here they come from interior_H2_estimate, for a weak solution quantified over H_0^1(Omega) rather than Evans' H^1(U). The step is proof step 2 of that theorem, the choice of W and the induction hypotheses (31) and (32)."
+    },
+    {
+      "decl": "EllipticPdes.Regularity.localWeakForm_of_fullBilin",
+      "source_id": "evans-2010",
+      "locator": "§6.3.1 Thm 2",
+      "claim": "formalises the passage from the identity B[u, v] = (f, v)_{L^2(U)}, which this development states through a bounded bilinear form on the trial space H_0^1(Omega) rather than over Evans' H^1(U), to the plain-integral form of the same identity on a measurable V inside Omega, against test functions supported in V, with each coordinate read as the V-restriction of its extension by zero. Evans moves between the two forms without comment. The step is proof step 3 of that theorem, the identity into which v := (-1)^{|alpha|} D^alpha v-tilde is inserted."
+    },
+    {
+      "decl": "EllipticPdes.Regularity.differentiated_weakForm_of_weakSolution",
+      "source_id": "evans-2010",
+      "locator": "§6.3.1 Thm 2",
+      "claim": "formalises equation (34) at |alpha| = 1 for a weak solution quantified over H_0^1(Omega) rather than Evans' H^1(U): on any compact V inside Omega the second weak derivatives exist with the interior H^2 bound, and the differentiated identity holds against every test function supported in V, with the datum delivered as the explicit lower-order sum of (36) rather than packaged as a single L^2 class. The weak l-derivative of f is carried as a hypothesis, since Evans (26) assumes f in H^m(U) and the datum (36) contains D^alpha f, which f in L^2 alone does not supply. The step is proof step 3 of that theorem, equations (34) to (36)."
+    },
+    {
+      "decl": "EllipticPdes.Poincare.intervalIntegral_mul_sq_le",
+      "source_id": "evans-2010",
+      "locator": "App. B (Hölder's inequality)",
+      "claim": "formalises Hölder's inequality at p = q = 2 on an interval, squared and stated for the signed integral: (int_a^b f g)^2 <= (int_a^b f^2)(int_a^b g^2) for f and g continuous on [a, b]. Evans states int_U |u v| <= ‖u‖_{L^p(U)} ‖v‖_{L^q(U)} for u in L^p(U) and v in L^q(U); continuity on a compact interval supplies both memberships, and |int f g| <= int |f g| supplies the signed form. The route differs, being the discriminant of the nonnegative quadratic lambda |-> int_a^b (f - lambda g)^2 in place of Evans' passage through Young's inequality"
+    },
+    {
+      "decl": "EllipticPdes.Poincare.poincare_H01_euclBox",
+      "source_id": "evans-2010",
+      "locator": "§5.6.1 Thm 3",
+      "claim": "formalises the p = q = 2 case on a coordinate box Q = prod_i (a_i, b_i), over the solution space H_0^1(Q) that Evans also takes, with an admissible constant exhibited: ‖u‖^2_{L^2(Q)} <= L^2/(2n) · sum_i ‖D_i u‖^2_{L^2(Q)} for L the maximal side, that is C_P = L/sqrt(2n). Evans asserts a constant depending on p, q, n and U without exhibiting one, and restricts to 1 <= p < n, which at p = 2 excludes dimensions one and two; the route here is the one-dimensional inequality and Fubini, which asks nothing of the dimension"
+    },
+    {
+      "decl": "EllipticPdes.Poincare.poincare_H01_of_bounded",
+      "source_id": "evans-2010",
+      "locator": "§5.6.1 Thm 3",
+      "claim": "formalises the p = q = 2 case on an arbitrary bounded Omega, over the solution space H_0^1(Omega) that Evans also takes: some C >= 0 bounds the function part by the gradient part throughout H_0^1(Omega). Evans takes U bounded and open and restricts to 1 <= p < n, so p = 2 carries the hypothesis n > 2; the declaration holds in every dimension and asks boundedness alone of Omega, the constant being transported from an enclosing box rather than derived from the Gagliardo-Nirenberg-Sobolev inequality, at the cost of L/sqrt(2n) in place of the sharp constant"
+    }
+  ]
+}

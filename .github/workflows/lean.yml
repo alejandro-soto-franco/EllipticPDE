@@ -10,6 +10,21 @@ on:
   pull_request:
 
 jobs:
+  # Every declaration Gates.lean pins is checked against the literature it
+  # cites, so a result cannot be presented as literature-checked when no
+  # warrant names it. Reads the manifest rather than the sources, which are
+  # copyrighted and gitignored, so it needs neither Lean nor a key.
+  warrant-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Every pinned declaration is warranted or exempt
+        run: uv run python verify/proofsense_coverage.py
+      - name: The coverage gate's own tests
+        working-directory: verify
+        run: uv run --with pytest python -m pytest test_proofsense_coverage.py -q
+
   lean:
     runs-on: ubuntu-latest
     steps:
