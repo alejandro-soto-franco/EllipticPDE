@@ -52,38 +52,34 @@ noncomputable def outerCutoffTower {V : Set (EuclideanSpace ℝ (Fin d))} (hΩo 
 /-- **The interior second derivatives at the outer tower.** For every direction pair `(k, i)`
 the whole-space extension of `ζ' · ∂ᵢu`, with `ζ'` the innermost cutoff of the outer tower,
 carries an `L²` weak `k`-derivative bounded by the data, with a single constant covering the
-whole index square. This is `interior_secondWeakDeriv` at `outerCutoffTower`, with the
-per-pair constants collected into one. -/
+whole index square. The constant is quantified before the solution and the datum, so it
+depends only on the operator and the tower. This is `interior_secondWeakDeriv` at
+`outerCutoffTower`, with the per-pair constants collected into one. -/
 theorem outer_secondWeakDeriv (Op : FullEllipticOp d) (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
     (hA : IsC1Coeff Op.toEllipticCoeff) {V : Set (EuclideanSpace ℝ (Fin d))}
-    (T : CutoffTower Ω V) (u : H01 Ω) (f : L2D Ω)
-    (hu : ∀ w : H01 Ω, Op.fullBilin Ω u w
-      = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) :
-    ∃ C : ℝ, 0 ≤ C ∧ ∀ k i : Fin d, ∃ w : EucL2 d,
-      HasWeakDeriv k
-          (extendL2 hΩm (mulTest (outerCutoffTower hΩo T).hζ ((u : H1amb Ω) i.succ))) w
-        ∧ ‖w‖ ≤ C * (‖f‖ + ‖(u : H1amb Ω) 0‖) := by
+    (T : CutoffTower Ω V) :
+    ∃ C : ℝ, 0 ≤ C ∧ ∀ (u : H01 Ω) (f : L2D Ω),
+      (∀ w : H01 Ω, Op.fullBilin Ω u w
+        = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) →
+      ∀ k i : Fin d, ∃ w : EucL2 d,
+        HasWeakDeriv k
+            (extendL2 hΩm (mulTest (outerCutoffTower hΩo T).hζ ((u : H1amb Ω) i.succ))) w
+          ∧ ‖w‖ ≤ C * (‖f‖ + ‖(u : H1amb Ω) 0‖) := by
   classical
-  have hstep : ∀ k i : Fin d, ∃ Cd : ℝ, ∃ w : EucL2 d,
-      HasWeakDeriv k
-          (extendL2 hΩm (mulTest (outerCutoffTower hΩo T).hζ ((u : H1amb Ω) i.succ))) w
-        ∧ ‖w‖ ≤ Cd * (‖f‖ + ‖(u : H1amb Ω) 0‖) := by
-    intro k i
-    obtain ⟨w, hw, Cd, hwn⟩ :=
-      interior_secondWeakDeriv Op hΩm hA (outerCutoffTower hΩo T) u f hu k i
-    exact ⟨Cd, w, hw, hwn⟩
-  choose Cd w hw hwn using hstep
-  refine ⟨∑ k : Fin d, ∑ i : Fin d, |Cd k i|,
-    Finset.sum_nonneg (fun _ _ => Finset.sum_nonneg (fun _ _ => abs_nonneg _)),
-    fun k i => ⟨w k i, hw k i, le_trans (hwn k i) ?_⟩⟩
+  choose Cd hCd0 hCd using fun k i : Fin d =>
+    interior_secondWeakDeriv Op hΩm hA (outerCutoffTower hΩo T) k i
+  refine ⟨∑ k : Fin d, ∑ i : Fin d, Cd k i,
+    Finset.sum_nonneg (fun k _ => Finset.sum_nonneg (fun i _ => hCd0 k i)), ?_⟩
+  intro u f hu k i
+  obtain ⟨w, hw, hwn⟩ := hCd k i u f hu
+  refine ⟨w, hw, le_trans hwn ?_⟩
   refine mul_le_mul_of_nonneg_right ?_ (by positivity)
-  calc Cd k i ≤ |Cd k i| := le_abs_self _
-    _ ≤ ∑ i' : Fin d, |Cd k i'| :=
-        Finset.single_le_sum (f := fun i' => |Cd k i'|)
-          (fun i' _ => abs_nonneg _) (Finset.mem_univ i)
-    _ ≤ ∑ k' : Fin d, ∑ i' : Fin d, |Cd k' i'| :=
-        Finset.single_le_sum (f := fun k' => ∑ i' : Fin d, |Cd k' i'|)
-          (fun k' _ => Finset.sum_nonneg (fun i' _ => abs_nonneg _)) (Finset.mem_univ k)
+  calc Cd k i ≤ ∑ i' : Fin d, Cd k i' :=
+        Finset.single_le_sum (f := fun i' => Cd k i')
+          (fun i' _ => hCd0 k i') (Finset.mem_univ i)
+    _ ≤ ∑ k' : Fin d, ∑ i' : Fin d, Cd k' i' :=
+        Finset.single_le_sum (f := fun k' => ∑ i' : Fin d, Cd k' i')
+          (fun k' _ => Finset.sum_nonneg (fun i' _ => hCd0 k' i')) (Finset.mem_univ k)
 
 /-- **The interior `H²` estimate on `tsupport T.ξ`.** The middle cutoff of a tower has
 compact support inside `Ω`, so the interior `H²` estimate applies at that set: the second
@@ -93,10 +89,11 @@ commutators live. -/
 theorem interior_H2_estimate_near_tsupport_xi {n : ℕ} (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
     (hA : IsC1Coeff Op.toEllipticCoeff) {V : Set (EuclideanSpace ℝ (Fin (n + 1)))}
-    (T : CutoffTower Ω V) (u : H01 Ω) (f : L2D Ω)
-    (hu : ∀ w : H01 Ω, Op.fullBilin Ω u w
-      = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) :
-    ∃ C : ℝ, 0 ≤ C ∧ ∀ k i : Fin (n + 1),
+    (T : CutoffTower Ω V) :
+    ∃ C : ℝ, 0 ≤ C ∧ ∀ (u : H01 Ω) (f : L2D Ω),
+      (∀ w : H01 Ω, Op.fullBilin Ω u w
+        = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) →
+      ∀ k i : Fin (n + 1),
       ∃ wki : Lp ℝ 2 (volume.restrict (tsupport T.ξ)),
         HasWeakDerivOn (tsupport T.ξ) k
             (restrictL2 (Ω := tsupport T.ξ) (extendL2 hΩm ((u : H1amb Ω) i.succ))) wki ∧
@@ -104,6 +101,6 @@ theorem interior_H2_estimate_near_tsupport_xi {n : ℕ} (Op : FullEllipticOp (n 
             + ‖restrictL2 (Ω := tsupport T.ξ) (extendL2 hΩm ((u : H1amb Ω) i.succ))‖
             + ‖restrictL2 (Ω := tsupport T.ξ) (extendL2 hΩm ((u : H1amb Ω) 0))‖
           ≤ C * (‖f‖ + ‖(u : H1amb Ω) 0‖) :=
-  interior_H2_estimate Op hΩm hΩo hA T.hξ.2.1 T.hξ.2.2 u f hu
+  interior_H2_estimate Op hΩm hΩo hA T.hξ.2.1 T.hξ.2.2
 
 end EllipticPdes.Regularity

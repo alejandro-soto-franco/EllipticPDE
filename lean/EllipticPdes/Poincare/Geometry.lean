@@ -27,7 +27,7 @@ level of box integrals `∫_Ω φ²` and `∫_Ω (∂ᵢφ)²`. Two bridges do t
   with `C_P = C / d`. For a box of maximal side `L` the slice bound holds with `C = L²/2`
   (the 1-D step), giving the diameter constant `C_P = L²/(2d)` of `notes/constants.md`.
 
-The remaining input, the per-direction integral slice bound on a concrete box, is exactly the
+The remaining input, the per-direction integral slice bound on a coordinate box, is exactly the
 conclusion of `poincare_box_dir` (`Poincare/Fubini.lean`); this file is the bridge that turns
 it into the abstract-norm `hbase` the Hilbert-space layer wants.
 -/

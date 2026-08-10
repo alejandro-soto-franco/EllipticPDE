@@ -19,8 +19,8 @@ phrased on `EuclideanSpace ℝ (Fin (n+1))`. The one-dimensional/Fubini machiner
 `Poincare/Fubini.lean` proves exactly this bound, but on the **plain product** `Fin (n+1) → ℝ`
 with the pi-Lebesgue measure (`poincare_box_dir`). This file is the missing transport: it moves
 `poincare_box_dir` across the measure-preserving identification `WithLp.toLp` between
-`Fin (n+1) → ℝ` and `EuclideanSpace ℝ (Fin (n+1))`, turning it into the slice bound on a concrete
-open coordinate box, and hence into **unconditional** coercivity of the Dirichlet form on that box.
+`Fin (n+1) → ℝ` and `EuclideanSpace ℝ (Fin (n+1))`, turning it into the slice bound on a
+coordinate box, and hence into **unconditional** coercivity of the Dirichlet form on that box.
 
 The three bridges:
 

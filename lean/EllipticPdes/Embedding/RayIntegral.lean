@@ -534,7 +534,7 @@ theorem exists_potential_bound (hd : 0 < d) :
   have hnex : ∀ᵐ z ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), z ≠ x := by
     rw [ae_iff, show {z : EuclideanSpace ℝ (Fin d) | ¬ z ≠ x} = {x} from by ext z; simp]
     exact measure_singleton x
-  -- `Rl` rewrites as a genuine `enorm` integral, hence is finite and its `toReal` is `∫ g`.
+  -- `Rl` rewrites as an `enorm` integral, hence is finite and its `toReal` is `∫ g`.
   have hRl_enorm : Rl = ∫⁻ z in ball c r, ‖g z‖ₑ ∂volume := by
     rw [hRl_def]
     refine lintegral_congr_ae ?_

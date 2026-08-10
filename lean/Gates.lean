@@ -25,6 +25,16 @@ import EllipticPdes
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Sobolev.FullEllipticOp.existence_three_of_bounded
 
+/-- info: 'EllipticPdes.Sobolev.FullEllipticOp.weak_solution_L2_of_nonneg_zeroth_of_bounded' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.FullEllipticOp.weak_solution_L2_of_nonneg_zeroth_of_bounded
+
+/-! ### The dual space `H⁻¹` -/
+
+/-- info: 'EllipticPdes.hneg_characterization' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.hneg_characterization
+
 /-! ### The Gårding inequality -/
 
 /-- info: 'EllipticPdes.Sobolev.FullEllipticOp.garding' depends on axioms: [propext, Classical.choice, Quot.sound] -/
@@ -32,6 +42,18 @@ import EllipticPdes
 #print axioms EllipticPdes.Sobolev.FullEllipticOp.garding
 
 /-! ### The Fredholm alternative -/
+
+/-- info: 'EllipticPdes.Sobolev.FullEllipticOp.fredholm_alternative' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.FullEllipticOp.fredholm_alternative
+
+/-- info: 'EllipticPdes.Sobolev.FullEllipticOp.finiteDimensional_solSpace' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.FullEllipticOp.finiteDimensional_solSpace
+
+/-- info: 'EllipticPdes.Sobolev.FullEllipticOp.finrank_solSpaceStar_eq_finrank_solSpace' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.FullEllipticOp.finrank_solSpaceStar_eq_finrank_solSpace
 
 /-- info: 'EllipticPdes.Sobolev.FullEllipticOp.solvable_iff_orthogonal_solSpaceStar' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
@@ -43,9 +65,21 @@ import EllipticPdes
 
 /-! ### The resolvent bound and the spectrum -/
 
+/-- info: 'EllipticPdes.Sobolev.FullEllipticOp.resolvent_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.FullEllipticOp.resolvent_bound
+
 /-- info: 'EllipticPdes.Sobolev.FullEllipticOp.resolvent_bound_of_bounded' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Sobolev.FullEllipticOp.resolvent_bound_of_bounded
+
+/-- info: 'EllipticPdes.Sobolev.spectrum_compact_operator' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.spectrum_compact_operator
+
+/-- info: 'EllipticPdes.Sobolev.solOp_spectral' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.solOp_spectral
 
 /-- info: 'EllipticPdes.Sobolev.dirichlet_spectral' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
@@ -54,6 +88,10 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Sobolev.dirichlet_spectral_of_bounded' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Sobolev.dirichlet_spectral_of_bounded
+
+/-- info: 'EllipticPdes.Sobolev.symmetric_fullElliptic_spectral' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.symmetric_fullElliptic_spectral
 
 /-! ### Interior regularity -/
 
@@ -147,6 +185,26 @@ import EllipticPdes
 
 /-! ### The Poincaré chain the development reduces to -/
 
+/-- info: 'EllipticPdes.Poincare.intervalIntegral_mul_sq_le' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Poincare.intervalIntegral_mul_sq_le
+
+/-- info: 'EllipticPdes.Poincare.poincare_oneDim' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Poincare.poincare_oneDim
+
 /-- info: 'EllipticPdes.Poincare.poincare_domain' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Poincare.poincare_domain
+
+/-- info: 'EllipticPdes.Poincare.poincare_H01' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Poincare.poincare_H01
+
+/-- info: 'EllipticPdes.Poincare.poincare_H01_euclBox' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Poincare.poincare_H01_euclBox
+
+/-- info: 'EllipticPdes.Poincare.poincare_H01_of_bounded' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Poincare.poincare_H01_of_bounded

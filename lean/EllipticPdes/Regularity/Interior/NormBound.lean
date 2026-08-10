@@ -75,30 +75,29 @@ private lemma exists_abs_diffQuot_bound {η : EuclideanSpace ℝ (Fin d) → ℝ
     _ ≤ C * |h| := hMVT
     _ ≤ max C 0 * |h| := mul_le_mul_of_nonneg_right (le_max_left _ _) (abs_nonneg _)
 
-/-- **Uniform difference-quotient norm bound (Evans §5.8.2 / §6.3.1).** For the concrete-model
-weak solution `u` of `L u = f`, a cutoff tower `T`, and each `(k, i)`, the whole-space
-difference quotient of the extension of `ζ · ∂ᵢu` is bounded in `L²`, uniformly over all steps
-`h ≠ 0`, by a constant that depends only on the data `‖f‖ + ‖u₀‖`. For small `h` the discrete
+/-- **Uniform difference-quotient norm bound (Evans §5.8.2 / §6.3.1).** For a cutoff tower `T`
+and each `(k, i)`, there is a constant `Cd` such that every weak solution `u` of
+`L u = f` has the whole-space difference quotient of the extension of `ζ · ∂ᵢu` bounded in `L²`
+by `M`, uniformly over all steps `h ≠ 0`, with `M ≤ Cd (‖f‖ + ‖u₀‖)`. The step-uniform bound
+`M` depends on `u` and `f`; `Cd` is quantified before both, so it depends only on
+`λ, Λ, A₁, d, γ, ‖b‖∞, ‖c‖∞` and the tower. For small `h` the discrete
 Leibniz split localises the difference quotient onto the master energy bound
 (`interior_diffQuot_energy_bound`) and the first-order energy; for large `h` the crude
 operator bound `‖Dₖʰ g‖ ≤ 2‖g‖/|h|` closes it. This uniform bound is exactly the hypothesis of
 the weak-limit converse `weakDeriv_of_diffQuot_bounded`. -/
 theorem interior_diffQuot_norm_bound (Op : FullEllipticOp d) (hΩm : MeasurableSet Ω)
     (hA : IsC1Coeff Op.toEllipticCoeff)
-    {V : Set (EuclideanSpace ℝ (Fin d))} (T : CutoffTower Ω V)
-    (u : H01 Ω) (f : L2D Ω)
-    (hu : ∀ w : H01 Ω, Op.fullBilin Ω u w
-      = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) (k i : Fin d) :
-    ∃ M : ℝ, 0 ≤ M
-      ∧ (∀ h : ℝ, h ≠ 0 →
-          ‖diffQuot k h (extendL2 hΩm (mulTest T.hζ ((u : H1amb Ω) i.succ)))‖ ≤ M)
-      ∧ ∃ Cd : ℝ, M ≤ Cd * (‖f‖ + ‖(u : H1amb Ω) 0‖) := by
+    {V : Set (EuclideanSpace ℝ (Fin d))} (T : CutoffTower Ω V) (k i : Fin d) :
+    ∃ Cd : ℝ, 0 ≤ Cd ∧ ∀ (u : H01 Ω) (f : L2D Ω),
+      (∀ w : H01 Ω, Op.fullBilin Ω u w
+        = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) →
+      ∃ M : ℝ, 0 ≤ M
+        ∧ (∀ h : ℝ, h ≠ 0 →
+            ‖diffQuot k h (extendL2 hΩm (mulTest T.hζ ((u : H1amb Ω) i.succ)))‖ ≤ M)
+        ∧ M ≤ Cd * (‖f‖ + ‖(u : H1amb Ω) 0‖) := by
   classical
-  set di : L2D Ω := (u : H1amb Ω) i.succ with hdidef
-  set gζ : L2D Ω := mulTest T.hζ di with hgζdef
-  set P : ℝ := ‖f‖ + ‖(u : H1amb Ω) 0‖ with hPdef
   have hlam : (0 : ℝ) < Op.lam := Op.toEllipticCoeff.lam_pos
-  have hP0 : (0 : ℝ) ≤ P := by rw [hPdef]; positivity
+  have hγnn : (0 : ℝ) ≤ Op.gardingγ := Op.gardingγ_nonneg
   -- Sup bound of `ζ` and its difference quotient.
   set Mζ : ℝ := (exists_abs_bound T.hζ).choose with hMζdef
   have hMζbd : ∀ z, |T.ζ z| ≤ Mζ := (exists_abs_bound T.hζ).choose_spec
@@ -121,10 +120,23 @@ theorem interior_diffQuot_norm_bound (Op : FullEllipticOp d) (hΩm : MeasurableS
   have hδ₀θ : δ₀ ≤ δθ := le_trans (min_le_right _ _) (min_le_right _ _)
   -- The master energy constant, uniform in `h`.
   obtain ⟨CD2, hCD20, hD2⟩ :=
-    interior_diffQuot_energy_bound Op hΩm hA T.hξ T.hθ u f hu k
+    interior_diffQuot_energy_bound Op hΩm hA T.hξ T.hθ k
+  -- The two data coefficients: the first-order gradient coefficient `√((1 + 4γ)/(2λ))`, and
+  -- the `h`-uniform energy coefficient `√(2 CD2 / λ)`.
+  set dcoef : ℝ := Real.sqrt ((1 + 4 * Op.gardingγ) / (2 * Op.lam)) with hdcoefdef
+  have hrad : (0 : ℝ) ≤ (1 + 4 * Op.gardingγ) / (2 * Op.lam) := by positivity
+  have hdcoef0 : (0 : ℝ) ≤ dcoef := Real.sqrt_nonneg _
+  set CD2coef : ℝ := Real.sqrt (2 * CD2 / Op.lam) with hCD2coefdef
+  have hCD2coef0 : (0 : ℝ) ≤ CD2coef := Real.sqrt_nonneg _
+  refine ⟨max (Mζ * CD2coef + L * dcoef) (2 * Mζ * dcoef / δ₀),
+    le_max_of_le_left (add_nonneg (mul_nonneg hMζ0 hCD2coef0) (mul_nonneg hL0 hdcoef0)), ?_⟩
+  intro u f hu
+  set di : L2D Ω := (u : H1amb Ω) i.succ with hdidef
+  set gζ : L2D Ω := mulTest T.hζ di with hgζdef
+  set P : ℝ := ‖f‖ + ‖(u : H1amb Ω) 0‖ with hPdef
+  have hP0 : (0 : ℝ) ≤ P := by rw [hPdef]; positivity
   -- First-order gradient bound: `‖di‖ ≤ √((1 + 4γ)/(2λ)) · P`. The drift and the
   -- zeroth-order term enter only through the Gårding shift `γ`.
-  have hγnn : (0 : ℝ) ≤ Op.gardingγ := Op.gardingγ_nonneg
   have hfo : Op.lam / 2 * ∑ i : Fin d, ‖(u : H1amb Ω) i.succ‖ ^ 2
       ≤ ‖f‖ * ‖(u : H1amb Ω) 0‖ + Op.gardingγ * ‖(u : H1amb Ω) 0‖ ^ 2 :=
     firstOrder_energy_le Op u f hu
@@ -139,9 +151,6 @@ theorem interior_diffQuot_norm_bound (Op : FullEllipticOp d) (hΩm : MeasurableS
     rw [hPdef]; nlinarith only [sq_nonneg (‖f‖ - ‖(u : H1amb Ω) 0‖)]
   have hu0P : ‖(u : H1amb Ω) 0‖ ^ 2 ≤ P ^ 2 := by
     rw [hPdef]; nlinarith only [norm_nonneg f, norm_nonneg ((u : H1amb Ω) 0)]
-  set dcoef : ℝ := Real.sqrt ((1 + 4 * Op.gardingγ) / (2 * Op.lam)) with hdcoefdef
-  have hrad : (0 : ℝ) ≤ (1 + 4 * Op.gardingγ) / (2 * Op.lam) := by positivity
-  have hdcoef0 : (0 : ℝ) ≤ dcoef := Real.sqrt_nonneg _
   have hdi : ‖di‖ ≤ dcoef * P := by
     have hdiP : ‖di‖ ^ 2 ≤ (1 + 4 * Op.gardingγ) / (2 * Op.lam) * P ^ 2 := by
       rw [div_mul_eq_mul_div, le_div_iff₀ (by positivity : (0 : ℝ) < 2 * Op.lam)]
@@ -154,10 +163,7 @@ theorem interior_diffQuot_norm_bound (Op : FullEllipticOp d) (hΩm : MeasurableS
       rw [← hsq]; exact Real.sqrt_sq (mul_nonneg hdcoef0 hP0)
     rw [show ‖di‖ = Real.sqrt (‖di‖ ^ 2) from (Real.sqrt_sq (norm_nonneg _)).symm, ← hval]
     exact Real.sqrt_le_sqrt hdiP
-  -- The `h`-uniform data constant `CD2coef := √(2 CD2 / λ)`.
-  set CD2coef : ℝ := Real.sqrt (2 * CD2 / Op.lam) with hCD2coefdef
-  have hCD2coef0 : (0 : ℝ) ≤ CD2coef := Real.sqrt_nonneg _
-  -- The bound value, and the data constant.
+  -- The bound value, in the two step regimes.
   set Msm : ℝ := Mζ * (CD2coef * P) + L * ‖di‖ with hMsmdef
   set Mlg : ℝ := 2 * (Mζ * ‖di‖) / δ₀ with hMlgdef
   have hMsm0 : (0 : ℝ) ≤ Msm := by
@@ -208,7 +214,7 @@ theorem interior_diffQuot_norm_bound (Op : FullEllipticOp d) (hΩm : MeasurableS
       -- The master energy bound for this `h`, specialised to index `i`.
       have hBsq : ‖mulTest T.hξ (diffQuotD k h hΩm di)‖ ^ 2
           ≤ 2 * CD2 / Op.lam * (‖f‖ ^ 2 + ‖(u : H1amb Ω) 0‖ ^ 2) := by
-        have hmaster := hD2 h hh hsm_in hsm_out hθ1 hθ0
+        have hmaster := hD2 u f hu h hh hsm_in hsm_out hθ1 hθ0
         have hsingle : ‖extendL2 hΩm (mulTest T.hξ (diffQuotD k h hΩm di))‖ ^ 2
             ≤ ∑ i : Fin d,
               ‖extendL2 hΩm (mulTest T.hξ (diffQuotD k h hΩm ((u : H1amb Ω) i.succ)))‖ ^ 2 := by
@@ -346,8 +352,7 @@ theorem interior_diffQuot_norm_bound (Op : FullEllipticOp d) (hΩm : MeasurableS
                 (by positivity)
           _ = 2 * (Mζ * ‖di‖) / δ₀ := by rw [div_eq_inv_mul]
       exact hchain
-  · -- The data bound `M ≤ Cd · P`, with a data-only constant.
-    refine ⟨max (Mζ * CD2coef + L * dcoef) (2 * Mζ * dcoef / δ₀), ?_⟩
+  · -- The data bound `M ≤ Cd · P`, against the constant fixed before `u` and `f`.
     apply max_le
     · -- The small-step regime.
       refine le_trans ?_ (mul_le_mul_of_nonneg_right (le_max_left _ _) hP0)

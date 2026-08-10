@@ -15,7 +15,7 @@ The special case of the boundary `H²` estimate (Evans, *Partial Differential Eq
 where the estimate is proved. This file provides that geometry: the half-ball as a set,
 its openness (hence measurability), its interior and closure, and the fact that a
 *tangential* translation of a point in the smaller half-ball stays in the larger one at a
-small enough parameter — the geometric fact that makes the difference-quotient method run
+small enough parameter: the geometric fact that makes the difference-quotient method run
 in directions parallel to the flat boundary, exactly as `hshift`-translation staying inside
 a compact-in-open pair (`EllipticPdes.Regularity.exists_margin_of_isCompact_subset_isOpen`,
 `Regularity/CutoffTower.lean`) makes it run in the interior.
@@ -32,7 +32,7 @@ model space for manifolds with boundary: `EuclideanHalfSpace n := {x : Euclidean
 * `isOpen_halfBall`, `measurableSet_halfBall`, `interior_halfBall`, `closure_halfBall`.
 * `tangential_add_hshift_mem_halfBall`: a tangential translation of a point in the half-ball
   `V := halfBall d (r / 2)` stays in `U := halfBall d r`, for any step below the margin
-  `r / 2` — the coordinate-`0` value is untouched by a tangential shift, so this is exact
+  `r / 2`: the coordinate-`0` value is untouched by a tangential shift, so this is exact
   geometry, not a compactness-derived margin.
 -/
 

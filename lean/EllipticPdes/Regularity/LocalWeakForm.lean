@@ -207,12 +207,11 @@ theorem differentiated_weakForm_of_weakSolution {n : ℕ} (Op : FullEllipticOp (
     (Mdc : ℝ)
     (hcdM : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin (n + 1)))),
       |partialD ℓ Op.c x| ≤ Mdc)
-    {V : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hVc : IsCompact V) (hVΩ : V ⊆ Ω)
-    (u : H01 Ω) (f : L2D Ω) (Df : Lp ℝ 2 (volume.restrict V))
-    (hf_Df : HasWeakDerivOn V ℓ (restrictL2 (Ω := V) (extendL2 hΩm f)) Df)
-    (hu : ∀ w : H01 Ω, Op.fullBilin Ω u w
-      = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) :
-    ∃ C : ℝ, 0 ≤ C ∧
+    {V : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hVc : IsCompact V) (hVΩ : V ⊆ Ω) :
+    ∃ C : ℝ, 0 ≤ C ∧ ∀ (u : H01 Ω) (f : L2D Ω) (Df : Lp ℝ 2 (volume.restrict V)),
+      HasWeakDerivOn V ℓ (restrictL2 (Ω := V) (extendL2 hΩm f)) Df →
+      (∀ w : H01 Ω, Op.fullBilin Ω u w
+        = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) →
       ∃ D2 : Fin (n + 1) → Fin (n + 1) → Lp ℝ 2 (volume.restrict V),
         (∀ k i, HasWeakDerivOn V k
             (restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ))) (D2 k i))
@@ -238,9 +237,10 @@ theorem differentiated_weakForm_of_weakSolution {n : ℕ} (Op : FullEllipticOp (
   classical
   have hVm : MeasurableSet V := hVc.isClosed.measurableSet
   obtain ⟨C, hC0, hest⟩ :=
-    interior_H2_estimate Op hΩm hΩo hA.toIsC1Coeff hVc hVΩ u f hu
-  choose D2 hD2w hD2n using hest
-  refine ⟨C, hC0, D2, hD2w, hD2n, fun φ hφc hφcs hφV => ?_⟩
+    interior_H2_estimate Op hΩm hΩo hA.toIsC1Coeff hVc hVΩ
+  refine ⟨C, hC0, fun u f Df hf_Df hu => ?_⟩
+  choose D2 hD2w hD2n using hest u f hu
+  refine ⟨D2, hD2w, hD2n, fun φ hφc hφcs hφV => ?_⟩
   exact differentiated_weakForm hVm Op hA ℓ hb hc Mdb hbdM Mdc hcdM
     (restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) 0)))
     (fun i => restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ)))

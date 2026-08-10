@@ -131,6 +131,7 @@ theorem norm_sq_eq_integral_sq (g : EucL2 n) : ‖g‖ ^ 2 = ∫ x, (g x) ^ 2 :=
 def transL2 (h : EuclideanSpace ℝ (Fin n)) : EucL2 n →ₗᵢ[ℝ] EucL2 n :=
   Lp.compMeasurePreservingₗᵢ (𝕜 := ℝ) (· + h) (measurePreserving_add_right volume h)
 
+/-- A translate is represented almost everywhere by the shifted function. -/
 theorem coeFn_transL2 (h : EuclideanSpace ℝ (Fin n)) (g : EucL2 n) :
     (transL2 h g : EuclideanSpace ℝ (Fin n) → ℝ) =ᵐ[volume] fun x => g (x + h) :=
   Lp.coeFn_compMeasurePreserving _ _
@@ -154,14 +155,17 @@ theorem norm_sq_transL2_sub (h : EuclideanSpace ℝ (Fin n)) (g : EucL2 n) :
 def cube (η : ℝ) (k : Fin n → ℤ) : Set (EuclideanSpace ℝ (Fin n)) :=
   WithLp.ofLp ⁻¹' Set.univ.pi (fun i => Set.Ico (η * (k i : ℝ)) (η * ((k i : ℝ) + 1)))
 
+/-- Membership of a cube is coordinatewise membership of the defining half-open intervals. -/
 theorem mem_cube {η : ℝ} {k : Fin n → ℤ} {x : EuclideanSpace ℝ (Fin n)} :
     x ∈ cube η k ↔ ∀ i, x i ∈ Set.Ico (η * (k i : ℝ)) (η * ((k i : ℝ) + 1)) := by
   simp only [cube, mem_preimage, Set.mem_univ_pi]
 
+/-- Every cube is measurable. -/
 theorem measurableSet_cube (η : ℝ) (k : Fin n → ℤ) : MeasurableSet (cube η k) :=
   (PiLp.volume_preserving_ofLp (ι := Fin n)).measurable
     (MeasurableSet.univ_pi fun _ => measurableSet_Ico)
 
+/-- A cube of side `η` has volume `η ^ n`, independently of the lattice index. -/
 theorem volume_cube (η : ℝ) (k : Fin n → ℤ) :
     volume (cube η k) = (ENNReal.ofReal η) ^ n := by
   have hbox : volume (Set.univ.pi (fun i => Set.Ico (η * (k i : ℝ)) (η * ((k i : ℝ) + 1))))
@@ -174,10 +178,12 @@ theorem volume_cube (η : ℝ) (k : Fin n → ℤ) :
   rw [cube, (PiLp.volume_preserving_ofLp (ι := Fin n)).measure_preimage
         (MeasurableSet.univ_pi fun _ => measurableSet_Ico).nullMeasurableSet, hbox]
 
+/-- A cube has finite volume, the form the integration lemmas take as a hypothesis. -/
 theorem volume_cube_ne_top (η : ℝ) (k : Fin n → ℤ) :
     volume (cube η k) ≠ ⊤ := by
   rw [volume_cube]; exact (ENNReal.pow_lt_top ENNReal.ofReal_lt_top).ne
 
+/-- The volume of a cube of nonnegative side, read as a real number. -/
 theorem volume_real_cube {η : ℝ} (hη : 0 ≤ η) (k : Fin n → ℤ) :
     volume.real (cube η k) = η ^ n := by
   rw [Measure.real, volume_cube, ENNReal.toReal_pow, ENNReal.toReal_ofReal hη]
@@ -215,14 +221,17 @@ differences of two points sharing a side-`η` cube. -/
 def dbox (η : ℝ) : Set (EuclideanSpace ℝ (Fin n)) :=
   WithLp.ofLp ⁻¹' Set.univ.pi (fun _ => Set.Ioo (-η) η)
 
+/-- Membership of the displacement box is coordinatewise membership of `(-η, η)`. -/
 theorem mem_dbox {η : ℝ} {w : EuclideanSpace ℝ (Fin n)} :
     w ∈ dbox η ↔ ∀ i, w i ∈ Set.Ioo (-η) η := by
   simp only [dbox, mem_preimage, Set.mem_univ_pi]
 
+/-- The displacement box is measurable. -/
 theorem measurableSet_dbox (η : ℝ) : MeasurableSet (dbox η : Set (EuclideanSpace ℝ (Fin n))) :=
   (PiLp.volume_preserving_ofLp (ι := Fin n)).measurable
     (MeasurableSet.univ_pi fun _ => measurableSet_Ioo)
 
+/-- The displacement box of half-width `η` has volume `(2 η) ^ n`. -/
 theorem volume_dbox (η : ℝ) :
     volume (dbox η : Set (EuclideanSpace ℝ (Fin n))) = (ENNReal.ofReal (2 * η)) ^ n := by
   have hbox : volume (Set.univ.pi (fun _ : Fin n => Set.Ioo (-η) η))
@@ -234,10 +243,13 @@ theorem volume_dbox (η : ℝ) :
   rw [dbox, (PiLp.volume_preserving_ofLp (ι := Fin n)).measure_preimage
         (MeasurableSet.univ_pi fun _ => measurableSet_Ioo).nullMeasurableSet, hbox]
 
+/-- The displacement box has finite volume, the form the integration lemmas take as a
+hypothesis. -/
 theorem volume_dbox_ne_top (η : ℝ) :
     volume (dbox η : Set (EuclideanSpace ℝ (Fin n))) ≠ ⊤ := by
   rw [volume_dbox]; exact (ENNReal.pow_lt_top ENNReal.ofReal_lt_top).ne
 
+/-- The volume of the displacement box of nonnegative half-width, read as a real number. -/
 theorem volume_real_dbox {η : ℝ} (hη : 0 ≤ η) :
     volume.real (dbox η : Set (EuclideanSpace ℝ (Fin n))) = (2 * η) ^ n := by
   rw [Measure.real, volume_dbox, ENNReal.toReal_pow, ENNReal.toReal_ofReal (by linarith)]
@@ -279,7 +291,7 @@ side-`η` cubes indexed by `K`, as an element of `L²`. -/
 def avg (η : ℝ) (K : Finset (Fin n → ℤ)) (g : EucL2 n) : EucL2 n :=
   ∑ k ∈ K, cubeCoef η k g • cubeIndicator η k
 
-/-- The averaging operator as an honest piecewise-constant function. -/
+/-- The averaging operator as a pointwise piecewise-constant function. -/
 def stepFun (η : ℝ) (K : Finset (Fin n → ℤ)) (g : EucL2 n) :
     EuclideanSpace ℝ (Fin n) → ℝ :=
   fun x => ∑ k ∈ K, cubeCoef η k g * (cube η k).indicator (fun _ => (1 : ℝ)) x
@@ -797,6 +809,10 @@ functions: a Sobolev function is an `L²` limit of smooth compactly supported fu
 gradients are uniformly bounded, and the modulus passes to the limit. Both the graph-closure `H₀¹`
 of the elliptic problem and the `W^{1,p}` structure of the Navier-Stokes development obtain their
 modulus through this lemma. -/
+
+/-- A uniform translation modulus passes to an `L²` limit: if every `gk k` satisfies
+`‖transL2 h (gk k) - gk k‖ ≤ Λ * ‖h‖` and `gk` converges to `g`, then `g` satisfies the same
+bound. -/
 theorem transL2_sub_le_of_tendsto {g : EucL2 n} {Λ : ℝ} {gk : ℕ → EucL2 n}
     (htend : Filter.Tendsto gk Filter.atTop (nhds g))
     (hmod : ∀ k, ∀ h, ‖transL2 h (gk k) - gk k‖ ≤ Λ * ‖h‖)

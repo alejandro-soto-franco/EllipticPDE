@@ -89,7 +89,7 @@ variable {d : ℕ} {r : ℝ} {ζ φ : EuclideanSpace ℝ (Fin (d + 1)) → ℝ}
 
 /-- **Discrete graph identity, tangential.** On a test-function graph, the cutoff of the
 tangential difference quotient is the graph of the product `ζ · Dₖ^h φ`. Coordinatewise the
-restricted difference quotient of `φ`'s classes equals the honest difference quotient of `φ`
+restricted difference quotient of `φ`'s classes equals the difference quotient of `φ`
 (its extension by zero being `φ` itself), and the Leibniz rule
 `∂ᵢ(ζ · Dₖ^h φ) = ζ · ∂ᵢ(Dₖ^h φ) + (∂ᵢζ) · Dₖ^h φ` together with `partialD_shiftDiffQuotFn`
 matches the successor coordinates. This is the boundary counterpart of

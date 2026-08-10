@@ -301,8 +301,9 @@ private lemma bAct_transport_regroup (Op : FullEllipticOp d)
 
 /-- **The interior energy (Caccioppoli) estimate.** For a weak solution `u ∈ H₀¹(Ω)` of
 `L u = f` and a cutoff `ζ` (a test function), the cutoff-weighted gradient energy
-`(λ/2) ∫_Ω ζ² |∇u|²` is bounded by `C · (‖f‖²_{L²} + ‖u₀‖²_{L²})`, with `C` depending only
-on `λ`, `Λ`, `‖b‖∞`, `‖c‖∞`, `‖ζ‖∞`, and `‖∇ζ‖∞`. Testing the weak formulation with
+`(λ/2) ∫_Ω ζ² |∇u|²` is bounded by `C · (‖f‖²_{L²} + ‖u₀‖²_{L²})`. The constant is quantified
+before the solution and the datum, so it depends only on `λ`, `Λ`, `‖b‖∞`, `‖c‖∞`, `‖ζ‖∞`,
+and `‖∇ζ‖∞`. Testing the weak formulation with
 `ζ² u` (admissible by [`cutoffMul_mem_H01`]), the ellipticity lower bound [`energy_ge`]
 controls the principal part from below, and Cauchy-Schwarz together with the Peter-Paul
 (Young) inequality absorbs the cross, transport, zeroth-order, and right-hand terms into a
@@ -317,23 +318,31 @@ datum on the right. This statement takes a solution of `Lu = f` for the full ope
 carries `f`, and imposes no sign condition, so neither implies the other. Gilbarg and
 Trudinger Theorem 8.8 remains the match, and that text is not transcribed. -/
 theorem caccioppoli (Op : FullEllipticOp d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
-    {ζ : EuclideanSpace ℝ (Fin d) → ℝ} (hζ : IsTestFn Ω ζ) (u : H01 Ω) (f : L2D Ω)
-    (hu : ∀ v : H01 Ω, Op.fullBilin Ω u v
-      = ∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ)) :
-    ∃ C : ℝ, 0 ≤ C ∧
+    {ζ : EuclideanSpace ℝ (Fin d) → ℝ} (hζ : IsTestFn Ω ζ) :
+    ∃ C : ℝ, 0 ≤ C ∧ ∀ (u : H01 Ω) (f : L2D Ω),
+      (∀ v : H01 Ω, Op.fullBilin Ω u v
+        = ∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ)) →
       Op.lam / 2 * ∑ i : Fin d, ‖mulTest hζ ((u : H1amb Ω) i.succ)‖ ^ 2
         ≤ C * (‖f‖ ^ 2 + ‖(u : H1amb Ω) 0‖ ^ 2) := by
   classical
   set A := Op.toEllipticCoeff with hA
-  set v : H01 Ω := ⟨cutoffMul (isTestFn_mul hζ hζ) (u : H1amb Ω),
-    cutoffMul_mem_H01 (isTestFn_mul hζ hζ) u.2⟩ with hvdef
-  set E : ℝ := ∑ i : Fin d, ‖mulTest hζ ((u : H1amb Ω) i.succ)‖ ^ 2 with hE
   set Z : ℝ := (exists_abs_bound hζ).choose with hZ
   set Z2 : ℝ := (exists_abs_bound (isTestFn_mul hζ hζ)).choose with hZ2
   set SW : ℝ := ∑ j : Fin d, (exists_abs_bound_partialD hζ j).choose with hSW
   set β : ℝ := 2 * A.Λ * SW + Op.Bsup * Z with hβ
   have hZ2n : (0 : ℝ) ≤ Z2 :=
     le_trans (abs_nonneg _) ((exists_abs_bound (isTestFn_mul hζ hζ)).choose_spec 0)
+  -- The constant, fixed before the solution and the datum.
+  have hβn : (0 : ℝ) ≤ (d : ℝ) * β ^ 2 / (2 * A.lam) :=
+    div_nonneg (by positivity) (by have := A.lam_pos; linarith)
+  have hCu : (0 : ℝ) ≤ Z2 ^ 2 / 2 + (d : ℝ) * β ^ 2 / (2 * A.lam) + Op.Csup * Z2 :=
+    by linarith [hβn, mul_nonneg Op.Csup_nonneg hZ2n, sq_nonneg Z2]
+  refine ⟨1 / 2 + Z2 ^ 2 / 2 + (d : ℝ) * β ^ 2 / (2 * A.lam) + Op.Csup * Z2,
+    by linarith, ?_⟩
+  intro u f hu
+  set v : H01 Ω := ⟨cutoffMul (isTestFn_mul hζ hζ) (u : H1amb Ω),
+    cutoffMul_mem_H01 (isTestFn_mul hζ hζ) u.2⟩ with hvdef
+  set E : ℝ := ∑ i : Fin d, ‖mulTest hζ ((u : H1amb Ω) i.succ)‖ ^ 2 with hE
   -- Coordinate values of the test element `ζ² u`.
   have hv0 : (v : H1amb Ω) 0 = mulTest (isTestFn_mul hζ hζ) ((u : H1amb Ω) 0) := by
     change cutoffMul (isTestFn_mul hζ hζ) (u : H1amb Ω) 0 = _
@@ -545,12 +554,6 @@ theorem caccioppoli (Op : FullEllipticOp d) {Ω : Set (EuclideanSpace ℝ (Fin d
         + (d : ℝ) * β ^ 2 / (2 * A.lam) * ‖(u : H1amb Ω) 0‖ ^ 2
         + Op.Csup * Z2 * ‖(u : H1amb Ω) 0‖ ^ 2 := by
     linarith [hen, hbil, hweak, hRHSf, hTsum, hZthbound, hrel]
-  have hβn : (0 : ℝ) ≤ (d : ℝ) * β ^ 2 / (2 * A.lam) :=
-    div_nonneg (by positivity) (by have := A.lam_pos; linarith)
-  have hCu : (0 : ℝ) ≤ Z2 ^ 2 / 2 + (d : ℝ) * β ^ 2 / (2 * A.lam) + Op.Csup * Z2 :=
-    by linarith [hβn, mul_nonneg Op.Csup_nonneg hZ2n, sq_nonneg Z2]
-  refine ⟨1 / 2 + Z2 ^ 2 / 2 + (d : ℝ) * β ^ 2 / (2 * A.lam) + Op.Csup * Z2,
-    by linarith, ?_⟩
   nlinarith [hfin, sq_nonneg ‖(u : H1amb Ω) 0‖, sq_nonneg ‖f‖,
     mul_nonneg hCu (sq_nonneg ‖f‖)]
 

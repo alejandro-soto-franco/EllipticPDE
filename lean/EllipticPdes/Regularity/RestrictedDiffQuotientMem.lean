@@ -18,8 +18,8 @@ The composite `cutoffMul ζ ∘ diffQuotG k h` is a **continuous** linear map an
 **closed**, so membership need only be checked on the spanning set `testGraphSet Ω`. On a
 test graph `testGraph φ` (`φ ∈ C_c^∞(Ω)`) the diagram collapses: `diffQuotG k h` acts
 coordinatewise as `diffQuotD k h` on `φ`'s function/gradient classes; because `φ` is a
-genuine smooth function that vanishes off its support in `Ω`, its extension by zero *is*
-`φ`, so the interior difference quotient equals the honest whole-space one, and multiplying
+smooth function that vanishes off its support in `Ω`, its extension by zero *is*
+`φ`, so the interior difference quotient equals the whole-space one, and multiplying
 by `ζ` returns the graph of `ζ · Dₖ^h φ`, where `Dₖ^h φ (x) = (φ(x + h eₖ) - φ(x))/h`.
 Since `ζ` localises the support, `ζ · Dₖ^h φ` is a test function **for every** `φ`, so its
 graph lies in the span, hence in `H₀¹(Ω)`. This mirrors `cutoffMul_mem_H01` exactly.
@@ -27,7 +27,7 @@ graph lies in the span, hence in `H₀¹(Ω)`. This mirrors `cutoffMul_mem_H01` 
 ## Main results
 
 * `mulTest_diffQuotD_eq_of_small`: multiplying by the cutoff makes the interior
-  difference quotient agree with the honest whole-space difference quotient.
+  difference quotient agree with the whole-space difference quotient.
 * `cutoffMul_diffQuotG_mem_H01`: the cutoff of the interior difference quotient of an
   `H₀¹` element is again in `H₀¹` (the crux admissibility).
 -/
@@ -47,7 +47,7 @@ variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))}
 /-! ### Chop-invisibility on the cutoff -/
 
 /-- **Chop-invisibility.** Multiplying by the cutoff `ζ` kills the difference between the
-interior difference quotient `diffQuotD` and the honest whole-space difference quotient
+interior difference quotient `diffQuotD` and the whole-space difference quotient
 `diffQuot` of the extension: the two differ only through `restrictL2`'s replacement of the
 extension's value by the class value on `Ω`, and on `Ω` these agree a.e. (Evans, *Partial
 Differential Equations* (2nd ed.), §6.3.1). -/
@@ -129,7 +129,7 @@ private lemma extendL2_toLp_ae_eq (hΩm : MeasurableSet Ω)
 difference quotient is the graph of the product `ζ · Dₖ^h φ`:
 `cutoffMul ζ (diffQuotG k h (testGraph φ)) = testGraph (ζ · Dₖ^h φ)`. This is the discrete
 analogue of `cutoffMul_testGraph`; coordinatewise the interior difference quotient of `φ`'s
-classes equals the honest difference quotient of `φ` (its extension by zero being `φ`
+classes equals the difference quotient of `φ` (its extension by zero being `φ`
 itself), and the Leibniz rule `∂ᵢ(ζ · Dₖ^h φ) = ζ · ∂ᵢ(Dₖ^h φ) + (∂ᵢζ) · Dₖ^h φ` together
 with `partialD_diffQuotFn` matches the successor coordinates. -/
 private lemma cutoffMul_diffQuotG_testGraph (hζ : IsTestFn Ω ζ) (hφ : IsTestFn Ω φ)

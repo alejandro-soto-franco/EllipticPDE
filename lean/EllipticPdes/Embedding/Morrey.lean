@@ -565,7 +565,7 @@ theorem morrey_ball_contDiff (hd : 0 < d) {p : ℝ} (hp : (d : ℝ) < p)
   exact (hC u hu c hr x hx y hy).trans
     (mul_le_mul_left (ENNReal.coe_le_coe.mpr hconst) _)
 
-/-- **Gradient-convolution bridge.** If `g` is the honest weak gradient of `u` on a measurable
+/-- **Gradient-convolution bridge.** If `g` is the weak gradient of `u` on a measurable
 set `B` and `ρ` is a normalised bump of outer radius `ε` centred at `0`, then at every interior
 point `x` with `Metric.closedBall x ε ⊆ B` the `k`-th partial of the mollification equals the
 mollified gradient component: `partialD k (uB ⋆ ρ) x = (gBk ⋆ ρ) x`, where `uB`, `gBk` are the
@@ -669,7 +669,7 @@ theorem partialD_convolution_eq_of_hasWeakGradOn
 
 /-- **Uniform-limit engine.** A sequence `U n` that is eventually (in `n`) `γ`-Hölder with a common
 constant `M` on each pair of points of an open set `B`, and converges pointwise almost everywhere
-on `B` to `u`, admits a limit `u'` that is genuinely `HolderOnWith M γ` on all of `B` and agrees
+on `B` to `u`, admits a limit `u'` that is `HolderOnWith M γ` on all of `B` and agrees
 with `u` almost everywhere. No Arzelà–Ascoli or continuous-extension machinery is needed: the
 Hölder bound provides equicontinuity, density of the almost-everywhere convergence set forces
 `U · x` to be Cauchy at every point of `B`, and the closed-ness of `≤` passes the Hölder
@@ -813,7 +813,7 @@ private theorem exists_holder_smooth_partialD (hd : 0 < d) {p : ℝ} (hp : (d : 
     (mul_le_mul_left (ENNReal.coe_le_coe.mpr hconst) _)
 
 /-- **Morrey embedding on a ball (weak-gradient form).** For `p > d`, a function `u` that is
-integrable on `Metric.ball c r` with an honest `Lᵖ` weak gradient `g` there has a continuous
+integrable on `Metric.ball c r` with an `Lᵖ` weak gradient `g` there has a continuous
 representative `u'` which is Hölder-`(1 - d/p)` on the ball, with constant linear in
 `∑ₖ ‖gₖ‖_{Lᵖ(ball c r)}`. The representative is obtained by mollification: each mollification is
 smooth and, by the smooth Morrey estimate applied on interior sub-balls, uniformly Hölder with the

@@ -9,7 +9,7 @@ import EllipticPdes.Regularity.Interior
 /-!
 # Bridge: `HasWeakDerivOn` to `HasWeakGradOn`
 
-The `L²` weak derivatives produced by `interior_H2_estimate` are honest-function weak
+The `L²` weak derivatives produced by `interior_H2_estimate` are pointwise weak
 gradients in the sense of the embedding layer, so the Morrey inequality consumes them
 directly at `p = 2`, hence in dimension one.
 
@@ -29,7 +29,7 @@ namespace EllipticPdes.Embedding
 
 variable {d : ℕ}
 
-/-- An `L²` weak gradient (componentwise `HasWeakDerivOn`) is an honest-function weak
+/-- An `L²` weak gradient (componentwise `HasWeakDerivOn`) is a pointwise weak
 gradient. This connects `interior_H2_estimate`'s output into `morrey_ball`. -/
 theorem hasWeakGradOn_of_hasWeakDerivOn {B : Set (EuclideanSpace ℝ (Fin d))}
     {u : Lp ℝ 2 (volume.restrict B)} {g : Fin d → Lp ℝ 2 (volume.restrict B)}

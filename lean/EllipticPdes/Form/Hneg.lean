@@ -9,7 +9,7 @@ import EllipticPdes.Form.BilinearForm
 # Characterisation of `H⁻¹(Ω)` (Evans §5.9.1, Theorem 1)
 
 `H⁻¹(Ω)` is the topological dual of `H₀¹(Ω)`; in the graph encoding it is the type
-`H01 Ω →L[ℝ] ℝ`. The characterization theorem says every `f ∈ H⁻¹(Ω)` is represented by
+`H01 Ω →L[ℝ] ℝ`. The characterisation theorem says every `f ∈ H⁻¹(Ω)` is represented by
 an `(n+1)`-tuple `(f₀, f₁, …, fₙ)` of `L²(Ω)` functions through the pairing
 
   `⟨f, v⟩ = ∫_Ω (f₀ v - ∑ᵢ fᵢ ∂ᵢv)`,
@@ -168,7 +168,10 @@ theorem hneg_norm_isLeast (Ω : Set (EuclideanSpace ℝ (Fin d))) (f : H01 Ω �
     exact norm_le_of_isHnegRepr hF
 
 /-- `‖f‖_{H⁻¹}` as the infimum of the tuple norms over all
-representations of `f`. -/
+representations of `f`.
+
+Terminal result of the library, the infimum form of `hneg_norm_isLeast`. Nothing inside the
+development consumes it. -/
 theorem hneg_norm_eq_sInf (Ω : Set (EuclideanSpace ℝ (Fin d))) (f : H01 Ω →L[ℝ] ℝ) :
     ‖f‖ = sInf {r : ℝ | ∃ F : H1amb Ω, IsHnegRepr Ω F f ∧ ‖F‖ = r} :=
   ((hneg_norm_isLeast Ω f).csInf_eq).symm
@@ -179,7 +182,10 @@ functional `f` on `H₀¹(Ω)` is represented by a tuple `F = (f₀, f₁, …, 
 functions through `⟨f, v⟩ = ∫_Ω f₀ v - ∑ᵢ ∫_Ω fᵢ ∂ᵢv`, whose
 tuple norm `(∫_Ω ∑ᵢ |fᵢ|²)^{1/2} = ‖F‖` equals `‖f‖_{H⁻¹}` and is least among all
 representing tuples -- the infimum is attained at the Riesz
-representative. -/
+representative.
+
+Terminal result of the library, stated in the manuscript. Nothing inside the development
+consumes it. -/
 theorem hneg_characterization (Ω : Set (EuclideanSpace ℝ (Fin d)))
     (f : H01 Ω →L[ℝ] ℝ) :
     ∃ F : H1amb Ω,
@@ -197,11 +203,13 @@ theorem hneg_characterization (Ω : Set (EuclideanSpace ℝ (Fin d)))
   rw [hn]
   exact norm_le_of_isHnegRepr ((isHnegRepr_iff_integral G f).mpr hG)
 
-/-! ### The `L² ⊆ H⁻¹` embedding as an instance -/
+/-! ### The `L² ⊆ H⁻¹` embedding -/
 
 /-- The `L² ⊆ H⁻¹` embedding (Evans §5.9.1, Theorem 1(iii)) is the representation by
 the tuple
-`(f, 0, …, 0)`: a single `L²` function with no gradient terms. -/
+`(f, 0, …, 0)`: a single `L²` function with no gradient terms.
+
+Kept as the statement of that clause of Evans Theorem 1. Nothing consumes it. -/
 private lemma isHnegRepr_single_l2Functional (Ω : Set (EuclideanSpace ℝ (Fin d))) (f : L2D Ω) :
     IsHnegRepr Ω (PiLp.single 2 (0 : Fin (d + 1)) f) (l2Functional Ω f) := by
   intro v

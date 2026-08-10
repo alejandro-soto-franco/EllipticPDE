@@ -138,7 +138,7 @@ private lemma exists_cutoffMul_diffQuotG_norm_bound (Op : FullEllipticOp d)
   have htξθ : tsupport T.ξ ⊆ tsupport T.θ := fun x hx =>
     subset_tsupport T.θ (by rw [Function.mem_support, T.theta_eqOn_one hx]; exact one_ne_zero)
   obtain ⟨δθ, hδθ, hθ1m⟩ := exists_eventually_one_margin T.hξ.2.1 T.hθ_one
-  obtain ⟨CE, hCE0, hCE⟩ := interior_diffQuot_energy_bound Op hΩm hA T.hξ T.hθ u f hu ℓ
+  obtain ⟨CE, hCE0, hCE⟩ := interior_diffQuot_energy_bound Op hΩm hA T.hξ T.hθ ℓ
   set Mξ : ℝ := (exists_abs_bound T.hξ).choose with hMξdef
   have hMξ0 : (0 : ℝ) ≤ Mξ := le_trans (abs_nonneg _) ((exists_abs_bound T.hξ).choose_spec 0)
   set c : Fin d → ℝ := fun i => (exists_abs_bound_partialD T.hξ i).choose with hcdef
@@ -185,7 +185,7 @@ private lemma exists_cutoffMul_diffQuotG_norm_bound (Op : FullEllipticOp d)
     intro j x _ hcase
     rw [partialD, (hev_case x hcase).fderiv_eq]
     simp
-  have hmaster := hCE h hh hsm_in hsm_out hθ1 hθ0
+  have hmaster := hCE u f hu h hh hsm_in hsm_out hθ1 hθ0
   -- The master estimate, with the extension bridge removed.
   have hE : ∑ i : Fin d, ‖mulTest T.hξ (diffQuotD ℓ h hΩm ((u : H1amb Ω) i.succ))‖ ^ 2
       ≤ 2 * CE * Q / Op.lam := by
@@ -392,7 +392,10 @@ theorem CutoffTower.xi_eqOn_one_base {V : Set (EuclideanSpace ℝ (Fin d))}
 /-- **The cutoff is invisible on the base set.** Because `ξ ≡ 1` on `V`, the `V`-restriction of
 the whole-space extension of `ξ · g` agrees with that of `g`. Applied to the function
 coordinate of `interior_cutoffGrad_mem_H01`, this says that the admissible element carries
-`∂_ℓ u` itself on `V`, so nothing is lost on the region of interest. -/
+`∂_ℓ u` itself on `V`, so nothing is lost on the region of interest.
+
+Kept as the statement that reads `interior_cutoffGrad_mem_H01`, which is pinned in `Gates`.
+Nothing inside the development consumes it. -/
 theorem restrictL2_extendL2_mulTest_xi (hΩm : MeasurableSet Ω)
     {V : Set (EuclideanSpace ℝ (Fin d))} (hVm : MeasurableSet V) (hVΩ : V ⊆ Ω)
     (T : CutoffTower Ω V) (g : L2D Ω) :

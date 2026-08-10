@@ -9,12 +9,12 @@ import Mathlib.MeasureTheory.Function.LpSpace.Basic
 import Mathlib.MeasureTheory.Integral.Average
 
 /-!
-# Honest-function weak gradients on a set
+# Pointwise weak gradients on a set
 
-The `Lᵖ`-scale, honest-function analogue of `HasWeakDerivOn`: a function `u` has weak
+The `Lᵖ`-scale, pointwise-function analogue of `HasWeakDerivOn`: a function `u` has weak
 gradient `g = (gₖ)` on `B` when integration by parts holds against every smooth test
 function supported in `B`. This is the interface the Morrey embedding consumes; it is
-stated for honest functions (not `Lp` classes) and for a full gradient tuple so that a
+stated for functions (not `Lp` classes) and for a full gradient tuple so that a
 general exponent `p > d` is expressible, which the `L²`-only `HasWeakDerivOn` cannot do.
 -/
 
@@ -29,9 +29,9 @@ open EllipticPdes.Sobolev (partialD)
 
 variable {d : ℕ}
 
-/-- `g` is the honest-function weak gradient of `u` on `B`: integration by parts holds
+/-- `g` is the pointwise weak gradient of `u` on `B`: integration by parts holds
 against every smooth compactly supported test function whose support lies in `B`. This
-mirrors `EllipticPdes.Regularity.HasWeakDerivOn` component-wise but for honest
+mirrors `EllipticPdes.Regularity.HasWeakDerivOn` component-wise but for pointwise
 functions `u, gₖ : EuclideanSpace ℝ (Fin d) → ℝ`. -/
 def HasWeakGradOn (B : Set (EuclideanSpace ℝ (Fin d)))
     (u : EuclideanSpace ℝ (Fin d) → ℝ) (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) : Prop :=

@@ -111,28 +111,30 @@ theorem eLpNorm_restrict_mono_toNNReal_le {S T : Set (EuclideanSpace ℝ (Fin d)
 /-- **Interior Hölder estimate in one dimension (Evans, *Partial Differential Equations*
 (2nd ed.), §5.6.2 Thm 5).** A weak solution `u ∈ H₀¹(Ω)` of `L u = f` has, on every ball, a
 representative that is Hölder continuous with exponent `1/2` and constant a multiple of
-`‖f‖ + ‖u‖`. In one dimension the first-order weak gradient already lies in `L²` and `2 > 1`,
+`‖f‖ + ‖u‖`, the multiplier being quantified before the solution and the datum, so it depends
+only on the operator and the ball. In one dimension the first-order weak gradient already lies
+in `L²` and `2 > 1`,
 so Morrey applies to it directly and only the first-order energy estimate is used: neither the
 interior `H²` estimate nor any hypothesis on the geometry of `Ω` is needed. -/
 theorem interior_holder_estimate_one (Op : FullEllipticOp 1)
     {Ω : Set (EuclideanSpace ℝ (Fin 1))} (hΩm : MeasurableSet Ω)
-    (c : EuclideanSpace ℝ (Fin 1)) {r : ℝ} (hr : 0 < r)
-    (u : H01 Ω) (f : L2D Ω)
-    (hu : ∀ w : H01 Ω, Op.fullBilin Ω u w
-      = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) :
-    ∃ C : ℝ≥0, ∃ u' : EuclideanSpace ℝ (Fin 1) → ℝ,
-      u' =ᵐ[volume.restrict (Metric.ball c r)]
-          (extendL2 hΩm ((u : H1amb Ω) 0) : EuclideanSpace ℝ (Fin 1) → ℝ) ∧
-        HolderOnWith (C * Real.toNNReal (‖f‖ + ‖(u : H1amb Ω) 0‖)) (1 / 2 : ℝ≥0) u'
-          (Metric.ball c r) := by
+    (c : EuclideanSpace ℝ (Fin 1)) {r : ℝ} (hr : 0 < r) :
+    ∃ C : ℝ≥0, ∀ (u : H01 Ω) (f : L2D Ω),
+      (∀ w : H01 Ω, Op.fullBilin Ω u w
+        = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) →
+      ∃ u' : EuclideanSpace ℝ (Fin 1) → ℝ,
+        u' =ᵐ[volume.restrict (Metric.ball c r)]
+            (extendL2 hΩm ((u : H1amb Ω) 0) : EuclideanSpace ℝ (Fin 1) → ℝ) ∧
+          HolderOnWith (C * Real.toNNReal (‖f‖ + ‖(u : H1amb Ω) 0‖)) (1 / 2 : ℝ≥0) u'
+            (Metric.ball c r) := by
   classical
   haveI : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
   have h2 : ENNReal.ofReal (2 : ℝ) = 2 := by simp
-  set P : ℝ := ‖f‖ + ‖(u : H1amb Ω) 0‖ with hPdef
   set dcoef : ℝ := Real.sqrt ((1 + 4 * Op.gardingγ) / (2 * Op.lam)) with hdcoefdef
   obtain ⟨C₀, hC₀⟩ := morrey_ball (d := 1) one_pos (by norm_num : ((1 : ℕ) : ℝ) < 2) c hr
-  refine ⟨C₀ * Real.toNNReal dcoef, ?_⟩
+  refine ⟨C₀ * Real.toNNReal dcoef, fun u f hu => ?_⟩
+  set P : ℝ := ‖f‖ + ‖(u : H1amb Ω) 0‖ with hPdef
   set X : EucL2 1 := extendL2 hΩm ((u : H1amb Ω) 0) with hXdef
   set Y : Fin 1 → EucL2 1 := fun k => extendL2 hΩm ((u : H1amb Ω) k.succ) with hYdef
   set B : Set (EuclideanSpace ℝ (Fin 1)) := Metric.ball c r with hBdef
@@ -178,11 +180,17 @@ theorem interior_holder_estimate_one (Op : FullEllipticOp 1)
 
 /-! ### The two-dimensional estimate -/
 
+set_option maxHeartbeats 800000 in
+-- The constant is assembled from the Morrey, bootstrap and `H²` constants before the solution
+-- is introduced, so the chain elaborates under one more binder layer than the default budget
+-- covers.
 /-- **Interior Hölder estimate in two dimensions (Evans, *Partial Differential Equations*
 (2nd ed.), §5.6.2 Thm 5, applied to the interior `H²` estimate of §6.3.1 Thm 1).** A weak
 solution `u ∈ H₀¹(Ω)` of `L u = f` with `C¹` principal coefficients has, on every ball whose
 double lies in `Ω`, a representative that is Hölder continuous with exponent `1/2` and constant
-a multiple of `‖f‖ + ‖u‖`. The interior `H²` estimate puts the second derivatives in `L²`; at
+a multiple of `‖f‖ + ‖u‖`, the multiplier being quantified before the solution and the datum,
+so it depends only on the operator and the two radii. The interior `H²` estimate puts the
+second derivatives in `L²`; at
 `d = 2` the Sobolev conjugate of `2` degenerates, so the bootstrap `exists_eLpNorm_four_le`
 takes its step at `p = 4/3`, paying the finite measure of the ball, and raises the gradient from
 `L²` to `L⁴`. `morrey_ball` then applies at `p = 4 > 2 = d`. -/
@@ -190,30 +198,34 @@ theorem interior_holder_estimate_two (Op : FullEllipticOp 2)
     {Ω : Set (EuclideanSpace ℝ (Fin 2))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
     (hA : IsC1Coeff Op.toEllipticCoeff)
     (c : EuclideanSpace ℝ (Fin 2)) {r R : ℝ} (hr : 0 < r) (hrR : r < R)
-    (hRΩ : Metric.closedBall c R ⊆ Ω)
-    (u : H01 Ω) (f : L2D Ω)
-    (hu : ∀ w : H01 Ω, Op.fullBilin Ω u w
-      = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) :
-    ∃ C : ℝ≥0, ∃ u' : EuclideanSpace ℝ (Fin 2) → ℝ,
-      u' =ᵐ[volume.restrict (Metric.ball c r)]
-          (extendL2 hΩm ((u : H1amb Ω) 0) : EuclideanSpace ℝ (Fin 2) → ℝ) ∧
-        HolderOnWith (C * Real.toNNReal (‖f‖ + ‖(u : H1amb Ω) 0‖)) (1 / 2 : ℝ≥0) u'
-          (Metric.ball c r) := by
+    (hRΩ : Metric.closedBall c R ⊆ Ω) :
+    ∃ C : ℝ≥0, ∀ (u : H01 Ω) (f : L2D Ω),
+      (∀ w : H01 Ω, Op.fullBilin Ω u w
+        = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) →
+      ∃ u' : EuclideanSpace ℝ (Fin 2) → ℝ,
+        u' =ᵐ[volume.restrict (Metric.ball c r)]
+            (extendL2 hΩm ((u : H1amb Ω) 0) : EuclideanSpace ℝ (Fin 2) → ℝ) ∧
+          HolderOnWith (C * Real.toNNReal (‖f‖ + ‖(u : H1amb Ω) 0‖)) (1 / 2 : ℝ≥0) u'
+            (Metric.ball c r) := by
   classical
   haveI : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
   have h4 : ENNReal.ofReal (4 : ℝ) = 4 := by simp
-  set P : ℝ := ‖f‖ + ‖(u : H1amb Ω) 0‖ with hPdef
-  have hP0 : (0 : ℝ) ≤ P := by rw [hPdef]; positivity
-  set Q : ℝ≥0 := Real.toNNReal P with hQdef
   set dcoef : ℝ := Real.sqrt ((1 + 4 * Op.gardingγ) / (2 * Op.lam)) with hdcoefdef
   have hd0 : (0 : ℝ) ≤ dcoef := Real.sqrt_nonneg _
   -- The compact set of the interior `H²` estimate, and the two balls inside it.
   set V : Set (EuclideanSpace ℝ (Fin 2)) := Metric.closedBall c R with hVdef
   have hVc : IsCompact V := isCompact_closedBall c R
   have hballV : Metric.ball c R ⊆ V := Metric.ball_subset_closedBall
-  obtain ⟨C₁, hC₁0, hC₁⟩ := interior_H2_estimate (n := 1) Op hΩm hΩo hA hVc hRΩ u f hu
-  choose W hW hWb using hC₁
+  obtain ⟨C₁, hC₁0, hC₁⟩ := interior_H2_estimate (n := 1) Op hΩm hΩo hA hVc hRΩ
+  -- Morrey at `p = 4 > 2 = d`, and the bootstrap constant, both before the solution.
+  obtain ⟨K, hK⟩ := exists_eLpNorm_four_le c hr hrR
+  obtain ⟨C₀, hC₀⟩ := morrey_ball (d := 2) (by norm_num) (by norm_num : ((2 : ℕ) : ℝ) < 4) c hr
+  refine ⟨C₀ * (2 * K * (Real.toNNReal dcoef + 2 * Real.toNNReal C₁)), fun u f hu => ?_⟩
+  set P : ℝ := ‖f‖ + ‖(u : H1amb Ω) 0‖ with hPdef
+  have hP0 : (0 : ℝ) ≤ P := by rw [hPdef]; positivity
+  set Q : ℝ≥0 := Real.toNNReal P with hQdef
+  choose W hW hWb using hC₁ u f hu
   -- Names for the extension-by-zero representatives.
   set X0 : EuclideanSpace ℝ (Fin 2) → ℝ :=
     (extendL2 hΩm ((u : H1amb Ω) 0) : EuclideanSpace ℝ (Fin 2) → ℝ) with hX0def
@@ -236,21 +248,18 @@ theorem interior_holder_estimate_two (Op : FullEllipticOp 2)
       (volume.restrict (Metric.ball c R)) :=
     fun k i => (Lp.memLp (W k i)).mono_measure (Measure.restrict_mono hballV le_rfl)
   -- The bootstrap raises each gradient component from `L²` to `L⁴` on the inner ball.
-  obtain ⟨K, hK⟩ := exists_eLpNorm_four_le c hr hrR
   have hfour : ∀ i, MemLp (X i) 4 (volume.restrict (Metric.ball c r))
       ∧ eLpNorm (X i) 4 (volume.restrict (Metric.ball c r))
         ≤ (K : ℝ≥0∞) * (eLpNorm (X i) 2 (volume.restrict (Metric.ball c R))
             + ∑ k, eLpNorm ((W k i : EuclideanSpace ℝ (Fin 2) → ℝ)) 2
                 (volume.restrict (Metric.ball c R))) :=
     fun i => hK (X i) _ (hXL2 i) (fun k => hWL2 k i) (hgradi i)
-  -- Morrey at `p = 4 > 2 = d`.
-  obtain ⟨C₀, hC₀⟩ := morrey_ball (d := 2) (by norm_num) (by norm_num : ((2 : ℕ) : ℝ) < 4) c hr
   have hint : IntegrableOn X0 (Metric.ball c r) volume :=
     ((Lp.memLp (extendL2 hΩm ((u : H1amb Ω) 0))).restrict _).integrable (by norm_num)
   have hmem : ∀ i, MemLp (X i) (ENNReal.ofReal 4) (volume.restrict (Metric.ball c r)) := by
     intro i; rw [h4]; exact (hfour i).1
   obtain ⟨u', hu'ae, hHol⟩ := hC₀ X0 X hint hmem hgrad0
-  refine ⟨C₀ * (2 * K * (Real.toNNReal dcoef + 2 * Real.toNNReal C₁)), u', hu'ae, ?_⟩
+  refine ⟨u', hu'ae, ?_⟩
   -- Each `L⁴` seminorm is bounded by the data through the two energy estimates.
   have hXbd : ∀ i, (eLpNorm (X i) 2 (volume.restrict (Metric.ball c R))).toNNReal
       ≤ Real.toNNReal dcoef * Q := by
@@ -306,11 +315,17 @@ theorem interior_holder_estimate_two (Op : FullEllipticOp 2)
 
 /-! ### The three-dimensional estimate -/
 
+set_option maxHeartbeats 800000 in
+-- The constant is assembled from the Morrey, bootstrap and `H²` constants before the solution
+-- is introduced, so the chain elaborates under one more binder layer than the default budget
+-- covers.
 /-- **Interior Hölder estimate in three dimensions (Evans, *Partial Differential Equations*
 (2nd ed.), §5.6.2 Thm 5, applied to the interior `H²` estimate of §6.3.1 Thm 1).** A weak
 solution `u ∈ H₀¹(Ω)` of `L u = f` with `C¹` principal coefficients has, on every ball whose
 double lies in `Ω`, a representative that is Hölder continuous with exponent `1/2` and constant
-a multiple of `‖f‖ + ‖u‖`. This is the chain the development was missing: the interior `H²`
+a multiple of `‖f‖ + ‖u‖`, the multiplier being quantified before the solution and the datum,
+so it depends only on the operator and the two radii. This is the chain the development was
+missing: the interior `H²`
 estimate puts the second derivatives in `L²`, the Gagliardo-Nirenberg-Sobolev bootstrap
 `exists_eLpNorm_six_le` raises the gradient from `L²` to `L⁶`, and `morrey_ball` applies at
 `p = 6 > 3 = d`, so the weak solution is classically differentiable in the Hölder sense. -/
@@ -318,30 +333,34 @@ theorem interior_holder_estimate (Op : FullEllipticOp 3)
     {Ω : Set (EuclideanSpace ℝ (Fin 3))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
     (hA : IsC1Coeff Op.toEllipticCoeff)
     (c : EuclideanSpace ℝ (Fin 3)) {r R : ℝ} (hr : 0 < r) (hrR : r < R)
-    (hRΩ : Metric.closedBall c R ⊆ Ω)
-    (u : H01 Ω) (f : L2D Ω)
-    (hu : ∀ w : H01 Ω, Op.fullBilin Ω u w
-      = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) :
-    ∃ C : ℝ≥0, ∃ u' : EuclideanSpace ℝ (Fin 3) → ℝ,
-      u' =ᵐ[volume.restrict (Metric.ball c r)]
-          (extendL2 hΩm ((u : H1amb Ω) 0) : EuclideanSpace ℝ (Fin 3) → ℝ) ∧
-        HolderOnWith (C * Real.toNNReal (‖f‖ + ‖(u : H1amb Ω) 0‖)) (1 / 2 : ℝ≥0) u'
-          (Metric.ball c r) := by
+    (hRΩ : Metric.closedBall c R ⊆ Ω) :
+    ∃ C : ℝ≥0, ∀ (u : H01 Ω) (f : L2D Ω),
+      (∀ w : H01 Ω, Op.fullBilin Ω u w
+        = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) →
+      ∃ u' : EuclideanSpace ℝ (Fin 3) → ℝ,
+        u' =ᵐ[volume.restrict (Metric.ball c r)]
+            (extendL2 hΩm ((u : H1amb Ω) 0) : EuclideanSpace ℝ (Fin 3) → ℝ) ∧
+          HolderOnWith (C * Real.toNNReal (‖f‖ + ‖(u : H1amb Ω) 0‖)) (1 / 2 : ℝ≥0) u'
+            (Metric.ball c r) := by
   classical
   haveI : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
   have h6 : ENNReal.ofReal (6 : ℝ) = 6 := by simp
-  set P : ℝ := ‖f‖ + ‖(u : H1amb Ω) 0‖ with hPdef
-  have hP0 : (0 : ℝ) ≤ P := by rw [hPdef]; positivity
-  set Q : ℝ≥0 := Real.toNNReal P with hQdef
   set dcoef : ℝ := Real.sqrt ((1 + 4 * Op.gardingγ) / (2 * Op.lam)) with hdcoefdef
   have hd0 : (0 : ℝ) ≤ dcoef := Real.sqrt_nonneg _
   -- The compact set of the interior `H²` estimate, and the two balls inside it.
   set V : Set (EuclideanSpace ℝ (Fin 3)) := Metric.closedBall c R with hVdef
   have hVc : IsCompact V := isCompact_closedBall c R
   have hballV : Metric.ball c R ⊆ V := Metric.ball_subset_closedBall
-  obtain ⟨C₁, hC₁0, hC₁⟩ := interior_H2_estimate (n := 2) Op hΩm hΩo hA hVc hRΩ u f hu
-  choose W hW hWb using hC₁
+  obtain ⟨C₁, hC₁0, hC₁⟩ := interior_H2_estimate (n := 2) Op hΩm hΩo hA hVc hRΩ
+  -- Morrey at `p = 6 > 3 = d`, and the bootstrap constant, both before the solution.
+  obtain ⟨K, hK⟩ := exists_eLpNorm_six_le c hr hrR
+  obtain ⟨C₀, hC₀⟩ := morrey_ball (d := 3) (by norm_num) (by norm_num : ((3 : ℕ) : ℝ) < 6) c hr
+  refine ⟨C₀ * (3 * K * (Real.toNNReal dcoef + 3 * Real.toNNReal C₁)), fun u f hu => ?_⟩
+  set P : ℝ := ‖f‖ + ‖(u : H1amb Ω) 0‖ with hPdef
+  have hP0 : (0 : ℝ) ≤ P := by rw [hPdef]; positivity
+  set Q : ℝ≥0 := Real.toNNReal P with hQdef
+  choose W hW hWb using hC₁ u f hu
   -- Names for the extension-by-zero representatives.
   set X0 : EuclideanSpace ℝ (Fin 3) → ℝ :=
     (extendL2 hΩm ((u : H1amb Ω) 0) : EuclideanSpace ℝ (Fin 3) → ℝ) with hX0def
@@ -364,21 +383,18 @@ theorem interior_holder_estimate (Op : FullEllipticOp 3)
       (volume.restrict (Metric.ball c R)) :=
     fun k i => (Lp.memLp (W k i)).mono_measure (Measure.restrict_mono hballV le_rfl)
   -- The bootstrap raises each gradient component from `L²` to `L⁶` on the inner ball.
-  obtain ⟨K, hK⟩ := exists_eLpNorm_six_le c hr hrR
   have hsix : ∀ i, MemLp (X i) 6 (volume.restrict (Metric.ball c r))
       ∧ eLpNorm (X i) 6 (volume.restrict (Metric.ball c r))
         ≤ (K : ℝ≥0∞) * (eLpNorm (X i) 2 (volume.restrict (Metric.ball c R))
             + ∑ k, eLpNorm ((W k i : EuclideanSpace ℝ (Fin 3) → ℝ)) 2
                 (volume.restrict (Metric.ball c R))) :=
     fun i => hK (X i) _ (hXL2 i) (fun k => hWL2 k i) (hgradi i)
-  -- Morrey at `p = 6 > 3 = d`.
-  obtain ⟨C₀, hC₀⟩ := morrey_ball (d := 3) (by norm_num) (by norm_num : ((3 : ℕ) : ℝ) < 6) c hr
   have hint : IntegrableOn X0 (Metric.ball c r) volume :=
     ((Lp.memLp (extendL2 hΩm ((u : H1amb Ω) 0))).restrict _).integrable (by norm_num)
   have hmem : ∀ i, MemLp (X i) (ENNReal.ofReal 6) (volume.restrict (Metric.ball c r)) := by
     intro i; rw [h6]; exact (hsix i).1
   obtain ⟨u', hu'ae, hHol⟩ := hC₀ X0 X hint hmem hgrad0
-  refine ⟨C₀ * (3 * K * (Real.toNNReal dcoef + 3 * Real.toNNReal C₁)), u', hu'ae, ?_⟩
+  refine ⟨u', hu'ae, ?_⟩
   -- Each `L⁶` seminorm is bounded by the data through the two energy estimates.
   have hXbd : ∀ i, (eLpNorm (X i) 2 (volume.restrict (Metric.ball c R))).toNNReal
       ≤ Real.toNNReal dcoef * Q := by

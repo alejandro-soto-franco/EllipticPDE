@@ -64,11 +64,17 @@ structure FullEllipticOp (d : ℕ) extends EllipticCoeff d where
   Bsup : ℝ
   /-- Sup bound on the zeroth-order coefficient. -/
   Csup : ℝ
+  /-- The bound on the transport field is nonnegative. -/
   Bsup_nonneg : 0 ≤ Bsup
+  /-- The bound on the zeroth-order coefficient is nonnegative. -/
   Csup_nonneg : 0 ≤ Csup
+  /-- Every component of the transport field is measurable. -/
   b_meas : ∀ i, Measurable (fun x => b x i)
+  /-- The zeroth-order coefficient is measurable. -/
   c_meas : Measurable c
+  /-- Every component of the transport field is bounded by `Bsup` almost everywhere. -/
   b_bdd : ∀ i, ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |b x i| ≤ Bsup
+  /-- The zeroth-order coefficient is bounded by `Csup` almost everywhere. -/
   c_bdd : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |c x| ≤ Csup
 
 namespace FullEllipticOp
@@ -569,15 +575,17 @@ theorem weak_solution_L2_of_nonneg_zeroth_of_subset_euclBox {n : ℕ}
 
 /-- **Existence, uniqueness, and the a-priori bound on an arbitrary bounded domain,
 `L²` right-hand side** (Theorem `thm: main` in full generality). The Poincaré constant
-`CP` is supplied by `poincare_H01_of_bounded`; the solution obeys
-`‖u‖_{H₀¹} ≤ (CP + 1)/λ · ‖f‖_{L²}`. -/
+`CP` is supplied by `poincare_H01_of_bounded` and is quantified before the datum, so it
+depends only on `Ω`; every `f ∈ L²(Ω)` then obeys `‖u‖_{H₀¹} ≤ (CP + 1)/λ · ‖f‖_{L²}`.
+
+Terminal result of the library, stated in the manuscript. Nothing inside the development
+consumes it. -/
 theorem weak_solution_L2_of_nonneg_zeroth_of_bounded {n : ℕ}
     (Op : FullEllipticOp (n + 1)) {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))}
     (hΩb : Bornology.IsBounded Ω)
     (hb : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
-    (hc : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x)
-    (f : L2D Ω) :
-    ∃ CP : ℝ, 0 ≤ CP ∧
+    (hc : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x) :
+    ∃ CP : ℝ, 0 ≤ CP ∧ ∀ f : L2D Ω,
       ((∃! u : H01 Ω, ∀ v : H01 Ω,
         Op.fullBilin Ω u v = ∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ))
       ∧ ∀ u : H01 Ω,
@@ -590,7 +598,7 @@ theorem weak_solution_L2_of_nonneg_zeroth_of_bounded {n : ℕ}
         ≤ CP * ∑ i : Fin (n + 1), ‖h.testGraph i.succ‖ ^ 2 :=
     fun {φ} h => hpoin h.testGraph
       ((Submodule.le_topologicalClosure _) (Submodule.subset_span ⟨φ, h, rfl⟩))
-  refine ⟨CP, hCP, ?_⟩
+  refine ⟨CP, hCP, fun f => ?_⟩
   have hexist := Op.weak_solution_of_nonneg_zeroth Ω hb hc CP hCP hbase (l2Functional Ω f)
   simp only [l2Functional_eq_integral] at hexist
   refine ⟨hexist, fun u hu => ?_⟩

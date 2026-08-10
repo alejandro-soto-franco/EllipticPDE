@@ -149,8 +149,12 @@ theorem MeasureTheory.poincare_1d {a b : ℝ} (hab : a ≤ b) {u u' : ℝ → �
 
 /-- The one-dimensional Poincaré inequality for a function compactly supported
 in the open interval `(a, b)`. Such a `u` vanishes at the left endpoint, so
-`poincare_1d` applies. This is the form consumed on each one-dimensional slice
-in the Fubini proof of the Poincaré inequality on a box. -/
+`poincare_1d` applies.
+
+The compact-support companion of `poincare_1d`, kept for callers that carry a
+`tsupport` hypothesis. The Fubini proof of the Poincaré inequality on a box takes
+`poincare_1d` directly, having the endpoint value to hand, so nothing inside the
+development consumes this form. -/
 theorem MeasureTheory.poincare_1d_of_tsupport {a b : ℝ} (hab : a ≤ b) {u u' : ℝ → ℝ}
     (hderiv : ∀ y ∈ uIcc a b, HasDerivAt u (u' y) y)
     (hu' : ContinuousOn u' (uIcc a b)) (hsupp : tsupport u ⊆ Ioo a b) :

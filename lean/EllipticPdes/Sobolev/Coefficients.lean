@@ -150,10 +150,15 @@ structure EllipticCoeff (d : ℕ) where
   lam : ℝ
   /-- Uniform sup bound on the entries. -/
   Λ : ℝ
+  /-- The ellipticity constant is strictly positive. -/
   lam_pos : 0 < lam
+  /-- The sup bound is nonnegative. -/
   Λ_nonneg : 0 ≤ Λ
+  /-- Every entry of the matrix is measurable. -/
   measurable : ∀ i j, Measurable (fun x => a x i j)
+  /-- Every entry is bounded by `Λ` almost everywhere. -/
   bdd : ∀ i j, ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |a x i j| ≤ Λ
+  /-- The quadratic form of `a x` dominates `lam · |ξ|²` for almost every `x`. -/
   elliptic : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))),
     ∀ ξ : Fin d → ℝ, lam * ∑ i, ξ i ^ 2 ≤ ∑ i, ∑ j, a x i j * ξ i * ξ j
 

@@ -511,7 +511,7 @@ theorem zeroth_move {V : Set (EuclideanSpace ℝ (Fin d))} (hVm : MeasurableSet 
 /-- **Datum term.** Given that `f` has weak `ℓ`-derivative `Df` on `V`, moving `∂_ℓ` off the test
 function is literally the defining property of `HasWeakDerivOn`: `∫_V f·∂_ℓφ = -∫_V (∂_ℓf)·φ`.
 This is where the milestone assumes `f ∈ H¹_loc(V)`, strictly stronger than the `f ∈ L²` already
-available from `interior_H2_estimate`, and is what makes `∂_ℓ f` a genuine `L²(V)` class feeding
+available from `interior_H2_estimate`, and is what makes `∂_ℓ f` an `L²(V)` class feeding
 the datum `f_ℓ`. -/
 theorem datum_move {V : Set (EuclideanSpace ℝ (Fin d))} (ℓ : Fin d)
     {f_V Df : Lp ℝ 2 (volume.restrict V)} (hf : HasWeakDerivOn V ℓ f_V Df)
@@ -764,7 +764,7 @@ theorem differentiated_weakForm_div {V : Set (EuclideanSpace ℝ (Fin d))}
 /-! ### The principal commutator: strong-datum form (needs `C²`) -/
 
 /-- **Moving `∂ⱼ` off the principal commutator (needs `a ∈ C²`).** For a fixed direction pair
-`i, j` the coefficient gradient `∂_ℓ a_{ij}` is a genuine `C¹` weight, so the product
+`i, j` the coefficient gradient `∂_ℓ a_{ij}` is a `C¹` weight, so the product
 `(∂_ℓ a_{ij})·∂ᵢu` has a weak `j`-derivative and testing against `φ` moves `∂ⱼ` onto the product:
 `∫_V (∂_ℓ a_{ij})(∂ᵢu) ∂ⱼφ = -∫_V [(∂ⱼ∂_ℓ a_{ij})(∂ᵢu) + (∂_ℓ a_{ij})(∂ⱼ∂ᵢu)] φ`.
 This is the only place the second-derivative bound `A2`/`hess_bdd` is load-bearing: it controls

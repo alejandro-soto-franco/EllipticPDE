@@ -36,24 +36,27 @@ variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))}
 /-! ### D4: existence of the second weak derivative -/
 
 /-- **Existence of the interior second weak derivative (Evans §6.3.1, VIII.2.1).** For each
-`(k, i)`, the whole-space extension of `ζ · ∂ᵢu` has an `L²` weak `k`-derivative `w`, bounded
-by the data: this is the weak-limit converse `weakDeriv_of_diffQuot_bounded` fed with the
-uniform difference-quotient bound `interior_diffQuot_norm_bound`. Because `ζ ≡ 1` on `V`, the
-restriction of `w` to `V` is the genuine `∂ₖ∂ᵢu` there. -/
+`(k, i)` there is a constant `Cd`, fixed before the solution and the datum, such that for every
+weak solution `u` of `L u = f` the whole-space extension of `ζ · ∂ᵢu` has an
+`L²` weak `k`-derivative `w` with `‖w‖ ≤ Cd (‖f‖ + ‖u₀‖)`: this is the weak-limit converse
+`weakDeriv_of_diffQuot_bounded` fed with the uniform difference-quotient bound
+`interior_diffQuot_norm_bound`. Because `ζ ≡ 1` on `V`, the restriction of `w` to `V` is
+`∂ₖ∂ᵢu` there. -/
 theorem interior_secondWeakDeriv (Op : FullEllipticOp d) (hΩm : MeasurableSet Ω)
     (hA : IsC1Coeff Op.toEllipticCoeff)
-    {V : Set (EuclideanSpace ℝ (Fin d))} (T : CutoffTower Ω V)
-    (u : H01 Ω) (f : L2D Ω)
-    (hu : ∀ w : H01 Ω, Op.fullBilin Ω u w
-      = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) (k i : Fin d) :
-    ∃ w : EucL2 d,
-      HasWeakDeriv k (extendL2 hΩm (mulTest T.hζ ((u : H1amb Ω) i.succ))) w
-      ∧ ∃ Cd : ℝ, ‖w‖ ≤ Cd * (‖f‖ + ‖(u : H1amb Ω) 0‖) := by
-  obtain ⟨M, _hM0, hMbd, Cd, hMCd⟩ :=
-    interior_diffQuot_norm_bound Op hΩm hA T u f hu k i
+    {V : Set (EuclideanSpace ℝ (Fin d))} (T : CutoffTower Ω V) (k i : Fin d) :
+    ∃ Cd : ℝ, 0 ≤ Cd ∧ ∀ (u : H01 Ω) (f : L2D Ω),
+      (∀ w : H01 Ω, Op.fullBilin Ω u w
+        = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) →
+      ∃ w : EucL2 d,
+        HasWeakDeriv k (extendL2 hΩm (mulTest T.hζ ((u : H1amb Ω) i.succ))) w
+        ∧ ‖w‖ ≤ Cd * (‖f‖ + ‖(u : H1amb Ω) 0‖) := by
+  obtain ⟨Cd, hCd0, hCd⟩ := interior_diffQuot_norm_bound Op hΩm hA T k i
+  refine ⟨Cd, hCd0, fun u f hu => ?_⟩
+  obtain ⟨M, _hM0, hMbd, hMCd⟩ := hCd u f hu
   obtain ⟨w, hw, hwn⟩ :=
     weakDeriv_of_diffQuot_bounded k (extendL2 hΩm (mulTest T.hζ ((u : H1amb Ω) i.succ))) M hMbd
-  exact ⟨w, hw, Cd, le_trans hwn hMCd⟩
+  exact ⟨w, hw, le_trans hwn hMCd⟩
 
 /-! ### §4: the interior H² estimate -/
 
@@ -138,27 +141,28 @@ lemma firstOrder_gradNorm_le (Op : FullEllipticOp d) (u : H01 Ω) (f : L2D Ω)
     (Real.sqrt_sq (norm_nonneg _)).symm, ← hval]
   exact Real.sqrt_le_sqrt hdiP
 
-set_option maxHeartbeats 400000 in
+set_option maxHeartbeats 600000 in
 -- The final assembly loops the per-`(k, i)` localised second-derivative statement over the
 -- finite index square and threads the cutoff-tower construction, whose elaboration (unfolding
 -- the tower definition and the difference-quotient bounds) exceeds the default budget.
 /-- **Interior H² estimate (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1;
 Gilbarg-Trudinger, *Elliptic Partial Differential Equations of Second Order*, Theorem 8.8).**
-For a concrete-model weak solution `u ∈ H₀¹(Ω)` of `L u = f` with `C¹` principal coefficients
+For a weak solution `u ∈ H₀¹(Ω)` of `L u = f` with `C¹` principal coefficients
 and bounded transport and zeroth-order coefficients, and for any compact `V ⋐ Ω`,
 the second weak derivatives exist in `L²(V)` and are bounded by the data: for every direction
 pair `(k, i)` there is a weak `k`-derivative `wki` of `∂ᵢu` on `V` (that is, `∂ₖ∂ᵢu ∈ L²(V)`)
-with `‖∂ₖ∂ᵢu‖_{L²(V)} + ‖∂ᵢu‖_{L²(V)} + ‖u‖_{L²(V)} ≤ C (‖f‖ + ‖u‖)`, the constant `C`
-depending only on the data (`λ, Λ, A₁, d, ‖b‖∞, ‖c‖∞`, the cutoff tower for `V ⋐ Ω`), not on
-`∇u`. This is the `L²`-level statement that `u ∈ H²_loc(Ω)` with the interior estimate. -/
+with `‖∂ₖ∂ᵢu‖_{L²(V)} + ‖∂ᵢu‖_{L²(V)} + ‖u‖_{L²(V)} ≤ C (‖f‖ + ‖u‖)`. The constant is
+quantified before the solution and the datum, so it depends only on the data
+(`λ, Λ, A₁, d, ‖b‖∞, ‖c‖∞`, the cutoff tower for `V ⋐ Ω`) and on neither `u` nor `f`. This is
+the `L²`-level statement that `u ∈ H²_loc(Ω)` with the interior estimate. -/
 theorem interior_H2_estimate {n : ℕ} (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
     (hA : IsC1Coeff Op.toEllipticCoeff)
-    {V : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hVc : IsCompact V) (hVΩ : V ⊆ Ω)
-    (u : H01 Ω) (f : L2D Ω)
-    (hu : ∀ w : H01 Ω, Op.fullBilin Ω u w
-      = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) :
-    ∃ C : ℝ, 0 ≤ C ∧ ∀ k i : Fin (n + 1),
+    {V : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hVc : IsCompact V) (hVΩ : V ⊆ Ω) :
+    ∃ C : ℝ, 0 ≤ C ∧ ∀ (u : H01 Ω) (f : L2D Ω),
+      (∀ w : H01 Ω, Op.fullBilin Ω u w
+        = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) →
+      ∀ k i : Fin (n + 1),
       ∃ wki : Lp ℝ 2 (volume.restrict V),
         HasWeakDerivOn V k
             (restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ))) wki ∧
@@ -169,20 +173,26 @@ theorem interior_H2_estimate {n : ℕ} (Op : FullEllipticOp (n + 1))
   classical
   have hVm : MeasurableSet V := hVc.isClosed.measurableSet
   set T := cutoffTowerOfIsCompactSubsetIsOpen hVc hΩo hVΩ with hT
-  set P : ℝ := ‖f‖ + ‖(u : H1amb Ω) 0‖ with hPdef
-  have hP0 : (0 : ℝ) ≤ P := by rw [hPdef]; positivity
   set dcoef : ℝ := Real.sqrt ((1 + 4 * Op.gardingγ) / (2 * Op.lam)) with hdcoefdef
   have hdcoef0 : (0 : ℝ) ≤ dcoef := Real.sqrt_nonneg _
-  have hdiu : ∀ i : Fin (n + 1), ‖(u : H1amb Ω) i.succ‖ ≤ dcoef * P := fun i =>
-    firstOrder_gradNorm_le Op u f hu i
   -- Per-`(k, i)` localised statement with a data-only growth constant. The `V`-restriction of
   -- the cutoff class `ζ · ∂ᵢu` coincides with that of `∂ᵢu`, because `ζ ≡ 1` on `V`.
-  have hstep : ∀ k i : Fin (n + 1), ∃ G : ℝ, ∃ wki : Lp ℝ 2 (volume.restrict V),
+  have hstep : ∀ k i : Fin (n + 1), ∃ G : ℝ, ∀ (u : H01 Ω) (f : L2D Ω),
+      (∀ w : H01 Ω, Op.fullBilin Ω u w
+        = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) →
+      ∃ wki : Lp ℝ 2 (volume.restrict V),
       HasWeakDerivOn V k (restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ))) wki ∧
       ‖wki‖ + ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ))‖
-          + ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) 0))‖ ≤ G * P := by
+          + ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) 0))‖
+        ≤ G * (‖f‖ + ‖(u : H1amb Ω) 0‖) := by
     intro k i
-    obtain ⟨w, hw, Cd, hwCd⟩ := interior_secondWeakDeriv Op hΩm hA T u f hu k i
+    obtain ⟨Cd, _hCd0, hCd⟩ := interior_secondWeakDeriv Op hΩm hA T k i
+    refine ⟨Cd + dcoef + 1, fun u f hu => ?_⟩
+    obtain ⟨w, hw, hwCd⟩ := hCd u f hu
+    set P : ℝ := ‖f‖ + ‖(u : H1amb Ω) 0‖ with hPdef
+    have hP0 : (0 : ℝ) ≤ P := by rw [hPdef]; positivity
+    have hdiu : ∀ j : Fin (n + 1), ‖(u : H1amb Ω) j.succ‖ ≤ dcoef * P := fun j =>
+      firstOrder_gradNorm_le Op u f hu j
     have hAB : (extendL2 hΩm (mulTest T.hζ ((u : H1amb Ω) i.succ))
           : EuclideanSpace ℝ (Fin (n + 1)) → ℝ)
         =ᵐ[volume.restrict V]
@@ -205,7 +215,7 @@ theorem interior_H2_estimate {n : ℕ} (Op : FullEllipticOp (n + 1))
           (extendL2 hΩm (mulTest T.hζ ((u : H1amb Ω) i.succ))),
         coeFn_restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ)), hAB] with x h1 h2 h3
       rw [h1, h2, h3]
-    refine ⟨Cd + dcoef + 1, restrictL2 w, ?_, ?_⟩
+    refine ⟨restrictL2 w, ?_, ?_⟩
     · rw [← hDiuEq]; exact hasWeakDerivOn_of_hasWeakDeriv k hw
     · have h1 : ‖restrictL2 (Ω := V) w‖ ≤ Cd * P := le_trans (norm_restrictL2_le w) hwCd
       have h2 : ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ))‖ ≤ dcoef * P := by
@@ -219,12 +229,13 @@ theorem interior_H2_estimate {n : ℕ} (Op : FullEllipticOp (n + 1))
               + ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) 0))‖
           ≤ Cd * P + dcoef * P + 1 * P := add_le_add (add_le_add h1 h2) h3
         _ = (Cd + dcoef + 1) * P := by ring
-  choose G wki hHWD hbound using hstep
+  choose G hG using hstep
   refine ⟨∑ k : Fin (n + 1), ∑ i : Fin (n + 1), |G k i|,
     Finset.sum_nonneg (fun _ _ => Finset.sum_nonneg (fun _ _ => abs_nonneg _)), ?_⟩
-  intro k i
-  refine ⟨wki k i, hHWD k i, le_trans (hbound k i) ?_⟩
-  refine mul_le_mul_of_nonneg_right ?_ hP0
+  intro u f hu k i
+  obtain ⟨wki, hHWD, hbound⟩ := hG k i u f hu
+  refine ⟨wki, hHWD, le_trans hbound ?_⟩
+  refine mul_le_mul_of_nonneg_right ?_ (by positivity)
   calc G k i ≤ |G k i| := le_abs_self _
     _ ≤ ∑ i' : Fin (n + 1), |G k i'| :=
         Finset.single_le_sum (f := fun i' => |G k i'|)

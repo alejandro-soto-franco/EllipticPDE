@@ -145,15 +145,16 @@ namespace CutoffTower
 
 variable {Ω V : Set (EuclideanSpace ℝ (Fin d))}
 
-/-- The innermost cutoff is honestly equal to `1` on `V` (not just eventually near it). -/
+/-- The innermost cutoff is equal to `1` at every point of `V`, rather than on a neighbourhood
+of it. -/
 theorem zeta_eqOn_one (T : CutoffTower Ω V) : Set.EqOn T.ζ 1 V :=
   fun x hx => T.hζ_one.self_of_nhdsSet x hx
 
-/-- The middle cutoff is honestly equal to `1` on `tsupport ζ`. -/
+/-- The middle cutoff is equal to `1` at every point of `tsupport ζ`. -/
 theorem xi_eqOn_one (T : CutoffTower Ω V) : Set.EqOn T.ξ 1 (tsupport T.ζ) :=
   fun x hx => T.hξ_one.self_of_nhdsSet x hx
 
-/-- The outermost cutoff is honestly equal to `1` on `tsupport ξ`. -/
+/-- The outermost cutoff is equal to `1` at every point of `tsupport ξ`. -/
 theorem theta_eqOn_one (T : CutoffTower Ω V) : Set.EqOn T.θ 1 (tsupport T.ξ) :=
   fun x hx => T.hθ_one.self_of_nhdsSet x hx
 

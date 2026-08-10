@@ -29,7 +29,7 @@ extend by zero, translate on the whole space where `diffQuot` already lives, res
 
 * `extendL2_inner_restrictL2`: `restrictL2` is the adjoint of `extendL2`.
 * `extendL2_diffQuotD_eq`: on classes whose translated support stays in `Ω`, the restricted
-  difference quotient's extension equals the honest whole-space difference quotient.
+  difference quotient's extension equals the whole-space difference quotient.
 -/
 
 open MeasureTheory
@@ -59,7 +59,10 @@ theorem coeFn_restrictL2 (g : EucL2 d) :
   LpToLpRestrictCLM_coeFn ℝ Ω g
 
 /-- **Restriction is a left inverse of extension by zero.** Extending a class by zero to
-the whole space and restricting back to `Ω` recovers the original class. -/
+the whole space and restricting back to `Ω` recovers the original class.
+
+Kept beside `extendL2_inner_restrictL2`, which states the adjoint law and is the form the
+difference-quotient argument takes. Nothing consumes this one. -/
 private theorem restrictL2_extendL2 (hΩm : MeasurableSet Ω) (g : L2D Ω) :
     restrictL2 (extendL2 hΩm g) = g := by
   refine Lp.ext ?_
@@ -92,7 +95,7 @@ theorem extendL2_inner_restrictL2 (hΩm : MeasurableSet Ω) (g : L2D Ω) (w : Eu
 
 /-- **The interior difference quotient** `Dₖʰ` on `L2D Ω`: extend by zero, translate on the
 whole space, restrict back. A bounded operator for every `h` (no support hypothesis needed
-for boundedness; the identity with the honest whole-space difference quotient needs a
+for boundedness; the identity with the whole-space difference quotient needs a
 support condition, see `extendL2_diffQuotD_eq`). Evans, *Partial Differential Equations*
 (2nd ed.), §6.3.1. -/
 def diffQuotD (k : Fin d) (h : ℝ) (hΩm : MeasurableSet Ω) : L2D Ω →L[ℝ] L2D Ω :=
@@ -147,7 +150,7 @@ def diffQuotG (k : Fin d) (h : ℝ) (hΩm : MeasurableSet Ω) : H1amb Ω →L[�
 /-! ### B4: Whole-space compatibility, the integration-by-parts bridge -/
 
 /-- **Whole-space compatibility.** On classes whose whole-space translate stays supported
-in `Ω`, the interior difference quotient's extension by zero equals the honest whole-space
+in `Ω`, the interior difference quotient's extension by zero equals the whole-space
 difference quotient of the extension: `extendL2 (Dₖʰ g) = Dₖʰ (extendL2 g)`. This lets the
 whole-space adjoint relation `diffQuot_inner_adjoint` act on restricted-domain difference
 quotients (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, proof of Theorem 1). -/

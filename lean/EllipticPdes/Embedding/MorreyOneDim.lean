@@ -338,7 +338,7 @@ private lemma exists_bump_integral_one (hpq : p < q) :
 
 /-- **The one-dimensional du Bois-Reymond lemma.** If `v` is locally integrable on `(p, q)` and
 its weak derivative vanishes there (tested against every smooth compactly supported bump), then
-`v` agrees a.e. on `(p, q)` with a constant. This is the key step recovering an honest
+`v` agrees a.e. on `(p, q)` with a constant. This is the key step recovering a
 representative of `u` from a weak derivative: applied to `v = u - (\text{primitive of } g)`, it
 supplies the constant of integration. -/
 private lemma ae_eq_const_of_forall_integral_mul_deriv_eq_zero {v : ℝ → ℝ} (hpq : p < q)
@@ -464,7 +464,10 @@ private lemma eLpNorm_two_sq_eq_ofReal_integral_sq {f : ℝ → ℝ} {μ : Measu
 
 /-- **Morrey on an interval.** A function with an `L²` weak derivative on a `1`-D ball has
 a `C^{0,1/2}` representative, with Hölder constant linear in the `L²` norm of its
-derivative. -/
+derivative.
+
+Terminal result of the library, the one-dimensional endpoint of the Morrey chain. Nothing
+inside the development consumes it. -/
 theorem morrey_ball_oneDim (c : EuclideanSpace ℝ (Fin 1)) {r : ℝ} (hr : 0 < r) :
     ∃ C : ℝ≥0, ∀ (u : EuclideanSpace ℝ (Fin 1) → ℝ) (g : EuclideanSpace ℝ (Fin 1) → ℝ),
       IntegrableOn u (Metric.ball c r) volume →

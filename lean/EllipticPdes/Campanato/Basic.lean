@@ -25,7 +25,7 @@ written `ballAverage u x r`, and the decay hypothesis
 
 written `CampanatoOn Ω u α M`. The hypothesis quantifies over balls contained in `Ω`, which is
 the form property (H3) of Fernández-Real and Ros-Oton takes, so every mean in sight is a mean
-over an honest ball and carries the exact volume `r^d · |B(0,1)|`.
+over a ball and carries the exact volume `r^d · |B(0,1)|`.
 
 The rest of the file records what the estimates downstream need: the volume of a ball as a real
 number, and the integrability of `u` and of `(u - c)²` on a ball, both read off from

@@ -13,7 +13,7 @@ import Mathlib.Topology.UniformSpace.UniformEmbedding
 import Mathlib.Analysis.Calculus.LineDeriv.IntegrationByParts
 
 /-!
-# Sobolev interface (M4): H¹ / H₀¹ as concrete weak-derivative Hilbert spaces
+# Sobolev interface (M4): H¹ / H₀¹ as weak-derivative Hilbert spaces
 
 We realise `W^{1,2}(Ω)` as the **graph of the weak-gradient operator** inside the
 Hilbert space `L²(Ω) × (L²(Ω))ᵈ` (encoded as `PiLp 2` over `Fin (d+1)`: coordinate `0`
@@ -241,13 +241,14 @@ orthogonal complement it is automatically a closed, complete, real Hilbert space
 def W12 (Ω : Set (EuclideanSpace ℝ (Fin d))) : Submodule ℝ (H1amb Ω) :=
   (Submodule.span ℝ (constraintSet Ω))ᗮ
 
+/-- `W^{1,2}(Ω)` is complete, being an orthogonal complement in a Hilbert space. -/
 instance instCompleteSpaceW12 (Ω : Set (EuclideanSpace ℝ (Fin d))) :
     CompleteSpace (W12 Ω) :=
   inferInstanceAs (CompleteSpace (Submodule.span ℝ (constraintSet Ω))ᗮ)
 
 /-- Membership in `W^{1,2}(Ω)` is exactly the weak-gradient relation tested against every
 test function: `⟪U₀, [∂ᵢφ]⟫ + ⟪U_{i+1}, [φ]⟫ = 0`. This is what makes an element of `W12`
-a genuine function (`U 0`) together with its weak `L²` gradient (`U ∘ Fin.succ`). -/
+a function (`U 0`) together with its weak `L²` gradient (`U ∘ Fin.succ`). -/
 lemma mem_W12_iff {Ω : Set (EuclideanSpace ℝ (Fin d))} (U : H1amb Ω) :
     U ∈ W12 Ω ↔ ∀ (φ : EuclideanSpace ℝ (Fin d) → ℝ) (h : IsTestFn Ω φ) (i : Fin d),
       ⟪h.partialCls i, U 0⟫ + ⟪h.testCls, U i.succ⟫ = 0 := by
@@ -295,6 +296,7 @@ complete, real Hilbert space. -/
 def H01 (Ω : Set (EuclideanSpace ℝ (Fin d))) : Submodule ℝ (H1amb Ω) :=
   (Submodule.span ℝ (testGraphSet Ω)).topologicalClosure
 
+/-- `H₀¹(Ω)` is complete, being a topological closure in a Hilbert space. -/
 instance instCompleteSpaceH01 (Ω : Set (EuclideanSpace ℝ (Fin d))) :
     CompleteSpace (H01 Ω) :=
   inferInstanceAs (CompleteSpace (Submodule.span ℝ (testGraphSet Ω)).topologicalClosure)

@@ -456,7 +456,10 @@ the Riesz representative `opA` of the full divergence form. -/
 def solSpace : Submodule ℝ (H01 Ω) := LinearMap.ker (Op.opA Ω).toLinearMap
 
 /-- Membership in `solSpace` is exactly being a weak solution of the homogeneous
-problem: `B[u, v] = 0` against every `v ∈ H₀¹(Ω)`. -/
+problem: `B[u, v] = 0` against every `v ∈ H₀¹(Ω)`.
+
+Kept as the characterisation of the definition above. The proofs below reach `solSpace`
+through `solSpace_eq_eigenspace`, so nothing consumes this form. -/
 private lemma mem_solSpace_iff (u : H01 Ω) :
     u ∈ Op.solSpace Ω ↔ ∀ v : H01 Ω, Op.fullBilin Ω u v = 0 := by
   rw [solSpace, LinearMap.mem_ker, ContinuousLinearMap.coe_coe]
@@ -495,7 +498,10 @@ half of Evans §6.2.3, Theorem 4(ii)).
 Under the Rellich-Kondrachov input (`opK` compact), the space of weak solutions of the
 homogeneous problem `Lu = 0` is finite-dimensional: it is the eigenspace of the compact
 operator `opK` at the nonzero eigenvalue `1`, and Riesz theory makes such eigenspaces
-finite-dimensional. -/
+finite-dimensional.
+
+Terminal result of the library, stated in the manuscript. Nothing inside the development
+consumes it. -/
 theorem finiteDimensional_solSpace (hK : IsCompactOperator (Op.opK Ω)) :
     FiniteDimensional ℝ (Op.solSpace Ω) := by
   rw [solSpace_eq_eigenspace]
@@ -527,7 +533,10 @@ def solSpaceStar : Submodule ℝ (H01 Ω) :=
   LinearMap.ker (ContinuousLinearMap.adjoint (Op.opA Ω)).toLinearMap
 
 /-- Membership in `solSpaceStar` is exactly being a weak solution of the transpose
-problem: `B[v, u] = 0` against every `v ∈ H₀¹(Ω)`. -/
+problem: `B[v, u] = 0` against every `v ∈ H₀¹(Ω)`.
+
+Kept as the characterisation of the definition above, the transpose counterpart of the
+characterisation of `solSpace`. Nothing consumes it. -/
 private lemma mem_solSpaceStar_iff (u : H01 Ω) :
     u ∈ Op.solSpaceStar Ω ↔ ∀ v : H01 Ω, Op.fullBilin Ω v u = 0 := by
   rw [solSpaceStar, LinearMap.mem_ker, ContinuousLinearMap.coe_coe]
@@ -585,7 +594,10 @@ space of weak
 solutions of the homogeneous problem and the space of weak solutions of the transpose
 problem have the same (finite) dimension. The factorisation `opA = opE ∘ (1 - opK)`
 carries `solSpaceStar = ker(opA†)` onto `ker(1 - opK†)` along the bijection `(opE)†`,
-and the abstract index theorem `finrank_ker_one_sub_adjoint_eq` applies. -/
+and the abstract index theorem `finrank_ker_one_sub_adjoint_eq` applies.
+
+Terminal result of the library, stated in the manuscript. Nothing inside the development
+consumes it. -/
 theorem finrank_solSpaceStar_eq_finrank_solSpace (hK : IsCompactOperator (Op.opK Ω)) :
     Module.finrank ℝ (Op.solSpaceStar Ω) = Module.finrank ℝ (Op.solSpace Ω) := by
   set T : H01 Ω →L[ℝ] H01 Ω :=

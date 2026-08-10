@@ -76,23 +76,27 @@ whole-space `EucL2 d` classes `extendL2 hΩm (ζ · ∂ᵢu)`, is bounded by the
 `(λ/2) ∑ᵢ ‖extendL2 hΩm (ζ · ∂ᵢu)‖² ≤ C (‖f‖² + ‖u₀‖²)`. These whole-space classes are the
 gradient data on which the difference-quotient method of the interior second-derivative
 estimate operates (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1;
-Gilbarg-Trudinger, *Elliptic PDE of Second Order*, Theorem 8.8). -/
+Gilbarg-Trudinger, *Elliptic PDE of Second Order*, Theorem 8.8).
+
+One of the two deliverables the module docstring names. The interior chain reaches the same
+energy through `Caccioppoli` on the restricted-domain classes, so nothing consumes this
+whole-space form. -/
 private theorem extendL2_cutoffGrad_energy_le (Op : FullEllipticOp d)
     {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩm : MeasurableSet Ω)
-    {ζ : EuclideanSpace ℝ (Fin d) → ℝ} (hζ : IsTestFn Ω ζ) (u : H01 Ω) (f : L2D Ω)
-    (hu : ∀ v : H01 Ω, Op.fullBilin Ω u v
-      = ∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ)) :
-    ∃ C : ℝ, 0 ≤ C ∧
+    {ζ : EuclideanSpace ℝ (Fin d) → ℝ} (hζ : IsTestFn Ω ζ) :
+    ∃ C : ℝ, 0 ≤ C ∧ ∀ (u : H01 Ω) (f : L2D Ω),
+      (∀ v : H01 Ω, Op.fullBilin Ω u v
+        = ∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ)) →
       Op.lam / 2 * ∑ i : Fin d, ‖extendL2 hΩm (mulTest hζ ((u : H1amb Ω) i.succ))‖ ^ 2
         ≤ C * (‖f‖ ^ 2 + ‖(u : H1amb Ω) 0‖ ^ 2) := by
-  obtain ⟨C, hC0, hC⟩ := caccioppoli Op hζ u f hu
-  refine ⟨C, hC0, ?_⟩
+  obtain ⟨C, hC0, hC⟩ := caccioppoli Op hζ
+  refine ⟨C, hC0, fun u f hu => ?_⟩
   have hnorm : ∀ i : Fin d,
       ‖extendL2 hΩm (mulTest hζ ((u : H1amb Ω) i.succ))‖
         = ‖mulTest hζ ((u : H1amb Ω) i.succ)‖ :=
     fun i => norm_extendL2 hΩm _
   simp_rw [hnorm]
-  exact hC
+  exact hC u f hu
 
 /-! ### Leibniz for extension against a coefficient, and translated coefficients
 

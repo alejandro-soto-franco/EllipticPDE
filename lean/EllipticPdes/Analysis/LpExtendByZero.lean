@@ -77,6 +77,7 @@ noncomputable def lpExtendByZero (hs : MeasurableSet s) :
     change ‖(memLp_indicator_extend hs f).toLp (s.indicator (f : α → ℝ))‖ = ‖f‖
     rw [Lp.norm_toLp, eLpNorm_indicator_eq_eLpNorm_restrict hs, Lp.norm_def]
 
+/-- The extension by zero is represented almost everywhere by the indicator of `s`. -/
 @[simp] theorem coeFn_lpExtendByZero (hs : MeasurableSet s) (f : Lp ℝ p (μ.restrict s)) :
     (lpExtendByZero μ p s hs f : α → ℝ) =ᵐ[μ] s.indicator (f : α → ℝ) :=
   MemLp.coeFn_toLp (memLp_indicator_extend hs f)

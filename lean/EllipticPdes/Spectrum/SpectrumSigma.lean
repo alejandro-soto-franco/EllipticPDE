@@ -243,7 +243,10 @@ theorem spectrum_diff_eq_eigenvalues (hK : IsCompactOperator K) :
 infinite-dimensional real Hilbert space, a compact operator `K` has `0` in its real
 spectrum; away from zero the spectrum consists exactly of the eigenvalues; the nonzero
 spectrum is countable; and only finitely many spectral points have `|μ| ≥ δ` for each
-`δ > 0` -- so an enumeration of the nonzero spectrum converges to `0`. -/
+`δ > 0` -- so an enumeration of the nonzero spectrum converges to `0`.
+
+Terminal result of the library, stated in the manuscript. Nothing inside the development
+consumes it. -/
 theorem spectrum_compact_operator (hK : IsCompactOperator K)
     (hinf : ¬ FiniteDimensional ℝ E) :
     (0 : ℝ) ∈ spectrum ℝ K
@@ -468,7 +471,7 @@ theorem solvable_of_notMem_sigmaSet (hK : IsCompactOperator (Op.opK Ω)) {lam : 
     (Op.opAlam_solves_iff Ω lam f u).symm)).mp
     (hbij.existsUnique ((InnerProductSpace.toDual ℝ (H01 Ω)).symm f))
 
-/-- The membership characterization of `Σ` (the `H⁻¹` form of Existence III(i)):
+/-- The membership characterisation of `Σ` (the `H⁻¹` form of Existence III(i)):
 `λ ∉ Σ` exactly when `B[u,v] = λ⟨u₀,v₀⟩ + f(v)` is uniquely solvable for every `f`. -/
 theorem notMem_sigmaSet_iff_solvable (hK : IsCompactOperator (Op.opK Ω)) (lam : ℝ) :
     lam ∉ Op.sigmaSet Ω

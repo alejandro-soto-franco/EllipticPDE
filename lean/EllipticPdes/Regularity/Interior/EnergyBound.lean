@@ -479,14 +479,17 @@ private lemma norm_diffQuotD_u0_le (hΩm : MeasurableSet Ω) (k : Fin d) (h : �
 /-- **Ambient-space generalisation of `norm_diffQuotD_u0_le` (proof of concept).** `H01` is not
 needed for this inequality itself: it is needed only to manufacture the one
 whole-space weak-derivative fact `hasWeakDeriv_extendL2_of_mem_H01` supplies. Factoring that
-fact out as a hypothesis `hW` shows the rest of `norm_diffQuotD_u0_le`'s proof — the identity
+fact out as a hypothesis `hW` shows the rest of `norm_diffQuotD_u0_le`'s proof (the identity
 `diffQuotD = restrict ∘ diffQuot ∘ extendL2`, the non-expansive restriction, and the
-difference-quotient/weak-derivative bound `norm_diffQuot_le_of_hasWeakDeriv` — survives
+difference-quotient/weak-derivative bound `norm_diffQuot_le_of_hasWeakDeriv`) survives
 unchanged for an arbitrary ambient graph `U : H1amb Ω`, with no reference to `H01` at all.
 Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, Remark (i), states that the
 zero-trace hypothesis this lemma's `H01`-typed sibling carries is not required for the interior
 estimate; this declaration isolates that the only place it was doing work in this particular
-step was in supplying `hW`, not in the inequality. -/
+step was in supplying `hW`, not in the inequality.
+
+Kept as that record. The chain runs on the `H01`-typed sibling, so nothing consumes this
+one. -/
 theorem norm_diffQuotD_u0_le_ambient (hΩm : MeasurableSet Ω) (k : Fin d) (h : ℝ)
     (U : H1amb Ω)
     (hW : HasWeakDeriv k (extendL2 hΩm (U 0)) (extendL2 hΩm (U k.succ))) :
@@ -576,8 +579,9 @@ set_option maxHeartbeats 500000 in
 weak solution `u ∈ H₀¹(Ω)` of `L u = f`, an inner cutoff `ξ` and an
 outer cutoff `θ ≡ 1` on the shift-reachable part of `tsupport ξ²`, the cutoff-weighted energy
 of the interior difference quotient of the gradient is bounded by the data, uniformly in the
-step `h`: `(λ/2) ∑ᵢ ‖ξ · Dₖ^h ∂ᵢu‖² ≤ C (‖f‖² + ‖u₀‖²)`, with `C` depending only on
-`λ, Λ, A₁, d, γ, ‖b‖∞, ‖c‖∞, ‖ξ‖∞, ‖∂ξ‖∞` (and not on `‖∇u‖` or `h`). Testing the weak
+step `h`: `(λ/2) ∑ᵢ ‖ξ · Dₖ^h ∂ᵢu‖² ≤ C (‖f‖² + ‖u₀‖²)`. The constant is quantified before
+the solution and the datum, so it depends only on
+`λ, Λ, A₁, d, γ, ‖b‖∞, ‖c‖∞, ‖ξ‖∞, ‖∂ξ‖∞`, and on none of `u`, `f`, `h`. Testing the weak
 formulation with the
 admissible Evans element `v_h = -Dₖ^{-h}(ξ² Dₖ^h u)`, discrete integration by parts
 (`evansTest_bilin_L2D`) moves the outer difference quotient onto the coefficient action; the
@@ -591,11 +595,11 @@ data
 PDE of Second Order*, Theorem 8.8). -/
 theorem interior_diffQuot_energy_bound (Op : FullEllipticOp d) (hΩm : MeasurableSet Ω)
     (hA : IsC1Coeff Op.toEllipticCoeff)
-    (hξ : IsTestFn Ω ξ) (hθ : IsTestFn Ω θ)
-    (u : H01 Ω) (f : L2D Ω)
-    (hu : ∀ w : H01 Ω, Op.fullBilin Ω u w
-      = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) (k : Fin d) :
-    ∃ C : ℝ, 0 ≤ C ∧ ∀ (h : ℝ), h ≠ 0 →
+    (hξ : IsTestFn Ω ξ) (hθ : IsTestFn Ω θ) (k : Fin d) :
+    ∃ C : ℝ, 0 ≤ C ∧ ∀ (u : H01 Ω) (f : L2D Ω),
+      (∀ w : H01 Ω, Op.fullBilin Ω u w
+        = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) →
+      ∀ (h : ℝ), h ≠ 0 →
       (∀ x ∈ tsupport (fun y => ξ y * ξ y), x + hshift k h ∈ Ω) →
       (∀ x ∈ tsupport θ, x + hshift k (-h) ∈ Ω) →
       (∀ x ∈ Ω,
@@ -609,7 +613,7 @@ theorem interior_diffQuot_energy_bound (Op : FullEllipticOp d) (hΩm : Measurabl
         ≤ C * (‖f‖ ^ 2 + ‖(u : H1amb Ω) 0‖ ^ 2) := by
   classical
   rcases Nat.eq_zero_or_pos d with hd0 | hd
-  · subst hd0; exact ⟨0, le_refl 0, fun h _ _ _ _ _ => k.elim0⟩
+  · subst hd0; exact ⟨0, le_refl 0, fun _ _ _ _ _ _ _ _ _ => k.elim0⟩
   set A := Op.toEllipticCoeff with hAdef
   have hγnn : (0 : ℝ) ≤ Op.gardingγ := Op.gardingγ_nonneg
   refine ⟨max 0 (4 / 3 * ((2 * (exists_abs_bound hξ).choose ^ 2 / A.lam
@@ -632,7 +636,7 @@ theorem interior_diffQuot_energy_bound (Op : FullEllipticOp d) (hΩm : Measurabl
               hA.A1 / 2 * (exists_abs_bound_partialD (isTestFn_mul hξ hξ) j).choose)
           / (2 * A.lam)))) * (2 + 4 * Op.gardingγ),
     mul_nonneg (le_max_left _ _) (by nlinarith only [hγnn]), ?_⟩
-  intro h hh hsm_in hsm_out hθ1 hθ0
+  intro u f hu h hh hsm_in hsm_out hθ1 hθ0
   set A' := A.translate (hshift k h) with hA'def
   set Dg : Fin d → L2D Ω := fun i => diffQuotD k h hΩm ((u : H1amb Ω) i.succ) with hDgdef
   set D0 : L2D Ω := diffQuotD k h hΩm ((u : H1amb Ω) 0) with hD0def
