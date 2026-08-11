@@ -26,6 +26,7 @@ import EllipticPdes.Regularity.CoeffC2
 import EllipticPdes.Regularity.CoeffCk
 import EllipticPdes.Regularity.CoeffWkInfty
 import EllipticPdes.Regularity.CoeffBridge
+import EllipticPdes.Regularity.MollifyWkInfty
 import EllipticPdes.Regularity.LowerOrderWkInfty
 import EllipticPdes.Regularity.CutoffTower
 import EllipticPdes.Regularity.RestrictedDiffQuotient
