@@ -81,14 +81,57 @@ of order `2` is a matter of naming: the empty list is `u`, a singleton `[i]` is 
 `[k, i]` is the returned `wki`, and longer lists are unconstrained because `D_step` is asked
 only of lists shorter than `2`.
 
-What the assembly still needs, and what the `H²` estimate does not itself provide, is the
-first-order step `HasWeakDerivOn V i (u|V) (∂ᵢu|V)`: that the ambient encoding's coordinate
-`i.succ` really is the weak `i`-derivative of coordinate `0`, localised to `V`. -/
+The first-order step, which the `H²` estimate does not itself provide, is
+`hasWeakDeriv_extendL2_of_mem_H01`: the ambient encoding's coordinate `i.succ` is the weak
+`i`-derivative of coordinate `0` on the whole space, and `hasWeakDerivOn_of_hasWeakDeriv`
+localises it to `V`.
+
+No constant is spent. The `H²` estimate bounds the sum of the three norms, so each of them is
+bounded on its own, and `IteratedL2Bound.norm_le` supplies `‖f‖ ≤ M`. -/
 theorem interiorRegularityAt_zero (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
     (hA : IsC1Coeff Op.toEllipticCoeff) :
     InteriorRegularityAt Op hΩm 0 := by
-  sorry
+  classical
+  intro V hVc hVΩ
+  obtain ⟨C, hC0, hC⟩ := interior_H2_estimate Op hΩm hΩo hA hVc hVΩ
+  refine ⟨C, hC0, fun u f M hfk hM hu => ?_⟩
+  choose W hW hWb using hC u f hu
+  -- The family: the empty list is `u`, a singleton is a first derivative, a pair is the
+  -- second derivative the `H²` estimate returned. Longer lists are never asked about.
+  refine ⟨⟨fun α =>
+      match α with
+      | [] => restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) 0))
+      | [i] => restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ))
+      | [k, i] => W k i
+      | _ => 0, rfl, ?_⟩, ?_⟩
+  · rintro m (_ | ⟨i, _ | ⟨j, rest⟩⟩) hα
+    · exact hasWeakDerivOn_of_hasWeakDeriv m (hasWeakDeriv_extendL2_of_mem_H01 hΩm m u.2)
+    · exact hW m i
+    · simp at hα
+  -- Each of the three norms is dominated by the sum the `H²` estimate bounds.
+  · have hfM : ‖f‖ ≤ M := hM.norm_le
+    have hshift : C * (‖f‖ + ‖(u : H1amb Ω) 0‖) ≤ C * (M + ‖(u : H1amb Ω) 0‖) :=
+      mul_le_mul_of_nonneg_left (by linarith) hC0
+    rintro (_ | ⟨i, _ | ⟨j, rest⟩⟩) hα
+    · refine le_trans ?_ hshift
+      have h := hWb 0 0
+      have h1 := norm_nonneg (W 0 0)
+      have h2 := norm_nonneg (restrictL2 (Ω := V)
+        (extendL2 hΩm ((u : H1amb Ω) (0 : Fin (n + 1)).succ)))
+      linarith
+    · refine le_trans ?_ hshift
+      have h := hWb 0 i
+      have h1 := norm_nonneg (W 0 i)
+      have h2 := norm_nonneg (restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) 0)))
+      linarith
+    · rcases rest with _ | ⟨p, rest'⟩
+      · refine le_trans ?_ hshift
+        have h := hWb i j
+        have h1 := norm_nonneg (restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) j.succ)))
+        have h2 := norm_nonneg (restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) 0)))
+        linarith
+      · simp at hα
 
 /-- **Induction step.** Differentiating the equation once carries the order-`k` conclusion to
 order `k + 1`, under one more order of regularity on every coefficient.
