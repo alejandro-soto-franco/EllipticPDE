@@ -67,6 +67,20 @@ theorem ae_abs_D_singleton_le (hA : IsWkInftyCoeff A (k + 1)) (ℓ i j : Fin d) 
   have h := hA.ess_bdd i j [ℓ] (by simp)
   simpa using h
 
+/-- The order-two member of the family is a weak partial derivative of the order-one member. -/
+theorem hasWeakPartial_D_singleton (hA : IsWkInftyCoeff A (k + 2)) (m ℓ i j : Fin d) :
+    HasWeakPartial m (hA.D [ℓ] i j) (hA.D [m, ℓ] i j) := hA.D_step i j m [ℓ] (by simp)
+
+/-- The order-two member of the family is measurable. -/
+theorem measurable_D_pair (hA : IsWkInftyCoeff A (k + 2)) (m ℓ i j : Fin d) :
+    Measurable (hA.D [m, ℓ] i j) := hA.D_meas i j [m, ℓ] (by simp)
+
+/-- The order-two member of the family is essentially bounded by `bound 2`. -/
+theorem ae_abs_D_pair_le (hA : IsWkInftyCoeff A (k + 2)) (m ℓ i j : Fin d) :
+    ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |hA.D [m, ℓ] i j x| ≤ hA.bound 2 := by
+  have h := hA.ess_bdd i j [m, ℓ] (by simp)
+  simpa using h
+
 end IsWkInftyCoeff
 
 namespace IsWkInfty
@@ -173,5 +187,56 @@ theorem zeroth_move_wkInfty {V : Set (EuclideanSpace ℝ (Fin d))} (ℓ : Fin d)
   HasWeakDerivOn.mul_isWkInfty_left ℓ hDu hc.measurable_self (hc.measurable_D_singleton ℓ)
     (hc.hasWeakPartial_D ℓ) hc.ae_abs_le (hc.ae_abs_D_singleton_le ℓ) cu hcu comm hcomm
     φ hφc hφcs hφV
+
+/-! ### The principal commutator -/
+
+/-- **Moving `∂ⱼ` off the principal commutator, for a `W^{2,∞}` coefficient.** The coefficient
+derivative `∂_ℓ a_{ij}` is itself a `W^{1,∞}` weight, so the product `(∂_ℓ a_{ij})·∂ᵢu` has a weak
+`j`-derivative and testing against `φ` moves `∂ⱼ` onto the product:
+`∫_V (∂_ℓ a_{ij})(∂ᵢu) ∂ⱼφ = -∫_V [(∂ⱼ∂_ℓ a_{ij})(∂ᵢu) + (∂_ℓ a_{ij})(∂ⱼ∂ᵢu)] φ`.
+
+This is the one place where the second order of the coefficient hypothesis is load-bearing: it
+supplies the mixed member `hA.D [j, ℓ]` of the family. The `C²` version `commutator_move` spends
+most of its length turning the Hessian bound into a bound on the mixed partial through two
+operator-norm steps, and the `W^{2,∞}` bundle carries that bound outright. -/
+theorem commutator_move_wkInfty {V : Set (EuclideanSpace ℝ (Fin d))}
+    {A : EllipticCoeff d} {k : ℕ} (hA : IsWkInftyCoeff A (k + 2)) (ℓ i j : Fin d)
+    (Du_i D2_ji : L2D V) (hD2 : HasWeakDerivOn V j Du_i D2_ji)
+    {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφc : ContDiff ℝ (⊤ : ℕ∞) φ)
+    (hφcs : HasCompactSupport φ) (hφV : tsupport φ ⊆ V) :
+    ∫ x in V, hA.D [ℓ] i j x * (Du_i x : ℝ) * partialD j φ x
+      = - ∫ x in V, (hA.D [j, ℓ] i j x * (Du_i x : ℝ)
+              + hA.D [ℓ] i j x * (D2_ji x : ℝ)) * φ x := by
+  classical
+  have hwm : Measurable (hA.D [ℓ] i j) := hA.measurable_D_singleton ℓ i j
+  have hdwm : Measurable (hA.D [j, ℓ] i j) := hA.measurable_D_pair j ℓ i j
+  have hwM : ∀ᵐ x ∂(volume.restrict V), |hA.D [ℓ] i j x| ≤ hA.bound 1 :=
+    ae_restrict_of_ae (hA.ae_abs_D_singleton_le ℓ i j)
+  have hdwM : ∀ᵐ x ∂(volume.restrict V), |hA.D [j, ℓ] i j x| ≤ hA.bound 2 :=
+    ae_restrict_of_ae (hA.ae_abs_D_pair_le j ℓ i j)
+  -- The two product classes, with their pointwise representatives.
+  set ag := mulCoeffL hwm hwM Du_i with hag_def
+  set dag := mulCoeffL hdwm hdwM Du_i + mulCoeffL hwm hwM D2_ji with hdag_def
+  have hag_rep : ag =ᵐ[volume.restrict V] fun x => hA.D [ℓ] i j x * (Du_i x : ℝ) := by
+    rw [hag_def]; exact mulCoeffL_coeFn hwm hwM Du_i
+  have hdag_rep : dag =ᵐ[volume.restrict V]
+      fun x => hA.D [j, ℓ] i j x * (Du_i x : ℝ) + hA.D [ℓ] i j x * (D2_ji x : ℝ) := by
+    rw [hdag_def]
+    filter_upwards [Lp.coeFn_add (mulCoeffL hdwm hdwM Du_i) (mulCoeffL hwm hwM D2_ji),
+      mulCoeffL_coeFn hdwm hdwM Du_i, mulCoeffL_coeFn hwm hwM D2_ji] with x hadd h1 h2
+    simp only [hadd, h1, h2, Pi.add_apply]
+  have hmove := HasWeakDerivOn.mul_isWkInfty_left j hD2 hwm hdwm
+    (hA.hasWeakPartial_D_singleton j ℓ i j) (hA.ae_abs_D_singleton_le ℓ i j)
+    (hA.ae_abs_D_pair_le j ℓ i j) ag hag_rep dag hdag_rep φ hφc hφcs hφV
+  -- Read the identity through the representatives.
+  have hlhs : ∫ x in V, (ag x : ℝ) * partialD j φ x
+      = ∫ x in V, hA.D [ℓ] i j x * (Du_i x : ℝ) * partialD j φ x :=
+    integral_congr_ae (by filter_upwards [hag_rep] with x hx; rw [hx])
+  have hrhs : ∫ x in V, (dag x : ℝ) * φ x
+      = ∫ x in V, (hA.D [j, ℓ] i j x * (Du_i x : ℝ)
+          + hA.D [ℓ] i j x * (D2_ji x : ℝ)) * φ x :=
+    integral_congr_ae (by filter_upwards [hdag_rep] with x hx; rw [hx])
+  rw [← hlhs, ← hrhs]
+  exact hmove
 
 end EllipticPdes.Regularity
