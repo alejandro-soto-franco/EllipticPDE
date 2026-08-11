@@ -17,7 +17,7 @@ Lax-Milgram.
 ## Results
 
 Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
-`sorry` in the development:
+`sorry` in the library:
 
 - existence and uniqueness of the weak solution,
 - the Gårding inequality,
@@ -77,7 +77,7 @@ cd lean && lake lint       # environment-level linter
 ```
 
 CI runs both on every push. It builds from a clean clone, asserts the
-development is free of `sorry`, and holds every headline result to the axioms
+library is free of `sorry`, and holds every headline result to the axioms
 `propext`, `Classical.choice` and `Quot.sound` through `Gates.lean`, where each
 is pinned with `#guard_msgs`.
 

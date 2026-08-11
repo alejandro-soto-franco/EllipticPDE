@@ -23,6 +23,7 @@ import EllipticPdes.Regularity.Caccioppoli
 import EllipticPdes.Regularity.InteriorCompactSupport
 import EllipticPdes.Regularity.CoeffC1
 import EllipticPdes.Regularity.CoeffC2
+import EllipticPdes.Regularity.CoeffCk
 import EllipticPdes.Regularity.CutoffTower
 import EllipticPdes.Regularity.RestrictedDiffQuotient
 import EllipticPdes.Regularity.RestrictedDiffQuotientMem
