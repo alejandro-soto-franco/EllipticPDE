@@ -25,6 +25,8 @@ import EllipticPdes.Regularity.CoeffC1
 import EllipticPdes.Regularity.CoeffC2
 import EllipticPdes.Regularity.CoeffCk
 import EllipticPdes.Regularity.CoeffWkInfty
+import EllipticPdes.Regularity.CoeffBridge
+import EllipticPdes.Regularity.LowerOrderWkInfty
 import EllipticPdes.Regularity.CutoffTower
 import EllipticPdes.Regularity.RestrictedDiffQuotient
 import EllipticPdes.Regularity.RestrictedDiffQuotientMem
@@ -32,6 +34,9 @@ import EllipticPdes.Regularity.Interior.Support
 import EllipticPdes.Regularity.Interior.EnergyBound
 import EllipticPdes.Regularity.Interior.NormBound
 import EllipticPdes.Regularity.Interior
+import EllipticPdes.Regularity.HigherWeakDeriv
+import EllipticPdes.Regularity.HigherInterior
+import EllipticPdes.Regularity.InteriorSmooth
 import EllipticPdes.Regularity.DifferentiatedEquation
 import EllipticPdes.Regularity.Boundary.HalfBall
 import EllipticPdes.Regularity.Boundary.TangentialDiffQuotient
