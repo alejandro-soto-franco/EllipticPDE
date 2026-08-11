@@ -526,7 +526,7 @@ theorem datum_move {V : Set (EuclideanSpace ℝ (Fin d))} (ℓ : Fin d)
 second partials agree: `∂_ℓ ∂ⱼφ = ∂ⱼ ∂_ℓφ`. This is `mathlib`'s symmetry of the second Fréchet
 derivative (`second_derivative_symmetric`), transported through the `partialD`-as-directional-
 `fderiv` notation via `fderiv_clm_apply`. -/
-private lemma partialD_partialD_swap {φ : EuclideanSpace ℝ (Fin d) → ℝ}
+lemma partialD_partialD_swap {φ : EuclideanSpace ℝ (Fin d) → ℝ}
     (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (j ℓ : Fin d) :
     partialD ℓ (partialD j φ) = partialD j (partialD ℓ φ) := by
   have hcf : ContDiff ℝ (⊤ : ℕ∞) (fderiv ℝ φ) := (contDiff_infty_iff_fderiv.mp hφ).2

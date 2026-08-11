@@ -105,6 +105,48 @@ theorem hasWeakDerivOn_D_singleton (hu : HasIteratedWeakDerivOn V (k + 1) u) (m 
   have h := hu.D_step m [] (Nat.succ_pos k)
   rwa [hu.D_nil] at h
 
+/-- The assembly a family is read off: the empty list is the function, and a nonempty list is
+the family of its last direction's derivative, indexed by what remains. Reversing is what makes
+the last direction visible, since `D_step` conses on the left. -/
+private def famAux (u : L2D V) (E : Fin d → List (Fin d) → L2D V) :
+    List (Fin d) → L2D V
+  | [] => u
+  | (ℓ :: βr) => E ℓ βr.reverse
+
+/-- **The inverse of `deriv`.** Weak derivatives in every direction, each carrying its own
+order-`k` family, assemble into an order-`k + 1` family of the function itself. The index of the
+assembled family reads `β ++ [ℓ]` as the `β`-entry of the family of `∂_ℓ u`, which is the
+convention `deriv` uses in the other direction.
+
+This is the step that carries the conclusion of the induction of Guo, *Partial Differential
+Equations I and II* (Course Lecture Notes), Theorem VIII.3.2 (p. 65) back to the solution:
+the induction hypothesis is applied to each `∂_ℓ u` and its conclusions are reassembled here. -/
+def ofDeriv {u : L2D V} {Du : Fin d → L2D V} (hu : ∀ ℓ, HasWeakDerivOn V ℓ u (Du ℓ))
+    (H : ∀ ℓ, HasIteratedWeakDerivOn V k (Du ℓ)) :
+    HasIteratedWeakDerivOn V (k + 1) u where
+  D α := famAux u (fun ℓ => (H ℓ).D) α.reverse
+  D_nil := rfl
+  D_step m α hα := by
+    rcases hcase : α.reverse with _ | ⟨ℓ, βr⟩
+    · have hαnil : α = [] := by simpa using congrArg List.reverse hcase
+      subst hαnil
+      change HasWeakDerivOn V m u ((H m).D [])
+      rw [(H m).D_nil]
+      exact hu m
+    · have hlen : βr.reverse.length < k := by
+        have h := congrArg List.length hcase
+        simp only [List.length_reverse] at h
+        simp only [List.length_reverse]
+        simp only [List.length_cons] at h
+        omega
+      have h2 : famAux u (fun ℓ => (H ℓ).D) (m :: α).reverse
+          = (H ℓ).D (m :: βr.reverse) := by
+        rw [List.reverse_cons, hcase]
+        change (H ℓ).D ((βr ++ [m]).reverse) = _
+        simp
+      rw [h2]
+      exact (H ℓ).D_step m βr.reverse hlen
+
 end HasIteratedWeakDerivOn
 
 /-- **A uniform `L²` bound on an iterated family.** Every derivative up to order `k` is
@@ -130,6 +172,26 @@ theorem mono_const {hu : HasIteratedWeakDerivOn V k u} (hC : IteratedL2Bound hu 
 /-- A bound at order `k` restricts to a bound on the order-`l` family for `l ≤ k`. -/
 theorem mono_order {hu : HasIteratedWeakDerivOn V k u} (hC : IteratedL2Bound hu C)
     (hlk : l ≤ k) : IteratedL2Bound (hu.mono hlk) C := fun α hα => hC α (hα.trans hlk)
+
+/-- The bound on an assembled family, read off the function and each first derivative's
+family. -/
+theorem ofDeriv {Du : Fin d → L2D V} {hu : ∀ ℓ, HasWeakDerivOn V ℓ u (Du ℓ)}
+    {H : ∀ ℓ, HasIteratedWeakDerivOn V k (Du ℓ)} (hC : ‖u‖ ≤ C)
+    (hF : ∀ ℓ, IteratedL2Bound (H ℓ) C) :
+    IteratedL2Bound (HasIteratedWeakDerivOn.ofDeriv hu H) C := by
+  intro α hα
+  rcases hcase : α.reverse with _ | ⟨ℓ, βr⟩
+  · have hαnil : α = [] := by simpa using congrArg List.reverse hcase
+    subst hαnil
+    exact hC
+  · have hlen : βr.reverse.length ≤ k := by
+      have h := congrArg List.length hcase
+      simp only [List.length_reverse, List.length_cons] at h
+      simp only [List.length_reverse]
+      omega
+    change ‖HasIteratedWeakDerivOn.famAux u (fun ℓ => (H ℓ).D) α.reverse‖ ≤ C
+    rw [hcase]
+    exact hF ℓ βr.reverse hlen
 
 end IteratedL2Bound
 

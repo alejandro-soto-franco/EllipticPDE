@@ -37,7 +37,9 @@ import EllipticPdes.Regularity.Interior.NormBound
 import EllipticPdes.Regularity.Interior
 import EllipticPdes.Regularity.LeibnizWkInfty
 import EllipticPdes.Regularity.DifferentiatedWkInfty
+import EllipticPdes.Regularity.LocalWeakFormWkInfty
 import EllipticPdes.Regularity.HigherWeakDeriv
+import EllipticPdes.Regularity.MulIterated
 import EllipticPdes.Regularity.HigherInterior
 import EllipticPdes.Regularity.InteriorSmooth
 import EllipticPdes.Regularity.DifferentiatedEquation
