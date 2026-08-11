@@ -80,6 +80,16 @@ def mono (hu : HasIteratedWeakDerivOn V k u) (hlk : l ≤ k) :
   D_nil := hu.D_nil
   D_step m α hα := hu.D_step m α (lt_of_lt_of_le hα hlk)
 
+/-- **Transport along an equality of the subject.** The family is unchanged; only the proof
+that its empty entry is the function moves. Stated because the induction reaches the derivative
+of `u` through a cutoff, whose function coordinate agrees with the derivative on the region of
+interest without being the same term. -/
+def congr {g : L2D V} (hu : HasIteratedWeakDerivOn V k u) (h : u = g) :
+    HasIteratedWeakDerivOn V k g where
+  D := hu.D
+  D_nil := hu.D_nil.trans h
+  D_step := hu.D_step
+
 /-- **The induction step.** From weak derivatives up to order `k + 1` of `u`, the direction
 `l` first derivative `D [l]` has weak derivatives up to order `k`, with family
 `α ↦ D (α ++ [l])`. Appending on the right rather than consing on the left is what makes the
@@ -168,6 +178,10 @@ theorem norm_le {hu : HasIteratedWeakDerivOn V k u} (hC : IteratedL2Bound hu C) 
 /-- A bound is inherited by any larger constant. -/
 theorem mono_const {hu : HasIteratedWeakDerivOn V k u} (hC : IteratedL2Bound hu C)
     (hCC : C ≤ C') : IteratedL2Bound hu C' := fun α hα => (hC α hα).trans hCC
+
+/-- Transport carries the bound: the family is unchanged. -/
+theorem congr {g : L2D V} {hu : HasIteratedWeakDerivOn V k u} {h : u = g}
+    (hC : IteratedL2Bound hu C) : IteratedL2Bound (hu.congr h) C := hC
 
 /-- A bound at order `k` restricts to a bound on the order-`l` family for `l ≤ k`. -/
 theorem mono_order {hu : HasIteratedWeakDerivOn V k u} (hC : IteratedL2Bound hu C)

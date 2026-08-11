@@ -5,6 +5,11 @@ Authors: Alejandro Soto Franco
 -/
 import EllipticPdes.Regularity.HigherWeakDeriv
 import EllipticPdes.Regularity.LowerOrderWkInfty
+import EllipticPdes.Regularity.IteratedSum
+import EllipticPdes.Regularity.IteratedRestrict
+import EllipticPdes.Regularity.WeakFormDense
+import EllipticPdes.Regularity.LocalWeakFormWkInfty
+import EllipticPdes.Regularity.CutoffDeriv
 
 /-!
 # Higher interior regularity
@@ -45,6 +50,8 @@ function it needs as `interior_cutoffGrad_mem_H01`.
 * `InteriorRegularityAt`: the order-`k` conclusion, as a predicate, so that the induction has
   something to be an induction over.
 * `interiorRegularityAt_zero`: the base case.
+* `exists_cutoffDeriv_weakForm`: the differentiated equation, as a weak formulation for the
+  cutoff derivative, which is what the induction hypothesis consumes.
 * `interiorRegularityAt_succ`: the induction step.
 * `higher_interior_regularity`: the theorem.
 -/
@@ -133,34 +140,91 @@ theorem interiorRegularityAt_zero (Op : FullEllipticOp (n + 1))
         linarith
       · simp at hα
 
+/-- **The differentiated equation, as a weak formulation for a cutoff derivative.** For a weak
+solution `u` of `L u = f` and each direction `ℓ`, there is an element `U ∈ H₀¹(Ω)` agreeing
+with `∂_ℓ u` on `V`, a datum `F ∈ L²(Ω)` carrying `k` weak derivatives, and a weak formulation
+`B[U, w] = ⟪F, w⟫` for every `w ∈ H₀¹(Ω)`, with both `‖U‖` and the `H^k` bound on `F`
+controlled by the data.
+
+This is Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 2, step 3 in the
+shape the induction consumes, and it is where the analytic content of the step sits.
+
+`U` is `ξ · ∂_ℓ u` for the middle cutoff of a tower for `V ⋐ Ω`, which
+`EllipticPdes.Regularity.interior_cutoffGrad_mem_H01` places in `H₀¹(Ω)` and
+`EllipticPdes.Regularity.restrictL2_extendL2_mulTest_xi` makes invisible on `V`. `F` collects
+`∂_ℓ f`, the terms of `EllipticPdes.Regularity.differentiated_weakForm_wkInfty` in which the
+differentiation lands on a coefficient, and the commutator with `ξ`. Each of those is a
+`W^{k,∞}` weight against a derivative of `u` of order at most two, so
+`EllipticPdes.Regularity.exists_iteratedWeakDeriv_mul` and
+`EllipticPdes.Regularity.HasIteratedWeakDerivOn.sum` assemble the family and its bound, and
+`EllipticPdes.Regularity.weakForm_of_testFn` carries the identity from test functions to
+`H₀¹(Ω)`. -/
+theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
+    {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
+    (hA1 : IsC1Coeff Op.toEllipticCoeff) {k : ℕ}
+    (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 3)) (hbc : IsWkInftyLower Op (k + 2))
+    {V : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hVc : IsCompact V) (hVΩ : V ⊆ Ω) :
+    ∃ C : ℝ, 0 ≤ C ∧ ∀ (u : H01 Ω) (f : L2D Ω) (M : ℝ)
+      (hfk : HasIteratedWeakDerivOn Ω (k + 1) f), IteratedL2Bound hfk M →
+      (∀ w : H01 Ω, Op.fullBilin Ω u w
+        = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) →
+      ∀ ℓ : Fin (n + 1), ∃ (U : H01 Ω) (F : L2D Ω) (hFk : HasIteratedWeakDerivOn Ω k F),
+        restrictL2 (Ω := V) (extendL2 hΩm ((U : H1amb Ω) 0))
+            = restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) ℓ.succ))
+          ∧ (∀ w : H01 Ω, Op.fullBilin Ω U w
+              = ∫ x in Ω, (F x : ℝ) * ((w : H1amb Ω) 0 x : ℝ))
+          ∧ IteratedL2Bound hFk (C * (M + ‖(u : H1amb Ω) 0‖))
+          ∧ ‖(U : H1amb Ω) 0‖ ≤ C * (M + ‖(u : H1amb Ω) 0‖) := by
+  sorry
+
 /-- **Induction step.** Differentiating the equation once carries the order-`k` conclusion to
 order `k + 1`, under one more order of regularity on every coefficient.
 
-The differentiated identity is already available:
-`EllipticPdes.Regularity.differentiated_weakForm_of_weakSolution` puts `∂_ℓ u` through Evans's
-equation (34) on any compact `V ⋐ Ω`, with every hypothesis but the weak `ℓ`-derivative of the
-datum discharged from the weak formulation itself. What the step adds is the passage from that
-identity back into the shape the induction hypothesis consumes, and that passage runs through a
-cutoff rather than through `∂_ℓ u` itself.
-
 `∂_ℓ u` is not in `H₀¹(Ω)`: it is a first derivative of an `H₀¹` function and lies only in
 `H¹_loc`, so `InteriorRegularityAt`, which quantifies over `H01 Ω`, cannot be applied to it.
-The step therefore takes `V ⋐ W ⋐ Ω` with a cutoff `ζ ≡ 1` on `W`, and applies the induction
-hypothesis to `ζ · ∂_ℓ u`, which `EllipticPdes.Regularity.interior_cutoffGrad_mem_H01` places
-in `H₀¹(Ω)`. Its datum is `∂_ℓ f` plus the terms in which `∂_ℓ` lands on a coefficient rather
-than on `u`, plus the commutator with `ζ`. Every coefficient factor there is essentially
-bounded by `IsWkInftyCoeff` and `IsWkInftyLower` at the order in hand, and every factor coming
-from `u` is a derivative of order at most two, controlled on `W` by the order-`0` conclusion.
-So the datum carries an `H^k` bound and the induction hypothesis returns
-`ζ · ∂_ℓ u ∈ H^{k + 2}(V)`, which is `∂_ℓ u ∈ H^{k + 2}(V)` because `ζ ≡ 1` there.
-Reassembling over `ℓ` through `HasIteratedWeakDerivOn.deriv` read backwards gives
-`u ∈ H^{k + 3}(V)`. -/
+`exists_cutoffDeriv_weakForm` supplies the cutoff that can be, together with its datum, and
+this step is what remains once that is in hand.
+
+The induction hypothesis returns `k + 2` weak derivatives of the cutoff derivative on `V`,
+which `HasIteratedWeakDerivOn.congr` reads as `k + 2` weak derivatives of `∂_ℓ u` itself,
+the cutoff being `1` there. Reassembling over `ℓ` through `HasIteratedWeakDerivOn.ofDeriv`
+gives `u ∈ H^{k + 3}(V)`.
+
+The constant is `2 C₁ C₀ + 1`, with `C₀` from the datum and `C₁` from the induction
+hypothesis. The two summands of `C₀ (M + ‖u‖) + ‖U‖` are each at most `C₀ (M + ‖u‖)`, which
+is where the factor of two comes from, and the `+ 1` covers `‖u‖` itself, which the order-zero
+entry of the assembled family needs and which no derivative bound supplies. -/
 theorem interiorRegularityAt_succ (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
-    {k : ℕ} (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 3))
+    (hA1 : IsC1Coeff Op.toEllipticCoeff) {k : ℕ}
+    (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 3))
     (hbc : IsWkInftyLower Op (k + 2)) (hk : InteriorRegularityAt Op hΩm k) :
     InteriorRegularityAt Op hΩm (k + 1) := by
-  sorry
+  classical
+  intro V hVc hVΩ
+  obtain ⟨C₀, hC₀0, hdat⟩ := exists_cutoffDeriv_weakForm Op hΩm hΩo hA1 hA hbc hVc hVΩ
+  obtain ⟨C₁, hC₁0, hIH⟩ := hk hVc hVΩ
+  refine ⟨2 * C₁ * C₀ + 1, by nlinarith [mul_nonneg hC₁0 hC₀0], fun u f M hfk hM hu => ?_⟩
+  have hM0 : 0 ≤ M := le_trans (norm_nonneg _) hM.norm_le
+  have hu00 : (0 : ℝ) ≤ ‖(u : H1amb Ω) 0‖ := norm_nonneg _
+  -- Each first derivative of `u` carries `k + 2` weak derivatives on `V`, read off the
+  -- induction hypothesis applied to the cutoff derivative and transported along `ξ ≡ 1`.
+  have hstep : ∀ ℓ : Fin (n + 1), ∃ H : HasIteratedWeakDerivOn V (k + 2)
+      (restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) ℓ.succ))),
+      IteratedL2Bound H ((2 * C₁ * C₀ + 1) * (M + ‖(u : H1amb Ω) 0‖)) := by
+    intro ℓ
+    obtain ⟨U, F, hFk, hres, hUweak, hFbd, hU0⟩ := hdat u f M hfk hM hu ℓ
+    obtain ⟨HU, hHU⟩ := hIH U F (C₀ * (M + ‖(u : H1amb Ω) 0‖)) hFk hFbd hUweak
+    exact ⟨HU.congr hres, hHU.congr.mono_const (by nlinarith)⟩
+  choose H hH using hstep
+  refine ⟨HasIteratedWeakDerivOn.ofDeriv
+    (fun ℓ => hasWeakDerivOn_of_hasWeakDeriv ℓ
+      (hasWeakDeriv_extendL2_of_mem_H01 hΩm ℓ u.2)) H, IteratedL2Bound.ofDeriv ?_ hH⟩
+  refine le_trans (norm_restrictL2_le _) ?_
+  rw [norm_extendL2]
+  have hprod : (0 : ℝ) ≤ 2 * C₁ * C₀ * (M + ‖(u : H1amb Ω) 0‖) :=
+    mul_nonneg (mul_nonneg (by linarith) hC₀0) (by linarith)
+  nlinarith [hprod]
 
 /-- **Higher interior regularity (Guo, Theorem VIII.3.2, p. 65).** A weak solution with
 `W^{k+2,∞}` principal coefficients, `W^{k+1,∞}` lower-order coefficients and an `H^k` datum has
@@ -179,7 +243,7 @@ theorem higher_interior_regularity (Op : FullEllipticOp (n + 1))
   induction k with
   | zero => exact interiorRegularityAt_zero Op hΩm hΩo hA1
   | succ j ih =>
-    refine interiorRegularityAt_succ (k := j) Op hΩm hΩo (hA.mono (by omega))
+    refine interiorRegularityAt_succ (k := j) Op hΩm hΩo hA1 (hA.mono (by omega))
       (hbc.mono (by omega)) ?_
     exact ih (hA.mono (by omega)) (hbc.mono (by omega))
 
