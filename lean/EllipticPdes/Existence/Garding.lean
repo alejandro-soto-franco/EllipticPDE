@@ -578,8 +578,7 @@ theorem weak_solution_L2_of_nonneg_zeroth_of_subset_euclBox {n : ℕ}
 `CP` is supplied by `poincare_H01_of_bounded` and is quantified before the datum, so it
 depends only on `Ω`; every `f ∈ L²(Ω)` then obeys `‖u‖_{H₀¹} ≤ (CP + 1)/λ · ‖f‖_{L²}`.
 
-Terminal result of the library, stated in the manuscript. Nothing inside the development
-consumes it. -/
+Terminal result of the library, stated in the manuscript. Nothing else consumes it. -/
 theorem weak_solution_L2_of_nonneg_zeroth_of_bounded {n : ℕ}
     (Op : FullEllipticOp (n + 1)) {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))}
     (hΩb : Bornology.IsBounded Ω)

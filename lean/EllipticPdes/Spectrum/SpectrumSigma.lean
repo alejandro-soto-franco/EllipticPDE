@@ -245,8 +245,7 @@ spectrum; away from zero the spectrum consists exactly of the eigenvalues; the n
 spectrum is countable; and only finitely many spectral points have `|μ| ≥ δ` for each
 `δ > 0` -- so an enumeration of the nonzero spectrum converges to `0`.
 
-Terminal result of the library, stated in the manuscript. Nothing inside the development
-consumes it. -/
+Terminal result of the library, stated in the manuscript. Nothing else consumes it. -/
 theorem spectrum_compact_operator (hK : IsCompactOperator K)
     (hinf : ¬ FiniteDimensional ℝ E) :
     (0 : ℝ) ∈ spectrum ℝ K

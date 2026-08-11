@@ -337,7 +337,7 @@ lemma testGraph_mem_W12 {Ω : Set (EuclideanSpace ℝ (Fin d))}
 
 /-- `H₀¹(Ω) ⊆ W^{1,2}(Ω)`: every element of `H₀¹` is a function with a weak `L²` gradient.
 
-Public because it is the bridge between the two solution spaces the development uses. The
+Public because it is the bridge between the two solution spaces the library uses. The
 interior regularity chain quantifies over `H01 Ω`, while Evans §6.3.1 Theorem 1 and
 Fernández-Real and Ros-Oton both state the interior theory over the ambient Sobolev space,
 so a generalisation of that chain runs through `W12 Ω` and needs this inclusion from outside

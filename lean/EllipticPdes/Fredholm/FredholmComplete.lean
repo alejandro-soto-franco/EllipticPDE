@@ -500,8 +500,7 @@ homogeneous problem `Lu = 0` is finite-dimensional: it is the eigenspace of the 
 operator `opK` at the nonzero eigenvalue `1`, and Riesz theory makes such eigenspaces
 finite-dimensional.
 
-Terminal result of the library, stated in the manuscript. Nothing inside the development
-consumes it. -/
+Terminal result of the library, stated in the manuscript. Nothing else consumes it. -/
 theorem finiteDimensional_solSpace (hK : IsCompactOperator (Op.opK Ω)) :
     FiniteDimensional ℝ (Op.solSpace Ω) := by
   rw [solSpace_eq_eigenspace]
@@ -596,8 +595,7 @@ problem have the same (finite) dimension. The factorisation `opA = opE ∘ (1 - 
 carries `solSpaceStar = ker(opA†)` onto `ker(1 - opK†)` along the bijection `(opE)†`,
 and the abstract index theorem `finrank_ker_one_sub_adjoint_eq` applies.
 
-Terminal result of the library, stated in the manuscript. Nothing inside the development
-consumes it. -/
+Terminal result of the library, stated in the manuscript. Nothing else consumes it. -/
 theorem finrank_solSpaceStar_eq_finrank_solSpace (hK : IsCompactOperator (Op.opK Ω)) :
     Module.finrank ℝ (Op.solSpaceStar Ω) = Module.finrank ℝ (Op.solSpace Ω) := by
   set T : H01 Ω →L[ℝ] H01 Ω :=

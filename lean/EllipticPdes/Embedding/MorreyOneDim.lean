@@ -466,8 +466,8 @@ private lemma eLpNorm_two_sq_eq_ofReal_integral_sq {f : ℝ → ℝ} {μ : Measu
 a `C^{0,1/2}` representative, with Hölder constant linear in the `L²` norm of its
 derivative.
 
-Terminal result of the library, the one-dimensional endpoint of the Morrey chain. Nothing
-inside the development consumes it. -/
+Terminal result of the library, the one-dimensional endpoint of the Morrey chain.
+Nothing else consumes it. -/
 theorem morrey_ball_oneDim (c : EuclideanSpace ℝ (Fin 1)) {r : ℝ} (hr : 0 < r) :
     ∃ C : ℝ≥0, ∀ (u : EuclideanSpace ℝ (Fin 1) → ℝ) (g : EuclideanSpace ℝ (Fin 1) → ℝ),
       IntegrableOn u (Metric.ball c r) volume →

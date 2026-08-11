@@ -170,8 +170,8 @@ theorem hneg_norm_isLeast (Ω : Set (EuclideanSpace ℝ (Fin d))) (f : H01 Ω �
 /-- `‖f‖_{H⁻¹}` as the infimum of the tuple norms over all
 representations of `f`.
 
-Terminal result of the library, the infimum form of `hneg_norm_isLeast`. Nothing inside the
-development consumes it. -/
+Terminal result of the library, the infimum form of `hneg_norm_isLeast`.
+Nothing else consumes it. -/
 theorem hneg_norm_eq_sInf (Ω : Set (EuclideanSpace ℝ (Fin d))) (f : H01 Ω →L[ℝ] ℝ) :
     ‖f‖ = sInf {r : ℝ | ∃ F : H1amb Ω, IsHnegRepr Ω F f ∧ ‖F‖ = r} :=
   ((hneg_norm_isLeast Ω f).csInf_eq).symm
@@ -184,8 +184,7 @@ tuple norm `(∫_Ω ∑ᵢ |fᵢ|²)^{1/2} = ‖F‖` equals `‖f‖_{H⁻¹}` 
 representing tuples -- the infimum is attained at the Riesz
 representative.
 
-Terminal result of the library, stated in the manuscript. Nothing inside the development
-consumes it. -/
+Terminal result of the library, stated in the manuscript. Nothing else consumes it. -/
 theorem hneg_characterization (Ω : Set (EuclideanSpace ℝ (Fin d)))
     (f : H01 Ω →L[ℝ] ℝ) :
     ∃ F : H1amb Ω,

@@ -242,8 +242,8 @@ theorem FullEllipticOp.fredholm_alternative_of_bounded (Op : FullEllipticOp d)
 
 /-- The Fredholm uniqueness-implies-existence corollary for a bounded measurable domain.
 
-Terminal result of the library, the companion of `fredholm_alternative_of_bounded`. Nothing
-inside the development consumes it. -/
+Terminal result of the library, the companion of `fredholm_alternative_of_bounded`.
+Nothing else consumes it. -/
 theorem FullEllipticOp.fredholm_unique_imp_exists_of_bounded (Op : FullEllipticOp d)
     (Ω : Set (EuclideanSpace ℝ (Fin d))) (hΩm : MeasurableSet Ω)
     (hΩb : Bornology.IsBounded Ω)
@@ -266,7 +266,7 @@ theorem dirichlet_spectral_of_bounded (Ω : Set (EuclideanSpace ℝ (Fin d)))
 /-- **Spectral theorem for the general symmetric divergence-form operator on a bounded measurable
 domain**, with the Rellich compact embedding discharged.
 
-Terminal result of the library. Nothing inside the development consumes it. -/
+Terminal result of the library. Nothing else consumes it. -/
 theorem symmetric_fullElliptic_spectral_of_bounded (Op : FullEllipticOp d)
     (Ω : Set (EuclideanSpace ℝ (Fin d))) (hΩm : MeasurableSet Ω) (hΩb : Bornology.IsBounded Ω)
     (hb : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)

@@ -183,7 +183,7 @@ import EllipticPdes
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Embedding.interior_holder_estimate_one
 
-/-! ### The Poincaré chain the development reduces to -/
+/-! ### The Poincaré chain the library reduces to -/
 
 /-- info: 'EllipticPdes.Poincare.intervalIntegral_mul_sq_le' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in

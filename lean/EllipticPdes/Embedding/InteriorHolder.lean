@@ -30,7 +30,7 @@ Three dimensions are covered, each with Hölder exponent `1/2`.
 `d/2 < p ≤ 2`, since `1/p' = 1/p - 1/d` gives `p' > d` exactly when `p > d/2`, and the ball
 turns `L²` data into `Lᵖ` data only for `p ≤ 2`. That range is empty once `d ≥ 4`, so one
 Sobolev step never reaches Morrey there. Those dimensions require iteration through the `H^k`
-ladder, which this development does not yet carry.
+ladder, which this library does not yet carry.
 
 ## Main declarations
 
@@ -324,7 +324,7 @@ set_option maxHeartbeats 800000 in
 solution `u ∈ H₀¹(Ω)` of `L u = f` with `C¹` principal coefficients has, on every ball whose
 double lies in `Ω`, a representative that is Hölder continuous with exponent `1/2` and constant
 a multiple of `‖f‖ + ‖u‖`, the multiplier being quantified before the solution and the datum,
-so it depends only on the operator and the two radii. This is the chain the development was
+so it depends only on the operator and the two radii. This is the chain the library was
 missing: the interior `H²`
 estimate puts the second derivatives in `L²`, the Gagliardo-Nirenberg-Sobolev bootstrap
 `exists_eLpNorm_six_le` raises the gradient from `L²` to `L⁶`, and `morrey_ball` applies at

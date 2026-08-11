@@ -43,7 +43,7 @@ namespace EllipticPdes.Campanato
 variable {d : ℕ}
 
 /-- The volume of the unit ball of `EuclideanSpace ℝ (Fin d)`, as a real number. Every ball
-volume in this development is a multiple of it, so it is convenient to name it once. -/
+volume in this library is a multiple of it, so it is convenient to name it once. -/
 def unitBallVolume (d : ℕ) : ℝ :=
   (volume (Metric.ball (0 : EuclideanSpace ℝ (Fin d)) 1)).toReal
 

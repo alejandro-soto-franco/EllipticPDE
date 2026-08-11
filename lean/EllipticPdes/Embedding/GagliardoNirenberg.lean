@@ -27,7 +27,7 @@ exactly when `p ≤ 2`, so a single Sobolev step feeds Morrey precisely when the
 * `d = 3`: `p = 2` has conjugate `6 > 3` (`exists_eLpNorm_six_le`).
 * `d ≥ 4`: the window is empty, since `d/2 ≥ 2`. One Sobolev step never reaches `p' > d` there,
   and closing those dimensions requires iteration through the `H^k` ladder, which this
-  development does not yet carry.
+  library does not yet carry.
 
 The bootstrap itself holds in every dimension. Only its composition with Morrey is limited.
 

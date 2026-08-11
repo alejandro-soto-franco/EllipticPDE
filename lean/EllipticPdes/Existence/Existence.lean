@@ -85,7 +85,7 @@ satisfying the Lax-Milgram estimate `‖u‖_{H₀¹} ≤ α⁻¹ ‖f‖` with 
 `α = 1 / (C / (n + 1) + 1)`, all carrying no abstract Poincaré input. This is the box
 instance of Theorem `thm: main` for the Poisson form.
 
-Terminal result of the library. Nothing inside the development consumes it. -/
+Terminal result of the library. Nothing else consumes it. -/
 theorem dirichlet_weak_solution_euclBox {n : ℕ} (a b : Fin (n + 1) → ℝ)
     (hab : ∀ k, a k ≤ b k) (C : ℝ) (hC : ∀ i, (b i - a i) ^ 2 / 2 ≤ C)
     (f : H01 (euclBox a b) →L[ℝ] ℝ) :
