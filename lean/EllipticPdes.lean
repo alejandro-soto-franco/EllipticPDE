@@ -43,6 +43,7 @@ import EllipticPdes.Regularity.HigherWeakDeriv
 import EllipticPdes.Regularity.MulIterated
 import EllipticPdes.Regularity.IteratedSum
 import EllipticPdes.Regularity.IteratedRestrict
+import EllipticPdes.Regularity.SmoothGlue
 import EllipticPdes.Regularity.HigherInterior
 import EllipticPdes.Regularity.InteriorSmooth
 import EllipticPdes.Regularity.DifferentiatedEquation

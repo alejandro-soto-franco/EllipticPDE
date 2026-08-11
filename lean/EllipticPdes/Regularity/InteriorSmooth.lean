@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
 import EllipticPdes.Regularity.HigherInterior
+import EllipticPdes.Regularity.SmoothGlue
 
 /-!
 # Infinite differentiability in the interior
@@ -51,20 +52,52 @@ open EllipticPdes.Sobolev
 
 variable {n : ℕ}
 
+/-- **The Sobolev ladder on a ball.** An `L²` class carrying weak derivatives of every order
+has a smooth representative on any ball whose closure sits inside the region.
+
+This is the analytic content of Evans's Theorem 3, and it is two steps. The
+Gagliardo-Nirenberg-Sobolev estimate `EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le`
+raises the exponent from `2` to `2d/(d-2)`, which passes `d` only for `d ≤ 3`, so the ladder
+has to be iterated before `EllipticPdes.Embedding.morrey_ball` puts a derivative of any fixed
+order in a Hölder class. A function whose weak derivatives have continuous representatives is
+then classically differentiable with those derivatives, and iterating that reads `H^m` for
+every `m` as `C^∞`, the representatives at successive orders agreeing almost everywhere by
+`EllipticPdes.Regularity.WeakDerivUnique`.
+
+The closed ball rather than the open one is asked for because the Sobolev estimate is applied
+to a cutoff of `u` supported in the region, and the cutoff needs room. -/
+theorem exists_contDiffOn_ball_of_hasIteratedWeakDerivOn
+    {V : Set (EuclideanSpace ℝ (Fin (n + 1)))} (u : L2D V)
+    (h : ∀ k : ℕ, Nonempty (HasIteratedWeakDerivOn V k u))
+    {x : EuclideanSpace ℝ (Fin (n + 1))} {r : ℝ} (hr : 0 < r)
+    (hball : Metric.closedBall x r ⊆ interior V) :
+    ∃ v : EuclideanSpace ℝ (Fin (n + 1)) → ℝ,
+      ContDiffOn ℝ (⊤ : ℕ∞) v (Metric.ball x r) ∧
+        v =ᵐ[volume.restrict (Metric.ball x r)]
+          (u : EuclideanSpace ℝ (Fin (n + 1)) → ℝ) := by
+  sorry
+
 /-- **The Sobolev ladder, qualitative form.** An `L²` class on `V` carrying weak derivatives of
 every order has a representative smooth on the interior of `V`. No bound is asked and none is
 produced: the estimate lives in `higher_interior_regularity`, and smoothness on a fixed set
 follows from the existence of the derivatives alone.
 
 The proof is local, so it runs on balls inside `interior V` and never sees `V` itself except
-through the family it is handed. -/
+through the family it is handed. `exists_contDiffOn_of_locally_ae` assembles the local
+representatives, and it needs no gluing: two of them are continuous and agree almost everywhere
+where their balls meet, so they agree there. -/
 theorem contDiffOn_interior_of_hasIteratedWeakDerivOn
     {V : Set (EuclideanSpace ℝ (Fin (n + 1)))} (u : L2D V)
     (h : ∀ k : ℕ, Nonempty (HasIteratedWeakDerivOn V k u)) :
     ∃ u' : EuclideanSpace ℝ (Fin (n + 1)) → ℝ,
       u' =ᵐ[volume.restrict (interior V)] (u : EuclideanSpace ℝ (Fin (n + 1)) → ℝ) ∧
         ContDiffOn ℝ (⊤ : ℕ∞) u' (interior V) := by
-  sorry
+  refine exists_contDiffOn_of_locally_ae isOpen_interior _ fun y hy => ?_
+  obtain ⟨r, hr, hrsub⟩ := Metric.isOpen_iff.1 isOpen_interior y hy
+  refine ⟨Metric.ball y (r / 2), Metric.isOpen_ball, Metric.mem_ball_self (by linarith),
+    (Metric.ball_subset_ball (by linarith)).trans hrsub, ?_⟩
+  exact exists_contDiffOn_ball_of_hasIteratedWeakDerivOn u h (by linarith)
+    ((Metric.closedBall_subset_ball (by linarith)).trans hrsub)
 
 /-- **Infinite differentiability in the interior (Evans, §6.3.1, Theorem 3, p. 331).** For a
 weak solution of `L u = f` whose coefficients lie in `W^{k,∞}` at every order and whose datum
