@@ -136,16 +136,25 @@ theorem interiorRegularityAt_zero (Op : FullEllipticOp (n + 1))
 /-- **Induction step.** Differentiating the equation once carries the order-`k` conclusion to
 order `k + 1`, under one more order of regularity on every coefficient.
 
-The step is Guo's, run one derivative at a time. Fix `V ⋐ Ω` and choose an intermediate
-compact `W` with `V ⋐ W ⋐ Ω`. For each direction `l`, `differentiated_weakForm_div` presents
-`∂_l u` as a weak solution on `W` of the same operator with datum `∂_l f + R_l`, where `R_l`
-collects the terms in which `∂_l` lands on a coefficient. Every entry of `R_l` is a
-coefficient derivative, essentially bounded by `IsWkInftyCoeff` and `IsWkInftyLower` at the
-order in hand, multiplied by a derivative of `u` of order at most two, which the order-`0`
-conclusion already controls on `W`. So `R_l` inherits an `H^k` bound from the order-`k`
-conclusion applied to `u`, and the induction hypothesis applies to `∂_l u` with datum
-`∂_l f + R_l`, giving `∂_l u ∈ H^{k + 2}(V)`. Reassembling over `l` through
-`HasIteratedWeakDerivOn.deriv` read backwards gives `u ∈ H^{k + 3}(V)`. -/
+The differentiated identity is already available:
+`EllipticPdes.Regularity.differentiated_weakForm_of_weakSolution` puts `∂_ℓ u` through Evans's
+equation (34) on any compact `V ⋐ Ω`, with every hypothesis but the weak `ℓ`-derivative of the
+datum discharged from the weak formulation itself. What the step adds is the passage from that
+identity back into the shape the induction hypothesis consumes, and that passage runs through a
+cutoff rather than through `∂_ℓ u` itself.
+
+`∂_ℓ u` is not in `H₀¹(Ω)`: it is a first derivative of an `H₀¹` function and lies only in
+`H¹_loc`, so `InteriorRegularityAt`, which quantifies over `H01 Ω`, cannot be applied to it.
+The step therefore takes `V ⋐ W ⋐ Ω` with a cutoff `ζ ≡ 1` on `W`, and applies the induction
+hypothesis to `ζ · ∂_ℓ u`, which `EllipticPdes.Regularity.interior_cutoffGrad_mem_H01` places
+in `H₀¹(Ω)`. Its datum is `∂_ℓ f` plus the terms in which `∂_ℓ` lands on a coefficient rather
+than on `u`, plus the commutator with `ζ`. Every coefficient factor there is essentially
+bounded by `IsWkInftyCoeff` and `IsWkInftyLower` at the order in hand, and every factor coming
+from `u` is a derivative of order at most two, controlled on `W` by the order-`0` conclusion.
+So the datum carries an `H^k` bound and the induction hypothesis returns
+`ζ · ∂_ℓ u ∈ H^{k + 2}(V)`, which is `∂_ℓ u ∈ H^{k + 2}(V)` because `ζ ≡ 1` there.
+Reassembling over `ℓ` through `HasIteratedWeakDerivOn.deriv` read backwards gives
+`u ∈ H^{k + 3}(V)`. -/
 theorem interiorRegularityAt_succ (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
     {k : ℕ} (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 3))
