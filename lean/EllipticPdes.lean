@@ -35,6 +35,7 @@ import EllipticPdes.Regularity.Interior.Support
 import EllipticPdes.Regularity.Interior.EnergyBound
 import EllipticPdes.Regularity.Interior.NormBound
 import EllipticPdes.Regularity.Interior
+import EllipticPdes.Regularity.LeibnizWkInfty
 import EllipticPdes.Regularity.HigherWeakDeriv
 import EllipticPdes.Regularity.HigherInterior
 import EllipticPdes.Regularity.InteriorSmooth
