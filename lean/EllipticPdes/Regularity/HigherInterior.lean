@@ -144,7 +144,7 @@ theorem interiorRegularityAt_zero (Op : FullEllipticOp (n + 1))
         linarith
       · simp at hα
 
-set_option maxHeartbeats 400000 in
+set_option maxHeartbeats 1600000 in
 -- The step carries the tower, its collar, four cutoffs, the inductive family on two sets and
 -- the datum, and the closed form of the gradient is checked against all of them.
 /-- **The differentiated equation, as a weak formulation for a cutoff derivative.** For a weak
@@ -273,7 +273,67 @@ theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
       setIntegral_blocks_eq Op hΩm hNm hξNt hA hbc (p := HuN.D [ℓ])
         (D2 := fun i => HuN.D [i, ℓ]) hgrad' hU0N hD2 hv.1,
       hFpair v hv.1 hv.2.1]
-    sorry
+    -- The mixed second derivative, swapped into the order the equation names.
+    have hsymm : ∀ i : Fin (n + 1),
+        (fun x => ϑ x * (HuN.D [i, ℓ] x : ℝ))
+          =ᵐ[volume.restrict N] fun x => ϑ x * (HuN.D [ℓ, i] x : ℝ) := by
+      intro i
+      have h := mulTest_mixed_weakDeriv_comm hNm hϑ
+        (HuN.D_step i [] (Nat.succ_pos _)) (HuN.D_step ℓ [] (Nat.succ_pos _))
+        (HuN.D_step ℓ [i] (Nat.succ_lt_succ (Nat.succ_pos k)))
+        (HuN.D_step i [ℓ] (Nat.succ_lt_succ (Nat.succ_pos k)))
+      filter_upwards [mulTest_coeFn hϑ (HuN.D [ℓ, i]), mulTest_coeFn hϑ (HuN.D [i, ℓ])]
+        with x h1 h2
+      rw [← h2, ← h, h1]
+    have hψ : ∀ j : Fin (n + 1), ∀ x, ϑ x * partialD j (fun y => T.ξ y * v y) x
+        = partialD j (fun y => T.ξ y * v y) x := fun j =>
+      mul_eq_self_of_eqOn_one hϑ_eqOn
+        ((tsupport_partialD_subset j _).trans tsupport_mul_subset_left)
+    rw [Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ =>
+      setIntegral_weight_mul_congr_of_cutoff_ae (hsymm i) (fun x => Op.a x i j) (hψ j)))]
+    -- The differentiated equation on the collar, tested against the cut-off test function.
+    have hfDf : HasWeakDerivOn N ℓ (restrictL2 (Ω := N) (extendL2 hΩm f))
+        (restrictL2 (Ω := N) (extendL2 hΩm (hfk.D [ℓ]))) := by
+      have h := hfk.D_step ℓ [] (Nat.succ_pos k)
+      rw [hfk.D_nil] at h
+      exact h.restrict hΩm hNm hNΩ
+    have hLoc : ∀ v' : EuclideanSpace ℝ (Fin (n + 1)) → ℝ, ContDiff ℝ (⊤ : ℕ∞) v' →
+        HasCompactSupport v' → tsupport v' ⊆ N →
+        (∑ i, ∑ j, ∫ x in N, Op.a x i j * (HuN.D [i] x : ℝ) * partialD j v' x)
+          + (∑ i, ∫ x in N, Op.b x i * (HuN.D [i] x : ℝ) * v' x)
+          + (∫ x in N, Op.c x * (HuN.D [] x : ℝ) * v' x)
+          = ∫ x in N, (restrictL2 (Ω := N) (extendL2 hΩm f) x : ℝ) * v' x := by
+      intro v' h1 h2 h3
+      simp only [hDu, HuN.D_nil]
+      exact localWeakForm_of_fullBilin Op hΩm hNm hNΩ u f hu v' h1 h2 h3
+    have hdiffeq := differentiated_weakForm_wkInfty Op hA hbc ℓ (HuN.D [])
+      (fun i => HuN.D [i]) (fun m i => HuN.D [m, i])
+      (restrictL2 (Ω := N) (extendL2 hΩm f))
+      (restrictL2 (Ω := N) (extendL2 hΩm (hfk.D [ℓ])))
+      (fun i => HuN.D_step ℓ [i] (Nat.succ_lt_succ (Nat.succ_pos k)))
+      (fun i j => HuN.D_step j [i] (Nat.succ_lt_succ (Nat.succ_pos k)))
+      (HuN.D_step ℓ [] (Nat.succ_pos _)) hfDf hLoc
+      (hξNt.1.mul hv.1) hξNt.2.1.mul_right (tsupport_mul_subset_left.trans hξN)
+    rw [hdiffeq,
+      show (∫ x in N, (restrictL2 (Ω := N) (extendL2 hΩm (hfk.D [ℓ])) x : ℝ) * (T.ξ x * v x))
+          = ∫ x in N, T.ξ x * ((1 : ℝ)
+              * (restrictL2 (Ω := N) (extendL2 hΩm (hfk.D [ℓ])) x : ℝ)) * v x from
+        integral_congr_ae (Filter.Eventually.of_forall fun x => by ring),
+      Finset.sum_congr rfl (fun i _ =>
+        setIntegral_add_weight_mul_cutoff ((hbc.bReg i).measurable_D_singleton ℓ)
+          ((hbc.bReg i).ae_abs_D_singleton_le ℓ) (hbc.bReg i).measurable_self
+          (hbc.bReg i).ae_abs_le (HuN.D [i]) (HuN.D [ℓ, i]) hξNt.1 hξNt.2.1 hv.1),
+      setIntegral_add_weight_mul_cutoff (hbc.cReg.measurable_D_singleton ℓ)
+        (hbc.cReg.ae_abs_D_singleton_le ℓ) hbc.cReg.measurable_self hbc.cReg.ae_abs_le
+        (HuN.D []) (HuN.D [ℓ]) hξNt.1 hξNt.2.1 hv.1,
+      Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ =>
+        setIntegral_add_weight_mul_cutoff (hA.D_meas i j [j, ℓ] (Nat.le_add_left 2 (k + 1)))
+          (hA.ess_bdd i j [j, ℓ] (Nat.le_add_left 2 (k + 1)))
+          (hA.D_meas i j [ℓ] (Nat.le_add_left 1 (k + 2)))
+          (hA.ess_bdd i j [ℓ] (Nat.le_add_left 1 (k + 2))) (HuN.D [i]) (HuN.D [j, i])
+          hξNt.1 hξNt.2.1 hv.1))]
+    simp only [HuN.D_nil, Finset.sum_add_distrib]
+    ring
   · -- The datum's bound, in the data.
     refine hFbd.mono_const ?_
     have h1 : C₁ * (M + ‖(u : H1amb Ω) 0‖) + M ≤ (C₁ + 1) * (M + ‖(u : H1amb Ω) 0‖) := by

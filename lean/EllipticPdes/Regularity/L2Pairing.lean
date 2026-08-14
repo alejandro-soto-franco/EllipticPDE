@@ -162,6 +162,50 @@ theorem setIntegral_mul_congr_of_cutoff_ae {θ : EuclideanSpace ℝ (Fin d) → 
     ring
   rw [← e (X x : ℝ), hx, e (Y x : ℝ)]
 
+/-- The same with a weight in front, which is the shape every block of the bilinear form takes.
+The cutoff passes through the weight, so the hypothesis is unchanged. -/
+theorem setIntegral_weight_mul_congr_of_cutoff_ae {θ : EuclideanSpace ℝ (Fin d) → ℝ}
+    {X Y : L2D V}
+    (h : (fun x => θ x * (X x : ℝ)) =ᵐ[volume.restrict V] fun x => θ x * (Y x : ℝ))
+    (a : EuclideanSpace ℝ (Fin d) → ℝ) {ψ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hψ : ∀ x, θ x * ψ x = ψ x) :
+    (∫ x in V, a x * (X x : ℝ) * ψ x) = ∫ x in V, a x * (Y x : ℝ) * ψ x := by
+  refine integral_congr_ae ?_
+  filter_upwards [h] with x hx
+  have e : ∀ z : ℝ, a x * (θ x * z) * ψ x = a x * z * ψ x := by
+    intro z
+    conv_rhs => rw [← hψ x]
+    ring
+  rw [← e (X x : ℝ), hx, e (Y x : ℝ)]
+
+/-- **A sum of two weighted classes, paired against a cut-off test function.** The
+differentiated equation groups its datum two terms at a time, one carrying a derivative of a
+coefficient and one carrying a derivative of the solution, and the datum of the induction step
+names them separately. This is the split, with the cutoff moved to the front where the datum
+carries it. -/
+theorem setIntegral_add_weight_mul_cutoff {a₁ a₂ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (h₁m : Measurable a₁) {M₁ : ℝ}
+    (h₁b : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |a₁ x| ≤ M₁)
+    (h₂m : Measurable a₂) {M₂ : ℝ}
+    (h₂b : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |a₂ x| ≤ M₂)
+    (p₁ p₂ : L2D V) {ξ v : EuclideanSpace ℝ (Fin d) → ℝ} (hξc : ContDiff ℝ (⊤ : ℕ∞) ξ)
+    (hξcs : HasCompactSupport ξ) (hvc : ContDiff ℝ (⊤ : ℕ∞) v) :
+    (∫ x in V, (a₁ x * (p₁ x : ℝ) + a₂ x * (p₂ x : ℝ)) * (ξ x * v x))
+      = (∫ x in V, ξ x * (a₁ x * (p₁ x : ℝ)) * v x)
+        + ∫ x in V, ξ x * (a₂ x * (p₂ x : ℝ)) * v x := by
+  have hi₁ : Integrable (fun x => ξ x * (a₁ x * (p₁ x : ℝ)) * v x) (volume.restrict V) := by
+    refine (integrable_mul_testFn (mulL2 h₁m h₁b p₁) (hξc.mul hvc) hξcs.mul_right).congr ?_
+    filter_upwards [mulL2_coeFn h₁m h₁b p₁] with x hx
+    rw [hx]
+    ring
+  have hi₂ : Integrable (fun x => ξ x * (a₂ x * (p₂ x : ℝ)) * v x) (volume.restrict V) := by
+    refine (integrable_mul_testFn (mulL2 h₂m h₂b p₂) (hξc.mul hvc) hξcs.mul_right).congr ?_
+    filter_upwards [mulL2_coeFn h₂m h₂b p₂] with x hx
+    rw [hx]
+    ring
+  rw [← integral_add hi₁ hi₂]
+  exact integral_congr_ae (Filter.Eventually.of_forall fun x => by ring)
+
 /-- A weighted class pairs as the weight against the class. -/
 theorem setIntegral_mulL2_mul_testFn {a : EuclideanSpace ℝ (Fin d) → ℝ} (ham : Measurable a)
     {M : ℝ} (haM : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |a x| ≤ M) (p : L2D V)

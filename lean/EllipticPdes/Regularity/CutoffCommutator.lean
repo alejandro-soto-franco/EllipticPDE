@@ -160,19 +160,22 @@ theorem setIntegral_principal_entry_coeff (Op : FullEllipticOp d)
       = (∫ x in N, Op.a x i j * (D2 i x : ℝ) * partialD j (fun y => ξ y * v y) x)
         - (∫ x in N, partialD j ξ x * (Op.a x i j * (D2 i x : ℝ)) * v x)
         - (∫ x in N, partialD j (partialD i ξ) x * (Op.a x i j * (p x : ℝ)) * v x)
-        - (∫ x in N, partialD i ξ x * ((hA.entry i j).D [j] x * (p x : ℝ)) * v x)
+        - (∫ x in N, partialD i ξ x * (hA.D [j] i j x * (p x : ℝ)) * v x)
         - ∫ x in N, partialD i ξ x * (Op.a x i j * (D2 j x : ℝ)) * v x := by
   classical
   -- The coefficient against the derivative, and its own weak derivative by the Leibniz rule.
   have hAip := Op.toEllipticCoeff.actL_coeFn (Ω := N) i j p
   have hAig := Op.toEllipticCoeff.actL_coeFn (Ω := N) i j (D2 i)
   have hAjd := Op.toEllipticCoeff.actL_coeFn (Ω := N) i j (D2 j)
-  have hmul := mulL2_coeFn ((hA.entry i j).measurable_D_singleton j)
-    ((hA.entry i j).ae_abs_D_singleton_le j) p
+  have hmul : (mulL2 ((hA.entry i j).measurable_D_singleton j)
+        ((hA.entry i j).ae_abs_D_singleton_le j) p : EuclideanSpace ℝ (Fin d) → ℝ)
+      =ᵐ[volume.restrict N] fun x => hA.D [j] i j x * (p x : ℝ) :=
+    mulL2_coeFn ((hA.entry i j).measurable_D_singleton j)
+      ((hA.entry i j).ae_abs_D_singleton_le j) p
   have hdag : (mulL2 ((hA.entry i j).measurable_D_singleton j)
         ((hA.entry i j).ae_abs_D_singleton_le j) p + Op.toEllipticCoeff.actL i j (D2 j))
       =ᵐ[volume.restrict N] fun x =>
-        (hA.entry i j).D [j] x * (p x : ℝ) + Op.a x i j * (D2 j x : ℝ) := by
+        hA.D [j] i j x * (p x : ℝ) + Op.a x i j * (D2 j x : ℝ) := by
     filter_upwards [Lp.coeFn_add (mulL2 ((hA.entry i j).measurable_D_singleton j)
         ((hA.entry i j).ae_abs_D_singleton_le j) p) (Op.toEllipticCoeff.actL i j (D2 j)),
       hmul, hAjd] with x h1 h2 h3
@@ -221,7 +224,7 @@ theorem setIntegral_principal_entry_coeff (Op : FullEllipticOp d)
     rw [hx]
     ring
   have hi2' : Integrable
-      (fun x => partialD i ξ x * ((hA.entry i j).D [j] x * (p x : ℝ)) * v x)
+      (fun x => partialD i ξ x * (hA.D [j] i j x * (p x : ℝ)) * v x)
       (volume.restrict N) := by
     refine hi2.congr ?_
     filter_upwards [hmul] with x hx
@@ -238,7 +241,7 @@ theorem setIntegral_principal_entry_coeff (Op : FullEllipticOp d)
             ((hA.entry i j).ae_abs_D_singleton_le j) p
           + Op.toEllipticCoeff.actL i j (D2 j)) x : ℝ)) * v x)
       = (∫ x in N, partialD j (partialD i ξ) x * (Op.a x i j * (p x : ℝ)) * v x)
-        + (∫ x in N, partialD i ξ x * ((hA.entry i j).D [j] x * (p x : ℝ)) * v x)
+        + (∫ x in N, partialD i ξ x * (hA.D [j] i j x * (p x : ℝ)) * v x)
         + ∫ x in N, partialD i ξ x * (Op.a x i j * (D2 j x : ℝ)) * v x := by
     have hcong : (fun x => (partialD j (partialD i ξ) x
           * (Op.toEllipticCoeff.actL i j p x : ℝ)
@@ -247,14 +250,14 @@ theorem setIntegral_principal_entry_coeff (Op : FullEllipticOp d)
             + Op.toEllipticCoeff.actL i j (D2 j)) x : ℝ)) * v x)
         =ᵐ[volume.restrict N] fun x =>
           (partialD j (partialD i ξ) x * (Op.a x i j * (p x : ℝ)) * v x
-            + partialD i ξ x * ((hA.entry i j).D [j] x * (p x : ℝ)) * v x)
+            + partialD i ξ x * (hA.D [j] i j x * (p x : ℝ)) * v x)
             + partialD i ξ x * (Op.a x i j * (D2 j x : ℝ)) * v x := by
       filter_upwards [hAip, hdag] with x h1 h2
       rw [h1, h2]
       ring
     have hi12 : Integrable
         (fun x => partialD j (partialD i ξ) x * (Op.a x i j * (p x : ℝ)) * v x
-          + partialD i ξ x * ((hA.entry i j).D [j] x * (p x : ℝ)) * v x)
+          + partialD i ξ x * (hA.D [j] i j x * (p x : ℝ)) * v x)
         (volume.restrict N) := hi1'.add hi2'
     rw [integral_congr_ae hcong, integral_add hi12 hi3', integral_add hi1' hi2']
   rw [e1, e2, e3]
@@ -295,7 +298,7 @@ theorem setIntegral_blocks_eq (Op : FullEllipticOp d)
         - (∑ i, ∑ j, ∫ x in N, partialD j ξ x * (Op.a x i j * (D2 i x : ℝ)) * v x)
         - (∑ i, ∑ j, ∫ x in N, partialD j (partialD i ξ) x * (Op.a x i j * (p x : ℝ)) * v x)
         - (∑ i, ∑ j, ∫ x in N,
-            partialD i ξ x * ((hA.entry i j).D [j] x * (p x : ℝ)) * v x)
+            partialD i ξ x * (hA.D [j] i j x * (p x : ℝ)) * v x)
         - (∑ i, ∑ j, ∫ x in N, partialD i ξ x * (Op.a x i j * (D2 j x : ℝ)) * v x)
         + (∑ i, ∫ x in N, partialD i ξ x * (Op.b x i * (p x : ℝ)) * v x)
         + (∑ i, ∫ x in N, ξ x * (Op.b x i * (D2 i x : ℝ)) * v x)

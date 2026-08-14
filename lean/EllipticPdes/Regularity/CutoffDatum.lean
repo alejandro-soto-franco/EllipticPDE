@@ -66,15 +66,15 @@ theorem exists_cutoffDatum (Op : FullEllipticOp (n + 1))
               - (∑ i, ∫ x in N, ξ x * (Op.b x i * (HuN.D [ℓ, i] x : ℝ)) * v x)
               - (∫ x in N, ξ x * (hbc.cReg.D [ℓ] x * (uN x : ℝ)) * v x)
               + (∑ i, ∑ j, ∫ x in N,
-                  ξ x * (((hA.entry i j).deriv ℓ).D [j] x * (HuN.D [i] x : ℝ)) * v x)
+                  ξ x * (hA.D [j, ℓ] i j x * (HuN.D [i] x : ℝ)) * v x)
               + (∑ i, ∑ j, ∫ x in N,
-                  ξ x * ((hA.entry i j).D [ℓ] x * (HuN.D [j, i] x : ℝ)) * v x)
+                  ξ x * (hA.D [ℓ] i j x * (HuN.D [j, i] x : ℝ)) * v x)
               - (∑ i, ∑ j, ∫ x in N,
                   partialD j ξ x * (Op.a x i j * (HuN.D [i, ℓ] x : ℝ)) * v x)
               - (∑ i, ∑ j, ∫ x in N,
                   partialD j (partialD i ξ) x * (Op.a x i j * (HuN.D [ℓ] x : ℝ)) * v x)
               - (∑ i, ∑ j, ∫ x in N,
-                  partialD i ξ x * ((hA.entry i j).D [j] x * (HuN.D [ℓ] x : ℝ)) * v x)
+                  partialD i ξ x * (hA.D [j] i j x * (HuN.D [ℓ] x : ℝ)) * v x)
               - (∑ i, ∑ j, ∫ x in N,
                   partialD i ξ x * (Op.a x i j * (HuN.D [j, ℓ] x : ℝ)) * v x)
               + (∑ i, ∫ x in N, partialD i ξ x * (Op.b x i * (HuN.D [ℓ] x : ℝ)) * v x)
@@ -113,7 +113,7 @@ theorem exists_cutoffDatum (Op : FullEllipticOp (n + 1))
   obtain ⟨K9, hK9, hP9⟩ := exists_datum_of_pieces (Ω := Ω) hNm hNΩ k
     (ι := Fin (n + 1) × Fin (n + 1))
     (χ := fun t => partialD t.1 ξ) (fun t => hξD t.1)
-    (a := fun t => (hA.entry t.1 t.2).D [t.2]) (fun t => haD t.1 t.2 t.2)
+    (a := fun t => hA.D [t.2] t.1 t.2) (fun t => haD t.1 t.2 t.2)
   obtain ⟨K10, hK10, hP10⟩ := exists_datum_of_pieces (Ω := Ω) hNm hNΩ k
     (ι := Fin (n + 1) × Fin (n + 1))
     (χ := fun t => partialD t.1 ξ) (fun t => hξD t.1)
@@ -133,11 +133,11 @@ theorem exists_cutoffDatum (Op : FullEllipticOp (n + 1))
   choose K5 hK5 hP5 using fun m : Fin (n + 1) =>
     exists_datum_of_pieces (Ω := Ω) hNm hNΩ k (ι := Fin (n + 1) × Fin (n + 1))
       (χ := fun _ => ξ) (fun _ => hξ)
-      (a := fun t => ((hA.entry t.1 t.2).deriv m).D [t.2]) (fun t => haDD t.1 t.2 m t.2)
+      (a := fun t => hA.D [t.2, m] t.1 t.2) (fun t => haDD t.1 t.2 m t.2)
   choose K6 hK6 hP6 using fun m : Fin (n + 1) =>
     exists_datum_of_pieces (Ω := Ω) hNm hNΩ k (ι := Fin (n + 1) × Fin (n + 1))
       (χ := fun _ => ξ) (fun _ => hξ)
-      (a := fun t => (hA.entry t.1 t.2).D [m]) (fun t => haD t.1 t.2 m)
+      (a := fun t => hA.D [m] t.1 t.2) (fun t => haD t.1 t.2 m)
   refine ⟨K1 + (∑ m, K2 m) + 2 * K3 + (∑ m, K4 m) + (∑ m, K5 m) + (∑ m, K6 m)
       + K7 + K8 + K9 + K10 + K11, ?_, ?_⟩
   · have h2 : (0 : ℝ) ≤ ∑ m, K2 m := Finset.sum_nonneg fun m _ => hK2 m
