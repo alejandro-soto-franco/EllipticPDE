@@ -108,6 +108,19 @@ def deriv (hu : HasIteratedWeakDerivOn V (k + 1) u) (l : Fin d) :
       simpa [List.length_append] using Nat.succ_lt_succ hα
     simpa using hu.D_step m (α ++ [l]) hlen
 
+/-- **A first derivative, at two orders down.** The datum of the induction step multiplies
+derivatives of the solution of order at most two, and asks each of them for `k` weak
+derivatives of its own. Naming the two cases here rather than inlining them keeps the
+definitional unfolding of `deriv` out of the assembly, where it is repeated a dozen times. -/
+def deriv₁ (hu : HasIteratedWeakDerivOn V (k + 2) u) (i : Fin d) :
+    HasIteratedWeakDerivOn V k (hu.D [i]) :=
+  (hu.deriv i).mono (Nat.le_succ k)
+
+/-- A second derivative, at two orders down. -/
+def deriv₂ (hu : HasIteratedWeakDerivOn V (k + 2) u) (i m : Fin d) :
+    HasIteratedWeakDerivOn V k (hu.D [m, i]) :=
+  (hu.deriv i).deriv m
+
 /-- The order-one family of a function with derivatives to order `k + 1` records a weak
 derivative in every direction. -/
 theorem hasWeakDerivOn_D_singleton (hu : HasIteratedWeakDerivOn V (k + 1) u) (m : Fin d) :
@@ -186,6 +199,17 @@ theorem congr {g : L2D V} {hu : HasIteratedWeakDerivOn V k u} {h : u = g}
 /-- A bound at order `k` restricts to a bound on the order-`l` family for `l ≤ k`. -/
 theorem mono_order {hu : HasIteratedWeakDerivOn V k u} (hC : IteratedL2Bound hu C)
     (hlk : l ≤ k) : IteratedL2Bound (hu.mono hlk) C := fun α hα => hC α (hα.trans hlk)
+
+/-- The bound is inherited by the family of a first derivative. -/
+theorem deriv₁ {hu : HasIteratedWeakDerivOn V (k + 2) u} (hC : IteratedL2Bound hu C)
+    (i : Fin d) : IteratedL2Bound (hu.deriv₁ i) C := fun α hα =>
+  hC (α ++ [i]) (by simp only [List.length_append, List.length_cons, List.length_nil]; omega)
+
+/-- The bound is inherited by the family of a second derivative. -/
+theorem deriv₂ {hu : HasIteratedWeakDerivOn V (k + 2) u} (hC : IteratedL2Bound hu C)
+    (i m : Fin d) : IteratedL2Bound (hu.deriv₂ i m) C := fun α hα =>
+  hC ((α ++ [m]) ++ [i])
+    (by simp only [List.length_append, List.length_cons, List.length_nil]; omega)
 
 /-- The bound on an assembled family, read off the function and each first derivative's
 family. -/
