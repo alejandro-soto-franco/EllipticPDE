@@ -23,8 +23,8 @@ solution and the datum, and nothing constrains its size.
 
 * `HasWeakDerivOn.zero`, `HasWeakDerivOn.neg`, `HasWeakDerivOn.sum`: linearity of the weak
   derivative on a region.
-* `HasIteratedWeakDerivOn.neg`, `HasIteratedWeakDerivOn.sum`: the families.
-* `IteratedL2Bound.add`, `IteratedL2Bound.neg`, `IteratedL2Bound.sum`: the bounds.
+* `HasIteratedWeakDerivOn.neg`, `.sub`, `.sum`: the families.
+* `IteratedL2Bound.add`, `.neg`, `.sub`, `.sum`: the bounds.
 -/
 
 open MeasureTheory
@@ -85,6 +85,12 @@ def HasIteratedWeakDerivOn.neg {g : L2D V} (hg : HasIteratedWeakDerivOn V k g) :
   D_nil := by rw [hg.D_nil]
   D_step m α hα := (hg.D_step m α hα).neg
 
+/-- The order-`k` family of a difference. The datum of the induction step is a signed
+combination, so subtraction is as basic here as addition. -/
+def HasIteratedWeakDerivOn.sub {g h : L2D V} (hg : HasIteratedWeakDerivOn V k g)
+    (hh : HasIteratedWeakDerivOn V k h) : HasIteratedWeakDerivOn V k (g - h) :=
+  (hg.add hh.neg).congr (sub_eq_add_neg g h).symm
+
 /-- The order-`k` family of a finite sum, entry by entry. -/
 def HasIteratedWeakDerivOn.sum {ι : Type*} [Fintype ι] {g : ι → L2D V}
     (H : ∀ i, HasIteratedWeakDerivOn V k (g i)) :
@@ -112,6 +118,12 @@ theorem neg {g : L2D V} {hg : HasIteratedWeakDerivOn V k g} (hC : IteratedL2Boun
     change ‖-hg.D α‖ ≤ C
     rw [norm_neg]
     exact hC α hα
+
+/-- The bound on a difference of families is the sum of the bounds. -/
+theorem sub {g h : L2D V} {hg : HasIteratedWeakDerivOn V k g}
+    {hh : HasIteratedWeakDerivOn V k h} (hC : IteratedL2Bound hg C)
+    (hC' : IteratedL2Bound hh C') : IteratedL2Bound (hg.sub hh) (C + C') :=
+  IteratedL2Bound.congr (IteratedL2Bound.add hC (IteratedL2Bound.neg hC'))
 
 /-- The bound on a finite sum of families is the sum of the bounds. -/
 theorem sum {ι : Type*} [Fintype ι] {g : ι → L2D V}

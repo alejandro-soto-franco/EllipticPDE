@@ -143,9 +143,6 @@ theorem interiorRegularityAt_zero (Op : FullEllipticOp (n + 1))
         linarith
       · simp at hα
 
-set_option maxHeartbeats 1600000 in
--- The datum is assembled from a dozen shapes indexed over one and two directions, and naming
--- their constants alone exceeds the default budget before the proof proper begins.
 /-- **The differentiated equation, as a weak formulation for a cutoff derivative.** For a weak
 solution `u` of `L u = f` and each direction `ℓ`, there is an element `U ∈ H₀¹(Ω)` agreeing
 with `∂_ℓ u` on `V`, a datum `F ∈ L²(Ω)` carrying `k` weak derivatives, and a weak formulation
@@ -191,85 +188,6 @@ theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
               = ∫ x in Ω, (F x : ℝ) * ((w : H1amb Ω) 0 x : ℝ))
           ∧ IteratedL2Bound hFk (C * (M + ‖(u : H1amb Ω) 0‖))
           ∧ ‖(U : H1amb Ω) 0‖ ≤ C * (M + ‖(u : H1amb Ω) 0‖) := by
-  classical
-  -- The cutoff tower for `V ⋐ Ω`, and an open collar around its middle cutoff.
-  set T : CutoffTower Ω V := cutoffTowerOfIsCompactSubsetIsOpen hVc hΩo hVΩ with hTdef
-  obtain ⟨N, hNo, hξN, hNW, hθN⟩ := T.exists_isOpen_collar
-  have hWm : MeasurableSet (tsupport T.θ) := T.hθ.2.1.isClosed.measurableSet
-  have hWΩ : tsupport T.θ ⊆ Ω := T.hθ.2.2
-  have hNm : MeasurableSet N := hNo.measurableSet
-  have hNΩ : N ⊆ Ω := hNW.trans hWΩ
-  have hξNt : IsTestFn N T.ξ := ⟨T.hξ.1, T.hξ.2.1, hξN⟩
-  have hθWt : IsTestFn (tsupport T.θ) T.θ := ⟨T.hθ.1, T.hθ.2.1, subset_rfl⟩
-  -- A fourth cutoff, identically one near the middle cutoff and supported in the collar. The
-  -- symmetry of the mixed second derivatives is only available after a cutoff, and this is the
-  -- one that is invisible against everything the datum pairs with.
-  obtain ⟨ϑ, hϑ, hϑ_one, _hϑ_Icc⟩ :=
-    exists_isTestFn_one_nhdsSet_of_isCompact T.hξ.2.1 hNo hξN
-  have hϑ_eqOn : Set.EqOn ϑ 1 (tsupport T.ξ) := fun x hx => hϑ_one.self_of_nhdsSet x hx
-  -- The cutoffs the datum is built from: the middle cutoff and its first two derivatives.
-  have hξD : ∀ i : Fin (n + 1), IsTestFn N (partialD i T.ξ) := fun i => isTestFn_partialD hξNt i
-  have hξDD : ∀ i j : Fin (n + 1), IsTestFn N (partialD j (partialD i T.ξ)) :=
-    fun i j => isTestFn_partialD (hξD i) j
-  -- The coefficients the datum is built from, each read off its bundle at order `k`.
-  have haE : ∀ i j : Fin (n + 1), IsWkInfty (fun x => Op.a x i j) k :=
-    fun i j => (hA.entry i j).mono (by omega)
-  have haD : ∀ i j m : Fin (n + 1), IsWkInfty ((hA.entry i j).D [m]) k :=
-    fun i j m => ((hA.entry i j).deriv m).mono (by omega)
-  have haDD : ∀ i j m r : Fin (n + 1), IsWkInfty (((hA.entry i j).deriv m).D [r]) k :=
-    fun i j m r => (((hA.entry i j).deriv m).deriv r).mono (by omega)
-  have hbE : ∀ i : Fin (n + 1), IsWkInfty (fun x => Op.b x i) k :=
-    fun i => (hbc.bReg i).mono (by omega)
-  have hbD : ∀ i m : Fin (n + 1), IsWkInfty ((hbc.bReg i).D [m]) k :=
-    fun i m => ((hbc.bReg i).deriv m).mono (by omega)
-  have hcE : IsWkInfty Op.c k := hbc.cReg.mono (by omega)
-  have hcD : ∀ m : Fin (n + 1), IsWkInfty (hbc.cReg.D [m]) k :=
-    fun m => (hbc.cReg.deriv m).mono (by omega)
-  -- The datum shapes and their constants. Each shape is a cutoff against a coefficient, and
-  -- only the derivative of the solution it multiplies varies with the solution.
-  obtain ⟨KDf, hKDf, hPDf⟩ := exists_datum_of_pieces (Ω := Ω) hNm hNΩ k (ι := Unit)
-    (χ := fun _ => T.ξ) (fun _ => hξNt)
-    (a := fun _ => fun _ => (1 : ℝ)) (fun _ => IsWkInfty.const 1 k)
-  obtain ⟨Kb, hKb, hPb⟩ := exists_datum_of_pieces (Ω := Ω) hNm hNΩ k (ι := Fin (n + 1))
-    (χ := fun _ => T.ξ) (fun _ => hξNt) (a := fun i => fun x => Op.b x i) hbE
-  obtain ⟨Kc, hKc, hPc⟩ := exists_datum_of_pieces (Ω := Ω) hNm hNΩ k (ι := Unit)
-    (χ := fun _ => T.ξ) (fun _ => hξNt) (a := fun _ => Op.c) (fun _ => hcE)
-  obtain ⟨KbX, hKbX, hPbX⟩ := exists_datum_of_pieces (Ω := Ω) hNm hNΩ k (ι := Fin (n + 1))
-    (χ := fun i => partialD i T.ξ) hξD (a := fun i => fun x => Op.b x i) hbE
-  obtain ⟨KaX, hKaX, hPaX⟩ := exists_datum_of_pieces (Ω := Ω) hNm hNΩ k
-    (ι := Fin (n + 1) × Fin (n + 1))
-    (χ := fun t => partialD t.2 T.ξ) (fun t => hξD t.2)
-    (a := fun t => fun x => Op.a x t.1 t.2) (fun t => haE t.1 t.2)
-  obtain ⟨KaXX, hKaXX, hPaXX⟩ := exists_datum_of_pieces (Ω := Ω) hNm hNΩ k
-    (ι := Fin (n + 1) × Fin (n + 1))
-    (χ := fun t => partialD t.2 (partialD t.1 T.ξ)) (fun t => hξDD t.1 t.2)
-    (a := fun t => fun x => Op.a x t.1 t.2) (fun t => haE t.1 t.2)
-  obtain ⟨KaY, hKaY, hPaY⟩ := exists_datum_of_pieces (Ω := Ω) hNm hNΩ k
-    (ι := Fin (n + 1) × Fin (n + 1))
-    (χ := fun t => partialD t.1 T.ξ) (fun t => hξD t.1)
-    (a := fun t => (hA.entry t.1 t.2).D [t.2]) (fun t => haD t.1 t.2 t.2)
-  obtain ⟨KaZ, hKaZ, hPaZ⟩ := exists_datum_of_pieces (Ω := Ω) hNm hNΩ k
-    (ι := Fin (n + 1) × Fin (n + 1))
-    (χ := fun t => partialD t.1 T.ξ) (fun t => hξD t.1)
-    (a := fun t => fun x => Op.a x t.1 t.2) (fun t => haE t.1 t.2)
-  -- The shapes that differentiate a coefficient in the direction the equation is
-  -- differentiated. Their constants depend on that direction, so they are collected over it.
-  choose KbL hKbL hPbL using fun m : Fin (n + 1) =>
-    exists_datum_of_pieces (Ω := Ω) hNm hNΩ k (ι := Fin (n + 1))
-      (χ := fun _ => T.ξ) (fun _ => hξNt)
-      (a := fun i => (hbc.bReg i).D [m]) (fun i => hbD i m)
-  choose KcL hKcL hPcL using fun m : Fin (n + 1) =>
-    exists_datum_of_pieces (Ω := Ω) hNm hNΩ k (ι := Unit)
-      (χ := fun _ => T.ξ) (fun _ => hξNt)
-      (a := fun _ => hbc.cReg.D [m]) (fun _ => hcD m)
-  choose KaL hKaL hPaL using fun m : Fin (n + 1) =>
-    exists_datum_of_pieces (Ω := Ω) hNm hNΩ k (ι := Fin (n + 1) × Fin (n + 1))
-      (χ := fun _ => T.ξ) (fun _ => hξNt)
-      (a := fun t => (hA.entry t.1 t.2).D [m]) (fun t => haD t.1 t.2 m)
-  choose KaLL hKaLL hPaLL using fun m : Fin (n + 1) =>
-    exists_datum_of_pieces (Ω := Ω) hNm hNΩ k (ι := Fin (n + 1) × Fin (n + 1))
-      (χ := fun _ => T.ξ) (fun _ => hξNt)
-      (a := fun t => ((hA.entry t.1 t.2).deriv m).D [t.2]) (fun t => haDD t.1 t.2 m t.2)
   sorry
 
 /-- **Induction step.** Differentiating the equation once carries the order-`k` conclusion to
