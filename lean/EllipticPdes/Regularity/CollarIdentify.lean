@@ -91,4 +91,34 @@ theorem restrictL2_extendL2_congr_of_weakDerivOn {W N : Set (EuclideanSpace ℝ 
   restrictL2_extendL2_eq_of_mulTest_eq hWm hNm hNW hθW hθN
     (mulTest_weakDerivOn_unique hWm hθW hX hY)
 
+/-- **The inductive family, moved to the collar.** A family on `W` for the whole-space
+extension of `g`, restricted to `N`, is a family there for the same class, with the same bound,
+and its first entries are the given weak derivatives of `g`.
+
+The three conclusions travel together because the induction step needs all three and each is a
+unification the elaborator should do once. Doing them inline costs minutes, since the step's
+context carries the tower, its collar, four cutoffs and the datum by the time it needs them. -/
+theorem exists_collarFamily {Ω W N : Set (EuclideanSpace ℝ (Fin d))}
+    (hΩm : MeasurableSet Ω) (hWm : MeasurableSet W) (hNm : MeasurableSet N) (hNW : N ⊆ W)
+    {θ : EuclideanSpace ℝ (Fin d) → ℝ} (hθW : IsTestFn W θ) (hθN : Set.EqOn θ 1 N)
+    {g : L2D Ω} {Dg : Fin d → L2D Ω}
+    (hDgw : ∀ i, HasWeakDeriv i (extendL2 hΩm g) (extendL2 hΩm (Dg i))) {m : ℕ} {C : ℝ}
+    (HuW : HasIteratedWeakDerivOn W (m + 1) (restrictL2 (Ω := W) (extendL2 hΩm g)))
+    (hHuW : IteratedL2Bound HuW C) :
+    ∃ HuN : HasIteratedWeakDerivOn N (m + 1) (restrictL2 (Ω := N) (extendL2 hΩm g)),
+      IteratedL2Bound HuN C ∧
+      ∀ i : Fin d, HuN.D [i] = restrictL2 (Ω := N) (extendL2 hΩm (Dg i)) := by
+  refine ⟨(HuW.restrict hWm hNm hNW).congr (restrictL2_extendL2_trans hΩm hWm hNm hNW g),
+    IteratedL2Bound.congr (h := restrictL2_extendL2_trans hΩm hWm hNm hNW g)
+      (IteratedL2Bound.restrict (hWm := hWm) (hVm := hNm) (hVW := hNW) hHuW), fun i => ?_⟩
+  have h1 : HasWeakDerivOn W i (restrictL2 (Ω := W) (extendL2 hΩm g)) (HuW.D [i]) := by
+    have h := HuW.D_step i [] (Nat.succ_pos m)
+    rwa [HuW.D_nil] at h
+  have h2 : HasWeakDerivOn W i (restrictL2 (Ω := W) (extendL2 hΩm g))
+      (restrictL2 (Ω := W) (extendL2 hΩm (Dg i))) :=
+    hasWeakDerivOn_of_hasWeakDeriv i (hDgw i)
+  show restrictL2 (Ω := N) (extendL2 hWm (HuW.D [i])) = _
+  rw [restrictL2_extendL2_congr_of_weakDerivOn hWm hNm hNW hθW hθN h1 h2,
+    restrictL2_extendL2_trans hΩm hWm hNm hNW]
+
 end EllipticPdes.Regularity

@@ -13,6 +13,7 @@ import EllipticPdes.Regularity.CutoffDeriv
 import EllipticPdes.Regularity.CutoffCommutator
 import EllipticPdes.Regularity.CollarIdentify
 import EllipticPdes.Regularity.DatumPiece
+import EllipticPdes.Regularity.CutoffDatum
 
 /-!
 # Higher interior regularity
@@ -143,6 +144,9 @@ theorem interiorRegularityAt_zero (Op : FullEllipticOp (n + 1))
         linarith
       · simp at hα
 
+set_option maxHeartbeats 400000 in
+-- The step carries the tower, its collar, four cutoffs, the inductive family on two sets and
+-- the datum, and the closed form of the gradient is checked against all of them.
 /-- **The differentiated equation, as a weak formulation for a cutoff derivative.** For a weak
 solution `u` of `L u = f` and each direction `ℓ`, there is an element `U ∈ H₀¹(Ω)` agreeing
 with `∂_ℓ u` on `V`, a datum `F ∈ L²(Ω)` carrying `k` weak derivatives, and a weak formulation
@@ -188,6 +192,51 @@ theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
               = ∫ x in Ω, (F x : ℝ) * ((w : H1amb Ω) 0 x : ℝ))
           ∧ IteratedL2Bound hFk (C * (M + ‖(u : H1amb Ω) 0‖))
           ∧ ‖(U : H1amb Ω) 0‖ ≤ C * (M + ‖(u : H1amb Ω) 0‖) := by
+  classical
+  -- The cutoff tower for `V ⋐ Ω`, and an open collar around its middle cutoff.
+  obtain ⟨T⟩ : Nonempty (CutoffTower Ω V) :=
+    ⟨cutoffTowerOfIsCompactSubsetIsOpen hVc hΩo hVΩ⟩
+  obtain ⟨N, hNo, hξN, hNW, hθN⟩ := T.exists_isOpen_collar
+  have hWm : MeasurableSet (tsupport T.θ) := T.hθ.2.1.isClosed.measurableSet
+  have hWΩ : tsupport T.θ ⊆ Ω := T.hθ.2.2
+  have hNm : MeasurableSet N := hNo.measurableSet
+  have hNΩ : N ⊆ Ω := hNW.trans hWΩ
+  have hξNt : IsTestFn N T.ξ := ⟨T.hξ.1, T.hξ.2.1, hξN⟩
+  have hθWt : IsTestFn (tsupport T.θ) T.θ := ⟨T.hθ.1, T.hθ.2.1, subset_rfl⟩
+  -- A fourth cutoff, identically one near the middle cutoff and supported in the collar. The
+  -- symmetry of the mixed second derivatives is only available after a cutoff, and this is the
+  -- one that is invisible against everything the datum pairs with.
+  obtain ⟨ϑ, hϑ, hϑ_one, _hϑ_Icc⟩ :=
+    exists_isTestFn_one_nhdsSet_of_isCompact T.hξ.2.1 hNo hξN
+  have hϑ_eqOn : Set.EqOn ϑ 1 (tsupport T.ξ) := fun x hx => hϑ_one.self_of_nhdsSet x hx
+  -- The datum, and the inductive hypothesis at the outer support of the tower.
+  obtain ⟨KD, hKD0, hDat⟩ := exists_cutoffDatum Op hNm hNΩ hA hbc hξNt
+  obtain ⟨C₁, hC₁0, hIH⟩ := hk T.hθ.2.1 hWΩ
+  obtain ⟨Cξ, hCξ⟩ := exists_abs_bound hξNt
+  have hCξ0 : (0 : ℝ) ≤ Cξ := le_trans (abs_nonneg (T.ξ 0)) (hCξ 0)
+  refine ⟨KD * (C₁ + 1) + Cξ * C₁,
+    add_nonneg (mul_nonneg hKD0 (add_nonneg hC₁0 zero_le_one)) (mul_nonneg hCξ0 hC₁0),
+    fun u f M hfk hM hu ℓ => ?_⟩
+  have hM0 : (0 : ℝ) ≤ M := le_trans (norm_nonneg f) hM.norm_le
+  have hu00 : (0 : ℝ) ≤ ‖(u : H1amb Ω) 0‖ := norm_nonneg _
+  -- The solution's derivatives to order `k + 2` on the outer support, then on the collar.
+  obtain ⟨HuW, hHuW⟩ :=
+    hIH u f M (hfk.mono (Nat.le_succ k)) (hM.mono_order (Nat.le_succ k)) hu
+  obtain ⟨HuN, hHuNbd, hDu⟩ := exists_collarFamily hΩm hWm hNm hNW hθWt hθN
+    (fun i => hasWeakDeriv_extendL2_of_mem_H01 hΩm i u.2) HuW hHuW
+  -- The cut-off derivative, and the closed form of its gradient.
+  obtain ⟨Uamb, hUmem, hU0, hUgrad⟩ := interior_cutoffGrad_mem_H01 Op hΩm hA1 T u f hu ℓ
+  have hDgℓ : ∀ i : Fin (n + 1),
+      HasWeakDerivOn N i (restrictL2 (Ω := N) (extendL2 hΩm ((u : H1amb Ω) ℓ.succ)))
+        (HuN.D [i, ℓ]) := by
+    intro i
+    have h := HuN.D_step i [ℓ] (Nat.succ_lt_succ (Nat.succ_pos k))
+    rwa [hDu ℓ] at h
+  have hgrad : ∀ i : Fin (n + 1), extendL2 hΩm (Uamb i.succ)
+      = extendL2 hNm (mulTest (isTestFn_partialD hξNt i)
+          (restrictL2 (Ω := N) (extendL2 hΩm ((u : H1amb Ω) ℓ.succ)))
+        + mulTest hξNt (HuN.D [i, ℓ])) :=
+    fun i => extendL2_cutoffGrad_eq hΩm hNm hNΩ T.hξ hξNt ((u : H1amb Ω) ℓ.succ) hUgrad hDgℓ i
   sorry
 
 /-- **Induction step.** Differentiating the equation once carries the order-`k` conclusion to
