@@ -27,6 +27,7 @@ than on the compact set is what lets a single family supply every derivative the
   on the collar.
 * `restrictL2_extendL2_congr_of_weakDerivOn`: two weak derivatives of one class are equal on the
   collar.
+* `exists_restrictFamily`, `exists_collarFamily`: a family and its bound, moved in one step.
 -/
 
 open MeasureTheory
@@ -90,6 +91,16 @@ theorem restrictL2_extendL2_congr_of_weakDerivOn {W N : Set (EuclideanSpace ℝ 
     restrictL2 (Ω := N) (extendL2 hWm X) = restrictL2 (Ω := N) (extendL2 hWm Y) :=
   restrictL2_extendL2_eq_of_mulTest_eq hWm hNm hNW hθW hθN
     (mulTest_weakDerivOn_unique hWm hθW hX hY)
+
+/-- **A family and its bound, moved to a subregion.** Both halves of the restriction, packaged
+so the elaborator does the unification once. Applied inline in the induction step, where the
+context carries the tower and the datum, the same two lines cost minutes. -/
+theorem exists_restrictFamily {Ω N : Set (EuclideanSpace ℝ (Fin d))}
+    (hΩm : MeasurableSet Ω) (hNm : MeasurableSet N) (hNΩ : N ⊆ Ω) {g : L2D Ω} {k : ℕ} {C : ℝ}
+    (H : HasIteratedWeakDerivOn Ω k g) (hC : IteratedL2Bound H C) :
+    ∃ HN : HasIteratedWeakDerivOn N k (restrictL2 (Ω := N) (extendL2 hΩm g)),
+      IteratedL2Bound HN C :=
+  ⟨H.restrict hΩm hNm hNΩ, IteratedL2Bound.restrict hC⟩
 
 /-- **The inductive family, moved to the collar.** A family on `W` for the whole-space
 extension of `g`, restricted to `N`, is a family there for the same class, with the same bound,

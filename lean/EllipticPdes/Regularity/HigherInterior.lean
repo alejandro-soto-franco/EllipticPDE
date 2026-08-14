@@ -237,7 +237,67 @@ theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
           (restrictL2 (Ω := N) (extendL2 hΩm ((u : H1amb Ω) ℓ.succ)))
         + mulTest hξNt (HuN.D [i, ℓ])) :=
     fun i => extendL2_cutoffGrad_eq hΩm hNm hNΩ T.hξ hξNt ((u : H1amb Ω) ℓ.succ) hUgrad hDgℓ i
-  sorry
+  -- The datum's own derivative, cut down to the collar.
+  obtain ⟨HDfN, hDfNbd⟩ := exists_restrictFamily hΩm hNm hNΩ (hfk.deriv ℓ) (hM.deriv ℓ)
+  -- One bound serving the solution's derivatives and the datum's alike.
+  have hMu : (0 : ℝ) ≤ M + ‖(u : H1amb Ω) 0‖ := add_nonneg hM0 hu00
+  have hC₁Mu : (0 : ℝ) ≤ C₁ * (M + ‖(u : H1amb Ω) 0‖) := mul_nonneg hC₁0 hMu
+  have hle1 : C₁ * (M + ‖(u : H1amb Ω) 0‖) ≤ C₁ * (M + ‖(u : H1amb Ω) 0‖) + M :=
+    le_add_of_nonneg_right hM0
+  have hle2 : M ≤ C₁ * (M + ‖(u : H1amb Ω) 0‖) + M := le_add_of_nonneg_left hC₁Mu
+  obtain ⟨F, HF, hFbd, hFpair⟩ := hDat ℓ _ _ HuN HDfN
+    (C₁ * (M + ‖(u : H1amb Ω) 0‖) + M) (hHuNbd.mono_const hle1) (hDfNbd.mono_const hle2)
+  have hVm : MeasurableSet V := hVc.isClosed.measurableSet
+  have hDℓnorm : ‖HuN.D [ℓ]‖ ≤ C₁ * (M + ‖(u : H1amb Ω) 0‖) :=
+    hHuNbd [ℓ] (Nat.succ_le_succ (Nat.zero_le _))
+  refine ⟨⟨Uamb, hUmem⟩, F, HF, ?_, ?_, ?_, ?_⟩
+  · -- The cutoff is invisible on the base set, so nothing is lost there.
+    show restrictL2 (Ω := V) (extendL2 hΩm (Uamb 0)) = _
+    rw [hU0]
+    exact restrictL2_extendL2_mulTest_xi hΩm hVm hVΩ T ((u : H1amb Ω) ℓ.succ)
+  · sorry
+  · -- The datum's bound, in the data.
+    refine hFbd.mono_const ?_
+    have h1 : C₁ * (M + ‖(u : H1amb Ω) 0‖) + M ≤ (C₁ + 1) * (M + ‖(u : H1amb Ω) 0‖) := by
+      linarith only [hu00]
+    calc KD * (C₁ * (M + ‖(u : H1amb Ω) 0‖) + M)
+        ≤ KD * ((C₁ + 1) * (M + ‖(u : H1amb Ω) 0‖)) := mul_le_mul_of_nonneg_left h1 hKD0
+      _ = KD * (C₁ + 1) * (M + ‖(u : H1amb Ω) 0‖) := by ring
+      _ ≤ (KD * (C₁ + 1) + Cξ * C₁) * (M + ‖(u : H1amb Ω) 0‖) :=
+          mul_le_mul_of_nonneg_right (le_add_of_nonneg_right (mul_nonneg hCξ0 hC₁0)) hMu
+  · -- The cut-off derivative's norm, read on the collar where the cutoff lives.
+    show ‖Uamb 0‖ ≤ _
+    rw [hU0]
+    have hag : (mulTest T.hξ ((u : H1amb Ω) ℓ.succ) : EuclideanSpace ℝ (Fin (n + 1)) → ℝ)
+        =ᵐ[volume.restrict Ω] fun x => T.ξ x
+          * ((restrictL2 (Ω := Ω) (extendL2 hNm (HuN.D [ℓ]))) x : ℝ) := by
+      have hres : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin (n + 1)))), x ∈ N →
+          (HuN.D [ℓ] x : ℝ) = (extendL2 hΩm ((u : H1amb Ω) ℓ.succ) x : ℝ) := by
+        rw [hDu ℓ]
+        exact (ae_restrict_iff' hNm).mp
+          (coeFn_restrictL2 (Ω := N) (extendL2 hΩm ((u : H1amb Ω) ℓ.succ)))
+      filter_upwards [mulTest_coeFn T.hξ ((u : H1amb Ω) ℓ.succ),
+        coeFn_restrictL2 (Ω := Ω) (extendL2 hNm (HuN.D [ℓ])),
+        ae_restrict_of_ae (coeFn_extendL2 hNm (HuN.D [ℓ])),
+        ae_restrict_of_ae (coeFn_extendL2 hΩm ((u : H1amb Ω) ℓ.succ)),
+        ae_restrict_of_ae hres, ae_restrict_mem hΩm] with x h1 h2 h3 h4 h5 h6
+      rw [h1, h2, h3]
+      by_cases hxN : x ∈ N
+      · rw [Set.indicator_of_mem hxN, h5 hxN, h4, Set.indicator_of_mem h6]
+      · rw [Set.indicator_of_notMem hxN, mul_zero,
+          show T.ξ x = 0 from image_eq_zero_of_notMem_tsupport (fun hc => hxN (hξN hc)),
+          zero_mul]
+    have hstep : ‖restrictL2 (Ω := Ω) (extendL2 hNm (HuN.D [ℓ]))‖ ≤ ‖HuN.D [ℓ]‖ :=
+      le_trans (norm_restrictL2_le _) (le_of_eq (norm_extendL2 hNm (HuN.D [ℓ])))
+    calc ‖mulTest T.hξ ((u : H1amb Ω) ℓ.succ)‖
+        ≤ Cξ * ‖restrictL2 (Ω := Ω) (extendL2 hNm (HuN.D [ℓ]))‖ :=
+          norm_le_of_ae_mul T.hξ.continuous.measurable (Filter.Eventually.of_forall hCξ) hag
+      _ ≤ Cξ * ‖HuN.D [ℓ]‖ := mul_le_mul_of_nonneg_left hstep hCξ0
+      _ ≤ Cξ * (C₁ * (M + ‖(u : H1amb Ω) 0‖)) := mul_le_mul_of_nonneg_left hDℓnorm hCξ0
+      _ = Cξ * C₁ * (M + ‖(u : H1amb Ω) 0‖) := by ring
+      _ ≤ (KD * (C₁ + 1) + Cξ * C₁) * (M + ‖(u : H1amb Ω) 0‖) :=
+          mul_le_mul_of_nonneg_right
+            (le_add_of_nonneg_left (mul_nonneg hKD0 (add_nonneg hC₁0 zero_le_one))) hMu
 
 /-- **Induction step.** Differentiating the equation once carries the order-`k` conclusion to
 order `k + 1`, under one more order of regularity on every coefficient.
