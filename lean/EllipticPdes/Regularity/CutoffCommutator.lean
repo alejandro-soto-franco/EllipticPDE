@@ -35,6 +35,7 @@ own and no product is constructed twice.
 
 ## Main declarations
 
+* `mul_eq_self_of_eqOn_one`: a cutoff that is one where a weight lives is invisible.
 * `setIntegral_principal_entry`: one entry of the principal block, expanded.
 * `setIntegral_lower_entry`: one entry of a block with no derivative on the test function.
 -/
@@ -70,13 +71,15 @@ theorem CutoffTower.exists_isOpen_collar {Ω V : Set (EuclideanSpace ℝ (Fin d)
   rw [Function.mem_support, hNθ hx]
   exact one_ne_zero
 
-/-- The outer cutoff is invisible against anything supported inside the collar. -/
-theorem CutoffTower.theta_mul_eq_of_tsupport_subset {Ω V : Set (EuclideanSpace ℝ (Fin d))}
-    (T : CutoffTower Ω V) {N : Set (EuclideanSpace ℝ (Fin d))} (hθN : Set.EqOn T.θ 1 N)
-    {ψ : EuclideanSpace ℝ (Fin d) → ℝ} (hψ : tsupport ψ ⊆ N) (x : EuclideanSpace ℝ (Fin d)) :
-    T.θ x * ψ x = ψ x := by
+/-- **A cutoff that is one where a weight lives is invisible against it.** Every identification
+the induction step makes holds only after a cutoff, and every weight it pairs against is
+supported where that cutoff is identically one, so the cutoff never reaches the conclusion. -/
+theorem mul_eq_self_of_eqOn_one {χ : EuclideanSpace ℝ (Fin d) → ℝ}
+    {S : Set (EuclideanSpace ℝ (Fin d))} (hχ : Set.EqOn χ 1 S)
+    {ψ : EuclideanSpace ℝ (Fin d) → ℝ} (hψ : tsupport ψ ⊆ S) (x : EuclideanSpace ℝ (Fin d)) :
+    χ x * ψ x = ψ x := by
   by_cases hx : x ∈ tsupport ψ
-  · rw [hθN (hψ hx)]
+  · rw [hχ (hψ hx)]
     simp
   · rw [image_eq_zero_of_notMem_tsupport hx, mul_zero]
 

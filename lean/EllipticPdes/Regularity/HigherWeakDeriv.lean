@@ -200,6 +200,11 @@ theorem congr {g : L2D V} {hu : HasIteratedWeakDerivOn V k u} {h : u = g}
 theorem mono_order {hu : HasIteratedWeakDerivOn V k u} (hC : IteratedL2Bound hu C)
     (hlk : l ≤ k) : IteratedL2Bound (hu.mono hlk) C := fun α hα => hC α (hα.trans hlk)
 
+/-- The bound is inherited by the family of a derivative. -/
+theorem deriv {hu : HasIteratedWeakDerivOn V (k + 1) u} (hC : IteratedL2Bound hu C)
+    (l : Fin d) : IteratedL2Bound (hu.deriv l) C := fun α hα =>
+  hC (α ++ [l]) (by simp only [List.length_append, List.length_cons, List.length_nil]; omega)
+
 /-- The bound is inherited by the family of a first derivative. -/
 theorem deriv₁ {hu : HasIteratedWeakDerivOn V (k + 2) u} (hC : IteratedL2Bound hu C)
     (i : Fin d) : IteratedL2Bound (hu.deriv₁ i) C := fun α hα =>
