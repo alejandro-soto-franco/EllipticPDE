@@ -47,6 +47,8 @@ import EllipticPdes.Regularity.L2Pairing
 import EllipticPdes.Regularity.ExtendCutoff
 import EllipticPdes.Regularity.WeakDerivOnSymm
 import EllipticPdes.Regularity.CutoffGradFormula
+import EllipticPdes.Regularity.CollarIdentify
+import EllipticPdes.Regularity.CutoffCommutator
 import EllipticPdes.Regularity.SmoothGlue
 import EllipticPdes.Regularity.HigherInterior
 import EllipticPdes.Regularity.InteriorSmooth

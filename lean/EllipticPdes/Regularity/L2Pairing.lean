@@ -106,6 +106,62 @@ theorem setIntegral_sum_mul_testFn {ι : Type*} [Fintype ι] (F : ι → L2D V)
     (∫ x in V, ((∑ i, F i) x : ℝ) * φ x) = ∑ i, ∫ x in V, (F i x : ℝ) * φ x :=
   setIntegral_finsetSum_mul_testFn Finset.univ F hφc hφcs
 
+/-- **An extension by zero pairs over the set it came from.** A whole-space integral of a
+weight against the extension of an `L²(S)` class collapses to an integral over `S`. Stated with
+a weight on each side, which is the shape every block of the bilinear form takes. -/
+theorem integral_extendL2_mul_mul (hVm : MeasurableSet V) (F : L2D V)
+    (a b : EuclideanSpace ℝ (Fin d) → ℝ) :
+    (∫ x, a x * (extendL2 hVm F x : ℝ) * b x) = ∫ x in V, a x * (F x : ℝ) * b x := by
+  have hae : (fun x => a x * (extendL2 hVm F x : ℝ) * b x)
+      =ᵐ[volume] Set.indicator V (fun x => a x * (F x : ℝ) * b x) := by
+    filter_upwards [coeFn_extendL2 hVm F] with x hx
+    rw [hx]
+    by_cases hxV : x ∈ V
+    · rw [Set.indicator_of_mem hxV, Set.indicator_of_mem hxV]
+    · rw [Set.indicator_of_notMem hxV, Set.indicator_of_notMem hxV, mul_zero, zero_mul]
+  rw [integral_congr_ae hae, integral_indicator hVm]
+
+/-- **A cutoff splits off a derivative of the test function.** Writing `χ ∂ⱼv` as
+`∂ⱼ(χv) - (∂ⱼχ)v` moves the pairing onto the cut-off test function, which is the form the
+differentiated equation is stated against. -/
+theorem setIntegral_mul_cutoff_partialD_split (P : L2D V) {χ v : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hχc : ContDiff ℝ (⊤ : ℕ∞) χ) (hχcs : HasCompactSupport χ) (hvc : ContDiff ℝ (⊤ : ℕ∞) v)
+    (j : Fin d) :
+    (∫ x in V, (P x : ℝ) * (χ x * partialD j v x))
+      = (∫ x in V, (P x : ℝ) * partialD j (fun y => χ y * v y) x)
+        - ∫ x in V, (P x : ℝ) * (partialD j χ x * v x) := by
+  have hχd : Differentiable ℝ χ := hχc.differentiable (by simp)
+  have hvd : Differentiable ℝ v := hvc.differentiable (by simp)
+  have hi1 : Integrable (fun x => (P x : ℝ) * (χ x * partialD j v x)) (volume.restrict V) :=
+    integrable_mul_testFn P (hχc.mul (contDiff_partialD hvc j)) hχcs.mul_right
+  have hi2 : Integrable (fun x => (P x : ℝ) * (partialD j χ x * v x)) (volume.restrict V) :=
+    integrable_mul_testFn P ((contDiff_partialD hχc j).mul hvc)
+      (hχcs.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single j 1)).mul_right
+  have hmid : (∫ x in V, (P x : ℝ) * partialD j (fun y => χ y * v y) x)
+      = (∫ x in V, (P x : ℝ) * (χ x * partialD j v x))
+        + ∫ x in V, (P x : ℝ) * (partialD j χ x * v x) := by
+    rw [partialD_mul hχd hvd j, ← integral_add hi1 hi2]
+    exact integral_congr_ae (Filter.Eventually.of_forall fun x => by ring)
+  linarith [hmid]
+
+/-- **Two classes agreeing under a cutoff pair identically against anything the cutoff fixes.**
+Where `θ·X = θ·Y` almost everywhere and `θψ = ψ` pointwise, the pairings against `ψ` agree.
+
+This is how an identification that only holds after a cutoff is used: every weight the datum
+assembly pairs against is supported where the outer cutoff of the tower is identically `1`, so
+`θψ = ψ` holds and the cutoff disappears from the conclusion. -/
+theorem setIntegral_mul_congr_of_cutoff_ae {θ : EuclideanSpace ℝ (Fin d) → ℝ} {X Y : L2D V}
+    (h : (fun x => θ x * (X x : ℝ)) =ᵐ[volume.restrict V] fun x => θ x * (Y x : ℝ))
+    {ψ : EuclideanSpace ℝ (Fin d) → ℝ} (hψ : ∀ x, θ x * ψ x = ψ x) :
+    (∫ x in V, (X x : ℝ) * ψ x) = ∫ x in V, (Y x : ℝ) * ψ x := by
+  refine integral_congr_ae ?_
+  filter_upwards [h] with x hx
+  have e : ∀ z : ℝ, θ x * z * ψ x = z * ψ x := by
+    intro z
+    conv_rhs => rw [← hψ x]
+    ring
+  rw [← e (X x : ℝ), hx, e (Y x : ℝ)]
+
 /-- A weighted class pairs as the weight against the class. -/
 theorem setIntegral_mulL2_mul_testFn {a : EuclideanSpace ℝ (Fin d) → ℝ} (ham : Measurable a)
     {M : ℝ} (haM : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |a x| ≤ M) (p : L2D V)
