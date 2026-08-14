@@ -1,2 +1,5 @@
 # Lean
 /lean/.lake
+
+# Python
+__pycache__/
