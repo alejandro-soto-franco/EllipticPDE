@@ -255,7 +255,25 @@ theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
     show restrictL2 (Ω := V) (extendL2 hΩm (Uamb 0)) = _
     rw [hU0]
     exact restrictL2_extendL2_mulTest_xi hΩm hVm hVΩ T ((u : H1amb Ω) ℓ.succ)
-  · sorry
+  · -- The weak formulation, carried from test functions by density.
+    intro w
+    refine weakForm_of_testFn Op ⟨Uamb, hUmem⟩ F (fun v hv => ?_) w
+    have hgrad' : ∀ i : Fin (n + 1), extendL2 hΩm (Uamb i.succ)
+        = extendL2 hNm (mulTest (isTestFn_partialD hξNt i) (HuN.D [ℓ])
+          + mulTest hξNt (HuN.D [i, ℓ])) := by
+      intro i
+      rw [hDu ℓ]
+      exact hgrad i
+    have hU0N : extendL2 hΩm (Uamb 0) = extendL2 hNm (mulTest hξNt (HuN.D [ℓ])) := by
+      rw [hU0, hDu ℓ]
+      exact extendL2_mulTest_eq hΩm hNm hNΩ T.hξ hξNt ((u : H1amb Ω) ℓ.succ)
+    have hD2 : ∀ i : Fin (n + 1), HasWeakDerivOn N i (HuN.D [ℓ]) (HuN.D [i, ℓ]) :=
+      fun i => HuN.D_step i [ℓ] (Nat.succ_lt_succ (Nat.succ_pos k))
+    rw [fullBilin_testGraph_eq Op ⟨Uamb, hUmem⟩ hv,
+      setIntegral_blocks_eq Op hΩm hNm hξNt hA hbc (p := HuN.D [ℓ])
+        (D2 := fun i => HuN.D [i, ℓ]) hgrad' hU0N hD2 hv.1,
+      hFpair v hv.1 hv.2.1]
+    sorry
   · -- The datum's bound, in the data.
     refine hFbd.mono_const ?_
     have h1 : C₁ * (M + ‖(u : H1amb Ω) 0‖) + M ≤ (C₁ + 1) * (M + ‖(u : H1amb Ω) 0‖) := by

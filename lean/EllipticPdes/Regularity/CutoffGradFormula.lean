@@ -28,6 +28,7 @@ on `Ω`.
 
 * `extendL2_restrictL2_extendL2_ae`: cutting an `L²(Ω)` class down to `W ⊆ Ω` and extending
   again is the indicator of `W`.
+* `extendL2_mulTest_eq`: a cut-off class is the cut-off restriction.
 * `extendL2_cutoffGrad_eq`: the gradient coordinates of the cut-off element, in closed form.
 -/
 
@@ -57,6 +58,41 @@ theorem extendL2_restrictL2_extendL2_ae {Ω W : Set (EuclideanSpace ℝ (Fin d))
   · rw [Set.indicator_of_mem hxW, Set.indicator_of_mem hxW, h3 hxW, h2,
       Set.indicator_of_mem (hWΩ hxW)]
   · rw [Set.indicator_of_notMem hxW, Set.indicator_of_notMem hxW]
+
+/-- **A cut-off class is the cut-off restriction.** For a cutoff supported in `W ⊆ Ω`, the
+whole-space extension of `ξ·g` is the whole-space extension of `ξ` against the restriction of
+`g` to `W`. The cutoff kills everything outside `W`, so nothing is lost.
+
+This is the function coordinate of `extendL2_cutoffGrad_eq`, stated on its own because the
+zeroth-order block of the induction step needs exactly it. -/
+theorem extendL2_mulTest_eq {Ω W : Set (EuclideanSpace ℝ (Fin d))}
+    (hΩm : MeasurableSet Ω) (hWm : MeasurableSet W) (hWΩ : W ⊆ Ω)
+    {ξ : EuclideanSpace ℝ (Fin d) → ℝ} (hξΩ : IsTestFn Ω ξ) (hξW : IsTestFn W ξ) (g : L2D Ω) :
+    extendL2 hΩm (mulTest hξΩ g)
+      = extendL2 hWm (mulTest hξW (restrictL2 (Ω := W) (extendL2 hΩm g))) := by
+  refine Lp.ext ?_
+  have hmtΩ : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), x ∈ Ω →
+      (mulTest hξΩ g x : ℝ) = ξ x * (g x : ℝ) :=
+    (ae_restrict_iff' hΩm).mp (mulTest_coeFn hξΩ g)
+  have hmtW : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), x ∈ W →
+      (mulTest hξW (restrictL2 (Ω := W) (extendL2 hΩm g)) x : ℝ)
+        = ξ x * (restrictL2 (Ω := W) (extendL2 hΩm g) x : ℝ) :=
+    (ae_restrict_iff' hWm).mp (mulTest_coeFn hξW _)
+  have hrW : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), x ∈ W →
+      (restrictL2 (Ω := W) (extendL2 hΩm g) x : ℝ) = (extendL2 hΩm g x : ℝ) :=
+    (ae_restrict_iff' hWm).mp (coeFn_restrictL2 (Ω := W) (extendL2 hΩm g))
+  filter_upwards [coeFn_extendL2 hΩm (mulTest hξΩ g),
+    coeFn_extendL2 hWm (mulTest hξW (restrictL2 (Ω := W) (extendL2 hΩm g))),
+    hmtΩ, hmtW, hrW, coeFn_extendL2 hΩm g] with x h1 h2 h3 h4 h5 h6
+  rw [h1, h2]
+  by_cases hxW : x ∈ W
+  · rw [Set.indicator_of_mem hxW, Set.indicator_of_mem (hWΩ hxW), h3 (hWΩ hxW), h4 hxW,
+      h5 hxW, h6, Set.indicator_of_mem (hWΩ hxW)]
+  · rw [Set.indicator_of_notMem hxW]
+    have hξx : ξ x = 0 := image_eq_zero_of_notMem_tsupport (fun hc => hxW (hξW.2.2 hc))
+    by_cases hxΩ : x ∈ Ω
+    · rw [Set.indicator_of_mem hxΩ, h3 hxΩ, hξx, zero_mul]
+    · rw [Set.indicator_of_notMem hxΩ]
 
 /-- **The gradient of a cut-off class, in closed form.** Let `ξ` be a cutoff supported in
 `W ⊆ Ω`, let `g ∈ L²(Ω)` have weak derivatives `Dg i` on `W`, and let `Uamb` be an ambient

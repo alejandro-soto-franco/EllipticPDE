@@ -40,6 +40,7 @@ own and no product is constructed twice.
 * `setIntegral_principal_entry_coeff`: the same at the operator's coefficient, in the shape the
   datum pairs against.
 * `setIntegral_lower_entry`: one entry of a block with no derivative on the test function.
+* `setIntegral_blocks_eq`: all three blocks, as the shapes the datum names.
 -/
 
 open MeasureTheory
@@ -268,5 +269,80 @@ theorem setIntegral_lower_entry {Ω W : Set (EuclideanSpace ℝ (Fin d))}
     (v : EuclideanSpace ℝ (Fin d) → ℝ) :
     (∫ x in Ω, a x * (F x : ℝ) * v x) = ∫ x in W, a x * (G x : ℝ) * v x := by
   rw [← integral_extendL2_mul_mul hΩm F a v, hFG, integral_extendL2_mul_mul hWm G a v]
+
+/-- **The three blocks of the bilinear form on the cut-off element.** Summing the principal
+entry over both directions and adding the transport and zeroth-order blocks, which need no
+integration by parts, gives the whole pairing as eight sums, each of them a shape the datum of
+the induction step names.
+
+The first sum is the differentiated equation's principal term tested against `ξv`, carrying the
+second derivative in the order the gradient produces it. Everything else is a pairing against
+`v`. -/
+theorem setIntegral_blocks_eq (Op : FullEllipticOp d)
+    {Ω N : Set (EuclideanSpace ℝ (Fin d))} (hΩm : MeasurableSet Ω) (hNm : MeasurableSet N)
+    {ξ : EuclideanSpace ℝ (Fin d) → ℝ} (hξN : IsTestFn N ξ) {k m : ℕ}
+    (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 1)) (hbc : IsWkInftyLower Op m)
+    {Uamb : H1amb Ω} {p : L2D N} {D2 : Fin d → L2D N}
+    (hgrad : ∀ i : Fin d, extendL2 hΩm (Uamb i.succ)
+      = extendL2 hNm (mulTest (isTestFn_partialD hξN i) p + mulTest hξN (D2 i)))
+    (hU0N : extendL2 hΩm (Uamb 0) = extendL2 hNm (mulTest hξN p))
+    (hpD : ∀ i : Fin d, HasWeakDerivOn N i p (D2 i))
+    {v : EuclideanSpace ℝ (Fin d) → ℝ} (hvc : ContDiff ℝ (⊤ : ℕ∞) v) :
+    (∑ i, ∑ j, ∫ x in Ω, Op.a x i j * ((Uamb i.succ) x : ℝ) * partialD j v x)
+        + (∑ i, ∫ x in Ω, Op.b x i * ((Uamb i.succ) x : ℝ) * v x)
+        + (∫ x in Ω, Op.c x * ((Uamb 0) x : ℝ) * v x)
+      = (∑ i, ∑ j, ∫ x in N, Op.a x i j * (D2 i x : ℝ) * partialD j (fun y => ξ y * v y) x)
+        - (∑ i, ∑ j, ∫ x in N, partialD j ξ x * (Op.a x i j * (D2 i x : ℝ)) * v x)
+        - (∑ i, ∑ j, ∫ x in N, partialD j (partialD i ξ) x * (Op.a x i j * (p x : ℝ)) * v x)
+        - (∑ i, ∑ j, ∫ x in N,
+            partialD i ξ x * ((hA.entry i j).D [j] x * (p x : ℝ)) * v x)
+        - (∑ i, ∑ j, ∫ x in N, partialD i ξ x * (Op.a x i j * (D2 j x : ℝ)) * v x)
+        + (∑ i, ∫ x in N, partialD i ξ x * (Op.b x i * (p x : ℝ)) * v x)
+        + (∑ i, ∫ x in N, ξ x * (Op.b x i * (D2 i x : ℝ)) * v x)
+        + ∫ x in N, ξ x * (Op.c x * (p x : ℝ)) * v x := by
+  classical
+  -- The transport block, entry by entry.
+  have htrans : ∀ i : Fin d, (∫ x in Ω, Op.b x i * ((Uamb i.succ) x : ℝ) * v x)
+      = (∫ x in N, partialD i ξ x * (Op.b x i * (p x : ℝ)) * v x)
+        + ∫ x in N, ξ x * (Op.b x i * (D2 i x : ℝ)) * v x := by
+    intro i
+    rw [setIntegral_lower_entry hΩm hNm (Uamb i.succ) _ (hgrad i) (fun x => Op.b x i) v]
+    have hi1 : Integrable (fun x => partialD i ξ x * (Op.b x i * (p x : ℝ)) * v x)
+        (volume.restrict N) := by
+      refine (integrable_mul_testFn (mulL2 (hbc.bReg i).measurable_self
+        (hbc.bReg i).ae_abs_le p) ((contDiff_partialD hξN.1 i).mul hvc)
+        (hξN.hasCompactSupport_partialD i).mul_right).congr ?_
+      filter_upwards [mulL2_coeFn (hbc.bReg i).measurable_self (hbc.bReg i).ae_abs_le p] with x hx
+      rw [hx]
+      ring
+    have hi2 : Integrable (fun x => ξ x * (Op.b x i * (D2 i x : ℝ)) * v x)
+        (volume.restrict N) := by
+      refine (integrable_mul_testFn (mulL2 (hbc.bReg i).measurable_self
+        (hbc.bReg i).ae_abs_le (D2 i)) (hξN.1.mul hvc) hξN.2.1.mul_right).congr ?_
+      filter_upwards [mulL2_coeFn (hbc.bReg i).measurable_self (hbc.bReg i).ae_abs_le (D2 i)]
+        with x hx
+      rw [hx]
+      ring
+    rw [← integral_add hi1 hi2]
+    refine integral_congr_ae ?_
+    filter_upwards [Lp.coeFn_add (mulTest (isTestFn_partialD hξN i) p) (mulTest hξN (D2 i)),
+      mulTest_coeFn (isTestFn_partialD hξN i) p, mulTest_coeFn hξN (D2 i)] with x h1 h2 h3
+    rw [h1, Pi.add_apply, h2, h3]
+    ring
+  -- The zeroth-order block.
+  have hzero : (∫ x in Ω, Op.c x * ((Uamb 0) x : ℝ) * v x)
+      = ∫ x in N, ξ x * (Op.c x * (p x : ℝ)) * v x := by
+    rw [setIntegral_lower_entry hΩm hNm (Uamb 0) _ hU0N Op.c v]
+    refine integral_congr_ae ?_
+    filter_upwards [mulTest_coeFn hξN p] with x hx
+    rw [hx]
+    ring
+  rw [Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ =>
+      setIntegral_principal_entry_coeff Op hΩm hNm hξN hA (p := p) (D2 := D2) i j
+        (hgrad i) hpD hvc)),
+    Finset.sum_congr rfl (fun i _ => htrans i), hzero]
+  simp only [Finset.sum_sub_distrib, Finset.sum_add_distrib]
+  ring
+
 
 end EllipticPdes.Regularity
