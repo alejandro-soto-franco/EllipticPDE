@@ -158,11 +158,21 @@ differentiation lands on a coefficient, and the commutator with `ξ`. Each of th
 `EllipticPdes.Regularity.exists_iteratedWeakDeriv_mul` and
 `EllipticPdes.Regularity.HasIteratedWeakDerivOn.sum` assemble the family and its bound, and
 `EllipticPdes.Regularity.weakForm_of_testFn` carries the identity from test functions to
-`H₀¹(Ω)`. -/
+`H₀¹(Ω)`.
+
+## Why the order-`k` conclusion is a hypothesis
+
+`F` carries second derivatives of `u` against first derivatives of the coefficients, so
+`F ∈ H^k` asks for `u ∈ H^{k+2}` on a neighbourhood of `tsupport ξ`, which is the order-`k`
+conclusion at that compact set. Evans reaches for it at the same point: the datum (36) of
+§6.3.1, Theorem 2 contains `D²u`, and its `H^k` bound is read off the inductive hypothesis
+rather than off the solution's membership of `H₀¹(Ω)`. Passing `hk` here rather than deriving
+it is what keeps the step an induction. -/
 theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
     (hA1 : IsC1Coeff Op.toEllipticCoeff) {k : ℕ}
     (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 3)) (hbc : IsWkInftyLower Op (k + 2))
+    (hk : InteriorRegularityAt Op hΩm k)
     {V : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hVc : IsCompact V) (hVΩ : V ⊆ Ω) :
     ∃ C : ℝ, 0 ≤ C ∧ ∀ (u : H01 Ω) (f : L2D Ω) (M : ℝ)
       (hfk : HasIteratedWeakDerivOn Ω (k + 1) f), IteratedL2Bound hfk M →
@@ -202,7 +212,7 @@ theorem interiorRegularityAt_succ (Op : FullEllipticOp (n + 1))
     InteriorRegularityAt Op hΩm (k + 1) := by
   classical
   intro V hVc hVΩ
-  obtain ⟨C₀, hC₀0, hdat⟩ := exists_cutoffDeriv_weakForm Op hΩm hΩo hA1 hA hbc hVc hVΩ
+  obtain ⟨C₀, hC₀0, hdat⟩ := exists_cutoffDeriv_weakForm Op hΩm hΩo hA1 hA hbc hk hVc hVΩ
   obtain ⟨C₁, hC₁0, hIH⟩ := hk hVc hVΩ
   refine ⟨2 * C₁ * C₀ + 1, by nlinarith [mul_nonneg hC₁0 hC₀0], fun u f M hfk hM hu => ?_⟩
   have hM0 : 0 ≤ M := le_trans (norm_nonneg _) hM.norm_le
