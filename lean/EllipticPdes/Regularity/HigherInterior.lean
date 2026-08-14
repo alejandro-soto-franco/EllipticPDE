@@ -252,7 +252,7 @@ theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
     hHuNbd [ℓ] (Nat.succ_le_succ (Nat.zero_le _))
   refine ⟨⟨Uamb, hUmem⟩, F, HF, ?_, ?_, ?_, ?_⟩
   · -- The cutoff is invisible on the base set, so nothing is lost there.
-    show restrictL2 (Ω := V) (extendL2 hΩm (Uamb 0)) = _
+    change restrictL2 (Ω := V) (extendL2 hΩm (Uamb 0)) = _
     rw [hU0]
     exact restrictL2_extendL2_mulTest_xi hΩm hVm hVΩ T ((u : H1amb Ω) ℓ.succ)
   · -- The weak formulation, carried from test functions by density.
@@ -344,7 +344,7 @@ theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
       _ ≤ (KD * (C₁ + 1) + Cξ * C₁) * (M + ‖(u : H1amb Ω) 0‖) :=
           mul_le_mul_of_nonneg_right (le_add_of_nonneg_right (mul_nonneg hCξ0 hC₁0)) hMu
   · -- The cut-off derivative's norm, read on the collar where the cutoff lives.
-    show ‖Uamb 0‖ ≤ _
+    change ‖Uamb 0‖ ≤ _
     rw [hU0]
     have hag : (mulTest T.hξ ((u : H1amb Ω) ℓ.succ) : EuclideanSpace ℝ (Fin (n + 1)) → ℝ)
         =ᵐ[volume.restrict Ω] fun x => T.ξ x

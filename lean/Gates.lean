@@ -129,6 +129,14 @@ import EllipticPdes
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Regularity.differentiated_weakForm_of_weakSolution
 
+/-- info: 'EllipticPdes.Regularity.higher_interior_regularity' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.higher_interior_regularity
+
+/-- info: 'EllipticPdes.Regularity.exists_gradClosed_of_hasIteratedWeakDerivOn' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.exists_gradClosed_of_hasIteratedWeakDerivOn
+
 /-! ### Campanato's characterisation of Hölder continuity -/
 
 /-- info: 'EllipticPdes.Campanato.campanato_holderOnWith' depends on axioms: [propext, Classical.choice, Quot.sound] -/
@@ -182,6 +190,22 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Embedding.interior_holder_estimate_one' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Embedding.interior_holder_estimate_one
+
+/-- info: 'EllipticPdes.Embedding.memLp_two_mul_of_gradClosed' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.memLp_two_mul_of_gradClosed
+
+/-- info: 'EllipticPdes.Embedding.hasFDerivAt_of_continuousOn_hasWeakGradOn' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.hasFDerivAt_of_continuousOn_hasWeakGradOn
+
+/-- info: 'EllipticPdes.Embedding.contDiffOn_of_gradClosed' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.contDiffOn_of_gradClosed
+
+/-- info: 'EllipticPdes.Regularity.interior_smooth' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.interior_smooth
 
 /-! ### The Poincaré chain the library reduces to -/
 

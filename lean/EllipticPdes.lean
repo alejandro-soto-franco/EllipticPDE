@@ -53,6 +53,7 @@ import EllipticPdes.Regularity.DatumPiece
 import EllipticPdes.Regularity.CutoffDatum
 import EllipticPdes.Regularity.SmoothGlue
 import EllipticPdes.Regularity.HigherInterior
+import EllipticPdes.Regularity.IteratedFamily
 import EllipticPdes.Regularity.InteriorSmooth
 import EllipticPdes.Regularity.DifferentiatedEquation
 import EllipticPdes.Regularity.Boundary.HalfBall

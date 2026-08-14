@@ -128,7 +128,7 @@ theorem exists_collarFamily {Ω W N : Set (EuclideanSpace ℝ (Fin d))}
   have h2 : HasWeakDerivOn W i (restrictL2 (Ω := W) (extendL2 hΩm g))
       (restrictL2 (Ω := W) (extendL2 hΩm (Dg i))) :=
     hasWeakDerivOn_of_hasWeakDeriv i (hDgw i)
-  show restrictL2 (Ω := N) (extendL2 hWm (HuW.D [i])) = _
+  change restrictL2 (Ω := N) (extendL2 hWm (HuW.D [i])) = _
   rw [restrictL2_extendL2_congr_of_weakDerivOn hWm hNm hNW hθW hθN h1 h2,
     restrictL2_extendL2_trans hΩm hWm hNm hNW]
 

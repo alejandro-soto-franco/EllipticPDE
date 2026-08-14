@@ -5,6 +5,8 @@ Authors: Alejandro Soto Franco
 -/
 import EllipticPdes.Regularity.HigherInterior
 import EllipticPdes.Regularity.SmoothGlue
+import EllipticPdes.Regularity.IteratedFamily
+import EllipticPdes.Embedding.SmoothOfGradClosed
 
 /-!
 # Infinite differentiability in the interior
@@ -21,19 +23,22 @@ a fixed `V` needs only that the derivatives exist.
 
 ## What the embedding half requires
 
-`contDiffOn_interior_of_hasIteratedWeakDerivOn` is the missing analytic content, and it is two
-steps rather than one.
+Weak derivatives of every order are handed over one family per order, with nothing relating them,
+so the embedding half starts by assembling them into a single family closed under
+differentiation. Uniqueness of the weak gradient on a ball is what identifies the entries two
+families share (`EllipticPdes.Regularity.exists_gradClosed_of_hasIteratedWeakDerivOn`).
 
-* On a ball inside `V`, `H^{m}` with `m > 1 + (d/2)` puts the first weak derivatives in a
-  Hölder class through `EllipticPdes.Embedding.morrey_ball`, after the Sobolev bootstrap
-  `exists_eLpNorm_sobolevConj_le` has raised the exponent from `2` past `d`. The bootstrap has
-  to be iterated: one Gagliardo-Nirenberg-Sobolev step raises `2` to `2d/(d-2)`, which passes
-  `d` only for `d ≤ 3`, and the same ladder that opens dimensions four and up for the Hölder
-  estimate opens them here.
-* A function whose weak derivatives have continuous representatives is classically
-  differentiable with those derivatives. Iterating that turns `H^m` for every `m` into
-  `ContDiffOn ℝ ⊤`, and the representatives at successive orders agree because weak derivatives
-  are unique almost everywhere, which is `EllipticPdes.Regularity.WeakDerivUnique`.
+From there it is two steps.
+
+* `EllipticPdes.Embedding.memLp_of_gradClosed` raises every member of the family from `L²` to
+  `L^{2d}`, iterating the Gagliardo-Nirenberg-Sobolev step and paying a weak derivative per rung.
+  Since `2d > d` in every dimension, `EllipticPdes.Embedding.morrey_ball` then puts every member
+  in a Hölder class, so the whole family becomes continuous at once.
+* A continuous function with a continuous weak gradient is classically differentiable with that
+  gradient (`EllipticPdes.Embedding.hasFDerivAt_of_continuousOn_hasWeakGradOn`). The derivative
+  of a representative is the representative of the derivative, so an induction on the order reads
+  the family as `C^∞` without shrinking the ball again
+  (`EllipticPdes.Embedding.contDiffOn_of_gradClosed`).
 
 ## Main declarations
 
@@ -55,27 +60,55 @@ variable {n : ℕ}
 /-- **The Sobolev ladder on a ball.** An `L²` class carrying weak derivatives of every order
 has a smooth representative on any ball whose closure sits inside the region.
 
-This is the analytic content of Evans's Theorem 3, and it is two steps. The
-Gagliardo-Nirenberg-Sobolev estimate `EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le`
-raises the exponent from `2` to `2d/(d-2)`, which passes `d` only for `d ≤ 3`, so the ladder
-has to be iterated before `EllipticPdes.Embedding.morrey_ball` puts a derivative of any fixed
-order in a Hölder class. A function whose weak derivatives have continuous representatives is
-then classically differentiable with those derivatives, and iterating that reads `H^m` for
-every `m` as `C^∞`, the representatives at successive orders agreeing almost everywhere by
-`EllipticPdes.Regularity.WeakDerivUnique`.
+This is the analytic content of Evans's Theorem 3, and it is three steps.
 
-The closed ball rather than the open one is asked for because the Sobolev estimate is applied
-to a cutoff of `u` supported in the region, and the cutoff needs room. -/
+* The families of `EllipticPdes.Regularity.HasIteratedWeakDerivOn`, one per order and unrelated
+  to each other, become one family closed under differentiation
+  (`EllipticPdes.Regularity.exists_gradClosed_of_hasIteratedWeakDerivOn`), by uniqueness of the
+  weak gradient on a ball.
+* The ladder `EllipticPdes.Embedding.memLp_two_mul_of_gradClosed` raises every member of that
+  family from `L²` to `L^{2d}`, which passes `d` in every dimension, so
+  `EllipticPdes.Embedding.morrey_ball` gives each a Hölder representative.
+* A continuous function with a continuous weak gradient is classically differentiable
+  (`EllipticPdes.Embedding.hasFDerivAt_of_continuousOn_hasWeakGradOn`), and the derivative of a
+  representative is the representative of the derivative, so an induction on the order reads the
+  family as `C^∞` (`EllipticPdes.Embedding.contDiffOn_of_gradClosed`).
+
+The argument is local, so it runs on balls small enough for the ladder to shrink inside, and
+`exists_contDiffOn_of_locally_ae` collects the local representatives. The closed ball is asked
+for so that every point of the open one has room for that shrinking. -/
 theorem exists_contDiffOn_ball_of_hasIteratedWeakDerivOn
     {V : Set (EuclideanSpace ℝ (Fin (n + 1)))} (u : L2D V)
     (h : ∀ k : ℕ, Nonempty (HasIteratedWeakDerivOn V k u))
-    {x : EuclideanSpace ℝ (Fin (n + 1))} {r : ℝ} (hr : 0 < r)
+    {x : EuclideanSpace ℝ (Fin (n + 1))} {r : ℝ}
     (hball : Metric.closedBall x r ⊆ interior V) :
     ∃ v : EuclideanSpace ℝ (Fin (n + 1)) → ℝ,
       ContDiffOn ℝ (⊤ : ℕ∞) v (Metric.ball x r) ∧
         v =ᵐ[volume.restrict (Metric.ball x r)]
           (u : EuclideanSpace ℝ (Fin (n + 1)) → ℝ) := by
-  sorry
+  have hVsub : Metric.ball x r ⊆ V :=
+    ((Metric.ball_subset_closedBall.trans hball).trans interior_subset)
+  have hloc : ∀ y ∈ Metric.ball x r, ∃ B : Set (EuclideanSpace ℝ (Fin (n + 1))),
+      IsOpen B ∧ y ∈ B ∧ B ⊆ Metric.ball x r ∧
+      ∃ w : EuclideanSpace ℝ (Fin (n + 1)) → ℝ, ContDiffOn ℝ (⊤ : ℕ∞) w B ∧
+        w =ᵐ[volume.restrict B] (u : EuclideanSpace ℝ (Fin (n + 1)) → ℝ) := by
+    intro y hy
+    obtain ⟨ρ, hρ, hρsub⟩ := Metric.isOpen_iff.1 Metric.isOpen_ball y hy
+    have hr1 : (0 : ℝ) < ρ / 4 := by linarith
+    have hr1R1 : ρ / 4 < ρ / 2 := by linarith
+    have hsubV : Metric.ball y (ρ / 2) ⊆ V :=
+      (Metric.ball_subset_ball (by linarith)).trans (hρsub.trans hVsub)
+    obtain ⟨F, hFgrad, hFmem, hF0⟩ := exists_gradClosed_of_hasIteratedWeakDerivOn u h hsubV
+    obtain ⟨w, hwsmooth, hwae⟩ :=
+      EllipticPdes.Embedding.contDiffOn_of_gradClosed
+        (nxt := fun (α : List (Fin (n + 1))) k => k :: α)
+        (Nat.succ_pos n) y hr1 hr1R1 hFgrad hFmem
+    refine ⟨Metric.ball y (ρ / 4), Metric.isOpen_ball, Metric.mem_ball_self hr1,
+      (Metric.ball_subset_ball (by linarith)).trans hρsub, w [], hwsmooth [], ?_⟩
+    rw [← hF0]
+    exact hwae []
+  obtain ⟨v, hvae, hvc⟩ := exists_contDiffOn_of_locally_ae Metric.isOpen_ball _ hloc
+  exact ⟨v, hvc, hvae⟩
 
 /-- **The Sobolev ladder, qualitative form.** An `L²` class on `V` carrying weak derivatives of
 every order has a representative smooth on the interior of `V`. No bound is asked and none is
@@ -96,7 +129,7 @@ theorem contDiffOn_interior_of_hasIteratedWeakDerivOn
   obtain ⟨r, hr, hrsub⟩ := Metric.isOpen_iff.1 isOpen_interior y hy
   refine ⟨Metric.ball y (r / 2), Metric.isOpen_ball, Metric.mem_ball_self (by linarith),
     (Metric.ball_subset_ball (by linarith)).trans hrsub, ?_⟩
-  exact exists_contDiffOn_ball_of_hasIteratedWeakDerivOn u h (by linarith)
+  exact exists_contDiffOn_ball_of_hasIteratedWeakDerivOn u h
     ((Metric.closedBall_subset_ball (by linarith)).trans hrsub)
 
 /-- **Infinite differentiability in the interior (Evans, §6.3.1, Theorem 3, p. 331).** For a

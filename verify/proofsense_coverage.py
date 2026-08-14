@@ -71,6 +71,21 @@ EXEMPT = {
         "poincare_H01_euclBox and poincare_H01_of_bounded are the inequality "
         "itself and carry the warrants"
     ),
+    "EllipticPdes.Embedding.hasFDerivAt_of_continuousOn_hasWeakGradOn": (
+        "a continuous function with a continuous weak gradient is Frechet "
+        "differentiable with that gradient. Evans performs the passage inside "
+        "the proof of 5.6.3 Theorem 6, where a weak derivative with a "
+        "continuous representative is read as a classical one, and states no "
+        "separate lemma, so no transcribed statement matches it"
+    ),
+    "EllipticPdes.Regularity.exists_gradClosed_of_hasIteratedWeakDerivOn": (
+        "bookkeeping with no analytic content of its own: higher interior "
+        "regularity is proved order by order, so the weak derivatives arrive "
+        "as one family per order with nothing relating them, and this "
+        "assembles them into a single family closed under differentiation, by "
+        "uniqueness of the weak gradient on a ball. Evans carries D^alpha u as "
+        "one symbol throughout and never faces the question"
+    ),
     "EllipticPdes.Campanato.campanatoOn_of_holderOnWith": (
         "the converse half of the Campanato characterisation; Fernandez-Real "
         "and Ros-Oton record only the space equality, attributed to Janson, "

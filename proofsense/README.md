@@ -39,8 +39,8 @@ The binary also exposes only `check`; there is no `resolve` subcommand, and
 `check` spawns `lake exe proofsense-lean`, which this lakefile does not declare.
 So no warrant in this manifest has been machine-checked end to end. What **is**
 enforced in CI is `verify/proofsense_coverage.py`, which checks that every
-axiom-gated declaration carries a warrant or a recorded exemption, and that no
-locator names a bare section. That gate passes.
+declaration whose axioms `lean/Gates.lean` pins carries a warrant or a recorded
+exemption, and that no locator names a bare section. It passes.
 
 ## Why the locators name theorems
 
@@ -60,8 +60,8 @@ result in a numbered section, a named result in a section that numbers none
 
 ## Coverage
 
-Thirty-eight of the forty-three declarations gated in `lean/Gates.lean` carry a
-warrant. The five that do not, and why:
+Forty-two of the forty-nine declarations pinned in `lean/Gates.lean` carry a
+warrant. The seven that do not, and why:
 
 | Declaration | State |
 |---|---|
@@ -69,6 +69,8 @@ warrant. The five that do not, and why:
 | `EllipticPdes.Poincare.poincare_domain` | Nothing to cite. It is the averaging step, taking `n` bounds over an arbitrary family and returning their average, with no gradient and no geometry. `poincare_H01_of_bounded` is the Poincaré inequality and is bound in `latex/.adduce/formalization.lock.toml`. |
 | `EllipticPdes.Poincare.poincare_oneDim` | No transcribed target. It is the interval inequality `∫_a^b u² ≤ (b-a)²/2 ∫_a^b (u')²` for `u` continuously differentiable with `u(a) = 0` at the left endpoint alone. Evans §5.6.1 Theorem 3 is the `W_0^{1,p}` statement, which in one dimension asks `u` to vanish at both ends and names no constant, and §5.8.1 Theorems 1 and 2 subtract the mean over a connected `C¹` domain or over a ball. The manuscript records this lemma as the one new analytic ingredient of the Poincaré chain and prepares it for Mathlib. |
 | `EllipticPdes.Poincare.poincare_H01` | Nothing to cite. It is the density step alone, carrying an abstract constant `C` from the test functions to their closure in `H₀¹(Ω)`, with no geometry and no bound on `C`. Evans performs the corresponding passage inside the proof of §5.6.1 Theorem 3, by approximating `u ∈ W_0^{1,p}(U)` with `C_c^∞(U)` functions, and states no separate lemma. |
+| `EllipticPdes.Embedding.hasFDerivAt_of_continuousOn_hasWeakGradOn` | No statement to name. It reads a continuous weak gradient as a classical derivative. Evans performs the passage inside the proof of §5.6.3 Theorem 6, where a weak derivative with a continuous representative is treated as a classical one, and states no separate lemma. |
+| `EllipticPdes.Regularity.exists_gradClosed_of_hasIteratedWeakDerivOn` | Nothing to cite. Higher interior regularity is proved order by order, so the weak derivatives arrive as one family per order with nothing relating them, and this assembles them into a single family closed under differentiation, by uniqueness of the weak gradient on a ball. Evans carries `D^α u` as one symbol throughout and never faces the question. |
 | `EllipticPdes.Campanato.campanatoOn_of_holderOnWith` | No statement to name. It is the converse of property (H3), which Fernández-Real and Ros-Oton record only as the space equality `L^{p,β} = C^{k,α}` in the remark following (H8), attributed to Janson, Taibleson and Weiss and proved there. That source is not transcribed. |
 
 The first two were findings of the 2026-07-22 warrant audit

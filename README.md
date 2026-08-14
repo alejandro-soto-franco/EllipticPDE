@@ -24,7 +24,11 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
 - the complete Fredholm alternative: kernel, index, and solvability,
 - the resolvent bound,
 - spectral compactness of the operator,
-- interior $H^2$ regularity, as `EllipticPdes.Regularity.interior_H2_estimate`, and
+- interior $H^2$ regularity, as `EllipticPdes.Regularity.interior_H2_estimate`,
+- higher interior regularity at every order, as
+  `EllipticPdes.Regularity.higher_interior_regularity`,
+- infinite differentiability in the interior, as
+  `EllipticPdes.Regularity.interior_smooth`, and
 - interior Hölder continuity of the solution at exponent $\tfrac12$ in dimensions
   one, two and three, as `EllipticPdes.Embedding.interior_holder_estimate_one`,
   `interior_holder_estimate_two` and `interior_holder_estimate`.
@@ -35,23 +39,20 @@ Gagliardo-Nirenberg-Sobolev bootstrap `exists_eLpNorm_sobolevConj_le` in general
 dimension and at a general exponent pair, Campanato's characterisation of Hölder
 continuity with its converse, and the Caccioppoli inequality.
 
-Dimension four and above stays open. Morrey needs a gradient in $L^{p'}$ with
-$p' > d$, the interior $H^2$ estimate supplies $L^2$ second derivatives, and
-$1/p' = 1/p - 1/d$ gives $p' > d$ only for $p > d/2$, so the exponent window
-$d/2 < p \le 2$ is empty once $d \ge 4$. One Sobolev step never reaches Morrey
-there; those dimensions need iteration through the $H^k$ ladder.
+Out of $L^2$ data one Sobolev step reaches Morrey only below dimension four:
+$1/p' = 1/p - 1/d$ gives $p' > d$ only for $p > d/2$, and the window
+$d/2 < p \le 2$ is empty once $d \ge 4$. Iterating the step reaches every
+dimension, at the price of a weak derivative per rung, which is what
+`EllipticPdes.Embedding.memLp_of_gradClosed` runs on a family closed under
+differentiation. Smoothness in the interior is that ladder followed by
+`EllipticPdes.Embedding.hasFDerivAt_of_continuousOn_hasWeakGradOn`, which turns a
+continuous weak gradient back into a classical derivative.
 
-Two further chains have their foundations in place and their headline estimates
-open. Higher interior regularity has the admissibility step,
-`EllipticPdes.Regularity.interior_cutoffGrad_mem_H01`, returning the cutoff of a
-first derivative to $H_0^1(\Omega)$, and the differentiated-equation identity
-`differentiated_weakForm_of_weakSolution`, which carries every hypothesis
-discharged from the weak formulation apart from a weak derivative of the datum.
-Boundary $H^2$ regularity has the half-ball geometry, tangential difference
-quotients with their $H_0^1$ admissibility, and the weak quotient rule dividing a
-$C^1$ weight out of a weak derivative. The interior $H^3$ and boundary $H^2$
-estimates themselves are not reached, and Schauder $C^{k,\alpha}$ estimates remain
-a roadmap item.
+Boundary $H^2$ regularity has its foundations in place and its headline estimate
+open: the half-ball geometry, tangential difference quotients with their $H_0^1$
+admissibility, and the weak quotient rule dividing a $C^1$ weight out of a weak
+derivative. The boundary estimate itself is not reached, and Schauder
+$C^{k,\alpha}$ estimates remain a roadmap item.
 
 ## Dependency chain
 
@@ -66,13 +67,13 @@ operator.
 
 - `lean/` the formalisation. A standalone lake project pinned to Lean
   `v4.31.0-rc1`.
-- `lean/Gates.lean` axiom gates for the headline results, built as a target of
-  its own.
+- `lean/Gates.lean` pins the axiom set of each headline result with
+  `#print axioms` under `#guard_msgs`, built as a target of its own.
 
 ## Build
 
 ```bash
-cd lean && lake build      # includes the axiom gates in Gates.lean
+cd lean && lake build      # includes the axiom pins in Gates.lean
 cd lean && lake lint       # environment-level linter
 ```
 

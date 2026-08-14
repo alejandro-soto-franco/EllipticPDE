@@ -185,6 +185,18 @@
       "claim": "formalises the inequality at d = 2 and p = 4/3, whose Sobolev conjugate is 4, applied to L² data on a ball"
     },
     {
+      "decl": "EllipticPdes.Embedding.memLp_two_mul_of_gradClosed",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "formalises clause (i) iterated, on a family closed under weak differentiation in place of a single W^{k,p} function: L^2 data whose weak gradients are again members lies in L^{2d} on any smaller concentric ball. Evans reads the exponent off 1/q = 1/p - k/n in one step, under k < n/p; the ladder here takes d - 1 rungs of 1/(2d) each, which holds every intermediate reciprocal strictly positive and lands past d in every dimension. Membership alone is stated, the constant of each rung being absorbed"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.contDiffOn_of_gradClosed",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "formalises clause (ii) at every order at once, on a family closed under weak differentiation in place of a single W^{k,p} function: on a smaller concentric ball every member has a representative in C^infty. Evans asks k > n/p and returns C^{k - [n/p] - 1, gamma} of the closure; with derivatives of every order available the Holder exponent plays no part, and the conclusion is smoothness on the open ball. The representatives are produced together, one per member, since the derivative of the representative of a member has to be the representative of that member's derivative"
+    },
+    {
       "decl": "EllipticPdes.Regularity.cutoffMulOn_tangDiffQuotG_mem_H01",
       "source_id": "evans-2010",
       "locator": "§6.3.2 Thm 4",
@@ -201,6 +213,12 @@
       "source_id": "evans-2010",
       "locator": "§6.3.2 Thm 4",
       "claim": "formalises the L^2 form of Evans' estimate (55) at the diagonal coefficient, with the lower bound a^{nn} >= theta of (54) discharged from ellipticity at xi = e_n and the derivative bound discharged from IsC1Coeff The step is proof step 5 of that theorem, equations (54) and (55)."
+    },
+    {
+      "decl": "EllipticPdes.Regularity.interior_smooth",
+      "source_id": "evans-2010",
+      "locator": "§6.3.1 Thm 3",
+      "claim": "formalises the theorem for a weak solution quantified over H_0^1(Omega) rather than Evans' H^1(U), and for coefficients in W^{k,infty} at every order rather than C^infty: the solution has a representative smooth on the interior of each compact V inside Omega. Evans states u in C^infty(U) for smooth coefficients and datum, which is an instance through IsCkCoeff.toIsWkInftyCoeff and IsWkInfty.ofContDiff. The conclusion names a representative, an L^2 class having no pointwise values, and it is smooth on the interior of V rather than on V, since smoothness is a statement about an open set"
     },
     {
       "decl": "EllipticPdes.Regularity.HasWeakDeriv.unique",
@@ -231,6 +249,12 @@
       "source_id": "evans-2010",
       "locator": "§6.3.1 Thm 2",
       "claim": "formalises equation (34) at |alpha| = 1 for a weak solution quantified over H_0^1(Omega) rather than Evans' H^1(U): on any compact V inside Omega the second weak derivatives exist with the interior H^2 bound, and the differentiated identity holds against every test function supported in V, with the datum delivered as the explicit lower-order sum of (36) rather than packaged as a single L^2 class. The weak l-derivative of f is carried as a hypothesis, since Evans (26) assumes f in H^m(U) and the datum (36) contains D^alpha f, which f in L^2 alone does not supply. The step is proof step 3 of that theorem, equations (34) to (36)."
+    },
+    {
+      "decl": "EllipticPdes.Regularity.higher_interior_regularity",
+      "source_id": "evans-2010",
+      "locator": "§6.3.1 Thm 2",
+      "claim": "formalises the theorem for a weak solution quantified over H_0^1(Omega) rather than Evans' H^1(U), and for coefficients in W^{k,infty} rather than C^{k+1} of the closure: on every compact V inside Omega the solution carries weak derivatives to order k + 2, with one constant bounding all of them by the L^2 norms of the solution and of the datum's derivatives. Evans states the conclusion as u in H^{k+2}(V) with the estimate; the family indexed by lists of directions carries the same data, named so that the induction can hand a derivative on. The datum's derivatives are a hypothesis with a bound, where Evans takes f in H^k(U)"
     },
     {
       "decl": "EllipticPdes.Poincare.intervalIntegral_mul_sq_le",
