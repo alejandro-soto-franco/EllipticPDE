@@ -28,6 +28,8 @@ anything else the induction differentiates.
 * `IsWkInfty`: weak derivatives to order `k` of a scalar function, essentially bounded.
 * `IsWkInfty.deriv`: an order-`k+1` bundle for `f` gives an order-`k` bundle for `∂_l f`.
 * `IsWkInfty.ofContDiff`: a `Cᵏ` function with bounded derivatives satisfies it.
+* `IsWkInfty.const`: a constant satisfies it at every order.
+* `IsWkInftyCoeff.entry`: one entry of the coefficient matrix, as a scalar bundle.
 * `IsWkInftyLower`: Guo's hypothesis on `b` and `c`, with a uniform constant.
 -/
 
@@ -121,7 +123,33 @@ def ofContDiff {B : ℕ → ℝ} (hf : ContDiff ℝ ((k : ℕ) : ℕ∞) f) (hB 
     Filter.Eventually.of_forall fun x =>
       (abs_iterPartial_le α hα hf x).trans (hbd α.length hα x)
 
+/-- **A constant lies in `W^{k,∞}` at every order.** Its derivatives past the zeroth vanish, so
+one bound serves every order. The datum of the induction step carries a term with no coefficient
+at all, namely the derivative of the datum itself, and this is what lets it be treated as a
+weighted term like the rest. -/
+def const (c : ℝ) (k : ℕ) : IsWkInfty (fun _ : EuclideanSpace ℝ (Fin d) => c) k :=
+  IsWkInfty.ofContDiff (B := fun _ => |c|) contDiff_const (fun _ => abs_nonneg c) (by
+    intro m _ x
+    rcases Nat.eq_zero_or_pos m with hm | hm
+    · subst hm
+      rw [norm_iteratedFDeriv_zero, Real.norm_eq_abs]
+    · rw [iteratedFDeriv_const_of_ne (by omega)]
+      simp [abs_nonneg c])
+
 end IsWkInfty
+
+/-- **A single entry of the coefficient matrix is a `W^{k,∞}` function.** The matrix bundle
+already carries a family for each entry, so the scalar bundle is that family read at a fixed
+pair of indices. -/
+def IsWkInftyCoeff.entry {A : EllipticCoeff d} {k : ℕ} (hA : IsWkInftyCoeff A k) (i j : Fin d) :
+    IsWkInfty (fun x => A.a x i j) k where
+  D α := hA.D α i j
+  D_nil := hA.D_nil i j
+  D_meas α hα := hA.D_meas i j α hα
+  D_step l α hα := hA.D_step i j l α hα
+  bound := hA.bound
+  bound_nonneg := hA.bound_nonneg
+  ess_bdd α hα := hA.ess_bdd i j α hα
 
 /-! ### The bundle over the lower-order coefficients -/
 
