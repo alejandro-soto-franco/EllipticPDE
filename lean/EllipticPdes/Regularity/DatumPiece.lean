@@ -5,6 +5,7 @@ Authors: Alejandro Soto Franco
 -/
 import EllipticPdes.Regularity.ExtendCutoff
 import EllipticPdes.Regularity.L2Pairing
+import EllipticPdes.Regularity.IteratedSum
 
 /-!
 # One piece of the differentiated datum
@@ -28,6 +29,7 @@ almost-everywhere description both of them are stated against.
 ## Main declarations
 
 * `exists_datum_piece`: the class, its family, its bound, and its pairing.
+* `exists_datum_of_pieces`: a finite family of pieces, assembled.
 -/
 
 open MeasureTheory
@@ -106,5 +108,35 @@ theorem exists_datum_piece {Ω N : Set (EuclideanSpace ℝ (Fin d))}
   refine integral_congr_ae ?_
   filter_upwards [mulL2_coeFn ha.measurable_self ha.ae_abs_le p] with x hx
   rw [hx]
+
+/-- **A finite family of pieces, assembled.** The datum of the induction step is a fixed finite
+list of shapes, each a cutoff against a coefficient against a derivative, and only the
+derivatives depend on the solution. Quantifying the constant before the derivatives is what
+carries that through: the cutoffs and coefficients are data of the operator and the tower, so
+their constants are summed once.
+
+The pairing is asked of a test function rather than of an arbitrary weight, since splitting the
+integral of the sum into the sum of the integrals is where integrability enters. -/
+theorem exists_datum_of_pieces {Ω N : Set (EuclideanSpace ℝ (Fin d))}
+    (hNm : MeasurableSet N) (hNΩ : N ⊆ Ω) (k : ℕ) {ι : Type*} [Fintype ι]
+    {χ : ι → EuclideanSpace ℝ (Fin d) → ℝ} (hχ : ∀ t, IsTestFn N (χ t))
+    {a : ι → EuclideanSpace ℝ (Fin d) → ℝ} (ha : ∀ t, IsWkInfty (a t) k) :
+    ∃ K : ℝ, 0 ≤ K ∧ ∀ (p : ι → L2D N) (hp : ∀ t, HasIteratedWeakDerivOn N k (p t)) {M : ℝ},
+      (∀ t, IteratedL2Bound (hp t) M) →
+      ∃ (F : L2D Ω) (HF : HasIteratedWeakDerivOn Ω k F),
+        IteratedL2Bound HF (K * M) ∧
+        ∀ v : EuclideanSpace ℝ (Fin d) → ℝ, ContDiff ℝ (⊤ : ℕ∞) v → HasCompactSupport v →
+          (∫ x in Ω, (F x : ℝ) * v x)
+            = ∑ t, ∫ x in N, χ t x * (a t x * (p t x : ℝ)) * v x := by
+  classical
+  choose K hK hP using fun t => exists_datum_piece hNm hNΩ k (hχ t) (ha t)
+  refine ⟨∑ t, K t, Finset.sum_nonneg fun t _ => hK t, ?_⟩
+  intro p hp M hM
+  choose q Hq hqbd hqpair using fun t => hP t (hp t) (hM t)
+  refine ⟨∑ t, q t, HasIteratedWeakDerivOn.sum Hq, ?_, fun v hvc hvcs => ?_⟩
+  · have hsum := IteratedL2Bound.sum (H := Hq) (C := fun t => K t * M) hqbd
+    rwa [← Finset.sum_mul] at hsum
+  · rw [setIntegral_sum_mul_testFn q hvc hvcs]
+    exact Finset.sum_congr rfl fun t _ => hqpair t v
 
 end EllipticPdes.Regularity
