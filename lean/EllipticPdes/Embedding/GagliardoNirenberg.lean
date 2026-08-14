@@ -25,11 +25,11 @@ exactly when `p ≤ 2`, so a single Sobolev step feeds Morrey precisely when the
 * `d = 1`: Morrey applies to the first-order gradient at `p = 2 > 1`, so no bootstrap is needed.
 * `d = 2`: `p = 4/3` has conjugate `4 > 2` (`exists_eLpNorm_four_le`).
 * `d = 3`: `p = 2` has conjugate `6 > 3` (`exists_eLpNorm_six_le`).
-* `d ≥ 4`: the window is empty, since `d/2 ≥ 2`. One Sobolev step never reaches `p' > d` there,
-  and closing those dimensions requires iteration through the `H^k` ladder, which this
-  library does not yet carry.
+* `d ≥ 4`: the window is empty, since `d/2 ≥ 2`, so one Sobolev step never reaches `p' > d`.
 
-The bootstrap itself holds in every dimension. Only its composition with Morrey is limited.
+The bootstrap itself holds in every dimension. Only its composition with Morrey out of `L²` data
+is limited, and `EllipticPdes.Embedding.memLp_of_gradClosed` lifts that limit by iterating the
+step, at the price of a weak derivative per rung.
 
 Mathlib's `MeasureTheory.eLpNorm_le_eLpNorm_fderiv_of_eq` asks for `ContDiff ℝ 1` and compact
 support, neither of which an `Lᵖ` class with weak derivatives has. Two devices bridge that.

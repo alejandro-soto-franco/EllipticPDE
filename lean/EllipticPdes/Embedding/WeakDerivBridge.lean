@@ -13,12 +13,17 @@ The `L²` weak derivatives produced by `interior_H2_estimate` are pointwise weak
 gradients in the sense of the embedding layer, so the Morrey inequality consumes them
 directly at `p = 2`, hence in dimension one.
 
-Higher dimensions need an `Lᵖ` bootstrap first, since Morrey asks for `p > d`. Dimension three
-is covered in `EllipticPdes.Embedding.GagliardoNirenberg`, where the Gagliardo-Nirenberg-Sobolev
-inequality raises the gradient from `L²` to `L⁶`, and the two resulting Hölder estimates are
-`EllipticPdes.Embedding.interior_holder_estimate_one` and
-`EllipticPdes.Embedding.interior_holder_estimate`. Dimension two is open: at `n = 2` and `p = 2`
-the sharp Gagliardo-Nirenberg-Sobolev inequality needs `p < n`, which fails.
+Higher dimensions need an `Lᵖ` bootstrap first, since Morrey asks for `p > d`. Dimensions two and
+three are covered in `EllipticPdes.Embedding.GagliardoNirenberg`, where the
+Gagliardo-Nirenberg-Sobolev inequality raises the gradient from `L²` to `L⁶` at `d = 3` and, over
+the finite measure of a ball, from `L^{4/3}` to `L⁴` at `d = 2`. The three resulting Hölder
+estimates are `EllipticPdes.Embedding.interior_holder_estimate_one`,
+`EllipticPdes.Embedding.interior_holder_estimate_two` and
+`EllipticPdes.Embedding.interior_holder_estimate`.
+
+Dimension four and above needs the step iterated, which costs a weak derivative per rung and so
+asks for more than the `H²` estimate supplies. `EllipticPdes.Embedding.memLp_of_gradClosed` runs
+that ladder on a family closed under differentiation.
 -/
 
 open MeasureTheory Set Metric

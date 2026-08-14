@@ -77,6 +77,10 @@ import EllipticPdes.Campanato.Telescope
 import EllipticPdes.Campanato.Holder
 import EllipticPdes.Campanato.Converse
 import EllipticPdes.Embedding.GagliardoNirenberg
+import EllipticPdes.Embedding.SobolevLadder
+import EllipticPdes.Embedding.WeakGradUnique
+import EllipticPdes.Embedding.ClassicalDeriv
+import EllipticPdes.Embedding.SmoothOfGradClosed
 import EllipticPdes.Embedding.InteriorHolder
 import EllipticPdes.Fredholm.Fredholm
 import EllipticPdes.Fredholm.FredholmComplete
