@@ -43,6 +43,7 @@ import EllipticPdes.Regularity.HigherWeakDeriv
 import EllipticPdes.Regularity.MulIterated
 import EllipticPdes.Regularity.IteratedSum
 import EllipticPdes.Regularity.IteratedRestrict
+import EllipticPdes.Regularity.L2Pairing
 import EllipticPdes.Regularity.ExtendCutoff
 import EllipticPdes.Regularity.WeakDerivOnSymm
 import EllipticPdes.Regularity.CutoffGradFormula

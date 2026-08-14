@@ -45,7 +45,9 @@ the weight change at each step without leaving the hypothesis.
 ## Main declarations
 
 * `isTestFn_partialD`: test functions are closed under a classical partial derivative.
+* `setIntegral_mul_mulTest_partialD`: the integration by parts the cutoff makes admissible.
 * `HasWeakDerivOn.extend_mulTest`: one weak derivative, from `W` to `Ω`, across a cutoff.
+* `hasWeakDeriv_extend_mulTest`: the same, on the whole space.
 * `exists_iteratedWeakDeriv_extend_mulTest`: the order-`k` family and its bound.
 -/
 
@@ -84,32 +86,29 @@ private theorem coeFn_extendL2_restrict {W : Set (EuclideanSpace ℝ (Fin d))}
   filter_upwards [ae_restrict_of_ae (coeFn_extendL2 hWm p), ae_restrict_mem hWm] with x h1 h2
   rw [h1, Set.indicator_of_mem h2]
 
-/-! ### One derivative across the cutoff -/
+/-! ### The integration by parts the cutoff makes admissible -/
 
-/-- **A cutoff carries one weak derivative from `W` up to `Ω`.** For a test function `χ`
-supported in `W ⊆ Ω` and a weak `ℓ`-derivative `p'` of `p` on `W`, any `L²(Ω)` class
-representing `χ·p` has `(∂_ℓχ)·p + χ·p'` as its weak `ℓ`-derivative on `Ω`.
+/-- **Integration by parts against a cut-off test function.** For `χ` supported in `W` and a
+weak `ℓ`-derivative `p'` of `p` on `W`,
 
-The classes are given through a.e. representations rather than as named products, matching
-`EllipticPdes.Regularity.norm_le_of_ae_mul`, because the consumers assemble their own.
+`∫_W p · (χ ∂_ℓφ) = - ∫_W ((∂_ℓχ)p + χp') · φ`
 
-The proof tests the `W`-derivative against `χφ`, which is admissible because `χ` is supported
-in `W`, and reads the Leibniz expansion of `∂_ℓ(χφ)` backwards. Each integral over `Ω` becomes
-one over `W` because `χ` vanishes off its support. -/
-theorem HasWeakDerivOn.extend_mulTest {W Ω : Set (EuclideanSpace ℝ (Fin d))}
-    (hWm : MeasurableSet W) (hWΩ : W ⊆ Ω)
+for every smooth `φ`, asking neither compact support nor a support condition of it. The product
+`χφ` is compactly supported in `tsupport χ ⊆ W` whatever `φ` does, so it is admissible for the
+weak derivative, and expanding `∂_ℓ(χφ)` moves the term where the derivative lands on the
+cutoff across.
+
+This is the one identity the cutoff buys, and everything else in this file and in Evans's step
+3 is bookkeeping around it. -/
+theorem setIntegral_mul_mulTest_partialD {W : Set (EuclideanSpace ℝ (Fin d))}
     {χ : EuclideanSpace ℝ (Fin d) → ℝ} (hχ : IsTestFn W χ) {ℓ : Fin d} {p p' : L2D W}
-    (h : HasWeakDerivOn W ℓ p p') {q q' : L2D Ω}
-    (hq : q =ᵐ[volume.restrict Ω] fun x => χ x * (extendL2 hWm p x : ℝ))
-    (hq' : q' =ᵐ[volume.restrict Ω] fun x =>
-      partialD ℓ χ x * (extendL2 hWm p x : ℝ) + χ x * (extendL2 hWm p' x : ℝ)) :
-    HasWeakDerivOn Ω ℓ q q' := by
-  intro φ hφc hφcs hφΩ
+    (h : HasWeakDerivOn W ℓ p p') {φ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hφc : ContDiff ℝ (⊤ : ℕ∞) φ) :
+    (∫ x in W, (p x : ℝ) * (χ x * partialD ℓ φ x))
+      = -∫ x in W, (partialD ℓ χ x * (p x : ℝ) + χ x * (p' x : ℝ)) * φ x := by
   haveI : ENNReal.HolderTriple (2 : ENNReal) 2 1 := ⟨by rw [ENNReal.inv_two_add_inv_two, inv_one]⟩
   have hχd : Differentiable ℝ χ := hχ.1.differentiable (by simp)
   have hφd : Differentiable ℝ φ := hφc.differentiable (by simp)
-  have hEp := coeFn_extendL2_restrict hWm p
-  have hEp' := coeFn_extendL2_restrict hWm p'
   -- The three continuous compactly supported weights the identity is tested against.
   have hAc : Continuous fun x => χ x * partialD ℓ φ x :=
     hχ.continuous.mul (contDiff_partialD hφc ℓ).continuous
@@ -132,7 +131,7 @@ theorem HasWeakDerivOn.extend_mulTest {W Ω : Set (EuclideanSpace ℝ (Fin d))}
     (Lp.memLp p).integrable_mul hBL
   have iC : Integrable (fun x => (p' x : ℝ) * (χ x * φ x)) (volume.restrict W) :=
     (Lp.memLp p').integrable_mul hCL
-  -- The derivative on `W`, tested against `χφ`.
+  -- The derivative on `W`, tested against the admissible `χφ`.
   have key := h (fun x => χ x * φ x) (hχ.1.mul hφc) hCcs
     (tsupport_mul_subset_left.trans hχ.2.2)
   rw [partialD_mul hχd hφd ℓ] at key
@@ -142,6 +141,37 @@ theorem HasWeakDerivOn.extend_mulTest {W Ω : Set (EuclideanSpace ℝ (Fin d))}
     rw [← integral_add iA iB]
     exact integral_congr_ae (Filter.Eventually.of_forall fun x => by ring)
   rw [hsplit] at key
+  have hmerge : (∫ x in W, (partialD ℓ χ x * (p x : ℝ) + χ x * (p' x : ℝ)) * φ x)
+      = (∫ x in W, (p x : ℝ) * (partialD ℓ χ x * φ x))
+        + ∫ x in W, (p' x : ℝ) * (χ x * φ x) := by
+    rw [← integral_add iB iC]
+    exact integral_congr_ae (Filter.Eventually.of_forall fun x => by ring)
+  rw [hmerge]
+  linarith [key]
+
+/-! ### One derivative across the cutoff -/
+
+/-- **A cutoff carries one weak derivative from `W` up to `Ω`.** For a test function `χ`
+supported in `W ⊆ Ω` and a weak `ℓ`-derivative `p'` of `p` on `W`, any `L²(Ω)` class
+representing `χ·p` has `(∂_ℓχ)·p + χ·p'` as its weak `ℓ`-derivative on `Ω`.
+
+The classes are given through a.e. representations rather than as named products, matching
+`EllipticPdes.Regularity.norm_le_of_ae_mul`, because the consumers assemble their own.
+
+The proof tests the `W`-derivative against `χφ`, which is admissible because `χ` is supported
+in `W`, and reads the Leibniz expansion of `∂_ℓ(χφ)` backwards. Each integral over `Ω` becomes
+one over `W` because `χ` vanishes off its support. -/
+theorem HasWeakDerivOn.extend_mulTest {W Ω : Set (EuclideanSpace ℝ (Fin d))}
+    (hWm : MeasurableSet W) (hWΩ : W ⊆ Ω)
+    {χ : EuclideanSpace ℝ (Fin d) → ℝ} (hχ : IsTestFn W χ) {ℓ : Fin d} {p p' : L2D W}
+    (h : HasWeakDerivOn W ℓ p p') {q q' : L2D Ω}
+    (hq : q =ᵐ[volume.restrict Ω] fun x => χ x * (extendL2 hWm p x : ℝ))
+    (hq' : q' =ᵐ[volume.restrict Ω] fun x =>
+      partialD ℓ χ x * (extendL2 hWm p x : ℝ) + χ x * (extendL2 hWm p' x : ℝ)) :
+    HasWeakDerivOn Ω ℓ q q' := by
+  intro φ hφc _hφcs _hφΩ
+  have hEp := coeFn_extendL2_restrict hWm p
+  have hEp' := coeFn_extendL2_restrict hWm p'
   -- The left-hand side, moved down to `W`.
   have hL : (∫ x in Ω, (q x : ℝ) * partialD ℓ φ x)
       = ∫ x in W, (p x : ℝ) * (χ x * partialD ℓ φ x) := by
@@ -157,10 +187,9 @@ theorem HasWeakDerivOn.extend_mulTest {W Ω : Set (EuclideanSpace ℝ (Fin d))}
     filter_upwards [hEp] with x hx
     rw [hx]
     ring
-  -- The right-hand side, moved down to `W` and split.
+  -- The right-hand side, moved down to `W`.
   have hR : (∫ x in Ω, (q' x : ℝ) * φ x)
-      = (∫ x in W, (p x : ℝ) * (partialD ℓ χ x * φ x))
-        + ∫ x in W, (p' x : ℝ) * (χ x * φ x) := by
+      = ∫ x in W, (partialD ℓ χ x * (p x : ℝ) + χ x * (p' x : ℝ)) * φ x := by
     have e1 : (∫ x in Ω, (q' x : ℝ) * φ x)
         = ∫ x in Ω, (partialD ℓ χ x * (extendL2 hWm p x : ℝ)
             + χ x * (extendL2 hWm p' x : ℝ)) * φ x := by
@@ -172,13 +201,11 @@ theorem HasWeakDerivOn.extend_mulTest {W Ω : Set (EuclideanSpace ℝ (Fin d))}
         show partialD ℓ χ x = 0 from image_eq_zero_of_notMem_tsupport
           (fun hc => hx (hχ.2.2 (tsupport_partialD_subset ℓ χ hc)))]
       ring)]
-    rw [← integral_add iB iC]
     refine integral_congr_ae ?_
     filter_upwards [hEp, hEp'] with x h1 h2
     rw [h1, h2]
-    ring
   rw [hL, hR]
-  linarith [key]
+  exact setIntegral_mul_mulTest_partialD hχ h hφc
 
 /-- **A cutoff carries one weak derivative from `W` up to the whole space.** The same identity
 as `HasWeakDerivOn.extend_mulTest` with the ambient set taken to be everything, which is the
@@ -193,42 +220,9 @@ theorem hasWeakDeriv_extend_mulTest {W : Set (EuclideanSpace ℝ (Fin d))}
     (hq' : q' =ᵐ[volume] fun x =>
       partialD ℓ χ x * (extendL2 hWm p x : ℝ) + χ x * (extendL2 hWm p' x : ℝ)) :
     HasWeakDeriv ℓ q q' := by
-  intro φ hφc hφcs
-  haveI : ENNReal.HolderTriple (2 : ENNReal) 2 1 := ⟨by rw [ENNReal.inv_two_add_inv_two, inv_one]⟩
-  have hχd : Differentiable ℝ χ := hχ.1.differentiable (by simp)
-  have hφd : Differentiable ℝ φ := hφc.differentiable (by simp)
+  intro φ hφc _hφcs
   have hEp := coeFn_extendL2_restrict hWm p
   have hEp' := coeFn_extendL2_restrict hWm p'
-  have hAc : Continuous fun x => χ x * partialD ℓ φ x :=
-    hχ.continuous.mul (contDiff_partialD hφc ℓ).continuous
-  have hBc : Continuous fun x => partialD ℓ χ x * φ x :=
-    (hχ.continuous_partialD ℓ).mul hφc.continuous
-  have hCc : Continuous fun x => χ x * φ x := hχ.continuous.mul hφc.continuous
-  have hAcs : HasCompactSupport fun x => χ x * partialD ℓ φ x := hχ.2.1.mul_right
-  have hBcs : HasCompactSupport fun x => partialD ℓ χ x * φ x :=
-    (hχ.hasCompactSupport_partialD ℓ).mul_right
-  have hCcs : HasCompactSupport fun x => χ x * φ x := hχ.2.1.mul_right
-  have hAL : MemLp (fun x => χ x * partialD ℓ φ x) 2 (volume.restrict W) :=
-    (hAc.memLp_of_hasCompactSupport (p := 2) (μ := volume) hAcs).restrict W
-  have hBL : MemLp (fun x => partialD ℓ χ x * φ x) 2 (volume.restrict W) :=
-    (hBc.memLp_of_hasCompactSupport (p := 2) (μ := volume) hBcs).restrict W
-  have hCL : MemLp (fun x => χ x * φ x) 2 (volume.restrict W) :=
-    (hCc.memLp_of_hasCompactSupport (p := 2) (μ := volume) hCcs).restrict W
-  have iA : Integrable (fun x => (p x : ℝ) * (χ x * partialD ℓ φ x)) (volume.restrict W) :=
-    (Lp.memLp p).integrable_mul hAL
-  have iB : Integrable (fun x => (p x : ℝ) * (partialD ℓ χ x * φ x)) (volume.restrict W) :=
-    (Lp.memLp p).integrable_mul hBL
-  have iC : Integrable (fun x => (p' x : ℝ) * (χ x * φ x)) (volume.restrict W) :=
-    (Lp.memLp p').integrable_mul hCL
-  have key := h (fun x => χ x * φ x) (hχ.1.mul hφc) hCcs
-    (tsupport_mul_subset_left.trans hχ.2.2)
-  rw [partialD_mul hχd hφd ℓ] at key
-  have hsplit : (∫ x in W, (p x : ℝ) * (χ x * partialD ℓ φ x + partialD ℓ χ x * φ x))
-      = (∫ x in W, (p x : ℝ) * (χ x * partialD ℓ φ x))
-        + ∫ x in W, (p x : ℝ) * (partialD ℓ χ x * φ x) := by
-    rw [← integral_add iA iB]
-    exact integral_congr_ae (Filter.Eventually.of_forall fun x => by ring)
-  rw [hsplit] at key
   have hL : (∫ x, (q x : ℝ) * partialD ℓ φ x)
       = ∫ x in W, (p x : ℝ) * (χ x * partialD ℓ φ x) := by
     have e1 : (∫ x, (q x : ℝ) * partialD ℓ φ x)
@@ -244,8 +238,7 @@ theorem hasWeakDeriv_extend_mulTest {W : Set (EuclideanSpace ℝ (Fin d))}
     rw [hx]
     ring
   have hR : (∫ x, (q' x : ℝ) * φ x)
-      = (∫ x in W, (p x : ℝ) * (partialD ℓ χ x * φ x))
-        + ∫ x in W, (p' x : ℝ) * (χ x * φ x) := by
+      = ∫ x in W, (partialD ℓ χ x * (p x : ℝ) + χ x * (p' x : ℝ)) * φ x := by
     have e1 : (∫ x, (q' x : ℝ) * φ x)
         = ∫ x, (partialD ℓ χ x * (extendL2 hWm p x : ℝ)
             + χ x * (extendL2 hWm p' x : ℝ)) * φ x := by
@@ -257,13 +250,11 @@ theorem hasWeakDeriv_extend_mulTest {W : Set (EuclideanSpace ℝ (Fin d))}
         show partialD ℓ χ x = 0 from image_eq_zero_of_notMem_tsupport
           (fun hc => hx (hχ.2.2 (tsupport_partialD_subset ℓ χ hc)))]
       ring)]
-    rw [← integral_add iB iC]
     refine integral_congr_ae ?_
     filter_upwards [hEp, hEp'] with x h1 h2
     rw [h1, h2]
-    ring
   rw [hL, hR]
-  linarith [key]
+  exact setIntegral_mul_mulTest_partialD hχ h hφc
 
 /-! ### The order-`k` family across the cutoff -/
 
