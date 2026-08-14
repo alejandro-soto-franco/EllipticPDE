@@ -26,6 +26,8 @@ because it is an inner product against a fixed vector: `⟪f, w₀⟫ = ⟪singl
 * `datumL`: the datum functional `w ↦ ∫_Ω f w₀`, as a continuous linear map on `H₀¹(Ω)`.
 * `eq_of_eq_on_testGraphs`: two continuous linear functionals agreeing on every
   test-function graph agree on `H₀¹(Ω)`.
+* `fullBilin_testGraph_eq`: the bilinear pairing against a test-function graph, as plain
+  integrals.
 * `weakForm_of_testFn`: the weak formulation, from test functions to `H₀¹(Ω)`.
 -/
 
@@ -93,6 +95,65 @@ theorem eq_of_eq_on_testGraphs (F G : H01 Ω →L[ℝ] ℝ)
     (G.continuous.tendsto w).comp hyt
   refine tendsto_nhds_unique ?_ h2
   simpa only [hFG] using h1
+
+/-- **The bilinear pairing against a test-function graph, as plain integrals.** Each block of
+`Op.fullBilin` is an inner product of a coefficient action against a coordinate of the graph,
+and each such inner product is an integral over `Ω` of the coefficient against the two
+representatives. The gradient coordinate of a test function's graph is the classical partial
+derivative and the function coordinate is the function, so no weak derivative survives on the
+test side.
+
+`EllipticPdes.Regularity.localWeakForm_of_fullBilin` reads the same unfolding on a measurable
+`V ⊆ Ω` for a solution known to satisfy the weak formulation. Here nothing is assumed of `U`,
+which is what the converse direction needs: `weakForm_of_testFn` asks for the pairing against
+every test graph, and a differentiated equation produces plain integrals. -/
+theorem fullBilin_testGraph_eq (Op : FullEllipticOp d) (U : H01 Ω)
+    {v : EuclideanSpace ℝ (Fin d) → ℝ} (hv : IsTestFn Ω v) :
+    Op.fullBilin Ω U ⟨hv.testGraph, testGraph_mem_H01 hv⟩
+      = (∑ i : Fin d, ∑ j : Fin d, ∫ x in Ω, Op.a x i j
+            * ((U : H1amb Ω) i.succ x : ℝ) * partialD j v x)
+        + (∑ i : Fin d, ∫ x in Ω, Op.b x i * ((U : H1amb Ω) i.succ x : ℝ) * v x)
+        + ∫ x in Ω, Op.c x * ((U : H1amb Ω) 0 x : ℝ) * v x := by
+  classical
+  -- The two coordinate representatives of the graph.
+  have hgrad : ∀ j : Fin d, (hv.testGraph j.succ : EuclideanSpace ℝ (Fin d) → ℝ)
+      =ᵐ[volume.restrict Ω] partialD j v := by
+    intro j
+    rw [IsTestFn.testGraph_succ]
+    exact (hv.memLp_partialD j).coeFn_toLp
+  have hfun : (hv.testGraph 0 : EuclideanSpace ℝ (Fin d) → ℝ) =ᵐ[volume.restrict Ω] v := by
+    rw [IsTestFn.testGraph_zero]
+    exact hv.mem_lp.coeFn_toLp
+  have hprin : ∀ i j : Fin d,
+      ⟪Op.toEllipticCoeff.actL i j ((U : H1amb Ω) i.succ), hv.testGraph j.succ⟫
+        = ∫ x in Ω, Op.a x i j * ((U : H1amb Ω) i.succ x : ℝ) * partialD j v x := by
+    intro i j
+    rw [Op.toEllipticCoeff.inner_actL_eq i j]
+    refine integral_congr_ae ?_
+    filter_upwards [hgrad j] with x hx
+    rw [hx]
+  have htrans : ∀ i : Fin d, ⟪Op.bAct i ((U : H1amb Ω) i.succ), hv.testGraph 0⟫
+      = ∫ x in Ω, Op.b x i * ((U : H1amb Ω) i.succ x : ℝ) * v x := by
+    intro i
+    rw [show ⟪Op.bAct i ((U : H1amb Ω) i.succ), hv.testGraph 0⟫
+        = ∫ x in Ω, Op.b x i * ((U : H1amb Ω) i.succ x : ℝ) * (hv.testGraph 0 x : ℝ) from
+      inner_mulCoeffL_eq _ _ _ _]
+    refine integral_congr_ae ?_
+    filter_upwards [hfun] with x hx
+    rw [hx]
+  have hzero : ⟪Op.cAct ((U : H1amb Ω) 0), hv.testGraph 0⟫
+      = ∫ x in Ω, Op.c x * ((U : H1amb Ω) 0 x : ℝ) * v x := by
+    rw [show ⟪Op.cAct ((U : H1amb Ω) 0), hv.testGraph 0⟫
+        = ∫ x in Ω, Op.c x * ((U : H1amb Ω) 0 x : ℝ) * (hv.testGraph 0 x : ℝ) from
+      inner_mulCoeffL_eq _ _ _ _]
+    refine integral_congr_ae ?_
+    filter_upwards [hfun] with x hx
+    rw [hx]
+  rw [FullEllipticOp.fullBilin_apply, EllipticCoeff.bilin_apply,
+    FullEllipticOp.lowerBilin_apply,
+    Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => hprin i j)),
+    Finset.sum_congr rfl (fun i _ => htrans i), hzero]
+  ring
 
 /-- **The weak formulation, from test functions to `H₀¹(Ω)`.** An identity
 `B[u, φ] = ∫_Ω f φ` holding for every test function holds against every `w ∈ H₀¹(Ω)`. This
