@@ -1,8 +1,40 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+#
+# Palomar requires the automation disclosure below to name the model the
+# development was written with, which the house-style linter otherwise refuses.
+# Waiving that one rule leaves every other rule in force.
+# prose-tics: allow ai-attribution
 version: "v0.4"
 
 project:
   name: "EllipticPdes"
+  description: >-
+    A Lean 4 formalisation of the solvability theory of linear second-order elliptic
+    operators in divergence form on a bounded domain,
+
+      -div(A grad u) + b · grad u + c u = f in Ω,   u = 0 on ∂Ω,
+
+    with A uniformly elliptic and every coefficient bounded and measurable. The drift b
+    is unrestricted, so the bilinear form is in general non-symmetric and the problem
+    carries no variational structure; existence runs through Lax-Milgram.
+
+    Proved for the general operator, with no `sorry` in the library: existence and
+    uniqueness of the weak solution; the Gårding inequality; the Fredholm alternative
+    with its kernel, index and solvability clauses; the resolvent bound; spectral
+    compactness of the operator; interior H² regularity; higher interior regularity at
+    every order; infinite differentiability in the interior; and interior Hölder
+    continuity at exponent 1/2 in dimensions one, two and three.
+
+    Supporting layers carry Morrey's inequality, the Gagliardo-Nirenberg-Sobolev estimate
+    in general dimension and at a general exponent pair, Campanato's characterisation of
+    Hölder continuity with its converse, the Caccioppoli inequality, and the Poincaré
+    chain down to the one-dimensional inequality. H_0^1(Ω) is realised as the closure of
+    the test-function graphs inside L²(Ω) × (L²(Ω))^d, so a member carries its weak
+    gradient as data rather than through a weak-derivative predicate.
+
+    Boundary H² regularity has its foundations in place and its headline estimate open,
+    and Schauder C^{k,α} estimates remain a roadmap item. This entry registers the
+    Fredholm alternative.
   authors:
     - "Alejandro Soto Franco"
   responsible_maintainers:
