@@ -72,6 +72,11 @@ status:
   sorry_count: 0
   sorry_in_definitions: 0
   axioms: ["propext", "Classical.choice", "Quot.sound"]
+  # Headline results of the library. Each is pinned to the three axioms in
+  # lean/AxiomAudit.lean and paired with its literature statement in
+  # proofsense/manifest.json. Only the Fredholm alternative carries a Comparator
+  # configuration so far; the rest are listed so this entry reports the size of the
+  # development behind it.
   main_results:
     - declaration: "Palomar.fredholm_alternative"
       file: "Solution.lean"
@@ -79,6 +84,50 @@ status:
       axioms: ["propext", "Classical.choice", "Quot.sound"]
       comparator_config: "comparator.json"
       literature_dependencies: []
+    - declaration: "EllipticPdes.dirichlet_weak_solution"
+      file: "EllipticPdes/Existence/Existence.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "EllipticPdes.Sobolev.FullEllipticOp.garding"
+      file: "EllipticPdes/Existence/Garding.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "EllipticPdes.Sobolev.FullEllipticOp.fredholm_alternative"
+      file: "EllipticPdes/Fredholm/Fredholm.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "EllipticPdes.Sobolev.FullEllipticOp.solvable_iff_orthogonal_solSpaceStar"
+      file: "EllipticPdes/Fredholm/FredholmComplete.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "EllipticPdes.Sobolev.FullEllipticOp.resolvent_bound"
+      file: "EllipticPdes/Spectrum/SpectrumSigma.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "EllipticPdes.Sobolev.dirichlet_spectral"
+      file: "EllipticPdes/Spectrum/Spectrum.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "EllipticPdes.Regularity.interior_H2_estimate"
+      file: "EllipticPdes/Regularity/Interior.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "EllipticPdes.Regularity.higher_interior_regularity"
+      file: "EllipticPdes/Regularity/HigherInterior.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "EllipticPdes.Regularity.interior_smooth"
+      file: "EllipticPdes/Regularity/InteriorSmooth.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "EllipticPdes.Embedding.interior_holder_estimate"
+      file: "EllipticPdes/Embedding/InteriorHolder.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "EllipticPdes.Poincare.poincare_H01_of_bounded"
+      file: "EllipticPdes/Poincare/BoundedDomain.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
 
 automation:
   methods:
