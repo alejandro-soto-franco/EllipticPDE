@@ -1,0 +1,106 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+version: "v0.4"
+
+project:
+  name: "EllipticPdes"
+  authors:
+    - "Alejandro Soto Franco"
+  responsible_maintainers:
+    - "Alejandro Soto Franco"
+  license: "Apache-2.0"
+
+sources:
+  - title: "Partial Differential Equations (2nd edition), Graduate Studies in Mathematics 19"
+    authors:
+      - "Evans, Lawrence C."
+    id: "American Mathematical Society, 2010"
+    type: "book"
+    location: "§6.2.3, Theorem 4(i), p. 321"
+    relationship: "formalizes"
+    license: ""
+    author_endorsement: "not-contacted"
+
+related_formalizations: []
+
+classification:
+  arxiv: ["math.AP"]
+  msc2020: ["35J25", "47A53", "35A01", "35A02"]
+
+status:
+  scope: >-
+    Solvability theory of linear second-order elliptic operators in divergence form on a
+    bounded domain, with bounded measurable coefficients and a non-zero drift, so the
+    bilinear form is in general non-symmetric. The library carries existence and
+    uniqueness through Lax-Milgram, the Gårding inequality, the Fredholm alternative with
+    its index and solvability clauses, the resolvent bound, spectral compactness, interior
+    H² regularity, higher interior regularity at every order, infinite differentiability
+    in the interior, and interior Hölder continuity at exponent 1/2 in dimensions one, two
+    and three. Boundary H² regularity has its foundations in place and its headline
+    estimate open. This submission covers the Fredholm alternative alone.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: ["propext", "Classical.choice", "Quot.sound"]
+  main_results:
+    - declaration: "Palomar.fredholm_alternative"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+      literature_dependencies: []
+
+automation:
+  methods:
+    - method: "agent"
+      models: []
+      framework: "Claude Code"
+      tool_setup: ""
+      cost:
+        wall_time: ""
+        spend_usd: ""
+        hardware: ""
+      prompting_notes: ""
+  spend_usd: ""
+  notes: ""
+
+fidelity:
+  divergences: >-
+    Evans derives the compactness of the embedding H_0^1(Ω) ↪ L²(Ω) from boundedness of
+    the domain through the Rellich-Kondrachov theorem; here it is a hypothesis, so the
+    statement holds for any Ω whose embedding is compact and asks nothing of the geometry
+    or the regularity of the boundary. The right-hand side is a bounded linear functional
+    on H_0^1(Ω) rather than an f ∈ L²(Ω); the L² case is the image of f under the pairing
+    v ↦ ∫_Ω f v. Coefficients are measurable and bounded on ℝ^d, with the bounds holding
+    almost everywhere for Lebesgue measure, rather than being defined on Ω alone.
+    H_0^1(Ω) is realised as the closure of the test-function graphs inside
+    L²(Ω) × (L²(Ω))^d, so a member carries its weak gradient as data rather than through a
+    weak-derivative predicate; the challenge statement spells that encoding out and reads
+    the bilinear form off the graph coordinates.
+
+review:
+  status: "self-assessed"
+  reviewers: []
+  notes: >-
+    Every declaration the repository presents as a headline result is pinned to the axioms
+    propext, Classical.choice and Quot.sound in lean/AxiomAudit.lean, checked in CI. Each
+    is separately paired with the literature statement it formalises in
+    proofsense/manifest.json, and verify/proofsense_coverage.py holds that pairing to
+    statement-granular locators and refuses an unwarranted declaration.
+
+alignment:
+  namespace: "Palomar"
+  statements:
+    - source: "Evans §6.2.3, Theorem 4(i), p. 321 (Second Existence Theorem for weak solutions)"
+      lean: "Palomar.fredholm_alternative"
+      module: "Solution.lean"
+      status: "proved"
+      note: >-
+        Evans states the alternative for the operator L u = -(a^{ij} u_{x_i})_{x_j} +
+        b^i u_{x_i} + c u on the bounded open U carrying the standing hypotheses of §6.2,
+        and for data f ∈ L²(U). The formal statement asks instead for compactness of the
+        embedding, which is what the proof consumes, and quantifies the right-hand side
+        over the dual of H_0^1(Ω), of which the L² data are the image under v ↦ ∫_Ω f v.
+
+acknowledgements: >-
+  Built on Mathlib. The Sobolev layer realises H_0^1(Ω) inside the graph space rather than
+  through a weak-derivative predicate, so nothing in it depends on a Sobolev-space API
+  that Mathlib does not yet carry.

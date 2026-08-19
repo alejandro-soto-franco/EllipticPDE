@@ -32,3 +32,13 @@ name = "EllipticPdes"
 # starts depending on an axiom beyond the classical three.
 [[lean_lib]]
 name = "AxiomAudit"
+
+# The Palomar submission pair: `Challenge` states the Fredholm alternative in
+# Mathlib vocabulary alone and leaves it `sorry`, `Solution` discharges it from
+# `EllipticPdes`. Neither is a default target, so `lake build` and the CI `sorry`
+# check see only the library.
+[[lean_lib]]
+name = "Challenge"
+
+[[lean_lib]]
+name = "Solution"

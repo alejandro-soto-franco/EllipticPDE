@@ -25,6 +25,9 @@ jobs:
         working-directory: verify
         run: uv run --with pytest python -m pytest test_proofsense_coverage.py -q
 
+      - name: The Palomar challenge and solution share one set of definitions
+        run: uv run python verify/palomar_sync.py
+
   lean:
     runs-on: ubuntu-latest
     steps:
@@ -60,3 +63,20 @@ jobs:
       - name: Environment linter
         working-directory: lean
         run: lake lint
+
+      # The Palomar submission pair. `Challenge` states the Fredholm alternative in
+      # Mathlib vocabulary and leaves it `sorry`; `Solution` restates it under the same
+      # name and proves it from the library. Comparator compares the two by name, so
+      # `Solution` cannot import `Challenge` and the shared definitions are two copies.
+      - name: Build the Palomar challenge and solution
+        working-directory: lean
+        run: lake build Challenge Solution
+
+      - name: Assert the Palomar solution is free of sorry
+        working-directory: lean
+        run: |
+          if grep -n -E '(^|[^A-Za-z_.])sorry([^A-Za-z_]|$)' Solution.lean; then
+            echo "::error::sorry found in Solution.lean"
+            exit 1
+          fi
+          echo "no sorry in Solution.lean"

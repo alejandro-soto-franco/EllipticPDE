@@ -69,18 +69,40 @@ operator.
   `v4.31.0-rc1`.
 - `lean/AxiomAudit.lean` pins the axiom set of each headline result with
   `#print axioms` under `#guard_msgs`, built as a target of its own.
+- `lean/Challenge.lean` and `lean/Solution.lean` are the Palomar submission pair
+  for the Fredholm alternative, with `lean/comparator.json` and
+  `lean/formalization.yaml`.
 
 ## Build
 
 ```bash
 cd lean && lake build      # includes the axiom pins in AxiomAudit.lean
 cd lean && lake lint       # environment-level linter
+cd lean && lake build Challenge Solution   # the Palomar pair
 ```
 
 CI runs both on every push. It builds from a clean clone, asserts the
 library is free of `sorry`, and holds every headline result to the axioms
 `propext`, `Classical.choice` and `Quot.sound` through `AxiomAudit.lean`, where
 each is pinned with `#guard_msgs`.
+
+## Palomar
+
+`lean/Challenge.lean` states the Fredholm alternative for the general operator in
+Mathlib vocabulary alone, inlining the graph encoding of $H_0^1(\Omega)$ and reading
+the bilinear form off the graph coordinates as a sum of integrals, and leaves the
+statement `sorry`. `lean/Solution.lean` carries the same statement under the same
+name and proves it from
+`EllipticPdes.Sobolev.FullEllipticOp.fredholm_alternative_rellich`.
+
+Comparator looks a theorem up by name in both modules, so `Solution.lean` restates
+the definitions instead of importing `Challenge.lean`. The two copies are held
+character for character by `verify/palomar_sync.py`, which CI runs: drift there
+produces two statements that both elaborate and differ, which the build would not
+catch.
+
+The `sorry` in `Challenge.lean` is the placeholder Comparator requires. Nothing under
+`EllipticPdes/` carries one, and `Solution.lean` carries none either; CI asserts both.
 
 ## Toolchain
 
