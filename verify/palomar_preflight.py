@@ -10,6 +10,11 @@ Three things this cannot check, because they need Palomar's own verifier: the li
 detector's SPDX verdict, whether Mathlib's manifest URL with a `.git` suffix satisfies the
 URL rule, and the editorial judgement. Those are reported as notes rather than results.
 
+It also prints the request body the submission takes. The Lean project sits in `lean/`
+rather than at the repository root, so `project_path` has to be sent: omitting it once
+sent a submission whose verifier looked for a lakefile at the root and failed intake with
+"project directory must contain exactly one of lakefile.toml or lakefile.lean".
+
 Run:  uv run --with pyyaml python verify/palomar_preflight.py
 Exit code 0 iff every check passes.
 """
@@ -322,6 +327,21 @@ def check_github() -> None:
           "step 3 of the submission proof creates a secret gist")
 
 
+def report_request() -> None:
+    """The request body `/api/submit` takes, printed so it is read rather than recalled."""
+    head = git("rev-parse", "HEAD")
+    body = {
+        "repository": "alejandro-soto-franco/EllipticPDE",
+        "commit": head,
+        "project_path": PROJECT.name,
+        "comparator_config_path": f"{PROJECT.name}/{CONFIG.name}",
+        "formalization_metadata_path": f"{PROJECT.name}/{META.name}",
+        "authorization_relationship": "maintainer",
+    }
+    print("\nsubmission request body:")
+    print(json.dumps(body, indent=2))
+
+
 def main() -> int:
     check_repository()
     check_licence()
@@ -341,6 +361,8 @@ def main() -> int:
     print(f"\n{len(results) - len(failed)}/{len(results)} checks pass")
     if failed:
         print("failing: " + ", ".join(failed))
+    else:
+        report_request()
     return 1 if failed else 0
 
 
