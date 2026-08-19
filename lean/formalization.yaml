@@ -34,9 +34,13 @@ project:
 
     Boundary H² regularity has its foundations in place and its headline estimate open,
     and Schauder C^{k,α} estimates remain a roadmap item. This entry registers the
-    Fredholm alternative.
+    solvability theory of §6.2 of Evans: the Gårding inequality, existence and uniqueness
+    for a nonnegative zeroth-order coefficient, the Fredholm alternative, solvability
+    against the transpose problem, the discrete set of exceptional shifts, and
+    boundedness of the inverse. The interior regularity results are a separate entry.
   authors:
     - "Alejandro Soto Franco"
+    - "Kobe Marshall-Stevens"
   responsible_maintainers:
     - "Alejandro Soto Franco"
   license: "Apache-2.0"
@@ -47,7 +51,7 @@ sources:
       - "Evans, Lawrence C."
     id: "American Mathematical Society, 2010"
     type: "book"
-    location: "§6.2.3, Theorem 4(i), p. 321"
+    location: "§6.2.2 Theorems 2 and 3, pp. 318-319; §6.2.3 Theorems 4, 5 and 6, pp. 321-324"
     relationship: "formalizes"
     license: ""
     author_endorsement: "not-contacted"
@@ -78,7 +82,37 @@ status:
   # configuration so far; the rest are listed so this entry reports the size of the
   # development behind it.
   main_results:
+    - declaration: "Palomar.garding"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+      literature_dependencies: []
+    - declaration: "Palomar.weak_solution_of_nonneg_zeroth"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+      literature_dependencies: []
     - declaration: "Palomar.fredholm_alternative"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+      literature_dependencies: []
+    - declaration: "Palomar.solvable_iff_orthogonal_transpose"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+      literature_dependencies: []
+    - declaration: "Palomar.existence_three"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+      literature_dependencies: []
+    - declaration: "Palomar.resolvent_bound"
       file: "Solution.lean"
       sorry_count: 0
       axioms: ["propext", "Classical.choice", "Quot.sound"]
@@ -183,6 +217,22 @@ review:
 alignment:
   namespace: "Palomar"
   statements:
+    - source: "Evans §6.2.2, Theorem 2, p. 318 (Energy estimates)"
+      lean: "Palomar.garding"
+      module: "Solution.lean"
+      status: "proved"
+      note: >-
+        Evans states the two energy estimates with unnamed constants α, β > 0 and γ ≥ 0.
+        The formal statement fixes β = λ/2 and γ = λ/2 + ‖c‖_∞ + d ‖b‖_∞²/(2λ), which is
+        the value the proof produces, and asks nothing of Ω.
+    - source: "Evans §6.2.2, Theorem 3, p. 319 (First Existence Theorem for weak solutions)"
+      lean: "Palomar.weak_solution_of_nonneg_zeroth"
+      module: "Solution.lean"
+      status: "proved"
+      note: >-
+        Stated at b = 0 and c ≥ 0 almost everywhere on Ω, where Evans asks for the
+        conditions on U. The Poincaré constant is existentially bound, so the a-priori
+        bound carries the domain through that constant alone.
     - source: "Evans §6.2.3, Theorem 4(i), p. 321 (Second Existence Theorem for weak solutions)"
       lean: "Palomar.fredholm_alternative"
       module: "Solution.lean"
@@ -190,9 +240,35 @@ alignment:
       note: >-
         Evans states the alternative for the operator L u = -(a^{ij} u_{x_i})_{x_j} +
         b^i u_{x_i} + c u on the bounded open U carrying the standing hypotheses of §6.2,
-        and for data f ∈ L²(U). The formal statement asks instead for compactness of the
-        embedding, which is what the proof consumes, and quantifies the right-hand side
-        over the dual of H_0^1(Ω), of which the L² data are the image under v ↦ ∫_Ω f v.
+        and for data f ∈ L²(U). The formal statement asks for a bounded measurable Ω and
+        nothing about its boundary, and quantifies the right-hand side over the dual of
+        H_0^1(Ω), of which the L² data are the image under v ↦ ∫_Ω f v.
+    - source: "Evans §6.2.3, Theorem 4(iii), p. 321"
+      lean: "Palomar.solvable_iff_orthogonal_transpose"
+      module: "Solution.lean"
+      status: "proved"
+      note: >-
+        Evans states solvability as orthogonality to the solution space of the adjoint
+        problem L* w = 0. The formal statement writes that space by its defining property,
+        B[v, w] = 0 for every v, so no differentiability is asked of a coefficient and the
+        adjoint appears only through the transposed form.
+    - source: "Evans §6.2.3, Theorem 5, p. 323 (Third Existence Theorem for weak solutions)"
+      lean: "Palomar.existence_three"
+      module: "Solution.lean"
+      status: "proved"
+      note: >-
+        Evans identifies Σ as the set of eigenvalues of the operator and records it as at
+        most countable and, if infinite, tending to infinity. The formal statement fixes Σ
+        by the solvability property and states discreteness as finiteness below every
+        level, which is the form the proof establishes.
+    - source: "Evans §6.2.3, Theorem 6, p. 324 (Boundedness of the inverse)"
+      lean: "Palomar.resolvent_bound"
+      module: "Solution.lean"
+      status: "proved"
+      note: >-
+        The hypothesis is unique solvability at the shift for every right-hand side rather
+        than membership of the complement of Σ; the two are equivalent by the previous
+        result. The bound is on the L² norm of the solution, as in Evans.
 
 acknowledgements: >-
   Built on Mathlib. The Sobolev layer realises H_0^1(Ω) inside the graph space rather than

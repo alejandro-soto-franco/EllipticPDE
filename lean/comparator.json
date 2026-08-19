@@ -1,6 +1,17 @@
 {
   "challenge_module": "Challenge",
   "solution_module": "Solution",
-  "theorem_names": ["Palomar.fredholm_alternative"],
-  "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"]
+  "theorem_names": [
+    "Palomar.garding",
+    "Palomar.weak_solution_of_nonneg_zeroth",
+    "Palomar.fredholm_alternative",
+    "Palomar.solvable_iff_orthogonal_transpose",
+    "Palomar.existence_three",
+    "Palomar.resolvent_bound"
+  ],
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
 }

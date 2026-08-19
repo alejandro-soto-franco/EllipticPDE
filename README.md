@@ -70,7 +70,7 @@ operator.
 - `lean/AxiomAudit.lean` pins the axiom set of each headline result with
   `#print axioms` under `#guard_msgs`, built as a target of its own.
 - `lean/Challenge.lean` and `lean/Solution.lean` are the Palomar submission pair
-  for the Fredholm alternative, with `lean/comparator.json` and
+  for the six solvability results of Evans §6.2, with `lean/comparator.json` and
   `lean/formalization.yaml`.
 
 ## Build
@@ -88,12 +88,16 @@ each is pinned with `#guard_msgs`.
 
 ## Palomar
 
-`lean/Challenge.lean` states the Fredholm alternative for the general operator in
-Mathlib vocabulary alone, inlining the graph encoding of $H_0^1(\Omega)$ and reading
-the bilinear form off the graph coordinates as a sum of integrals, and leaves the
-statement `sorry`. `lean/Solution.lean` carries the same statement under the same
-name and proves it from
-`EllipticPdes.Sobolev.FullEllipticOp.fredholm_alternative_rellich`.
+`lean/Challenge.lean` states six results of Evans §6.2 in Mathlib vocabulary alone:
+the Gårding inequality, existence and uniqueness for a nonnegative zeroth-order
+coefficient, the Fredholm alternative, solvability against the transpose problem,
+the discrete set of exceptional shifts, and boundedness of the inverse. It inlines
+the graph encoding of $H_0^1(\Omega)$, reads the bilinear form off the graph
+coordinates as a sum of integrals, and leaves each statement `sorry`. Every result
+but the Gårding inequality is stated for a bounded measurable $\Omega$, so the
+Rellich-Kondrachov compact embedding is discharged rather than assumed.
+`lean/Solution.lean` carries the same six statements under the same names and proves
+them from the library.
 
 Comparator looks a theorem up by name in both modules, so `Solution.lean` restates
 the definitions instead of importing `Challenge.lean`. The two copies are held
@@ -101,8 +105,10 @@ character for character by `verify/palomar_sync.py`, which CI runs: drift there
 produces two statements that both elaborate and differ, which the build would not
 catch.
 
-The `sorry` in `Challenge.lean` is the placeholder Comparator requires. Nothing under
-`EllipticPdes/` carries one, and `Solution.lean` carries none either; CI asserts both.
+The six `sorry`s in `Challenge.lean` are the placeholders Comparator requires.
+Nothing under `EllipticPdes/` carries one, and `Solution.lean` carries none either:
+each of its six results pins its own axiom set with `#guard_msgs`, so a `sorryAx`
+reaching any of them fails the build.
 
 ## Toolchain
 

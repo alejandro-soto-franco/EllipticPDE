@@ -13,7 +13,7 @@ import Mathlib.Analysis.Calculus.LineDeriv.IntegrationByParts
 import Mathlib.Analysis.Normed.Operator.Compact.Basic
 
 /-!
-# Fredholm alternative for a second-order divergence-form elliptic operator
+# Solvability theory for second-order divergence-form elliptic operators
 
 Let `Ω ⊆ ℝ^d` and let
 
@@ -21,21 +21,25 @@ Let `Ω ⊆ ℝ^d` and let
 
 be a second-order operator in divergence form whose coefficients are measurable and
 bounded and whose principal part is uniformly elliptic, `∑_{ij} a_{ij}(x) ξ_i ξ_j ≥ λ |ξ|²`
-for almost every `x` and every `ξ`. The drift `b` is unrestricted, so the operator is in
-general non-symmetric and the problem carries no variational structure.
-
-The weak formulation of the Dirichlet problem seeks `u ∈ H_0^1(Ω)` with
-
-  `B[u, v] = ⟨f, v⟩` for every `v ∈ H_0^1(Ω)`,
-
-where
+for almost every `x` and every `ξ`. The drift `b` is unrestricted and `c` carries no sign
+condition, so the operator is in general non-symmetric and the problem carries no
+variational structure. The weak formulation of the Dirichlet problem seeks `u ∈ H_0^1(Ω)`
+with `B[u, v] = ⟨f, v⟩` for every `v ∈ H_0^1(Ω)`, where
 
   `B[u, v] = ∑_{ij} ∫_Ω a_{ij} ∂_i u ∂_j v + ∑_i ∫_Ω b_i ∂_i u v + ∫_Ω c u v`.
 
-The theorem below is the Fredholm alternative for that problem (Evans, *Partial
-Differential Equations* (2nd ed.), §6.2.3, Theorem 4(i), p. 321): exactly one of the two
-alternatives holds. Either the homogeneous problem `L u = 0` has a weak solution other
-than `0`, or `L u = f` has exactly one weak solution for every bounded functional `f`.
+Six results are stated below, all from Evans, *Partial Differential Equations* (2nd ed.),
+§6.2, and all but the first for a bounded measurable `Ω` with no hypothesis on its
+boundary:
+
+* the Gårding inequality (§6.2.2, Theorem 2, p. 318);
+* existence, uniqueness and the a-priori bound when `b = 0` and `c ≥ 0`
+  (§6.2.2, Theorem 3, p. 319);
+* the Fredholm alternative (§6.2.3, Theorem 4(i), p. 321);
+* solvability against the transpose problem (§6.2.3, Theorem 4(iii), p. 321);
+* the discrete set of shifts off which the problem is uniquely solvable
+  (§6.2.3, Theorem 5, p. 323);
+* boundedness of the inverse off that set (§6.2.3, Theorem 6, p. 324).
 
 ## Encoding of `H_0^1(Ω)`
 
@@ -44,11 +48,10 @@ the graph space `L²(Ω) × (L²(Ω))^d`, carrying the `H¹` inner product. An e
 that ambient space is a `(d+1)`-tuple of `L²` classes: coordinate `0` is the function and
 coordinate `i.succ` is its `i`-th partial derivative. A test function `φ` enters as the
 tuple `(φ, ∂_1 φ, …, ∂_d φ)`, and `H_0^1(Ω)` is the topological closure of the span of
-those tuples. So a member of `H_0^1(Ω)` carries its weak gradient with it, and
-`(U : H1amb Ω) 0` denotes the function while `(U : H1amb Ω) i.succ` denotes `∂_i u`.
-
-The compactness of the embedding `H_0^1(Ω) ↪ L²(Ω)`, which for a bounded `Ω` is the
-Rellich-Kondrachov theorem, enters as a hypothesis.
+those tuples, so a member carries its weak gradient with it: `(U : H1amb Ω) 0` denotes the
+function and `(U : H1amb Ω) i.succ` denotes `∂_i u`. Compactness of the embedding
+`H_0^1(Ω) ↪ L²(Ω)`, the Rellich-Kondrachov theorem, is proved for a bounded measurable `Ω`
+rather than assumed, so it appears in none of the statements below.
 -/
 
 open MeasureTheory
@@ -131,12 +134,6 @@ space. -/
 def H01 (Ω : Set (EuclideanSpace ℝ (Fin d))) : Submodule ℝ (H1amb Ω) :=
   (Submodule.span ℝ (testGraphSet Ω)).topologicalClosure
 
-/-- The embedding `H_0^1(Ω) ↪ L²(Ω)`, `U ↦ U 0`, as a continuous linear map: the
-projection onto coordinate `0` precomposed with the inclusion. -/
-def embL2 (Ω : Set (EuclideanSpace ℝ (Fin d))) : H01 Ω →L[ℝ] L2D Ω :=
-  (PiLp.proj (𝕜 := ℝ) 2 (fun _ : Fin (d + 1) => L2D Ω) (0 : Fin (d + 1))).comp
-    (H01 Ω).subtypeL
-
 /-! ### The operator and its bilinear form -/
 
 /-- A second-order divergence-form operator
@@ -194,25 +191,109 @@ def weakForm (Op : EllipticOperator d) (Ω : Set (EuclideanSpace ℝ (Fin d)))
         ∫ x in Ω, Op.b x i * ((U : H1amb Ω) i.succ x : ℝ) * ((V : H1amb Ω) 0 x : ℝ))
     + ∫ x in Ω, Op.c x * ((U : H1amb Ω) 0 x : ℝ) * ((V : H1amb Ω) 0 x : ℝ)
 
+/-- The `L²` pairing of the function coordinates, `⟨u, v⟩ = ∫_Ω u v`. A spectral shift
+`L u + μ u` enters the weak formulation through it. -/
+def zerothPairing (Ω : Set (EuclideanSpace ℝ (Fin d))) (U V : H01 Ω) : ℝ :=
+  ∫ x in Ω, ((U : H1amb Ω) 0 x : ℝ) * ((V : H1amb Ω) 0 x : ℝ)
+
+/-- The pairing of an `L²(Ω)` datum against the function coordinate, `⟨f, v⟩ = ∫_Ω f v`.
+An `L²` right-hand side enters the weak problem through it. -/
+def datumPairing {Ω : Set (EuclideanSpace ℝ (Fin d))} (f : L2D Ω) (V : H01 Ω) : ℝ :=
+  ∫ x in Ω, (f x : ℝ) * ((V : H1amb Ω) 0 x : ℝ)
+
+/-! ### The Gårding inequality -/
+
+/-- **The Gårding inequality** (Evans, *Partial Differential Equations* (2nd ed.),
+§6.2.2, Theorem 2, p. 318). The form is coercive on `H_0^1(Ω)` after a shift by a
+multiple of the `L²` norm,
+
+`(λ/2) ‖u‖²_{H¹} ≤ B[u, u] + γ ‖u‖²_{L²}`,   `γ = λ/2 + ‖c‖_∞ + d ‖b‖_∞² / (2λ)`,
+
+for every `u ∈ H_0^1(Ω)`, on any `Ω`. The shift is what the drift and the zeroth-order
+term cost: at `b = 0` and `c ≥ 0` the form is coercive outright. -/
+theorem garding (Op : EllipticOperator d) (Ω : Set (EuclideanSpace ℝ (Fin d)))
+    (U : H01 Ω) :
+    Op.lam / 2 * ‖U‖ ^ 2
+      ≤ weakForm Op Ω U U
+        + (Op.lam / 2 + Op.Csup + (d : ℝ) * Op.Bsup ^ 2 / (2 * Op.lam))
+            * ‖(U : H1amb Ω) 0‖ ^ 2 := by
+  sorry
+
+/-! ### Existence and uniqueness for a nonnegative zeroth-order coefficient -/
+
+/-- **First Existence Theorem for weak solutions** (Evans, §6.2.2, Theorem 3, p. 319).
+On a bounded `Ω`, with no drift and a nonnegative zeroth-order coefficient, the Dirichlet
+problem `L u = f` has exactly one weak solution for every `f ∈ L²(Ω)`, and that solution
+obeys `‖u‖_{H¹} ≤ C ‖f‖_{L²}` with a constant fixed by the ellipticity constant and the
+Poincaré constant of the domain. Evans asks for `c ≥ 0` on `U`; the hypotheses here are
+the almost-everywhere forms on `Ω`. -/
+theorem weak_solution_of_nonneg_zeroth {n : ℕ} (Op : EllipticOperator (n + 1))
+    {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩb : Bornology.IsBounded Ω)
+    (hb : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
+    (hc : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x) :
+    ∃ CP : ℝ, 0 ≤ CP ∧ ∀ f : L2D Ω,
+      (∃! u : H01 Ω, ∀ v : H01 Ω, weakForm Op Ω u v = datumPairing f v)
+        ∧ ∀ u : H01 Ω, (∀ v : H01 Ω, weakForm Op Ω u v = datumPairing f v) →
+            ‖u‖ ≤ (CP + 1) / Op.lam * ‖f‖ := by
+  sorry
+
 /-! ### The Fredholm alternative -/
 
-/-- **The Fredholm alternative for the elliptic Dirichlet problem** (Evans, *Partial
-Differential Equations* (2nd ed.), §6.2.3, Theorem 4(i), p. 321). Let `L` be a
-second-order divergence-form operator with measurable bounded coefficients and uniformly
-elliptic principal part, on a domain whose embedding `H_0^1(Ω) ↪ L²(Ω)` is compact.
-Then exactly one of the following holds.
-
-* The homogeneous problem `L u = 0` has a weak solution `u ≠ 0`, that is, some `u ≠ 0` in
-  `H_0^1(Ω)` with `B[u, v] = 0` for every `v ∈ H_0^1(Ω)`.
-* The problem `L u = f` has exactly one weak solution for every bounded linear functional
-  `f` on `H_0^1(Ω)`.
-
-The two alternatives exclude one another, since a nonzero solution of the homogeneous
-problem can be added to any solution of the inhomogeneous one. -/
+/-- **Second Existence Theorem for weak solutions** (Evans, §6.2.3, Theorem 4(i),
+p. 321). On a bounded measurable `Ω`, exactly one of the following holds. Either the
+homogeneous problem `L u = 0` has a weak solution `u ≠ 0`, or `L u = f` has exactly one
+weak solution for every bounded linear functional `f` on `H_0^1(Ω)`. The two exclude one
+another, since a nonzero solution of the homogeneous problem can be added to any solution
+of the inhomogeneous one. -/
 theorem fredholm_alternative (Op : EllipticOperator d)
-    (Ω : Set (EuclideanSpace ℝ (Fin d))) (hRellich : IsCompactOperator (embL2 Ω)) :
+    (Ω : Set (EuclideanSpace ℝ (Fin d))) (hΩm : MeasurableSet Ω)
+    (hΩb : Bornology.IsBounded Ω) :
     (∃ u : H01 Ω, u ≠ 0 ∧ ∀ v : H01 Ω, weakForm Op Ω u v = 0)
-      ∨ (∀ f : H01 Ω →L[ℝ] ℝ, ∃! u : H01 Ω, ∀ v : H01 Ω, weakForm Op Ω u v = f v) := by
+      ∨ (∀ f : H01 Ω →L[ℝ] ℝ, ∃! u : H01 Ω,
+          ∀ v : H01 Ω, weakForm Op Ω u v = f v) := by
+  sorry
+
+/-- **Solvability against the transpose problem** (Evans, §6.2.3, Theorem 4(iii),
+p. 321). `L u = f` has a weak solution exactly when `f` annihilates every weak solution
+of the transpose problem `B[v, w] = 0`, which is the weak form of the formal adjoint
+`L* w = -∂_i (a_{ij} ∂_j w) - ∂_i (b_i w) + c w`. Nothing here asks a coefficient to be
+differentiable, so the adjoint appears only through the transposed form. -/
+theorem solvable_iff_orthogonal_transpose (Op : EllipticOperator d)
+    (Ω : Set (EuclideanSpace ℝ (Fin d))) (hΩm : MeasurableSet Ω)
+    (hΩb : Bornology.IsBounded Ω) (f : H01 Ω →L[ℝ] ℝ) :
+    (∃ u : H01 Ω, ∀ v : H01 Ω, weakForm Op Ω u v = f v)
+      ↔ ∀ w : H01 Ω, (∀ v : H01 Ω, weakForm Op Ω v w = 0) → f w = 0 := by
+  sorry
+
+/-! ### The discrete set of exceptional shifts -/
+
+/-- **Third Existence Theorem for weak solutions** (Evans, §6.2.3, Theorem 5, p. 323).
+On a bounded measurable `Ω` there is an at most countable set `Σ ⊆ ℝ`, finite below every
+level, such that the shifted problem `L u + μ u = f` is uniquely solvable for every
+`f ∈ L²(Ω)` exactly when `μ ∉ Σ`. Evans records `Σ` as the set of eigenvalues of the
+operator; the statement here fixes it by that solvability property alone. -/
+theorem existence_three (Op : EllipticOperator d)
+    (Ω : Set (EuclideanSpace ℝ (Fin d))) (hΩm : MeasurableSet Ω)
+    (hΩb : Bornology.IsBounded Ω) :
+    ∃ S : Set ℝ, S.Countable ∧ (∀ C : ℝ, (S ∩ Set.Iic C).Finite) ∧
+      ∀ lam : ℝ, lam ∉ S ↔ ∀ f : L2D Ω, ∃! u : H01 Ω, ∀ v : H01 Ω,
+        weakForm Op Ω u v = lam * zerothPairing Ω u v + datumPairing f v := by
+  sorry
+
+/-! ### Boundedness of the inverse -/
+
+/-- **Boundedness of the inverse** (Evans, §6.2.3, Theorem 6, p. 324). At a shift where
+the problem is uniquely solvable for every right-hand side, the solution operator is
+bounded from `L²(Ω)` to `L²(Ω)`: one constant serves every datum and every solution. -/
+theorem resolvent_bound (Op : EllipticOperator d)
+    (Ω : Set (EuclideanSpace ℝ (Fin d))) (hΩm : MeasurableSet Ω)
+    (hΩb : Bornology.IsBounded Ω) {lam : ℝ}
+    (hlam : ∀ f : H01 Ω →L[ℝ] ℝ, ∃! u : H01 Ω, ∀ v : H01 Ω,
+      weakForm Op Ω u v = lam * zerothPairing Ω u v + f v) :
+    ∃ C : ℝ, 0 < C ∧ ∀ f : L2D Ω, ∀ u : H01 Ω,
+      (∀ v : H01 Ω,
+        weakForm Op Ω u v = lam * zerothPairing Ω u v + datumPairing f v) →
+      ‖(u : H1amb Ω) 0‖ ≤ C * ‖f‖ := by
   sorry
 
 end Palomar

@@ -14,27 +14,26 @@ import Mathlib.Analysis.Normed.Operator.Compact.Basic
 import EllipticPdes
 
 /-!
-# Discharging the Fredholm alternative from `EllipticPdes`
+# Discharging the solvability theory from `EllipticPdes`
 
-`Challenge.lean` states the Fredholm alternative in Mathlib vocabulary alone and leaves it
-`sorry`. This module carries the same statement, under the same name, and proves it from
-`EllipticPdes.Sobolev.FullEllipticOp.fredholm_alternative_rellich`.
+`Challenge.lean` states six results of §6.2 of Evans in Mathlib vocabulary alone and
+leaves each one open. This module carries the same six statements, under the same names,
+and proves them from `EllipticPdes`.
 
 Comparator looks a theorem up by name in both modules and compares the two statements, so
 this module restates the definitions rather than importing `Challenge`. Everything above
 `toFullEllipticOp` is character-for-character the text of `Challenge.lean`, which
 `verify/palomar_sync.py` checks.
 
-Three things connect the statement to the library.
+Three identifications carry the statements across.
 
-* `Palomar.H01` and `Palomar.embL2` unfold to `EllipticPdes.Sobolev.H01` and
-  `EllipticPdes.Sobolev.embL2`, so the two quantify over the same space and the
-  compactness hypothesis transports by `rfl`.
+* `Palomar.H01` unfolds to `EllipticPdes.Sobolev.H01`, so the two quantify over the same
+  space.
 * `Palomar.EllipticOperator` carries the fields of
   `EllipticPdes.Sobolev.FullEllipticOp` flattened, and `toFullEllipticOp` rebundles them.
-* `weakForm_eq` identifies the sum of integrals of `Palomar.weakForm` with
-  `FullEllipticOp.fullBilin`, whose principal and lower-order parts are inner products of
-  coefficient actions on `L²`.
+* `weakForm_eq`, `zerothPairing_eq` and `datumPairing_eq` identify the sums of integrals
+  with `FullEllipticOp.fullBilin`, `FullEllipticOp.zerothForm` and the `L²` pairing, whose
+  principal and lower-order parts are inner products of coefficient actions on `L²`.
 -/
 
 open MeasureTheory
@@ -117,12 +116,6 @@ space. -/
 def H01 (Ω : Set (EuclideanSpace ℝ (Fin d))) : Submodule ℝ (H1amb Ω) :=
   (Submodule.span ℝ (testGraphSet Ω)).topologicalClosure
 
-/-- The embedding `H_0^1(Ω) ↪ L²(Ω)`, `U ↦ U 0`, as a continuous linear map: the
-projection onto coordinate `0` precomposed with the inclusion. -/
-def embL2 (Ω : Set (EuclideanSpace ℝ (Fin d))) : H01 Ω →L[ℝ] L2D Ω :=
-  (PiLp.proj (𝕜 := ℝ) 2 (fun _ : Fin (d + 1) => L2D Ω) (0 : Fin (d + 1))).comp
-    (H01 Ω).subtypeL
-
 /-! ### The operator and its bilinear form -/
 
 /-- A second-order divergence-form operator
@@ -180,7 +173,17 @@ def weakForm (Op : EllipticOperator d) (Ω : Set (EuclideanSpace ℝ (Fin d)))
         ∫ x in Ω, Op.b x i * ((U : H1amb Ω) i.succ x : ℝ) * ((V : H1amb Ω) 0 x : ℝ))
     + ∫ x in Ω, Op.c x * ((U : H1amb Ω) 0 x : ℝ) * ((V : H1amb Ω) 0 x : ℝ)
 
-/-! ### Discharging the statement from the library -/
+/-- The `L²` pairing of the function coordinates, `⟨u, v⟩ = ∫_Ω u v`. A spectral shift
+`L u + μ u` enters the weak formulation through it. -/
+def zerothPairing (Ω : Set (EuclideanSpace ℝ (Fin d))) (U V : H01 Ω) : ℝ :=
+  ∫ x in Ω, ((U : H1amb Ω) 0 x : ℝ) * ((V : H1amb Ω) 0 x : ℝ)
+
+/-- The pairing of an `L²(Ω)` datum against the function coordinate, `⟨f, v⟩ = ∫_Ω f v`.
+An `L²` right-hand side enters the weak problem through it. -/
+def datumPairing {Ω : Set (EuclideanSpace ℝ (Fin d))} (f : L2D Ω) (V : H01 Ω) : ℝ :=
+  ∫ x in Ω, (f x : ℝ) * ((V : H1amb Ω) 0 x : ℝ)
+
+/-! ### Discharging the statements from the library -/
 
 open EllipticPdes.Sobolev in
 /-- The flattened operator data of the challenge, rebundled as the library's
@@ -209,10 +212,6 @@ def toFullEllipticOp (Op : EllipticOperator d) : FullEllipticOp d where
 lemma H01_eq (Ω : Set (EuclideanSpace ℝ (Fin d))) :
     H01 Ω = EllipticPdes.Sobolev.H01 Ω := rfl
 
-/-- The challenge's embedding into `L²(Ω)` is the library's. -/
-lemma embL2_eq (Ω : Set (EuclideanSpace ℝ (Fin d))) :
-    embL2 Ω = EllipticPdes.Sobolev.embL2 Ω := rfl
-
 /-- The sum of integrals is the library's bilinear form. The principal part is
 `∑ᵢⱼ ⟪aᵢⱼ ∂ᵢu, ∂ⱼv⟫`, the transport part `∑ᵢ ⟪bᵢ ∂ᵢu, v⟫` and the zeroth-order part
 `⟪c u, v⟫`, and each inner product of a coefficient action against an `L²` class is the
@@ -228,37 +227,155 @@ lemma weakForm_eq (Op : EllipticOperator d) (Ω : Set (EuclideanSpace ℝ (Fin d
     EllipticPdes.Sobolev.inner_mulCoeffL_eq]
   rfl
 
+/-- The `L²` pairing of the function coordinates is the library's zeroth-order form. -/
+lemma zerothPairing_eq (Ω : Set (EuclideanSpace ℝ (Fin d))) (U V : H01 Ω) :
+    zerothPairing Ω U V = EllipticPdes.Sobolev.FullEllipticOp.zerothForm Ω U V := by
+  rw [EllipticPdes.Sobolev.FullEllipticOp.zerothForm_apply, zerothPairing, L2.inner_def]
+  simp only [Real.inner_apply]
+
+/-- The pairing of an `L²` datum against the function coordinate is the library's. -/
+lemma datumPairing_eq {Ω : Set (EuclideanSpace ℝ (Fin d))} (f : L2D Ω) (V : H01 Ω) :
+    datumPairing f V = ∫ x in Ω, (f x : ℝ) * ((V : H1amb Ω) 0 x : ℝ) := rfl
+
+/-! ### The Gårding inequality -/
+
+/-- **The Gårding inequality** (Evans, *Partial Differential Equations* (2nd ed.),
+§6.2.2, Theorem 2, p. 318). -/
+theorem garding (Op : EllipticOperator d) (Ω : Set (EuclideanSpace ℝ (Fin d)))
+    (U : H01 Ω) :
+    Op.lam / 2 * ‖U‖ ^ 2
+      ≤ weakForm Op Ω U U
+        + (Op.lam / 2 + Op.Csup + (d : ℝ) * Op.Bsup ^ 2 / (2 * Op.lam))
+            * ‖(U : H1amb Ω) 0‖ ^ 2 := by
+  rw [weakForm_eq]
+  exact (toFullEllipticOp Op).garding Ω U
+
+/-! ### Existence and uniqueness for a nonnegative zeroth-order coefficient -/
+
+/-- **First Existence Theorem for weak solutions** (Evans, §6.2.2, Theorem 3, p. 319). -/
+theorem weak_solution_of_nonneg_zeroth {n : ℕ} (Op : EllipticOperator (n + 1))
+    {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩb : Bornology.IsBounded Ω)
+    (hb : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
+    (hc : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x) :
+    ∃ CP : ℝ, 0 ≤ CP ∧ ∀ f : L2D Ω,
+      (∃! u : H01 Ω, ∀ v : H01 Ω, weakForm Op Ω u v = datumPairing f v)
+        ∧ ∀ u : H01 Ω, (∀ v : H01 Ω, weakForm Op Ω u v = datumPairing f v) →
+            ‖u‖ ≤ (CP + 1) / Op.lam * ‖f‖ := by
+  obtain ⟨CP, hCP, hmain⟩ :=
+    EllipticPdes.Sobolev.FullEllipticOp.weak_solution_L2_of_nonneg_zeroth_of_bounded
+      (toFullEllipticOp Op) hΩb hb hc
+  refine ⟨CP, hCP, fun f => ⟨?_, ?_⟩⟩
+  · simp only [weakForm_eq, datumPairing_eq]
+    exact (hmain f).1
+  · intro u hu
+    simp only [weakForm_eq, datumPairing_eq] at hu
+    exact (hmain f).2 u hu
+
 /-! ### The Fredholm alternative -/
 
-/-- **The Fredholm alternative for the elliptic Dirichlet problem** (Evans, *Partial
-Differential Equations* (2nd ed.), §6.2.3, Theorem 4(i), p. 321). Let `L` be a
-second-order divergence-form operator with measurable bounded coefficients and uniformly
-elliptic principal part, on a domain whose embedding `H_0^1(Ω) ↪ L²(Ω)` is compact.
-Then exactly one of the following holds.
-
-* The homogeneous problem `L u = 0` has a weak solution `u ≠ 0`, that is, some `u ≠ 0` in
-  `H_0^1(Ω)` with `B[u, v] = 0` for every `v ∈ H_0^1(Ω)`.
-* The problem `L u = f` has exactly one weak solution for every bounded linear functional
-  `f` on `H_0^1(Ω)`.
-
-The two alternatives exclude one another, since a nonzero solution of the homogeneous
-problem can be added to any solution of the inhomogeneous one. -/
+/-- **Second Existence Theorem for weak solutions** (Evans, §6.2.3, Theorem 4(i),
+p. 321). -/
 theorem fredholm_alternative (Op : EllipticOperator d)
-    (Ω : Set (EuclideanSpace ℝ (Fin d))) (hRellich : IsCompactOperator (embL2 Ω)) :
+    (Ω : Set (EuclideanSpace ℝ (Fin d))) (hΩm : MeasurableSet Ω)
+    (hΩb : Bornology.IsBounded Ω) :
     (∃ u : H01 Ω, u ≠ 0 ∧ ∀ v : H01 Ω, weakForm Op Ω u v = 0)
       ∨ (∀ f : H01 Ω →L[ℝ] ℝ, ∃! u : H01 Ω,
           ∀ v : H01 Ω, weakForm Op Ω u v = f v) := by
-  have halt := (toFullEllipticOp Op).fredholm_alternative_rellich Ω hRellich
-  rcases halt with ⟨u, hu0, hu⟩ | hall
-  · exact Or.inl ⟨u, hu0, fun v => by rw [weakForm_eq]; exact hu v⟩
-  · refine Or.inr fun f => ?_
-    obtain ⟨u, hu, huniq⟩ := hall f
-    exact ⟨u, fun v => by rw [weakForm_eq]; exact hu v,
-      fun w hw => huniq w fun v => by rw [← weakForm_eq]; exact hw v⟩
+  simp only [weakForm_eq]
+  exact EllipticPdes.Sobolev.FullEllipticOp.fredholm_alternative_of_bounded
+    (toFullEllipticOp Op) Ω hΩm hΩb
 
--- The proof rests on the three axioms of classical Lean and on nothing else.
+/-- **Solvability against the transpose problem** (Evans, §6.2.3, Theorem 4(iii),
+p. 321). -/
+theorem solvable_iff_orthogonal_transpose (Op : EllipticOperator d)
+    (Ω : Set (EuclideanSpace ℝ (Fin d))) (hΩm : MeasurableSet Ω)
+    (hΩb : Bornology.IsBounded Ω) (f : H01 Ω →L[ℝ] ℝ) :
+    (∃ u : H01 Ω, ∀ v : H01 Ω, weakForm Op Ω u v = f v)
+      ↔ ∀ w : H01 Ω, (∀ v : H01 Ω, weakForm Op Ω v w = 0) → f w = 0 := by
+  have hK := (toFullEllipticOp Op).opK_isCompact Ω
+    (EllipticPdes.Sobolev.embL2_isCompact hΩm hΩb)
+  have hmem : ∀ w : EllipticPdes.Sobolev.H01 Ω,
+      w ∈ (toFullEllipticOp Op).solSpaceStar Ω
+        ↔ ∀ v : EllipticPdes.Sobolev.H01 Ω, (toFullEllipticOp Op).fullBilin Ω v w = 0 := by
+    intro w
+    rw [EllipticPdes.Sobolev.FullEllipticOp.solSpaceStar, LinearMap.mem_ker,
+      ContinuousLinearMap.coe_coe]
+    constructor
+    · intro hw v
+      rw [← (toFullEllipticOp Op).inner_opA Ω v w, ← ContinuousLinearMap.adjoint_inner_right,
+        hw, inner_zero_right]
+    · intro hw
+      refine ext_inner_right (𝕜 := ℝ) (fun v => ?_)
+      rw [ContinuousLinearMap.adjoint_inner_left, inner_zero_left, real_inner_comm,
+        (toFullEllipticOp Op).inner_opA Ω v w, hw v]
+  have hiff := (toFullEllipticOp Op).solvable_iff_orthogonal_solSpaceStar Ω hK f
+  simp only [weakForm_eq]
+  constructor
+  · intro h w hw
+    exact hiff.mp h w ((hmem w).mpr hw)
+  · intro h
+    exact hiff.mpr (fun w hw => h w ((hmem w).mp hw))
+
+/-! ### The discrete set of exceptional shifts -/
+
+/-- **Third Existence Theorem for weak solutions** (Evans, §6.2.3, Theorem 5, p. 323). -/
+theorem existence_three (Op : EllipticOperator d)
+    (Ω : Set (EuclideanSpace ℝ (Fin d))) (hΩm : MeasurableSet Ω)
+    (hΩb : Bornology.IsBounded Ω) :
+    ∃ S : Set ℝ, S.Countable ∧ (∀ C : ℝ, (S ∩ Set.Iic C).Finite) ∧
+      ∀ lam : ℝ, lam ∉ S ↔ ∀ f : L2D Ω, ∃! u : H01 Ω, ∀ v : H01 Ω,
+        weakForm Op Ω u v = lam * zerothPairing Ω u v + datumPairing f v := by
+  obtain ⟨S, hcount, hfin, hiff⟩ :=
+    (toFullEllipticOp Op).existence_three_of_bounded Ω hΩm hΩb
+  refine ⟨S, hcount, hfin, fun lam => ?_⟩
+  simp only [weakForm_eq, zerothPairing_eq, datumPairing_eq]
+  exact hiff lam
+
+/-! ### Boundedness of the inverse -/
+
+/-- **Boundedness of the inverse** (Evans, §6.2.3, Theorem 6, p. 324). -/
+theorem resolvent_bound (Op : EllipticOperator d)
+    (Ω : Set (EuclideanSpace ℝ (Fin d))) (hΩm : MeasurableSet Ω)
+    (hΩb : Bornology.IsBounded Ω) {lam : ℝ}
+    (hlam : ∀ f : H01 Ω →L[ℝ] ℝ, ∃! u : H01 Ω, ∀ v : H01 Ω,
+      weakForm Op Ω u v = lam * zerothPairing Ω u v + f v) :
+    ∃ C : ℝ, 0 < C ∧ ∀ f : L2D Ω, ∀ u : H01 Ω,
+      (∀ v : H01 Ω,
+        weakForm Op Ω u v = lam * zerothPairing Ω u v + datumPairing f v) →
+      ‖(u : H1amb Ω) 0‖ ≤ C * ‖f‖ := by
+  simp only [weakForm_eq, zerothPairing_eq] at hlam
+  have hnot : lam ∉ (toFullEllipticOp Op).sigmaSet Ω :=
+    ((toFullEllipticOp Op).notMem_sigmaSet_iff_solvable_of_bounded Ω hΩm hΩb lam).mpr hlam
+  obtain ⟨C, hC, hbound⟩ :=
+    (toFullEllipticOp Op).resolvent_bound_of_bounded Ω hΩm hΩb hnot
+  refine ⟨C, hC, fun f u hu => hbound f u ?_⟩
+  simp only [weakForm_eq, zerothPairing_eq, datumPairing_eq,
+    EllipticPdes.Sobolev.FullEllipticOp.zerothForm_apply] at hu
+  exact hu
+
+-- The proofs rest on the three axioms of classical Lean and on nothing else.
+/-- info: 'Palomar.garding' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms Palomar.garding
+
+/-- info: 'Palomar.weak_solution_of_nonneg_zeroth' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms Palomar.weak_solution_of_nonneg_zeroth
+
 /-- info: 'Palomar.fredholm_alternative' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms Palomar.fredholm_alternative
+
+/-- info: 'Palomar.solvable_iff_orthogonal_transpose' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms Palomar.solvable_iff_orthogonal_transpose
+
+/-- info: 'Palomar.existence_three' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms Palomar.existence_three
+
+/-- info: 'Palomar.resolvent_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms Palomar.resolvent_bound
 
 end Palomar
