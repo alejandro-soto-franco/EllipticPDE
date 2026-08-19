@@ -1,5 +1,5 @@
 /-
-Axiom gates for the headline results.
+Axiom audit of the headline results.
 
 Each declaration the README claims is pinned here to the three axioms of
 classical Lean: `propext`, `Classical.choice` and `Quot.sound`. `#guard_msgs`

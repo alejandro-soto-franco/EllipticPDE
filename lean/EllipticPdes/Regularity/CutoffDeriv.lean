@@ -394,7 +394,7 @@ the whole-space extension of `ξ · g` agrees with that of `g`. Applied to the f
 coordinate of `interior_cutoffGrad_mem_H01`, this says that the admissible element carries
 `∂_ℓ u` itself on `V`, so nothing is lost on the region of interest.
 
-Kept as the statement that reads `interior_cutoffGrad_mem_H01`, which is pinned in `Gates`.
+Kept as the statement that reads `interior_cutoffGrad_mem_H01`, which is pinned in `AxiomAudit`.
 Nothing else consumes it. -/
 theorem restrictL2_extendL2_mulTest_xi (hΩm : MeasurableSet Ω)
     {V : Set (EuclideanSpace ℝ (Fin d))} (hVm : MeasurableSet V) (hVΩ : V ⊆ Ω)

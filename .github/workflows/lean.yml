@@ -10,7 +10,7 @@ on:
   pull_request:
 
 jobs:
-  # Every declaration Gates.lean pins is checked against the literature it
+  # Every declaration AxiomAudit.lean pins is checked against the literature it
   # cites, so a result cannot be presented as literature-checked when no
   # warrant names it. Reads the manifest rather than the sources, which are
   # copyrighted and gitignored, so it needs neither Lean nor a key.
@@ -21,7 +21,7 @@ jobs:
       - uses: astral-sh/setup-uv@v5
       - name: Every pinned declaration is warranted or exempt
         run: uv run python verify/proofsense_coverage.py
-      - name: The coverage gate's own tests
+      - name: The coverage check's own tests
         working-directory: verify
         run: uv run --with pytest python -m pytest test_proofsense_coverage.py -q
 
@@ -36,10 +36,10 @@ jobs:
           ./elan-init -y --default-toolchain "$(cat lean/lean-toolchain)"
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
 
-      # Builds `EllipticPdes` and `Gates`. The `Gates` target pins every headline
+      # Builds `EllipticPdes` and `AxiomAudit`. That target pins every headline
       # result to [propext, Classical.choice, Quot.sound] with `#guard_msgs`, so a
       # change in the axiom set fails here instead of going unnoticed.
-      - name: Build, including the axiom gates
+      - name: Build, including the axiom audit
         working-directory: lean
         run: |
           lake exe cache get || true

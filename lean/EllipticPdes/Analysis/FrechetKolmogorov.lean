@@ -419,7 +419,7 @@ theorem integrableOn_prod_sq_sub (g : EucL2 n) {s t : Set (EuclideanSpace ℝ (F
   nlinarith [sq_nonneg (g p.1 - g p.2), sq_nonneg (g p.1 + g p.2)]
 
 /-- **The displacement product integrability.** The squared difference `(g x - g (x + w)) ^ 2`
-is integrable over `ℝⁿ × D` for any finite-measure `D` of displacements. This is the gateway to the
+is integrable over `ℝⁿ × D` for any finite-measure `D` of displacements. This is what admits the
 Tonelli swap in the cube-translation estimate: the `w`-marginal of the integrand is the constant
 `‖g‖ ^ 2` (translation is an `L²` isometry), so `integrable_prod_iff'` closes. -/
 theorem integrable_prod_displacement (g : EucL2 n) {D : Set (EuclideanSpace ℝ (Fin n))}

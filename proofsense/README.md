@@ -1,7 +1,7 @@
 # proofsense warrants
 
 A [proofsense](https://github.com/alejandro-soto-franco/proofsense) manifest
-pairing this development's axiom-gated results with the literature statements
+pairing this development's audited results with the literature statements
 they cite, so a claim of the form "this formalises Evans Theorem N" is checkable
 rather than asserted. Two sources carry warrants: Evans for the existence,
 Fredholm, spectral and interior-regularity chain, and Fernández-Real and
@@ -39,7 +39,7 @@ The binary also exposes only `check`; there is no `resolve` subcommand, and
 `check` spawns `lake exe proofsense-lean`, which this lakefile does not declare.
 So no warrant in this manifest has been machine-checked end to end. What **is**
 enforced in CI is `verify/proofsense_coverage.py`, which checks that every
-declaration whose axioms `lean/Gates.lean` pins carries a warrant or a recorded
+declaration whose axioms `lean/AxiomAudit.lean` pins carries a warrant or a recorded
 exemption, and that no locator names a bare section. It passes.
 
 ## Why the locators name theorems
@@ -60,7 +60,7 @@ result in a numbered section, a named result in a section that numbers none
 
 ## Coverage
 
-Forty-two of the forty-nine declarations pinned in `lean/Gates.lean` carry a
+Forty-two of the forty-nine declarations pinned in `lean/AxiomAudit.lean` carry a
 warrant. The seven that do not, and why:
 
 | Declaration | State |

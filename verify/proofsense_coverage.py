@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 """
-Warrant-coverage gate between Gates.lean and the proofsense manifest.
+Warrant coverage between AxiomAudit.lean and the proofsense manifest.
 
-`adduce formalize check` gates the LaTeX statement against the Lean declaration
-that discharges it. Nothing gates the other link: whether the Lean declaration
+`adduce formalize check` compares the LaTeX statement with the Lean declaration
+that discharges it. The other link goes unchecked: whether the Lean declaration
 states the theorem in the literature it cites. That link is proofsense's, and
-this script gates its coverage, so a result cannot be presented as checked
+this script requires its coverage, so a result cannot be presented as checked
 against the literature when no warrant names it.
 
 Three things are asserted:
 
-  * every declaration axiom-gated in `lean/Gates.lean` either carries a warrant
+  * every declaration audited in `lean/AxiomAudit.lean` either carries a warrant
     in `proofsense/manifest.json` or appears in EXEMPT below with a reason;
-  * every warrant names a declaration that Gates.lean gates, so the manifest
+  * every warrant names a declaration AxiomAudit.lean audits, so the manifest
     cannot drift onto a declaration nothing pins the axioms of;
   * every warrant's locator names a statement rather than a section, since a
     section locator hands the judge every theorem under the heading and makes
@@ -32,10 +32,10 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-GATES = ROOT / "lean" / "Gates.lean"
+AUDIT = ROOT / "lean" / "AxiomAudit.lean"
 MANIFEST = ROOT / "proofsense" / "manifest.json"
 
-# Gated declarations with no warrant, and why. Adding a name here is a claim
+# Audited declarations with no warrant, and why. Adding a name here is a claim
 # that no transcribed statement matches it, which the README under
 # proofsense/ has to justify in prose.
 EXEMPT = {
@@ -104,8 +104,8 @@ EXEMPT = {
 # The second and third forms arrived with the Fernandez-Real and Ros-Oton text,
 # which numbers its appendix properties (H1) to (H8) and leaves several chapter
 # theorems unnumbered. Restricting the rule to the first form would have forced
-# a warrant for either to cite the enclosing section, which is the failure the
-# gate exists to prevent.
+# a warrant for either to cite the enclosing section, which is the failure this
+# script exists to prevent.
 _MARKER = r"Thm|Theorem|Lem|Lemma|Cor|Corollary|Def|Definition|Rmk|Remark|Prop|Proposition"
 STATEMENT_LOCATOR = re.compile(
     rf"""^(?:
@@ -116,31 +116,33 @@ STATEMENT_LOCATOR = re.compile(
 )
 
 
-def gated_declarations(path: Path) -> list[str]:
-    """Every declaration `#print axioms` pins in Gates.lean, in file order."""
+def audited_declarations(path: Path) -> list[str]:
+    """Every declaration `#print axioms` pins in AxiomAudit.lean, in file order."""
     text = path.read_text(encoding="utf-8")
     return re.findall(r"^#print axioms\s+(\S+)\s*$", text, re.MULTILINE)
 
 
-def check(gated: list[str], warrants: list[dict], exempt: dict) -> list[str]:
-    """Every way the manifest and Gates.lean can disagree, as failure lines."""
+def check(audited: list[str], warrants: list[dict], exempt: dict) -> list[str]:
+    """Every way the manifest and AxiomAudit.lean can disagree, as failure lines."""
     warranted = {w["decl"] for w in warrants}
     failures: list[str] = []
 
-    for decl in gated:
+    for decl in audited:
         if decl not in warranted and decl not in exempt:
             failures.append(
-                f"{decl} is axiom-gated but carries no warrant and is not exempt"
+                f"{decl} is audited but carries no warrant and is not exempt"
             )
 
-    for decl in sorted(d for d in exempt if d not in gated):
-        failures.append(f"{decl} is exempt but Gates.lean no longer gates it")
+    for decl in sorted(d for d in exempt if d not in audited):
+        failures.append(f"{decl} is exempt but AxiomAudit.lean no longer audits it")
 
     for decl in sorted(warranted & set(exempt)):
         failures.append(f"{decl} is both warranted and exempt; drop the exemption")
 
-    for decl in sorted(d for d in warranted if d not in gated):
-        failures.append(f"{decl} carries a warrant but Gates.lean does not gate it")
+    for decl in sorted(d for d in warranted if d not in audited):
+        failures.append(
+            f"{decl} carries a warrant but AxiomAudit.lean does not audit it"
+        )
 
     for w in warrants:
         if not STATEMENT_LOCATOR.match(w["locator"]):
@@ -153,28 +155,28 @@ def check(gated: list[str], warrants: list[dict], exempt: dict) -> list[str]:
 
 
 def main() -> int:
-    for path in (GATES, MANIFEST):
+    for path in (AUDIT, MANIFEST):
         if not path.exists():
             print(f"missing {path}", file=sys.stderr)
             return 2
 
-    gated = gated_declarations(GATES)
-    if not gated:
-        print(f"no `#print axioms` lines found in {GATES}", file=sys.stderr)
+    audited = audited_declarations(AUDIT)
+    if not audited:
+        print(f"no `#print axioms` lines found in {AUDIT}", file=sys.stderr)
         return 2
 
     warrants = json.loads(MANIFEST.read_text(encoding="utf-8")).get("warrants", [])
-    failures = check(gated, warrants, EXEMPT)
+    failures = check(audited, warrants, EXEMPT)
 
     for failure in failures:
         print(f"  FAIL  {failure}")
 
     warranted = {w["decl"] for w in warrants}
-    exempt_count = len([d for d in gated if d in EXEMPT])
-    uncovered = len([d for d in gated if d not in warranted and d not in EXEMPT])
+    exempt_count = len([d for d in audited if d in EXEMPT])
+    uncovered = len([d for d in audited if d not in warranted and d not in EXEMPT])
     print(
-        f"\n{len(gated)} gated declarations: "
-        f"{len(gated) - exempt_count - uncovered} warranted, "
+        f"\n{len(audited)} audited declarations: "
+        f"{len(audited) - exempt_count - uncovered} warranted, "
         f"{exempt_count} exempt, {uncovered} uncovered"
     )
 

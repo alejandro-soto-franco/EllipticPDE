@@ -67,20 +67,20 @@ operator.
 
 - `lean/` the formalisation. A standalone lake project pinned to Lean
   `v4.31.0-rc1`.
-- `lean/Gates.lean` pins the axiom set of each headline result with
+- `lean/AxiomAudit.lean` pins the axiom set of each headline result with
   `#print axioms` under `#guard_msgs`, built as a target of its own.
 
 ## Build
 
 ```bash
-cd lean && lake build      # includes the axiom pins in Gates.lean
+cd lean && lake build      # includes the axiom pins in AxiomAudit.lean
 cd lean && lake lint       # environment-level linter
 ```
 
 CI runs both on every push. It builds from a clean clone, asserts the
 library is free of `sorry`, and holds every headline result to the axioms
-`propext`, `Classical.choice` and `Quot.sound` through `Gates.lean`, where each
-is pinned with `#guard_msgs`.
+`propext`, `Classical.choice` and `Quot.sound` through `AxiomAudit.lean`, where
+each is pinned with `#guard_msgs`.
 
 ## Toolchain
 

@@ -1,9 +1,9 @@
 name = "EllipticPdes"
 version = "0.1.0"
 keywords = ["math", "pde", "elliptic"]
-defaultTargets = ["EllipticPdes", "Gates"]
+defaultTargets = ["EllipticPdes", "AxiomAudit"]
 
-# Environment-level lint gate, mirroring Mathlib's own configuration. `lake lint`
+# Environment-level linter, mirroring Mathlib's own configuration. `lake lint`
 # runs Batteries' linter frontend over the elaborated `Environment`, covering the
 # checks a text-based linter cannot reach: docBlame, unusedArguments, simpNF,
 # synTaut and unusedHavesSuffices.
@@ -27,8 +27,8 @@ rev = "542645ab80a3ee3a715ad8610b8c0fdac58ba54c"
 [[lean_lib]]
 name = "EllipticPdes"
 
-# Axiom gates for the headline results, pinned with `#guard_msgs`. A build
+# Axiom audit of the headline results, pinned with `#guard_msgs`. A build
 # target rather than a script, so `lake build` fails when a headline result
 # starts depending on an axiom beyond the classical three.
 [[lean_lib]]
-name = "Gates"
+name = "AxiomAudit"

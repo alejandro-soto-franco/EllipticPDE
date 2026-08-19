@@ -5,8 +5,8 @@ def warrant(decl, locator="§6.3.1 Thm 1"):
     return {"decl": decl, "source_id": "evans-2010", "locator": locator}
 
 
-def test_gates_parses_the_printed_declarations(tmp_path):
-    f = tmp_path / "Gates.lean"
+def test_the_audit_parses_the_printed_declarations(tmp_path):
+    f = tmp_path / "AxiomAudit.lean"
     f.write_text(
         "import EllipticPdes\n"
         "/-- info: 'A.b' depends on axioms: [propext] -/\n"
@@ -14,26 +14,26 @@ def test_gates_parses_the_printed_declarations(tmp_path):
         "#print axioms A.b\n"
         "#print axioms C.d\n"
     )
-    assert pc.gated_declarations(f) == ["A.b", "C.d"]
+    assert pc.audited_declarations(f) == ["A.b", "C.d"]
 
 
-def test_a_warranted_gated_declaration_passes():
+def test_a_warranted_audited_declaration_passes():
     assert pc.check(["A.b"], [warrant("A.b")], {}) == []
 
 
-def test_an_unwarranted_gated_declaration_fails():
+def test_an_unwarranted_audited_declaration_fails():
     failures = pc.check(["A.b"], [], {})
     assert len(failures) == 1
     assert "carries no warrant" in failures[0]
 
 
-def test_an_exemption_covers_a_gated_declaration():
+def test_an_exemption_covers_an_audited_declaration():
     assert pc.check(["A.b"], [], {"A.b": "no transcribed target"}) == []
 
 
 def test_a_stale_exemption_fails():
     failures = pc.check(["A.b"], [warrant("A.b")], {"C.d": "gone"})
-    assert any("no longer gates it" in f for f in failures)
+    assert any("no longer audits it" in f for f in failures)
 
 
 def test_being_both_warranted_and_exempt_fails():
@@ -41,9 +41,9 @@ def test_being_both_warranted_and_exempt_fails():
     assert any("both warranted and exempt" in f for f in failures)
 
 
-def test_a_warrant_on_an_ungated_declaration_fails():
+def test_a_warrant_on_an_unaudited_declaration_fails():
     failures = pc.check(["A.b"], [warrant("A.b"), warrant("X.y")], {})
-    assert any("does not gate it" in f for f in failures)
+    assert any("does not audit it" in f for f in failures)
 
 
 def test_a_section_locator_fails():
@@ -90,9 +90,9 @@ def test_a_bare_appendix_locator_still_fails():
 
 
 def test_the_repository_is_covered():
-    """The gate against the real Gates.lean and the real manifest."""
+    """Run against the real AxiomAudit.lean and the real manifest."""
     import json
 
-    gated = pc.gated_declarations(pc.GATES)
+    audited = pc.audited_declarations(pc.AUDIT)
     warrants = json.loads(pc.MANIFEST.read_text(encoding="utf-8"))["warrants"]
-    assert pc.check(gated, warrants, pc.EXEMPT) == []
+    assert pc.check(audited, warrants, pc.EXEMPT) == []
