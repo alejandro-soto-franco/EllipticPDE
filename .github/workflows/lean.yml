@@ -76,3 +76,14 @@ jobs:
       - name: Build the Palomar challenge and solution
         working-directory: lean
         run: lake build Challenge Solution
+
+      # Every sentence describing a compared statement is bound to that statement's
+      # elaborated type by a digest in lean/palomar-claims.lock.json. A statement or a
+      # docstring that moves leaves the lock stale, and this fails until someone re-reads
+      # the prose against the type and signs it with `--sign`. The 2026-08-19 Palomar
+      # review returned five blocking problems, every one a sentence the Lean did not
+      # support and one of them a claim that went stale when the statements changed.
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Every claim about a compared statement matches that statement
+        run: uv run --with pyyaml python verify/palomar_claims.py
