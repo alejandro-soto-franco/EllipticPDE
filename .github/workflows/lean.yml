@@ -65,18 +65,14 @@ jobs:
         run: lake lint
 
       # The Palomar submission pair. `Challenge` states the Fredholm alternative in
-      # Mathlib vocabulary and leaves it `sorry`; `Solution` restates it under the same
-      # name and proves it from the library. Comparator compares the two by name, so
-      # `Solution` cannot import `Challenge` and the shared definitions are two copies.
+      # Mathlib vocabulary and leaves the deliberate placeholder Comparator asks for;
+      # `Solution` restates it under the same name and proves it from the library.
+      # Comparator compares the two by name, so `Solution` cannot import `Challenge`
+      # and the shared definitions are two copies.
+      #
+      # `Solution.lean` pins its own axiom set with `#guard_msgs`, so a `sorryAx`
+      # reaching the proof fails this build. That is the check; a text search for the
+      # word would only find the prose describing the challenge.
       - name: Build the Palomar challenge and solution
         working-directory: lean
         run: lake build Challenge Solution
-
-      - name: Assert the Palomar solution is free of sorry
-        working-directory: lean
-        run: |
-          if grep -n -E '(^|[^A-Za-z_.])sorry([^A-Za-z_]|$)' Solution.lean; then
-            echo "::error::sorry found in Solution.lean"
-            exit 1
-          fi
-          echo "no sorry in Solution.lean"
