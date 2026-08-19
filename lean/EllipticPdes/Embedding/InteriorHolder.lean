@@ -113,9 +113,9 @@ theorem eLpNorm_restrict_mono_toNNReal_le {S T : Set (EuclideanSpace ℝ (Fin d)
 representative that is Hölder continuous with exponent `1/2` and constant a multiple of
 `‖f‖ + ‖u‖`, the multiplier being quantified before the solution and the datum, so it depends
 only on the operator and the ball. In one dimension the first-order weak gradient already lies
-in `L²` and `2 > 1`,
-so Morrey applies to it directly and only the first-order energy estimate is used: neither the
-interior `H²` estimate nor any hypothesis on the geometry of `Ω` is needed. -/
+in `L²` and `2 > 1`, so Morrey applies to it directly and only the first-order energy estimate
+is used: neither the interior `H²` estimate nor any hypothesis on the geometry of `Ω` is
+needed. -/
 theorem interior_holder_estimate_one (Op : FullEllipticOp 1)
     {Ω : Set (EuclideanSpace ℝ (Fin 1))} (hΩm : MeasurableSet Ω)
     (c : EuclideanSpace ℝ (Fin 1)) {r : ℝ} (hr : 0 < r) :
@@ -186,14 +186,14 @@ set_option maxHeartbeats 800000 in
 -- covers.
 /-- **Interior Hölder estimate in two dimensions (Evans, *Partial Differential Equations*
 (2nd ed.), §5.6.2 Thm 5, applied to the interior `H²` estimate of §6.3.1 Thm 1).** A weak
-solution `u ∈ H₀¹(Ω)` of `L u = f` with `C¹` principal coefficients has, on every ball whose
-double lies in `Ω`, a representative that is Hölder continuous with exponent `1/2` and constant
-a multiple of `‖f‖ + ‖u‖`, the multiplier being quantified before the solution and the datum,
-so it depends only on the operator and the two radii. The interior `H²` estimate puts the
-second derivatives in `L²`; at
-`d = 2` the Sobolev conjugate of `2` degenerates, so the bootstrap `exists_eLpNorm_four_le`
-takes its step at `p = 4/3`, paying the finite measure of the ball, and raises the gradient from
-`L²` to `L⁴`. `morrey_ball` then applies at `p = 4 > 2 = d`. -/
+solution `u ∈ H₀¹(Ω)` of `L u = f` with `C¹` principal coefficients has, on every ball
+`B(c, r)` with `r < R` and `closedBall c R ⊆ Ω`, a representative that is Hölder continuous with
+exponent `1/2` and constant a multiple of `‖f‖ + ‖u‖`, the multiplier being quantified before
+the solution and the datum, so it depends only on the operator and the two radii. The interior
+`H²` estimate puts the second derivatives in `L²`; at `d = 2` the Sobolev conjugate of `2`
+degenerates, so the bootstrap `exists_eLpNorm_four_le` takes its step at `p = 4/3`, paying the
+finite measure of the ball, and raises the gradient from `L²` to `L⁴`. `morrey_ball` then
+applies at `p = 4 > 2 = d`. -/
 theorem interior_holder_estimate_two (Op : FullEllipticOp 2)
     {Ω : Set (EuclideanSpace ℝ (Fin 2))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
     (hA : IsC1Coeff Op.toEllipticCoeff)
@@ -321,12 +321,11 @@ set_option maxHeartbeats 800000 in
 -- covers.
 /-- **Interior Hölder estimate in three dimensions (Evans, *Partial Differential Equations*
 (2nd ed.), §5.6.2 Thm 5, applied to the interior `H²` estimate of §6.3.1 Thm 1).** A weak
-solution `u ∈ H₀¹(Ω)` of `L u = f` with `C¹` principal coefficients has, on every ball whose
-double lies in `Ω`, a representative that is Hölder continuous with exponent `1/2` and constant
-a multiple of `‖f‖ + ‖u‖`, the multiplier being quantified before the solution and the datum,
-so it depends only on the operator and the two radii. This is the chain the library was
-missing: the interior `H²`
-estimate puts the second derivatives in `L²`, the Gagliardo-Nirenberg-Sobolev bootstrap
+solution `u ∈ H₀¹(Ω)` of `L u = f` with `C¹` principal coefficients has, on every ball
+`B(c, r)` with `r < R` and `closedBall c R ⊆ Ω`, a representative that is Hölder continuous with
+exponent `1/2` and constant a multiple of `‖f‖ + ‖u‖`, the multiplier being quantified before
+the solution and the datum, so it depends only on the operator and the two radii. The interior
+`H²` estimate puts the second derivatives in `L²`, the Gagliardo-Nirenberg-Sobolev bootstrap
 `exists_eLpNorm_six_le` raises the gradient from `L²` to `L⁶`, and `morrey_ball` applies at
 `p = 6 > 3 = d`, so the weak solution is classically differentiable in the Hölder sense. -/
 theorem interior_holder_estimate (Op : FullEllipticOp 3)

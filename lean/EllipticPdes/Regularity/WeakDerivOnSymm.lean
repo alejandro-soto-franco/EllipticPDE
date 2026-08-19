@@ -120,7 +120,7 @@ theorem mulTest_eq_zero_of_forall_testFn {V : Set (EuclideanSpace ℝ (Fin d))}
   exact norm_eq_zero.mp hnorm
 
 /-- The difference of two `L²(V)` classes pairs with a test function one term at a time. -/
-private theorem setIntegral_sub_mul_testFn {V : Set (EuclideanSpace ℝ (Fin d))}
+private theorem setIntegral_sub_mul_testFn_symm {V : Set (EuclideanSpace ℝ (Fin d))}
     {w₁ w₂ : L2D V} {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφc : ContDiff ℝ (⊤ : ℕ∞) φ)
     (hφcs : HasCompactSupport φ) :
     (∫ x in V, ((w₁ - w₂) x : ℝ) * φ x)
@@ -153,7 +153,7 @@ theorem mulTest_weakDerivOn_unique {V : Set (EuclideanSpace ℝ (Fin d))} (hVm :
   have hkey : ∀ φ : EuclideanSpace ℝ (Fin d) → ℝ, ContDiff ℝ (⊤ : ℕ∞) φ → HasCompactSupport φ →
       tsupport φ ⊆ V → ∫ x in V, ((w₁ - w₂) x : ℝ) * φ x = 0 := by
     intro φ hφc hφcs hφV
-    rw [setIntegral_sub_mul_testFn hφc hφcs]
+    rw [setIntegral_sub_mul_testFn_symm hφc hφcs]
     linarith [h₁ φ hφc hφcs hφV, h₂ φ hφc hφcs hφV]
   have hzero := mulTest_eq_zero_of_forall_testFn hVm hχ hkey
   rw [map_sub] at hzero
@@ -192,7 +192,7 @@ theorem mulTest_mixed_weakDeriv_comm {V : Set (EuclideanSpace ℝ (Fin d))}
       rw [hul (partialD i φ) hdic hdics hdiV]
       linarith [huil φ hφc hφcs hφV]
     -- The two right-hand sides agree, so the difference annihilates `φ`.
-    rw [setIntegral_sub_mul_testFn hφc hφcs, h1, h2, partialD_comm hφc i ℓ, sub_self]
+    rw [setIntegral_sub_mul_testFn_symm hφc hφcs, h1, h2, partialD_comm hφc i ℓ, sub_self]
   have hzero := mulTest_eq_zero_of_forall_testFn hVm hχ hkey
   rw [map_sub] at hzero
   exact sub_eq_zero.mp hzero

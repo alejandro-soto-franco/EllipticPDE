@@ -87,7 +87,7 @@ every point of `[a, b]` with `u'` continuous there, and `u a = 0`, then
 
 A function compactly supported in `(a, b)` satisfies `u a = 0`, so this applies
 to each one-dimensional slice in the Fubini proof of the Poincaré inequality on
-a box, with constant at most `(b - a) ^ 2`. -/
+a box, with constant `(b - a) ^ 2 / 2`. -/
 theorem MeasureTheory.poincare_1d {a b : ℝ} (hab : a ≤ b) {u u' : ℝ → ℝ}
     (hderiv : ∀ y ∈ uIcc a b, HasDerivAt u (u' y) y)
     (hu' : ContinuousOn u' (uIcc a b)) (ha : u a = 0) :

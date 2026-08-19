@@ -132,14 +132,14 @@ theorem contDiffOn_interior_of_hasIteratedWeakDerivOn
   exact exists_contDiffOn_ball_of_hasIteratedWeakDerivOn u h
     ((Metric.closedBall_subset_ball (by linarith)).trans hrsub)
 
-/-- **Infinite differentiability in the interior (Evans, §6.3.1, Theorem 3, p. 331).** For a
-weak solution of `L u = f` whose coefficients lie in `W^{k,∞}` at every order and whose datum
-has weak derivatives of every order in `L²(Ω)`, the solution has a representative smooth on the
-interior of each compact `V ⋐ Ω`.
+/-- **Infinite differentiability in the interior (Evans, *Partial Differential Equations*
+(2nd ed.), §6.3.1, Theorem 3, p. 334).** For a weak solution of `L u = f` whose coefficients lie
+in `W^{k,∞}` at every order and whose datum has weak derivatives of every order in `L²(Ω)`, the
+solution has a representative smooth on the interior of each compact `V ⋐ Ω`.
 
 Smooth coefficients meet the hypothesis through `IsCkCoeff.toIsWkInftyCoeff` and
-`IsWkInfty.ofContDiff`, so the classical statement with `a_{ij}, b_i, c, f ∈ C^∞(Ω)` is an
-instance rather than a separate theorem. -/
+`IsWkInfty.ofContDiff`, so the classical statement with `a_{ij}, b_i, c, f ∈ C^∞(Ω)` follows as
+an instance. -/
 theorem interior_smooth (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
     (hA1 : IsC1Coeff Op.toEllipticCoeff)

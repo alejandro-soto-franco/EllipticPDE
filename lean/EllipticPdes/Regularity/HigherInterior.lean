@@ -426,14 +426,19 @@ theorem interiorRegularityAt_succ (Op : FullEllipticOp (n + 1))
     mul_nonneg (mul_nonneg (by linarith) hC₀0) (by linarith)
   nlinarith [hprod]
 
-/-- **Higher interior regularity (Guo, Theorem VIII.3.2, p. 65).** A weak solution with
-`W^{k+2,∞}` principal coefficients, `W^{k+1,∞}` lower-order coefficients and an `H^k` datum has
-weak derivatives of every order up to `k + 2` on each compact `V ⋐ Ω`, bounded by the data with
-a constant quantified before the solution and the datum.
+/-- **Higher interior regularity (Evans, *Partial Differential Equations* (2nd ed.),
+§6.3.1, Theorem 2, p. 332; Guo, *Partial Differential Equations I and II* (Course Lecture
+Notes), Theorem VIII.3.2, p. 65).** Evans states the result for `C^{m+1}` coefficients; the
+`W^{k,∞}` hypotheses below are Guo's, and nothing in the differentiated equation asks a
+coefficient to be continuous. A weak solution with `W^{k+2,∞}` principal coefficients,
+`W^{k+1,∞}` lower-order coefficients and an `H^k` datum has weak derivatives of every order up
+to `k + 2` on each compact `V ⋐ Ω`, bounded by the data with a constant quantified before the
+solution and the datum.
 
-The coefficient hypotheses are asked at `k + 3` and `k + 2` rather than at `k + 2` and `k + 1`
-because the induction consumes one order per step and the statement is proved for every order
-at once; `IsWkInftyCoeff.mono` recovers the weaker form at any fixed `k`. -/
+The coefficient hypotheses are asked at `k + 3` and `k + 2`, one order above the `k + 2` and
+`k + 1` the conclusion at a fixed `k` needs. The induction consumes one order per step and the
+statement is proved for every order at once; `IsWkInftyCoeff.mono` recovers the weaker form at
+any fixed `k`. -/
 theorem higher_interior_regularity (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
     (hA1 : IsC1Coeff Op.toEllipticCoeff) (k : ℕ)
