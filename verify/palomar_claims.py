@@ -14,7 +14,10 @@ So each compared declaration carries the digest of its own elaborated type in
 stale, and this refuses to pass until someone re-reads the prose and signs it again. That
 is the whole point: signing asserts a human compared the sentence with the type.
 
-Four rules run alongside the lock, each one a defect the review actually found:
+Seven rules run alongside the lock, each one a defect a review actually found. The last
+three come from the second review, and the first of those is the reason the corpus below
+is read from every prose field rather than from `project.description`: the stale sentence
+that survived the first round sat in `status.scope`, which nothing was reading.
 
   * every compared declaration has an `alignment.statements` row, and every row names a
     compared declaration, so the described set and the selected set cannot drift apart;
@@ -23,7 +26,13 @@ Four rules run alongside the lock, each one a defect the review actually found:
   * a statement written in the shifted form `B[u, v] = μ ⟨u, v⟩ + ⟨f, v⟩` must be
     described as `L u = μ u + f`, never with the opposite sign;
   * the scope paragraph must state how many declarations the configuration selects, and
-    the number must be right.
+    the number must be right;
+  * no prose may say the submission covers one result alone while the configuration
+    selects several;
+  * a constant that a statement supplies as a structure field may not be described as a
+    norm of the coefficient it bounds, since a caller may hand over a loose bound;
+  * prose may not describe the compared statements as asking for a measurable domain when
+    they ask for an open one.
 
 Run:  uv run --with pyyaml python verify/palomar_claims.py
       uv run --with pyyaml python verify/palomar_claims.py --sign   (after re-reading)
@@ -58,6 +67,19 @@ COMPACTNESS_DENIED = re.compile(
 # The shifted problem, written with the sign the Lean does not use.
 WRONG_SHIFT_SIGN = re.compile(r"L\s*u\s*\+\s*[μλ]\s*u\s*=\s*f")
 RIGHT_SHIFT_SIGN = re.compile(r"L\s*u\s*=\s*[μλ]\s*u\s*\+\s*f")
+# Prose that reduces the submission to a single result. Both forms below stood in the
+# metadata for a widened configuration, one in `status.scope` and one in a YAML comment.
+SINGLE_RESULT = re.compile(
+    r"(this submission|configuration|comparator)[^.]{0,90}\balone\b"
+    r"|\bonly the [^.]{0,70}(carries|has) a comparator", re.I)
+# A norm written where the statement takes a supplied bound.
+SUPREMUM_NORM = re.compile(r"‖\s*[bc]\s*‖\s*_?[∞_]|essential supremum of\s*[bc]\b", re.I)
+# Prose that attributes a domain hypothesis to the compared statements. The library states
+# its own theory for a measurable domain and must not trip the rule. Hence the subject
+# phrase has to precede the word.
+MEASURABLE_DOMAIN = re.compile(
+    r"(compared statement|formal statement|statement here|statements below|this submission)"
+    r"[^.]{0,160}\bmeasurable\b(?!\s+coefficient)", re.I)
 
 results: list[tuple[bool, str, str]] = []
 
@@ -135,11 +157,16 @@ def main() -> int:
     prose = "\n".join([
         meta.get("fidelity", {}).get("divergences", ""),
         meta.get("project", {}).get("description", ""),
+        meta.get("status", {}).get("scope", ""),
+        # the YAML parser strips comments; the file itself is read for them
+        *[line.lstrip("# ").strip() for line in META.read_text(encoding="utf-8").splitlines()
+          if line.lstrip().startswith("#")],
         *[r.get("note", "") for r in rows],
+        *docs.values(),
     ])
-    offending = [sentence.strip() for sentence in re.split(r"(?<=[.;])\s+", prose)
-                 if COMPACTNESS_CLAIMED.search(sentence)
-                 and not COMPACTNESS_DENIED.search(sentence)]
+    sentences = [x.strip() for x in re.split(r"(?<=[.;])\s+", prose)]
+    offending = [x for x in sentences if COMPACTNESS_CLAIMED.search(x)
+                 and not COMPACTNESS_DENIED.search(x)]
     check(bool(takes_compactness) or not offending,
           "no prose calls compactness a hypothesis while no statement takes one",
           offending[0][:90] if offending else "")
@@ -158,14 +185,34 @@ def main() -> int:
               f"{short} states the shifted equation explicitly",
               "" if RIGHT_SHIFT_SIGN.search(text) else "expected L u = μ u + f")
 
-    # 4. the scope paragraph counts the selected declarations
+    # 4a. no prose reduces a configuration of several declarations to one result
+    single = [x for x in sentences if len(names) > 1 and SINGLE_RESULT.search(x)]
+    check(not single, "no prose says the submission covers one result alone",
+          single[0][:90] if single else "")
+
+    # 4b. a supplied bound is not described as the norm it bounds
+    supplied = {f for n, t in types.items() for f in ("Csup", "Bsup") if f in t}
+    norms = [x for x in sentences if SUPREMUM_NORM.search(x)]
+    check(not (supplied and norms),
+          "no prose calls a supplied coefficient bound an essential supremum",
+          norms[0][:90] if norms else "")
+
+    # 4c. the domain hypothesis in the prose is the one the statements take
+    opens = any("IsOpen" in t for t in types.values())
+    measurables = any("MeasurableSet" in t for t in types.values())
+    stale = [x for x in sentences if MEASURABLE_DOMAIN.search(x)]
+    check(not (opens and not measurables and stale),
+          "the domain hypothesis described is the one the statements take",
+          stale[0][:90] if stale else "")
+
+    # 5. the scope paragraph counts the selected declarations
     description = meta.get("project", {}).get("description", "")
     word = NUMBER_WORDS.get(len(names), str(len(names)))
     counted = re.search(rf"selects {word} declarations", description, re.I) is not None
     check(counted, "the description states how many declarations the configuration selects",
           "" if counted else f"expected 'selects {word} declarations'")
 
-    # 5. the lock: a statement or its prose cannot change unread
+    # 6. the lock: a statement or its prose cannot change unread
     current = {name: {"type_sha256": digest(types[name]),
                       "docstring_sha256": digest(docs.get(name.rsplit(".", 1)[-1], ""))}
                for name in names}

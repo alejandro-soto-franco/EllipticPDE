@@ -22,7 +22,7 @@ project:
     operator on any domain; existence and uniqueness of the weak solution, which needs a
     coercive form and so is proved for a bounded domain with no drift and a nonnegative
     zeroth-order coefficient; the Fredholm alternative for the general operator on a
-    bounded measurable domain, which is what governs solvability when the form is not
+    bounded domain, which is what governs solvability when the form is not
     coercive, together with its solvability criterion against the transpose problem; the
     discrete set of μ off which L u = μ u + f is uniquely solvable, and boundedness of the
     inverse off that set; spectral compactness of the operator; interior H² regularity;
@@ -83,15 +83,20 @@ status:
     H² regularity, higher interior regularity at every order, infinite differentiability
     in the interior, and interior Hölder continuity at exponent 1/2 in dimensions one, two
     and three. Boundary H² regularity has its foundations in place and its headline
-    estimate open. This submission covers the Fredholm alternative alone.
+    estimate open. This Comparator configuration selects six declarations, the
+    solvability theory listed above: the Gårding inequality, existence and uniqueness
+    for a bounded domain with no drift and a nonnegative zeroth-order coefficient, the
+    Fredholm alternative, solvability against the transpose problem, the discrete set of
+    exceptional shifts, and boundedness of the inverse. The regularity, spectral and
+    Poincaré results are listed below without a Comparator configuration.
   sorry_count: 0
   sorry_in_definitions: 0
   axioms: ["propext", "Classical.choice", "Quot.sound"]
   # Headline results of the library. Each is pinned to the three axioms in
   # lean/AxiomAudit.lean and paired with its literature statement in
-  # proofsense/manifest.json. Only the Fredholm alternative carries a Comparator
-  # configuration so far; the rest are listed so this entry reports the size of the
-  # development behind it.
+  # proofsense/manifest.json. Six appear in the Comparator configuration of this
+  # submission; the rest are listed so this entry reports the size of the development
+  # behind it.
   main_results:
     - declaration: "Palomar.garding"
       file: "Solution.lean"
@@ -204,9 +209,14 @@ automation:
 fidelity:
   divergences: >-
     Compactness of the embedding H_0^1(Ω) ↪ L²(Ω) is derived, not assumed. Five of the six
-    compared statements hypothesise only that Ω is bounded and measurable, and the library
-    proves the Rellich-Kondrachov compact embedding from those two assumptions; the Gårding
-    inequality hypothesises nothing about Ω. No statement in this submission takes
+    compared statements hypothesise only that Ω is bounded and open, and the library proves
+    the Rellich-Kondrachov compact embedding from boundedness and measurability alone; the
+    Gårding inequality hypothesises nothing about Ω. The library states its solvability
+    theory for a bounded measurable Ω, and the compared statements narrow that to an open
+    Ω, because a test function has tsupport φ ⊆ Ω: on a set of positive measure with
+    empty interior every test function vanishes, H_0^1(Ω) collapses to zero and unique
+    solvability holds without expressing any Dirichlet problem. Openness is what makes the
+    conclusions have content. No statement in this submission takes
     compactness, or any boundary regularity, as a hypothesis. The library does carry
     theorems conditioned on compactness directly, `fredholm_alternative_rellich` and
     `fredholm_alternative` among them, and those are not the declarations compared here.
@@ -240,8 +250,11 @@ alignment:
       status: "proved"
       note: >-
         Evans states the two energy estimates with unnamed constants α, β > 0 and γ ≥ 0.
-        The formal statement fixes β = λ/2 and γ = λ/2 + ‖c‖_∞ + d ‖b‖_∞²/(2λ), which is
-        the value the proof produces, and asks nothing of Ω. The shift cannot be dropped
+        The formal statement fixes β = λ/2 and γ = λ/2 + C + d B²/(2λ), which is the value
+        the proof produces, and asks nothing of Ω. B and C are the bounds the operator
+        structure supplies, satisfying |b_i| ≤ B and |c| ≤ C almost everywhere; neither is
+        asked to be an essential supremum, so a caller supplying a loose bound obtains a
+        larger shift than the sharp inequality would give. The shift cannot be dropped
         at that generality: coercivity in the H¹ norm needs a Poincaré inequality, which
         the next result obtains from boundedness.
     - source: "Evans §6.2.2, Theorem 3, p. 319 (First Existence Theorem for weak solutions)"
@@ -250,8 +263,10 @@ alignment:
       status: "proved"
       note: >-
         Stated at b = 0 and c ≥ 0 almost everywhere on Ω, where Evans asks for the
-        conditions on U. The Poincaré constant is existentially bound, so the a-priori
-        bound carries the domain through that constant alone.
+        conditions on U. The constant C_P is existentially quantified after both Ω and the
+        operator and has no Poincaré property in the statement, so the a-priori bound
+        ‖u‖ ≤ ((C_P + 1)/λ) ‖f‖ asserts the existence of some constant rather than
+        dependence on the domain alone. The proof supplies a Poincaré constant of Ω.
     - source: "Evans §6.2.3, Theorem 4(i), p. 321 (Second Existence Theorem for weak solutions)"
       lean: "Palomar.fredholm_alternative"
       module: "Solution.lean"
@@ -259,8 +274,8 @@ alignment:
       note: >-
         Evans states the alternative for the operator L u = -(a^{ij} u_{x_i})_{x_j} +
         b^i u_{x_i} + c u on the bounded open U carrying the standing hypotheses of §6.2,
-        and for data f ∈ L²(U). The formal statement asks for a bounded measurable Ω and
-        nothing about its boundary, and quantifies the right-hand side over the dual of
+        and for data f ∈ L²(U). The formal statement asks for a bounded open Ω and nothing
+        further about its boundary, and quantifies the right-hand side over the dual of
         H_0^1(Ω), of which the L² data are the image under v ↦ ∫_Ω f v.
     - source: "Evans §6.2.3, Theorem 4(iii), p. 321"
       lean: "Palomar.solvable_iff_orthogonal_transpose"

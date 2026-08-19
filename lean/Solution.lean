@@ -252,9 +252,11 @@ theorem garding (Op : EllipticOperator d) (Ω : Set (EuclideanSpace ℝ (Fin d))
 
 /-! ### Existence and uniqueness for a nonnegative zeroth-order coefficient -/
 
+set_option linter.unusedVariables false in
 /-- **First Existence Theorem for weak solutions** (Evans, §6.2.2, Theorem 3, p. 319). -/
 theorem weak_solution_of_nonneg_zeroth {n : ℕ} (Op : EllipticOperator (n + 1))
-    {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩb : Bornology.IsBounded Ω)
+    {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩo : IsOpen Ω)
+    (hΩb : Bornology.IsBounded Ω)
     (hb : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
     (hc : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x) :
     ∃ CP : ℝ, 0 ≤ CP ∧ ∀ f : L2D Ω,
@@ -276,24 +278,24 @@ theorem weak_solution_of_nonneg_zeroth {n : ℕ} (Op : EllipticOperator (n + 1))
 /-- **Second Existence Theorem for weak solutions** (Evans, §6.2.3, Theorem 4(i),
 p. 321). -/
 theorem fredholm_alternative (Op : EllipticOperator d)
-    (Ω : Set (EuclideanSpace ℝ (Fin d))) (hΩm : MeasurableSet Ω)
+    (Ω : Set (EuclideanSpace ℝ (Fin d))) (hΩo : IsOpen Ω)
     (hΩb : Bornology.IsBounded Ω) :
     (∃ u : H01 Ω, u ≠ 0 ∧ ∀ v : H01 Ω, weakForm Op Ω u v = 0)
       ∨ (∀ f : H01 Ω →L[ℝ] ℝ, ∃! u : H01 Ω,
           ∀ v : H01 Ω, weakForm Op Ω u v = f v) := by
   simp only [weakForm_eq]
   exact EllipticPdes.Sobolev.FullEllipticOp.fredholm_alternative_of_bounded
-    (toFullEllipticOp Op) Ω hΩm hΩb
+    (toFullEllipticOp Op) Ω hΩo.measurableSet hΩb
 
 /-- **Solvability against the transpose problem** (Evans, §6.2.3, Theorem 4(iii),
 p. 321). -/
 theorem solvable_iff_orthogonal_transpose (Op : EllipticOperator d)
-    (Ω : Set (EuclideanSpace ℝ (Fin d))) (hΩm : MeasurableSet Ω)
+    (Ω : Set (EuclideanSpace ℝ (Fin d))) (hΩo : IsOpen Ω)
     (hΩb : Bornology.IsBounded Ω) (f : H01 Ω →L[ℝ] ℝ) :
     (∃ u : H01 Ω, ∀ v : H01 Ω, weakForm Op Ω u v = f v)
       ↔ ∀ w : H01 Ω, (∀ v : H01 Ω, weakForm Op Ω v w = 0) → f w = 0 := by
   have hK := (toFullEllipticOp Op).opK_isCompact Ω
-    (EllipticPdes.Sobolev.embL2_isCompact hΩm hΩb)
+    (EllipticPdes.Sobolev.embL2_isCompact hΩo.measurableSet hΩb)
   have hmem : ∀ w : EllipticPdes.Sobolev.H01 Ω,
       w ∈ (toFullEllipticOp Op).solSpaceStar Ω
         ↔ ∀ v : EllipticPdes.Sobolev.H01 Ω, (toFullEllipticOp Op).fullBilin Ω v w = 0 := by
@@ -321,13 +323,13 @@ theorem solvable_iff_orthogonal_transpose (Op : EllipticOperator d)
 /-- **Third Existence Theorem for weak solutions** (Evans, §6.2.3, Theorem 5, p. 323).
 `L u = μ u + f`, so the weak form reads `B[u, v] = μ ⟨u, v⟩ + ⟨f, v⟩`. -/
 theorem existence_three (Op : EllipticOperator d)
-    (Ω : Set (EuclideanSpace ℝ (Fin d))) (hΩm : MeasurableSet Ω)
+    (Ω : Set (EuclideanSpace ℝ (Fin d))) (hΩo : IsOpen Ω)
     (hΩb : Bornology.IsBounded Ω) :
     ∃ S : Set ℝ, S.Countable ∧ (∀ C : ℝ, (S ∩ Set.Iic C).Finite) ∧
       ∀ lam : ℝ, lam ∉ S ↔ ∀ f : L2D Ω, ∃! u : H01 Ω, ∀ v : H01 Ω,
         weakForm Op Ω u v = lam * zerothPairing Ω u v + datumPairing f v := by
   obtain ⟨S, hcount, hfin, hiff⟩ :=
-    (toFullEllipticOp Op).existence_three_of_bounded Ω hΩm hΩb
+    (toFullEllipticOp Op).existence_three_of_bounded Ω hΩo.measurableSet hΩb
   refine ⟨S, hcount, hfin, fun lam => ?_⟩
   simp only [weakForm_eq, zerothPairing_eq, datumPairing_eq]
   exact hiff lam
@@ -336,7 +338,7 @@ theorem existence_three (Op : EllipticOperator d)
 
 /-- **Boundedness of the inverse** (Evans, §6.2.3, Theorem 6, p. 324). -/
 theorem resolvent_bound (Op : EllipticOperator d)
-    (Ω : Set (EuclideanSpace ℝ (Fin d))) (hΩm : MeasurableSet Ω)
+    (Ω : Set (EuclideanSpace ℝ (Fin d))) (hΩo : IsOpen Ω)
     (hΩb : Bornology.IsBounded Ω) {lam : ℝ}
     (hlam : ∀ f : H01 Ω →L[ℝ] ℝ, ∃! u : H01 Ω, ∀ v : H01 Ω,
       weakForm Op Ω u v = lam * zerothPairing Ω u v + f v) :
@@ -346,9 +348,10 @@ theorem resolvent_bound (Op : EllipticOperator d)
       ‖(u : H1amb Ω) 0‖ ≤ C * ‖f‖ := by
   simp only [weakForm_eq, zerothPairing_eq] at hlam
   have hnot : lam ∉ (toFullEllipticOp Op).sigmaSet Ω :=
-    ((toFullEllipticOp Op).notMem_sigmaSet_iff_solvable_of_bounded Ω hΩm hΩb lam).mpr hlam
+    ((toFullEllipticOp Op).notMem_sigmaSet_iff_solvable_of_bounded Ω hΩo.measurableSet hΩb
+      lam).mpr hlam
   obtain ⟨C, hC, hbound⟩ :=
-    (toFullEllipticOp Op).resolvent_bound_of_bounded Ω hΩm hΩb hnot
+    (toFullEllipticOp Op).resolvent_bound_of_bounded Ω hΩo.measurableSet hΩb hnot
   refine ⟨C, hC, fun f u hu => hbound f u ?_⟩
   simp only [weakForm_eq, zerothPairing_eq, datumPairing_eq,
     EllipticPdes.Sobolev.FullEllipticOp.zerothForm_apply] at hu
