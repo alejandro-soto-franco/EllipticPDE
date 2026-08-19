@@ -3,7 +3,7 @@
 A [proofsense](https://github.com/alejandro-soto-franco/proofsense) manifest
 pairing this development's audited results with the literature statements
 they cite, so a claim of the form "this formalises Evans Theorem N" is checkable
-rather than asserted. Two sources carry warrants: Evans for the existence,
+rather than asserted. Two sources supply warrants: Evans for the existence,
 Fredholm, spectral and interior-regularity chain, and Fernández-Real and
 Ros-Oton for Campanato's characterisation of Hölder continuity.
 
@@ -39,7 +39,7 @@ The binary also exposes only `check`; there is no `resolve` subcommand, and
 `check` spawns `lake exe proofsense-lean`, which this lakefile does not declare.
 So no warrant in this manifest has been machine-checked end to end. What **is**
 enforced in CI is `verify/proofsense_coverage.py`, which checks that every
-declaration whose axioms `lean/AxiomAudit.lean` pins carries a warrant or a recorded
+declaration whose axioms `lean/AxiomAudit.lean` pins has a warrant or a recorded
 exemption, and that no locator names a bare section. It passes.
 
 ## Why the locators name theorems
@@ -48,7 +48,7 @@ A locator naming a section resolves to every theorem under that heading, and the
 declaration is then asked to entail all of them, which is answered false almost
 always. Measured across the nine warrants of the 2026-07-22 audit, section
 granularity hands the judge 88,249 characters where statement granularity hands
-it 7,617, a factor of 11.6. Section 6.3.1 alone carries three theorems over
+it 7,617, a factor of 11.6. Section 6.3.1 alone holds three theorems over
 12,555 characters, of which `interior_H2_estimate` formalises one, at 1,304.
 
 Every warrant here therefore names its theorem, `§6.3.1 Thm 1` rather than
@@ -60,7 +60,7 @@ result in a numbered section, a named result in a section that numbers none
 
 ## Coverage
 
-Forty-two of the forty-nine declarations pinned in `lean/AxiomAudit.lean` carry a
+Forty-two of the forty-nine declarations pinned in `lean/AxiomAudit.lean` have a
 warrant. The seven that do not, and why:
 
 | Declaration | State |
@@ -68,9 +68,9 @@ warrant. The seven that do not, and why:
 | `EllipticPdes.Regularity.caccioppoli` | No transcribed target. It states a first-derivative Caccioppoli estimate, which Evans proves inside §6.3.1 Theorem 1 rather than stating as a numbered result. Gilbarg and Trudinger Theorem 8.8 is the statement it matches, and that text is not transcribed. |
 | `EllipticPdes.Poincare.poincare_domain` | Nothing to cite. It is the averaging step, taking `n` bounds over an arbitrary family and returning their average, with no gradient and no geometry. `poincare_H01_of_bounded` is the Poincaré inequality and is bound in `latex/.adduce/formalization.lock.toml`. |
 | `EllipticPdes.Poincare.poincare_oneDim` | No transcribed target. It is the interval inequality `∫_a^b u² ≤ (b-a)²/2 ∫_a^b (u')²` for `u` continuously differentiable with `u(a) = 0` at the left endpoint alone. Evans §5.6.1 Theorem 3 is the `W_0^{1,p}` statement, which in one dimension asks `u` to vanish at both ends and names no constant, and §5.8.1 Theorems 1 and 2 subtract the mean over a connected `C¹` domain or over a ball. The manuscript records this lemma as the one new analytic ingredient of the Poincaré chain and prepares it for Mathlib. |
-| `EllipticPdes.Poincare.poincare_H01` | Nothing to cite. It is the density step alone, carrying an abstract constant `C` from the test functions to their closure in `H₀¹(Ω)`, with no geometry and no bound on `C`. Evans performs the corresponding passage inside the proof of §5.6.1 Theorem 3, by approximating `u ∈ W_0^{1,p}(U)` with `C_c^∞(U)` functions, and states no separate lemma. |
+| `EllipticPdes.Poincare.poincare_H01` | Nothing to cite. It is the density step alone, taking an abstract constant `C` from the test functions to their closure in `H₀¹(Ω)`, with no geometry and no bound on `C`. Evans performs the corresponding passage inside the proof of §5.6.1 Theorem 3, by approximating `u ∈ W_0^{1,p}(U)` with `C_c^∞(U)` functions, and states no separate lemma. |
 | `EllipticPdes.Embedding.hasFDerivAt_of_continuousOn_hasWeakGradOn` | No statement to name. It reads a continuous weak gradient as a classical derivative. Evans performs the passage inside the proof of §5.6.3 Theorem 6, where a weak derivative with a continuous representative is treated as a classical one, and states no separate lemma. |
-| `EllipticPdes.Regularity.exists_gradClosed_of_hasIteratedWeakDerivOn` | Nothing to cite. Higher interior regularity is proved order by order, so the weak derivatives arrive as one family per order with nothing relating them, and this assembles them into a single family closed under differentiation, by uniqueness of the weak gradient on a ball. Evans carries `D^α u` as one symbol throughout and never faces the question. |
+| `EllipticPdes.Regularity.exists_gradClosed_of_hasIteratedWeakDerivOn` | Nothing to cite. Higher interior regularity is proved order by order, so the weak derivatives arrive as one family per order with nothing relating them, and this assembles them into a single family closed under differentiation, by uniqueness of the weak gradient on a ball. Evans writes `D^α u` as one symbol throughout and never faces the question. |
 | `EllipticPdes.Campanato.campanatoOn_of_holderOnWith` | No statement to name. It is the converse of property (H3), which Fernández-Real and Ros-Oton record only as the space equality `L^{p,β} = C^{k,α}` in the remark following (H8), attributed to Janson, Taibleson and Weiss and proved there. That source is not transcribed. |
 
 The first two were findings of the 2026-07-22 warrant audit
@@ -132,7 +132,7 @@ Appendix D numbers its theorems 1 to 7 straight through §D.1 to §D.6, so
 general Hölder inequality of item (g).
 
 The three Poincaré warrants all cite Evans §5.6.1 Theorem 3, which restricts to
-`1 ≤ p < n` and so carries the hypothesis `n > 2` at `p = 2`. The declarations
+`1 ≤ p < n` and so needs the hypothesis `n > 2` at `p = 2`. The declarations
 hold in every dimension, since the box route through the one-dimensional
 inequality and Fubini replaces the Gagliardo-Nirenberg-Sobolev route, at the
 cost of `C_P = L/√(2n)` in place of the sharp constant. Evans exhibits no

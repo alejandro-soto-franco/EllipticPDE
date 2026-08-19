@@ -79,7 +79,13 @@ SUPREMUM_NORM = re.compile(r"‖\s*[bc]\s*‖\s*_?[∞_]|essential supremum of\s
 # phrase has to precede the word.
 MEASURABLE_DOMAIN = re.compile(
     r"(compared statement|formal statement|statement here|statements below|this submission)"
-    r"[^.]{0,160}\bmeasurable\b(?!\s+coefficient)", re.I)
+    r"[^.]{0,160}\bmeasurable\b(?!\s+coefficient)"
+    r"|(stated|state[sd]?|asks?) for [^.]{0,40}\bmeasurable\b(?!\s+coefficient)"
+    r"|(requires?|requiring|hypothesis[ei]s\w*) [^.]{0,40}\bmeasurable\b(?!\s+coefficient)",
+    re.I)
+# A sentence whose subject is the library says something true. The library does state its
+# solvability theory for a measurable domain.
+ABOUT_THE_LIBRARY = re.compile(r"\blibrar(y|ies)\b", re.I)
 
 results: list[tuple[bool, str, str]] = []
 
@@ -158,6 +164,8 @@ def main() -> int:
         meta.get("fidelity", {}).get("divergences", ""),
         meta.get("project", {}).get("description", ""),
         meta.get("status", {}).get("scope", ""),
+        # the README is prose about the submission, and the review reads it as such
+        (ROOT / "README.md").read_text(encoding="utf-8"),
         # the YAML parser strips comments; the file itself is read for them
         *[line.lstrip("# ").strip() for line in META.read_text(encoding="utf-8").splitlines()
           if line.lstrip().startswith("#")],
@@ -200,7 +208,8 @@ def main() -> int:
     # 4c. the domain hypothesis in the prose is the one the statements take
     opens = any("IsOpen" in t for t in types.values())
     measurables = any("MeasurableSet" in t for t in types.values())
-    stale = [x for x in sentences if MEASURABLE_DOMAIN.search(x)]
+    stale = [x for x in sentences if MEASURABLE_DOMAIN.search(x)
+             and not ABOUT_THE_LIBRARY.search(x)]
     check(not (opens and not measurables and stale),
           "the domain hypothesis described is the one the statements take",
           stale[0][:90] if stale else "")

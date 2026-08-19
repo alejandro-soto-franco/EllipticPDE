@@ -11,7 +11,7 @@ formulation seeks $u \in H_0^1(\Omega)$ satisfying $B[u,v] = \langle f, v\rangle
 for every $v \in H_0^1(\Omega)$, where $B$ is the associated bilinear form.
 
 The drift term is permitted to be non-zero, so $B$ is in general non-symmetric
-and the problem carries no variational structure. Existence runs through
+and the problem has no variational structure. Existence runs through
 Lax-Milgram.
 
 ## Results
@@ -34,7 +34,7 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   `interior_holder_estimate_two` and `interior_holder_estimate`.
 
 The Hölder estimate chains the $H^2$ estimate through Morrey's inequality on a
-ball. Supporting layers carry Morrey's inequality itself, the
+ball. Supporting layers supply Morrey's inequality itself, the
 Gagliardo-Nirenberg-Sobolev bootstrap `exists_eLpNorm_sobolevConj_le` in general
 dimension and at a general exponent pair, Campanato's characterisation of Hölder
 continuity with its converse, and the Caccioppoli inequality.
@@ -94,9 +94,12 @@ coefficient, the Fredholm alternative, solvability against the transpose problem
 the discrete set of exceptional shifts, and boundedness of the inverse. It inlines
 the graph encoding of $H_0^1(\Omega)$, reads the bilinear form off the graph
 coordinates as a sum of integrals, and leaves each statement `sorry`. Every result
-but the Gårding inequality is stated for a bounded measurable $\Omega$, so the
-Rellich-Kondrachov compact embedding is discharged rather than assumed.
-`lean/Solution.lean` carries the same six statements under the same names and proves
+but the Gårding inequality is stated for a bounded open $\Omega$, so the
+Rellich-Kondrachov compact embedding is discharged rather than assumed. Openness is
+what gives those five conclusions content: a test function has
+$\operatorname{tsupport} \varphi \subseteq \Omega$, so on a set of positive measure
+with empty interior every test function vanishes and $H_0^1(\Omega)$ is zero.
+`lean/Solution.lean` states the same six statements under the same names and proves
 them from the library.
 
 Comparator looks a theorem up by name in both modules, so `Solution.lean` restates
@@ -106,7 +109,7 @@ produces two statements that both elaborate and differ, which the build would no
 catch.
 
 The six `sorry`s in `Challenge.lean` are the placeholders Comparator requires.
-Nothing under `EllipticPdes/` carries one, and `Solution.lean` carries none either:
+Nothing under `EllipticPdes/` has one, and `Solution.lean` has none either:
 each of its six results pins its own axiom set with `#guard_msgs`, so a `sorryAx`
 reaching any of them fails the build.
 
