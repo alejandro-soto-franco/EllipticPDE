@@ -51,16 +51,29 @@ status:
 automation:
   methods:
     - method: "agent"
-      models: []
+      models: ["claude-opus-4-5"]
       framework: "Claude Code"
-      tool_setup: ""
+      tool_setup: >-
+        Claude Code in a terminal on a local workstation, running lake and the repository's
+        own checks directly. No retrieval harness or proof-search tool was involved, and
+        no model beyond the one named.
       cost:
-        wall_time: ""
-        spend_usd: ""
-        hardware: ""
-      prompting_notes: ""
-  spend_usd: ""
-  notes: ""
+        wall_time: "about eleven weeks, 2026-06-01 to 2026-08-19"
+        spend_usd: "subscription"
+        hardware: "API-only, on a local workstation"
+      prompting_notes: >-
+        Statement-first: a target theorem was named with its literature locator, the
+        declaration and its hypotheses were fixed by hand, and the proof was developed
+        against `lake build`. Sorries were permitted on a branch and never on the default
+        branch, which CI enforces.
+  spend_usd: "subscription-based usage"
+  notes: >-
+    The development was written with substantial assistance from Claude Opus 4.5 under
+    Claude Code, directed and reviewed by the author throughout. Every statement in the
+    library was chosen and read by the author; the axiom set of each headline result is
+    pinned in `lean/AxiomAudit.lean` and each is paired with its literature statement in
+    `proofsense/manifest.json`, both checked in CI. Wall time spans the private manuscript
+    repository from 2026-06-01; the public repository carries the library from 2026-08-02.
 
 fidelity:
   divergences: >-
