@@ -18,12 +18,16 @@ project:
     is unrestricted, so the bilinear form is in general non-symmetric and the problem
     carries no variational structure; existence runs through Lax-Milgram.
 
-    Proved for the general operator, with no `sorry` in the library: existence and
-    uniqueness of the weak solution; the Gårding inequality; the Fredholm alternative
-    with its kernel, index and solvability clauses; the resolvent bound; spectral
-    compactness of the operator; interior H² regularity; higher interior regularity at
-    every order; infinite differentiability in the interior; and interior Hölder
-    continuity at exponent 1/2 in dimensions one, two and three.
+    Proved with no `sorry` in the library: the Gårding inequality for the general
+    operator on any domain; existence and uniqueness of the weak solution, which needs a
+    coercive form and so is proved for a bounded domain with no drift and a nonnegative
+    zeroth-order coefficient; the Fredholm alternative for the general operator on a
+    bounded measurable domain, which is what governs solvability when the form is not
+    coercive, together with its solvability criterion against the transpose problem; the
+    discrete set of μ off which L u = μ u + f is uniquely solvable, and boundedness of the
+    inverse off that set; spectral compactness of the operator; interior H² regularity;
+    higher interior regularity at every order; infinite differentiability in the interior;
+    and interior Hölder continuity at exponent 1/2 in dimensions one, two and three.
 
     Supporting layers carry Morrey's inequality, the Gagliardo-Nirenberg-Sobolev estimate
     in general dimension and at a general exponent pair, Campanato's characterisation of
@@ -33,11 +37,18 @@ project:
     gradient as data rather than through a weak-derivative predicate.
 
     Boundary H² regularity has its foundations in place and its headline estimate open,
-    and Schauder C^{k,α} estimates remain a roadmap item. This entry registers the
-    solvability theory of §6.2 of Evans: the Gårding inequality, existence and uniqueness
-    for a nonnegative zeroth-order coefficient, the Fredholm alternative, solvability
-    against the transpose problem, the discrete set of exceptional shifts, and
-    boundedness of the inverse. The interior regularity results are a separate entry.
+    and Schauder C^{k,α} estimates remain a roadmap item.
+
+    The Comparator configuration of this submission selects six declarations and no
+    others, the solvability theory of Evans §6.2: the Gårding inequality, existence and
+    uniqueness for a bounded domain with no drift and a nonnegative zeroth-order
+    coefficient, the Fredholm alternative, solvability against the transpose problem, the
+    discrete set of exceptional μ, and boundedness of the inverse. It excludes the
+    interior-regularity results of the library, which are interior H² regularity, higher
+    interior regularity, infinite differentiability in the interior and interior Hölder
+    continuity, along with the spectral results and the Poincaré chain. Those are listed
+    under status.main_results without a Comparator configuration and will take their own
+    challenge and solution modules in a later submission.
   authors:
     - "Alejandro Soto Franco"
     - "Kobe Marshall-Stevens"
@@ -192,16 +203,22 @@ automation:
 
 fidelity:
   divergences: >-
-    Evans derives the compactness of the embedding H_0^1(Ω) ↪ L²(Ω) from boundedness of
-    the domain through the Rellich-Kondrachov theorem; here it is a hypothesis, so the
-    statement holds for any Ω whose embedding is compact and asks nothing of the geometry
-    or the regularity of the boundary. The right-hand side is a bounded linear functional
-    on H_0^1(Ω) rather than an f ∈ L²(Ω); the L² case is the image of f under the pairing
-    v ↦ ∫_Ω f v. Coefficients are measurable and bounded on ℝ^d, with the bounds holding
-    almost everywhere for Lebesgue measure, rather than being defined on Ω alone.
-    H_0^1(Ω) is realised as the closure of the test-function graphs inside
-    L²(Ω) × (L²(Ω))^d, so a member carries its weak gradient as data rather than through a
-    weak-derivative predicate; the challenge statement spells that encoding out and reads
+    Compactness of the embedding H_0^1(Ω) ↪ L²(Ω) is derived, not assumed. Five of the six
+    compared statements hypothesise only that Ω is bounded and measurable, and the library
+    proves the Rellich-Kondrachov compact embedding from those two assumptions; the Gårding
+    inequality hypothesises nothing about Ω. No statement in this submission takes
+    compactness, or any boundary regularity, as a hypothesis. The library does carry
+    theorems conditioned on compactness directly, `fredholm_alternative_rellich` and
+    `fredholm_alternative` among them, and those are not the declarations compared here.
+    Evans works on a bounded open U carrying the standing hypotheses of §6.2, which include
+    boundary regularity; the compared statements ask less of the domain than that.
+    The right-hand side of the Fredholm alternative and of the solvability criterion is a
+    bounded linear functional on H_0^1(Ω) rather than an f ∈ L²(Ω); the L² case is the
+    image of f under the pairing v ↦ ∫_Ω f v. Coefficients are measurable and bounded on
+    ℝ^d, with the bounds holding almost everywhere for Lebesgue measure, rather than being
+    defined on Ω alone. H_0^1(Ω) is realised as the closure of the test-function graphs
+    inside L²(Ω) × (L²(Ω))^d, so a member carries its weak gradient as data rather than
+    through a weak-derivative predicate; the challenge spells that encoding out and reads
     the bilinear form off the graph coordinates.
 
 review:
@@ -224,7 +241,9 @@ alignment:
       note: >-
         Evans states the two energy estimates with unnamed constants α, β > 0 and γ ≥ 0.
         The formal statement fixes β = λ/2 and γ = λ/2 + ‖c‖_∞ + d ‖b‖_∞²/(2λ), which is
-        the value the proof produces, and asks nothing of Ω.
+        the value the proof produces, and asks nothing of Ω. The shift cannot be dropped
+        at that generality: coercivity in the H¹ norm needs a Poincaré inequality, which
+        the next result obtains from boundedness.
     - source: "Evans §6.2.2, Theorem 3, p. 319 (First Existence Theorem for weak solutions)"
       lean: "Palomar.weak_solution_of_nonneg_zeroth"
       module: "Solution.lean"
@@ -257,10 +276,11 @@ alignment:
       module: "Solution.lean"
       status: "proved"
       note: >-
-        Evans identifies Σ as the set of eigenvalues of the operator and records it as at
-        most countable and, if infinite, tending to infinity. The formal statement fixes Σ
-        by the solvability property and states discreteness as finiteness below every
-        level, which is the form the proof establishes.
+        The equation is L u = μ u + f, in Evans's eigenvalue convention, so the weak form
+        reads B[u, v] = μ ⟨u, v⟩ + ⟨f, v⟩ and Σ is the set of eigenvalues of L. Evans
+        records Σ as at most countable and, if infinite, tending to infinity. The formal
+        statement fixes Σ by the solvability property and states discreteness as finiteness
+        below every level, which is the form the proof establishes.
     - source: "Evans §6.2.3, Theorem 6, p. 324 (Boundedness of the inverse)"
       lean: "Palomar.resolvent_bound"
       module: "Solution.lean"

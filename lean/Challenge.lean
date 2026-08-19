@@ -22,9 +22,9 @@ Let `Ω ⊆ ℝ^d` and let
 be a second-order operator in divergence form whose coefficients are measurable and
 bounded and whose principal part is uniformly elliptic, `∑_{ij} a_{ij}(x) ξ_i ξ_j ≥ λ |ξ|²`
 for almost every `x` and every `ξ`. The drift `b` is unrestricted and `c` carries no sign
-condition, so the operator is in general non-symmetric and the problem carries no
-variational structure. The weak formulation of the Dirichlet problem seeks `u ∈ H_0^1(Ω)`
-with `B[u, v] = ⟨f, v⟩` for every `v ∈ H_0^1(Ω)`, where
+condition, so the operator is in general non-symmetric and carries no variational
+structure. The weak Dirichlet problem seeks `u ∈ H_0^1(Ω)` with `B[u, v] = ⟨f, v⟩` for
+every `v ∈ H_0^1(Ω)`, where
 
   `B[u, v] = ∑_{ij} ∫_Ω a_{ij} ∂_i u ∂_j v + ∑_i ∫_Ω b_i ∂_i u v + ∫_Ω c u v`.
 
@@ -33,25 +33,22 @@ Six results are stated below, all from Evans, *Partial Differential Equations* (
 boundary:
 
 * the Gårding inequality (§6.2.2, Theorem 2, p. 318);
-* existence, uniqueness and the a-priori bound when `b = 0` and `c ≥ 0`
-  (§6.2.2, Theorem 3, p. 319);
+* existence, uniqueness and the a-priori bound at `b = 0`, `c ≥ 0` (§6.2.2, Thm 3, p. 319);
 * the Fredholm alternative (§6.2.3, Theorem 4(i), p. 321);
 * solvability against the transpose problem (§6.2.3, Theorem 4(iii), p. 321);
-* the discrete set of shifts off which the problem is uniquely solvable
-  (§6.2.3, Theorem 5, p. 323);
+* the discrete set of `μ` off which `L u = μ u + f` is solvable (§6.2.3, Thm 5, p. 323);
 * boundedness of the inverse off that set (§6.2.3, Theorem 6, p. 324).
 
 ## Encoding of `H_0^1(Ω)`
 
 `H_0^1(Ω)` is realised as the closure of the smooth compactly supported functions inside
-the graph space `L²(Ω) × (L²(Ω))^d`, carrying the `H¹` inner product. An element `U` of
-that ambient space is a `(d+1)`-tuple of `L²` classes: coordinate `0` is the function and
-coordinate `i.succ` is its `i`-th partial derivative. A test function `φ` enters as the
-tuple `(φ, ∂_1 φ, …, ∂_d φ)`, and `H_0^1(Ω)` is the topological closure of the span of
-those tuples, so a member carries its weak gradient with it: `(U : H1amb Ω) 0` denotes the
-function and `(U : H1amb Ω) i.succ` denotes `∂_i u`. Compactness of the embedding
-`H_0^1(Ω) ↪ L²(Ω)`, the Rellich-Kondrachov theorem, is proved for a bounded measurable `Ω`
-rather than assumed, so it appears in none of the statements below.
+the graph space `L²(Ω) × (L²(Ω))^d`, carrying the `H¹` inner product. An element `U` is a
+`(d+1)`-tuple of `L²` classes: coordinate `0` is the function, coordinate `i.succ` its
+`i`-th partial derivative. A test function `φ` enters as `(φ, ∂_1 φ, …, ∂_d φ)`, and
+`H_0^1(Ω)` is the topological closure of the span of those tuples, so a member carries its
+weak gradient with it. Compactness of the embedding `H_0^1(Ω) ↪ L²(Ω)`, the
+Rellich-Kondrachov theorem, is proved for a bounded measurable `Ω` rather than assumed, so
+it appears in none of the statements below.
 -/
 
 open MeasureTheory
@@ -209,8 +206,9 @@ multiple of the `L²` norm,
 
 `(λ/2) ‖u‖²_{H¹} ≤ B[u, u] + γ ‖u‖²_{L²}`,   `γ = λ/2 + ‖c‖_∞ + d ‖b‖_∞² / (2λ)`,
 
-for every `u ∈ H_0^1(Ω)`, on any `Ω`. The shift is what the drift and the zeroth-order
-term cost: at `b = 0` and `c ≥ 0` the form is coercive outright. -/
+for every `u ∈ H_0^1(Ω)`, on any `Ω`. Removing the shift takes more than `b = 0` and
+`c ≥ 0`, which leave `B[u, u]` bounding the gradient alone: coercivity in the `H¹` norm
+needs a Poincaré inequality too, so it holds on a bounded domain, as in the next result. -/
 theorem garding (Op : EllipticOperator d) (Ω : Set (EuclideanSpace ℝ (Fin d)))
     (U : H01 Ω) :
     Op.lam / 2 * ‖U‖ ^ 2
@@ -269,9 +267,10 @@ theorem solvable_iff_orthogonal_transpose (Op : EllipticOperator d)
 
 /-- **Third Existence Theorem for weak solutions** (Evans, §6.2.3, Theorem 5, p. 323).
 On a bounded measurable `Ω` there is an at most countable set `Σ ⊆ ℝ`, finite below every
-level, such that the shifted problem `L u + μ u = f` is uniquely solvable for every
-`f ∈ L²(Ω)` exactly when `μ ∉ Σ`. Evans records `Σ` as the set of eigenvalues of the
-operator; the statement here fixes it by that solvability property alone. -/
+level, such that `L u = μ u + f` is uniquely solvable for every `f ∈ L²(Ω)` exactly when
+`μ ∉ Σ`, so the weak form below reads `B[u, v] = μ ⟨u, v⟩_{L²} + ⟨f, v⟩_{L²}`. Evans
+records `Σ` as the eigenvalues of `L`, the `μ` at which `L w = μ w` has a nontrivial weak
+solution; the statement here fixes `Σ` by the solvability property alone. -/
 theorem existence_three (Op : EllipticOperator d)
     (Ω : Set (EuclideanSpace ℝ (Fin d))) (hΩm : MeasurableSet Ω)
     (hΩb : Bornology.IsBounded Ω) :
@@ -282,8 +281,8 @@ theorem existence_three (Op : EllipticOperator d)
 
 /-! ### Boundedness of the inverse -/
 
-/-- **Boundedness of the inverse** (Evans, §6.2.3, Theorem 6, p. 324). At a shift where
-the problem is uniquely solvable for every right-hand side, the solution operator is
+/-- **Boundedness of the inverse** (Evans, §6.2.3, Theorem 6, p. 324). At a `μ` where
+`L u = μ u + f` is uniquely solvable for every right-hand side, the solution operator is
 bounded from `L²(Ω)` to `L²(Ω)`: one constant serves every datum and every solution. -/
 theorem resolvent_bound (Op : EllipticOperator d)
     (Ω : Set (EuclideanSpace ℝ (Fin d))) (hΩm : MeasurableSet Ω)

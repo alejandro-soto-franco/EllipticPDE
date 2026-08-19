@@ -318,7 +318,8 @@ theorem solvable_iff_orthogonal_transpose (Op : EllipticOperator d)
 
 /-! ### The discrete set of exceptional shifts -/
 
-/-- **Third Existence Theorem for weak solutions** (Evans, §6.2.3, Theorem 5, p. 323). -/
+/-- **Third Existence Theorem for weak solutions** (Evans, §6.2.3, Theorem 5, p. 323).
+`L u = μ u + f`, so the weak form reads `B[u, v] = μ ⟨u, v⟩ + ⟨f, v⟩`. -/
 theorem existence_three (Op : EllipticOperator d)
     (Ω : Set (EuclideanSpace ℝ (Fin d))) (hΩm : MeasurableSet Ω)
     (hΩb : Bornology.IsBounded Ω) :
