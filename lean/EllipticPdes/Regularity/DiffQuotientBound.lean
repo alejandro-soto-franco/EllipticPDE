@@ -47,7 +47,7 @@ def HasWeakDeriv (k : Fin d) (g g' : EucL2 d) : Prop :=
   ∀ φ : EuclideanSpace ℝ (Fin d) → ℝ, ContDiff ℝ (⊤ : ℕ∞) φ → HasCompactSupport φ →
     ∫ x, (g x) * (partialD k φ x) = - ∫ x, (g' x) * (φ x)
 
-/-! ### The smooth compactly supported case -/
+/-! ### Smooth compactly supported case -/
 
 /-- The segment path `t ↦ φ (x + t • v)` has derivative `(fderiv ℝ φ (x + t • v)) v`
 at every `t`, for `φ` smooth. -/
@@ -612,7 +612,7 @@ theorem weakDeriv_of_diffQuot_bounded (k : Fin d) (g : EucL2 d) (M : ℝ)
   rw [hinnerG', hinnerG] at hkey
   linarith [hkey]
 
-/-! ### The general weak-derivative direction-i bound -/
+/-! ### General weak-derivative direction-i bound -/
 
 /-- The uncurried product `(x, t) ↦ g(x) · ψ(x - t v)` of an `L²` class `g` with a translate
 of a continuous compactly supported `ψ` is integrable for the product of Lebesgue measure with

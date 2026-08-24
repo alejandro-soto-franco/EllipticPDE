@@ -6,7 +6,7 @@ Authors: Alejandro Soto Franco
 import EllipticPdes.Regularity.Interior.Support
 
 /-!
-# The master interior difference-quotient energy estimate
+# Master interior difference-quotient energy estimate
 
 The interior second-derivative estimate (Evans, *Partial Differential Equations* (2nd ed.),
 §6.3.1; Gilbarg-Trudinger, *Elliptic PDE of Second Order*, Theorem 8.8) proceeds by testing
@@ -20,8 +20,7 @@ commutator, cross, zeroth-order, and right-hand terms.
 
 * `evansTest`: the admissible test element `v_h = -Dₖ^{-h}(ξ² Dₖ^h u) ∈ H₀¹(Ω)`, whose
   membership is two applications of `cutoffMul_diffQuotG_mem_H01`.
-* `interior_diffQuot_energy_bound`: the master energy estimate that the sections D1 and D2
-  assemble.
+* `interior_diffQuot_energy_bound`: the master energy estimate the sections below assemble.
 -/
 
 open MeasureTheory
@@ -36,7 +35,7 @@ open EllipticPdes.Sobolev
 variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))}
   {ξ θ : EuclideanSpace ℝ (Fin d) → ℝ}
 
-/-! ### D1: The admissible Evans test element -/
+/-! ### Admissible Evans test element -/
 
 /-- **The admissible Evans test element** `v_h = -Dₖ^{-h}(ξ² Dₖ^h u) ∈ H₀¹(Ω)`. The inner
 cutoff `ξ²` and the outer cutoff `θ` (which is `≡ 1` on `tsupport ξ`) localise the two
@@ -66,7 +65,7 @@ theorem evansTest_coe (hΩm : MeasurableSet Ω) (hξ : IsTestFn Ω ξ) (hθ : Is
           (cutoffMul (isTestFn_mul hξ hξ) (diffQuotG k h hΩm (u : H1amb Ω))))) :=
   rfl
 
-/-! ### D2 core: support control and θ-invisibility -/
+/-! ### Support control and θ-invisibility -/
 
 /-- **Support of the interior difference quotient.** If a class `g` has whole-space extension
 a.e. supported in a measurable set `S`, then its interior difference quotient `diffQuotD k h g`
@@ -137,7 +136,7 @@ private lemma mulTestPartial_theta_diffQuotD (hΩm : MeasurableSet Ω) (hθ : Is
       by_contra hc; exact hd (hzero (not_or.mp hc).1 (not_or.mp hc).2)
     rw [hθ0 x hmem hmemS, zero_mul]
 
-/-! ### D2 core: discrete integration by parts -/
+/-! ### Discrete integration by parts -/
 
 /-- **Discrete integration by parts, principal term.** For a class `p` whose whole-space
 extension stays supported inside `Ω` after the backward shift, the restricted-domain pairing
@@ -158,13 +157,12 @@ private lemma actL_diffQuotD_ibp (A : EllipticCoeff d) (hΩm : MeasurableSet Ω)
     diffQuot_inner_adjoint k h (extendL2 hΩm (A.actL i j g)) (extendL2 hΩm p)]
   exact (neg_neg _).symm
 
-/-! ### D2 core: support of the inner cutoff data and the Evans coordinate reduction -/
+/-! ### Support of the inner cutoff data and the Evans coordinate reduction -/
 
-/-- **Support of the inner cutoff data.** Every ambient coordinate of the inner block
-`ξ² · Dₖ^h u` has whole-space extension a.e. supported in `tsupport ξ²`: the zeroth
-coordinate is `ξ² · Dₖ^h u₀`, and the `i+1` coordinate is
-`ξ² · Dₖ^h ∂ᵢu + (∂ᵢξ²) · Dₖ^h u₀`, both of which carry the factor `ξ²` (or its partial,
-whose support is smaller). -/
+/-- **Support of the inner cutoff data.** Every ambient coordinate of the inner block `ξ² · Dₖ^h
+u` has whole-space extension a.e. supported in `tsupport ξ²`: the zeroth coordinate is `ξ² ·
+Dₖ^h u₀`, and the `i+1` coordinate is `ξ² · Dₖ^h ∂ᵢu + (∂ᵢξ²) · Dₖ^h u₀`, both of which have the
+factor `ξ²` (or its partial, whose support is smaller). -/
 private lemma diffQuotG_cutoffSq_supp (hξ : IsTestFn Ω ξ) (hΩm : MeasurableSet Ω)
     (k : Fin d) (h : ℝ) (u : H1amb Ω) (j : Fin (d + 1)) :
     ∀ᵐ x ∂volume,
@@ -318,16 +316,16 @@ private lemma evansTest_bilin_L2D (A : EllipticCoeff d) (hΩm : MeasurableSet Ω
   refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
   rw [real_inner_comm, extendL2_inner_restrictL2, ← diffQuotD_eq_restrictL2_diffQuot]
 
-/-! ### D2 core: the extension-by-zero weak derivative and the first-order global energy -/
+/-! ### Extension-by-zero weak derivative and the first-order global energy -/
 
-/-- **Extension by zero of an `H₀¹` element carries the weak gradient.** For `u ∈ H₀¹(Ω)`,
-the whole-space extension by zero of the function value `u₀` has whole-space `L²` weak
-`k`-derivative equal to the extension by zero of the gradient component `u_{k+1}`. Because
-`u` vanishes at the boundary (it lies in the closure of the compactly supported test
-functions), no boundary term appears when integrating against an arbitrary whole-space test
-function `φ`: the identity `∫ (extendL2 u₀) ∂ₖφ = -∫ (extendL2 u_{k+1}) φ` is closed under
-`L²` limits and holds on every test-function graph by classical integration by parts, hence
-on the whole of `H₀¹(Ω)` (Evans, *Partial Differential Equations* (2nd ed.), §5.8.2). -/
+/-- **Extension by zero of an `H₀¹` element carries the weak gradient.** For `u ∈ H₀¹(Ω)`, the
+whole-space extension by zero of the function value `u₀` has whole-space `L²` weak
+`k`-derivative equal to the extension by zero of the gradient component `u_{k+1}`. Because `u`
+vanishes at the boundary (it lies in the closure of the compactly supported test functions), no
+boundary term appears when integrating against an arbitrary whole-space test function `φ`: the
+identity `∫ (extendL2 u₀) ∂ₖφ = -∫ (extendL2 u_{k+1}) φ` is closed under `L²` limits and holds
+on every test-function graph by classical integration by parts, hence on all of `H₀¹(Ω)` (Evans,
+*Partial Differential Equations* (2nd ed.), §5.8.2). -/
 theorem hasWeakDeriv_extendL2_of_mem_H01 (hΩm : MeasurableSet Ω) (k : Fin d)
     {U : H1amb Ω} (hU : U ∈ H01 Ω) :
     HasWeakDeriv k (extendL2 hΩm (U 0)) (extendL2 hΩm (U k.succ)) := by
@@ -477,16 +475,16 @@ private lemma norm_diffQuotD_u0_le (hΩm : MeasurableSet Ω) (k : Fin d) (h : �
     _ = ‖(u : H1amb Ω) k.succ‖ := norm_extendL2 hΩm _
 
 /-- **Ambient-space generalisation of `norm_diffQuotD_u0_le` (proof of concept).** `H01` is not
-needed for this inequality itself: it is needed only to manufacture the one
-whole-space weak-derivative fact `hasWeakDeriv_extendL2_of_mem_H01` supplies. Factoring that
-fact out as a hypothesis `hW` shows the rest of `norm_diffQuotD_u0_le`'s proof (the identity
-`diffQuotD = restrict ∘ diffQuot ∘ extendL2`, the non-expansive restriction, and the
-difference-quotient/weak-derivative bound `norm_diffQuot_le_of_hasWeakDeriv`) survives
-unchanged for an arbitrary ambient graph `U : H1amb Ω`, with no reference to `H01` at all.
-Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, Remark (i), states that the
-zero-trace hypothesis this lemma's `H01`-typed sibling carries is not required for the interior
-estimate; this declaration isolates that the only place it was doing work in this particular
-step was in supplying `hW`, not in the inequality.
+needed for this inequality itself: it is needed only to manufacture the one whole-space
+weak-derivative fact `hasWeakDeriv_extendL2_of_mem_H01` supplies. Factoring that fact out as a
+hypothesis `hW` shows the rest of `norm_diffQuotD_u0_le`'s proof (the identity `diffQuotD =
+restrict ∘ diffQuot ∘ extendL2`, the non-expansive restriction, and the
+difference-quotient/weak-derivative bound `norm_diffQuot_le_of_hasWeakDeriv`) survives unchanged
+for an arbitrary ambient graph `U : H1amb Ω`, with no reference to `H01` at all. Evans, *Partial
+Differential Equations* (2nd ed.), §6.3.1, Remark (i), states that the zero-trace hypothesis
+this lemma's `H01`-typed sibling states is not required for the interior estimate; this
+declaration isolates that the only place it was doing work in this particular step was in
+supplying `hW`, not in the inequality.
 
 Kept as that record. The chain runs on the `H01`-typed sibling, so nothing consumes this
 one. -/
@@ -502,7 +500,7 @@ theorem norm_diffQuotD_u0_le_ambient (hΩm : MeasurableSet Ω) (k : Fin d) (h : 
         norm_diffQuot_le_of_hasWeakDeriv k (extendL2 hΩm (U 0)) (extendL2 hΩm (U k.succ)) hW h
     _ = ‖U k.succ‖ := norm_extendL2 hΩm _
 
-/-! ### D2 core: the master assembly toolkit -/
+/-! ### Master assembly toolkit -/
 
 /-- Multiplying by `ξ²` is multiplying by `ξ` twice: `[ξ² · g] = [ξ · (ξ · g)]`. -/
 private lemma mulTest_mul_eq (hξ : IsTestFn Ω ξ) (g : L2D Ω) :
@@ -554,7 +552,7 @@ private lemma norm_diffQuotD_actL_sub_le {A : EllipticCoeff d} (hA : IsC1Coeff A
     ring
   rw [hkey]; exact norm_mulCoeffL_le hmeas hbdd g
 
-/-! ### D2: the master interior difference-quotient energy estimate -/
+/-! ### Master interior difference-quotient energy estimate -/
 
 /-- The squared interior difference quotient of `u₀` is bounded by the full gradient energy:
 `‖Dₖ^h u₀‖² ≤ ∑ᵢ ‖u_{i+1}‖²`. Squaring `norm_diffQuotD_u0_le` (via `gcongr`) and dominating the
@@ -572,9 +570,9 @@ private lemma sq_norm_diffQuotD_u0_le (hΩm : MeasurableSet Ω) (k : Fin d) (h :
 
 
 set_option maxHeartbeats 500000 in
--- The final Young-absorption assembly chains the full D2 toolkit (bilinear identity,
+-- The final Young-absorption assembly chains the full toolkit (bilinear identity,
 -- ellipticity lower bound, five Cauchy-Schwarz/Peter-Paul term families) in one term, whose
--- elaboration exceeds the default heartbeat budget.
+-- elaboration exceeds the default `maxHeartbeats`.
 /-- **The master interior difference-quotient energy estimate.** For a `C¹`-coefficient
 weak solution `u ∈ H₀¹(Ω)` of `L u = f`, an inner cutoff `ξ` and an
 outer cutoff `θ ≡ 1` on the shift-reachable part of `tsupport ξ²`, the cutoff-weighted energy

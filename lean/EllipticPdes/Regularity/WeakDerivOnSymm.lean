@@ -16,19 +16,19 @@ II* (Course Lecture Notes), Theorem VIII.3.2 (p. 65) consumes it as an equation 
 whose gradient is `(∂ᵢ∂_ℓu)ᵢ`. Those two vectors agree only because mixed weak derivatives
 commute, and `HasIteratedWeakDerivOn` is deliberately built without presuming it.
 
-## Why no local integrability appears
+## Absence of local integrability
 
 Testing shows only that the difference of the two second derivatives annihilates every test
 function supported in the region, and the fundamental lemma of the calculus of variations turns
 that into vanishing almost everywhere on an open set. Reaching for it here would drag in local
 integrability of an `L²` class, which is a detour.
 
-A cutoff is cheaper and is what the consumers want anyway. For a test function `χ` supported in
+A cutoff is shorter and is what the consumers want anyway. For a test function `χ` supported in
 the region, `χ·ρ` is admissible for every whole-space test function `ρ`, so the whole-space
 class of `χ·w` annihilates every test class and
 `EllipticPdes.Regularity.annihilates_of_forall_testCls` kills it outright. Every term the
-induction rewrites carries a factor of the middle cutoff or one of its derivatives, and the
-outer cutoff of the tower is identically `1` on a neighbourhood of that support, so the cut-off
+induction rewrites has a factor of the middle cutoff or one of its derivatives, and the outer
+cutoff of the tower is identically `1` on a neighbourhood of that support, so the cut-off
 identity is all that is ever asked for.
 
 ## Main declarations
@@ -78,7 +78,7 @@ theorem partialD_comm {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφ : ContDiff 
   simp only [minSmoothness_of_isRCLikeNormedField]
   exact WithTop.coe_le_coe.mpr le_top
 
-/-! ### A cutoff kills a class that annihilates every test function -/
+/-! ### Vanishing of a class orthogonal to every test function -/
 
 /-- **Test-annihilation kills the cut-off class.** If `w ∈ L²(V)` integrates to zero against
 every test function supported in `V`, then `χ·w = 0` for any test function `χ` supported in
@@ -143,9 +143,9 @@ private theorem setIntegral_sub_mul_testFn_symm {V : Set (EuclideanSpace ℝ (Fi
 the same class pair identically with every test function supported in the region, so their
 difference is killed by any cutoff supported there.
 
-The region is not asked to be open, which is why the conclusion carries the cutoff. A weak
-derivative on a set with empty interior is constrained by nothing, and the consumers multiply
-by a cutoff regardless. -/
+The region is not asked to be open, which is why the conclusion has the cutoff. A weak
+derivative on a set with empty interior is constrained by nothing, and the consumers multiply by
+a cutoff regardless. -/
 theorem mulTest_weakDerivOn_unique {V : Set (EuclideanSpace ℝ (Fin d))} (hVm : MeasurableSet V)
     {χ : EuclideanSpace ℝ (Fin d) → ℝ} (hχ : IsTestFn V χ) {ℓ : Fin d} {g w₁ w₂ : L2D V}
     (h₁ : HasWeakDerivOn V ℓ g w₁) (h₂ : HasWeakDerivOn V ℓ g w₂) :

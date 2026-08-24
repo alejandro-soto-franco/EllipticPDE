@@ -19,7 +19,7 @@ At the point that step is invoked only the tangential second derivatives are kno
 that division: the inverse of the weighted product rule
 `EllipticPdes.Regularity.HasWeakDerivOn.mul_contDiff_left`.
 
-The mathematical content is one line, `v = a⁻¹ · (a · v)`, and the whole cost sits in the
+The mathematical content is one line, `v = a⁻¹ · (a · v)`, and the whole difficulty sits in the
 hypotheses on `a`. A bounded measurable `a` bounded away from zero falls short, since
 differentiating `a⁻¹` costs a derivative of `a`. What the argument needs is
 
@@ -56,7 +56,7 @@ open EllipticPdes.Sobolev
 
 variable {d : ℕ}
 
-/-! ### An almost-everywhere bound on a continuous function is an everywhere bound -/
+/-! ### Everywhere bound from an almost-everywhere bound -/
 
 /-- **A continuous function bounded below almost everywhere is bounded below everywhere.**
 The set where the bound holds is closed, and it is dense because its complement is null and
@@ -100,7 +100,7 @@ open EllipticPdes.Sobolev
 
 variable {d : ℕ}
 
-/-! ### The reciprocal weight -/
+/-! ### Reciprocal weight -/
 
 /-- The reciprocal of a `C¹` function bounded below by `θ > 0` is `C¹`. -/
 private theorem contDiff_inv_of_le {a : EuclideanSpace ℝ (Fin d) → ℝ} (ha : ContDiff ℝ 1 a)
@@ -227,11 +227,10 @@ theorem exists_hasWeakDerivOn_of_mul_contDiff_left {V : Set (EuclideanSpace ℝ 
 
 /-- **The packaged form for a `C¹` elliptic bundle.** With `a := a_{kk}` the `k`-th diagonal
 coefficient entry, ellipticity supplies the lower bound `a_{kk} ≥ lam > 0` (Evans (54)) and
-`IsC1Coeff` supplies both the `C¹` regularity and the gradient bound `A₁`, so the division
-runs on the data the boundary programme already carries. At `ℓ = k = n` this is exactly the
-passage from the rearranged equation (53) to `u_{x_n} ∈ H¹` in step 5 of the proof of
-Evans, *Partial Differential Equations* (2nd ed.), §6.3.2, Theorem 4 (*Boundary `H²`
-regularity*). -/
+`IsC1Coeff` supplies both the `C¹` regularity and the gradient bound `A₁`, so the division runs
+on the data the boundary programme already has. At `ℓ = k = n` this is exactly the passage from
+the rearranged equation (53) to `u_{x_n} ∈ H¹` in step 5 of the proof of Evans, *Partial
+Differential Equations* (2nd ed.), §6.3.2, Theorem 4 (*Boundary `H²` regularity*). -/
 theorem exists_hasWeakDerivOn_of_mul_diag {V : Set (EuclideanSpace ℝ (Fin d))}
     (hVm : MeasurableSet V) (A : EllipticCoeff d) (hA : IsC1Coeff A) (ℓ k : Fin d)
     {v av dav : Lp ℝ 2 (volume.restrict V)}

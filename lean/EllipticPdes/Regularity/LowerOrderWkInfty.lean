@@ -16,7 +16,7 @@ need. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), The
 coefficients than on the principal part, because the lower-order terms are differentiated once
 less often on the way to the same conclusion. This file supplies the missing hypothesis.
 
-## A scalar predicate, then a bundle
+## Scalar predicate and bundle
 
 `IsWkInfty f k` states the hypothesis for a single scalar function, and `IsWkInftyLower`
 bundles it over the `d + 1` lower-order coefficients with a constant uniform across them.
@@ -43,9 +43,9 @@ open EllipticPdes.Sobolev
 
 variable {d : ℕ}
 
-/-! ### The scalar hypothesis -/
+/-! ### Scalar hypothesis -/
 
-/-- **`f ∈ W^{k,∞}`**, carried as data: a family of weak derivatives indexed by lists of
+/-- **`f ∈ W^{k,∞}`**, given as data: a family of weak derivatives indexed by lists of
 directions, each measurable and essentially bounded, with no continuity assumed. The order-zero
 member is `f` itself, so `bound 0` is a sup bound on `f`. -/
 structure IsWkInfty (f : EuclideanSpace ℝ (Fin d) → ℝ) (k : ℕ) where
@@ -102,7 +102,7 @@ def deriv (hf : IsWkInfty f (k + 1)) (m : Fin d) : IsWkInfty (hf.D [m]) k where
 /-- **A `Cᵏ` function with bounded derivatives is in `W^{k,∞}`.** The classical iterated
 partials serve as the family, through `hasWeakPartial_partialD`, and the pointwise
 `iteratedFDeriv` bounds transfer through `abs_iterPartial_le`. Order zero is included here,
-unlike in `IsCkCoeff`, where `EllipticCoeff.Λ` already carries it. -/
+unlike in `IsCkCoeff`, where `EllipticCoeff.Λ` already has it. -/
 def ofContDiff {B : ℕ → ℝ} (hf : ContDiff ℝ ((k : ℕ) : ℕ∞) f) (hB : ∀ m, 0 ≤ B m)
     (hbd : ∀ m, m ≤ k → ∀ x, ‖iteratedFDeriv ℝ m f x‖ ≤ B m) : IsWkInfty f k where
   D := iterPartial f
@@ -124,8 +124,8 @@ def ofContDiff {B : ℕ → ℝ} (hf : ContDiff ℝ ((k : ℕ) : ℕ∞) f) (hB 
       (abs_iterPartial_le α hα hf x).trans (hbd α.length hα x)
 
 /-- **A constant lies in `W^{k,∞}` at every order.** Its derivatives past the zeroth vanish, so
-one bound serves every order. The datum of the induction step carries a term with no coefficient
-at all, namely the derivative of the datum itself, and this is what lets it be treated as a
+one bound serves every order. The datum of the induction step has a term with no coefficient at
+all, namely the derivative of the datum itself, and this is what lets it be treated as a
 weighted term like the rest. -/
 def const (c : ℝ) (k : ℕ) : IsWkInfty (fun _ : EuclideanSpace ℝ (Fin d) => c) k :=
   IsWkInfty.ofContDiff (B := fun _ => |c|) contDiff_const (fun _ => abs_nonneg c) (by
@@ -139,8 +139,8 @@ def const (c : ℝ) (k : ℕ) : IsWkInfty (fun _ : EuclideanSpace ℝ (Fin d) =>
 end IsWkInfty
 
 /-- **A single entry of the coefficient matrix is a `W^{k,∞}` function.** The matrix bundle
-already carries a family for each entry, so the scalar bundle is that family read at a fixed
-pair of indices. -/
+already has a family for each entry, so the scalar bundle is that family read at a fixed pair of
+indices. -/
 def IsWkInftyCoeff.entry {A : EllipticCoeff d} {k : ℕ} (hA : IsWkInftyCoeff A k) (i j : Fin d) :
     IsWkInfty (fun x => A.a x i j) k where
   D α := hA.D α i j
@@ -151,11 +151,11 @@ def IsWkInftyCoeff.entry {A : EllipticCoeff d} {k : ℕ} (hA : IsWkInftyCoeff A 
   bound_nonneg := hA.bound_nonneg
   ess_bdd α hα := hA.ess_bdd i j α hα
 
-/-! ### The bundle over the lower-order coefficients -/
+/-! ### Bundle over the lower-order coefficients -/
 
 /-- **Guo's hypothesis on the lower-order coefficients.** Every transport component and the
 zeroth-order coefficient lie in `W^{k,∞}`, with one constant serving all of them. The uniform
-constant is what the estimate of Theorem VIII.3.2 is stated against, so it is carried here
+constant is what the estimate of Theorem VIII.3.2 is stated against, so it is recorded here
 rather than reconstructed as a maximum at the point of use. -/
 structure IsWkInftyLower (Op : FullEllipticOp d) (k : ℕ) where
   /-- Each transport component is in `W^{k,∞}`. -/

@@ -7,7 +7,7 @@ import EllipticPdes.Embedding.SobolevLadder
 import EllipticPdes.Embedding.ClassicalDeriv
 
 /-!
-# A family closed under differentiation is smooth
+# Smoothness of a family closed under differentiation
 
 Put the two halves together. The Sobolev ladder raises every member of a family closed under weak
 differentiation from `L²` to `L^{2d}` on an inner ball, Morrey turns that into a Hölder
@@ -16,10 +16,10 @@ A continuous function with a continuous weak gradient is classically differentia
 representative is differentiable with its derivative again in the family, and an induction on the
 order reads that as `C^∞`.
 
-Only one ball is lost, at the Morrey step. The ladder shrinks internally between the two radii it
-is given, and the differentiability argument runs on the inner ball itself, since the derivative
-of a representative is a representative. Were the derivative to cost a further shrinking, no
-fixed ball would carry every order.
+Only one ball is lost, at the Morrey step. The ladder shrinks internally between the two radii
+it is given, and the differentiability argument runs on the inner ball itself, since the
+derivative of a representative is a representative. Were the derivative to cost a further
+shrinking, no fixed ball would serve every order.
 
 ## Main declarations
 

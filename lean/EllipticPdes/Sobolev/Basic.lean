@@ -13,13 +13,13 @@ import Mathlib.Topology.UniformSpace.UniformEmbedding
 import Mathlib.Analysis.Calculus.LineDeriv.IntegrationByParts
 
 /-!
-# Sobolev interface (M4): H¹ / H₀¹ as weak-derivative Hilbert spaces
+# H¹ and H₀¹ as weak-derivative Hilbert spaces
 
-We realise `W^{1,2}(Ω)` as the **graph of the weak-gradient operator** inside the
-Hilbert space `L²(Ω) × (L²(Ω))ᵈ` (encoded as `PiLp 2` over `Fin (d+1)`: coordinate `0`
-is the function, coordinate `i.succ` the `i`-th weak partial). The weak-gradient
-relation is orthogonality to a family of explicit "constraint vectors", so `W^{1,2}` is
-an orthogonal complement: closed, complete, and a real Hilbert space for free.
+We realise `W^{1,2}(Ω)` as the **graph of the weak-gradient operator** inside the Hilbert space
+`L²(Ω) × (L²(Ω))ᵈ` (encoded as `PiLp 2` over `Fin (d+1)`: coordinate `0` is the function,
+coordinate `i.succ` the `i`-th weak partial). The weak-gradient relation is orthogonality to a
+family of explicit "constraint vectors", so `W^{1,2}` is an orthogonal complement: closed,
+complete, and a real Hilbert space with no further work.
 -/
 
 open MeasureTheory
@@ -35,9 +35,9 @@ variable {d : ℕ}
 abbrev L2D (Ω : Set (EuclideanSpace ℝ (Fin d))) : Type :=
   Lp ℝ 2 (volume.restrict Ω)
 
-/-- Ambient Hilbert space for the graph encoding: a function value together with `d`
-gradient components, carrying the ℓ² (H¹) inner product. Coordinate `0` is the function;
-coordinate `i.succ` is the `i`-th weak partial derivative. -/
+/-- Ambient Hilbert space for the graph encoding: a function value together with `d` gradient
+components, with the ℓ² (H¹) inner product. Coordinate `0` is the function; coordinate `i.succ`
+is the `i`-th weak partial derivative. -/
 abbrev H1amb (Ω : Set (EuclideanSpace ℝ (Fin d))) : Type :=
   PiLp 2 (fun _ : Fin (d + 1) => L2D Ω)
 
@@ -228,7 +228,7 @@ lemma inner_toLp_eq {Ω : Set (EuclideanSpace ℝ (Fin d))}
   filter_upwards [hf.coeFn_toLp, hg.coeFn_toLp] with a ha hb
   rw [Real.inner_apply, ha, hb]
 
-/-! ### The weak-gradient graph space `W^{1,2}(Ω)` -/
+/-! ### Weak-gradient graph space `W^{1,2}(Ω)` -/
 
 /-- The set of all constraint vectors over `Ω`. -/
 def constraintSet (Ω : Set (EuclideanSpace ℝ (Fin d))) : Set (H1amb Ω) :=
@@ -266,7 +266,7 @@ lemma mem_W12_iff {Ω : Set (EuclideanSpace ℝ (Fin d))} (U : H1amb Ω) :
     | add x y _ _ ihx ihy => rw [inner_add_left, ihx, ihy, add_zero]
     | smul c x _ ih => rw [inner_smul_left]; simp [ih]
 
-/-! ### H₀¹(Ω): the closure of the test functions -/
+/-! ### H₀¹(Ω) as the closure of the test functions -/
 
 /-- The set of test-function graphs over `Ω`. -/
 def testGraphSet (Ω : Set (EuclideanSpace ℝ (Fin d))) : Set (H1amb Ω) :=

@@ -6,24 +6,24 @@ Authors: Alejandro Soto Franco
 import EllipticPdes.Regularity.HigherWeakDeriv
 
 /-!
-# A locally smooth representative is a smooth representative
+# Smoothness of a locally smooth representative
 
 Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 3 (p. 331) is proved on
 balls: the Sobolev ladder runs inside a ball compactly contained in the region, and produces a
-smooth function agreeing almost everywhere with the solution there. The theorem is stated on
-the region. This file is the passage between the two, and it is the only part of that argument
-carrying no analysis.
+smooth function agreeing almost everywhere with the solution there. The theorem is stated on the
+region. This file is the passage between the two, and it is the only part of that argument with
+no analysis.
 
 Two observations do the work.
 
 * **The local representatives agree where they overlap.** Both are continuous on the
-  intersection of their balls, which is open, and both agree almost everywhere with the same
-  class there. A nonempty open set has positive Lebesgue measure, so two continuous functions
-  agreeing almost everywhere on one agree on it.
+  intersection of their balls, which is open, and agree almost everywhere with the same class
+  there. A nonempty open set has positive Lebesgue measure, so two continuous functions agreeing
+  almost everywhere on one agree on it.
 * **So no gluing is needed.** Sending `x` to the value at `x` of the representative attached to
-  `x` itself already agrees with every local representative on the whole of that
-  representative's ball, by the previous point. Smoothness is then local, and the almost
-  everywhere identity follows from a countable subcover.
+  `x` itself already agrees with every local representative on all of that representative's
+  ball, by the previous point. Smoothness is then local, and the almost everywhere identity
+  follows from a countable subcover.
 
 ## Main declarations
 
@@ -40,9 +40,9 @@ namespace EllipticPdes.Regularity
 
 variable {d : ℕ}
 
-/-- **Almost everywhere equality upgrades to equality for continuous functions on an open
-set.** Where they differ at a point they differ on an open neighbourhood, which carries
-positive Lebesgue measure. -/
+/-- **Almost everywhere equality upgrades to equality for continuous functions on an open set.**
+Where they differ at a point they differ on an open neighbourhood, which has positive Lebesgue
+measure. -/
 theorem eqOn_of_ae_eq_of_continuousOn {W : Set (EuclideanSpace ℝ (Fin d))} (hW : IsOpen W)
     {f g : EuclideanSpace ℝ (Fin d) → ℝ} (hf : ContinuousOn f W) (hg : ContinuousOn g W)
     (hae : f =ᵐ[volume.restrict W] g) : Set.EqOn f g W := by
@@ -67,9 +67,8 @@ open ball inside `U` on which some smooth function agrees almost everywhere with
 single smooth function does so on all of `U`.
 
 No gluing construction appears. The value at `x` is taken from the representative attached to
-`x`, and `eqOn_of_ae_eq_of_continuousOn` makes that choice agree with every other
-representative on the whole of its own ball, which is what turns pointwise selection into a
-locally smooth function. -/
+`x`, and `eqOn_of_ae_eq_of_continuousOn` makes that choice agree with every other representative
+on all of its own ball, which is what turns pointwise selection into a locally smooth function. -/
 theorem exists_contDiffOn_of_locally_ae {U : Set (EuclideanSpace ℝ (Fin d))} (hUo : IsOpen U)
     (u : EuclideanSpace ℝ (Fin d) → ℝ)
     (h : ∀ x ∈ U, ∃ B : Set (EuclideanSpace ℝ (Fin d)), IsOpen B ∧ x ∈ B ∧ B ⊆ U ∧

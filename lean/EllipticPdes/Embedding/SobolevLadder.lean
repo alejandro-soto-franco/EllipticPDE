@@ -14,13 +14,13 @@ One Gagliardo-Nirenberg-Sobolev step raises the exponent from `p` to `p'` with
 three, which is where `EllipticPdes.Embedding.exists_eLpNorm_six_le` and
 `EllipticPdes.Embedding.exists_eLpNorm_four_le` stop.
 
-Iterating the step reaches every dimension, at the price of consuming a weak derivative per rung.
-The family that pays for it is one closed under differentiation: an index type `ι`, a function
-`F i` for each index, and a successor `nxt i k` naming the `k`-th weak derivative of `F i`. A
-solution with weak derivatives of every order carries such a family, indexed by lists of
+Iterating the step reaches every dimension, at the price of consuming a weak derivative per
+rung. The family that pays for it is one closed under differentiation: an index type `ι`, a
+function `F i` for each index, and a successor `nxt i k` naming the `k`-th weak derivative of `F
+i`. A solution with weak derivatives of every order has such a family, indexed by lists of
 directions, and closure is what lets a single induction climb without bookkeeping of orders.
 
-## The rungs
+## Rungs
 
 Each rung improves the reciprocal exponent by `1/(2d)` rather than the full `1/d` the inequality
 allows. The half-step is deliberate. Starting at `1/2` and taking `d - 1` rungs of `1/(2d)` lands
@@ -62,7 +62,8 @@ variable {d : ℕ}
 
 The ladder is bookkeeping on reciprocals, and every exponent it constructs is `Real.toNNReal` of
 one. These three facts are all it asks of them, kept apart so the induction's own context stays
-small. -/
+small.
+-/
 
 private theorem inv_antitone_aux {a b : ℝ} (ha : 0 < a) (h : a ≤ b) : b⁻¹ ≤ a⁻¹ := by
   have hb : 0 < b := lt_of_lt_of_le ha h
@@ -76,7 +77,7 @@ private theorem coe_toNNReal_inv_aux {t : ℝ} (ht : 0 < t) :
     ((Real.toNNReal t⁻¹ : ℝ≥0) : ℝ) = t⁻¹ :=
   Real.coe_toNNReal _ (inv_nonneg.mpr ht.le)
 
-/-! ### The ladder -/
+/-! ### Ladder -/
 
 /-- **The Sobolev ladder on a family closed under differentiation.** Let `F` assign a function to
 each index of `ι`, let `nxt i k` name a weak `k`-derivative of `F i` on `Metric.ball c R`, and let

@@ -16,7 +16,7 @@ inequality to absorb the gradient term. See Gilbarg-Trudinger, *Elliptic PDE of
 Second Order*, Theorem 8.8, and Evans, *Partial Differential Equations* (2nd ed.),
 §6.3.1.
 
-## The cutoff-multiplication keystone
+## Cutoff-multiplication keystone
 
 The test function `ζ² u` for `u ∈ H₀¹(Ω)` is not directly available from the graph
 encoding of `Sobolev/Basic.lean`. We build it here. For a smooth compactly supported
@@ -57,7 +57,7 @@ lemma exists_abs_bound_partialD {Ω : Set (EuclideanSpace ℝ (Fin d))}
     (h.hasCompactSupport_partialD i)
   exact ⟨C, fun x => by have := hC x; rwa [Real.norm_eq_abs] at this⟩
 
-/-! ### The multiplier actions of a cutoff on `L²(Ω)` -/
+/-! ### Multiplier actions of a cutoff on `L²(Ω)` -/
 
 /-- Multiplication by the cutoff `η` on `L²(Ω)`, as a continuous linear map. -/
 def mulTest {Ω : Set (EuclideanSpace ℝ (Fin d))} {η : EuclideanSpace ℝ (Fin d) → ℝ}
@@ -83,7 +83,7 @@ lemma mulTestPartial_coeFn {Ω : Set (EuclideanSpace ℝ (Fin d))}
     mulTestPartial h i g =ᵐ[volume.restrict Ω] fun x => partialD i η x * (g x : ℝ) :=
   mulCoeffL_coeFn _ _ g
 
-/-! ### The cutoff-multiplication operator on the graph space -/
+/-! ### Cutoff-multiplication operator on the graph space -/
 
 /-- The **cutoff-multiplication operator** `cutoffMul η : H1amb Ω →L H1amb Ω`, encoding the
 Leibniz rule `∇(η u) = η ∇u + (∇η) u`: coordinate `0` multiplies by `η`, coordinate `i+1`
@@ -115,7 +115,7 @@ lemma cutoffMul_apply_succ {Ω : Set (EuclideanSpace ℝ (Fin d))}
     PiLp.coe_continuousLinearEquiv, PiLp.toLp_apply, ContinuousLinearMap.pi_apply,
     Fin.cons_succ, ContinuousLinearMap.add_apply, ContinuousLinearMap.proj_apply]
 
-/-! ### The Leibniz product rule and stability of test functions under products -/
+/-! ### Leibniz product rule and stability of test functions under products -/
 
 /-- The classical Leibniz rule for the `i`-th partial of a product:
 `∂ᵢ(η φ) = η ∂ᵢφ + (∂ᵢη) φ`. -/
@@ -139,7 +139,7 @@ lemma isTestFn_mul {Ω : Set (EuclideanSpace ℝ (Fin d))}
   · exact HasCompactSupport.mul_left (f' := φ) (f := η) hφ.2.1
   · exact (closure_mono (Function.support_mul_subset_right η φ)).trans hφ.2.2
 
-/-! ### The keystone: cutoff multiplication sends a graph to the product graph -/
+/-! ### Cutoff multiplication sending a graph to the product graph -/
 
 /-- **Keystone (graphs).** The cutoff-multiplication operator sends the graph of a test
 function `φ` to the graph of the product `η φ`: `cutoffMul η (graph φ) = graph (η φ)`. This
@@ -177,7 +177,7 @@ lemma cutoffMul_testGraph {Ω : Set (EuclideanSpace ℝ (Fin d))}
       congrFun (partialD_mul (hη.1.differentiable (by simp))
         (hφ.1.differentiable (by simp)) i) x]
 
-/-! ### The keystone: cutoff multiplication preserves `H₀¹(Ω)` -/
+/-! ### Preservation of `H₀¹(Ω)` under cutoff multiplication -/
 
 /-- **Keystone (membership).** The cutoff-multiplication operator maps `H₀¹(Ω)` into
 itself. Since `cutoffMul η` is continuous and sends every test-function graph into
@@ -297,7 +297,7 @@ private lemma bAct_transport_regroup (Op : FullEllipticOp d)
   rw [hq2, hp, hq]
   ring
 
-/-! ### The interior energy (Caccioppoli) estimate -/
+/-! ### Interior energy (Caccioppoli) estimate -/
 
 /-- **The interior energy (Caccioppoli) estimate.** For a weak solution `u ∈ H₀¹(Ω)` of
 `L u = f` and a cutoff `ζ` (a test function), the cutoff-weighted gradient energy
@@ -311,12 +311,12 @@ controls the principal part from below, and Cauchy-Schwarz together with the Pet
 `‖∇u‖_{L²(V)} ≤ C' (‖f‖ + ‖u₀‖)`. See Gilbarg-Trudinger, *Elliptic PDE of Second Order*,
 Theorem 8.8, and Evans, *Partial Differential Equations* (2nd ed.), §6.3.1.
 
-Guo, *Partial Differential Equations* (JHU AS.110.631-632), Lemma X.3.5 also carries the
-name Caccioppoli, and is a different statement: it takes a non-negative subsolution
-`Lv ≥ 0` of the principal part alone and bounds `∫ |∇(φv)|²` by `‖∇φ‖²_∞ ∫ v²`, with no
-datum on the right. This statement takes a solution of `Lu = f` for the full operator,
-carries `f`, and imposes no sign condition, so neither implies the other. Gilbarg and
-Trudinger Theorem 8.8 remains the match, and that text is not transcribed. -/
+Guo, *Partial Differential Equations* (JHU AS.110.631-632), Lemma X.3.5 also has the name
+Caccioppoli, and is a different statement: it takes a non-negative subsolution `Lv ≥ 0` of the
+principal part alone and bounds `∫ |∇(φv)|²` by `‖∇φ‖²_∞ ∫ v²`, with no datum on the right. This
+statement takes a solution of `Lu = f` for the full operator, has `f` on the right, and imposes
+no sign condition, so neither implies the other. Gilbarg and Trudinger Theorem 8.8 remains the
+match, cited here rather than transcribed. -/
 theorem caccioppoli (Op : FullEllipticOp d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
     {ζ : EuclideanSpace ℝ (Fin d) → ℝ} (hζ : IsTestFn Ω ζ) :
     ∃ C : ℝ, 0 ≤ C ∧ ∀ (u : H01 Ω) (f : L2D Ω),

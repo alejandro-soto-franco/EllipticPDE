@@ -74,16 +74,15 @@ theorem dirichlet_weak_solution_bound
     (dirichletBilin_coercive_const Ω CP hCP hbase) hu
   rwa [one_div, inv_inv] at h
 
-/-- **Unconditional existence, uniqueness, and a-priori bound on an open coordinate
-box.** Specialising `dirichlet_weak_solution` to the box `∏ₖ (aₖ, bₖ)`, the test-function
-Poincaré hypothesis is discharged from the box geometry: the per-direction slice bound
+/-- **Unconditional existence, uniqueness, and a-priori bound on an open coordinate box.**
+Specialising `dirichlet_weak_solution` to the box `∏ₖ (aₖ, bₖ)`, the test-function Poincaré
+hypothesis is discharged from the box geometry: the per-direction slice bound
 `Poincare.slice_bound_euclBox` (which rests on the one-dimensional/Fubini bound
-`Poincare.poincare_box_dir`) is averaged by `Poincare.poincare_testfn` into the
-graph-coordinate bound with constant `C_P = C / (n + 1)`. So for every continuous
-functional `f` on `H₀¹` of the box there is a unique weak solution of `B[u, v] = f v`,
-satisfying the Lax-Milgram estimate `‖u‖_{H₀¹} ≤ α⁻¹ ‖f‖` with coercivity constant
-`α = 1 / (C / (n + 1) + 1)`, all carrying no abstract Poincaré input. This is the box
-instance of Theorem `thm: main` for the Poisson form.
+`Poincare.poincare_box_dir`) is averaged by `Poincare.poincare_testfn` into the graph-coordinate
+bound with constant `C_P = C / (n + 1)`. So for every continuous functional `f` on `H₀¹` of the
+box there is a unique weak solution of `B[u, v] = f v`, satisfying the Lax-Milgram estimate
+`‖u‖_{H₀¹} ≤ α⁻¹ ‖f‖` with coercivity constant `α = 1 / (C / (n + 1) + 1)`, with no abstract
+Poincaré input. This is the box instance of Theorem `thm: main` for the Poisson form.
 
 Terminal result of the library. Nothing else consumes it. -/
 theorem dirichlet_weak_solution_euclBox {n : ℕ} (a b : Fin (n + 1) → ℝ)

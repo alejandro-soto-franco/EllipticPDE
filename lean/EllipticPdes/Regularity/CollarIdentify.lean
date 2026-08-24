@@ -12,8 +12,8 @@ import EllipticPdes.Regularity.IteratedRestrict
 The inductive hypothesis of Guo, *Partial Differential Equations I and II* (Course Lecture
 Notes), Theorem VIII.3.2 (p. 65) hands over a family of iterated weak derivatives on a compact
 set, and says of its first entries only that they are weak derivatives of the solution. The
-ambient element carries its own first derivatives, in its gradient coordinates. The two agree,
-but only almost everywhere, and only where a cutoff is invisible.
+ambient element has its own first derivatives, in its gradient coordinates. The two agree, but
+only almost everywhere, and only where a cutoff is invisible.
 
 `EllipticPdes.Regularity.mulTest_weakDerivOn_unique` gives the agreement after a cutoff. On an
 open collar where the outer cutoff of the tower is identically `1`, the cutoff drops out and the
@@ -94,7 +94,7 @@ theorem restrictL2_extendL2_congr_of_weakDerivOn {W N : Set (EuclideanSpace ℝ 
 
 /-- **A family and its bound, moved to a subregion.** Both halves of the restriction, packaged
 so the elaborator does the unification once. Applied inline in the induction step, where the
-context carries the tower and the datum, the same two lines cost minutes. -/
+context has the tower and the datum, the same two lines take minutes. -/
 theorem exists_restrictFamily {Ω N : Set (EuclideanSpace ℝ (Fin d))}
     (hΩm : MeasurableSet Ω) (hNm : MeasurableSet N) (hNΩ : N ⊆ Ω) {g : L2D Ω} {k : ℕ} {C : ℝ}
     (H : HasIteratedWeakDerivOn Ω k g) (hC : IteratedL2Bound H C) :
@@ -107,8 +107,8 @@ extension of `g`, restricted to `N`, is a family there for the same class, with 
 and its first entries are the given weak derivatives of `g`.
 
 The three conclusions travel together because the induction step needs all three and each is a
-unification the elaborator should do once. Doing them inline costs minutes, since the step's
-context carries the tower, its collar, four cutoffs and the datum by the time it needs them. -/
+unification the elaborator should do once. Doing them inline takes minutes, since the step's
+context has the tower, its collar, four cutoffs and the datum by the time it needs them. -/
 theorem exists_collarFamily {Ω W N : Set (EuclideanSpace ℝ (Fin d))}
     (hΩm : MeasurableSet Ω) (hWm : MeasurableSet W) (hNm : MeasurableSet N) (hNW : N ⊆ W)
     {θ : EuclideanSpace ℝ (Fin d) → ℝ} (hθW : IsTestFn W θ) (hθN : Set.EqOn θ 1 N)

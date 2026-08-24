@@ -123,7 +123,7 @@ private lemma extendL2_toLp_ae_eq (hΩm : MeasurableSet Ω)
   · rw [Set.indicator_of_notMem hxΩ,
       image_eq_zero_of_notMem_tsupport (fun hc => hxΩ (hsupp hc))]
 
-/-! ### The discrete graph identity -/
+/-! ### Discrete graph identity -/
 
 /-- **Discrete graph identity.** On a test-function graph, the cutoff of the interior
 difference quotient is the graph of the product `ζ · Dₖ^h φ`:
@@ -196,7 +196,7 @@ private lemma cutoffMul_diffQuotG_testGraph (hζ : IsTestFn Ω ζ) (hφ : IsTest
     rw [hadd, Pi.add_apply, hmt, hmtp, hdqp, hdqt, hshp, hsht, htcp, htct, hpsi,
       congrFun hpsi_eq x]
 
-/-! ### The crux admissibility -/
+/-! ### Crux admissibility -/
 
 /-- **Crux admissibility.** For `U ∈ H₀¹(Ω)`, the cutoff of its interior difference quotient
 is again in `H₀¹(Ω)`. Since `cutoffMul ζ ∘ diffQuotG k h` is continuous and sends every

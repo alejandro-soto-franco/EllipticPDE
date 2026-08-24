@@ -10,10 +10,10 @@ import EllipticPdes.Regularity.Caccioppoli
 
 The localised moves of `EllipticPdes.Regularity.DifferentiatedEquation` are stated for test
 functions supported inside the region `V` where the weak-derivative data lives. The terms of
-higher interior regularity (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1,
-Theorem 2) instead pair against a test function on the whole domain, each term carrying a
-factor supported inside a compact `K ⊆ V`. Replacing the test function `φ` by `χ · φ` for a
-cutoff `χ` identically `1` near `K` and supported in `V` brings the two shapes together.
+higher interior regularity (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, Theorem
+2) instead pair against a test function on the whole domain, each term with a factor supported
+inside a compact `K ⊆ V`. Replacing the test function `φ` by `χ · φ` for a cutoff `χ`
+identically `1` near `K` and supported in `V` brings the two shapes together.
 
 The replacement is invisible to any factor supported in `K`: there `χ = 1` and `∂ⱼχ = 0`, so
 the Leibniz expansion of `∂ⱼ(χ φ)` collapses to `∂ⱼφ`. Both facts need `χ = 1` on a
@@ -42,7 +42,7 @@ open EllipticPdes.Sobolev
 
 variable {d : ℕ}
 
-/-! ### The two pointwise facts -/
+/-! ### Two pointwise facts -/
 
 /-- **A cutoff identically `1` near `K` has vanishing partials on `K`.** At a point of `K` the
 function agrees with the constant `1` on a whole neighbourhood, so its Fréchet derivative is
@@ -56,7 +56,7 @@ theorem partialD_eq_zero_of_eventually_one {K : Set (EuclideanSpace ℝ (Fin d))
   simp [partialD, hfd]
 
 /-- **The cut of a smooth function is a test function on `V`.** Smoothness is `ContDiff.mul`,
-compact support comes from `χ`, and the support inclusion is the one `χ` carries. Unlike
+compact support comes from `χ`, and the support inclusion is the one `χ` has. Unlike
 `isTestFn_mul`, the second factor need not be compactly supported. -/
 theorem isTestFn_cut {V : Set (EuclideanSpace ℝ (Fin d))}
     {χ φ : EuclideanSpace ℝ (Fin d) → ℝ} (hχc : ContDiff ℝ (⊤ : ℕ∞) χ)
@@ -91,7 +91,7 @@ theorem mul_partialD_cut_eq {K : Set (EuclideanSpace ℝ (Fin d))}
     ring
   · rw [image_eq_zero_of_notMem_tsupport hx, zero_mul, zero_mul]
 
-/-! ### The integral forms, for an almost-everywhere supported weight -/
+/-! ### Integral forms for an almost-everywhere supported weight -/
 
 /-- **The integral form of `mul_cut_eq`.** The weight is only required to vanish almost
 everywhere off `K`, which is the form an `L²` class supported in `K` supplies. -/

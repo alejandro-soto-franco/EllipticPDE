@@ -17,12 +17,12 @@ an `(n+1)`-tuple `(f₀, f₁, …, fₙ)` of `L²(Ω)` functions through the pa
 and that `‖f‖_{H⁻¹}` is the infimum of the tuple norms `(∫_Ω ∑ᵢ |fᵢ|²)^{1/2}` over all
 such representations, attained at the Riesz representative.
 
-In the graph encoding a tuple of `L²` functions *is* an element `F` of the ambient space
-`H1amb Ω = PiLp 2 (fun _ : Fin (d+1) => L2D Ω)`, and its `PiLp` norm *is* the tuple norm
-`(∑ᵢ ‖Fᵢ‖²_{L²})^{1/2} = (∫_Ω ∑ᵢ |fᵢ|²)^{1/2}`. The sign convention adopted here
-is the gradient flip `F ↦ (F₀, -F₁, …, -Fₙ)`, a norm-preserving involution `gradFlip`,
-under which the representation property becomes `f v = ⟪gradFlip F, v⟫` in `H1amb Ω`.
-The proof is then the Riesz representation theorem on the Hilbert space `H₀¹(Ω)`:
+In the graph encoding a tuple of `L²` functions *is* an element `F` of the ambient space `H1amb
+Ω = PiLp 2 (fun _ : Fin (d+1) => L2D Ω)`, and its `PiLp` norm *is* the tuple norm `(∑ᵢ
+‖Fᵢ‖²_{L²})^{1/2} = (∫_Ω ∑ᵢ |fᵢ|²)^{1/2}`. The sign convention is the gradient flip `F ↦ (F₀,
+-F₁, …, -Fₙ)`, a norm-preserving involution `gradFlip`, under which the representation property
+becomes `f v = ⟪gradFlip F, v⟫` in `H1amb Ω`. The proof is then the Riesz representation theorem
+on the Hilbert space `H₀¹(Ω)`:
 
 * existence with `‖F‖ = ‖f‖`: flip the Riesz representative of `f`;
 * minimality: any representing tuple `G` gives `f` as `⟪gradFlip G, ·⟫` restricted to
@@ -43,7 +43,7 @@ open EllipticPdes.Sobolev
 
 variable {d : ℕ}
 
-/-! ### The gradient flip -/
+/-! ### Gradient flip -/
 
 /-- The sign convention adopted here: flip the gradient
 coordinates, keeping the function coordinate. A norm-preserving involution of the
@@ -202,14 +202,12 @@ theorem hneg_characterization (Ω : Set (EuclideanSpace ℝ (Fin d)))
   rw [hn]
   exact norm_le_of_isHnegRepr ((isHnegRepr_iff_integral G f).mpr hG)
 
-/-! ### The `L² ⊆ H⁻¹` embedding -/
+/-! ### `L² ⊆ H⁻¹` embedding -/
 
 /-- The `L² ⊆ H⁻¹` embedding (Evans §5.9.1, Theorem 1(iii)) is the representation by
 the tuple
-`(f, 0, …, 0)`: a single `L²` function with no gradient terms.
-
-Kept as the statement of that clause of Evans Theorem 1. Nothing consumes it. -/
-private lemma isHnegRepr_single_l2Functional (Ω : Set (EuclideanSpace ℝ (Fin d))) (f : L2D Ω) :
+`(f, 0, …, 0)`: a single `L²` function with no gradient terms. -/
+lemma isHnegRepr_single_l2Functional (Ω : Set (EuclideanSpace ℝ (Fin d))) (f : L2D Ω) :
     IsHnegRepr Ω (PiLp.single 2 (0 : Fin (d + 1)) f) (l2Functional Ω f) := by
   intro v
   rw [l2Functional_apply, PiLp.single_eq_same]

@@ -6,7 +6,7 @@ Authors: Alejandro Soto Franco
 import EllipticPdes.Existence.Garding
 
 /-!
-# The weak formulation extends from test functions to all of `H₀¹(Ω)`
+# Extension of the weak formulation from test functions to `H₀¹(Ω)`
 
 `EllipticPdes.Regularity.localWeakForm_of_fullBilin` reads a localised identity off the
 weak formulation `∀ w : H₀¹(Ω), B[u, w] = ⟪f, w₀⟫`. The induction of Guo, *Partial
@@ -48,10 +48,9 @@ theorem testGraph_mem_H01 {v : EuclideanSpace ℝ (Fin d) → ℝ} (hv : IsTestF
     hv.testGraph ∈ H01 Ω :=
   Submodule.le_topologicalClosure _ (Submodule.subset_span ⟨v, hv, rfl⟩)
 
-/-- **The datum functional.** Pairing against `f` in the function coordinate,
-`w ↦ ∫_Ω f w₀`, is continuous linear on `H₀¹(Ω)`: it is the inner product against the
-ambient vector carrying `f` in coordinate `0` and zero elsewhere, restricted to the
-subspace. -/
+/-- **The datum functional.** Pairing against `f` in the function coordinate, `w ↦ ∫_Ω f w₀`, is
+continuous linear on `H₀¹(Ω)`: it is the inner product against the ambient vector with `f` in
+coordinate `0` and zero elsewhere, restricted to the subspace. -/
 def datumL (f : L2D Ω) : H01 Ω →L[ℝ] ℝ :=
   (innerSL ℝ (PiLp.single 2 (0 : Fin (d + 1)) f)).comp (Submodule.subtypeL (H01 Ω))
 
@@ -155,10 +154,10 @@ theorem fullBilin_testGraph_eq (Op : FullEllipticOp d) (U : H01 Ω)
     Finset.sum_congr rfl (fun i _ => htrans i), hzero]
   ring
 
-/-- **The weak formulation, from test functions to `H₀¹(Ω)`.** An identity
-`B[u, φ] = ∫_Ω f φ` holding for every test function holds against every `w ∈ H₀¹(Ω)`. This
-is the shape `InteriorRegularityAt` consumes, and the shape the differentiated equation
-does not directly produce, since a differentiated equation is derived by testing. -/
+/-- **The weak formulation, from test functions to `H₀¹(Ω)`.** An identity `B[u, φ] = ∫_Ω f φ`
+valid for every test function extends to every `w ∈ H₀¹(Ω)`. This is the shape
+`InteriorRegularityAt` consumes, and the shape the differentiated equation does not directly
+produce, since a differentiated equation is derived by testing. -/
 theorem weakForm_of_testFn (Op : FullEllipticOp d) (u : H01 Ω) (f : L2D Ω)
     (h : ∀ (v : EuclideanSpace ℝ (Fin d) → ℝ) (hv : IsTestFn Ω v),
       Op.fullBilin Ω u ⟨hv.testGraph, testGraph_mem_H01 hv⟩ = ∫ x in Ω, (f x : ℝ) * v x)

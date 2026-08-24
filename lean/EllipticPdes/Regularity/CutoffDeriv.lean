@@ -7,14 +7,14 @@ import EllipticPdes.Regularity.Interior
 import EllipticPdes.Regularity.WeakLimit
 
 /-!
-# The cutoff of a directional derivative lies in `H₀¹(Ω)`
+# Membership of a cut-off directional derivative in `H₀¹(Ω)`
 
 Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 2 bootstraps interior
 regularity by running the interior `H²` estimate on a derivative `∂_ℓ u` of the weak solution.
-`EllipticPdes.Regularity.interior_H2_estimate` quantifies its solution over `H₀¹(Ω)`, and
-`∂_ℓ u` carries no boundary condition, so the derivative has to be cut off before it can be fed
-back in. This file supplies the resulting admissibility statement: for the middle cutoff `ξ` of
-a cutoff tower, the product `ξ · ∂_ℓ u` is again an element of `H₀¹(Ω)`.
+`EllipticPdes.Regularity.interior_H2_estimate` quantifies its solution over `H₀¹(Ω)`, and `∂_ℓ
+u` has no boundary condition, so the derivative has to be cut off before it can be fed back in.
+This file supplies the resulting admissibility statement: for the middle cutoff `ξ` of a cutoff
+tower, the product `ξ · ∂_ℓ u` is again an element of `H₀¹(Ω)`.
 
 The route is a weak limit of the discrete family `cutoffMul ξ (diffQuotG ℓ h u)`, every member
 of which lies in `H₀¹(Ω)` by `cutoffMul_diffQuotG_mem_H01`. The family is bounded in the graph
@@ -32,7 +32,7 @@ quotients.
   whole-space one.
 * `inner_mulTest_comm`: multiplication by a cutoff is self-adjoint on `L²(Ω)`.
 * `exists_mem_H01_mulTest_gradient`: the cutoff of a directional derivative lies in `H₀¹(Ω)`.
-* `interior_cutoffGrad_mem_H01`: the same, together with the weak gradient it carries.
+* `interior_cutoffGrad_mem_H01`: the same, together with the weak gradient it has.
 -/
 
 open MeasureTheory
@@ -94,7 +94,7 @@ theorem inner_mulTest_comm {η : EuclideanSpace ℝ (Fin d) → ℝ} (hη : IsTe
   rw [key g w, real_inner_comm, key w g]
   exact integral_congr_ae (Filter.Eventually.of_forall fun x => by ring)
 
-/-! ### The one-neighbourhood shift margin -/
+/-! ### One-neighbourhood shift margin -/
 
 /-- **A one-neighbourhood shift margin.** If the cutoff `η` is `≡ 1` on a neighbourhood of a
 compact set `K`, then there is a positive margin `δ` such that `η` is locally constant `≡ 1`
@@ -114,7 +114,7 @@ theorem exists_eventually_one_margin {η : EuclideanSpace ℝ (Fin d) → ℝ}
     hδ (Metric.thickening_subset_cthickening δ K (Metric.mem_thickening_iff.mpr hx))
   exact Filter.eventually_of_mem (hUopen.mem_nhds hxU) (fun y hy => hUsub hy)
 
-/-! ### The uniform graph-norm bound on the discrete family -/
+/-! ### Uniform graph-norm bound on the discrete family -/
 
 /-- **Uniform graph-norm bound.** For a weak solution `u` and a cutoff tower `T`, the discrete
 family `ξ · Dₗ^h u` is bounded in the ambient graph norm uniformly over all steps below a
@@ -243,7 +243,7 @@ private lemma exists_cutoffMul_diffQuotG_norm_bound (Op : FullEllipticOp d)
   have := Real.sqrt_le_sqrt hsq
   rwa [Real.sqrt_sq (norm_nonneg _)] at this
 
-/-! ### The cutoff of a directional derivative lies in `H₀¹(Ω)` -/
+/-! ### Membership of a cut-off directional derivative in `H₀¹(Ω)` -/
 
 /-- **The cutoff of a directional derivative is admissible (Evans, *Partial Differential
 Equations* (2nd ed.), §6.3.1, Theorem 2, step 3).** For a weak solution `u ∈ H₀¹(Ω)` of
@@ -255,8 +255,8 @@ derivatives of `ξ · ∂_ℓ u`, which `hasWeakDeriv_extendL2_of_mem_H01` reads
 
 This is the admissibility step the `H^k` bootstrap needs and that Evans does not: his interior
 `H²` theorem asks only `u ∈ H¹(U)`, so he differentiates the equation without cutting off,
-whereas `EllipticPdes.Regularity.interior_H2_estimate` quantifies its solution over `H₀¹(Ω)`
-and `∂_ℓ u` carries no boundary condition.
+whereas `EllipticPdes.Regularity.interior_H2_estimate` quantifies its solution over `H₀¹(Ω)` and
+`∂_ℓ u` has no boundary condition.
 
 The proof takes a weak limit of the admissible discrete family `ξ · Dₗ^h u`, whose members lie
 in `H₀¹(Ω)` by `cutoffMul_diffQuotG_mem_H01` and which is bounded in the graph norm by
@@ -360,10 +360,10 @@ Differential Equations* (2nd ed.), §6.3.1, Theorem 2, step 3).** For a weak sol
 the weak `k`-derivative of `ξ · ∂_ℓ u` on the whole space.
 
 This is the admissibility step that lets `EllipticPdes.Regularity.interior_H2_estimate`, whose
-solution is quantified over `H₀¹(Ω)`, be applied to a derivative of `u`, which carries no
-boundary condition of its own. Because `ξ ≡ 1` on `tsupport ζ`, and `ζ ≡ 1` on `V`, the
-function coordinate agrees with `∂_ℓ u` on a neighbourhood of `V`, so nothing is lost on the
-region of interest. -/
+solution is quantified over `H₀¹(Ω)`, be applied to a derivative of `u`, which has no boundary
+condition of its own. Because `ξ ≡ 1` on `tsupport ζ`, and `ζ ≡ 1` on `V`, the function
+coordinate agrees with `∂_ℓ u` on a neighbourhood of `V`, so nothing is lost on the region of
+interest. -/
 theorem interior_cutoffGrad_mem_H01 (Op : FullEllipticOp d)
     (hΩm : MeasurableSet Ω) (hA : IsC1Coeff Op.toEllipticCoeff)
     {V : Set (EuclideanSpace ℝ (Fin d))} (T : CutoffTower Ω V)
@@ -378,7 +378,7 @@ theorem interior_cutoffGrad_mem_H01 (Op : FullEllipticOp d)
   rw [← hW0]
   exact hasWeakDeriv_extendL2_of_mem_H01 hΩm k hWmem
 
-/-! ### The cutoff is invisible on the base set -/
+/-! ### Triviality of the cutoff on the base set -/
 
 /-- **The middle tower cutoff is identically `1` on the base set.** `ζ ≡ 1` on `V`, so `V` sits
 inside `tsupport ζ`, where `ξ ≡ 1`. -/
@@ -390,9 +390,9 @@ theorem CutoffTower.xi_eqOn_one_base {V : Set (EuclideanSpace ℝ (Fin d))}
   exact one_ne_zero
 
 /-- **The cutoff is invisible on the base set.** Because `ξ ≡ 1` on `V`, the `V`-restriction of
-the whole-space extension of `ξ · g` agrees with that of `g`. Applied to the function
-coordinate of `interior_cutoffGrad_mem_H01`, this says that the admissible element carries
-`∂_ℓ u` itself on `V`, so nothing is lost on the region of interest.
+the whole-space extension of `ξ · g` agrees with that of `g`. Applied to the function coordinate
+of `interior_cutoffGrad_mem_H01`, this says that the admissible element has `∂_ℓ u` itself on
+`V`, so nothing is lost on the region of interest.
 
 Kept as the statement that reads `interior_cutoffGrad_mem_H01`, which is pinned in `AxiomAudit`.
 Nothing else consumes it. -/

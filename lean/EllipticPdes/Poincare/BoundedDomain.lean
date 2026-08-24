@@ -6,7 +6,7 @@ Authors: Alejandro Soto Franco
 import EllipticPdes.Poincare.BoxSlice
 
 /-!
-# The Poincaré inequality on arbitrary bounded domains (chain step 5)
+# Poincaré inequality on arbitrary bounded domains (chain step 5)
 
 `BoxSlice.lean` discharges the per-direction slice bound when the domain IS the open
 coordinate box. This file removes that restriction: any `Ω` contained in a box inherits

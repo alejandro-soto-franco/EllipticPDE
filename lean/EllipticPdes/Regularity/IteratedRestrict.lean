@@ -85,7 +85,7 @@ def HasIteratedWeakDerivOn.restrict (hWm : MeasurableSet W) (hVm : MeasurableSet
   D_nil := by rw [hg.D_nil]
   D_step m α hα := (hg.D_step m α hα).restrict hWm hVm hVW
 
-/-- The restricted family carries the same bound: extension by zero preserves the norm and
+/-- The restricted family has the same bound: extension by zero preserves the norm and
 restriction does not increase it. -/
 theorem IteratedL2Bound.restrict {hWm : MeasurableSet W} {hVm : MeasurableSet V} {hVW : V ⊆ W}
     {g : L2D W} {hg : HasIteratedWeakDerivOn W k g} {C : ℝ} (hC : IteratedL2Bound hg C) :

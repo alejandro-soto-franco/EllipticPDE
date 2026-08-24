@@ -30,20 +30,19 @@ the constant depending on the data and the pair `V ⋐ Ω` and on neither `u` no
 with `C^{k+1}` coefficients, which `IsCkCoeff.toIsWkInftyCoeff` shows to be the stronger
 hypothesis.
 
-## How the induction runs
+## Shape of the induction
 
 `InteriorRegularityAt Op Ω k` packages the conclusion at order `k`, and the theorem is an
 induction on `k` over that predicate.
 
 * Order `0` is `interior_H2_estimate` with its `(k, i)`-indexed second derivatives assembled
   into a `HasIteratedWeakDerivOn` family of order `2`.
-* The step differentiates the equation once. Where `u` solves `L u = f`, the derivative
-  `∂_l u` solves `L (∂_l u) = ∂_l f + R_l`, with `R_l` collecting the terms in which the
-  differentiation lands on a coefficient rather than on `u`. Those terms carry one derivative
-  of a coefficient against derivatives of `u` of order at most two, so `R_l` sits in `H^{k-1}`
-  once the order-`k-1` conclusion is available for `u` itself. Applying the induction
-  hypothesis to `∂_l u` on an intermediate `V ⋐ W ⋐ Ω` gives `∂_l u ∈ H^{k+1}(V)`, which is
-  `u ∈ H^{k+2}(V)`.
+* The step differentiates the equation once. Where `u` solves `L u = f`, the derivative `∂_l u`
+  solves `L (∂_l u) = ∂_l f + R_l`, with `R_l` collecting the terms in which the differentiation
+  lands on a coefficient rather than on `u`. Those terms pair one derivative of a coefficient
+  against derivatives of `u` of order at most two, so `R_l` sits in `H^{k-1}` once the
+  order-`k-1` conclusion is available for `u` itself. Applying the induction hypothesis to `∂_l
+  u` on an intermediate `V ⋐ W ⋐ Ω` gives `∂_l u ∈ H^{k+1}(V)`, which is `u ∈ H^{k+2}(V)`.
 
 The differentiated equation is already available as
 `EllipticPdes.Regularity.differentiated_weakForm_div`, and the admissibility of the test
@@ -145,13 +144,13 @@ theorem interiorRegularityAt_zero (Op : FullEllipticOp (n + 1))
       · simp at hα
 
 set_option maxHeartbeats 1600000 in
--- The step carries the tower, its collar, four cutoffs, the inductive family on two sets and
--- the datum, and the closed form of the gradient is checked against all of them.
+-- The step has the tower, its collar, four cutoffs, the inductive family on two sets and the
+-- datum, and the closed form of the gradient is checked against all of them.
 /-- **The differentiated equation, as a weak formulation for a cutoff derivative.** For a weak
-solution `u` of `L u = f` and each direction `ℓ`, there is an element `U ∈ H₀¹(Ω)` agreeing
-with `∂_ℓ u` on `V`, a datum `F ∈ L²(Ω)` carrying `k` weak derivatives, and a weak formulation
-`B[U, w] = ⟪F, w⟫` for every `w ∈ H₀¹(Ω)`, with both `‖U‖` and the `H^k` bound on `F`
-controlled by the data.
+solution `u` of `L u = f` and each direction `ℓ`, there is an element `U ∈ H₀¹(Ω)` agreeing with
+`∂_ℓ u` on `V`, a datum `F ∈ L²(Ω)` with `k` weak derivatives, and a weak formulation `B[U, w] =
+⟪F, w⟫` for every `w ∈ H₀¹(Ω)`, with both `‖U‖` and the `H^k` bound on `F` controlled by the
+data.
 
 This is Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 2, step 3 in the
 shape the induction consumes, and it is where the analytic content of the step sits.
@@ -167,14 +166,14 @@ differentiation lands on a coefficient, and the commutator with `ξ`. Each of th
 `EllipticPdes.Regularity.weakForm_of_testFn` carries the identity from test functions to
 `H₀¹(Ω)`.
 
-## Why the order-`k` conclusion is a hypothesis
+## Order-`k` conclusion as a hypothesis
 
-`F` carries second derivatives of `u` against first derivatives of the coefficients, so
-`F ∈ H^k` asks for `u ∈ H^{k+2}` on a neighbourhood of `tsupport ξ`, which is the order-`k`
-conclusion at that compact set. Evans reaches for it at the same point: the datum (36) of
-§6.3.1, Theorem 2 contains `D²u`, and its `H^k` bound is read off the inductive hypothesis
-rather than off the solution's membership of `H₀¹(Ω)`. Passing `hk` here rather than deriving
-it is what keeps the step an induction. -/
+`F` pairs second derivatives of `u` against first derivatives of the coefficients, so `F ∈ H^k`
+asks for `u ∈ H^{k+2}` on a neighbourhood of `tsupport ξ`, which is the order-`k` conclusion at
+that compact set. Evans reaches for it at the same point: the datum (36) of §6.3.1, Theorem 2
+contains `D²u`, and its `H^k` bound is read off the inductive hypothesis rather than off the
+solution's membership of `H₀¹(Ω)`. Passing `hk` here rather than deriving it is what keeps the
+step an induction. -/
 theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
     (hA1 : IsC1Coeff Op.toEllipticCoeff) {k : ℕ}
@@ -407,8 +406,8 @@ theorem interiorRegularityAt_succ (Op : FullEllipticOp (n + 1))
   refine ⟨2 * C₁ * C₀ + 1, by nlinarith [mul_nonneg hC₁0 hC₀0], fun u f M hfk hM hu => ?_⟩
   have hM0 : 0 ≤ M := le_trans (norm_nonneg _) hM.norm_le
   have hu00 : (0 : ℝ) ≤ ‖(u : H1amb Ω) 0‖ := norm_nonneg _
-  -- Each first derivative of `u` carries `k + 2` weak derivatives on `V`, read off the
-  -- induction hypothesis applied to the cutoff derivative and transported along `ξ ≡ 1`.
+  -- Each first derivative of `u` has `k + 2` weak derivatives on `V`, read off the induction
+  -- hypothesis applied to the cutoff derivative and transported along `ξ ≡ 1`.
   have hstep : ∀ ℓ : Fin (n + 1), ∃ H : HasIteratedWeakDerivOn V (k + 2)
       (restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) ℓ.succ))),
       IteratedL2Bound H ((2 * C₁ * C₀ + 1) * (M + ‖(u : H1amb Ω) 0‖)) := by

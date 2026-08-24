@@ -94,6 +94,17 @@ import EllipticPdes.BoundedInstances
 /-!
 # EllipticPdes
 
-Existence and uniqueness for the linear elliptic Dirichlet problem, assembled
-from a Sobolev layer, the Poincaré inequality, and the Lax-Milgram theorem.
+Solvability and interior regularity for the linear second-order elliptic Dirichlet
+problem in divergence form on a bounded domain, with bounded measurable coefficients
+and a drift term, so the bilinear form is in general non-symmetric.
+
+Existence and uniqueness run from the one-dimensional Poincaré inequality through the
+domain inequality, continuity and coercivity of the form, and Lax-Milgram. The same
+operator then supports the Gårding inequality, the Fredholm alternative with its index
+and solvability clauses, the resolvent bound and spectral compactness, the interior
+`H²` estimate with its higher-order and smooth refinements, and interior Hölder
+continuity in dimensions one to three through Morrey's inequality and Campanato's
+characterisation.
+
+Boundary `H²` regularity has its foundations here and its headline estimate open.
 -/

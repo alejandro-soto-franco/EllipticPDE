@@ -13,7 +13,7 @@ import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
 import EllipticPdes.Analysis.PoincareInequality
 
 /-!
-# The `L²` translation estimate
+# `L²` translation estimate
 
 For a continuously differentiable, compactly supported `f : ℝⁿ → ℝ`, the `L²`
 norm of the difference between `f` and its translate `f(· + h)` is controlled by

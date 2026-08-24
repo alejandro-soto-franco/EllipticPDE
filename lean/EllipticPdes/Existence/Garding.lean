@@ -51,7 +51,7 @@ lemma young_peterPaul {lam B x y : ℝ} (hlam : 0 < lam) :
   rw [key]
   exact div_nonneg (sq_nonneg _) h2l.le
 
-/-! ### The full divergence-form operator -/
+/-! ### Full divergence-form operator -/
 
 /-- A full second-order divergence-form operator: a uniformly elliptic principal part `A`
 together with a bounded measurable transport field `b` and zeroth-order coefficient `c`. -/
@@ -99,7 +99,7 @@ lemma norm_cAct_le {Ω : Set (EuclideanSpace ℝ (Fin d))} (g : L2D Ω) :
     ‖Op.cAct g‖ ≤ Op.Csup * ‖g‖ :=
   norm_mulCoeffL_le _ _ g
 
-/-! ### The lower-order (transport + zeroth) bilinear form -/
+/-! ### Lower-order (transport + zeroth) bilinear form -/
 
 /-- The lower-order part `∑ᵢ ⟪bᵢ ∂ᵢu, v₀⟫ + ⟪c u₀, v₀⟫` as a bare bilinear map. -/
 def lowerBilinₗ (Ω : Set (EuclideanSpace ℝ (Fin d))) :
@@ -173,7 +173,7 @@ lemma fullBilin_apply (Ω : Set (EuclideanSpace ℝ (Fin d))) (U V : H01 Ω) :
     Op.fullBilin Ω U V = Op.toEllipticCoeff.bilin Ω U V + Op.lowerBilin Ω U V := by
   simp only [FullEllipticOp.fullBilin, ContinuousLinearMap.add_apply]
 
-/-! ### The Gårding inequality -/
+/-! ### Gårding inequality -/
 
 /-- The Gårding shift constant `γ = λ/2 + ‖c‖∞ + d ‖b‖∞² / (2λ)`. -/
 def gardingγ : ℝ :=
@@ -323,8 +323,9 @@ theorem weak_solution (Ω : Set (EuclideanSpace ℝ (Fin d))) {μ : ℝ}
     refine ext_inner_right (𝕜 := ℝ) (fun w => ?_)
     rw [hco.continuousLinearEquivOfBilin_apply, hu w, ← hgrep w]
 
-/-! ### The transport-free, nonnegative-zeroth coercive case (Evans §6.2.2, closing
-Examples remark) -/
+/-! ### Transport-free, nonnegative-zeroth coercive case (Evans §6.2.2, closing
+Examples remark)
+-/
 
 /-- **The lower-order form is nonnegative** when the transport field vanishes (`b = 0`
 a.e. on `Ω`) and the zeroth coefficient is nonnegative (`c ≥ 0` a.e. on `Ω`): the
@@ -601,8 +602,8 @@ theorem weak_solution_L2_of_nonneg_zeroth_of_bounded {n : ℕ}
   have hexist := Op.weak_solution_of_nonneg_zeroth Ω hb hc CP hCP hbase (l2Functional Ω f)
   simp only [l2Functional_eq_integral] at hexist
   refine ⟨hexist, fun u hu => ?_⟩
-  -- Refold to `l2Functional` form: `_bound` expects the functional,
-  -- while `hu` carries the unfolded integral.
+  -- Refold to `l2Functional` form: `_bound` expects the functional, while `hu` states the
+  -- unfolded integral.
   have hhu : ∀ v : H01 Ω, Op.fullBilin Ω u v = l2Functional Ω f v := by
     intro v; rw [l2Functional_eq_integral]; exact hu v
   have hbound := Op.weak_solution_of_nonneg_zeroth_bound Ω hb hc CP hCP hbase hhu

@@ -7,7 +7,7 @@ import EllipticPdes.Embedding.WeakGradient
 import EllipticPdes.Regularity.Interior
 
 /-!
-# Bridge: `HasWeakDerivOn` to `HasWeakGradOn`
+# Bridge from `HasWeakDerivOn` to `HasWeakGradOn`
 
 The `L²` weak derivatives produced by `interior_H2_estimate` are pointwise weak
 gradients in the sense of the embedding layer, so the Morrey inequality consumes them

@@ -10,10 +10,10 @@ against the literature when no warrant names it.
 
 Three things are asserted:
 
-  * every declaration audited in `lean/AxiomAudit.lean` either carries a warrant
+  * every declaration audited in `lean/AxiomAudit.lean` either has a warrant
     in `proofsense/manifest.json` or appears in EXEMPT below with a reason;
   * every warrant names a declaration AxiomAudit.lean audits, so the manifest
-    cannot drift onto a declaration nothing pins the axioms of;
+    cannot drift onto a declaration whose axioms nothing pins;
   * every warrant's locator names a statement rather than a section, since a
     section locator hands the judge every theorem under the heading and makes
     the equivalent relation unreachable.
@@ -95,7 +95,7 @@ EXEMPT = {
 }
 
 # A statement locator names one statement, never a whole section. Three forms
-# carry that, and a bare section number carries none of them:
+# name one, and a bare section number names none of them:
 #
 #   §6.3.1 Thm 1                  a numbered result inside a numbered section
 #   §1.1 Thm (Sobolev inequality) a named result in a section that numbers none

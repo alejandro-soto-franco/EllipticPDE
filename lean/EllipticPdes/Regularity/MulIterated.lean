@@ -14,13 +14,13 @@ derivative of the solution. Feeding that datum back into the induction of Guo, *
 Differential Equations I and II* (Course Lecture Notes), Theorem VIII.3.2 (p. 65) needs weak
 derivatives of the product up to order `k`, with a bound. This file supplies them.
 
-## The recursion
+## Recursion
 
-`HasWeakDerivOn.mul_isWkInfty_left` gives one derivative of `a·g`, namely
-`(∂_ℓ a)·g + a·(∂_ℓ g)`. Both summands are again products of a `W^{k,∞}` weight with a function
-carrying `k` weak derivatives, so the statement recurses on its own conclusion. The family for
-`a·g` at order `k + 1` is therefore assembled rather than written down: the empty list is the
-product itself, and a list `ℓ :: α` reads the order-`k` family built for the `ℓ`-derivative.
+`HasWeakDerivOn.mul_isWkInfty_left` gives one derivative of `a·g`, namely `(∂_ℓ a)·g + a·(∂_ℓ
+g)`. Both summands are again products of a `W^{k,∞}` weight with a function with `k` weak
+derivatives, so the statement recurses on its own conclusion. The family for `a·g` at order `k +
+1` is therefore assembled rather than written down: the empty list is the product itself, and a
+list `ℓ :: α` reads the order-`k` family built for the `ℓ`-derivative.
 
 No Leibniz formula over subsets of the index list appears, and none is needed. Naming the
 derivative of each order through the recursion avoids the combinatorial statement altogether,
@@ -32,8 +32,8 @@ about its size, so nothing is lost.
 
 * `HasWeakDerivOn.add`, `HasIteratedWeakDerivOn.add`: sums.
 * `mulL2`: a bounded measurable weight acting on an `L²(V)` class.
-* `exists_iteratedWeakDeriv_mul`: the product carries `k` weak derivatives, with a bound linear
-  in the bound on the family of `g`.
+* `exists_iteratedWeakDeriv_mul`: the product has `k` weak derivatives, with a bound linear in
+  the bound on the family of `g`.
 -/
 
 open MeasureTheory
@@ -86,10 +86,10 @@ def HasIteratedWeakDerivOn.add {V : Set (EuclideanSpace ℝ (Fin d))} {k : ℕ} 
   D_nil := by rw [hg.D_nil, hh.D_nil]
   D_step m α hα := (hg.D_step m α hα).add (hh.D_step m α hα)
 
-/-! ### A bounded weight acting on an `L²` class -/
+/-! ### Bounded weight acting on an `L²` class -/
 
 /-- **A bounded measurable weight acting on `L²(V)`.** The bound is asked on the whole space
-rather than on `V`, which is the form every `W^{k,∞}` bundle carries. -/
+rather than on `V`, which is the form every `W^{k,∞}` bundle has. -/
 def mulL2 {V : Set (EuclideanSpace ℝ (Fin d))} {a : EuclideanSpace ℝ (Fin d) → ℝ}
     (ham : Measurable a) {M : ℝ}
     (haM : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |a x| ≤ M) (g : L2D V) :
@@ -118,12 +118,12 @@ theorem norm_le_of_ae_mul {V : Set (EuclideanSpace ℝ (Fin d))}
   rw [hrw]
   exact norm_mulCoeffL_le ham (ae_restrict_of_ae haM) g
 
-/-! ### The product rule at every order -/
+/-! ### Product rule at every order -/
 
 /-- **A `W^{k,∞}` weight preserves `k` weak derivatives.** For `a ∈ W^{k,∞}` there is a constant
-`K`, depending on the bundle alone, such that whenever `g` carries weak derivatives to order `k`
-on `V` bounded by `M`, every class representing `a·g` carries weak derivatives to order `k`
-bounded by `K·M`.
+`K`, depending on the bundle alone, such that whenever `g` has weak derivatives to order `k` on
+`V` bounded by `M`, every class representing `a·g` has weak derivatives to order `k` bounded by
+`K·M`.
 
 The induction is on `k`. The step applies `HasWeakDerivOn.mul_isWkInfty_left` once to obtain
 `∂_ℓ(a·g) = (∂_ℓ a)·g + a·(∂_ℓ g)`, then the induction hypothesis to each summand, the first with

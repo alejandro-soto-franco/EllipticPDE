@@ -10,26 +10,25 @@ import Mathlib.Geometry.Manifold.ContMDiff.NormedSpace
 import Mathlib.Topology.MetricSpace.Thickening
 
 /-!
-# The smooth cutoff tower for the interior `H²` estimate
+# Smooth cutoff tower for the interior `H²` estimate
 
 The interior second-derivative estimate (Evans, *Partial Differential Equations* (2nd ed.),
 §6.3.1; Gilbarg-Trudinger, *Elliptic PDE of Second Order*, Theorem 8.8) localises the
-difference-quotient method with a nested family of smooth cutoffs: an innermost cutoff `ζ`
-equal to `1` on the region of interest `V`, a middle cutoff `ξ` equal to `1` on the support of
-`ζ`, and an outermost cutoff `θ` equal to `1` on the support of `ξ`, all three compactly
-supported inside the ambient domain `Ω`. The outermost support carries a positive margin
-`δ`: every point of `tsupport θ` stays inside `Ω` after a coordinate shift `h eₖ` of size
-`|h| < δ`, which is exactly what lets the discrete difference quotient act inside `Ω` without
-losing mass.
+difference-quotient method with a nested family of smooth cutoffs: an innermost cutoff `ζ` equal
+to `1` on the region of interest `V`, a middle cutoff `ξ` equal to `1` on the support of `ζ`,
+and an outermost cutoff `θ` equal to `1` on the support of `ξ`, all three compactly supported
+inside the ambient domain `Ω`. The outermost support has a positive margin `δ`: every point of
+`tsupport θ` stays inside `Ω` after a coordinate shift `h eₖ` of size `|h| < δ`, which is
+exactly what lets the discrete difference quotient act inside `Ω` without losing mass.
 
 This file provides:
 
-* `exists_isTestFn_one_nhdsSet_of_isCompact`: the underlying smooth Urysohn-type cutoff
-  lemma: for `K` compact inside an open `U`, a test function on `U` valued in `[0,1]` and
-  equal to `1` on a neighbourhood of `K`. This specialises the classical smooth-partition-of-
-  unity construction (`Mathlib.Geometry.Manifold.PartitionOfUnity`) to the trivial self-chart
-  manifold structure that `EuclideanSpace ℝ (Fin d)` carries as a finite-dimensional normed
-  space, bridged back to plain `ContDiff` via `contMDiff_iff_contDiff`.
+* `exists_isTestFn_one_nhdsSet_of_isCompact`: the underlying smooth Urysohn-type cutoff lemma:
+  for `K` compact inside an open `U`, a test function on `U` valued in `[0,1]` and equal to `1`
+  on a neighbourhood of `K`. This specialises the classical smooth-partition-of-unity
+  construction (`Mathlib.Geometry.Manifold.PartitionOfUnity`) to the trivial self-chart manifold
+  structure that `EuclideanSpace ℝ (Fin d)` has as a finite-dimensional normed space, bridged
+  back to plain `ContDiff` via `contMDiff_iff_contDiff`.
 * `exists_margin_of_isCompact_subset_isOpen`: the positive-margin fact for a compact-in-open
   pair, from `IsCompact.exists_cthickening_subset_open`.
 * `CutoffTower`: the bundle of the three nested cutoffs and the margin.
@@ -49,14 +48,14 @@ open EllipticPdes.Sobolev
 
 variable {d : ℕ}
 
-/-! ### The Urysohn-type smooth cutoff on a compact-in-open pair -/
+/-! ### Urysohn-type smooth cutoff on a compact-in-open pair -/
 
-/-- **Smooth Urysohn cutoff.** For `K` compact contained in an open `U`, a test function on
-`U` (`EllipticPdes.Sobolev.IsTestFn`), valued in `[0,1]`, equal to `1` on a neighbourhood
-of `K`. This is the smooth cutoff-function device used throughout interior regularity theory
-(Evans, *Partial Differential Equations* (2nd ed.), §6.3.1), obtained here from the manifold
+/-- **Smooth Urysohn cutoff.** For `K` compact contained in an open `U`, a test function on `U`
+(`EllipticPdes.Sobolev.IsTestFn`), valued in `[0,1]`, equal to `1` on a neighbourhood of `K`.
+This is the smooth cutoff-function device used throughout interior regularity theory (Evans,
+*Partial Differential Equations* (2nd ed.), §6.3.1), obtained here from the manifold
 smooth-partition-of-unity Urysohn lemma specialised to the self-chart manifold structure
-`EuclideanSpace ℝ (Fin d)` carries as a finite-dimensional normed space. -/
+`EuclideanSpace ℝ (Fin d)` has as a finite-dimensional normed space. -/
 theorem exists_isTestFn_one_nhdsSet_of_isCompact {K U : Set (EuclideanSpace ℝ (Fin d))}
     (hK : IsCompact K) (hU : IsOpen U) (hKU : K ⊆ U) :
     ∃ ζ : EuclideanSpace ℝ (Fin d) → ℝ,
@@ -82,7 +81,7 @@ theorem exists_isTestFn_one_nhdsSet_of_isCompact {K U : Set (EuclideanSpace ℝ 
   · exact ht_closure_compact.of_isClosed_subset isClosed_closure (closure_mono hsupp)
   · exact (closure_mono hsupp).trans ht_closure_subset
 
-/-! ### The positive shift margin on a compact-in-open pair -/
+/-! ### Positive shift margin on a compact-in-open pair -/
 
 /-- **Positive margin.** For `K` compact inside an open `Ω`, there is `δ > 0` such that every
 point of `K` stays inside `Ω` after any coordinate shift `h eₖ` with `|h| < δ`. This is the
@@ -100,7 +99,7 @@ theorem exists_margin_of_isCompact_subset_isOpen {K Ω : Set (EuclideanSpace ℝ
   calc ‖hshift k h‖ = |h| := by simp [hshift, norm_smul]
     _ < δ := hh
 
-/-! ### The nested cutoff tower -/
+/-! ### Nested cutoff tower -/
 
 /-- **The nested cutoff tower.** Three test functions on `Ω`: `ζ` equal to `1` on the base
 compact set `V`, `ξ` equal to `1` on the support of `ζ`, `θ` equal to `1` on the support of

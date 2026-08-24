@@ -7,7 +7,7 @@ import EllipticPdes.Poincare.Density
 import Mathlib.Analysis.InnerProductSpace.LaxMilgram
 
 /-!
-# The divergence-form bilinear form (dependency-chain step 5)
+# Divergence-form bilinear form (dependency-chain step 5)
 
 We treat the symmetric, transport-free, zeroth-order-free case first: the Dirichlet
 (Poisson) form `B[U, V] = ∑ᵢ ⟪∂ᵢu, ∂ᵢv⟫_{L²}`, i.e. the coefficient matrix is the
@@ -127,7 +127,7 @@ theorem dirichletBilin_coercive (Ω : Set (EuclideanSpace ℝ (Fin d)))
     IsCoercive (dirichletBilin Ω) :=
   ⟨1 / (CP + 1), by positivity, dirichletBilin_coercive_const Ω CP hCP hbase⟩
 
-/-! ### The Lax-Milgram a-priori estimate -/
+/-! ### Lax-Milgram a-priori estimate -/
 
 /-- **The Lax-Milgram a-priori estimate.** If the bilinear form `B` satisfies the
 quantitative coercivity bound `α ‖U‖² ≤ B[U, U]` with `α > 0`, then any weak solution

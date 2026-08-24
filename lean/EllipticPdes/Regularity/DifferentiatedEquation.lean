@@ -18,7 +18,7 @@ import Mathlib.MeasureTheory.Measure.Haar.Unique
 import Mathlib.MeasureTheory.Integral.DominatedConvergence
 
 /-!
-# The differentiated-equation integral identity
+# Differentiated-equation integral identity
 
 For `u ∈ H₀¹(Ω)` weakly solving `Lu = f` with `C²` principal coefficients, this file builds
 towards the **differentiated-equation integral identity** of Evans, *Partial Differential
@@ -32,10 +32,10 @@ compactly-supported test `φ` with `tsupport φ ⊆ V`,
 with `f_ℓ` an explicit lower-order datum. The identity is stated in `HasWeakDerivOn`-style
 integration by parts on plain `Lp ℝ 2 (volume.restrict V)` classes.
 
-This file starts with the small calculus facts used repeatedly throughout the milestone: the
-partial derivative of a smooth (resp. compactly supported) test function is again smooth
-(resp. compactly supported), so `∂ⱼφ` is again an admissible `HasWeakDerivOn` test function,
-and the pointwise Leibniz rule for `partialD` against a product.
+This file starts with the small calculus facts used repeatedly throughout this file: the partial
+derivative of a smooth (resp. compactly supported) test function is again smooth (resp.
+compactly supported), so `∂ⱼφ` is again an admissible `HasWeakDerivOn` test function, and the
+pointwise Leibniz rule for `partialD` against a product.
 -/
 
 open MeasureTheory
@@ -274,7 +274,7 @@ private lemma tendsto_setIntegral_mul_convolution
   · refine Filter.Eventually.of_forall fun x => ?_
     exact ((hconv x).mul_const (χ x)).const_mul (w x : ℝ)
 
-/-! ### The weighted weak-derivative product rule -/
+/-! ### Weighted weak-derivative product rule -/
 
 /-- **Weak-derivative Leibniz with a `C¹` weight.** If `g` has weak `ℓ`-derivative `g'` on `V`,
 and `a` is `C¹` with `a`, `∂_ℓ a` bounded almost everywhere (so the products below are `L²(V)`
@@ -417,7 +417,7 @@ theorem HasWeakDerivOn.mul_contDiff_left {V : Set (EuclideanSpace ℝ (Fin d))}
   rw [hLHS, hRHS]
   linarith [hkey]
 
-/-! ### Principal term: moving `∂_ℓ` onto `u` -/
+/-! ### Moving `∂_ℓ` onto `u` in the principal term -/
 
 /-- Moving `∂_ℓ` from the test function onto `u` in the principal term. For every direction
 pair the coefficient-weighted first derivative `a_{ij}·∂ᵢu` has weak `ℓ`-derivative
@@ -466,7 +466,7 @@ theorem principal_move {V : Set (EuclideanSpace ℝ (Fin d))} (hVm : MeasurableS
     _ = - ∑ i, ∑ j, ∫ x in V, (comm i j x : ℝ) * partialD j φ x := by
         simp only [Finset.sum_neg_distrib]
 
-/-! ### Lower-order terms: transport, zeroth-order, and datum -/
+/-! ### Transport, zeroth-order and datum terms -/
 
 /-- **Transport term.** Moving `∂_ℓ` from the test function onto `∂ᵢu` weighted by the transport
 coefficient `b_i`: `∫_V b_i(∂ᵢu) ∂_ℓφ = -∫_V [(∂_ℓ b_i)(∂ᵢu) + b_i(∂ₗ∂ᵢu)] φ`. A direct
@@ -508,11 +508,11 @@ theorem zeroth_move {V : Set (EuclideanSpace ℝ (Fin d))} (hVm : MeasurableSet 
     ∫ x in V, (cu x : ℝ) * partialD ℓ φ x = - ∫ x in V, (comm x : ℝ) * φ x :=
   HasWeakDerivOn.mul_contDiff_left hVm ℓ hDu hc hcM hdcM cu hcu comm hcomm φ hφc hφcs hφV
 
-/-- **Datum term.** Given that `f` has weak `ℓ`-derivative `Df` on `V`, moving `∂_ℓ` off the test
-function is literally the defining property of `HasWeakDerivOn`: `∫_V f·∂_ℓφ = -∫_V (∂_ℓf)·φ`.
-This is where the milestone assumes `f ∈ H¹_loc(V)`, strictly stronger than the `f ∈ L²` already
-available from `interior_H2_estimate`, and is what makes `∂_ℓ f` an `L²(V)` class feeding
-the datum `f_ℓ`. -/
+/-- **Datum term.** Given that `f` has weak `ℓ`-derivative `Df` on `V`, moving `∂_ℓ` off the
+test function is literally the defining property of `HasWeakDerivOn`: `∫_V f·∂_ℓφ = -∫_V
+(∂_ℓf)·φ`. This is where the development assumes `f ∈ H¹_loc(V)`, strictly stronger than the `f
+∈ L²` already available from `interior_H2_estimate`, and is what makes `∂_ℓ f` an `L²(V)` class
+feeding the datum `f_ℓ`. -/
 theorem datum_move {V : Set (EuclideanSpace ℝ (Fin d))} (ℓ : Fin d)
     {f_V Df : Lp ℝ 2 (volume.restrict V)} (hf : HasWeakDerivOn V ℓ f_V Df)
     {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφc : ContDiff ℝ (⊤ : ℕ∞) φ)
@@ -555,11 +555,11 @@ lemma partialD_partialD_swap {φ : EuclideanSpace ℝ (Fin d) → ℝ}
 /-- **Differentiated weak formulation (divergence-datum form), Evans, *Partial Differential
 Equations* (2nd ed.), §6.3.1, Theorem 2.** Given the local weak identity `hLoc` for `u` on `V`
 together with the first/second weak-derivative data, for a fixed direction `ℓ` and every
-admissible test `φ` with `tsupport φ ⊆ V`, the difference quotient `∂_ℓu` satisfies
-`∑ ∫_V a_{ij}(∂ₗ∂ᵢu) ∂ⱼφ + ∑ ∫_V (∂_ℓ a_{ij})(∂ᵢu) ∂ⱼφ
-   = ∫_V (∂_ℓf) φ - ∑ ∫_V [(∂_ℓ b_i)(∂ᵢu)+b_i(∂ₗ∂ᵢu)] φ - ∫_V [(∂_ℓ c)u + c(∂_ℓu)] φ`.
-The local weak formulation `hLoc` on plain integrals is a hypothesis: deriving it from the
-divergence-form bilinear pairing is the repackaging the milestone defers, and is not done here. -/
+admissible test `φ` with `tsupport φ ⊆ V`, the difference quotient `∂_ℓu` satisfies `∑ ∫_V
+a_{ij}(∂ₗ∂ᵢu) ∂ⱼφ + ∑ ∫_V (∂_ℓ a_{ij})(∂ᵢu) ∂ⱼφ = ∫_V (∂_ℓf) φ - ∑ ∫_V [(∂_ℓ
+b_i)(∂ᵢu)+b_i(∂ₗ∂ᵢu)] φ - ∫_V [(∂_ℓ c)u + c(∂_ℓu)] φ`. The local weak formulation `hLoc` on
+plain integrals is a hypothesis: deriving it from the divergence-form bilinear pairing is the
+repackaging deferred to a later step. -/
 theorem differentiated_weakForm_div {V : Set (EuclideanSpace ℝ (Fin d))}
     (hVm : MeasurableSet V) (Op : FullEllipticOp d) (hA : IsC2Coeff Op.toEllipticCoeff)
     (ℓ : Fin d)
@@ -761,14 +761,14 @@ theorem differentiated_weakForm_div {V : Set (EuclideanSpace ℝ (Fin d))}
     exact datum_move ℓ hf_Df hφc hφcs hφV
   linarith [hstar, hprin, htrans, hzero, hdat]
 
-/-! ### The principal commutator: strong-datum form (needs `C²`) -/
+/-! ### Principal commutator in strong-datum form (needs `C²`) -/
 
 /-- **Moving `∂ⱼ` off the principal commutator (needs `a ∈ C²`).** For a fixed direction pair
-`i, j` the coefficient gradient `∂_ℓ a_{ij}` is a `C¹` weight, so the product
-`(∂_ℓ a_{ij})·∂ᵢu` has a weak `j`-derivative and testing against `φ` moves `∂ⱼ` onto the product:
-`∫_V (∂_ℓ a_{ij})(∂ᵢu) ∂ⱼφ = -∫_V [(∂ⱼ∂_ℓ a_{ij})(∂ᵢu) + (∂_ℓ a_{ij})(∂ⱼ∂ᵢu)] φ`.
-This is the only place the second-derivative bound `A2`/`hess_bdd` is load-bearing: it controls
-the mixed partial `∂ⱼ∂_ℓ a_{ij}` appearing in the commutator datum. -/
+`i, j` the coefficient gradient `∂_ℓ a_{ij}` is a `C¹` weight, so the product `(∂_ℓ a_{ij})·∂ᵢu`
+has a weak `j`-derivative and testing against `φ` moves `∂ⱼ` onto the product: `∫_V (∂_ℓ
+a_{ij})(∂ᵢu) ∂ⱼφ = -∫_V [(∂ⱼ∂_ℓ a_{ij})(∂ᵢu) + (∂_ℓ a_{ij})(∂ⱼ∂ᵢu)] φ`. The second-derivative
+bound `A2`/`hess_bdd` is used only here: it controls the mixed partial `∂ⱼ∂_ℓ a_{ij}` appearing
+in the commutator datum. -/
 theorem commutator_move {V : Set (EuclideanSpace ℝ (Fin d))} (hVm : MeasurableSet V)
     (A : EllipticCoeff d) (hA : IsC2Coeff A) (ℓ i j : Fin d)
     (Du_i D2_ji : Lp ℝ 2 (volume.restrict V)) (hD2 : HasWeakDerivOn V j Du_i D2_ji)

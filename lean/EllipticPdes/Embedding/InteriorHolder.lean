@@ -15,22 +15,21 @@ the domain, with the Hölder constant controlled by `‖f‖ + ‖u‖`.
 
 Three dimensions are covered, each with Hölder exponent `1/2`.
 
-* `d = 1`. Morrey applies at `p = 2 > 1 = d` to the first-order weak gradient, so the first-order
-  energy estimate alone suffices and the exponent is `1 - 1/2 = 1/2`.
+* `d = 1`. Morrey applies at `p = 2 > 1 = d` to the first-order weak gradient, so the
+  first-order energy estimate alone suffices and the exponent is `1 - 1/2 = 1/2`.
 * `d = 2`. The Sobolev conjugate of `2` degenerates at `d = 2`, so the bootstrap of
   `EllipticPdes.Embedding.GagliardoNirenberg` takes its step at `p = 4/3`, whose conjugate is
-  `4`. The ball carries finite measure, so the `L²` second derivatives of the interior `H²`
-  estimate are `L^{4/3}` data, and Morrey applies at `p = 4 > 2 = d` with exponent
-  `1 - 2/4 = 1/2`.
+  `4`. The ball has finite measure, so the `L²` second derivatives of the interior `H²` estimate
+  are `L^{4/3}` data, and Morrey applies at `p = 4 > 2 = d` with exponent `1 - 2/4 = 1/2`.
 * `d = 3`. Morrey needs `p > 3`, and the interior `H²` estimate supplies second derivatives in
-  `L²`. The bootstrap raises the gradient from `L²` to `L⁶`, and Morrey then applies at
-  `p = 6 > 3 = d` with exponent `1 - 3/6 = 1/2`.
+  `L²`. The bootstrap raises the gradient from `L²` to `L⁶`, and Morrey then applies at `p = 6 >
+  3 = d` with exponent `1 - 3/6 = 1/2`.
 
 `d ≥ 4` stays open. Reaching Morrey from `L²` second derivatives asks for an exponent `p` with
 `d/2 < p ≤ 2`, since `1/p' = 1/p - 1/d` gives `p' > d` exactly when `p > d/2`, and the ball
 turns `L²` data into `Lᵖ` data only for `p ≤ 2`. That range is empty once `d ≥ 4`, so one
 Sobolev step never reaches Morrey there. Those dimensions require iteration through the `H^k`
-ladder, which this library does not yet carry.
+ladder, which this library does not yet have.
 
 ## Main declarations
 
@@ -50,7 +49,7 @@ open EllipticPdes.Sobolev EllipticPdes.Regularity
 
 variable {d : ℕ}
 
-/-! ### The Morrey exponent at the two exponent pairs used here -/
+/-! ### Morrey exponent at the two exponent pairs used here -/
 
 /-- At `d = 1` and `p = 2` the Morrey exponent is `1/2`. -/
 theorem morreyExponent_one_two : morreyExponent 1 2 = (1 / 2 : ℝ≥0) := by
@@ -106,7 +105,7 @@ theorem eLpNorm_restrict_mono_toNNReal_le {S T : Set (EuclideanSpace ℝ (Fin d)
   exact ENNReal.toNNReal_mono (Lp.eLpNorm_ne_top X)
     (eLpNorm_mono_measure _ (Measure.restrict_mono hST le_rfl))
 
-/-! ### The one-dimensional estimate -/
+/-! ### One-dimensional estimate -/
 
 /-- **Interior Hölder estimate in one dimension (Evans, *Partial Differential Equations*
 (2nd ed.), §5.6.2 Thm 5).** A weak solution `u ∈ H₀¹(Ω)` of `L u = f` has, on every ball, a
@@ -178,12 +177,12 @@ theorem interior_holder_estimate_one (Op : FullEllipticOp 1)
         mul_le_mul' le_rfl (Finset.sum_le_sum fun k _ => hterm k)
     _ = C₀ * Real.toNNReal dcoef * Real.toNNReal P := by simp [mul_assoc]
 
-/-! ### The two-dimensional estimate -/
+/-! ### Two-dimensional estimate -/
 
 set_option maxHeartbeats 800000 in
 -- The constant is assembled from the Morrey, bootstrap and `H²` constants before the solution
--- is introduced, so the chain elaborates under one more binder layer than the default budget
--- covers.
+-- is introduced, so the chain elaborates under one more binder layer than the default
+-- `maxHeartbeats` covers.
 /-- **Interior Hölder estimate in two dimensions (Evans, *Partial Differential Equations*
 (2nd ed.), §5.6.2 Thm 5, applied to the interior `H²` estimate of §6.3.1 Thm 1).** A weak
 solution `u ∈ H₀¹(Ω)` of `L u = f` with `C¹` principal coefficients has, on every ball
@@ -313,12 +312,12 @@ theorem interior_holder_estimate_two (Op : FullEllipticOp 2)
         push_cast
         ring
 
-/-! ### The three-dimensional estimate -/
+/-! ### Three-dimensional estimate -/
 
 set_option maxHeartbeats 800000 in
 -- The constant is assembled from the Morrey, bootstrap and `H²` constants before the solution
--- is introduced, so the chain elaborates under one more binder layer than the default budget
--- covers.
+-- is introduced, so the chain elaborates under one more binder layer than the default
+-- `maxHeartbeats` covers.
 /-- **Interior Hölder estimate in three dimensions (Evans, *Partial Differential Equations*
 (2nd ed.), §5.6.2 Thm 5, applied to the interior `H²` estimate of §6.3.1 Thm 1).** A weak
 solution `u ∈ H₀¹(Ω)` of `L u = f` with `C¹` principal coefficients has, on every ball

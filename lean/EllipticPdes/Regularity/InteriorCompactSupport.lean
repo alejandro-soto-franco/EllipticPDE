@@ -7,7 +7,7 @@ import EllipticPdes.Regularity.Caccioppoli
 import EllipticPdes.Analysis.LpExtendByZero
 
 /-!
-# The whole-space extension bridge for the interior `H²` estimate
+# Whole-space extension bridge for the interior `H²` estimate
 
 The interior second-derivative estimate (Evans, *Partial Differential Equations* (2nd ed.),
 §6.3.1; Gilbarg-Trudinger, *Elliptic PDE of Second Order*, Theorem 8.8) runs the
@@ -18,13 +18,12 @@ solution and its Caccioppoli energy bound
 (`EllipticPdes.Regularity.Caccioppoli`).
 
 The two layers live on different measures: the difference-quotient engine is built on the
-whole-space space `EucL2 d = Lp ℝ 2 volume`, while the weak solution, the cutoff
-multiplication keystone, and the Caccioppoli estimate live on the restricted-domain space
-`L2D Ω = Lp ℝ 2 (volume.restrict Ω)`. This file provides the load-bearing bridge between
-them: extension by zero `L2D Ω →ₗᵢ[ℝ] EucL2 d`, packaged from the Mathlib linear isometry
-`MeasureTheory.lpExtendByZero`, together with the compatibility that carries the
-cutoff-weighted gradient energy of the Caccioppoli estimate onto whole-space `EucL2 d`
-classes with the `L²` norm preserved.
+whole-space space `EucL2 d = Lp ℝ 2 volume`, while the weak solution, the cutoff multiplication
+keystone, and the Caccioppoli estimate live on the restricted-domain space `L2D Ω = Lp ℝ 2
+(volume.restrict Ω)`. This file provides the bridge between them: extension by zero `L2D Ω
+→ₗᵢ[ℝ] EucL2 d`, packaged from the Mathlib linear isometry `MeasureTheory.lpExtendByZero`,
+together with the compatibility that carries the cutoff-weighted gradient energy of the
+Caccioppoli estimate onto whole-space `EucL2 d` classes with the `L²` norm preserved.
 -/
 
 open MeasureTheory
@@ -79,9 +78,8 @@ estimate operates (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1;
 Gilbarg-Trudinger, *Elliptic PDE of Second Order*, Theorem 8.8).
 
 One of the two deliverables the module docstring names. The interior chain reaches the same
-energy through `Caccioppoli` on the restricted-domain classes, so nothing consumes this
-whole-space form. -/
-private theorem extendL2_cutoffGrad_energy_le (Op : FullEllipticOp d)
+energy through `Caccioppoli` on the restricted-domain classes. -/
+theorem extendL2_cutoffGrad_energy_le (Op : FullEllipticOp d)
     {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩm : MeasurableSet Ω)
     {ζ : EuclideanSpace ℝ (Fin d) → ℝ} (hζ : IsTestFn Ω ζ) :
     ∃ C : ℝ, 0 ≤ C ∧ ∀ (u : H01 Ω) (f : L2D Ω),
@@ -108,7 +106,8 @@ an elliptic leading term and a commutator term (`coeFn_diffQuot_mul_coeff`), and
 translated coefficient bundle stays uniformly elliptic (`EllipticCoeff.translate`), which
 lets the leading term reuse the energy lower bound directly (Evans, *Partial Differential
 Equations* (2nd ed.), §6.3.1; Gilbarg–Trudinger, *Elliptic Partial Differential Equations of
-Second Order*, Theorem 8.8). -/
+Second Order*, Theorem 8.8).
+-/
 
 /-- **Extension commutes with coefficient multiplication.** Extending `A.actL i j g` by zero
 to the whole space agrees, `volume`-a.e., with multiplying the whole-space extension of `g`

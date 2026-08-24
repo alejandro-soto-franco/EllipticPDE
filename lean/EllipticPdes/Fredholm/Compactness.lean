@@ -8,12 +8,12 @@ import Mathlib.Analysis.InnerProductSpace.Adjoint
 import Mathlib.Analysis.Normed.Operator.Compact.Basic
 
 /-!
-# The Rellich-Kondrachov reduction: from the compact embedding to a compact `opK`
+# Rellich-Kondrachov reduction from the compact embedding to a compact `opK`
 
 The Fredholm alternative of `Fredholm.lean` is conditioned on the abstract hypothesis
-`IsCompactOperator (opK)`. Here we trace that hypothesis to its single analytic
-source: the **Rellich-Kondrachov compact embedding** `H₀¹(Ω) ↪ L²(Ω)`, encoded as the
-coordinate-`0` map `embL2 Ω : H₀¹(Ω) →L[ℝ] L²(Ω)`.
+`IsCompactOperator (opK)`. This file traces that hypothesis to its single analytic source: the
+**Rellich-Kondrachov compact embedding** `H₀¹(Ω) ↪ L²(Ω)`, encoded as the coordinate-`0` map
+`embL2 Ω : H₀¹(Ω) →L[ℝ] L²(Ω)`.
 
 * `embL2 Ω`: the embedding `U ↦ U 0`, the composition of the submodule inclusion with the
   `PiLp` projection onto coordinate `0`.

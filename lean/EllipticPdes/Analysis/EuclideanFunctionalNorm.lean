@@ -7,7 +7,7 @@ import Mathlib.Analysis.InnerProductSpace.Dual
 import Mathlib.Analysis.InnerProductSpace.PiL2
 
 /-!
-# The norm of a functional on Euclidean space in standard coordinates
+# Norm of a functional on Euclidean space in standard coordinates
 
 A continuous linear functional `L` on `EuclideanSpace ℝ (Fin n)` has squared norm equal to the
 sum of the squares of its values on the standard basis vectors: `‖L‖² = ∑ i, (L (single i 1))²`.

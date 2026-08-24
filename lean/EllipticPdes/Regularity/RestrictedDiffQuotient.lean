@@ -7,7 +7,7 @@ import EllipticPdes.Regularity.InteriorCompactSupport
 import Mathlib.MeasureTheory.Integral.Bochner.Set
 
 /-!
-# The interior difference quotient on `L2D Ω` / `H1amb Ω`
+# Interior difference quotient on `L2D Ω` / `H1amb Ω`
 
 The interior second-derivative estimate (Evans, *Partial Differential Equations* (2nd ed.),
 §6.3.1; Gilbarg-Trudinger, *Elliptic PDE of Second Order*, Theorem 8.8) needs a difference
@@ -43,7 +43,7 @@ open EllipticPdes.Sobolev
 
 variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))}
 
-/-! ### B1: Restriction, the retraction/adjoint of `extendL2` -/
+/-! ### Restriction as the retraction and adjoint of `extendL2` -/
 
 /-- **Restriction** `EucL2 d →L[ℝ] L2D Ω`, `g ↦ g|_Ω`: the retraction and adjoint of
 `extendL2`. Built from the Mathlib restriction of `Lp` classes to a restricted measure
@@ -61,9 +61,9 @@ theorem coeFn_restrictL2 (g : EucL2 d) :
 /-- **Restriction is a left inverse of extension by zero.** Extending a class by zero to
 the whole space and restricting back to `Ω` recovers the original class.
 
-Kept beside `extendL2_inner_restrictL2`, which states the adjoint law and is the form the
-difference-quotient argument takes. Nothing consumes this one. -/
-private theorem restrictL2_extendL2 (hΩm : MeasurableSet Ω) (g : L2D Ω) :
+The companion of `extendL2_inner_restrictL2`, which states the adjoint law and is the form
+the difference-quotient argument takes. -/
+theorem restrictL2_extendL2 (hΩm : MeasurableSet Ω) (g : L2D Ω) :
     restrictL2 (extendL2 hΩm g) = g := by
   refine Lp.ext ?_
   filter_upwards [coeFn_restrictL2 (extendL2 hΩm g),
@@ -91,7 +91,7 @@ theorem extendL2_inner_restrictL2 (hΩm : MeasurableSet Ω) (g : L2D Ω) (w : Eu
     rw [RCLike.inner_apply, conj_trivial, hx, mul_comm]
   exact hLHS.trans hRHS.symm
 
-/-! ### B2: The interior difference quotient on `L2D Ω` -/
+/-! ### Interior difference quotient on `L2D Ω` -/
 
 /-- **The interior difference quotient** `Dₖʰ` on `L2D Ω`: extend by zero, translate on the
 whole space, restrict back. A bounded operator for every `h` (no support hypothesis needed
@@ -124,7 +124,7 @@ theorem coeFn_diffQuotD (k : Fin d) (h : ℝ) (hΩm : MeasurableSet Ω) (g : L2D
     with x hx1 hx2 hx3
   simp only [hx1, Pi.smul_apply, hx2, Pi.sub_apply, hx3, smul_eq_mul, div_eq_inv_mul]
 
-/-! ### B3: The graph-level interior difference quotient -/
+/-! ### Graph-level interior difference quotient -/
 
 /-- **The graph-level interior difference quotient** `diffQuotG k h : H1amb Ω →L[ℝ] H1amb Ω`,
 applying `diffQuotD k h` in every ambient coordinate. Assembled exactly as `cutoffMul`
@@ -147,7 +147,7 @@ def diffQuotG (k : Fin d) (h : ℝ) (hΩm : MeasurableSet Ω) : H1amb Ω →L[�
     PiLp.coe_continuousLinearEquiv, PiLp.toLp_apply, ContinuousLinearMap.pi_apply,
     ContinuousLinearMap.proj_apply]
 
-/-! ### B4: Whole-space compatibility, the integration-by-parts bridge -/
+/-! ### Whole-space compatibility as the integration-by-parts bridge -/
 
 /-- **Whole-space compatibility.** On classes whose whole-space translate stays supported
 in `Ω`, the interior difference quotient's extension by zero equals the whole-space

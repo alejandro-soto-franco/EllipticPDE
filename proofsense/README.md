@@ -29,11 +29,10 @@ the warrants themselves:
 - `proofsense check` requires `ANTHROPIC_API_KEY` and fails with
   `ANTHROPIC_API_KEY is not set; required for LlmEntailment` before reading a
   source.
-- `proofsense check --stub`, which skips the judge, fails with
-  `parsing content_list JSON .../evans-2010-par-dif-equ.md — expected value at
-  line 2 column 1` on the pre-existing Evans entry. The binary expects a MinerU
-  `content_list.json` where the manifest supplies a Markdown transcription, and
-  no `.json` file exists in the corpus.
+- `proofsense check --stub`, which skips the judge, fails on the pre-existing
+  Evans entry with a `parsing content_list JSON` error at line 2 column 1. The
+  binary expects a MinerU `content_list.json` where the manifest supplies a
+  Markdown transcription, and no `.json` file exists in the corpus.
 
 The binary also exposes only `check`; there is no `resolve` subcommand, and
 `check` spawns `lake exe proofsense-lean`, which this lakefile does not declare.
@@ -42,13 +41,13 @@ enforced in CI is `verify/proofsense_coverage.py`, which checks that every
 declaration whose axioms `lean/AxiomAudit.lean` pins has a warrant or a recorded
 exemption, and that no locator names a bare section. It passes.
 
-## Why the locators name theorems
+## Locators naming theorems
 
 A locator naming a section resolves to every theorem under that heading, and the
 declaration is then asked to entail all of them, which is answered false almost
 always. Measured across the nine warrants of the 2026-07-22 audit, section
 granularity hands the judge 88,249 characters where statement granularity hands
-it 7,617, a factor of 11.6. Section 6.3.1 alone holds three theorems over
+it 7,617, a factor of 11.6. Section 6.3.1 alone has three theorems over
 12,555 characters, of which `interior_H2_estimate` formalises one, at 1,304.
 
 Every warrant here therefore names its theorem, `§6.3.1 Thm 1` rather than

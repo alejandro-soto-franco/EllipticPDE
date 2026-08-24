@@ -29,19 +29,19 @@ import EllipticPdes
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Sobolev.FullEllipticOp.weak_solution_L2_of_nonneg_zeroth_of_bounded
 
-/-! ### The dual space `H⁻¹` -/
+/-! ### Dual space `H⁻¹` -/
 
 /-- info: 'EllipticPdes.hneg_characterization' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.hneg_characterization
 
-/-! ### The Gårding inequality -/
+/-! ### Gårding inequality -/
 
 /-- info: 'EllipticPdes.Sobolev.FullEllipticOp.garding' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Sobolev.FullEllipticOp.garding
 
-/-! ### The Fredholm alternative -/
+/-! ### Fredholm alternative -/
 
 /-- info: 'EllipticPdes.Sobolev.FullEllipticOp.fredholm_alternative' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
@@ -63,7 +63,7 @@ import EllipticPdes
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Sobolev.FullEllipticOp.fredholm_alternative_of_bounded
 
-/-! ### The resolvent bound and the spectrum -/
+/-! ### Resolvent bound and spectrum -/
 
 /-- info: 'EllipticPdes.Sobolev.FullEllipticOp.resolvent_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
@@ -207,7 +207,7 @@ import EllipticPdes
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Regularity.interior_smooth
 
-/-! ### The Poincaré chain the library reduces to -/
+/-! ### Base of the Poincaré chain -/
 
 /-- info: 'EllipticPdes.Poincare.intervalIntegral_mul_sq_le' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in

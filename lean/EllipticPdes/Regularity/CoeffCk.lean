@@ -7,7 +7,7 @@ import EllipticPdes.Sobolev.Coefficients
 import EllipticPdes.Regularity.CoeffC2
 
 /-!
-# `Cᵏ` coefficients, indexed by the derivative order
+# `Cᵏ` coefficients indexed by the derivative order
 
 Higher interior regularity (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1,
 Theorem 2) runs by induction on `m`, and its hypothesis moves with the induction: reaching
@@ -18,13 +18,13 @@ family. This file gives the family.
 
 `IsCkCoeff A k` bundles `ContDiff ℝ k` on every entry together with a uniform bound on each
 iterated derivative of order `1 ≤ m ≤ k`. Orders start at one because order zero is already
-carried by `EllipticCoeff.Λ`, so the mixin adds exactly the derivative data and nothing that
+supplied by `EllipticCoeff.Λ`, so the mixin adds exactly the derivative data and nothing that
 the bundle beneath it already supplies.
 
 The bounds are collected as a single function `bound : ℕ → ℝ` rather than as one field per
-order. A `Fin (k+1)`-indexed family would carry the order in its type and force a cast at
-every use; the constraint `1 ≤ m ≤ k` in `iteratedFDeriv_bdd` says which values of the
-function carry meaning, and `mono` then restricts to a lower order without touching it.
+order. A `Fin (k+1)`-indexed family would record the order in its type and force a cast at every
+use; the constraint `1 ≤ m ≤ k` in `iteratedFDeriv_bdd` says which values of the function are
+meaningful, and `mono` then restricts to a lower order without touching it.
 
 Derivatives are taken as `iteratedFDeriv`, where `IsC2Coeff` nests `fderiv` inside `fderiv`.
 The two agree at order two (`norm_fderiv_fderiv_eq` below, from Mathlib's

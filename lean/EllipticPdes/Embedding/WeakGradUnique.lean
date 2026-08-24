@@ -7,10 +7,10 @@ import EllipticPdes.Embedding.WeakGradient
 import Mathlib.Analysis.Distribution.AEEqOfIntegralContDiff
 
 /-!
-# The weak gradient on an open set is unique
+# Uniqueness of the weak gradient on an open set
 
-Two weak gradients of one function differ by a function orthogonal to every test function, and on
-an open set the fundamental lemma of the calculus of variations kills it. Mathlib carries the
+Two weak gradients of one function differ by a function orthogonal to every test function, and
+on an open set the fundamental lemma of the calculus of variations kills it. Mathlib has the
 lemma as `IsOpen.ae_eq_zero_of_integral_contDiff_smul_eq_zero`.
 
 Uniqueness is what lets separate structures be assembled into one family. Higher interior

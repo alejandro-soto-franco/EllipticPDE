@@ -1,6 +1,6 @@
 name: lean
 
-# Build the formalisation from a clean clone and hold it to what the README
+# Build the formalisation from a clean clone and check it against what the README
 # claims: no `sorry`, no axiom beyond the classical three, and a clean pass of
 # the environment-level linter. The only dependency is upstream Mathlib at a
 # pinned revision, so a clean clone resolves without anything private.

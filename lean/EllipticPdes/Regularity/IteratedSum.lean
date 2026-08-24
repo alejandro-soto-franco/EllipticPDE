@@ -12,12 +12,12 @@ The datum of the differentiated equation is a finite sum of signed terms, each a
 weight against a derivative of the solution. `EllipticPdes.Regularity.MulIterated` supplies
 the weight; this file supplies the sum.
 
-Everything here is the same observation at three levels: weak differentiation is linear, so
-an order-`k` family of a sum is the entrywise sum of the families, and the triangle inequality
-turns a bound on each summand into a bound on the sum. The constants add rather than being
-optimised, which is all the induction of Guo, *Partial Differential Equations I and II*
-(Course Lecture Notes), Theorem VIII.3.2 (p. 65) needs: its constant is quantified before the
-solution and the datum, and nothing constrains its size.
+The same observation appears at three levels: weak differentiation is linear, so an order-`k`
+family of a sum is the entrywise sum of the families, and the triangle inequality turns a bound
+on each summand into a bound on the sum. The constants add rather than being optimised, which is
+all the induction of Guo, *Partial Differential Equations I and II* (Course Lecture Notes),
+Theorem VIII.3.2 (p. 65) needs: its constant is quantified before the solution and the datum,
+and nothing constrains its size.
 
 ## Main declarations
 
@@ -76,7 +76,7 @@ theorem HasWeakDerivOn.sum {ι : Type*} {g g' : ι → L2D V}
       rw [Finset.sum_insert hi, Finset.sum_insert hi]
       exact (h i).add ih
 
-/-! ### The families -/
+/-! ### Families -/
 
 /-- The order-`k` family of a negation, entry by entry. -/
 def HasIteratedWeakDerivOn.neg {g : L2D V} (hg : HasIteratedWeakDerivOn V k g) :
@@ -99,7 +99,7 @@ def HasIteratedWeakDerivOn.sum {ι : Type*} [Fintype ι] {g : ι → L2D V}
   D_nil := Finset.sum_congr rfl fun i _ => (H i).D_nil
   D_step m α hα := HasWeakDerivOn.sum (fun i => (H i).D_step m α hα) Finset.univ
 
-/-! ### The bounds -/
+/-! ### Bounds -/
 
 namespace IteratedL2Bound
 
@@ -111,7 +111,7 @@ theorem add {g h : L2D V} {hg : HasIteratedWeakDerivOn V k g}
     (hC' : IteratedL2Bound hh C') : IteratedL2Bound (hg.add hh) (C + C') :=
   fun α hα => (norm_add_le _ _).trans (add_le_add (hC α hα) (hC' α hα))
 
-/-- A negation carries the same bound. -/
+/-- A negation has the same bound. -/
 theorem neg {g : L2D V} {hg : HasIteratedWeakDerivOn V k g} (hC : IteratedL2Bound hg C) :
     IteratedL2Bound hg.neg C :=
   fun α hα => by

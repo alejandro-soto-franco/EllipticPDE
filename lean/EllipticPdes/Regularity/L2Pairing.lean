@@ -9,11 +9,10 @@ import EllipticPdes.Regularity.MulIterated
 # Pairing an `L²` class against a test function
 
 Evans's step 3 of §6.3.1, Theorem 2 assembles a datum out of a dozen products of a coefficient
-against a derivative of the solution, and every one of them reaches the statement as an
-integral against a test function. Moving between the sum of the integrals and the integral of
-the sum is the whole of the bookkeeping, and it is the same three facts each time: the pairing
-is additive, it commutes with a finite sum, and a weighted class pairs as the weight times the
-class.
+against a derivative of the solution, and every one of them reaches the statement as an integral
+against a test function. Moving between the sum of the integrals and the integral of the sum is
+all of the bookkeeping, and it is the same three facts each time: the pairing is additive, it
+commutes with a finite sum, and a weighted class pairs as the weight times the class.
 
 Integrability is what makes the moves legal, and it is uniform: an `L²` class against a
 continuous compactly supported function is integrable, by Hölder. Every lemma here takes the
@@ -179,10 +178,9 @@ theorem setIntegral_weight_mul_congr_of_cutoff_ae {θ : EuclideanSpace ℝ (Fin 
   rw [← e (X x : ℝ), hx, e (Y x : ℝ)]
 
 /-- **A sum of two weighted classes, paired against a cut-off test function.** The
-differentiated equation groups its datum two terms at a time, one carrying a derivative of a
-coefficient and one carrying a derivative of the solution, and the datum of the induction step
-names them separately. This is the split, with the cutoff moved to the front where the datum
-carries it. -/
+differentiated equation groups its datum two terms at a time, one with a derivative of a
+coefficient and one with a derivative of the solution, and the datum of the induction step names
+them separately. This is the split, with the cutoff moved to the front where the datum has it. -/
 theorem setIntegral_add_weight_mul_cutoff {a₁ a₂ : EuclideanSpace ℝ (Fin d) → ℝ}
     (h₁m : Measurable a₁) {M₁ : ℝ}
     (h₁b : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |a₁ x| ≤ M₁)

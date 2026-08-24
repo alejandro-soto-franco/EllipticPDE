@@ -12,8 +12,8 @@ import EllipticPdes.Analysis.EuclideanFunctionalNorm
 # Discharging the Rellich-Kondrachov compact embedding
 
 `Compactness.lean` reduces the Fredholm theory to the single analytic hypothesis
-`IsCompactOperator (embL2 Ω)`, the Rellich-Kondrachov compact embedding `H₀¹(Ω) ↪ L²(Ω)`. Here we
-prove it for bounded measurable `Ω`, consuming the Fréchet-Kolmogorov engine built in the author's
+`IsCompactOperator (embL2 Ω)`, the Rellich-Kondrachov compact embedding `H₀¹(Ω) ↪ L²(Ω)`. This
+file proves it for bounded measurable `Ω`, consuming the Fréchet-Kolmogorov engine built in
 `EllipticPdes.Analysis.*`.
 
 The argument carries `embL2 Ω U = U 0 ∈ L²(Ω)` to its extension by zero in `L²(ℝᵈ)`, where the
@@ -226,11 +226,12 @@ theorem embL2_isCompact {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩm : Measurab
   exact (isCompactOperator_iff_isCompact_closure_image_closedBall (embL2 Ω).toLinearMap
     one_pos).mpr (hTB.closure.isCompact_of_isClosed isClosed_closure)
 
-/-! ### The Fredholm and spectral theorems, with the Rellich hypothesis discharged
+/-! ### Fredholm and spectral theorems with the Rellich hypothesis discharged
 
 With `embL2_isCompact` proved, the analytic hypothesis `IsCompactOperator (embL2 Ω)` threaded
 through `Compactness.lean` and `Spectrum.lean` is no longer assumed: every headline theorem holds
-for a bounded measurable domain outright. -/
+for a bounded measurable domain outright.
+-/
 
 /-- The Fredholm alternative for a bounded measurable domain, with no compactness hypothesis. -/
 theorem FullEllipticOp.fredholm_alternative_of_bounded (Op : FullEllipticOp d)

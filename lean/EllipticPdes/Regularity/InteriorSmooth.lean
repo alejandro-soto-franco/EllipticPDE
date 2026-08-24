@@ -21,7 +21,7 @@ of weak derivatives into classical ones. Neither half needs a quantitative state
 constants of `higher_interior_regularity` are what make the estimate uniform, and smoothness on
 a fixed `V` needs only that the derivatives exist.
 
-## What the embedding half requires
+## Requirements of the embedding half
 
 Weak derivatives of every order are handed over one family per order, with nothing relating them,
 so the embedding half starts by assembling them into a single family closed under
@@ -57,8 +57,8 @@ open EllipticPdes.Sobolev
 
 variable {n : ℕ}
 
-/-- **The Sobolev ladder on a ball.** An `L²` class carrying weak derivatives of every order
-has a smooth representative on any ball whose closure sits inside the region.
+/-- **The Sobolev ladder on a ball.** An `L²` class with weak derivatives of every order has a
+smooth representative on any ball whose closure sits inside the region.
 
 This is the analytic content of Evans's Theorem 3, and it is three steps.
 
@@ -110,7 +110,7 @@ theorem exists_contDiffOn_ball_of_hasIteratedWeakDerivOn
   obtain ⟨v, hvae, hvc⟩ := exists_contDiffOn_of_locally_ae Metric.isOpen_ball _ hloc
   exact ⟨v, hvc, hvae⟩
 
-/-- **The Sobolev ladder, qualitative form.** An `L²` class on `V` carrying weak derivatives of
+/-- **The Sobolev ladder, qualitative form.** An `L²` class on `V` with weak derivatives of
 every order has a representative smooth on the interior of `V`. No bound is asked and none is
 produced: the estimate lives in `higher_interior_regularity`, and smoothness on a fixed set
 follows from the existence of the derivatives alone.

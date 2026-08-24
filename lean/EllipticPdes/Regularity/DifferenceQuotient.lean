@@ -8,11 +8,11 @@ import EllipticPdes.Analysis.FrechetKolmogorov
 /-!
 # Difference quotients on `L²(ℝⁿ)`
 
-The difference quotient `Dₖʰ u(x) = (u(x + h eₖ) - u(x)) / h` is the engine of the
-interior regularity theory (Evans, *Partial Differential Equations* (2nd ed.), §5.8.2
-and §6.3.1). It is realised here as a continuous linear map on the whole-space space
-`EucL2 d`, built from the translation isometry `transL2`, so that its adjoint and norm
-bounds descend from translation invariance of Lebesgue measure.
+The difference quotient `Dₖʰ u(x) = (u(x + h eₖ) - u(x)) / h` drives the interior regularity
+theory (Evans, *Partial Differential Equations* (2nd ed.), §5.8.2 and §6.3.1). It is realised
+here as a continuous linear map on the whole-space space `EucL2 d`, built from the translation
+isometry `transL2`, so that its adjoint and norm bounds descend from translation invariance of
+Lebesgue measure.
 -/
 
 open MeasureTheory

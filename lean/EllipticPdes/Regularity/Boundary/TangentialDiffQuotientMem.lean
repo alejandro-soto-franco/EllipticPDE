@@ -57,7 +57,7 @@ private lemma extendL2_toLp_ae_eq_halfBall {n : ℕ} {Ω : Set (EuclideanSpace �
   · rw [Set.indicator_of_notMem hxΩ,
       image_eq_zero_of_notMem_tsupport (fun hc => hxΩ (hsupp hc))]
 
-/-! ### The difference quotient commutes with the partial derivative -/
+/-! ### Commutation of the difference quotient with the partial derivative -/
 
 /-- **The difference quotient along a fixed vector commutes with the partial derivative.**
 `∂ᵢ(D^v φ) = D^v(∂ᵢφ)`: the shift map has derivative the identity, so the shift and the
@@ -81,7 +81,7 @@ private lemma partialD_shiftDiffQuotFn {n : ℕ} {φ : EuclideanSpace ℝ (Fin n
   simp only [ContinuousLinearMap.smul_apply, ContinuousLinearMap.sub_apply, smul_eq_mul]
   ring
 
-/-! ### The discrete graph identity -/
+/-! ### Discrete graph identity -/
 
 section GraphIdentity
 
@@ -162,7 +162,7 @@ private lemma cutoffMulOn_tangDiffQuotG_testGraph (hζ : IsTestFn (Metric.ball 0
     rw [hadd, Pi.add_apply, hmt, hmtp, hdqp, hdqt, hshp, hsht, htcp, htct, hpsi,
       congrFun hpsi_eq x]
 
-/-! ### The crux admissibility -/
+/-! ### Crux admissibility -/
 
 /-- **Crux admissibility, tangential.** For `U ∈ H₀¹(halfBall d r)`, the cutoff of its
 tangential difference quotient is again in `H₀¹(halfBall d r)`. Since

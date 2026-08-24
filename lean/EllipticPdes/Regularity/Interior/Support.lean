@@ -10,11 +10,10 @@ import EllipticPdes.Regularity.CutoffTower
 /-!
 # Internal support lemmas for the interior estimate
 
-Shared scaffolding for the modules under `EllipticPdes.Regularity.Interior`. These
-declarations are not public API: they are exposed only because Lean's `private` modifier is
-file-scoped and the interior estimate spans several modules. Each lemma here is stated and
-proved once but consumed on both sides of the D3 section boundary, so no single module can
-hold it privately.
+Shared scaffolding for the modules under `EllipticPdes.Regularity.Interior`. These declarations
+are not public API: they are exposed only because Lean's `private` modifier is file-scoped and
+the interior estimate spans several modules. Each lemma here is stated and proved once but
+consumed in more than one of them, so no single module can keep it private.
 
 Consumers should use `interior_H2_estimate` and its siblings from
 `EllipticPdes.Regularity.Interior`.

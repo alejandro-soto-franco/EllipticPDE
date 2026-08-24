@@ -16,7 +16,7 @@ import Mathlib.Topology.MetricSpace.Bounded
 import EllipticPdes.Analysis.LpTranslation
 
 /-!
-# The Fréchet-Kolmogorov precompactness criterion in `L²(ℝⁿ)`
+# Fréchet-Kolmogorov precompactness criterion in `L²(ℝⁿ)`
 
 A family of `L²` functions that is uniformly bounded, supported in a fixed ball, and
 uniformly Lipschitz under translation is totally bounded in `L²(ℝⁿ)`. This is the
@@ -80,7 +80,7 @@ theorem totallyBounded_of_finiteDimensional_bounded {E : Type*} [NormedAddCommGr
 
 namespace MeasureTheory
 
-/-! ### A finite-measure Cauchy-Schwarz bound -/
+/-! ### Finite-measure Cauchy-Schwarz bound -/
 
 variable {α : Type*} [MeasurableSpace α] {μ : Measure α} {s : Set α}
 
@@ -114,7 +114,7 @@ theorem sq_setIntegral_le (hs : MeasurableSet s) (hμs : μ s ≠ ⊤) {f : α �
   rw [discrim] at hdisc
   nlinarith [hdisc]
 
-/-! ### The `L²` space, translation, and the squared norm as an integral -/
+/-! ### `L²` space, translation, and the squared norm as an integral -/
 
 /-- `L²(ℝⁿ)` with Lebesgue measure. -/
 abbrev EucL2 (n : ℕ) := Lp ℝ 2 (volume : Measure (EuclideanSpace ℝ (Fin n)))
@@ -148,7 +148,7 @@ theorem norm_sq_transL2_sub (h : EuclideanSpace ℝ (Fin n)) (g : EucL2 n) :
   filter_upwards [Lp.coeFn_sub (transL2 h g) g, coeFn_transL2 h g] with x hx hx1
   rw [hx]; simp only [Pi.sub_apply]; rw [hx1]
 
-/-! ### The cube grid -/
+/-! ### Cube grid -/
 
 /-- The half-open cube of side `η` at lattice index `k`, as a subset of
 `EuclideanSpace ℝ (Fin n)`. -/
@@ -214,7 +214,7 @@ theorem coord_dist_lt_of_mem_cube {η : ℝ} {k : Fin n → ℤ} {x y : Euclidea
   obtain ⟨hl', hu'⟩ := hy i
   rw [abs_lt]; constructor <;> linarith
 
-/-! ### The displacement box -/
+/-! ### Displacement box -/
 
 /-- The open displacement box `(-η, η)ⁿ` in `EuclideanSpace ℝ (Fin n)`: the set of admissible
 differences of two points sharing a side-`η` cube. -/
@@ -276,7 +276,7 @@ theorem normSq_le_of_mem_dbox {η : ℝ} {w : EuclideanSpace ℝ (Fin n)} (hw : 
         nlinarith [hl, hu]
     _ = n * η ^ 2 := by rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
 
-/-! ### The cube-averaging operator -/
+/-! ### Cube-averaging operator -/
 
 /-- The `L²` class of the indicator of the cube `cube η k`. -/
 def cubeIndicator (η : ℝ) (k : Fin n → ℤ) : EucL2 n :=
@@ -340,7 +340,7 @@ theorem stepFun_eq_on_cube {η : ℝ} (hη : 0 < η) {K : Finset (Fin n → ℤ)
       (fun hxk => absurd hx (Set.disjoint_left.mp (cube_disjoint hη hne) hxk)), mul_zero]
   · intro h; exact absurd hk₀ h
 
-/-! ### The approximation error as a sum of cube variances -/
+/-! ### Approximation error as a sum of cube variances -/
 
 /-- On any cube the squared deviation of `g` from a constant is integrable. -/
 theorem integrableOn_cube_sq_sub (η : ℝ) (k : Fin n → ℤ) (g : EucL2 n) (c : ℝ) :
@@ -386,7 +386,7 @@ theorem norm_sq_sub_avg_eq {η : ℝ} (hη : 0 < η) {K : Finset (Fin n → ℤ)
       (integrableOn_cube_sq_sub η k g _))]
   exact Finset.sum_congr rfl (fun k _ => integral_indicator (measurableSet_cube η k))
 
-/-! ### The cube-translation estimate -/
+/-! ### Cube-translation estimate -/
 
 /-- The squared difference `(g x - g y) ^ 2` is integrable over a product of finite-measure sets. -/
 theorem integrableOn_prod_sq_sub (g : EucL2 n) {s t : Set (EuclideanSpace ℝ (Fin n))}
@@ -693,7 +693,7 @@ theorem norm_sq_sub_avg_le_const {η : ℝ} (hη : 0 < η) {K : Finset (Fin n �
         mul_le_mul_of_nonneg_left hbound (inv_nonneg.mpr (pow_nonneg hη.le n))
     _ = 2 ^ n * n * Λ ^ 2 * η ^ 2 := by rw [mul_pow]; field_simp
 
-/-! ### The Fréchet-Kolmogorov criterion -/
+/-! ### Fréchet-Kolmogorov criterion -/
 
 /-- Each coordinate of a Euclidean vector is bounded in absolute value by the norm. -/
 theorem coord_abs_le_norm (x : EuclideanSpace ℝ (Fin n)) (i : Fin n) : |x i| ≤ ‖x‖ := by
@@ -808,7 +808,8 @@ estimate for smooth compactly supported functions, to its consequence on the `L�
 functions: a Sobolev function is an `L²` limit of smooth compactly supported functions whose
 gradients are uniformly bounded, and the modulus passes to the limit. Both the graph-closure `H₀¹`
 of the elliptic problem and the `W^{1,p}` structure of the Navier-Stokes development obtain their
-modulus through this lemma. -/
+modulus through this lemma.
+-/
 
 /-- A uniform translation modulus passes to an `L²` limit: if every `gk k` satisfies
 `‖transL2 h (gk k) - gk k‖ ≤ Λ * ‖h‖` and `gk` converges to `g`, then `g` satisfies the same
@@ -824,7 +825,7 @@ theorem transL2_sub_le_of_tendsto {g : EucL2 n} {Λ : ℝ} {gk : ℕ → EucL2 n
 
 /-- A sharper limit form of `transL2_sub_le_of_tendsto`: the per-term moduli `Λ k` need only
 converge to `Λ`, not be uniformly bounded by it. This is the form a Sobolev function uses, since
-its smooth approximants carry gradient norms that converge to, but need not equal, its own. -/
+its smooth approximants have gradient norms that converge to, but need not equal, its own. -/
 theorem transL2_sub_le_of_tendsto' {g : EucL2 n} {Λ : ℝ} {gk : ℕ → EucL2 n} {Λk : ℕ → ℝ}
     (htend : Filter.Tendsto gk Filter.atTop (nhds g))
     (hΛ : Filter.Tendsto Λk Filter.atTop (nhds Λ))

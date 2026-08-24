@@ -100,7 +100,7 @@ theorem sq_ballAverage_sub_le {Ω : Set (EuclideanSpace ℝ (Fin d))}
           + 2 * ∫ w in Metric.ball z σ, (u w - B) ^ 2 := hmono
     _ ≤ 2 * M ^ 2 * (r ^ ((d : ℝ) + 2 * α) + t ^ ((d : ℝ) + 2 * α)) := by linarith
 
-/-- The single constant every mean comparison in this file carries. -/
+/-- The single constant every mean comparison in this file uses. -/
 def campanatoConst (d : ℕ) : ℝ := Real.sqrt (2 ^ (d + 4) / unitBallVolume d)
 
 /-- The Campanato constant is positive. -/

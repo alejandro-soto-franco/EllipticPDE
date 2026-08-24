@@ -10,7 +10,7 @@ import Mathlib.Analysis.Calculus.Deriv.Mul
 import Mathlib.Algebra.QuadraticDiscriminant
 
 /-!
-# The one-dimensional Poincaré inequality
+# One-dimensional Poincaré inequality
 
 For a continuously differentiable `u` on a compact interval `[a, b]` that
 vanishes at the left endpoint, the `L²` norm of `u` is controlled by the `L²`
@@ -151,9 +151,9 @@ theorem MeasureTheory.poincare_1d {a b : ℝ} (hab : a ≤ b) {u u' : ℝ → �
 in the open interval `(a, b)`. Such a `u` vanishes at the left endpoint, so
 `poincare_1d` applies.
 
-The compact-support companion of `poincare_1d`, kept for callers that carry a
-`tsupport` hypothesis. The Fubini proof of the Poincaré inequality on a box takes
-`poincare_1d` directly, having the endpoint value to hand, so nothing else consumes this form. -/
+The compact-support companion of `poincare_1d`, kept for callers that have a `tsupport`
+hypothesis. The Fubini proof of the Poincaré inequality on a box takes `poincare_1d` directly,
+having the endpoint value to hand, so nothing else consumes this form. -/
 theorem MeasureTheory.poincare_1d_of_tsupport {a b : ℝ} (hab : a ≤ b) {u u' : ℝ → ℝ}
     (hderiv : ∀ y ∈ uIcc a b, HasDerivAt u (u' y) y)
     (hu' : ContinuousOn u' (uIcc a b)) (hsupp : tsupport u ⊆ Ioo a b) :

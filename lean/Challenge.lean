@@ -39,15 +39,15 @@ Six results are stated below, all from Evans, *Partial Differential Equations* (
 
 ## Encoding of `H_0^1(Ω)`
 
-`H_0^1(Ω)` is realised as the closure of the smooth compactly supported functions inside
-the graph space `L²(Ω) × (L²(Ω))^d`, carrying the `H¹` inner product. An element `U` is a
-`(d+1)`-tuple of `L²` classes: coordinate `0` is the function, coordinate `i.succ` its
-`i`-th partial derivative. A test function `φ` enters as `(φ, ∂_1 φ, …, ∂_d φ)`, and
-`H_0^1(Ω)` is the topological closure of the span of those tuples, so a member carries its
-weak gradient with it. Openness keeps that space non-trivial: a test function has
-`tsupport φ ⊆ Ω`, so on a set with empty interior every test function vanishes.
-Compactness of the embedding `H_0^1(Ω) ↪ L²(Ω)`, the Rellich-Kondrachov theorem, is proved
-for a bounded `Ω` rather than assumed, so it appears in none of the statements below.
+`H_0^1(Ω)` is realised as the closure of the smooth compactly supported functions inside the
+graph space `L²(Ω) × (L²(Ω))^d`, with the `H¹` inner product. An element `U` is a `(d+1)`-tuple
+of `L²` classes: coordinate `0` is the function, coordinate `i.succ` its `i`-th partial
+derivative. A test function `φ` enters as `(φ, ∂_1 φ, …, ∂_d φ)`, and `H_0^1(Ω)` is the
+topological closure of the span of those tuples, so a member has its weak gradient with it.
+Openness keeps that space non-trivial: a test function has `tsupport φ ⊆ Ω`, so on a set with
+empty interior every test function vanishes. Compactness of the embedding `H_0^1(Ω) ↪ L²(Ω)`,
+the Rellich-Kondrachov theorem, is proved for a bounded `Ω` rather than assumed, so it appears
+in none of the statements below.
 -/
 
 open MeasureTheory
@@ -59,15 +59,15 @@ namespace Palomar
 
 variable {d : ℕ}
 
-/-! ### The graph encoding of `H_0^1(Ω)` -/
+/-! ### Graph encoding of `H_0^1(Ω)` -/
 
 /-- The real `L²` space on a domain `Ω ⊆ ℝ^d` (restricted Lebesgue measure). -/
 abbrev L2D (Ω : Set (EuclideanSpace ℝ (Fin d))) : Type :=
   Lp ℝ 2 (volume.restrict Ω)
 
-/-- Ambient Hilbert space for the graph encoding: a function value together with `d`
-gradient components, carrying the ℓ² (`H¹`) inner product. Coordinate `0` is the
-function; coordinate `i.succ` is the `i`-th weak partial derivative. -/
+/-- Ambient Hilbert space for the graph encoding: a function value together with `d` gradient
+components, with the ℓ² (`H¹`) inner product. Coordinate `0` is the function; coordinate
+`i.succ` is the `i`-th weak partial derivative. -/
 abbrev H1amb (Ω : Set (EuclideanSpace ℝ (Fin d))) : Type :=
   PiLp 2 (fun _ : Fin (d + 1) => L2D Ω)
 
@@ -130,7 +130,7 @@ space. -/
 def H01 (Ω : Set (EuclideanSpace ℝ (Fin d))) : Submodule ℝ (H1amb Ω) :=
   (Submodule.span ℝ (testGraphSet Ω)).topologicalClosure
 
-/-! ### The operator and its bilinear form -/
+/-! ### Operator and its bilinear form -/
 
 /-- A second-order divergence-form operator
 `L u = -∂_j (a_{ij} ∂_i u) + b_i ∂_i u + c u` with measurable coefficients, bounded by
@@ -197,7 +197,7 @@ An `L²` right-hand side enters the weak problem through it. -/
 def datumPairing {Ω : Set (EuclideanSpace ℝ (Fin d))} (f : L2D Ω) (V : H01 Ω) : ℝ :=
   ∫ x in Ω, (f x : ℝ) * ((V : H1amb Ω) 0 x : ℝ)
 
-/-! ### The Gårding inequality -/
+/-! ### Gårding inequality -/
 
 /-- **The Gårding inequality** (Evans, *Partial Differential Equations* (2nd ed.),
 §6.2.2, Theorem 2, p. 318). The form is coercive on `H_0^1(Ω)` after a shift by a
@@ -237,7 +237,7 @@ theorem weak_solution_of_nonneg_zeroth {n : ℕ} (Op : EllipticOperator (n + 1))
             ‖u‖ ≤ (CP + 1) / Op.lam * ‖f‖ := by
   sorry
 
-/-! ### The Fredholm alternative -/
+/-! ### Fredholm alternative -/
 
 /-- **Second Existence Theorem for weak solutions** (Evans, §6.2.3, Theorem 4(i),
 p. 321). On a bounded open `Ω`, exactly one of the following holds. Either the
@@ -265,7 +265,7 @@ theorem solvable_iff_orthogonal_transpose (Op : EllipticOperator d)
       ↔ ∀ w : H01 Ω, (∀ v : H01 Ω, weakForm Op Ω v w = 0) → f w = 0 := by
   sorry
 
-/-! ### The discrete set of exceptional shifts -/
+/-! ### Discrete set of exceptional shifts -/
 
 /-- **Third Existence Theorem for weak solutions** (Evans, §6.2.3, Theorem 5, p. 323).
 On a bounded open `Ω` there is an at most countable set `Σ ⊆ ℝ`, finite below every

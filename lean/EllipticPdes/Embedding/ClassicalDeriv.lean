@@ -6,7 +6,7 @@ Authors: Alejandro Soto Franco
 import EllipticPdes.Embedding.Morrey
 
 /-!
-# A continuous weak gradient is a classical one
+# Continuous weak gradient as a classical gradient
 
 The Sobolev ladder puts a solution and its weak derivatives in a Hölder class, so both are
 continuous. Continuity is what turns them back into classical derivatives: a function with a
@@ -46,7 +46,7 @@ open EllipticPdes.Sobolev (partialD)
 
 variable {d : ℕ}
 
-/-! ### A gradient tuple as a functional -/
+/-! ### Gradient tuple as a functional -/
 
 /-- The continuous linear functional whose coordinate values are the entries of `g` at `y`. This
 is the shape `HasFDerivAt` asks for, assembled from the shape a weak gradient comes in. -/
@@ -146,7 +146,7 @@ theorem tendstoUniformlyOn_indicator_convolution
     _ ≤ ε / 2 := hkey
     _ < ε := by linarith
 
-/-! ### The classical derivative -/
+/-! ### Classical derivative -/
 
 /-- **A continuous weak gradient is a classical derivative.** On an open region, a function that
 is continuous and integrable, with a weak gradient that is continuous and integrable, is Fréchet

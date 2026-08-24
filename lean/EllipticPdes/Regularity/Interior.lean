@@ -6,11 +6,11 @@ Authors: Alejandro Soto Franco
 import EllipticPdes.Regularity.Interior.NormBound
 
 /-!
-# The interior H² estimate
+# Interior H² estimate
 
-The capstone of the interior regularity chain. Section D4 passes to the limit in the uniform
+The capstone of the interior regularity chain. This file passes to the limit in the uniform
 difference-quotient bound of `EllipticPdes.Regularity.Interior.NormBound` to produce the
-second weak derivative, and §4 assembles the coordinates into the interior H² estimate.
+second weak derivative, then assembles the coordinates into the interior H² estimate.
 
 This module keeps the import path `EllipticPdes.Regularity.Interior` and re-exports the whole
 chain, so dependents see the same API as before the file was split.
@@ -33,7 +33,7 @@ open EllipticPdes.Sobolev
 
 variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))}
 
-/-! ### D4: existence of the second weak derivative -/
+/-! ### Existence of the second weak derivative -/
 
 /-- **Existence of the interior second weak derivative (Evans §6.3.1, VIII.2.1).** For each
 `(k, i)` there is a constant `Cd`, fixed before the solution and the datum, such that for every
@@ -58,7 +58,7 @@ theorem interior_secondWeakDeriv (Op : FullEllipticOp d) (hΩm : MeasurableSet �
     weakDeriv_of_diffQuot_bounded k (extendL2 hΩm (mulTest T.hζ ((u : H1amb Ω) i.succ))) M hMbd
   exact ⟨w, hw, le_trans hwn hMCd⟩
 
-/-! ### §4: the interior H² estimate -/
+/-! ### Assembly of the interior H² estimate -/
 
 /-- **Weak derivative on an open region.** `g'` is the weak `k`-derivative of `g` on `V` if
 integration by parts holds against every test function supported in `V`. This is the
@@ -144,7 +144,7 @@ lemma firstOrder_gradNorm_le (Op : FullEllipticOp d) (u : H01 Ω) (f : L2D Ω)
 set_option maxHeartbeats 600000 in
 -- The final assembly loops the per-`(k, i)` localised second-derivative statement over the
 -- finite index square and threads the cutoff-tower construction, whose elaboration (unfolding
--- the tower definition and the difference-quotient bounds) exceeds the default budget.
+-- the tower definition and the difference-quotient bounds) exceeds the default `maxHeartbeats`.
 /-- **Interior H² estimate (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1;
 Gilbarg-Trudinger, *Elliptic Partial Differential Equations of Second Order*, Theorem 8.8).**
 For a weak solution `u ∈ H₀¹(Ω)` of `L u = f` with `C¹` principal coefficients

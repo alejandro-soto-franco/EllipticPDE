@@ -137,12 +137,11 @@ lemma inner_mulCoeffL_eq {Ω : Set (EuclideanSpace ℝ (Fin d))}
 /-! ### Uniformly elliptic coefficient matrices (Evans §6.1.1) -/
 
 /-- A measurable, bounded, symmetric-or-not coefficient matrix `a` that is **uniformly
-elliptic** with ellipticity constant `lam > 0` and sup bound `Λ`:
-`∑ᵢⱼ aᵢⱼ(x) ξᵢ ξⱼ ≥ lam · |ξ|²` and `|aᵢⱼ(x)| ≤ Λ` for almost every `x` (Evans §6.1.1
-states ellipticity pointwise for a.e. `x ∈ U`; the bundle carries a measurable
-representative on `ℝᵈ` with the bounds holding `volume`-a.e., which restricts to a.e. on
-every domain `Ω`). This is exactly the data the divergence-form operator
-`Lu = -Dⱼ(aᵢⱼ Dᵢu)` needs for the energy estimate. -/
+elliptic** with ellipticity constant `lam > 0` and sup bound `Λ`: `∑ᵢⱼ aᵢⱼ(x) ξᵢ ξⱼ ≥ lam ·
+|ξ|²` and `|aᵢⱼ(x)| ≤ Λ` for almost every `x` (Evans §6.1.1 states ellipticity pointwise for
+a.e. `x ∈ U`; the bundle has a measurable representative on `ℝᵈ` with the bounds holding
+`volume`-a.e., which restricts to a.e. on every domain `Ω`). This is exactly the data the
+divergence-form operator `Lu = -Dⱼ(aᵢⱼ Dᵢu)` needs for the energy estimate. -/
 structure EllipticCoeff (d : ℕ) where
   /-- The coefficient matrix entries. -/
   a : EuclideanSpace ℝ (Fin d) → Fin d → Fin d → ℝ

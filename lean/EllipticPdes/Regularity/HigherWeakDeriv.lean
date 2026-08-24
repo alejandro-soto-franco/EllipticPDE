@@ -15,10 +15,10 @@ its length. This file supplies the indexed object.
 
 `HasIteratedWeakDerivOn V k u` names a family `D : List (Fin d) → L²(V)` with `D [] = u` and
 each `D (l :: α)` a weak `l`-derivative of `D α`, for every list shorter than `k`. It is the
-`L²`-level reading of `u ∈ H^k(V)`, carried as data rather than as an existential, so that a
-proof can name a particular derivative and hand it on.
+`L²`-level reading of `u ∈ H^k(V)`, given as data rather than as an existential, so that a proof
+can name a particular derivative and hand it on.
 
-## Why a list of directions
+## Choice of a list of directions
 
 The same choice as in `EllipticPdes.Regularity.IsWkInftyCoeff`, and for the same reason: one
 step of the recursion is `cons`. A multi-index in `Fin d →₀ ℕ` would need equality of mixed
@@ -27,12 +27,12 @@ family rather than part of its definition. Nothing here presumes it.
 
 ## Main declarations
 
-* `HasIteratedWeakDerivOn`: weak derivatives up to order `k` on `V`, carried as a family.
+* `HasIteratedWeakDerivOn`: weak derivatives up to order `k` on `V`, given as a family.
 * `HasIteratedWeakDerivOn.mono`: an order-`k` family is an order-`l` family for `l ≤ k`.
-* `HasIteratedWeakDerivOn.deriv`: the order-`k` family of a first derivative, extracted from
-  an order-`k+1` family by appending the direction on the right. This is the step the
-  induction of Guo, *Partial Differential Equations I and II* (Course Lecture Notes),
-  Theorem VIII.3.2 (p. 65) runs on.
+* `HasIteratedWeakDerivOn.deriv`: the order-`k` family of a first derivative, extracted from an
+  order-`k+1` family by appending the direction on the right. This is the step the induction
+  of Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem VIII.3.2
+  (p. 65) runs on.
 * `IteratedL2Bound`: a uniform bound on every member of the family up to order `k`.
 -/
 
@@ -46,11 +46,11 @@ open EllipticPdes.Sobolev
 
 variable {d : ℕ} {V : Set (EuclideanSpace ℝ (Fin d))} {k l : ℕ}
 
-/-- **Iterated weak derivatives on a region.** A family of `L²(V)` classes indexed by lists
-of directions, with the empty list the function itself and each `cons` a weak derivative of
-its parent. Carrying the family as data rather than asserting existence at each order lets a
-consumer name `D [i, j]` and pass it on, which the induction of Guo, *Partial Differential
-Equations I and II* (Course Lecture Notes), Theorem VIII.3.2 (p. 65) requires. -/
+/-- **Iterated weak derivatives on a region.** A family of `L²(V)` classes indexed by lists of
+directions, with the empty list the function itself and each `cons` a weak derivative of its
+parent. Giving the family as data rather than asserting existence at each order lets a consumer
+name `D [i, j]` and pass it on, which the induction of Guo, *Partial Differential Equations I
+and II* (Course Lecture Notes), Theorem VIII.3.2 (p. 65) requires. -/
 structure HasIteratedWeakDerivOn (V : Set (EuclideanSpace ℝ (Fin d))) (k : ℕ) (u : L2D V)
     where
   /-- The chosen representative of the iterated weak derivative along a list of directions. -/
@@ -136,10 +136,10 @@ private def famAux (u : L2D V) (E : Fin d → List (Fin d) → L2D V) :
   | [] => u
   | (ℓ :: βr) => E ℓ βr.reverse
 
-/-- **The inverse of `deriv`.** Weak derivatives in every direction, each carrying its own
-order-`k` family, assemble into an order-`k + 1` family of the function itself. The index of the
-assembled family reads `β ++ [ℓ]` as the `β`-entry of the family of `∂_ℓ u`, which is the
-convention `deriv` uses in the other direction.
+/-- **The inverse of `deriv`.** Weak derivatives in every direction, each with its own order-`k`
+family, assemble into an order-`k + 1` family of the function itself. The index of the assembled
+family reads `β ++ [ℓ]` as the `β`-entry of the family of `∂_ℓ u`, which is the convention
+`deriv` uses in the other direction.
 
 This is the step that carries the conclusion of the induction of Guo, *Partial Differential
 Equations I and II* (Course Lecture Notes), Theorem VIII.3.2 (p. 65) back to the solution:

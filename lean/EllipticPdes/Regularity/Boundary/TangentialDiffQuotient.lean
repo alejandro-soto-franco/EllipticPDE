@@ -78,7 +78,7 @@ def mulCutoff (Ω : Set (EuclideanSpace ℝ (Fin n))) (hη : IsTestFn Ω' η) :
     (ae_of_all (volume.restrict Ω) (exists_abs_bound hη).choose_spec)
 
 /-- **Multiplication by the partial `∂ᵢη` of an ambiently supported cutoff** on `L²(Ω)`, the
-companion of `mulCutoff` carrying the Leibniz correction term. -/
+companion of `mulCutoff` with the Leibniz correction term. -/
 def mulCutoffPartial (Ω : Set (EuclideanSpace ℝ (Fin n))) (hη : IsTestFn Ω' η) (i : Fin n) :
     L2D Ω →L[ℝ] L2D Ω :=
   mulCoeffL (hη.continuous_partialD i).measurable
@@ -168,7 +168,7 @@ theorem tsupport_shiftDiffQuotFn_subset (φ : EuclideanSpace ℝ (Fin n) → ℝ
 
 end Support
 
-/-! ### The tangential difference quotient -/
+/-! ### Tangential difference quotient -/
 
 section Tangential
 
@@ -227,13 +227,12 @@ section Cutoff
 variable {d : ℕ}
 
 /-- **Evans' cutoff.** For `0 < r` there is a test function on the ball `B(0, r)`, valued in
-`[0, 1]`, equal to `1` on a neighbourhood of `closedBall 0 (r / 2)`. This is exactly the `ζ`
-of Evans, *Partial Differential Equations* (2nd ed.), §6.3.2, Theorem 4, proof step 1:
-`ζ ≡ 1` on `B(0, 1/2)`, `ζ ≡ 0` off `B(0, 1)`, `0 ≤ ζ ≤ 1`, so `ζ` vanishes near the curved
-part of `∂U` and carries no constraint on the flat part. The construction is the Urysohn-type
-cutoff of `exists_isTestFn_one_nhdsSet_of_isCompact`
-(`EllipticPdes.Regularity.CutoffTower`), applied to the compact-in-open pair
-`closedBall 0 (r / 2) ⊆ ball 0 r`. -/
+`[0, 1]`, equal to `1` on a neighbourhood of `closedBall 0 (r / 2)`. This is exactly the `ζ` of
+Evans, *Partial Differential Equations* (2nd ed.), §6.3.2, Theorem 4, proof step 1: `ζ ≡ 1` on
+`B(0, 1/2)`, `ζ ≡ 0` off `B(0, 1)`, `0 ≤ ζ ≤ 1`, so `ζ` vanishes near the curved part of `∂U`
+and has no constraint on the flat part. The construction is the Urysohn-type cutoff of
+`exists_isTestFn_one_nhdsSet_of_isCompact` (`EllipticPdes.Regularity.CutoffTower`), applied to
+the compact-in-open pair `closedBall 0 (r / 2) ⊆ ball 0 r`. -/
 theorem eqOn_one_closure_halfBall {r : ℝ} (hr : 0 < r)
     {ζ : EuclideanSpace ℝ (Fin (d + 1)) → ℝ}
     (hζ_one : ∀ᶠ x in 𝓝ˢ (Metric.closedBall (0 : EuclideanSpace ℝ (Fin (d + 1))) (r / 2)),
@@ -246,11 +245,11 @@ theorem eqOn_one_closure_halfBall {r : ℝ} (hr : 0 < r)
 /-- **Evans' cutoff.** For `0 < r` there is a test function on the ball `B(0, r)`, valued in
 `[0, 1]`, equal to `1` on a neighbourhood of `closedBall 0 (r / 2)` and hence on the whole
 closed smaller half-ball, flat part included. This is exactly the `ζ` of Evans, *Partial
-Differential Equations* (2nd ed.), §6.3.2, Theorem 4, proof step 1: `ζ ≡ 1` on `B(0, 1/2)`,
-`ζ ≡ 0` off `B(0, 1)`, `0 ≤ ζ ≤ 1`, so `ζ` vanishes near the curved part of `∂U` and carries
-no constraint on the flat part. The construction is the Urysohn-type cutoff of
-`exists_isTestFn_one_nhdsSet_of_isCompact` (`EllipticPdes.Regularity.CutoffTower`), applied
-to the compact-in-open pair `closedBall 0 (r / 2) ⊆ ball 0 r`. -/
+Differential Equations* (2nd ed.), §6.3.2, Theorem 4, proof step 1: `ζ ≡ 1` on `B(0, 1/2)`, `ζ ≡
+0` off `B(0, 1)`, `0 ≤ ζ ≤ 1`, so `ζ` vanishes near the curved part of `∂U` and has no
+constraint on the flat part. The construction is the Urysohn-type cutoff of
+`exists_isTestFn_one_nhdsSet_of_isCompact` (`EllipticPdes.Regularity.CutoffTower`), applied to
+the compact-in-open pair `closedBall 0 (r / 2) ⊆ ball 0 r`. -/
 theorem exists_tangentialCutoff {r : ℝ} (hr : 0 < r) :
     ∃ ζ : EuclideanSpace ℝ (Fin (d + 1)) → ℝ,
       IsTestFn (Metric.ball 0 r) ζ
@@ -267,7 +266,7 @@ theorem exists_tangentialCutoff {r : ℝ} (hr : 0 < r) :
 
 end Cutoff
 
-/-! ### The cutoff of a tangential difference quotient is a test function -/
+/-! ### Cut-off tangential difference quotient as a test function -/
 
 section CutoffDiffQuot
 

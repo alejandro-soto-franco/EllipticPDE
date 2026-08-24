@@ -8,19 +8,19 @@ import EllipticPdes.Regularity.LeibnizWkInfty
 import EllipticPdes.Regularity.LowerOrderWkInfty
 
 /-!
-# Moving a derivative onto the solution, under Guo's coefficient hypothesis
+# Moving a derivative onto the solution under Guo's coefficient hypothesis
 
-`EllipticPdes.Regularity.principal_move`, `transport_move` and `zeroth_move` carry `∂_ℓ` from the
-test function onto the solution in the three terms of the equation, each by one application of
-the Leibniz rule for a `C¹` weight. Guo, *Partial Differential Equations I and II* (Course
-Lecture Notes), Theorem VIII.3.2 (p. 65) asks only for `W^{k,∞}` coefficients, which carry no
+`EllipticPdes.Regularity.principal_move`, `transport_move` and `zeroth_move` carry `∂_ℓ` from
+the test function onto the solution in the three terms of the equation, each by one application
+of the Leibniz rule for a `C¹` weight. Guo, *Partial Differential Equations I and II* (Course
+Lecture Notes), Theorem VIII.3.2 (p. 65) asks only for `W^{k,∞}` coefficients, which have no
 classical derivative, and this file repeats the three with `HasWeakDerivOn.mul_isWkInfty_left`
 in place of `HasWeakDerivOn.mul_contDiff_left`.
 
-The statements differ from their `C¹` counterparts in one place: where those write
-`partialD ℓ (fun y => A.a y i j)` for the derivative of a coefficient, these write the chosen
-representative `hA.D [ℓ] i j` that `IsWkInftyCoeff` carries. Everything else is unchanged, so a
-consumer that reaches for the commutator by name sees the same shape.
+The statements differ from their `C¹` counterparts in one place: where those write `partialD ℓ
+(fun y => A.a y i j)` for the derivative of a coefficient, these write the chosen representative
+`hA.D [ℓ] i j` that `IsWkInftyCoeff` supplies. Everything else is unchanged, so a consumer that
+reaches for the commutator by name sees the same shape.
 
 ## Main declarations
 
@@ -119,7 +119,7 @@ theorem ae_abs_D_singleton_le (hf : IsWkInfty f (k + 1)) (ℓ : Fin d) :
 
 end IsWkInfty
 
-/-! ### The three terms -/
+/-! ### Three terms -/
 
 /-- **Principal term, for a `W^{1,∞}` coefficient.** For every direction pair the weighted first
 derivative `a_{ij}·∂ᵢu` has weak `ℓ`-derivative `(∂_ℓ a_{ij})·∂ᵢu + a_{ij}·∂_ℓ∂ᵢu`, with the
@@ -191,17 +191,17 @@ theorem zeroth_move_wkInfty {V : Set (EuclideanSpace ℝ (Fin d))} (ℓ : Fin d)
     (hc.hasWeakPartial_D ℓ) hc.ae_abs_le (hc.ae_abs_D_singleton_le ℓ) cu hcu comm hcomm
     φ hφc hφcs hφV
 
-/-! ### The principal commutator -/
+/-! ### Principal commutator -/
 
 /-- **Moving `∂ⱼ` off the principal commutator, for a `W^{2,∞}` coefficient.** The coefficient
 derivative `∂_ℓ a_{ij}` is itself a `W^{1,∞}` weight, so the product `(∂_ℓ a_{ij})·∂ᵢu` has a weak
 `j`-derivative and testing against `φ` moves `∂ⱼ` onto the product:
 `∫_V (∂_ℓ a_{ij})(∂ᵢu) ∂ⱼφ = -∫_V [(∂ⱼ∂_ℓ a_{ij})(∂ᵢu) + (∂_ℓ a_{ij})(∂ⱼ∂ᵢu)] φ`.
 
-This is the one place where the second order of the coefficient hypothesis is load-bearing: it
-supplies the mixed member `hA.D [j, ℓ]` of the family. The `C²` version `commutator_move` spends
-most of its length turning the Hessian bound into a bound on the mixed partial through two
-operator-norm steps, and the `W^{2,∞}` bundle carries that bound outright. -/
+The second order of the coefficient hypothesis is used only here: it supplies the mixed member
+`hA.D [j, ℓ]` of the family. The `C²` version `commutator_move` spends most of its length
+turning the Hessian bound into a bound on the mixed partial through two operator-norm steps, and
+the `W^{2,∞}` bundle has that bound outright. -/
 theorem commutator_move_wkInfty {V : Set (EuclideanSpace ℝ (Fin d))}
     {A : EllipticCoeff d} {k : ℕ} (hA : IsWkInftyCoeff A (k + 2)) (ℓ i j : Fin d)
     (Du_i D2_ji : L2D V) (hD2 : HasWeakDerivOn V j Du_i D2_ji)
@@ -242,15 +242,15 @@ theorem commutator_move_wkInfty {V : Set (EuclideanSpace ℝ (Fin d))}
   rw [← hlhs, ← hrhs]
   exact hmove
 
-/-! ### The differentiated identity -/
+/-! ### Differentiated identity -/
 
 /-- **Differentiated weak formulation (divergence-datum form), for `W^{1,∞}` coefficients.**
 Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 2, with every classical
-coefficient derivative replaced by the chosen representative the `W^{k,∞}` bundles carry. Given
+coefficient derivative replaced by the chosen representative the `W^{k,∞}` bundles supply. Given
 the localised weak identity `hLoc` for `u` on `V` together with the first and second weak
-derivatives, for a fixed direction `ℓ` and every test function `φ` with `tsupport φ ⊆ V`,
-`∑ ∫_V a_{ij}(∂ₗ∂ᵢu) ∂ⱼφ + ∑ ∫_V (∂_ℓ a_{ij})(∂ᵢu) ∂ⱼφ
-   = ∫_V (∂_ℓf) φ - ∑ ∫_V [(∂_ℓ b_i)(∂ᵢu)+b_i(∂ₗ∂ᵢu)] φ - ∫_V [(∂_ℓ c)u + c(∂_ℓu)] φ`.
+derivatives, for a fixed direction `ℓ` and every test function `φ` with `tsupport φ ⊆ V`, `∑ ∫_V
+a_{ij}(∂ₗ∂ᵢu) ∂ⱼφ + ∑ ∫_V (∂_ℓ a_{ij})(∂ᵢu) ∂ⱼφ = ∫_V (∂_ℓf) φ - ∑ ∫_V [(∂_ℓ
+b_i)(∂ᵢu)+b_i(∂ₗ∂ᵢu)] φ - ∫_V [(∂_ℓ c)u + c(∂_ℓu)] φ`.
 
 Where `differentiated_weakForm_div` asks for `a ∈ C²` and `b, c ∈ C¹`, this asks for one weak
 derivative of each, which is Guo's hypothesis at the first order. -/

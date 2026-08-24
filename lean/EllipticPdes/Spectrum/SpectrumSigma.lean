@@ -7,7 +7,7 @@ import EllipticPdes.Fredholm.FredholmComplete
 import Mathlib.Analysis.Normed.Operator.Compact.FiniteDimension
 
 /-!
-# The spectrum of compact operators and Existence III
+# Spectrum of compact operators and Existence III
 
 Two layers.
 
@@ -38,7 +38,7 @@ noncomputable section
 
 namespace EllipticPdes.Sobolev
 
-/-! ### The spectrum of a compact operator (Evans Appendix D.5, Theorem 6) -/
+/-! ### Spectrum of a compact operator (Evans Appendix D.5, Theorem 6) -/
 
 section CompactSpectrum
 

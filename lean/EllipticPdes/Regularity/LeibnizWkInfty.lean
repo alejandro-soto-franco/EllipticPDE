@@ -9,13 +9,13 @@ import EllipticPdes.Regularity.Caccioppoli
 import EllipticPdes.Embedding.Convolution
 
 /-!
-# The Leibniz rule for a `W^{1,∞}` weight
+# Leibniz rule for a `W^{1,∞}` weight
 
 `EllipticPdes.Regularity.HasWeakDerivOn.mul_contDiff_left` proves the weak-derivative product
 rule for a `C¹` weight. Guo's hypothesis supplies no classical derivative, and this file
 replaces that route.
 
-## The smooth case is free
+## Smooth case
 
 For a weight that is already `C^∞`, no mollification is needed at all and no product rule for
 weak derivatives has to be proved: `b · φ` is itself a smooth compactly supported test function
@@ -23,7 +23,7 @@ supported where `φ` is, so it may be fed straight to `HasWeakDerivOn`, and the 
 Leibniz rule splits the result. That is `weakDerivOn_smul_test_contDiff` below, and it is the
 whole content of the mollified stage.
 
-## Where the weak hypothesis enters
+## Entry point of the weak hypothesis
 
 The mollification `a ⋆ ρ_ε` of a `W^{1,∞}` weight is `C^∞`, and its derivative is the
 mollification of the weak derivative (`partialD_convolution_eq_of_hasWeakPartial`). Feeding it to
@@ -171,7 +171,7 @@ theorem memLp_two_restrict_mul_of_ae_bound {V : Set (EuclideanSpace ℝ (Fin d))
     exact mul_le_mul_of_nonneg_right hx (abs_nonneg _)
   exact hfull.restrict V
 
-/-! ### The mollification limit for a measurable weight -/
+/-! ### Mollification limit for a measurable weight -/
 
 /-- **The mollification limit against an `L²` class.** For a measurable, essentially bounded `c`,
 an `L²(V)` class `h` and a continuous compactly supported `η`,
@@ -377,7 +377,7 @@ theorem tendsto_setIntegral_mul_convolution_of_measurable
   rw [← tendsto_sub_nhds_zero_iff]
   exact squeeze_zero_norm' hbound hεtend
 
-/-! ### The Leibniz rule -/
+/-! ### Leibniz rule -/
 
 /-- **Weak-derivative Leibniz with a `W^{1,∞}` weight.** If `g` has weak `ℓ`-derivative `g'` on
 `V`, and `a` is measurable and essentially bounded with an essentially bounded weak `ℓ`-derivative

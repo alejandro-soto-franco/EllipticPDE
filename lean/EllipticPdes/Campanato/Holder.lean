@@ -26,8 +26,8 @@ estimate at each of the two centres, bounds `|campanatoLimit u x - campanatoLimi
 The hypothesis quantifies over balls contained in `B(c, R)`, so the pair estimate needs both
 `B(x, 2|x-y|)` and `B(y, 2|x-y|)` inside `B(c, R)`. That holds for `x, y` in the concentric ball
 `B(c, ρ)` whenever `5ρ ≤ R`, which is the form `campanato_holderOnWith` takes. Passing from the
-concentric ball to the whole of `B(c, R)` is a separate chaining argument, property (H1') of the
-same source, and is not carried out here.
+concentric ball to all of `B(c, R)` is a separate chaining argument, property (H1') of the same
+source, and is not carried out here.
 -/
 
 open MeasureTheory Set Metric Filter

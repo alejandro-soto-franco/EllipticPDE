@@ -107,7 +107,7 @@ lemma solOp_inner_self_nonneg (hco : IsCoercive B) (f : L2D Ω) :
   obtain ⟨C, hC, hcoer⟩ := hco
   nlinarith [hcoer w, mul_nonneg (mul_nonneg hC.le (norm_nonneg w)) (norm_nonneg w)]
 
-/-! ### The spectral theorem and the eigenfunction correspondence -/
+/-! ### Spectral theorem and eigenfunction correspondence -/
 
 /-- **The spectral theorem for the symmetric elliptic Dirichlet problem** (Evans §6.5). Given the
 Rellich compact embedding, the eigenspaces of the solution operator span `L²(Ω)`: their
@@ -148,7 +148,7 @@ theorem solOp_eigenvalue_nonneg (hco : IsCoercive B) {μ : ℝ} {φ : L2D Ω}
   rw [not_le] at h
   linarith [mul_neg_of_neg_of_pos h hpos]
 
-/-! ### Instantiation: the Dirichlet (Poisson) form `-Δ` -/
+/-! ### Instantiation at the Dirichlet (Poisson) form `-Δ` -/
 
 /-- The Dirichlet form is symmetric. -/
 lemma dirichletBilin_symm (Ω : Set (EuclideanSpace ℝ (Fin d))) (U V : H01 Ω) :
@@ -168,7 +168,7 @@ theorem dirichlet_spectral (Ω : Set (EuclideanSpace ℝ (Fin d))) (CP : ℝ) (h
           : Module.End ℝ (L2D Ω)) μ)ᗮ = ⊥ :=
   solOp_spectral (dirichletBilin_coercive Ω CP hCP hbase) (dirichletBilin_symm Ω) hRellich
 
-/-! ### Instantiation: the general symmetric divergence-form operator `-Dⱼ(aᵢⱼ Dᵢ·) + c` -/
+/-! ### Instantiation at the general symmetric divergence-form operator `-Dⱼ(aᵢⱼ Dᵢ·) + c` -/
 
 /-- The principal-part form `B_A` is symmetric when the coefficient matrix is symmetric
 (`aᵢⱼ = aⱼᵢ` a.e. on `Ω`): swap the summation order and use `a` symmetry plus

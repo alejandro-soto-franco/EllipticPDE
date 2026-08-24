@@ -7,7 +7,7 @@ import EllipticPdes.Fredholm.Fredholm
 import Mathlib.Analysis.InnerProductSpace.Spectrum
 
 /-!
-# Towards the complete Fredholm theory (Evans §6.2.3, Theorem 4)
+# Complete Fredholm theory (Evans §6.2.3, Theorem 4)
 
 `Fredholm.lean` reduces the weak problem `Lu = f` to the compact-operator equation
 `(1 - opK)u = h` through the factorisation `opA = opE ∘ (1 - opK)` and derives the
@@ -34,7 +34,7 @@ noncomputable section
 
 namespace EllipticPdes.Sobolev
 
-/-! ### Generic Riesz theory: `1 - K` for a compact operator on a real Hilbert space -/
+/-! ### Riesz theory for `1 - K` with `K` compact on a real Hilbert space -/
 
 section RieszTheory
 
@@ -59,11 +59,10 @@ theorem finiteDimensional_ker_one_sub (hK : IsCompactOperator K) :
   exact ContinuousLinearMap.finite_dimensional_eigenspace hK 1 one_ne_zero
 
 omit [CompleteSpace E] in
-/-- `1 - K` is **bounded below on the orthogonal complement of its kernel**: the heart
-of the Riesz closed-range theorem, by the standard compactness contradiction. If not,
-normalised `xₙ ∈ (ker(1-K))ᗮ` have `(1-K)xₙ → 0`; compactness of `K` extracts
-`Kx_{φ(n)} → z`, so `x_{φ(n)} → z` with `‖z‖ = 1`, `z ∈ ker(1-K)`, and
-`z ∈ (ker(1-K))ᗮ` -- forcing `z = 0`, a contradiction. -/
+/-- `1 - K` is **bounded below on the orthogonal complement of its kernel**: the main step of
+the Riesz closed-range theorem, by the standard compactness contradiction. If not, normalised
+`xₙ ∈ (ker(1-K))ᗮ` have `(1-K)xₙ → 0`; compactness of `K` extracts `Kx_{φ(n)} → z`, so `x_{φ(n)}
+→ z` with `‖z‖ = 1`, `z ∈ ker(1-K)`, and `z ∈ (ker(1-K))ᗮ` -- forcing `z = 0`, a contradiction. -/
 theorem exists_pos_bound_on_orthogonal_ker (hK : IsCompactOperator K) :
     ∃ c : ℝ, 0 < c ∧ ∀ x ∈ (LinearMap.ker ((1 - K : E →L[ℝ] E)).toLinearMap)ᗮ,
       c * ‖x‖ ≤ ‖(1 - K : E →L[ℝ] E) x‖ := by
@@ -456,11 +455,9 @@ the Riesz representative `opA` of the full divergence form. -/
 def solSpace : Submodule ℝ (H01 Ω) := LinearMap.ker (Op.opA Ω).toLinearMap
 
 /-- Membership in `solSpace` is exactly being a weak solution of the homogeneous
-problem: `B[u, v] = 0` against every `v ∈ H₀¹(Ω)`.
-
-Kept as the characterisation of the definition above. The proofs below reach `solSpace`
-through `solSpace_eq_eigenspace`, so nothing consumes this form. -/
-private lemma mem_solSpace_iff (u : H01 Ω) :
+problem: `B[u, v] = 0` against every `v ∈ H₀¹(Ω)`. The proofs below reach `solSpace`
+through `solSpace_eq_eigenspace` instead. -/
+lemma mem_solSpace_iff (u : H01 Ω) :
     u ∈ Op.solSpace Ω ↔ ∀ v : H01 Ω, Op.fullBilin Ω u v = 0 := by
   rw [solSpace, LinearMap.mem_ker, ContinuousLinearMap.coe_coe]
   constructor
@@ -532,11 +529,9 @@ def solSpaceStar : Submodule ℝ (H01 Ω) :=
   LinearMap.ker (ContinuousLinearMap.adjoint (Op.opA Ω)).toLinearMap
 
 /-- Membership in `solSpaceStar` is exactly being a weak solution of the transpose
-problem: `B[v, u] = 0` against every `v ∈ H₀¹(Ω)`.
-
-Kept as the characterisation of the definition above, the transpose counterpart of the
-characterisation of `solSpace`. Nothing consumes it. -/
-private lemma mem_solSpaceStar_iff (u : H01 Ω) :
+problem: `B[v, u] = 0` against every `v ∈ H₀¹(Ω)`, the transpose counterpart of
+`mem_solSpace_iff`. -/
+lemma mem_solSpaceStar_iff (u : H01 Ω) :
     u ∈ Op.solSpaceStar Ω ↔ ∀ v : H01 Ω, Op.fullBilin Ω v u = 0 := by
   rw [solSpaceStar, LinearMap.mem_ker, ContinuousLinearMap.coe_coe]
   constructor
@@ -586,7 +581,7 @@ theorem solvable_iff_orthogonal_solSpaceStar (hK : IsCompactOperator (Op.opK Ω)
 set_option maxHeartbeats 1600000 in
 -- The bijectivity proof for the restricted adjoint `Trest` unfolds nested
 -- `ContinuousLinearMap.adjoint` and `LinearMap.restrict` coercions through `simpa`, each
--- re-resolving the Hilbert-space instance chain on `H01 Ω`; the default budget is
+-- re-resolving the Hilbert-space instance chain on `H01 Ω`; the default `maxHeartbeats` is
 -- insufficient for the combined injectivity and surjectivity arguments.
 /-- **`dim N = dim N*` for the elliptic problem** (Evans §6.2.3, Theorem 4(ii)). The
 space of weak

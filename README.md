@@ -81,8 +81,8 @@ cd lean && lake lint       # environment-level linter
 cd lean && lake build Challenge Solution   # the Palomar pair
 ```
 
-CI runs both on every push. It builds from a clean clone, asserts the
-library is free of `sorry`, and holds every headline result to the axioms
+CI runs these on every push. It builds from a clean clone, asserts the
+library is free of `sorry`, and pins every headline result to the axioms
 `propext`, `Classical.choice` and `Quot.sound` through `AxiomAudit.lean`, where
 each is pinned with `#guard_msgs`.
 
@@ -103,10 +103,10 @@ with empty interior every test function vanishes and $H_0^1(\Omega)$ is zero.
 them from the library.
 
 Comparator looks a theorem up by name in both modules, so `Solution.lean` restates
-the definitions instead of importing `Challenge.lean`. The two copies are held
-character for character by `verify/palomar_sync.py`, which CI runs: drift there
-produces two statements that both elaborate and differ, which the build would not
-catch.
+the definitions instead of importing `Challenge.lean`. The two copies are kept
+identical character for character by `verify/palomar_sync.py`, which CI runs:
+drift there produces two statements that both elaborate and differ, which the
+build would not catch.
 
 The six `sorry`s in `Challenge.lean` are the placeholders Comparator requires.
 Nothing under `EllipticPdes/` has one, and `Solution.lean` has none either:

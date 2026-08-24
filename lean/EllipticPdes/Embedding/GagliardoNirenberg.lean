@@ -9,14 +9,14 @@ import EllipticPdes.Regularity.CutoffTower
 import Mathlib.Analysis.FunctionalSpaces.SobolevInequality
 
 /-!
-# The Sobolev bootstrap from `Lᵖ` to the conjugate exponent
+# Sobolev bootstrap from `Lᵖ` to the conjugate exponent
 
 `morrey_ball` needs a gradient in `Lᵖ` with `p > d`, and the interior `H²` estimate delivers one
 in `L²`, so the two compose directly only when `d = 1`. The Gagliardo-Nirenberg-Sobolev
 inequality closes the gap in low dimension: an `Lᵖ` weak gradient with `1 ≤ p < d` upgrades to
 `Lᵖ'` at the Sobolev conjugate `1/p' = 1/p - 1/d`, and Morrey then applies whenever `p' > d`.
 
-## Which dimensions the chain reaches
+## Dimensions the chain reaches
 
 `p' > d` is equivalent to `p > d/2`, and `L²` data on a ball of finite measure is `Lᵖ` data
 exactly when `p ≤ 2`, so a single Sobolev step feeds Morrey precisely when the window
@@ -110,7 +110,7 @@ theorem HasWeakGradOn.congr_ae {B : Set (EuclideanSpace ℝ (Fin d))}
       (fun x => g k x * φ x) =ᵐ[volume.restrict B] fun x => g' k x * φ x)]
   exact h φ hφc hφcs hφB k
 
-/-! ### The product rule against a smooth cutoff -/
+/-! ### Product rule against a smooth cutoff -/
 
 /-- The product rule for the coordinate partial derivative. -/
 theorem partialD_mul {η φ : EuclideanSpace ℝ (Fin d) → ℝ} (k : Fin d)
@@ -220,7 +220,7 @@ theorem hasWeakGradOn_univ_mul_cutoff {B : Set (EuclideanSpace ℝ (Fin d))}
   rw [Measure.restrict_univ, hL, hR, hswap]
   linarith [hsplit]
 
-/-! ### The bootstrap -/
+/-! ### Bootstrap -/
 
 section Bootstrap
 
@@ -482,8 +482,8 @@ theorem exists_eLpNorm_sobolevConj_le (hd : 0 < d) (c : EuclideanSpace ℝ (Fin 
   · refine lt_of_le_of_lt hfinal (ENNReal.mul_lt_top ENNReal.coe_lt_top ?_)
     exact ENNReal.add_lt_top.mpr ⟨hv.2, ENNReal.sum_lt_top.mpr fun k _ => (hg k).2⟩
 
-/-- **The bootstrap fed by a higher exponent.** The ball carries finite measure, so `Lq` data
-with `p ≤ q` is `Lᵖ` data, at the price of a factor `|B|^{1/p - 1/q}` which the constant absorbs.
+/-- **The bootstrap fed by a higher exponent.** The ball has finite measure, so `Lq` data with
+`p ≤ q` is `Lᵖ` data, at the price of a factor `|B|^{1/p - 1/q}` which the constant absorbs.
 This is the form the dimension-two chain uses: the interior `H²` estimate delivers `L²` data,
 while the exponent that reaches Morrey through `1/p' = 1/p - 1/d` is `p = 4/3`. -/
 theorem exists_eLpNorm_sobolevConj_le_of_le (hd : 0 < d) (c : EuclideanSpace ℝ (Fin d))

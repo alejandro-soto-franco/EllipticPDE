@@ -758,10 +758,10 @@ private theorem exists_holderOnWith_of_ae_tendsto
   · filter_upwards [hae, ae_restrict_mem hB.measurableSet] with x hxtend hxB
     exact tendsto_nhds_unique (hu'lim x hxB) hxtend
 
-/-- **Uniform-constant coordinate-partial Morrey estimate.** Identical to `morrey_ball_contDiff`,
-but with a single constant valid for every centre and radius, obtained by keeping the ball inside
-the quantifier of `exists_holder_smooth`. This uniformity is what lets the exhaustion of a ball by
-interior sub-balls carry a fixed Hölder constant. -/
+/-- **Uniform-constant coordinate-partial Morrey estimate.** Identical to
+`morrey_ball_contDiff`, but with a single constant valid for every centre and radius, obtained
+by keeping the ball inside the quantifier of `exists_holder_smooth`. This uniformity is what
+lets the exhaustion of a ball by interior sub-balls have a fixed Hölder constant. -/
 private theorem exists_holder_smooth_partialD (hd : 0 < d) {p : ℝ} (hp : (d : ℝ) < p) :
     ∃ C : ℝ≥0, ∀ (v : EuclideanSpace ℝ (Fin d) → ℝ), ContDiff ℝ (⊤ : ℕ∞) v →
       ∀ (c : EuclideanSpace ℝ (Fin d)) {r : ℝ}, 0 < r →

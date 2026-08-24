@@ -17,14 +17,14 @@ import Mathlib.MeasureTheory.Measure.Haar.Unique
 `EllipticPdes.Regularity.HasWeakDerivOn.mul_contDiff_left` proves the weak-derivative Leibniz
 rule for a `C¹` weight, by mollifying the weight and differentiating the mollification
 classically. Guo's hypothesis supplies no classical derivative, so that route is closed and the
-mollification has to carry the weak derivative instead. This file rebuilds the two facts about
+mollification has to take the weak derivative instead. This file rebuilds the two facts about
 mollification the Leibniz rule needs, with continuity of the weight dropped throughout.
 
 * The sup bound survives with measurability alone. `EllipticPdes.Regularity` already had this
   for a continuous weight; continuity entered only through the integrability of the convolution
   integrand, which an essential bound supplies just as well.
 * The derivative of the mollification is the mollification of the *weak* derivative. This is
-  where the weak hypothesis pays for itself: the classical proof moves the derivative from the
+  where the weak hypothesis does the work: the classical proof moves the derivative from the
   kernel back onto the weight by integration by parts, and `HasWeakPartial` is that
   integration-by-parts identity, applied to the reflected kernel `t ↦ ρ (x - t)`, which is a
   legitimate test function. The weak version is shorter than the `C¹` version it replaces.
@@ -58,7 +58,7 @@ theorem convolution_lsmul_apply (F K : EuclideanSpace ℝ (Fin d) → ℝ)
   refine integral_congr_ae (Filter.Eventually.of_forall fun t => ?_)
   simp only [ContinuousLinearMap.lsmul_apply, smul_eq_mul]
 
-/-! ### The sup bound, without continuity -/
+/-! ### Sup bound with no continuity assumed -/
 
 /-- **Sup bound for a mollification of an essentially bounded weight.** If `h` is measurable and
 bounded by `M` almost everywhere, and `ρ` is a non-negative continuous compactly supported kernel
@@ -127,7 +127,7 @@ theorem convolution_congr_of_eqOn {a b ρ : EuclideanSpace ℝ (Fin d) → ℝ}
   · rw [heq t hlt]
   · rw [hρsupp (x - t) hge, mul_zero, mul_zero]
 
-/-! ### The derivative of a mollification, from the weak derivative -/
+/-! ### Derivative of a mollification from the weak derivative -/
 
 /-- **The reflected kernel is a test function.** For a smooth compactly supported `ρ`, the map
 `t ↦ ρ (x - t)` is smooth with compact support, so `HasWeakPartial` may be applied to it. -/

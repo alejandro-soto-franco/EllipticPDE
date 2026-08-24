@@ -6,10 +6,10 @@ Authors: Alejandro Soto Franco
 import EllipticPdes.Regularity.Interior.EnergyBound
 
 /-!
-# The uniform interior difference-quotient norm bound
+# Uniform interior difference-quotient norm bound
 
-Section D3 of the interior estimate. The master energy bound of
-`EllipticPdes.Regularity.Interior.EnergyBound` is run along a cutoff tower to produce a bound
+The master energy bound of `EllipticPdes.Regularity.Interior.EnergyBound` is run along a
+cutoff tower to produce a bound
 on `‖Dₖ^h (ζ ∂ᵢu)‖` that is uniform in the step `h`, which is the hypothesis the weak-limit
 converse consumes to produce the second weak derivative.
 
@@ -31,7 +31,7 @@ open EllipticPdes.Sobolev
 variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))}
   {ξ θ : EuclideanSpace ℝ (Fin d) → ℝ}
 
-/-! ### D3: uniform difference-quotient norm bound (the limit-passage input) -/
+/-! ### Uniform difference-quotient norm bound for the limit passage -/
 
 /-- **A one-neighbourhood shift margin.** If the cutoff `η` is `≡ 1` on a neighbourhood of a
 compact set `K`, then there is a positive margin `δ` such that `η` is locally constant `≡ 1`
@@ -310,7 +310,7 @@ theorem interior_diffQuot_norm_bound (Op : FullEllipticOp d) (hΩm : MeasurableS
         · refine le_trans (norm_mulCoeffL_le hm1meas hm1bd _) ?_
           exact mul_le_mul_of_nonneg_left hB hMζ0
         · exact norm_mulCoeffL_le hm2meas hm2bd di
-      -- Transfer the whole-space difference quotient to the restricted one via `B4`.
+      -- Transfer the whole-space difference quotient via `extendL2_diffQuotD_eq`.
       have hsuppcond : ∀ᵐ x ∂volume,
           (extendL2 hΩm gζ : EuclideanSpace ℝ (Fin d) → ℝ) (x + hshift k h) ≠ 0 → x ∈ Ω := by
         have hshift_supp : ∀ᵐ x ∂volume,

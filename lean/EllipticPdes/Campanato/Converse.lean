@@ -6,7 +6,7 @@ Authors: Alejandro Soto Franco
 import EllipticPdes.Campanato.Holder
 
 /-!
-# The converse: a Hölder function satisfies the Campanato decay
+# Campanato decay of a Hölder function
 
 A function that is Hölder of exponent `α` on `Ω` oscillates by at most `K (2r)^α` over any ball
 of radius `r` contained in `Ω`, so its mean oscillation there is bounded by `K (2r)^α` as well,

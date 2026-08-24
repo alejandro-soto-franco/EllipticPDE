@@ -8,7 +8,7 @@ import EllipticPdes.Poincare.Density
 import Mathlib.Analysis.InnerProductSpace.LaxMilgram
 
 /-!
-# The general divergence-form bilinear form (general elliptic matrix `A`)
+# General divergence-form bilinear form (general elliptic matrix `A`)
 
 We generalise the Poisson form `∑ᵢ ⟪∂ᵢu, ∂ᵢv⟫` of `BilinearForm.lean` to the symmetric
 second-order divergence-form operator `L u = -Dⱼ(aᵢⱼ Dᵢu)` with a measurable, bounded,
@@ -17,12 +17,12 @@ and the uniform ellipticity condition):
 
   `B_A[U, V] = ∑ᵢ ∑ⱼ ⟪aᵢⱼ ∂ᵢu, ∂ⱼv⟫_{L²}`.
 
-* **Continuity** (`β = d² Λ`): each coefficient action has operator norm `≤ Λ` and each
-  coordinate norm is bounded by the ambient `H¹` norm.
-* **Energy identity / lower bound** (`bilin_self_ge`): `B_A[U, U] = ∫_Ω ∑ᵢⱼ aᵢⱼ ∂ᵢu ∂ⱼu`,
-  and pointwise ellipticity `∑ᵢⱼ aᵢⱼ ξᵢ ξⱼ ≥ λ |ξ|²` integrates to `B_A[U, U] ≥ λ · ‖∇u‖²`.
-* **Coercivity** (`α = λ / (C_P + 1)`): the density Poincaré inequality `poincare_H01`
-  controls the function part, so `B_A` dominates the full `H¹` norm.
+* **Continuity** (`β = d² Λ`): coefficient actions have operator norm `≤ Λ`, and coordinate norm
+  is bounded by the ambient `H¹` norm.
+* **Energy identity / lower bound** (`bilin_self_ge`): `B_A[U, U] = ∫_Ω ∑ᵢⱼ aᵢⱼ ∂ᵢu ∂ⱼu`, and
+  pointwise ellipticity `∑ᵢⱼ aᵢⱼ ξᵢ ξⱼ ≥ λ |ξ|²` integrates to `B_A[U, U] ≥ λ · ‖∇u‖²`.
+* **Coercivity** (`α = λ / (C_P + 1)`): the density Poincaré inequality `poincare_H01` controls
+  the function part, so `B_A` dominates the full `H¹` norm.
 
 This is the closing Examples remark of Evans §6.2.2: the symmetric, transport-free,
 `c = 0` case where `γ = 0` in the Gårding inequality and coercivity is immediate from
@@ -67,7 +67,7 @@ lemma EllipticCoeff.integrable_triple (A : EllipticCoeff d)
   filter_upwards [A.actL_coeFn i j p] with x hx
   simp only [Real.inner_apply, hx]
 
-/-! ### The general divergence-form bilinear form -/
+/-! ### General divergence-form bilinear form -/
 
 /-- The general divergence-form bilinear form as a bare bilinear map on `H₀¹(Ω)`:
 `B_A[U, V] = ∑ᵢⱼ ⟪aᵢⱼ ∂ᵢu, ∂ⱼv⟫`. -/

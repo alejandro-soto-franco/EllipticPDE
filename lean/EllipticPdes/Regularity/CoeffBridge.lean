@@ -18,13 +18,13 @@ of Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theore
 that a theorem proved under Guo's hypothesis applies to smooth coefficients with no further
 work.
 
-The bridge needs two facts and nothing else. A classical partial derivative of a `C¹`
-function is a weak partial derivative, which is integration by parts against a compactly
-supported test function. A classical iterated partial derivative is a value of
-`iteratedFDeriv` on unit vectors, so the operator-norm bound `IsCkCoeff` carries transfers to
-it pointwise, and a pointwise bound is in particular an essential bound.
+The bridge needs two facts and nothing else. A classical partial derivative of a `C¹` function
+is a weak partial derivative, which is integration by parts against a compactly supported test
+function. A classical iterated partial derivative is a value of `iteratedFDeriv` on unit
+vectors, so the operator-norm bound of `IsCkCoeff` transfers to it pointwise, and a pointwise
+bound is in particular an essential bound.
 
-## The iterated classical partial derivative
+## Iterated classical partial derivative
 
 `iterPartial f α` applies `partialD` once per entry of `α`, outermost first, so that
 `iterPartial f (l :: α) = ∂_l (iterPartial f α)`. This is the `cons` convention of
@@ -76,7 +76,7 @@ theorem norm_dirVec (α : List (Fin d)) (i : Fin α.length) : ‖dirVec α i‖ 
     · simp
     · simpa [dirVec] using ih j
 
-/-! ### The iterated classical partial derivative -/
+/-! ### Iterated classical partial derivative -/
 
 /-- The iterated classical partial derivative along a list of directions, outermost first:
 `iterPartial f (l :: α) = ∂_l (iterPartial f α)`. The `cons` convention matches
@@ -153,7 +153,7 @@ theorem abs_iterPartial_le {f : EuclideanSpace ℝ (Fin d) → ℝ} (α : List (
   rw [Finset.prod_congr rfl (fun i _ => norm_dirVec α i)]
   simp
 
-/-! ### A classical derivative is a weak derivative -/
+/-! ### Classical derivative as a weak derivative -/
 
 /-- **Integration by parts for a `C¹` function against a test function.** The classical
 partial derivative of a continuously differentiable function is its weak partial derivative.
@@ -188,7 +188,7 @@ theorem hasWeakPartial_partialD {f : EuclideanSpace ℝ (Fin d) → ℝ}
     (v := EuclideanSpace.single l 1) h1 h2 h3
     (fun x _ => hfd.differentiableAt) (fun x _ => hφd.differentiableAt)
 
-/-! ### The bridge -/
+/-! ### Bridge -/
 
 /-- **A `Cᵏ` coefficient bundle is a `W^{k,∞}` coefficient bundle.** The classical iterated
 partial derivatives serve as the weak derivative family, each step is integration by parts,

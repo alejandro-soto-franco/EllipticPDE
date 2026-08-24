@@ -7,7 +7,7 @@ import EllipticPdes.Regularity.LocalWeakForm
 import EllipticPdes.Regularity.DifferentiatedWkInfty
 
 /-!
-# The differentiated identity for a weak solution, under Guo's coefficient hypothesis
+# Differentiated identity for a weak solution under Guo's coefficient hypothesis
 
 `EllipticPdes.Regularity.differentiated_weakForm_of_weakSolution` discharges every hypothesis
 of the differentiated identity except the weak `ℓ`-derivative of the datum, and asks for `C²`
@@ -38,9 +38,9 @@ open EllipticPdes.Sobolev
 /-- **The differentiated-equation identity for a weak solution, for `W^{k,∞}` coefficients.**
 For a weak solution `u ∈ H₀¹(Ω)` of `L u = f` and any compact `V ⋐ Ω`, the second weak
 derivatives of `u` on `V` exist and are bounded by the data, and for every direction `ℓ` in
-which the datum carries a weak derivative `Df`, the pair `(∂_ℓ∂ᵢu, Df)` satisfies Evans's
-equation (34) against every test function supported in `V`, with each coefficient derivative
-read off its bundle.
+which the datum has a weak derivative `Df`, the pair `(∂_ℓ∂ᵢu, Df)` satisfies Evans's equation
+(34) against every test function supported in `V`, with each coefficient derivative read off its
+bundle.
 
 The `H²` estimate supplies the second derivatives and their bound,
 `hasWeakDeriv_extendL2_of_mem_H01` the first derivatives, and `localWeakForm_of_fullBilin` the

@@ -7,24 +7,24 @@ import EllipticPdes.Regularity.L2Pairing
 import EllipticPdes.Regularity.CutoffGradFormula
 
 /-!
-# The commutator of the bilinear form with a cutoff
+# Commutator of the bilinear form with a cutoff
 
 Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 2 differentiates the equation
 without cutting off, because his interior `H²` theorem asks only `u ∈ H¹(U)`. The interior `H²`
-estimate here quantifies its solution over `H₀¹(Ω)`, and `∂_ℓu` carries no boundary condition,
-so the induction runs on `ξ·∂_ℓu` and pays a commutator.
+estimate here quantifies its solution over `H₀¹(Ω)`, and `∂_ℓu` has no boundary condition, so
+the induction runs on `ξ·∂_ℓu` and pays a commutator.
 
 This file computes it. Each block of `Op.fullBilin` is expanded on the cut-off element, one
 entry at a time, and every term either matches the differentiated equation tested against `ξv`
 or becomes an `L²` pairing against `v`.
 
-## The principal entry
+## Principal entry
 
 `∂ᵢ(ξ·∂_ℓu)` is `(∂ᵢξ)(∂_ℓu) + ξ(∂ᵢ∂_ℓu)`, so the entry splits in two.
 
-* The term carrying `ξ` keeps its derivative on the solution. Writing `ξ∂ⱼv = ∂ⱼ(ξv) - (∂ⱼξ)v`
-  turns it into the differentiated equation tested against `ξv`, plus a pairing.
-* The term carrying `∂ᵢξ` keeps its derivative on the test function, and has to be integrated by
+* The term with `ξ` keeps its derivative on the solution. Writing `ξ∂ⱼv = ∂ⱼ(ξv) - (∂ⱼξ)v` turns
+  it into the differentiated equation tested against `ξv`, plus a pairing.
+* The term with `∂ᵢξ` keeps its derivative on the test function, and has to be integrated by
   parts. It is admissible because `∂ᵢξ` is supported in `W`, which is
   `EllipticPdes.Regularity.setIntegral_mul_mulTest_partialD`.
 
@@ -53,9 +53,9 @@ open EllipticPdes.Sobolev
 
 variable {d : ℕ}
 
-/-! ### The open collar the identifications run on -/
+/-! ### Open collar the identifications use -/
 
-/-- **The tower carries an open collar around the middle cutoff.** There is an open `N` with
+/-- **The tower has an open collar around the middle cutoff.** There is an open `N` with
 `tsupport ξ ⊆ N ⊆ tsupport θ` on which `θ` is identically `1`.
 
 Every identification the induction step makes holds only after a cutoff, and `N` is where the
@@ -144,9 +144,9 @@ entry is instantiated at the operator's coefficient, its weak derivative is supp
 `W^{k,∞}` bundle through the Leibniz rule, and the three integrals it returns are split into the
 five the datum names.
 
-The first is the differentiated equation's principal term tested against `ξv`, carrying the
-second derivative in the order the gradient of the cut-off derivative produces it. The other
-four are pairings, and each is one of the datum's shapes. -/
+The first is the differentiated equation's principal term tested against `ξv`, with the second
+derivative in the order the gradient of the cut-off derivative produces it. The other four are
+pairings, and each is one of the datum's shapes. -/
 theorem setIntegral_principal_entry_coeff (Op : FullEllipticOp d)
     {Ω N : Set (EuclideanSpace ℝ (Fin d))} (hΩm : MeasurableSet Ω) (hNm : MeasurableSet N)
     {ξ : EuclideanSpace ℝ (Fin d) → ℝ} (hξN : IsTestFn N ξ) {k : ℕ}
@@ -278,7 +278,7 @@ entry over both directions and adding the transport and zeroth-order blocks, whi
 integration by parts, gives the whole pairing as eight sums, each of them a shape the datum of
 the induction step names.
 
-The first sum is the differentiated equation's principal term tested against `ξv`, carrying the
+The first sum is the differentiated equation's principal term tested against `ξv`, with the
 second derivative in the order the gradient produces it. Everything else is a pairing against
 `v`. -/
 theorem setIntegral_blocks_eq (Op : FullEllipticOp d)

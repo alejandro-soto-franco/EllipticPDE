@@ -7,7 +7,7 @@ import EllipticPdes.Regularity.DatumPiece
 import EllipticPdes.Regularity.LocalWeakFormWkInfty
 
 /-!
-# The datum of the induction step
+# Datum of the induction step
 
 Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 2 step 3 produces an equation
 for the cut-off derivative whose datum is a fixed list of shapes. Each is the middle cutoff of
@@ -40,13 +40,13 @@ variable {n : ℕ}
 
 /-- **The datum of the induction step.** For a cutoff `ξ` supported in the collar `N ⊆ Ω`, there
 is a constant such that every family of derivatives of the solution on `N` bounded by `B`, and
-every derivative of the datum bounded by `B`, produce an `L²(Ω)` class carrying `k` weak
-derivatives bounded by `K·B` and pairing against a test function as the twelve shapes.
+every derivative of the datum bounded by `B`, produce an `L²(Ω)` class with `k` weak derivatives
+bounded by `K·B` and pairing against a test function as the twelve shapes.
 
-The two shapes carrying the zeroth-order coefficient against the differentiated solution cancel
-between the differentiated equation and the zeroth-order block, and are absent. The two carrying
-the transport coefficient do not, because the equation names one order of differentiation and
-the block the other, and only the symmetry of the mixed second derivatives identifies them. -/
+The two shapes with the zeroth-order coefficient against the differentiated solution cancel
+between the differentiated equation and the zeroth-order block, and are absent. The two with the
+transport coefficient do not, because the equation names one order of differentiation and the
+block the other, and only the symmetry of the mixed second derivatives identifies them. -/
 theorem exists_cutoffDatum (Op : FullEllipticOp (n + 1))
     {Ω N : Set (EuclideanSpace ℝ (Fin (n + 1)))}
     (hNm : MeasurableSet N) (hNΩ : N ⊆ Ω) {k : ℕ}

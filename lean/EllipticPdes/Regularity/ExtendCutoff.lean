@@ -6,19 +6,19 @@ Authors: Alejandro Soto Franco
 import EllipticPdes.Regularity.MulIterated
 
 /-!
-# A cutoff carries weak derivatives from a subregion up to the ambient domain
+# Cutoff transport of weak derivatives to the ambient domain
 
-The induction of Guo, *Partial Differential Equations I and II* (Course Lecture Notes),
-Theorem VIII.3.2 (p. 65) runs on a pair `V ⋐ W ⋐ Ω`. The order-`k` conclusion is available on
-the compact `W`, and the datum the induction hypothesis consumes has to carry its weak
-derivatives on all of `Ω`. `EllipticPdes.Regularity.HasIteratedWeakDerivOn.restrict` moves a
-family the other way, from `W` down to a smaller set, and is no help here.
+The induction of Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem
+VIII.3.2 (p. 65) runs on a pair `V ⋐ W ⋐ Ω`. The order-`k` conclusion is available on the
+compact `W`, and the datum the induction hypothesis consumes needs its weak derivatives on all
+of `Ω`. `EllipticPdes.Regularity.HasIteratedWeakDerivOn.restrict` moves a family the other way,
+from `W` down to a smaller set, and is no help here.
 
 Extension by zero is what closes the gap, and it needs the function to vanish near the boundary
 of `W`. A cutoff supplies that: for a test function `χ` supported in `W`, the product `χ · p`
 extended by zero to `Ω` has as many weak derivatives on `Ω` as `p` has on `W`.
 
-## The one identity everything rests on
+## Keystone identity
 
 Against a test function `φ` supported in `Ω`, the product `χ · φ` is a test function supported
 in `tsupport χ ⊆ W`, so the weak derivative of `p` on `W` may be tested against it:
@@ -34,13 +34,13 @@ That is the statement that `(∂_ℓχ)p + χp'` is the weak `ℓ`-derivative of
 about `∂W` is needed, and no extension operator on Sobolev spaces appears: the cutoff does all
 the work.
 
-## The order-`k` family
+## Order-`k` family
 
 The recursion is the one `EllipticPdes.Regularity.exists_iteratedWeakDeriv_mul` uses. The
 `ℓ`-derivative of `χ·p` is `(∂_ℓχ)·p + χ·(∂_ℓp)`, and each summand is again a test function
-supported in `W` against a function carrying `k` weak derivatives on `W`, so the statement
-recurses on its own conclusion. Test functions are closed under `partialD`, which is what lets
-the weight change at each step without leaving the hypothesis.
+supported in `W` against a function with `k` weak derivatives on `W`, so the statement recurses
+on its own conclusion. Test functions are closed under `partialD`, which is what lets the weight
+change at each step without leaving the hypothesis.
 
 ## Main declarations
 
@@ -86,7 +86,7 @@ private theorem coeFn_extendL2_restrict {W : Set (EuclideanSpace ℝ (Fin d))}
   filter_upwards [ae_restrict_of_ae (coeFn_extendL2 hWm p), ae_restrict_mem hWm] with x h1 h2
   rw [h1, Set.indicator_of_mem h2]
 
-/-! ### The integration by parts the cutoff makes admissible -/
+/-! ### Integration by parts the cutoff makes admissible -/
 
 /-- **Integration by parts against a cut-off test function.** For `χ` supported in `W` and a
 weak `ℓ`-derivative `p'` of `p` on `W`,
@@ -98,7 +98,7 @@ for every smooth `φ`, asking neither compact support nor a support condition of
 weak derivative, and expanding `∂_ℓ(χφ)` moves the term where the derivative lands on the
 cutoff across.
 
-This is the one identity the cutoff buys, and everything else in this file and in Evans's step
+This is the one identity the cutoff gives, and everything else in this file and in Evans's step
 3 is bookkeeping around it. -/
 theorem setIntegral_mul_mulTest_partialD {W : Set (EuclideanSpace ℝ (Fin d))}
     {χ : EuclideanSpace ℝ (Fin d) → ℝ} (hχ : IsTestFn W χ) {ℓ : Fin d} {p p' : L2D W}
@@ -212,7 +212,7 @@ as `HasWeakDerivOn.extend_mulTest` with the ambient set taken to be everything, 
 form `EllipticPdes.Regularity.HasWeakDeriv.unique` consumes.
 
 Stated separately rather than instantiated, because `L²(univ)` and `L²(ℝᵈ)` are different types
-and the conversion costs more than the proof. -/
+and the conversion is longer than the proof. -/
 theorem hasWeakDeriv_extend_mulTest {W : Set (EuclideanSpace ℝ (Fin d))}
     (hWm : MeasurableSet W) {χ : EuclideanSpace ℝ (Fin d) → ℝ} (hχ : IsTestFn W χ)
     {ℓ : Fin d} {p p' : L2D W} (h : HasWeakDerivOn W ℓ p p') {q q' : EucL2 d}
@@ -256,12 +256,12 @@ theorem hasWeakDeriv_extend_mulTest {W : Set (EuclideanSpace ℝ (Fin d))}
   rw [hL, hR]
   exact setIntegral_mul_mulTest_partialD hχ h hφc
 
-/-! ### The order-`k` family across the cutoff -/
+/-! ### Order-`k` family across the cutoff -/
 
 /-- **A cutoff carries `k` weak derivatives from `W` up to `Ω`.** For a test function `χ`
-supported in `W ⊆ Ω` there is a constant `K`, depending on `χ` and `k` alone, such that
-whenever `p` carries weak derivatives to order `k` on `W` bounded by `M`, every `L²(Ω)` class
-representing `χ·p` carries weak derivatives to order `k` on `Ω` bounded by `K·M`.
+supported in `W ⊆ Ω` there is a constant `K`, depending on `χ` and `k` alone, such that whenever
+`p` has weak derivatives to order `k` on `W` bounded by `M`, every `L²(Ω)` class representing
+`χ·p` has weak derivatives to order `k` on `Ω` bounded by `K·M`.
 
 The induction is on `k`, with the weight quantified inside so that it may change at each step.
 `HasWeakDerivOn.extend_mulTest` supplies the single derivative

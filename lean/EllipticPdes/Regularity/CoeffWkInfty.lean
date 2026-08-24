@@ -15,15 +15,15 @@ Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem V
 Theorem 2 asks for `C^{m+1}`. This file states Guo's hypothesis: weak derivatives up to
 order `k`, each essentially bounded, with no continuity assumed anywhere.
 
-## Why a new weak-derivative predicate
+## Choice of a new weak-derivative predicate
 
-`HasWeakDerivOn` is typed on `Lp ℝ 2 (volume.restrict V)` classes, which suits a solution on
-a bounded domain. A coefficient is a bounded measurable function on all of `EuclideanSpace ℝ
-(Fin d)`, and on an unbounded domain such a function need not be `L²`, so it has no `Lp 2`
-class to carry. `HasWeakPartial` below is the same integration-by-parts identity stated for
-plain functions, which is where a locally integrable coefficient lives.
+`HasWeakDerivOn` is typed on `Lp ℝ 2 (volume.restrict V)` classes, which suits a solution on a
+bounded domain. A coefficient is a bounded measurable function on all of `EuclideanSpace ℝ (Fin
+d)`, and on an unbounded domain such a function need not be `L²`, so it has no `Lp 2` class to
+represent it. `HasWeakPartial` below is the same integration-by-parts identity stated for plain
+functions, which is where a locally integrable coefficient lives.
 
-## How the derivative family is indexed
+## Indexing of the derivative family
 
 The iterated derivative is indexed by a `List (Fin d)` of directions rather than by a
 multi-index in `Fin d →₀ ℕ`. Guo's proof expands `D^α` through the Leibniz rule over
@@ -43,14 +43,14 @@ coefficient itself and `D_step` makes each successive entry a weak derivative of
 * `IsWkInftyCoeff`: Guo's coefficient hypothesis at order `k`.
 * `IsWkInftyCoeff.mono`: an order-`k` bundle is an order-`l` bundle for every `l ≤ k`.
 
-## What this file does not yet supply
+## Statements this file does not yet supply
 
 The bridge `IsCkCoeff A k → IsWkInftyCoeff A k` and the difference-quotient bound under the
 weaker hypothesis. The latter cannot be had in the everywhere-pointwise form that
 `IsC1Coeff.abs_diffQuot_coeff_le` currently has: that proof is the classical mean value
 inequality, which needs a derivative at every point, and recovering a pointwise bound from an
 essentially bounded weak derivative is the statement that `W^{1,∞}` functions have Lipschitz
-representatives. Mathlib carries Rademacher's theorem in the opposite direction
+representatives. Mathlib has Rademacher's theorem in the opposite direction
 (`LipschitzWith.ae_differentiableAt`) and not this one. The route that avoids it is
 mollification: `(∇a) * ρ_ε` inherits the essential bound of `∇a`, the classical inequality
 applies to the smooth `a * ρ_ε`, and the bound passes to the limit almost everywhere. That
@@ -75,10 +75,10 @@ def HasWeakPartial (k : Fin d) (f f' : EuclideanSpace ℝ (Fin d) → ℝ) : Pro
   ∀ φ : EuclideanSpace ℝ (Fin d) → ℝ, ContDiff ℝ (⊤ : ℕ∞) φ → HasCompactSupport φ →
     ∫ x, f x * partialD k φ x = - ∫ x, f' x * φ x
 
-/-- A `W^{k,∞}` ellipticity bundle, in the sense of Guo, *Partial Differential Equations I
-and II* (Course Lecture Notes), Theorem VIII.3.2 (p. 65): every coefficient entry carries
-weak derivatives up to order `k`, each measurable and essentially bounded, with no
-continuity assumed. The derivative family is indexed by a list of directions, one `cons` per
+/-- A `W^{k,∞}` ellipticity bundle, in the sense of Guo, *Partial Differential Equations I and
+II* (Course Lecture Notes), Theorem VIII.3.2 (p. 65): every coefficient entry has weak
+derivatives up to order `k`, each measurable and essentially bounded, with no continuity
+assumed. The derivative family is indexed by a list of directions, one `cons` per
 differentiation. -/
 structure IsWkInftyCoeff (A : EllipticCoeff d) (k : ℕ) where
   /-- The chosen representative of the iterated weak derivative of the `(i,j)` entry along a

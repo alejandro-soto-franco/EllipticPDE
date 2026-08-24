@@ -7,7 +7,7 @@ import EllipticPdes.Regularity.DifferenceQuotient
 import Mathlib.Geometry.Manifold.Instances.Real
 
 /-!
-# The half-ball and tangential directions
+# Half-ball and tangential directions
 
 The special case of the boundary `H²` estimate (Evans, *Partial Differential Equations*
 (2nd ed.), §6.3.2, Theorem 4, proof steps 1–5) is set on the half-ball
@@ -43,7 +43,7 @@ noncomputable section
 
 namespace EllipticPdes.Regularity
 
-/-! ### The half-ball -/
+/-! ### Half-ball -/
 
 /-- The open half-ball of radius `r` centred at the origin in `ℝ^{d+1}`: the metric ball
 intersected with the open coordinate half-space `{x | 0 < x 0}`. Coordinate `0` is the

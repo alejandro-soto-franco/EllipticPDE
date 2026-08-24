@@ -38,12 +38,12 @@ open EllipticPdes.Sobolev EllipticPdes.Embedding
 variable {d : ℕ}
 
 /-- **Weak derivatives of every order give one family closed under differentiation.** On a ball
-inside the region, the functions `F α` read off the order-`α.length` family carry, for each
+inside the region, the functions `F α` read off the order-`α.length` family have, for each
 direction `k`, the function `F (k :: α)` as a weak `k`-derivative, and all of them lie in `L²`.
 The empty list is the function itself, on the nose.
 
 The induction along the list is where uniqueness is spent: the entries at `α` of two families
-agree almost everywhere by the inductive hypothesis, so the two weak gradients they carry are
+agree almost everywhere by the inductive hypothesis, so the two weak gradients they have are
 weak gradients of one function, hence agree, which is the inductive step at `k :: α`. -/
 theorem exists_gradClosed_of_hasIteratedWeakDerivOn {V : Set (EuclideanSpace ℝ (Fin d))}
     (u : L2D V) (h : ∀ k : ℕ, Nonempty (HasIteratedWeakDerivOn V k u))

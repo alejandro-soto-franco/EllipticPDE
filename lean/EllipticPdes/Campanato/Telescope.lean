@@ -6,7 +6,7 @@ Authors: Alejandro Soto Franco
 import EllipticPdes.Campanato.Compare
 
 /-!
-# The dyadic telescoping estimate and the Campanato limit
+# Dyadic telescoping estimate and Campanato limit
 
 Halving the radius moves the ball mean by at most `campanatoConst d · M · r^α`, so the means at
 the dyadic radii `r, r/2, r/4, …` form a Cauchy sequence with an explicit geometric bound. Summing

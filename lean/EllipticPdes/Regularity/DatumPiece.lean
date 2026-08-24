@@ -16,10 +16,10 @@ of order at most two. The cutoff is the middle cutoff of the tower or one of its
 partial derivatives, and it is what confines the term to the collar and lets it be extended by
 zero to the whole domain.
 
-This file turns that shape into a single lemma. Given the cutoff and the coefficient, there is
-a constant such that every derivative carrying `k` weak derivatives on the collar produces a
-class on the domain that carries `k` weak derivatives, is bounded by the constant times the
-bound on the derivative, and pairs against a test function as the product of the three factors.
+This file turns that shape into a single lemma. Given the cutoff and the coefficient, there is a
+constant such that every derivative with `k` weak derivatives on the collar produces a class on
+the domain that has `k` weak derivatives, is bounded by the constant times the bound on the
+derivative, and pairs against a test function as the product of the three factors.
 
 The three conclusions are produced together because they are produced by the same construction:
 `exists_iteratedWeakDeriv_mul` puts the coefficient in, `exists_iteratedWeakDeriv_extend_mulTest`
@@ -42,9 +42,9 @@ open EllipticPdes.Sobolev
 
 variable {d : ℕ}
 
-/-- **One piece of the datum.** For a cutoff `χ` supported in the collar `N ⊆ Ω` and a
-`W^{k,∞}` coefficient `a`, there is a constant `K` such that every `p` carrying `k` weak
-derivatives on `N` bounded by `M` yields a class `q` on `Ω` with
+/-- **One piece of the datum.** For a cutoff `χ` supported in the collar `N ⊆ Ω` and a `W^{k,∞}`
+coefficient `a`, there is a constant `K` such that every `p` with `k` weak derivatives on `N`
+bounded by `M` yields a class `q` on `Ω` with
 
 * `k` weak derivatives on `Ω`, bounded by `K·M`;
 * `∫_Ω q·v = ∫_N χ·a·p·v` for every `v`.

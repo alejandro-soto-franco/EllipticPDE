@@ -6,7 +6,7 @@ Authors: Alejandro Soto Franco
 import EllipticPdes.Regularity.Interior
 
 /-!
-# The outer cutoff tower, and second derivatives near `tsupport ξ`
+# Outer cutoff tower and second derivatives near `tsupport ξ`
 
 Higher interior regularity (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1,
 Theorem 2) runs the interior `H²` estimate a second time, on the cutoff derivative
@@ -14,9 +14,9 @@ Theorem 2) runs the interior `H²` estimate a second time, on the cutoff derivat
 `tsupport ξ` of the first tower, so the second run needs its own tower, based at that compact
 set rather than at the original `V`, together with the second derivatives of `u` there.
 
-Both come for free from what the interior `H²` chain already provides. `tsupport ξ` is
-compact and sits inside `Ω`, so `cutoffTowerOfIsCompactSubsetIsOpen` builds the outer tower,
-and `interior_secondWeakDeriv` and `interior_H2_estimate` apply at that compact set verbatim.
+Both follow from what the interior `H²` chain already provides. `tsupport ξ` is compact and sits
+inside `Ω`, so `cutoffTowerOfIsCompactSubsetIsOpen` builds the outer tower, and
+`interior_secondWeakDeriv` and `interior_H2_estimate` apply at that compact set verbatim.
 
 ## Main declarations
 
@@ -37,7 +37,7 @@ open EllipticPdes.Sobolev
 
 variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))}
 
-/-! ### The outer tower -/
+/-! ### Outer tower -/
 
 /-- **The outer cutoff tower.** A tower based at the compact set `tsupport T.ξ` of a given
 tower `T`. Its innermost cutoff is identically `1` on `tsupport T.ξ`
@@ -50,11 +50,11 @@ noncomputable def outerCutoffTower {V : Set (EuclideanSpace ℝ (Fin d))} (hΩo 
 /-! ### Second derivatives at the outer tower -/
 
 /-- **The interior second derivatives at the outer tower.** For every direction pair `(k, i)`
-the whole-space extension of `ζ' · ∂ᵢu`, with `ζ'` the innermost cutoff of the outer tower,
-carries an `L²` weak `k`-derivative bounded by the data, with a single constant covering the
-whole index square. The constant is quantified before the solution and the datum, so it
-depends only on the operator and the tower. This is `interior_secondWeakDeriv` at
-`outerCutoffTower`, with the per-pair constants collected into one. -/
+the whole-space extension of `ζ' · ∂ᵢu`, with `ζ'` the innermost cutoff of the outer tower, has
+an `L²` weak `k`-derivative bounded by the data, with a single constant covering the whole index
+square. The constant is quantified before the solution and the datum, so it depends only on the
+operator and the tower. This is `interior_secondWeakDeriv` at `outerCutoffTower`, with the
+per-pair constants collected into one. -/
 theorem outer_secondWeakDeriv (Op : FullEllipticOp d) (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
     (hA : IsC1Coeff Op.toEllipticCoeff) {V : Set (EuclideanSpace ℝ (Fin d))}
     (T : CutoffTower Ω V) :

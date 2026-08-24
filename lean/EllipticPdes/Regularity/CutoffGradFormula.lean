@@ -8,12 +8,12 @@ import EllipticPdes.Regularity.WeakDerivUnique
 import EllipticPdes.Regularity.CutoffDeriv
 
 /-!
-# The gradient of a cut-off function, in closed form
+# Gradient of a cut-off function in closed form
 
 `EllipticPdes.Regularity.interior_cutoffGrad_mem_H01` puts `ξ·∂_ℓu` in `H₀¹(Ω)` and says that
 the gradient coordinates of the resulting element are its weak derivatives. It says nothing
-about what they are, because the element is produced as a weak limit of difference quotients
-and the limit carries no formula.
+about what they are, because the element is produced as a weak limit of difference quotients and
+the limit has no formula.
 
 Evans's step 3 needs the formula. Expanding `B[ξ·∂_ℓu, w]` asks for `∂ᵢ(ξ·∂_ℓu)` as a sum of a
 term where the derivative lands on the cutoff and a term where it lands on the solution, and

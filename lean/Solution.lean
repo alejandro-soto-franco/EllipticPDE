@@ -16,9 +16,9 @@ import EllipticPdes
 /-!
 # Discharging the solvability theory from `EllipticPdes`
 
-`Challenge.lean` states six results of §6.2 of Evans in Mathlib vocabulary alone and
-leaves each one open. This module carries the same six statements, under the same names,
-and proves them from `EllipticPdes`.
+`Challenge.lean` states six results of §6.2 of Evans in Mathlib vocabulary alone and leaves each
+one open. This module states the same six statements, under the same names, and proves them from
+`EllipticPdes`.
 
 Comparator looks a theorem up by name in both modules and compares the two statements, so
 this module restates the definitions rather than importing `Challenge`. Everything above
@@ -27,13 +27,12 @@ this module restates the definitions rather than importing `Challenge`. Everythi
 
 Three identifications carry the statements across.
 
-* `Palomar.H01` unfolds to `EllipticPdes.Sobolev.H01`, so the two quantify over the same
-  space.
-* `Palomar.EllipticOperator` carries the fields of
-  `EllipticPdes.Sobolev.FullEllipticOp` flattened, and `toFullEllipticOp` rebundles them.
-* `weakForm_eq`, `zerothPairing_eq` and `datumPairing_eq` identify the sums of integrals
-  with `FullEllipticOp.fullBilin`, `FullEllipticOp.zerothForm` and the `L²` pairing, whose
-  principal and lower-order parts are inner products of coefficient actions on `L²`.
+* `Palomar.H01` unfolds to `EllipticPdes.Sobolev.H01`, so the two quantify over the same space.
+* `Palomar.EllipticOperator` has the fields of `EllipticPdes.Sobolev.FullEllipticOp` flattened,
+  and `toFullEllipticOp` rebundles them.
+* `weakForm_eq`, `zerothPairing_eq` and `datumPairing_eq` identify the sums of integrals with
+  `FullEllipticOp.fullBilin`, `FullEllipticOp.zerothForm` and the `L²` pairing, whose principal
+  and lower-order parts are inner products of coefficient actions on `L²`.
 -/
 
 open MeasureTheory
@@ -45,15 +44,15 @@ namespace Palomar
 
 variable {d : ℕ}
 
-/-! ### The graph encoding of `H_0^1(Ω)` -/
+/-! ### Graph encoding of `H_0^1(Ω)` -/
 
 /-- The real `L²` space on a domain `Ω ⊆ ℝ^d` (restricted Lebesgue measure). -/
 abbrev L2D (Ω : Set (EuclideanSpace ℝ (Fin d))) : Type :=
   Lp ℝ 2 (volume.restrict Ω)
 
-/-- Ambient Hilbert space for the graph encoding: a function value together with `d`
-gradient components, carrying the ℓ² (`H¹`) inner product. Coordinate `0` is the
-function; coordinate `i.succ` is the `i`-th weak partial derivative. -/
+/-- Ambient Hilbert space for the graph encoding: a function value together with `d` gradient
+components, with the ℓ² (`H¹`) inner product. Coordinate `0` is the function; coordinate
+`i.succ` is the `i`-th weak partial derivative. -/
 abbrev H1amb (Ω : Set (EuclideanSpace ℝ (Fin d))) : Type :=
   PiLp 2 (fun _ : Fin (d + 1) => L2D Ω)
 
@@ -116,7 +115,7 @@ space. -/
 def H01 (Ω : Set (EuclideanSpace ℝ (Fin d))) : Submodule ℝ (H1amb Ω) :=
   (Submodule.span ℝ (testGraphSet Ω)).topologicalClosure
 
-/-! ### The operator and its bilinear form -/
+/-! ### Operator and its bilinear form -/
 
 /-- A second-order divergence-form operator
 `L u = -∂_j (a_{ij} ∂_i u) + b_i ∂_i u + c u` with measurable coefficients, bounded by
@@ -237,7 +236,7 @@ lemma zerothPairing_eq (Ω : Set (EuclideanSpace ℝ (Fin d))) (U V : H01 Ω) :
 lemma datumPairing_eq {Ω : Set (EuclideanSpace ℝ (Fin d))} (f : L2D Ω) (V : H01 Ω) :
     datumPairing f V = ∫ x in Ω, (f x : ℝ) * ((V : H1amb Ω) 0 x : ℝ) := rfl
 
-/-! ### The Gårding inequality -/
+/-! ### Gårding inequality -/
 
 /-- **The Gårding inequality** (Evans, *Partial Differential Equations* (2nd ed.),
 §6.2.2, Theorem 2, p. 318). -/
@@ -273,7 +272,7 @@ theorem weak_solution_of_nonneg_zeroth {n : ℕ} (Op : EllipticOperator (n + 1))
     simp only [weakForm_eq, datumPairing_eq] at hu
     exact (hmain f).2 u hu
 
-/-! ### The Fredholm alternative -/
+/-! ### Fredholm alternative -/
 
 /-- **Second Existence Theorem for weak solutions** (Evans, §6.2.3, Theorem 4(i),
 p. 321). -/
@@ -318,7 +317,7 @@ theorem solvable_iff_orthogonal_transpose (Op : EllipticOperator d)
   · intro h
     exact hiff.mpr (fun w hw => h w ((hmem w).mp hw))
 
-/-! ### The discrete set of exceptional shifts -/
+/-! ### Discrete set of exceptional shifts -/
 
 /-- **Third Existence Theorem for weak solutions** (Evans, §6.2.3, Theorem 5, p. 323).
 `L u = μ u + f`, so the weak form reads `B[u, v] = μ ⟨u, v⟩ + ⟨f, v⟩`. -/
