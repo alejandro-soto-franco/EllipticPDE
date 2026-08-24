@@ -19,7 +19,7 @@ complete orthogonal family of eigenfunctions.
 * `solOp_isCompact`: `solOp` is compact, because `ι` is compact (Rellich) and the rest is bounded.
 * `solOp_inner_symm`: `solOp` is symmetric, because `B` is symmetric (so `B♯` and `B♯⁻¹` are).
 * `solOp_inner_self_nonneg`: `solOp` is positive, from coercivity.
-* `solOp_spectral`: the **spectral theorem** -- the eigenspaces of `solOp` span `L²(Ω)` (their
+* `solOp_spectral`: the **spectral theorem**: the eigenspaces of `solOp` span `L²(Ω)` (their
   orthogonal complement is trivial). The eigenvalues are of finite multiplicity
   (`ContinuousLinearMap.finite_dimensional_eigenspace`) and, by `solOp_eigenvalue_nonneg`,
   nonnegative.

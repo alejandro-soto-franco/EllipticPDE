@@ -24,9 +24,9 @@ The reduction is exact:
 * `opE`: the coercive Lax-Milgram equivalence of `B_γ` (for `γ = gardingγ`), so
   `opA = opE - γ·opT` (`opA_eq`) and hence `opA = opE ∘ (1 - opK)` (`opA_factor`) with
   `opK = γ·opE⁻¹·opT`.
-* `fredholm_alternative`: assuming `opK` is a **compact** operator -- the Rellich-Kondrachov
+* `fredholm_alternative`: assuming `opK` is a **compact** operator (the Rellich-Kondrachov
   input, that the embedding `H₀¹(Ω) ↪ L²(Ω)` is compact, exactly as the box geometry was the
-  external input for coercivity -- either `Lu = 0` has a nontrivial weak solution, or `Lu = f`
+  external input for coercivity): either `Lu = 0` has a nontrivial weak solution, or `Lu = f`
   has a unique weak solution for every `f`. `fredholm_unique_imp_exists` is the usual corollary:
   uniqueness for the homogeneous problem forces solvability of the inhomogeneous one.
 -/
@@ -101,7 +101,7 @@ lemma opA_factor :
 
 /-- **The Fredholm alternative for the elliptic Dirichlet problem** (Evans §6.2.3,
 Theorem 4). Assume the
-operator `opK` is compact -- the Rellich-Kondrachov input, that `H₀¹(Ω) ↪ L²(Ω)` is a compact
+operator `opK` is compact: the Rellich-Kondrachov input, that `H₀¹(Ω) ↪ L²(Ω)` is a compact
 embedding. Then exactly one of two alternatives holds: either the homogeneous problem `Lu = 0`
 has a nontrivial weak solution `u ≠ 0` (`∀ v, B[u, v] = 0`), or the inhomogeneous problem
 `Lu = f` has a unique weak solution for every continuous functional `f`. -/

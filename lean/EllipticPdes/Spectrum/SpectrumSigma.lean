@@ -14,7 +14,7 @@ Two layers.
 **Generic** (Evans Appendix D.5, Theorem 6: the spectrum of a compact operator `K` on a
 real Hilbert space): `0 ∈ σ(K)` when the space is infinite-dimensional; away from zero
 the spectrum consists of eigenvalues (mathlib's Fredholm alternative); and the
-eigenvalues cannot accumulate away from zero -- for every `δ > 0` only finitely many
+eigenvalues cannot accumulate away from zero: for every `δ > 0` only finitely many
 eigenvalues have `|μ| ≥ δ`, so `σ(K) \ {0}` is countable. The accumulation argument is
 the classical eigenvector chain: distinct eigenvalues give a strictly increasing chain
 of spans `Eₙ`, Hilbert geometry provides unit vectors `uₙ ∈ Eₙ₊₁ ∩ Eₙᗮ`, and
@@ -243,7 +243,7 @@ theorem spectrum_diff_eq_eigenvalues (hK : IsCompactOperator K) :
 infinite-dimensional real Hilbert space, a compact operator `K` has `0` in its real
 spectrum; away from zero the spectrum consists exactly of the eigenvalues; the nonzero
 spectrum is countable; and only finitely many spectral points have `|μ| ≥ δ` for each
-`δ > 0` -- so an enumeration of the nonzero spectrum converges to `0`.
+`δ > 0`, so an enumeration of the nonzero spectrum converges to `0`.
 
 Terminal result of the library, stated in the manuscript. Nothing else consumes it. -/
 theorem spectrum_compact_operator (hK : IsCompactOperator K)
@@ -289,7 +289,7 @@ lemma gardingγ_pos : 0 < Op.gardingγ := by
   linarith
 
 /-- **The set `Σ` of Existence III**: the real `λ` for which `γ/(γ+λ)` is an
-eigenvalue of the compact part `opK` of the reduction -- equivalently (see
+eigenvalue of the compact part `opK` of the reduction, equivalently (see
 `notMem_sigmaSet_iff_solvable`), the `λ` for which the weak problem `Lu = λu + f`
 fails to be uniquely solvable for every right-hand side. -/
 def sigmaSet : Set ℝ :=
@@ -558,7 +558,7 @@ private lemma integral_zero_rhs (v : H01 Ω) :
 /-- **Existence III.** There is a set `Σ ⊆ ℝ`, countable and with
 finite intersection with every `(-∞, C]` (so an infinite `Σ` is a nondecreasing
 sequence diverging to `+∞`), such that for every `λ ∉ Σ` and every `f ∈ L²(Ω)` the
-weak problem `Lu = λu + f` -- `B[u,v] = λ⟨u₀,v₀⟩ + ∫_Ω f v₀` for all `v` -- has a
+weak problem `Lu = λu + f` (`B[u,v] = λ⟨u₀,v₀⟩ + ∫_Ω f v₀` for all `v`) has a
 unique solution `u ∈ H₀¹(Ω)`, and for `λ ∈ Σ` uniqueness fails. -/
 theorem existence_three (hK : IsCompactOperator (Op.opK Ω)) :
     ∃ S : Set ℝ, S.Countable ∧ (∀ C : ℝ, (S ∩ Set.Iic C).Finite) ∧

@@ -62,7 +62,7 @@ omit [CompleteSpace E] in
 /-- `1 - K` is **bounded below on the orthogonal complement of its kernel**: the main step of
 the Riesz closed-range theorem, by the standard compactness contradiction. If not, normalised
 `xₙ ∈ (ker(1-K))ᗮ` have `(1-K)xₙ → 0`; compactness of `K` extracts `Kx_{φ(n)} → z`, so `x_{φ(n)}
-→ z` with `‖z‖ = 1`, `z ∈ ker(1-K)`, and `z ∈ (ker(1-K))ᗮ` -- forcing `z = 0`, a contradiction. -/
+→ z` with `‖z‖ = 1`, `z ∈ ker(1-K)`, and `z ∈ (ker(1-K))ᗮ`, forcing `z = 0`, a contradiction. -/
 theorem exists_pos_bound_on_orthogonal_ker (hK : IsCompactOperator K) :
     ∃ c : ℝ, 0 < c ∧ ∀ x ∈ (LinearMap.ker ((1 - K : E →L[ℝ] E)).toLinearMap)ᗮ,
       c * ‖x‖ ≤ ‖(1 - K : E →L[ℝ] E) x‖ := by
@@ -133,8 +133,8 @@ theorem exists_pos_bound_on_orthogonal_ker (hK : IsCompactOperator K) :
   exact zero_ne_one hznorm
 
 /-- **Closed range (Riesz theory).** For a compact operator `K` on a real Hilbert
-space the range of `1 - K` is closed: `1 - K` is bounded below -- hence antilipschitz
-with closed range -- on the orthogonal complement of its finite-dimensional kernel, and
+space the range of `1 - K` is closed: `1 - K` is bounded below (hence antilipschitz
+with closed range) on the orthogonal complement of its finite-dimensional kernel, and
 the full range is the image of that complement. This is the geometric half towards
 Evans's Theorem 4(ii) (§6.2.3). -/
 theorem isClosed_range_one_sub (hK : IsCompactOperator K) :
@@ -273,11 +273,11 @@ lemma adjoint_one_sub (K : E →L[ℝ] E) :
       = 1 - ContinuousLinearMap.adjoint K := by
   rw [map_sub, ContinuousLinearMap.adjoint_one]
 
-/-- **The two kernels have equal (finite) dimension** -- one inequality. If
+/-- **The two kernels have equal (finite) dimension**, one inequality. If
 `dim ker(1-K) < dim ker(1-K†)` then an injective, non-surjective linear map
 `Λ : ker(1-K) → ker(1-K†)` composed with the orthogonal projection gives a finite-rank
 perturbation `S = K + Λ∘P` with `1 - S` injective; the Fredholm alternative makes
-`1 - S` surjective, yet nothing outside `range Λ` is attained -- a contradiction
+`1 - S` surjective, yet nothing outside `range Λ` is attained, a contradiction
 (Brezis Thm 6.6 adapted to the Hilbert setting). -/
 theorem finrank_ker_one_sub_adjoint_le (hK : IsCompactOperator K) :
     Module.finrank ℝ
@@ -505,8 +505,8 @@ theorem finiteDimensional_solSpace (hK : IsCompactOperator (Op.opK Ω)) :
 
 /-- **Closed range of the elliptic operator** (towards Evans §6.2.3, Theorem
 4(ii)-(iii)). Under
-the Rellich-Kondrachov input the range of `opA` -- the set of Riesz representatives of
-solvable right-hand sides -- is closed: `opA = opE ∘ (1 - opK)` with `opE` a
+the Rellich-Kondrachov input the range of `opA` (the set of Riesz representatives of
+solvable right-hand sides) is closed: `opA = opE ∘ (1 - opK)` with `opE` a
 homeomorphism, and `1 - opK` has closed range by Riesz theory. This is the geometric
 input for the solvability criterion `Lu = f solvable ↔ f ⊥ N*`. -/
 theorem isClosed_range_opA (hK : IsCompactOperator (Op.opK Ω)) :

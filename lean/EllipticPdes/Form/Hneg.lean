@@ -96,7 +96,7 @@ lemma inner_gradFlip_left {Ω : Set (EuclideanSpace ℝ (Fin d))} (F V : H1amb �
 /-! ### Representations of functionals by `L²` tuples -/
 
 /-- The tuple `F = (f₀, f₁, …, fₙ)` of `L²(Ω)` functions **represents** the functional
-`f ∈ H⁻¹(Ω)` when `⟨f, v⟩ = ⟪f₀, v₀⟫ - ∑ᵢ ⟪fᵢ, ∂ᵢv⟫` for every `v ∈ H₀¹(Ω)` -- the
+`f ∈ H⁻¹(Ω)` when `⟨f, v⟩ = ⟪f₀, v₀⟫ - ∑ᵢ ⟪fᵢ, ∂ᵢv⟫` for every `v ∈ H₀¹(Ω)`, the
 inner-product form of the minus-sign convention adopted here. -/
 def IsHnegRepr (Ω : Set (EuclideanSpace ℝ (Fin d))) (F : H1amb Ω)
     (f : H01 Ω →L[ℝ] ℝ) : Prop :=
@@ -181,7 +181,7 @@ adopted here). Every continuous linear
 functional `f` on `H₀¹(Ω)` is represented by a tuple `F = (f₀, f₁, …, fₙ)` of `L²(Ω)`
 functions through `⟨f, v⟩ = ∫_Ω f₀ v - ∑ᵢ ∫_Ω fᵢ ∂ᵢv`, whose
 tuple norm `(∫_Ω ∑ᵢ |fᵢ|²)^{1/2} = ‖F‖` equals `‖f‖_{H⁻¹}` and is least among all
-representing tuples -- the infimum is attained at the Riesz
+representing tuples: the infimum is attained at the Riesz
 representative.
 
 Terminal result of the library, stated in the manuscript. Nothing else consumes it. -/
