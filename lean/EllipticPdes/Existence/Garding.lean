@@ -188,9 +188,8 @@ lemma gardingγ_nonneg : 0 ≤ Op.gardingγ := by
     div_nonneg (by positivity) this.le
   linarith [Op.Csup_nonneg]
 
-/-- **The Gårding inequality** (Evans §6.2.2, Theorem 2(ii)). With `β = λ/2` and
-`γ = gardingγ`,
-`β ‖U‖²_{H¹} ≤ B[U, U] + γ ‖u₀‖²_{L²}` for every `U ∈ H₀¹(Ω)`. -/
+/-- **The Gårding inequality** (Evans §6.2.2, Theorem 2(ii)). With `β = λ/2` and `γ` the
+shift constant, `β ‖U‖²_{H¹} ≤ B[U, U] + γ ‖u₀‖²_{L²}` for every `U ∈ H₀¹(Ω)`. -/
 theorem garding (Ω : Set (EuclideanSpace ℝ (Fin d))) (U : H01 Ω) :
     Op.lam / 2 * ‖U‖ ^ 2
       ≤ Op.fullBilin Ω U U + Op.gardingγ * ‖(U : H1amb Ω) 0‖ ^ 2 := by
