@@ -3,14 +3,14 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.SobolevLadderSharp
+import EllipticPdes.Embedding.SobolevLadderFullStep
 import EllipticPdes.Embedding.ClassicalDeriv
 
 /-!
 # Hölder regularity of finite order from a bounded supply of weak derivatives
 
 Guo's Sobolev embedding (Guo, *Partial Differential Equations*, Theorem IV.2.3) has two cases.
-The first raises the exponent, and `EllipticPdes.Embedding.memLp_of_gradClosed_sharp` runs it.
+The first raises the exponent, and `EllipticPdes.Embedding.memLp_of_gradClosed_fullStep` runs it.
 The second reads a bounded supply of weak derivatives as classical ones: for `u ∈ W^{m,p}(Ω)`
 with `m > n/p`, the conclusion is `u ∈ C^{m-1-⌊n/p⌋, γ}(Ω)`. This file proves the second case at
 `p = 2`, locally, for a family closed under weak differentiation as far as `m`.
@@ -19,8 +19,9 @@ with `m > n/p`, the conclusion is `u ∈ C^{m-1-⌊n/p⌋, γ}(Ω)`. This file p
 
 The supply is spent in three places. Morrey asks for the weak gradient, so one order goes there;
 the ladder takes `⌊d/2⌋` more raising that gradient from `L²` to `L^{2d}`; and reading the `n`-th
-classical derivative asks the same of every index `n` levels up. So an index of depth `dep i` reaches `C^n` while `dep i + n + 1 + ⌊d/2⌋ ≤ m`, and at
-`dep i = 0` that is `n = m - 1 - ⌊d/2⌋`, which is Guo's order exactly.
+classical derivative asks the same of every index `n` levels up. So an index of depth `dep i`
+reaches `C^n` while `dep i + n + 1 + ⌊d/2⌋ ≤ m`, and at `dep i = 0` that is
+`n = m - 1 - ⌊d/2⌋`, which is Guo's order exactly.
 
 ## The Hölder exponent
 
@@ -107,7 +108,7 @@ theorem contDiffOn_holder_of_gradClosed (hd : 0 < d) (c : EuclideanSpace ℝ (Fi
   have hladder : ∀ i, dep i + d / 2 ≤ m →
       MemLp (F i) (ENNReal.ofReal (2 * (d : ℝ))) (volume.restrict (Metric.ball c r)) := by
     intro i hi
-    have h := memLp_two_mul_of_gradClosed_sharp hd c hdep hr hrR hgrad hmem i hi
+    have h := memLp_two_mul_of_gradClosed_fullStep hd c hdep hr hrR hgrad hmem i hi
     have hcast : ENNReal.ofReal (2 * (d : ℝ)) = ((2 * (d : ℝ≥0) : ℝ≥0) : ℝ≥0∞) := by
       rw [← ENNReal.ofReal_coe_nnreal]
       congr 1

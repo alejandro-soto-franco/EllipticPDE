@@ -275,13 +275,13 @@
       "claim": "formalises the p = q = 2 case on an arbitrary bounded Omega, over the solution space H_0^1(Omega) that Evans also takes: some C >= 0 bounds the function part by the gradient part throughout H_0^1(Omega). Evans takes U bounded and open and restricts to 1 <= p < n, so p = 2 carries the hypothesis n > 2; the declaration holds in every dimension and asks boundedness alone of Omega, the constant being transported from an enclosing box rather than derived from the Gagliardo-Nirenberg-Sobolev inequality, at the cost of L/sqrt(2n) in place of the sharp constant"
     },
     {
-      "decl": "EllipticPdes.Embedding.memLp_of_gradClosed_sharp",
+      "decl": "EllipticPdes.Embedding.memLp_of_gradClosed_fullStep",
       "source_id": "evans-2010",
       "locator": "§5.6.3 Thm 6",
       "claim": "formalises clause (i) iterated at the full step and to a bounded depth, on a family closed under weak differentiation in place of a single W^{k,p} function: after s rungs with 2 s <= d, a member sitting s orders below the top of the supply lies in L^q on a smaller concentric ball, for every q >= 2 with 1/q >= 1/2 - s/d. Evans reads the exponent off 1/q = 1/p - k/n in one step under k < n/p, at p = 2 and k = s; the rung condition 2 s <= d is that hypothesis in the non-strict form the last rung needs, since at s = d/2 in even dimensions the reciprocal is zero and every finite exponent is reached. Membership alone is stated, the constant of each rung being absorbed"
     },
     {
-      "decl": "EllipticPdes.Embedding.memLp_two_mul_of_gradClosed_sharp",
+      "decl": "EllipticPdes.Embedding.memLp_two_mul_of_gradClosed_fullStep",
       "source_id": "evans-2010",
       "locator": "§5.6.3 Thm 6",
       "claim": "formalises clause (i) run to L^{2d}, which passes d in every dimension and is the exponent Morrey then consumes. The rung count is floor(d/2), against the d - 1 a half-step ladder needs for the same conclusion, and it is the count Evans' exponent relation gives: 1/2 - floor(d/2)/d is zero for d even and 1/(2d) for d odd, both at most 1/(2d)"

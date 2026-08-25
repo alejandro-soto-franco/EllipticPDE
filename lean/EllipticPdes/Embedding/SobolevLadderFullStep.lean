@@ -6,7 +6,7 @@ Authors: Alejandro Soto Franco
 import EllipticPdes.Embedding.GagliardoNirenberg
 
 /-!
-# The Sobolev ladder at the sharp exponent
+# The Sobolev ladder at the full step
 
 `EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le` raises the exponent from `p` to `p'` with
 `1/p' = 1/p - 1/d`. Iterating it `s` times lands on `1/p - s/d`, which is the exponent Guo's
@@ -20,9 +20,9 @@ it so: at the top rung the reciprocal is `1/2 - s/d ≥ 0`, and at every rung be
 `1/d`. So `⌊d/2⌋` rungs run, against the `d - 1` a half-step ladder needs, and both reach `L^{2d}`.
 
 The top rung is where the two dimensional parities separate. For `d` even the reciprocal at
-`s = d/2` is exactly `0`, so the rung reaches every finite exponent and none of them sharply;
-for `d` odd it is `1/(2d)`, reached sharply. Neither case is special in the proof, since the
-statement asks only that the target reciprocal be at least `1/2 - s/d`, and
+`s = d/2` is exactly `0`, so the rung reaches every finite exponent and attains none of them;
+for `d` odd it is `1/(2d)`, and that one is attained. Neither case is special in the proof,
+since the statement asks only that the target reciprocal be at least `1/2 - s/d`, and
 `EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_of_le` is what lets a rung be fed from an
 exponent above the one it consumes. That is the same mechanism
 `EllipticPdes.Embedding.exists_eLpNorm_four_le` uses in dimension two.
@@ -36,9 +36,9 @@ on `F i` consumes `s` of the orders above `dep i`, so the conclusion is stated f
 
 ## Main declarations
 
-* `EllipticPdes.Embedding.memLp_of_gradClosed_sharp`: the ladder, at rung `s` and any exponent
+* `EllipticPdes.Embedding.memLp_of_gradClosed_fullStep`: the ladder, at rung `s` and any exponent
   the rung reaches.
-* `EllipticPdes.Embedding.memLp_two_mul_of_gradClosed_sharp`: the ladder run to `L^{2d}`, which
+* `EllipticPdes.Embedding.memLp_two_mul_of_gradClosed_fullStep`: the ladder run to `L^{2d}`, which
   passes `d` in every dimension and is what `EllipticPdes.Embedding.morrey_ball` consumes.
 
 ## References
@@ -61,15 +61,15 @@ variable {d : ℕ}
 Three facts about reciprocals, kept apart so that the induction's own context stays small.
 -/
 
-private theorem inv_antitone_sharp {a b : ℝ} (ha : 0 < a) (h : a ≤ b) : b⁻¹ ≤ a⁻¹ := by
+private theorem inv_antitone_fullStep {a b : ℝ} (ha : 0 < a) (h : a ≤ b) : b⁻¹ ≤ a⁻¹ := by
   have hb : 0 < b := lt_of_lt_of_le ha h
   nlinarith [mul_inv_cancel₀ ha.ne', mul_inv_cancel₀ hb.ne', inv_pos.mpr ha, inv_pos.mpr hb]
 
-private theorem le_of_inv_le_inv_sharp {a b : ℝ} (ha : 0 < a) (hb : 0 < b) (h : a⁻¹ ≤ b⁻¹) :
+private theorem le_of_inv_le_inv_fullStep {a b : ℝ} (ha : 0 < a) (hb : 0 < b) (h : a⁻¹ ≤ b⁻¹) :
     b ≤ a := by
   nlinarith [mul_inv_cancel₀ ha.ne', mul_inv_cancel₀ hb.ne', inv_pos.mpr ha, inv_pos.mpr hb]
 
-private theorem coe_toNNReal_inv_sharp {t : ℝ} (ht : 0 < t) :
+private theorem coe_toNNReal_inv_fullStep {t : ℝ} (ht : 0 < t) :
     ((Real.toNNReal t⁻¹ : ℝ≥0) : ℝ) = t⁻¹ :=
   Real.coe_toNNReal _ (inv_nonneg.mpr ht.le)
 
@@ -88,7 +88,7 @@ hypothesis at rung `s` on the outer half to the index and to its derivatives, an
 Gagliardo-Nirenberg-Sobolev step on the inner half. The depth bookkeeping is what replaces
 closure at every order: a derivative sits one level higher, so a rung fewer is available to it,
 which is exactly the budget the recursive call is given. -/
-theorem memLp_of_gradClosed_sharp (hd : 0 < d) (c : EuclideanSpace ℝ (Fin d))
+theorem memLp_of_gradClosed_fullStep (hd : 0 < d) (c : EuclideanSpace ℝ (Fin d))
     {ι : Type*} {F : ι → EuclideanSpace ℝ (Fin d) → ℝ} {nxt : ι → Fin d → ι}
     {dep : ι → ℕ} {m : ℕ} (hdep : ∀ i k, dep (nxt i k) ≤ dep i + 1) :
     ∀ (s : ℕ) {q : ℝ≥0} {r R : ℝ}, 2 * s ≤ d → (2 : ℝ≥0) ≤ q →
@@ -107,7 +107,7 @@ theorem memLp_of_gradClosed_sharp (hd : 0 < d) (c : EuclideanSpace ℝ (Fin d))
     -- At the bottom rung the exponent is `2` itself, since `1/q ≥ 1/2` caps it there.
     have hq2' : q ≤ 2 := by
       rw [← NNReal.coe_le_coe, NNReal.coe_ofNat]
-      refine le_of_inv_le_inv_sharp (by norm_num) hq0 ?_
+      refine le_of_inv_le_inv_fullStep (by norm_num) hq0 ?_
       simpa using hqs
     haveI : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
       ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
@@ -121,7 +121,7 @@ theorem memLp_of_gradClosed_sharp (hd : 0 < d) (c : EuclideanSpace ℝ (Fin d))
     have hd2 : (2 : ℝ) ≤ (d : ℝ) := by exact_mod_cast hd2n
     have hdpos : (0 : ℝ) < (d : ℝ) := by linarith
     have hdinv : (d : ℝ)⁻¹ ≤ 2⁻¹ := by
-      have := inv_antitone_sharp (a := (2 : ℝ)) (by norm_num) hd2
+      have := inv_antitone_fullStep (a := (2 : ℝ)) (by norm_num) hd2
       simpa using this
     have hdinv0 : (0 : ℝ) < (d : ℝ)⁻¹ := inv_pos.mpr hdpos
     have hqinv0 : (0 : ℝ) < (q : ℝ)⁻¹ := by
@@ -131,7 +131,7 @@ theorem memLp_of_gradClosed_sharp (hd : 0 < d) (c : EuclideanSpace ℝ (Fin d))
     have hqinv : (q : ℝ)⁻¹ ≤ 2⁻¹ := by
       have h2q : ((2 : ℝ≥0) : ℝ) ≤ (q : ℝ) := NNReal.coe_le_coe.mpr hq2
       simp only [NNReal.coe_ofNat] at h2q
-      have := inv_antitone_sharp (a := (2 : ℝ)) (by norm_num) h2q
+      have := inv_antitone_fullStep (a := (2 : ℝ)) (by norm_num) h2q
       simpa using this
     push_cast at hqs
     -- The midpoint of the gap, so that the rung shrinks the ball without leaving `r`.
@@ -153,30 +153,30 @@ theorem memLp_of_gradClosed_sharp (hd : 0 < d) (c : EuclideanSpace ℝ (Fin d))
       have : 0 ≤ (s : ℝ) * (d : ℝ)⁻¹ := by positivity
       rw [ht_def]; linarith
     set Q : ℝ≥0 := Real.toNNReal t⁻¹ with hQ_def
-    have hQcoe : ((Q : ℝ≥0) : ℝ) = t⁻¹ := by rw [hQ_def]; exact coe_toNNReal_inv_sharp ht0
+    have hQcoe : ((Q : ℝ≥0) : ℝ) = t⁻¹ := by rw [hQ_def]; exact coe_toNNReal_inv_fullStep ht0
     have hQ0 : (0 : ℝ) < (Q : ℝ) := by rw [hQcoe]; exact inv_pos.mpr ht0
     have hQinv : ((Q : ℝ≥0) : ℝ)⁻¹ = t := by rw [hQcoe, inv_inv]
     have hQ2 : (2 : ℝ≥0) ≤ Q := by
       rw [← NNReal.coe_le_coe, NNReal.coe_ofNat, hQcoe]
-      have := inv_antitone_sharp ht0 ht2
+      have := inv_antitone_fullStep ht0 ht2
       simpa using this
     -- The exponent the inequality is applied at, `1/p = 1/q + 1/d`.
     set u : ℝ := (q : ℝ)⁻¹ + (d : ℝ)⁻¹ with hu_def
     have hu0 : 0 < u := by rw [hu_def]; linarith
     have hu1 : u ≤ 1 := by rw [hu_def]; linarith
     set p : ℝ≥0 := Real.toNNReal u⁻¹ with hp_def
-    have hpcoe : ((p : ℝ≥0) : ℝ) = u⁻¹ := by rw [hp_def]; exact coe_toNNReal_inv_sharp hu0
+    have hpcoe : ((p : ℝ≥0) : ℝ) = u⁻¹ := by rw [hp_def]; exact coe_toNNReal_inv_fullStep hu0
     have hp0 : (0 : ℝ) < (p : ℝ) := by rw [hpcoe]; exact inv_pos.mpr hu0
     have hpinv : ((p : ℝ≥0) : ℝ)⁻¹ = u := by rw [hpcoe, inv_inv]
     have hp1 : (1 : ℝ≥0) ≤ p := by
       rw [← NNReal.coe_le_coe, NNReal.coe_one, hpcoe]
-      have := inv_antitone_sharp hu0 hu1
+      have := inv_antitone_fullStep hu0 hu1
       simpa using this
     -- The full step is exactly what the target reciprocal at rung `s + 1` pays for.
     have htu : t ≤ u := by rw [ht_def, hu_def]; linarith
     have hpQ : p ≤ Q := by
       rw [← NNReal.coe_le_coe]
-      refine le_of_inv_le_inv_sharp hQ0 hp0 ?_
+      refine le_of_inv_le_inv_fullStep hQ0 hp0 ?_
       rw [hQinv, hpinv]; exact htu
     have hpp' : ((q : ℝ≥0) : ℝ)⁻¹ = ((p : ℝ≥0) : ℝ)⁻¹ - (d : ℝ)⁻¹ := by
       rw [hpinv, hu_def]; ring
@@ -189,7 +189,7 @@ theorem memLp_of_gradClosed_sharp (hd : 0 < d) (c : EuclideanSpace ℝ (Fin d))
       (fun k => hQmem (nxt i k) (by have := hdep i k; omega))
       ((hgrad i (by omega)).mono (Metric.ball_subset_ball hr'R.le))).1
 
-/-- **The sharp ladder, run to the top.** An index of depth at most `m - ⌊d/2⌋` in a family
+/-- **The full-step ladder, run to the top.** An index of depth at most `m - ⌊d/2⌋` in a family
 closed under weak differentiation as far as `m`, with every member of depth at most `m` in `L²`
 on `Metric.ball c R`, lies in `L^{2d}` on any smaller concentric ball. Since `2d > d`, this is
 the exponent `EllipticPdes.Embedding.morrey_ball` asks for, in every dimension.
@@ -197,7 +197,7 @@ the exponent `EllipticPdes.Embedding.morrey_ball` asks for, in every dimension.
 The rung count is `⌊d/2⌋`, and the reciprocal it lands on is `1/2 - ⌊d/2⌋/d`, which is `0` when
 `d` is even and `1/(2d)` when `d` is odd. Both are at most `1/(2d)`, which is why one statement
 serves the two parities. -/
-theorem memLp_two_mul_of_gradClosed_sharp (hd : 0 < d) (c : EuclideanSpace ℝ (Fin d))
+theorem memLp_two_mul_of_gradClosed_fullStep (hd : 0 < d) (c : EuclideanSpace ℝ (Fin d))
     {ι : Type*} {F : ι → EuclideanSpace ℝ (Fin d) → ℝ} {nxt : ι → Fin d → ι}
     {dep : ι → ℕ} {m : ℕ} (hdep : ∀ i k, dep (nxt i k) ≤ dep i + 1)
     {r R : ℝ} (hr : 0 < r) (hrR : r < R)
@@ -223,6 +223,6 @@ theorem memLp_two_mul_of_gradClosed_sharp (hd : 0 < d) (c : EuclideanSpace ℝ (
     have := mul_le_mul_of_nonneg_right hmod hdinv0.le
     rw [hcancel] at this
     nlinarith
-  exact memLp_of_gradClosed_sharp hd c hdep (d / 2) (by omega) h2d2 hland hr hrR hgrad hmem i hi
+  exact memLp_of_gradClosed_fullStep hd c hdep (d / 2) (by omega) h2d2 hland hr hrR hgrad hmem i hi
 
 end EllipticPdes.Embedding

@@ -207,13 +207,13 @@ import EllipticPdes
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Regularity.interior_smooth
 
-/-- info: 'EllipticPdes.Embedding.memLp_of_gradClosed_sharp' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'EllipticPdes.Embedding.memLp_of_gradClosed_fullStep' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
-#print axioms EllipticPdes.Embedding.memLp_of_gradClosed_sharp
+#print axioms EllipticPdes.Embedding.memLp_of_gradClosed_fullStep
 
-/-- info: 'EllipticPdes.Embedding.memLp_two_mul_of_gradClosed_sharp' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'EllipticPdes.Embedding.memLp_two_mul_of_gradClosed_fullStep' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
-#print axioms EllipticPdes.Embedding.memLp_two_mul_of_gradClosed_sharp
+#print axioms EllipticPdes.Embedding.memLp_two_mul_of_gradClosed_fullStep
 
 /-- info: 'EllipticPdes.Embedding.contDiffOn_holder_of_gradClosed' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
