@@ -17,8 +17,8 @@ jobs:
   warrant-coverage:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
       - name: Every pinned declaration is warranted or exempt
         run: uv run python verify/proofsense_coverage.py
       - name: The coverage check's own tests
@@ -31,7 +31,7 @@ jobs:
   lean:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install elan (Lean toolchain manager)
         run: |

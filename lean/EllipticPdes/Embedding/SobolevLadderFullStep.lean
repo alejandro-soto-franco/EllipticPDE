@@ -87,7 +87,7 @@ The induction is on the rung. Each step splits the gap `r < R` at its midpoint, 
 hypothesis at rung `s` on the outer half to the index and to its derivatives, and takes one
 Gagliardo-Nirenberg-Sobolev step on the inner half. The depth bookkeeping is what replaces
 closure at every order: a derivative sits one level higher, so a rung fewer is available to it,
-which is exactly the budget the recursive call is given. -/
+and that is what the recursive call is given. -/
 theorem memLp_of_gradClosed_fullStep (hd : 0 < d) (c : EuclideanSpace ℝ (Fin d))
     {ι : Type*} {F : ι → EuclideanSpace ℝ (Fin d) → ℝ} {nxt : ι → Fin d → ι}
     {dep : ι → ℕ} {m : ℕ} (hdep : ∀ i k, dep (nxt i k) ≤ dep i + 1) :

@@ -89,9 +89,21 @@ theorem exists_contDiffOn_holder_ball_of_hasIteratedWeakDerivOn (hd : 0 < d)
   rw [← hF0]
   exact h0
 
-/-- **Guo's second case, at the root.** The class itself has a representative of class `C^k` on
-the ball, Hölder-`1/2` there, whenever the supply of weak derivatives reaches
-`k + 1 + ⌊d/2⌋`. -/
+/-- **Guo's second case, at the root.** An `L²` class `u` on `V` with weak derivatives to order
+`m`, and `k + 1 + ⌊d/2⌋ ≤ m`, has on any ball whose enlargement sits inside `V` a representative
+of class `C^k`, Hölder-`1/2` there.
+
+This is Guo's Theorem IV.2.3 case (ii) at `p = 2`, read locally. The order `k = m - 1 - ⌊d/2⌋`
+is his, and his hypothesis `m > d/2` is the displayed inequality at `k = 0`. The exponent `1/2`
+is his `⌊d/2⌋ + 1 - d/2` when `d` is odd; when `d` is even that value is `0`, his statement
+leaves the exponent free in `(0, 1)`, and `1/2` is what the landing exponent `2d` gives.
+
+Guo takes a bounded `Ω` with `C¹` boundary and concludes on its closure, with a norm estimate.
+The statement here asks nothing of a boundary, concludes on an open ball, and is qualitative;
+the estimate belongs to `EllipticPdes.Regularity.higher_interior_regularity`, which supplies the
+weak derivatives this consumes. It is read off the multi-index form
+`EllipticPdes.Regularity.exists_contDiffOn_holder_ball_of_hasIteratedWeakDerivOn` at the empty
+list. -/
 theorem exists_contDiffOn_holder_ball (hd : 0 < d)
     {V : Set (EuclideanSpace ℝ (Fin d))} (u : L2D V) {m k : ℕ}
     (H : HasIteratedWeakDerivOn V m u) (hmk : k + 1 + d / 2 ≤ m)
