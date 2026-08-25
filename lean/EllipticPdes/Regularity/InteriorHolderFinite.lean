@@ -60,9 +60,9 @@ representatives indexed by lists of directions: the empty list represents the cl
 of length at most `k` is Hölder-`1/2` and of class `C^{k - |α|}`, and each is the classical
 derivative of its parent.
 
-Three orders of the supply are spent before the first classical derivative appears. Morrey takes
-the weak gradient, the ladder takes `⌊d/2⌋` more raising it to `L^{2d}`, and reading the order-`k`
-derivative asks the same of everything `k` levels up. -/
+The supply is spent in three places. Morrey takes the weak gradient, the ladder takes `⌊d/2⌋`
+more raising it to `L^{2d}`, and reading the order-`k` derivative asks the same of everything `k`
+levels up, which together are the `k + 1 + ⌊d/2⌋` of the hypothesis. -/
 theorem exists_contDiffOn_holder_ball_of_hasIteratedWeakDerivOn (hd : 0 < d)
     {V : Set (EuclideanSpace ℝ (Fin d))} (u : L2D V) {m k : ℕ}
     (H : HasIteratedWeakDerivOn V m u) (hmk : k + 1 + d / 2 ≤ m)

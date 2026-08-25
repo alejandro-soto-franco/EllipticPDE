@@ -17,10 +17,9 @@ with `m > n/p`, the conclusion is `u ∈ C^{m-1-⌊n/p⌋, γ}(Ω)`. This file p
 
 ## The order the supply pays for
 
-Three orders leave the supply before a classical derivative appears. Morrey asks for the weak
-gradient, so one order goes there; the ladder consumes `⌊d/2⌋` more raising that gradient from
-`L²` to `L^{2d}`; and reading the `n`-th classical derivative asks the same of every index `n`
-levels up. So an index of depth `dep i` reaches `C^n` while `dep i + n + 1 + ⌊d/2⌋ ≤ m`, and at
+The supply is spent in three places. Morrey asks for the weak gradient, so one order goes there;
+the ladder takes `⌊d/2⌋` more raising that gradient from `L²` to `L^{2d}`; and reading the `n`-th
+classical derivative asks the same of every index `n` levels up. So an index of depth `dep i` reaches `C^n` while `dep i + n + 1 + ⌊d/2⌋ ≤ m`, and at
 `dep i = 0` that is `n = m - 1 - ⌊d/2⌋`, which is Guo's order exactly.
 
 ## The Hölder exponent
