@@ -207,6 +207,30 @@ import EllipticPdes
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Regularity.interior_smooth
 
+/-- info: 'EllipticPdes.Embedding.memLp_of_gradClosed_sharp' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.memLp_of_gradClosed_sharp
+
+/-- info: 'EllipticPdes.Embedding.memLp_two_mul_of_gradClosed_sharp' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.memLp_two_mul_of_gradClosed_sharp
+
+/-- info: 'EllipticPdes.Embedding.contDiffOn_holder_of_gradClosed' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.contDiffOn_holder_of_gradClosed
+
+/-- info: 'EllipticPdes.Regularity.exists_gradClosed_of_hasIteratedWeakDerivOn_le' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.exists_gradClosed_of_hasIteratedWeakDerivOn_le
+
+/-- info: 'EllipticPdes.Regularity.exists_contDiffOn_holder_ball_of_hasIteratedWeakDerivOn' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.exists_contDiffOn_holder_ball_of_hasIteratedWeakDerivOn
+
+/-- info: 'EllipticPdes.Regularity.exists_contDiffOn_holder_ball' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.exists_contDiffOn_holder_ball
+
 /-! ### Base of the Poincaré chain -/
 
 /-- info: 'EllipticPdes.Poincare.intervalIntegral_mul_sq_le' depends on axioms: [propext, Classical.choice, Quot.sound] -/

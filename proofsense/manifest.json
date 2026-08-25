@@ -273,6 +273,36 @@
       "source_id": "evans-2010",
       "locator": "§5.6.1 Thm 3",
       "claim": "formalises the p = q = 2 case on an arbitrary bounded Omega, over the solution space H_0^1(Omega) that Evans also takes: some C >= 0 bounds the function part by the gradient part throughout H_0^1(Omega). Evans takes U bounded and open and restricts to 1 <= p < n, so p = 2 carries the hypothesis n > 2; the declaration holds in every dimension and asks boundedness alone of Omega, the constant being transported from an enclosing box rather than derived from the Gagliardo-Nirenberg-Sobolev inequality, at the cost of L/sqrt(2n) in place of the sharp constant"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.memLp_of_gradClosed_sharp",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "formalises clause (i) iterated at the full step and to a bounded depth, on a family closed under weak differentiation in place of a single W^{k,p} function: after s rungs with 2 s <= d, a member sitting s orders below the top of the supply lies in L^q on a smaller concentric ball, for every q >= 2 with 1/q >= 1/2 - s/d. Evans reads the exponent off 1/q = 1/p - k/n in one step under k < n/p, at p = 2 and k = s; the rung condition 2 s <= d is that hypothesis in the non-strict form the last rung needs, since at s = d/2 in even dimensions the reciprocal is zero and every finite exponent is reached. Membership alone is stated, the constant of each rung being absorbed"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.memLp_two_mul_of_gradClosed_sharp",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "formalises clause (i) run to L^{2d}, which passes d in every dimension and is the exponent Morrey then consumes. The rung count is floor(d/2), against the d - 1 a half-step ladder needs for the same conclusion, and it is the count Evans' exponent relation gives: 1/2 - floor(d/2)/d is zero for d even and 1/(2d) for d odd, both at most 1/(2d)"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.contDiffOn_holder_of_gradClosed",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "formalises clause (ii) at finite order, on a family closed under weak differentiation to bounded depth in place of a single W^{k,p} function: on a smaller concentric ball a member sitting n + 1 + floor(d/2) orders below the top of the supply has a representative of class C^n, and one sitting 1 + floor(d/2) below has a Holder-1/2 representative. At p = 2 that order is Evans' k - [n/p] - 1 exactly. The Holder exponent is his gamma = [n/p] + 1 - n/p when d is odd, and one admissible choice from the interval (0, 1) his statement leaves open when d is even. The conclusion is stated on the open ball rather than on a closure, and it names representatives, an L^2 class having no pointwise values; the last component identifies the family's entries as the classical partial derivatives of one another, which is what makes C^{n, 1/2} read as the multi-index statement Evans writes"
+    },
+    {
+      "decl": "EllipticPdes.Regularity.exists_contDiffOn_holder_ball_of_hasIteratedWeakDerivOn",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "formalises clause (ii) at p = 2 against the supply of weak derivatives interior regularity produces: an L^2 class with weak derivatives to order m on V, and k + 1 + floor(d/2) <= m, has on a ball inside V a family of representatives indexed by lists of directions, each of length at most k Holder-1/2 and of class C^{k - |alpha|}, and each the classical derivative of its parent. Evans takes u in W^{k,p}(U) on a bounded U with C^1 boundary and concludes on the closure of U; the statement here is local on a ball and asks nothing of the boundary. The order k = m - 1 - floor(d/2) is his, and the hypothesis m > n/p is this one at k = 0"
+    },
+    {
+      "decl": "EllipticPdes.Regularity.exists_contDiffOn_holder_ball",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "formalises clause (ii) read at the root of that family: the class itself has a representative of class C^k on the ball, Holder-1/2 there, whenever its weak derivatives reach order k + 1 + floor(d/2). This is the statement Evans writes for u, the multi-index form above being the statement for every D^alpha u at once"
     }
   ]
 }

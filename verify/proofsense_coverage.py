@@ -86,6 +86,13 @@ EXEMPT = {
         "uniqueness of the weak gradient on a ball. Evans carries D^alpha u as "
         "one symbol throughout and never faces the question"
     ),
+    "EllipticPdes.Regularity.exists_gradClosed_of_hasIteratedWeakDerivOn_le": (
+        "the same bookkeeping at a bounded order, where the whole supply is "
+        "one family and nothing has to be reconciled, so it is a restatement "
+        "of HasIteratedWeakDerivOn on a ball rather than a result. Evans "
+        "carries D^alpha u as one symbol throughout and never faces the "
+        "question"
+    ),
     "EllipticPdes.Campanato.campanatoOn_of_holderOnWith": (
         "the converse half of the Campanato characterisation; Fernandez-Real "
         "and Ros-Oton record only the space equality, attributed to Janson, "

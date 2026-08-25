@@ -55,6 +55,7 @@ import EllipticPdes.Regularity.SmoothGlue
 import EllipticPdes.Regularity.HigherInterior
 import EllipticPdes.Regularity.IteratedFamily
 import EllipticPdes.Regularity.InteriorSmooth
+import EllipticPdes.Regularity.InteriorHolderFinite
 import EllipticPdes.Regularity.DifferentiatedEquation
 import EllipticPdes.Regularity.Boundary.HalfBall
 import EllipticPdes.Regularity.Boundary.TangentialDiffQuotient
@@ -79,9 +80,11 @@ import EllipticPdes.Campanato.Holder
 import EllipticPdes.Campanato.Converse
 import EllipticPdes.Embedding.GagliardoNirenberg
 import EllipticPdes.Embedding.SobolevLadder
+import EllipticPdes.Embedding.SobolevLadderSharp
 import EllipticPdes.Embedding.WeakGradUnique
 import EllipticPdes.Embedding.ClassicalDeriv
 import EllipticPdes.Embedding.SmoothOfGradClosed
+import EllipticPdes.Embedding.HolderOfGradClosed
 import EllipticPdes.Embedding.InteriorHolder
 import EllipticPdes.Fredholm.Fredholm
 import EllipticPdes.Fredholm.FredholmComplete

@@ -25,6 +25,8 @@ differentiation up to a null set, which is all the ladder reads.
 ## Main declarations
 
 * `EllipticPdes.Regularity.exists_gradClosed_of_hasIteratedWeakDerivOn`: the closed family.
+* `EllipticPdes.Regularity.exists_gradClosed_of_hasIteratedWeakDerivOn_le`: the same at a bounded
+  order, where one family is the whole supply and no uniqueness is spent.
 -/
 
 open MeasureTheory Set Metric
@@ -96,5 +98,25 @@ theorem exists_gradClosed_of_hasIteratedWeakDerivOn {V : Set (EuclideanSpace ℝ
   simp only [List.length_cons]
   exact HasWeakGradOn.congr_ae (hgradV (α.length + 1) α (Nat.lt_succ_self _))
     (hcoh α (α.length + 1) α.length (Nat.le_succ _) le_rfl) fun _ => Filter.EventuallyEq.rfl
+
+/-- **Weak derivatives up to order `m` give one family closed under differentiation as far as
+`m`.** A single `EllipticPdes.Regularity.HasIteratedWeakDerivOn` at order `m` already assigns a
+class to every list of directions, so the family is that assignment and nothing has to be
+reconciled: `D_step` is the closure below order `m`, and membership at order `2` is inherited
+from the region by restriction.
+
+The unbounded statement needs uniqueness of the weak gradient because it receives one family per
+order and has to identify the entries they share. Here there is one family, and the entries above
+order `m` are carried along unconstrained, which is all the bounded ladder reads of them. -/
+theorem exists_gradClosed_of_hasIteratedWeakDerivOn_le {V : Set (EuclideanSpace ℝ (Fin d))}
+    (u : L2D V) {m : ℕ} (H : HasIteratedWeakDerivOn V m u)
+    {c : EuclideanSpace ℝ (Fin d)} {R : ℝ} (hBV : Metric.ball c R ⊆ V) :
+    ∃ F : List (Fin d) → EuclideanSpace ℝ (Fin d) → ℝ,
+      (∀ α, α.length < m → HasWeakGradOn (Metric.ball c R) (F α) (fun k => F (k :: α))) ∧
+      (∀ α, MemLp (F α) 2 (volume.restrict (Metric.ball c R))) ∧
+      F [] = (u : EuclideanSpace ℝ (Fin d) → ℝ) := by
+  refine ⟨fun α => ((H.D α : EuclideanSpace ℝ (Fin d) → ℝ)), fun α hα => ?_,
+    fun α => (Lp.memLp _).mono_measure (Measure.restrict_mono hBV le_rfl), by simp only [H.D_nil]⟩
+  exact HasWeakGradOn.mono hBV (hasWeakGradOn_of_hasWeakDerivOn fun k => H.D_step k α hα)
 
 end EllipticPdes.Regularity
