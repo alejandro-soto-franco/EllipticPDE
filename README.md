@@ -14,6 +14,18 @@ The drift term is permitted to be non-zero, so $B$ is in general non-symmetric
 and the problem has no variational structure. Existence runs through
 Lax-Milgram.
 
+**Symmetry of $a^{ij}$ is never assumed.** Evans §6.1.1 assumes $a^{ij} =
+a^{ji}$ throughout, and Gilbarg-Trudinger ch. 8 assumes it for the principal
+part. `EllipticPdes.Sobolev.EllipticCoeff` takes an arbitrary measurable
+matrix: uniform ellipticity constrains the quadratic form $A(x)\xi\cdot\xi$
+and the entries, and neither condition sees the antisymmetric part of $A(x)$.
+Symmetry enters at one declaration and one only, the spectral theorem
+`symmetric_fullElliptic_spectral`, whose argument `hAsymm` asks $a^{ij} =
+a^{ji}$ a.e. on $\Omega$, and which needs it because the spectral theorem for
+compact self-adjoint operators does. With $A$ non-symmetric the formal adjoint
+$L^{*}$ has principal part built from $A^{\top}$, which is the transpose
+problem the Fredholm results state.
+
 ## Results
 
 Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
@@ -31,7 +43,14 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   `EllipticPdes.Regularity.interior_smooth`, and
 - interior Hölder continuity of the solution at exponent $\tfrac12$ in dimensions
   one, two and three, as `EllipticPdes.Embedding.interior_holder_estimate_one`,
-  `interior_holder_estimate_two` and `interior_holder_estimate`.
+  `interior_holder_estimate_two` and `interior_holder_estimate`, and
+- interior Hölder continuity of finite order in every dimension, as
+  `EllipticPdes.Regularity.exists_contDiffOn_holder_ball`: $m$ orders of weak
+  derivative on $V$ give a $C^{k,1/2}$ representative on a ball whenever
+  $k + 1 + \lfloor n/2 \rfloor \le m$. This is case (ii) of Guo's Sobolev
+  embedding (Theorem IV.2.3) at $p = 2$, and composed with
+  `higher_interior_regularity` it is the $C^{k,1/2}$ interior estimate in every
+  dimension.
 
 The Hölder estimate chains the $H^2$ estimate through Morrey's inequality on a
 ball. Supporting layers supply Morrey's inequality itself, the
@@ -42,9 +61,23 @@ continuity with its converse, and the Caccioppoli inequality.
 Out of $L^2$ data one Sobolev step reaches Morrey only below dimension four:
 $1/p' = 1/p - 1/d$ gives $p' > d$ only for $p > d/2$, and the window
 $d/2 < p \le 2$ is empty once $d \ge 4$. Iterating the step reaches every
-dimension, at the price of a weak derivative per rung, which is what
-`EllipticPdes.Embedding.memLp_of_gradClosed` runs on a family closed under
-differentiation. Smoothness in the interior is that ladder followed by
+dimension, at one weak derivative per rung, and the iteration runs on a family
+closed under weak differentiation: an index type, a function per index, and a
+successor naming the weak derivatives of that function, so one induction climbs
+with no separate induction on the order of differentiation.
+
+Two ladders are built on that family. `memLp_of_gradClosed` climbs at the half
+step $1/(2d)$ and reaches $L^{2d}$ after $d - 1$ rungs, keeping every
+intermediate reciprocal positive; it is run where weak derivatives of every
+order are available, and its consumer is `interior_smooth`.
+`memLp_of_gradClosed_fullStep` climbs at the full step $1/d$ and reaches the
+same exponent after $\lfloor d/2 \rfloor$ rungs, bounding the supply with a
+depth function; its consumer is `exists_contDiffOn_holder_ball`, where the
+supply is finite. The full step lands on the reciprocal $0$ when $d$ is even,
+and the rung form `exists_eLpNorm_sobolevConj_le_of_le`, which takes its
+hypothesis in $L^q$ for any $q \ge p$ while concluding at the conjugate of $p$,
+is what covers that case. Smoothness in the interior is the half-step ladder
+followed by
 `EllipticPdes.Embedding.hasFDerivAt_of_continuousOn_hasWeakGradOn`, which turns a
 continuous weak gradient back into a classical derivative.
 

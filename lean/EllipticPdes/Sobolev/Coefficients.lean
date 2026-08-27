@@ -136,12 +136,28 @@ lemma inner_mulCoeffL_eq {Ω : Set (EuclideanSpace ℝ (Fin d))}
 
 /-! ### Uniformly elliptic coefficient matrices (Evans §6.1.1) -/
 
-/-- A measurable, bounded, symmetric-or-not coefficient matrix `a` that is **uniformly
-elliptic** with ellipticity constant `lam > 0` and sup bound `Λ`: `∑ᵢⱼ aᵢⱼ(x) ξᵢ ξⱼ ≥ lam ·
-|ξ|²` and `|aᵢⱼ(x)| ≤ Λ` for almost every `x` (Evans §6.1.1 states ellipticity pointwise for
+/-- A measurable, bounded coefficient matrix `a` that is **uniformly elliptic** with
+ellipticity constant `lam > 0` and sup bound `Λ`: `∑ᵢⱼ aᵢⱼ(x) ξᵢ ξⱼ ≥ lam · |ξ|²` and
+`|aᵢⱼ(x)| ≤ Λ` for almost every `x` (Evans §6.1.1 states ellipticity pointwise for
 a.e. `x ∈ U`; the bundle has a measurable representative on `ℝᵈ` with the bounds holding
 `volume`-a.e., which restricts to a.e. on every domain `Ω`). This is exactly the data the
-divergence-form operator `Lu = -Dⱼ(aᵢⱼ Dᵢu)` needs for the energy estimate. -/
+divergence-form operator `Lu = -Dⱼ(aᵢⱼ Dᵢu)` needs for the energy estimate.
+
+**No symmetry is assumed**, where Evans §6.1.1 assumes `aᵢⱼ = aⱼᵢ` throughout and
+Gilbarg-Trudinger ch. 8 assumes it for the principal part. Neither field above sees the
+antisymmetric part of `a x`: `elliptic` constrains the quadratic form `ξ ↦ ∑ᵢⱼ aᵢⱼ ξᵢ ξⱼ`,
+which the antisymmetric part annihilates, and `bdd` constrains the entries one at a time.
+
+Symmetry is asked for at one place in the development, as the explicit hypothesis
+`hAsymm : ∀ᵐ x ∂(volume.restrict Ω), ∀ i j, a x i j = a x j i` of `bilin_symm` and of the
+spectral theorems above it (`symmetric_fullElliptic_spectral` and its bounded-set form).
+It enters there because the spectral theorem for compact self-adjoint operators asks the
+bilinear form to be symmetric, and `bilin` is symmetric exactly when `a` is (with the drift
+vanishing). Every other result of the library is proved for an arbitrary `a`: Gårding,
+existence and uniqueness, Fredholm, the resolvent bound, and the whole
+interior-regularity chain. With `a` non-symmetric the formal adjoint `L* v = -Dᵢ(aᵢⱼ Dⱼv) - bⁱ Dᵢv + (c - Dᵢbⁱ)v`
+has principal part built from the transpose, which is the transpose problem the Fredholm
+solvability criterion states. -/
 structure EllipticCoeff (d : ℕ) where
   /-- The coefficient matrix entries. -/
   a : EuclideanSpace ℝ (Fin d) → Fin d → Fin d → ℝ

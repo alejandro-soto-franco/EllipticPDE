@@ -47,7 +47,7 @@ A locator naming a section resolves to every theorem under that heading, and the
 declaration is then asked to entail all of them, which is answered false almost
 always. Measured across the nine warrants of the 2026-07-22 audit, section
 granularity hands the judge 88,249 characters where statement granularity hands
-it 7,617, a factor of 11.6. Section 6.3.1 alone has three theorems over
+it 7,617, which is 11.6 times as much. Section 6.3.1 alone has three theorems over
 12,555 characters, of which `interior_H2_estimate` formalises one, at 1,304.
 
 Every warrant here therefore names its theorem, `§6.3.1 Thm 1` rather than
@@ -64,13 +64,13 @@ warrant. The seven that do not, and why:
 
 | Declaration | State |
 |---|---|
-| `EllipticPdes.Regularity.caccioppoli` | No transcribed target. It states a first-derivative Caccioppoli estimate, which Evans proves inside §6.3.1 Theorem 1 rather than stating as a numbered result. Gilbarg and Trudinger Theorem 8.8 is the statement it matches, and that text is not transcribed. |
+| `EllipticPdes.Regularity.caccioppoli` | No transcribed target. It states a first-derivative Caccioppoli estimate, which Evans proves inside §6.3.1 Theorem 1 rather than stating as a numbered result. Gilbarg and Trudinger Theorem 8.8 is the statement it matches, and the transcribed corpus omits that text. |
 | `EllipticPdes.Poincare.poincare_domain` | Nothing to cite. It is the averaging step, taking `n` bounds over an arbitrary family and returning their average, with no gradient and no geometry. `poincare_H01_of_bounded` is the Poincaré inequality and is bound in `latex/.adduce/formalization.lock.toml`. |
 | `EllipticPdes.Poincare.poincare_oneDim` | No transcribed target. It is the interval inequality `∫_a^b u² ≤ (b-a)²/2 ∫_a^b (u')²` for `u` continuously differentiable with `u(a) = 0` at the left endpoint alone. Evans §5.6.1 Theorem 3 is the `W_0^{1,p}` statement, which in one dimension asks `u` to vanish at both ends and names no constant, and §5.8.1 Theorems 1 and 2 subtract the mean over a connected `C¹` domain or over a ball. The manuscript records this lemma as the one new analytic ingredient of the Poincaré chain and prepares it for Mathlib. |
 | `EllipticPdes.Poincare.poincare_H01` | Nothing to cite. It is the density step alone, taking an abstract constant `C` from the test functions to their closure in `H₀¹(Ω)`, with no geometry and no bound on `C`. Evans performs the corresponding passage inside the proof of §5.6.1 Theorem 3, by approximating `u ∈ W_0^{1,p}(U)` with `C_c^∞(U)` functions, and states no separate lemma. |
 | `EllipticPdes.Embedding.hasFDerivAt_of_continuousOn_hasWeakGradOn` | No statement to name. It reads a continuous weak gradient as a classical derivative. Evans performs the passage inside the proof of §5.6.3 Theorem 6, where a weak derivative with a continuous representative is treated as a classical one, and states no separate lemma. |
 | `EllipticPdes.Regularity.exists_gradClosed_of_hasIteratedWeakDerivOn` | Nothing to cite. Higher interior regularity is proved order by order, so the weak derivatives arrive as one family per order with nothing relating them, and this assembles them into a single family closed under differentiation, by uniqueness of the weak gradient on a ball. Evans writes `D^α u` as one symbol throughout and never faces the question. |
-| `EllipticPdes.Campanato.campanatoOn_of_holderOnWith` | No statement to name. It is the converse of property (H3), which Fernández-Real and Ros-Oton record only as the space equality `L^{p,β} = C^{k,α}` in the remark following (H8), attributed to Janson, Taibleson and Weiss and proved there. That source is not transcribed. |
+| `EllipticPdes.Campanato.campanatoOn_of_holderOnWith` | No statement to name. It is the converse of property (H3), which Fernández-Real and Ros-Oton record only as the space equality `L^{p,β} = C^{k,α}` in the remark following (H8), attributed to Janson, Taibleson and Weiss and proved there. The transcribed corpus omits that source. |
 
 The first two were findings of the 2026-07-22 warrant audit
 (`docs/review/2026-07-22-warrant-audit.md`). Neither was ever a live
@@ -116,8 +116,9 @@ already spent the interior `H²` estimate to reach the `W^{2,2}` norm. Neither
 difference weakens the claim; both narrow it.
 
 `spectrum_compact_operator` is cited in the manuscript to Brezis, *Functional
-Analysis, Sobolev Spaces and Partial Differential Equations*, §6.3. Brezis is
-not transcribed. Evans states the same theorem as Appendix D Theorem 6, with
+Analysis, Sobolev Spaces and Partial Differential Equations*, §6.3. The
+transcribed corpus omits Brezis. Evans states the same theorem as Appendix D
+Theorem 6, with
 the third clause read as the disjunction that the nonzero spectrum is finite or
 a sequence tending to zero, where the declaration states countability together
 with finiteness above every `δ > 0`. The warrant therefore names Evans where
@@ -133,9 +134,9 @@ general Hölder inequality of item (g).
 The three Poincaré warrants all cite Evans §5.6.1 Theorem 3, which restricts to
 `1 ≤ p < n` and so needs the hypothesis `n > 2` at `p = 2`. The declarations
 hold in every dimension, since the box route through the one-dimensional
-inequality and Fubini replaces the Gagliardo-Nirenberg-Sobolev route, at the
-cost of `C_P = L/√(2n)` in place of the sharp constant. Evans exhibits no
-constant at all.
+inequality and Fubini replaces the Gagliardo-Nirenberg-Sobolev route, and the
+constant it yields is `C_P = L/√(2n)` in place of the sharp one. Evans exhibits
+no constant at all.
 
 `exists_eLpNorm_six_le` cites the Sobolev inequality of Fernández-Real and
 Ros-Oton §1.1 rather than Evans §5.6.1, because the declaration is stated at the
