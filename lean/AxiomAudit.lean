@@ -304,3 +304,7 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Embedding.not_isCompactOperator_critEmb' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Embedding.not_isCompactOperator_critEmb
+
+/-- info: 'EllipticPdes.Analysis.exists_weakLimit' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Analysis.exists_weakLimit

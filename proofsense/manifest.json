@@ -357,6 +357,12 @@
       "source_id": "evans-2010",
       "locator": "§5.6.3 Thm 6",
       "claim": "formalises the estimate of clause (ii) at p = 2, composing the ladder's constant with Morrey's: one constant, quantified before the family, bounding the Holder seminorm of a member by a uniform L^2 bound over the outer ball. Evans writes ||u||_{C^{k-[n/p]-1,gamma}} <= C||u||_{W^{k,p}(U)}; the seminorm alone is bounded here, the supremum norm of the member being no part of what HolderOnWith records, and the domain pair is two concentric balls"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.exists_weakLimit",
+      "source_id": "evans-2010",
+      "locator": "App. D (Thm 3)",
+      "claim": "formalises weak compactness for a real Hilbert space, where Evans states it for a reflexive Banach space: a bounded sequence has a subsequence whose inner products against every vector converge to the inner products against one vector, which is his weak convergence read through Riesz representation. The proof is the sequential one his reflexive statement leaves to Banach-Alaoglu: a diagonal over the countable family of inner products against the sequence itself, extended to the closed span by the uniform bound and to the whole space by orthogonal decomposition, so no separability of the space is assumed"
     }
   ]
 }

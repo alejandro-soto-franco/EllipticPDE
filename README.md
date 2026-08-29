@@ -67,6 +67,11 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   `EllipticPdes.Embedding.rellichEmbL_isCompact_of_lt`: that embedding is
   compact at every $q < 2^{\star}$, on the interpolation inequality
   `EllipticPdes.Analysis.eLpNorm_le_rpow_mul_rpow`,
+- weak sequential compactness, as `EllipticPdes.Analysis.exists_weakLimit`: a
+  bounded sequence in a real Hilbert space has a subsequence whose inner products
+  converge against every vector, which is Evans §D.4 Theorem 3 read through Riesz
+  representation and the compactness the direct method of the calculus of
+  variations runs on,
 - the two general Sobolev estimates with their constants, as
   `EllipticPdes.Embedding.exists_const_eLpNorm_le_of_gradClosed_fullStep` and
   `EllipticPdes.Embedding.exists_const_holderOnWith_of_gradClosed_of_bound`: one

@@ -93,6 +93,7 @@ import EllipticPdes.Fredholm.Compactness
 import EllipticPdes.Spectrum.Spectrum
 import EllipticPdes.Spectrum.RellichDischarge
 import EllipticPdes.BoundedInstances
+import EllipticPdes.Analysis.WeakCompactness
 import EllipticPdes.Analysis.LpInterpolation
 import EllipticPdes.Analysis.Dilation
 import EllipticPdes.Embedding.H01Sobolev
