@@ -93,6 +93,32 @@ EXEMPT = {
         "carries D^alpha u as one symbol throughout and never faces the "
         "question"
     ),
+    "EllipticPdes.Embedding.not_isCompactOperator_critEmb": (
+        "the sharpness of the range in 5.7 Theorem 1. Evans states compactness "
+        "for q < p* and says nothing of the endpoint, and the scaling family "
+        "that rules it out is Guo's Example IV.2.11, which is not among the "
+        "transcribed sources, so no transcribed statement matches it. The "
+        "compactness it complements is warranted at rellichEmbL_isCompact_of_lt"
+    ),
+    "EllipticPdes.Embedding.eLpNorm_weakSolution_le": (
+        "the composition of 5.6.1 Theorem 3 with the a priori bound of 6.2.2 "
+        "Theorem 3: the solution's L^q seminorm bounded by the L^2 norm of "
+        "the datum, for every q up to the critical exponent. Evans states "
+        "each factor and draws no such conclusion for the solution, so no "
+        "transcribed statement matches it. The two factors are warranted at "
+        "eLpNorm_le_of_mem_H01_of_isBounded and at "
+        "weak_solution_L2_of_nonneg_zeroth_of_bounded"
+    ),
+    "EllipticPdes.Regularity.interior_holder_of_weakSolution": (
+        "the finite-order form of the composition Evans performs inside the "
+        "proof of 6.3.1 Theorem 3: higher interior regularity supplies the "
+        "weak derivatives and 5.6.3 Theorem 6 clause (ii) converts them. His "
+        "numbered statement is the C^infty one, under coefficients and datum "
+        "of every order, which interior_smooth formalises; at finite order he "
+        "draws no separate conclusion and keeps no Holder exponent, so no "
+        "transcribed statement matches it. The two factors are warranted at "
+        "higher_interior_regularity and exists_contDiffOn_holder_ball"
+    ),
     "EllipticPdes.Campanato.campanatoOn_of_holderOnWith": (
         "the converse half of the Campanato characterisation; Fernandez-Real "
         "and Ros-Oton record only the space equality, attributed to Janson, "

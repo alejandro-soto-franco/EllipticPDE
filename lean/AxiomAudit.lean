@@ -256,3 +256,51 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Poincare.poincare_H01_of_bounded' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Poincare.poincare_H01_of_bounded
+
+/-- info: 'EllipticPdes.Embedding.eLpNorm_le_of_mem_H01' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.eLpNorm_le_of_mem_H01
+
+/-- info: 'EllipticPdes.Embedding.eLpNorm_le_of_mem_H01_of_isBounded' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.eLpNorm_le_of_mem_H01_of_isBounded
+
+/-- info: 'EllipticPdes.Regularity.interior_holder_of_weakSolution' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.interior_holder_of_weakSolution
+
+/-- info: 'EllipticPdes.Embedding.eLpNorm_weakSolution_le' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.eLpNorm_weakSolution_le
+
+/-- info: 'EllipticPdes.Analysis.eLpNorm_le_rpow_mul_rpow' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Analysis.eLpNorm_le_rpow_mul_rpow
+
+/-- info: 'EllipticPdes.Embedding.rellichEmbL_isCompact' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.rellichEmbL_isCompact
+
+/-- info: 'EllipticPdes.Embedding.rellichEmbL_isCompact_of_le' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.rellichEmbL_isCompact_of_le
+
+/-- info: 'EllipticPdes.Embedding.rellichEmbL_isCompact_of_lt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.rellichEmbL_isCompact_of_lt
+
+/-- info: 'EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed_even' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed_even
+
+/-- info: 'EllipticPdes.Embedding.exists_const_eLpNorm_le_of_gradClosed_fullStep' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.exists_const_eLpNorm_le_of_gradClosed_fullStep
+
+/-- info: 'EllipticPdes.Embedding.exists_const_holderOnWith_of_gradClosed_of_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.exists_const_holderOnWith_of_gradClosed_of_bound
+
+/-- info: 'EllipticPdes.Embedding.not_isCompactOperator_critEmb' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.not_isCompactOperator_critEmb

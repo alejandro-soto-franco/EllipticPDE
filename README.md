@@ -48,9 +48,67 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   `EllipticPdes.Regularity.exists_contDiffOn_holder_ball`: $m$ orders of weak
   derivative on $V$ give a $C^{k,1/2}$ representative on a ball whenever
   $k + 1 + \lfloor n/2 \rfloor \le m$. This is case (ii) of Guo's Sobolev
-  embedding (Theorem IV.2.3) at $p = 2$, and composed with
-  `higher_interior_regularity` it is the $C^{k,1/2}$ interior estimate in every
-  dimension.
+  embedding (Theorem IV.2.3) at $p = 2$,
+- the same estimate for the weak solution itself, as
+  `EllipticPdes.Regularity.interior_holder_of_weakSolution`, which discharges
+  that supply of weak derivatives from the equation through
+  `higher_interior_regularity` and is the $C^{k,1/2}$ interior estimate in
+  every dimension and at every finite order,
+- the Sobolev embedding of $H_0^1(\Omega)$, as
+  `EllipticPdes.Embedding.eLpNorm_le_of_mem_H01` at the critical exponent on any
+  measurable domain and `eLpNorm_le_of_mem_H01_of_isBounded` at every exponent
+  below it on a bounded one, bundled as the continuous linear map
+  `EllipticPdes.Embedding.sobolevEmbL`, and
+- integrability of the weak solution above $L^2$, as
+  `EllipticPdes.Embedding.eLpNorm_weakSolution_le`: on a bounded domain in
+  dimension greater than two the solution lies in $L^q(\Omega)$ up to the
+  critical exponent, with $\|u\|_{L^q} \le K \|f\|_{L^2}$, and
+- Rellich-Kondrachov below the critical exponent, as
+  `EllipticPdes.Embedding.rellichEmbL_isCompact_of_lt`: that embedding is
+  compact at every $q < 2^{\star}$, on the interpolation inequality
+  `EllipticPdes.Analysis.eLpNorm_le_rpow_mul_rpow`,
+- the two general Sobolev estimates with their constants, as
+  `EllipticPdes.Embedding.exists_const_eLpNorm_le_of_gradClosed_fullStep` and
+  `EllipticPdes.Embedding.exists_const_holderOnWith_of_gradClosed_of_bound`: one
+  constant, quantified before the family, taking a uniform $L^2$ bound over the
+  outer ball to the $L^q$ bound and to the Hölder seminorm on the inner one, and
+- the Hölder exponent in even dimension, as
+  `EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed_even`: any
+  $\gamma \in (0,1)$, which is the interval Evans §5.6.3 Theorem 6 leaves open
+  when $n/p$ is an integer. In odd dimension the reciprocal the ladder lands on
+  caps the exponent at $2d$ and forces $\gamma = 1/2$.
+
+The embedding of $H_0^1(\Omega)$ runs the Gagliardo-Nirenberg-Sobolev
+inequality on test functions and passes it to their closure. `poincare_H01`
+makes that passage by continuity, its estimate being a closed condition on a
+continuous function of the graph. The two sides of the Sobolev estimate sit at
+different exponents, which leaves lower semicontinuity in place of continuity:
+convergence in $H^1$ gives convergence of the function coordinates in
+$L^2(\Omega)$, hence in measure, and Fatou's lemma along an almost-everywhere
+convergent subsequence takes the bound to the limit. The transfer reads the
+test-function estimate as a hypothesis at an arbitrary exponent, so each variant
+of the inequality reaches $H_0^1(\Omega)$ by supplying it.
+
+Compactness at those exponents refines the $L^2$ statement rather than repeating
+its proof. Evans and Guo both mollify, bound the $L^1$ error uniformly over a
+bounded family, interpolate, and finish with Arzelà-Ascoli. The first and last
+moves give compactness at the lower exponent, which `embL2_isCompact` already
+supplies from a translation modulus and without an extension operator. The
+interpolation does the rest: a finite net of the unit ball's image in
+$L^2(\Omega)$ is a net in $L^q(\Omega)$, at the radius the estimate names, once
+the $L^{2^{\star}}$ seminorms of the differences are bounded on the ball. Below
+$L^2$ no interpolation is needed, the embedding factoring through the $L^2$ one
+along the inclusion a finite measure supplies.
+
+That range is optimal, as
+`EllipticPdes.Embedding.not_isCompactOperator_critEmb`: at $2^{\star}$ itself
+the embedding is bounded and not compact. Dilating by $\lambda$ scales the
+$L^p$ seminorm by $\lambda^{d/p}$ and each derivative by $\lambda^{-1}$
+(`EllipticPdes.Analysis.eLpNorm_comp_smul` and
+`EllipticPdes.Embedding.eLpNorm_partialD_dilate`), so the renormalised dilates
+$\lambda^{1-d/2}\varphi(\cdot/\lambda)$ of a bump keep their $L^{2^{\star}}$
+norm and their gradient norm while losing their $L^2$ norm, and their images
+have no convergent subsequence.
 
 The Hölder estimate chains the $H^2$ estimate through Morrey's inequality on a
 ball. Supporting layers supply Morrey's inequality itself, the

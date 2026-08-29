@@ -173,4 +173,189 @@ theorem contDiffOn_holder_of_gradClosed (hd : 0 < d) (c : EuclideanSpace ℝ (Fi
       exact hsum.congr fun y hy => (hfd i (by omega) y hy).fderiv
   exact ⟨v, hvae, hvhol, hcn, hfd⟩
 
+
+/-! ### The Hölder exponent Guo leaves open -/
+
+/-- **The Hölder clause at a general exponent.** The ladder run for `s` rungs lands at any `P`
+the reciprocal relation `1/2 - s/d ≤ 1/P` admits, and Morrey at `P > d` reads off the exponent
+`1 - d/P`. The fixed exponent `1/2` of `contDiffOn_holder_of_gradClosed` is this at `s = ⌊d/2⌋`
+and `P = 2d`. -/
+theorem exists_holderOnWith_of_gradClosed (hd : 0 < d) (c : EuclideanSpace ℝ (Fin d))
+    {r R : ℝ} (hr : 0 < r) (hrR : r < R)
+    {ι : Type*} {F : ι → EuclideanSpace ℝ (Fin d) → ℝ} {nxt : ι → Fin d → ι}
+    {dep : ι → ℕ} {m : ℕ} (hdep : ∀ i k, dep (nxt i k) ≤ dep i + 1)
+    (hgrad : ∀ i, dep i < m → HasWeakGradOn (Metric.ball c R) (F i) (fun k => F (nxt i k)))
+    (hmem : ∀ i, dep i ≤ m → MemLp (F i) 2 (volume.restrict (Metric.ball c R)))
+    {s : ℕ} {P : ℝ≥0} (hsd : 2 * s ≤ d) (hP2 : (2 : ℝ≥0) ≤ P) (hPd : (d : ℝ) < (P : ℝ))
+    (hPs : 2⁻¹ - (s : ℝ) * (d : ℝ)⁻¹ ≤ (P : ℝ)⁻¹)
+    (i : ι) (hi : dep i + 1 + s ≤ m) :
+    ∃ w : EuclideanSpace ℝ (Fin d) → ℝ,
+      w =ᵐ[volume.restrict (Metric.ball c r)] F i ∧
+        ∃ M : ℝ≥0, HolderOnWith M (morreyExponent d (P : ℝ)) w (Metric.ball c r) := by
+  haveI : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
+    ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
+  have hcast : ((P : ℝ≥0) : ℝ≥0∞) = ENNReal.ofReal (P : ℝ) := by
+    rw [ENNReal.ofReal_coe_nnreal]
+  -- The gradient coordinates reach `L^P` on the inner ball.
+  have hgradP : ∀ k, MemLp (F (nxt i k)) (ENNReal.ofReal (P : ℝ))
+      (volume.restrict (Metric.ball c r)) := by
+    intro k
+    have h := memLp_of_gradClosed_fullStep hd c hdep s hsd hP2 hPs hr hrR hgrad hmem
+      (nxt i k) (by have := hdep i k; omega)
+    rwa [hcast] at h
+  -- The member itself is integrable there.
+  have hFint : IntegrableOn (F i) (Metric.ball c r) volume :=
+    ((hmem i (by omega)).mono_measure
+      (Measure.restrict_mono (Metric.ball_subset_ball hrR.le) le_rfl)).integrable (by norm_num)
+  have hgradr : HasWeakGradOn (Metric.ball c r) (F i) (fun k => F (nxt i k)) :=
+    (hgrad i (by omega)).mono (Metric.ball_subset_ball hrR.le)
+  obtain ⟨C, hC⟩ := morrey_ball hd hPd c hr
+  obtain ⟨w, hwae, hwhol⟩ := hC (F i) (fun k => F (nxt i k)) hFint hgradP hgradr
+  exact ⟨w, hwae, ⟨_, hwhol⟩⟩
+
+/-- **Guo's free Hölder exponent in even dimension.** When `d/2` is an integer, which at `p = 2`
+is Guo's case `n/p ∈ ℕ`, the ladder reaches every finite exponent, so the Hölder exponent may be
+any value in `(0,1)`. In odd dimension the reciprocal `1/2 - ⌊d/2⌋/d = 1/(2d)` caps the exponent
+at `2d` and the Hölder exponent at `1/2`, which is Guo's other case. -/
+theorem exists_holderOnWith_of_gradClosed_even (hd : 0 < d) (hdeven : 2 * (d / 2) = d)
+    (c : EuclideanSpace ℝ (Fin d)) {r R : ℝ} (hr : 0 < r) (hrR : r < R)
+    {ι : Type*} {F : ι → EuclideanSpace ℝ (Fin d) → ℝ} {nxt : ι → Fin d → ι}
+    {dep : ι → ℕ} {m : ℕ} (hdep : ∀ i k, dep (nxt i k) ≤ dep i + 1)
+    (hgrad : ∀ i, dep i < m → HasWeakGradOn (Metric.ball c R) (F i) (fun k => F (nxt i k)))
+    (hmem : ∀ i, dep i ≤ m → MemLp (F i) 2 (volume.restrict (Metric.ball c R)))
+    {γ : ℝ≥0} (hγ0 : 0 < γ) (hγ1 : γ < 1)
+    (i : ι) (hi : dep i + 1 + d / 2 ≤ m) :
+    ∃ w : EuclideanSpace ℝ (Fin d) → ℝ,
+      w =ᵐ[volume.restrict (Metric.ball c r)] F i ∧
+        ∃ M : ℝ≥0, HolderOnWith M γ w (Metric.ball c r) := by
+  have hdR : (0 : ℝ) < (d : ℝ) := by exact_mod_cast hd
+  have hd2 : (2 : ℕ) ≤ d := by omega
+  have hγ1R : ((γ : ℝ≥0) : ℝ) < 1 := by exact_mod_cast hγ1
+  have hden : (0 : ℝ) < 1 - (γ : ℝ) := by linarith
+  -- The exponent whose Morrey exponent is `γ`.
+  set P : ℝ≥0 := Real.toNNReal ((d : ℝ) / (1 - (γ : ℝ))) with hP_def
+  have hPcoe : ((P : ℝ≥0) : ℝ) = (d : ℝ) / (1 - (γ : ℝ)) := by
+    rw [hP_def, Real.coe_toNNReal _ (by positivity)]
+  have hPd : (d : ℝ) < (P : ℝ) := by
+    rw [hPcoe, lt_div_iff₀ hden]
+    have hγ0R : (0 : ℝ) < (γ : ℝ) := by exact_mod_cast hγ0
+    nlinarith
+  have hP2 : (2 : ℝ≥0) ≤ P := by
+    rw [← NNReal.coe_le_coe, NNReal.coe_ofNat]
+    have : (2 : ℝ) ≤ (d : ℝ) := by exact_mod_cast hd2
+    linarith [hPd]
+  have hPs : 2⁻¹ - ((d / 2 : ℕ) : ℝ) * (d : ℝ)⁻¹ ≤ (P : ℝ)⁻¹ := by
+    have hhalf : ((d / 2 : ℕ) : ℝ) * (d : ℝ)⁻¹ = 2⁻¹ := by
+      have hne : ((d / 2 : ℕ) : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (by omega)
+      have hR : (d : ℝ) = 2 * ((d / 2 : ℕ) : ℝ) := by
+        conv_lhs => rw [hdeven.symm]
+        push_cast
+        ring
+      rw [hR]
+      field_simp
+    rw [hhalf, sub_self]
+    positivity
+  obtain ⟨w, hwae, M, hwhol⟩ := exists_holderOnWith_of_gradClosed hd c hr hrR hdep hgrad hmem
+    (s := d / 2) (P := P) (by omega) hP2 hPd hPs i hi
+  refine ⟨w, hwae, M, ?_⟩
+  have hexp : morreyExponent d (P : ℝ) = γ := by
+    have := coe_morreyExponent (d := d) hPd hd
+    refine NNReal.coe_injective ?_
+    have hdne : (d : ℝ) ≠ 0 := ne_of_gt hdR
+    have hdenne : (1 - (γ : ℝ)) ≠ 0 := ne_of_gt hden
+    rw [this, hPcoe, div_div_eq_mul_div, mul_comm (d : ℝ) (1 - (γ : ℝ)), mul_div_assoc,
+      div_self hdne, mul_one]
+    ring
+  rwa [hexp] at hwhol
+
+
+/-- **The Hölder estimate with its constant**, in the shape Guo states: one constant, depending
+on the dimension, the exponent and the ball alone, bounding the Hölder seminorm of every member
+of every family by the `L^P` norms of that member's first derivatives.
+
+`exists_holderOnWith_of_gradClosed` is this with the constant discarded. The remaining step to
+Guo's `‖u‖_{C^{k-1-⌊n/p⌋,γ}} ≤ C‖u‖_{W^{k,p}}` is the ladder's own constant, which takes the
+`L^P` norms here back to the `L²` data. -/
+theorem exists_const_holderOnWith_of_gradClosed (hd : 0 < d) (c : EuclideanSpace ℝ (Fin d))
+    {r R : ℝ} (hr : 0 < r) (hrR : r < R) (ι : Type*)
+    {s : ℕ} {P : ℝ≥0} (hsd : 2 * s ≤ d) (hP2 : (2 : ℝ≥0) ≤ P) (hPd : (d : ℝ) < (P : ℝ))
+    (hPs : 2⁻¹ - (s : ℝ) * (d : ℝ)⁻¹ ≤ (P : ℝ)⁻¹) :
+    ∃ C : ℝ≥0, ∀ {F : ι → EuclideanSpace ℝ (Fin d) → ℝ} {nxt : ι → Fin d → ι}
+      {dep : ι → ℕ} {m : ℕ}, (∀ i k, dep (nxt i k) ≤ dep i + 1) →
+      (∀ i, dep i < m → HasWeakGradOn (Metric.ball c R) (F i) (fun k => F (nxt i k))) →
+      (∀ i, dep i ≤ m → MemLp (F i) 2 (volume.restrict (Metric.ball c R))) →
+      ∀ i, dep i + 1 + s ≤ m →
+        ∃ w : EuclideanSpace ℝ (Fin d) → ℝ,
+          w =ᵐ[volume.restrict (Metric.ball c r)] F i ∧
+            HolderOnWith
+              (C * ∑ k, (eLpNorm (F (nxt i k)) (ENNReal.ofReal (P : ℝ))
+                          (volume.restrict (Metric.ball c r))).toNNReal)
+              (morreyExponent d (P : ℝ)) w (Metric.ball c r) := by
+  haveI : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
+    ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
+  have hcast : ((P : ℝ≥0) : ℝ≥0∞) = ENNReal.ofReal (P : ℝ) := by
+    rw [ENNReal.ofReal_coe_nnreal]
+  obtain ⟨C, hC⟩ := morrey_ball hd hPd c hr
+  refine ⟨C, fun {F nxt dep m} hdep hgrad hmem i hi => ?_⟩
+  have hgradP : ∀ k, MemLp (F (nxt i k)) (ENNReal.ofReal (P : ℝ))
+      (volume.restrict (Metric.ball c r)) := by
+    intro k
+    have h := memLp_of_gradClosed_fullStep hd c hdep s hsd hP2 hPs hr hrR hgrad hmem
+      (nxt i k) (by have := hdep i k; omega)
+    rwa [hcast] at h
+  have hFint : IntegrableOn (F i) (Metric.ball c r) volume :=
+    ((hmem i (by omega)).mono_measure
+      (Measure.restrict_mono (Metric.ball_subset_ball hrR.le) le_rfl)).integrable (by norm_num)
+  have hgradr : HasWeakGradOn (Metric.ball c r) (F i) (fun k => F (nxt i k)) :=
+    (hgrad i (by omega)).mono (Metric.ball_subset_ball hrR.le)
+  exact hC (F i) (fun k => F (nxt i k)) hFint hgradP hgradr
+
+
+/-- **Guo's clause (ii) with its constant, against the `L²` data.** Composing the ladder's
+constant with Morrey's gives one constant, depending on the dimension, the rung count, the
+exponent and the two radii, bounding the Hölder seminorm of every member by a uniform `L²` bound
+on the family over the outer ball. This is the shape of Guo's
+`‖u‖_{C^{k-1-⌊n/p⌋,γ}} ≤ C‖u‖_{W^{k,p}}` at `p = 2`. -/
+theorem exists_const_holderOnWith_of_gradClosed_of_bound (hd : 0 < d)
+    (c : EuclideanSpace ℝ (Fin d)) {r R : ℝ} (hr : 0 < r) (hrR : r < R) (ι : Type*)
+    {s : ℕ} {P : ℝ≥0} (hsd : 2 * s ≤ d) (hP2 : (2 : ℝ≥0) ≤ P) (hPd : (d : ℝ) < (P : ℝ))
+    (hPs : 2⁻¹ - (s : ℝ) * (d : ℝ)⁻¹ ≤ (P : ℝ)⁻¹) :
+    ∃ C : ℝ≥0, ∀ {F : ι → EuclideanSpace ℝ (Fin d) → ℝ} {nxt : ι → Fin d → ι}
+      {dep : ι → ℕ} {m : ℕ}, (∀ i k, dep (nxt i k) ≤ dep i + 1) →
+      (∀ i, dep i < m → HasWeakGradOn (Metric.ball c R) (F i) (fun k => F (nxt i k))) →
+      (∀ i, dep i ≤ m → MemLp (F i) 2 (volume.restrict (Metric.ball c R))) →
+      ∀ M : ℝ≥0, (∀ j, dep j ≤ m → eLpNorm (F j) 2 (volume.restrict (Metric.ball c R)) ≤ M) →
+      ∀ i, dep i + 1 + s ≤ m →
+        ∃ w : EuclideanSpace ℝ (Fin d) → ℝ,
+          w =ᵐ[volume.restrict (Metric.ball c r)] F i ∧
+            HolderOnWith (C * M) (morreyExponent d (P : ℝ)) w (Metric.ball c r) := by
+  obtain ⟨Cm, hCm⟩ := exists_const_holderOnWith_of_gradClosed hd c hr hrR ι hsd hP2 hPd hPs
+  obtain ⟨K, hK⟩ := exists_const_eLpNorm_le_of_gradClosed_fullStep hd c ι s hsd hP2 hPs hr hrR
+  have hcast : ((P : ℝ≥0) : ℝ≥0∞) = ENNReal.ofReal (P : ℝ) := by
+    rw [ENNReal.ofReal_coe_nnreal]
+  refine ⟨Cm * d * K, ?_⟩
+  intro F nxt dep m hdep hgrad hmem M hM i hi
+  obtain ⟨w, hwae, hwhol⟩ := hCm hdep hgrad hmem i hi
+  refine ⟨w, hwae, hwhol.mono_const ?_⟩
+  have hterm : ∀ k : Fin d, (eLpNorm (F (nxt i k)) (ENNReal.ofReal (P : ℝ))
+      (volume.restrict (Metric.ball c r))).toNNReal ≤ K * M := by
+    intro k
+    have h := hK hdep hgrad hmem M hM (nxt i k) (by have := hdep i k; omega)
+    rw [hcast] at h
+    have hcoe' : eLpNorm (F (nxt i k)) (ENNReal.ofReal (P : ℝ))
+        (volume.restrict (Metric.ball c r)) ≤ ((K * M : ℝ≥0) : ℝ≥0∞) := by
+      rwa [ENNReal.coe_mul]
+    have hne : eLpNorm (F (nxt i k)) (ENNReal.ofReal (P : ℝ))
+        (volume.restrict (Metric.ball c r)) ≠ ⊤ :=
+      ne_top_of_le_ne_top ENNReal.coe_ne_top hcoe'
+    simpa using (ENNReal.toNNReal_le_toNNReal hne ENNReal.coe_ne_top).mpr hcoe'
+  calc Cm * ∑ k, (eLpNorm (F (nxt i k)) (ENNReal.ofReal (P : ℝ))
+          (volume.restrict (Metric.ball c r))).toNNReal
+      ≤ Cm * ∑ _k : Fin d, K * M := by
+        gcongr with k _
+        exact hterm k
+    _ = Cm * d * K * M := by
+        rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+        ring
+
 end EllipticPdes.Embedding

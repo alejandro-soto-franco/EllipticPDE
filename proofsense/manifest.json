@@ -303,6 +303,60 @@
       "source_id": "evans-2010",
       "locator": "§5.6.3 Thm 6",
       "claim": "formalises clause (ii) read at the root of that family: the class itself has a representative of class C^k on the ball, Holder-1/2 there, whenever its weak derivatives reach order k + 1 + floor(d/2). This is the statement Evans writes for u, the multi-index form above being the statement for every D^alpha u at once"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.eLpNorm_le_of_mem_H01",
+      "source_id": "evans-2010",
+      "locator": "§5.6.1 Thm 3",
+      "claim": "formalises the estimate at the critical exponent alone, and on an arbitrary measurable Omega in place of a bounded open one. Evans states the range q in [1, p*] for a bounded U, and his proof reaches q = p* by approximating u in W_0^{1,p}(U) with C_c^infty(U) functions and applying Theorem 1 to the zero extension, using |U| < infinity only to drop from p* to a smaller q. At p = 2 that first half is what this states. The seminorm is the ENNReal-valued one and the gradient is read off the graph coordinates, so the right-hand side is the sum of the coordinate norms rather than ||Du||_{L^2}, and the constant is Mathlib's Gagliardo-Nirenberg-Sobolev constant, which depends on the dimension and the exponent alone where Evans lets C depend on U as well"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.eLpNorm_le_of_mem_H01_of_isBounded",
+      "source_id": "evans-2010",
+      "locator": "§5.6.1 Thm 3",
+      "claim": "formalises the theorem at p = 2 on a bounded measurable Omega: every exponent q with 1/q >= 1/2 - 1/d, the critical one included, is bounded by the gradient coordinates alone, and the dimension condition p < n reads 2 < d. Evans asks U bounded and open and writes the range as q in [1, p*]; the reciprocal form leaves q below 1 admissible, where he starts at 1, and on a domain of finite measure those exponents are weaker still. The constant is Mathlib's, which carries the measure of Omega through the factor |Omega|^(1/q - 1/p*) that Evans absorbs into C"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.eLpNorm_le_rpow_mul_rpow",
+      "source_id": "evans-2010",
+      "locator": "App. B (h)",
+      "claim": "formalises the interpolation inequality for L^p norms in the ENNReal-valued seminorm, at finite positive exponents and with a real parameter theta in (0,1), the reciprocal relation written 1/q = theta/r + (1-theta)/s. Evans states it for 1 <= s <= r <= t <= infinity and u in the intersection of the two end spaces; the seminorm form asks no membership, since an infinite right-hand side makes the bound vacuous, and the ordering of the three exponents follows from the relation rather than being assumed. The proof is his, Holder against the splitting of |u|^r into the two powers"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.rellichEmbL_isCompact",
+      "source_id": "evans-2010",
+      "locator": "§5.7 Thm 1",
+      "claim": "formalises the theorem at p = 2 in the zero-boundary form: on a bounded measurable Omega, with no regularity of the boundary and no extension operator, the embedding of H_0^1(Omega) into L^q(Omega) is a compact operator for every q strictly between 2 and the Sobolev conjugate, that range being written as the reciprocal relation 1/q = theta/2 + (1-theta)/2* with theta in (0,1). Evans asks a C^1 boundary and writes the range as 1 <= q < p*. His q = p endpoint is embL2_isCompact here, proved from a translation modulus, and it supplies the net this argument refines; the exponents below 2 are not formalised. The interpolation step of his proof is eLpNorm_le_rpow_mul_rpow, applied between L^2 and L^{2*} where he interpolates between L^1 and L^{p*}"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.rellichEmbL_isCompact_of_le",
+      "source_id": "evans-2010",
+      "locator": "§5.7 Thm 1",
+      "claim": "formalises the same theorem at the exponents up to 2, where no interpolation is needed: the embedding factors through the L^2 one, the finite measure of a bounded domain supplying the inclusion of L^2 into L^q as a continuous linear map, so compactness is inherited from embL2_isCompact. With rellichEmbL_isCompact this covers Evans' range 1 <= q < p* at p = 2, in the zero-boundary form that asks no regularity of the boundary"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.rellichEmbL_isCompact_of_lt",
+      "source_id": "evans-2010",
+      "locator": "§5.7 Thm 1",
+      "claim": "formalises the theorem at p = 2 over its whole range, in the zero-boundary form: on a bounded measurable Omega the embedding of H_0^1(Omega) into L^q(Omega) is a compact operator for every q below the Sobolev conjugate, where Evans asks a bounded open U with C^1 boundary and writes the range as 1 <= q < p*. The lower bound q >= 1 is the Fact instance the target space needs. The interpolation parameter of the exponents above 2 is recovered from q < 2* here rather than assumed, and the two halves are rellichEmbL_isCompact_of_le and rellichEmbL_isCompact"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed_even",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "formalises the interval clause (ii) leaves open. When n/p is an integer, which at p = 2 is an even dimension, Evans allows any positive gamma below 1; the ladder reaches every finite exponent after d/2 rungs, since the reciprocal it lands on is zero, so Morrey reads off 1 - d/P and P = d/(1 - gamma) realises each gamma. contDiffOn_holder_of_gradClosed fixes the single choice 1/2, which is the forced value in odd dimension and one admissible value here"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.exists_const_eLpNorm_le_of_gradClosed_fullStep",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "formalises the estimate of clause (i) at p = 2, on a family closed under weak differentiation in place of a single W^{k,p} function: one constant, depending on the dimension, the rung count, the exponent and the two radii and quantified before the family, takes a uniform L^2 bound over the outer ball to the L^q bound on the inner one. Evans writes the norm on the right as ||u||_{W^{k,p}(U)} with C depending on k, p, n and U; the uniform bound over the members the rungs consume is that norm here, and the domain pair is two concentric balls in place of a bounded U with C^1 boundary. memLp_of_gradClosed_fullStep is this with the constant discarded"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.exists_const_holderOnWith_of_gradClosed_of_bound",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "formalises the estimate of clause (ii) at p = 2, composing the ladder's constant with Morrey's: one constant, quantified before the family, bounding the Holder seminorm of a member by a uniform L^2 bound over the outer ball. Evans writes ||u||_{C^{k-[n/p]-1,gamma}} <= C||u||_{W^{k,p}(U)}; the seminorm alone is bounded here, the supremum norm of the member being no part of what HolderOnWith records, and the domain pair is two concentric balls"
     }
   ]
 }
