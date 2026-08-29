@@ -308,3 +308,7 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Analysis.exists_weakLimit' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Analysis.exists_weakLimit
+
+/-- info: 'EllipticPdes.Embedding.exists_minimiser_of_lt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.exists_minimiser_of_lt

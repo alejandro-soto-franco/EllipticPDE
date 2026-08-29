@@ -100,6 +100,7 @@ import EllipticPdes.Embedding.H01Sobolev
 import EllipticPdes.Embedding.SobolevSolution
 import EllipticPdes.Embedding.RellichLq
 import EllipticPdes.Embedding.SobolevSharp
+import EllipticPdes.Embedding.DirectMethod
 import EllipticPdes.Regularity.InteriorHolderSolution
 
 /-!

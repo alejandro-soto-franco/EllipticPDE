@@ -197,4 +197,20 @@ theorem mem_of_weakLimit {K : Submodule ℝ H} (hK : IsClosed (K : Set H)) (hu :
     exact this
   rwa [Submodule.orthogonal_orthogonal] at hperp
 
+
+omit [CompleteSpace H] in
+/-- The weak limit of a sequence whose norms converge is bounded by that limit. -/
+theorem norm_weakLimit_le_of_tendsto {m : ℝ} (hm : Tendsto (fun k => ‖u k‖) atTop (𝓝 m))
+    (hw : ∀ v : H, Tendsto (fun k => ⟪u k, v⟫) atTop (𝓝 ⟪w, v⟫)) :
+    ‖w‖ ≤ m := by
+  have hm0 : 0 ≤ m := ge_of_tendsto hm (Eventually.of_forall (fun k => norm_nonneg _))
+  rcases eq_or_lt_of_le (norm_nonneg w) with h | h
+  · exact h ▸ hm0
+  · have hlim : Tendsto (fun k => ⟪u k, w⟫) atTop (𝓝 (‖w‖ ^ 2)) := by
+      simpa [real_inner_self_eq_norm_sq] using hw w
+    have hsq : ‖w‖ ^ 2 ≤ m * ‖w‖ :=
+      le_of_tendsto_of_tendsto' hlim (hm.mul_const ‖w‖)
+        (fun k => le_trans (real_inner_le_norm _ _) le_rfl)
+    nlinarith
+
 end EllipticPdes.Analysis

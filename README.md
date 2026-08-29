@@ -72,6 +72,14 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   converge against every vector, which is Evans §D.4 Theorem 3 read through Riesz
   representation and the compactness the direct method of the calculus of
   variations runs on,
+- the direct method under a subcritical constraint, as
+  `EllipticPdes.Embedding.exists_minimiser_of_lt`: on the unit ball the $H_0^1$
+  norm attains its minimum on the functions of unit $L^q$ norm for
+  $2 \le q < 2^{\star}$, the weak limit of a minimising sequence coming from
+  `exists_weakLimit` and the constraint passing to that limit through
+  `rellichEmbL_isCompact_of_lt`. At $2^{\star}$ the second step fails, which is
+  the exponent restriction Guo writes as $p + 1 < 2^{\star}$ for
+  $-\Delta u = u^p$,
 - the two general Sobolev estimates with their constants, as
   `EllipticPdes.Embedding.exists_const_eLpNorm_le_of_gradClosed_fullStep` and
   `EllipticPdes.Embedding.exists_const_holderOnWith_of_gradClosed_of_bound`: one

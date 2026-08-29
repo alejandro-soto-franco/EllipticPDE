@@ -363,6 +363,12 @@
       "source_id": "evans-2010",
       "locator": "App. D (Thm 3)",
       "claim": "formalises weak compactness for a real Hilbert space, where Evans states it for a reflexive Banach space: a bounded sequence has a subsequence whose inner products against every vector converge to the inner products against one vector, which is his weak convergence read through Riesz representation. The proof is the sequential one his reflexive statement leaves to Banach-Alaoglu: a diagonal over the countable family of inner products against the sequence itself, extended to the closed span by the uniform bound and to the whole space by orthogonal decomposition, so no separability of the space is assumed"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.exists_minimiser_of_lt",
+      "source_id": "evans-2010",
+      "locator": "§8.4.1 Thm 1",
+      "claim": "formalises the existence of a constrained minimiser, with three differences from the statement as written. The constraint is the unit sphere of L^q rather than the vanishing of an integral of a general G, which is that constraint at G(z) = |z|^q minus a constant; the functional minimised is the H_0^1 norm rather than the Dirichlet energy, and Poincare makes the two equivalent on a bounded domain; and the exponent is restricted to q below the Sobolev conjugate, which is where rellichEmbL_isCompact_of_lt takes the constraint to the weak limit and where Evans' growth condition on G is spent. The domain is the unit ball, where the constraint set is inhabited by a renormalised bump"
     }
   ]
 }
