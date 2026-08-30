@@ -84,6 +84,7 @@ import EllipticPdes.Embedding.SobolevLadderCompactSupport
 import EllipticPdes.Embedding.SobolevLadderFullStep
 import EllipticPdes.Embedding.SobolevLadderGeneral
 import EllipticPdes.Embedding.HolderGeneral
+import EllipticPdes.Extension.C1Test
 import EllipticPdes.Extension.Reflect
 import EllipticPdes.Extension.Translate
 import EllipticPdes.Analysis.LpTranslationContinuity
