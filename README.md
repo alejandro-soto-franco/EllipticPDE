@@ -95,6 +95,13 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   `principalEigenvalue_le_of_weak_eigen` placing $\lambda_1$ below every weak
   eigenvalue and `dirichlet_principal_eigenpair` the instance at $-\Delta$ on a
   bounded measurable domain,
+- the later eigenvalues by constrained minimisation, as
+  `EllipticPdes.Sobolev.exists_higher_eigenpair`: minimising over the part of
+  the unit $L^2$ sphere orthogonal to a finite orthonormal family of
+  eigenfunctions produces another eigenpair, whose eigenvalue is at least
+  $\lambda_1$. The multipliers of the extra constraints drop out, since
+  $B[u, w_i] = \lambda_i \langle u, w_i \rangle_{L^2} = 0$ on the admissible
+  complement, so the minimiser is a weak eigenfunction of the whole space,
 - the optimal constant in the Poincaré inequality, as
   `EllipticPdes.Sobolev.dirichlet_poincare_sharp` with the equality case
   `dirichlet_poincare_attained`: $\lambda_1 \|u\|_{L^2}^2 \le \int |\nabla u|^2$

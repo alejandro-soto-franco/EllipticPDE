@@ -105,6 +105,7 @@ import EllipticPdes.Analysis.LqEulerLagrange
 import EllipticPdes.Embedding.DirectMethod
 import EllipticPdes.Regularity.InteriorHolderSolution
 import EllipticPdes.Spectrum.Variational
+import EllipticPdes.Spectrum.HigherEigenvalues
 
 /-!
 # EllipticPdes

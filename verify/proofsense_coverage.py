@@ -125,6 +125,17 @@ EXEMPT = {
         "Taibleson and Weiss, which is not transcribed, so no transcribed "
         "statement matches the direction this declaration proves"
     ),
+    "EllipticPdes.Sobolev.exists_higher_eigenpair": (
+        "obtains a later eigenpair by minimising the Rayleigh quotient over "
+        "the part of the unit sphere orthogonal to a finite family of "
+        "eigenfunctions. Evans reaches the later eigenvalues only through the "
+        "spectral theorem for the compact self-adjoint solution operator, "
+        "6.5.1 Theorem 1, and states no theorem that a constrained minimum is "
+        "an eigenpair; the ordering appears as a Remark after 6.5.1 Theorem 2 "
+        "rather than as a statement, and Courant's min-max is in neither "
+        "transcribed source, so no transcribed statement matches it. The "
+        "unconstrained case is warranted at exists_principal_eigenpair"
+    ),
     "EllipticPdes.Analysis.hasDerivAt_integral_abs_rpow": (
         "differentiation under the integral sign for the L^q functional, a "
         "step Evans takes inside the proof of 8.4.1 Theorem 2 and states as "

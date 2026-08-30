@@ -340,3 +340,7 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Embedding.exists_weakSolution_semilinear_of_lt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Embedding.exists_weakSolution_semilinear_of_lt
+
+/-- info: 'EllipticPdes.Sobolev.exists_higher_eigenpair' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.exists_higher_eigenpair
