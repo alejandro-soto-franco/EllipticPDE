@@ -344,3 +344,19 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Sobolev.exists_higher_eigenpair' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Sobolev.exists_higher_eigenpair
+
+/-- info: 'EllipticPdes.Analysis.exists_bilin_minimiser' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Analysis.exists_bilin_minimiser
+/-- info: 'EllipticPdes.Analysis.euler_lagrange_of_bilin_min' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Analysis.euler_lagrange_of_bilin_min
+/-- info: 'EllipticPdes.Embedding.exists_weakSolution_dirichlet_of_lt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.exists_weakSolution_dirichlet_of_lt
+/-- info: 'EllipticPdes.Embedding.exists_weakSolution_dirichlet_of_lt'' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.exists_weakSolution_dirichlet_of_lt'
+/-- info: 'EllipticPdes.Sobolev.dirichlet_principal_eigenpair_of_bounded' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.dirichlet_principal_eigenpair_of_bounded

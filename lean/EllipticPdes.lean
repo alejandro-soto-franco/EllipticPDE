@@ -94,6 +94,7 @@ import EllipticPdes.Spectrum.Spectrum
 import EllipticPdes.Spectrum.RellichDischarge
 import EllipticPdes.BoundedInstances
 import EllipticPdes.Analysis.WeakCompactness
+import EllipticPdes.Analysis.DirectMethodForm
 import EllipticPdes.Analysis.LpInterpolation
 import EllipticPdes.Analysis.Dilation
 import EllipticPdes.Embedding.H01Sobolev
@@ -103,6 +104,7 @@ import EllipticPdes.Embedding.SobolevSharp
 import EllipticPdes.Analysis.LqDerivative
 import EllipticPdes.Analysis.LqEulerLagrange
 import EllipticPdes.Embedding.DirectMethod
+import EllipticPdes.Embedding.DirichletSemilinear
 import EllipticPdes.Regularity.InteriorHolderSolution
 import EllipticPdes.Spectrum.Variational
 import EllipticPdes.Spectrum.HigherEigenvalues

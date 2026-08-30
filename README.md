@@ -87,6 +87,14 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   asserted to exist. The constraint is differentiated by
   `EllipticPdes.Analysis.hasDerivAt_integral_abs_rpow`, and the abstract form of
   the equation is `EllipticPdes.Analysis.euler_lagrange_of_norm_min`,
+- the same equation with no lower-order term, as
+  `EllipticPdes.Embedding.exists_weakSolution_dirichlet_of_lt`: minimising the
+  Dirichlet energy $\int|\nabla u|^2$ in place of the graph norm gives a weak
+  solution of $-\Delta u = \lambda|u|^{q-2}u$ with
+  $\lambda = \int|\nabla u|^2 > 0$, which is the equation of Guo IX.1 and of
+  Evans §8.4.1 Theorem 2. The minimiser comes from the abstract direct method
+  `EllipticPdes.Analysis.exists_bilin_minimiser` and the equation from
+  `EllipticPdes.Analysis.euler_lagrange_of_bilin_min`,
 - the variational principle for the principal eigenvalue, as
   `EllipticPdes.Sobolev.exists_principal_eigenpair`: for a symmetric coercive
   form with the Rellich compact embedding, the infimum
@@ -94,7 +102,8 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   solves $B[u,v] = \lambda_1 (u,v)$ for every $v$, with
   `principalEigenvalue_le_of_weak_eigen` placing $\lambda_1$ below every weak
   eigenvalue and `dirichlet_principal_eigenpair` the instance at $-\Delta$ on a
-  bounded measurable domain,
+  bounded measurable domain. `dirichlet_principal_eigenpair_of_bounded` asks for
+  boundedness alone, the Poincaré inequality naming the coercivity constant,
 - the later eigenvalues by constrained minimisation, as
   `EllipticPdes.Sobolev.exists_higher_eigenpair`: minimising over the part of
   the unit $L^2$ sphere orthogonal to a finite orthonormal family of
@@ -188,7 +197,12 @@ $t \mapsto \|U + tV\|^2 - \lambda\|T(U + tV)\|_{L^q}^2$, which vanishes at
 $t = 0$ and is nonnegative everywhere, since rescaling $U + tV$ back to the
 constraint set is admissible wherever its image is nonzero. Homogeneity of the
 `L^q` norm is what makes that rescaling available and replaces the implicit
-function theorem Evans applies to a general constraint.
+function theorem Evans applies to a general constraint. The same argument runs
+at any symmetric positive semidefinite form in place of the squared norm, since
+it uses only the quadratic expansion of $Q(U + tV)$ and the degree-two
+homogeneity of $Q$: `EllipticPdes.Analysis.euler_lagrange_of_quadratic_min` is
+that statement, and at the Dirichlet form it gives Guo's equation with no
+lower-order term.
 
 The eigenvalue chapter has two independent routes to the Dirichlet spectrum.
 `solOp_spectral` runs the spectral theorem for the compact self-adjoint solution
@@ -199,9 +213,12 @@ lower semicontinuity of the form is the expansion of
 $0 \le B[u_k - w, u_k - w]$ against $B[u_k, w] \to B[w, w]$, and the
 Euler-Lagrange step is one variable, the map
 $t \mapsto B[u + tv, u + tv] - \lambda_1\|u + tv\|_{L^2}^2$ being a quadratic
-that vanishes at $t = 0$ and is nonnegative everywhere. Positivity of the
-minimiser and simplicity of $\lambda_1$, the remaining clauses of Evans §6.5.1
-Theorem 2, need the maximum principle and are open.
+that vanishes at $t = 0$ and is nonnegative everywhere.
+`exists_bilin_minimiser` states the direct method once, for a symmetric
+coercive form and any compact constraint map into a normed space, and both the
+Rayleigh problem and the semilinear problem are instances of it. Positivity of
+the minimiser and simplicity of $\lambda_1$, the remaining clauses of Evans
+§6.5.1 Theorem 2, need the maximum principle and are open.
 
 Boundary $H^2$ regularity has its foundations in place and its headline estimate
 open: the half-ball geometry, tangential difference quotients with their $H_0^1$

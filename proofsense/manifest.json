@@ -399,6 +399,36 @@
       "source_id": "evans-2010",
       "locator": "§8.4.1 Thm 2",
       "claim": "instantiates the Lagrange multiplier equation (10) at the subcritical minimiser on the unit ball, so the pair (u, lambda) solves the nonlinear eigenvalue problem of the Remark after the theorem. The equation differs from -Delta u = lambda g(u) by the lower-order term: the inner product of the graph encoding is the integral of uv plus the integral of the gradients, so the identity is the weak form of -Delta u + u = lambda |u|^{q-2} u. The multiplier is the square of the H_0^1 norm of the minimiser, where Evans asserts only that some real lambda exists, and the exponent is restricted to q below the Sobolev conjugate, which is where the compactness supplying the minimiser is spent"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.exists_bilin_minimiser",
+      "source_id": "evans-2010",
+      "locator": "§8.4.1 Thm 1",
+      "claim": "states the existence of a constrained minimiser in the abstract setting the proof uses: a symmetric coercive form on a real Hilbert space attains its minimum on the set where a compact linear map into a normed space has unit norm. Evans minimises the Dirichlet energy I over the admissible class J[w] = 0 on a bounded connected smooth domain, and the two steps are the same, a weak limit of a minimising sequence and the passage of the constraint to that limit through compactness. Three differences: the constraint is the unit sphere of the image rather than the vanishing of an integral of a smooth G, so Evans's growth bound (3) has no counterpart; the compactness is a hypothesis on the map rather than the Rellich theorem at a fixed pair of exponents; and the target of the map is any normed space, the identification of the strong limit with the image of the weak limit going through the dual rather than through an adjoint"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.euler_lagrange_of_bilin_min",
+      "source_id": "evans-2010",
+      "locator": "§8.4.1 Thm 2",
+      "claim": "formalises the Lagrange multiplier equation (10) with the Dirichlet energy replaced by a symmetric positive semidefinite form B: a minimiser of B[W, W] over the unit L^q sphere of the image of T satisfies B[U, V] = B[U, U] times the integral of |TU|^{q-2} (TU)(TV) for every V. Evans states the constraint as the vanishing of the integral of a smooth G obeying (3), which at G(z) = |z|^q / q minus a constant gives g(z) = |z|^{q-2} z and this constraint. Two differences from Evans: the multiplier is named rather than merely asserted to exist, being the minimum itself, and the differentiation of the constraint uses the homogeneity of the L^q norm in place of the implicit function theorem, rescaling U + tV back to the sphere"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.exists_weakSolution_dirichlet_of_lt",
+      "source_id": "evans-2010",
+      "locator": "§8.4.1 Thm 2",
+      "claim": "instantiates the Lagrange multiplier equation (10) at the minimiser of the Dirichlet energy on the unit L^q sphere of the unit ball, so the pair (u, lambda) solves the nonlinear eigenvalue problem (11) of the Remark, -Delta u = lambda |u|^{q-2} u with zero boundary data, for 2 <= q below the Sobolev conjugate. This is Evans's equation with no lower-order term, where exists_weakSolution_semilinear_of_lt minimises the graph norm instead and reaches -Delta u + u = lambda |u|^{q-2} u. Two differences from Evans: the multiplier is the minimum of the Dirichlet energy, stated and shown positive, where Evans asserts only that some real lambda exists; and G(z) = |z|^q / q exceeds the quadratic growth (4) once q > 2, so the compactness supplying the minimiser is the Rellich theorem below the critical exponent rather than the L^2 convergence Evans uses in Theorem 1"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.exists_weakSolution_dirichlet_of_lt'",
+      "source_id": "evans-2010",
+      "locator": "§8.4.1 Thm 2",
+      "claim": "the identity (10) of the previous warrant written over the gradient coordinates of the graph encoding, so that the left side is the sum over i of the L^2 pairings of the weak partials of u and v, which is the integral of the scalar product of Du with Dv, and the multiplier lambda is displayed as the Dirichlet energy of u. Same theorem, same proof, unfolded once so that both sides read as Evans writes them"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.dirichlet_principal_eigenpair_of_bounded",
+      "source_id": "evans-2010",
+      "locator": "§6.5.1 Thm 2",
+      "claim": "instantiates clauses (i) and (ii) at L = -Delta with Dirichlet data, with boundedness and measurability of Omega as the only hypotheses: the Poincare inequality of poincare_H01_of_bounded discharges coercivity and embL2_isCompact discharges the compact embedding, where dirichlet_principal_eigenpair takes both as abstract hypotheses. The positivity of lambda_1 that Evans states in the Definition preceding the theorem is included. Two clauses of Evans are absent: the positivity of w_1 within U and the simplicity of lambda_1, both of which rest on the maximum principle. The eigenvalue named is that of the graph inner product on H_0^1, which exceeds the eigenvalue of -Delta by one, the function coordinate being a summand of the graph norm"
     }
   ]
 }

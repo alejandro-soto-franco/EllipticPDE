@@ -151,4 +151,27 @@ theorem poincare_H01_of_bounded {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))}
   exact ⟨L ^ 2 / (2 * (n + 1)), by positivity, fun U hU =>
     poincare_H01_of_subset_euclBox hab hsub hL hU⟩
 
+/-- **Coercivity of the Dirichlet form on a bounded domain**, with no abstract Poincaré
+hypothesis. `poincare_H01_of_bounded` names the constant, so the only input is boundedness of
+`Ω`. This is the form of coercivity the direct method uses, where the domain is a ball and no
+box structure is at hand. -/
+theorem dirichletBilin_coercive_of_bounded {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))}
+    (hΩb : Bornology.IsBounded Ω) : IsCoercive (EllipticPdes.dirichletBilin Ω) := by
+  obtain ⟨C, hC, hpoin⟩ := poincare_H01_of_bounded hΩb
+  have hpos : (0 : ℝ) < C + 1 := by linarith
+  refine ⟨1 / (C + 1), by positivity, fun U => ?_⟩
+  set S : ℝ := ∑ i : Fin (n + 1), ‖(U : H1amb Ω) i.succ‖ ^ 2 with hS
+  have hBUU : EllipticPdes.dirichletBilin Ω U U = S := EllipticPdes.dirichletBilin_self Ω U
+  have hnorm : ‖U‖ ^ 2 = ‖(U : H1amb Ω) 0‖ ^ 2 + S := by
+    rw [show ‖U‖ = ‖(U : H1amb Ω)‖ from rfl, PiLp.norm_sq_eq_of_L2, Fin.sum_univ_succ]
+  have hkey : ‖U‖ * ‖U‖ ≤ (C + 1) * S := by
+    have h1 : ‖U‖ ^ 2 ≤ (C + 1) * S := by
+      rw [hnorm]
+      nlinarith [hpoin (U : H1amb Ω) U.2]
+    nlinarith [h1]
+  rw [hBUU, mul_assoc]
+  calc 1 / (C + 1) * (‖U‖ * ‖U‖)
+      ≤ 1 / (C + 1) * ((C + 1) * S) := mul_le_mul_of_nonneg_left hkey (by positivity)
+    _ = S := by rw [← mul_assoc, one_div_mul_cancel hpos.ne', one_mul]
+
 end EllipticPdes.Poincare

@@ -5,6 +5,8 @@ Authors: Alejandro Soto Franco
 -/
 import EllipticPdes.Spectrum.RellichDischarge
 import EllipticPdes.Analysis.WeakCompactness
+import EllipticPdes.Analysis.DirectMethodForm
+import EllipticPdes.Poincare.BoundedDomain
 
 /-!
 # Variational characterisation of the principal eigenvalue
@@ -76,9 +78,8 @@ Rayleigh quotient `B[U, U]` over the functions of unit `L²` norm. -/
 def principalEigenvalue (B : H01 Ω →L[ℝ] H01 Ω →L[ℝ] ℝ) : ℝ := sInf (rayleighValues B)
 
 /-- A coercive form is positive semidefinite. -/
-lemma nonneg_of_isCoercive (hco : IsCoercive B) (U : H01 Ω) : 0 ≤ B U U := by
-  obtain ⟨C, hC, hcoer⟩ := hco
-  nlinarith [hcoer U, mul_nonneg (mul_nonneg hC.le (norm_nonneg U)) (norm_nonneg U)]
+lemma nonneg_of_isCoercive (hco : IsCoercive B) (U : H01 Ω) : 0 ≤ B U U :=
+  bilin_self_nonneg hco U
 
 /-- The constraint set is inhabited as soon as some element has a nonzero `L²` class: rescale. -/
 lemma rayleighSphere_nonempty (hne : ∃ V : H01 Ω, embL2 Ω V ≠ 0) :
@@ -296,12 +297,6 @@ theorem exists_rayleigh_minimiser_on (hco : IsCoercive B) (hsymm : ∀ U V : H01
     exact tendsto_nhds_unique h1 h2
   have hwS : w ∈ S := hSclosed (fun k => U (φ k)) w (fun k => hUS (φ k)) hweak
   -- Weak lower semicontinuity of the form.
-  have hBconv : Tendsto (fun k => B (U (φ k)) w) atTop (𝓝 (B w w)) := by
-    have hrw : ∀ x : H01 Ω, ⟪x, hco.continuousLinearEquivOfBilin w⟫ = B x w := by
-      intro x
-      rw [real_inner_comm, hco.continuousLinearEquivOfBilin_apply]
-      exact hsymm w x
-    simpa only [hrw] using hweak (hco.continuousLinearEquivOfBilin w)
   have hBUU : Tendsto (fun n => B (U n) (U n)) atTop (𝓝 (eigenvalueOn B S)) := by
     refine tendsto_of_tendsto_of_tendsto_of_le_of_le (g := fun _ : ℕ => eigenvalueOn B S)
       (h := fun n => eigenvalueOn B S + 1 / ((n : ℝ) + 1)) tendsto_const_nhds ?_
@@ -311,22 +306,9 @@ theorem exists_rayleigh_minimiser_on (hco : IsCoercive B) (hsymm : ∀ U V : H01
     have hsum : Tendsto (fun n : ℕ => eigenvalueOn B S + 1 / ((n : ℝ) + 1)) atTop
         (𝓝 (eigenvalueOn B S + 0)) := tendsto_const_nhds.add hzero
     rwa [add_zero] at hsum
-  have hlim : Tendsto (fun k => 2 * B (U (φ k)) w - B w w) atTop (𝓝 (B w w)) := by
-    have h := (hBconv.const_mul 2).sub_const (B w w)
-    rwa [show 2 * B w w - B w w = B w w by ring] at h
   have hlsc : B w w ≤ eigenvalueOn B S := by
-    refine le_of_tendsto_of_tendsto' hlim (hBUU.comp hφ.tendsto_atTop) (fun k => ?_)
-    have h0 : 0 ≤ B (U (φ k) - w) (U (φ k) - w) := nonneg_of_isCoercive hco _
-    have hexp : B (U (φ k) - w) (U (φ k) - w)
-        = B (U (φ k)) (U (φ k)) - 2 * B (U (φ k)) w + B w w := by
-      have h1 : B (U (φ k) - w) = B (U (φ k)) - B w := by rw [map_sub]
-      rw [h1]
-      simp only [ContinuousLinearMap.sub_apply, map_sub]
-      rw [hsymm w (U (φ k))]
-      ring
-    rw [hexp] at h0
-    simp only [Function.comp_def]
-    linarith
+    refine bilin_le_of_weakLimit hco hsymm hweak ?_
+    simpa [Function.comp_def] using hBUU.comp hφ.tendsto_atTop
   exact ⟨w, hwnorm, hwS, le_antisymm hlsc (eigenvalueOn_le hco hwnorm hwS)⟩
 
 /-- **The infimum of the Rayleigh quotient is attained.** The unconstrained case. -/
@@ -422,5 +404,22 @@ theorem dirichlet_principalEigenvalue_pos (Ω : Set (EuclideanSpace ℝ (Fin d))
     (hne : ∃ V : H01 Ω, embL2 Ω V ≠ 0) :
     0 < principalEigenvalue (dirichletBilin Ω) :=
   principalEigenvalue_pos (dirichletBilin_coercive Ω CP hCP hbase) hne
+
+/-- **The principal Dirichlet eigenpair on a bounded domain**, with no abstract Poincaré
+hypothesis: `EllipticPdes.Poincare.dirichletBilin_coercive_of_bounded` names the constant, so
+boundedness and measurability of `Ω` are the whole input. This is the statement Evans makes, and
+it includes the positivity of `λ₁`. -/
+theorem dirichlet_principal_eigenpair_of_bounded {n : ℕ}
+    (Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))) (hΩm : MeasurableSet Ω)
+    (hΩb : Bornology.IsBounded Ω) (hne : ∃ V : H01 Ω, embL2 Ω V ≠ 0) :
+    ∃ U : H01 Ω, ‖embL2 Ω U‖ = 1 ∧
+      dirichletBilin Ω U U = principalEigenvalue (dirichletBilin Ω) ∧
+      0 < principalEigenvalue (dirichletBilin Ω) ∧
+      ∀ V : H01 Ω, dirichletBilin Ω U V
+        = principalEigenvalue (dirichletBilin Ω) * ⟪embL2 Ω U, embL2 Ω V⟫ := by
+  have hco := EllipticPdes.Poincare.dirichletBilin_coercive_of_bounded hΩb
+  obtain ⟨U, hU, hmin, heq⟩ :=
+    exists_principal_eigenpair hco (dirichletBilin_symm Ω) (embL2_isCompact hΩm hΩb) hne
+  exact ⟨U, hU, hmin, principalEigenvalue_pos hco hne, heq⟩
 
 end EllipticPdes.Sobolev
