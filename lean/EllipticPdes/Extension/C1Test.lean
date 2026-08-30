@@ -127,7 +127,7 @@ theorem hasWeakGradOn_contDiffOne {B : Set (EuclideanSpace ℝ (Fin d))} (hBopen
     have h : Tendsto (fun n : ℕ => ε * (1 / ((n : ℝ) + 1))) atTop (𝓝 0) := by
       simpa using tendsto_one_div_add_atTop_nhds_zero_nat.const_mul ε
     refine h.congr fun n => ?_
-    show ε * (1 / ((n : ℝ) + 1)) = ε / ((n : ℝ) + 1)
+    change ε * (1 / ((n : ℝ) + 1)) = ε / ((n : ℝ) + 1)
     ring
   set ψn : ℕ → EuclideanSpace ℝ (Fin d) → ℝ :=
     fun n => (ρ n).normed volume ⋆[Lsm, volume] ψ with hψndef
@@ -159,7 +159,8 @@ theorem hasWeakGradOn_contDiffOne {B : Set (EuclideanSpace ℝ (Fin d))} (hBopen
     ContDiffBump.convolution_tendsto_right_of_continuous (μ := volume) hrOut hψc x
   have hconvd : ∀ x, Tendsto (fun n => partialD k (ψn n) x) atTop (𝓝 (partialD k ψ x)) := by
     intro x
-    have h := ContDiffBump.convolution_tendsto_right_of_continuous (μ := volume) (φ := ρ) hrOut hdc x
+    have h := ContDiffBump.convolution_tendsto_right_of_continuous (μ := volume) (φ := ρ)
+      hrOut hdc x
     refine h.congr fun n => ?_
     exact (partialD_convolution_normed (ρ n) hψ hψcs k x).symm
   -- Uniform bounds, from the same suprema.

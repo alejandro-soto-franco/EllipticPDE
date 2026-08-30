@@ -77,7 +77,7 @@ theorem partialD_eq_zero_of_indepCoord {j : Fin d} {γ : EuclideanSpace ℝ (Fin
       (EuclideanSpace.single j (1 : ℝ)) :=
     (hγ y).hasFDerivAt.hasLineDerivAt _
   have h0 : HasLineDerivAt ℝ γ 0 y (EuclideanSpace.single j (1 : ℝ)) := by
-    show HasDerivAt (fun t : ℝ => γ (y + t • EuclideanSpace.single j (1 : ℝ))) 0 0
+    change HasDerivAt (fun t : ℝ => γ (y + t • EuclideanSpace.single j (1 : ℝ))) 0 0
     have hconst : (fun t : ℝ => γ (y + t • EuclideanSpace.single j (1 : ℝ))) = fun _ => γ y :=
       funext (hind y)
     rw [hconst]
@@ -119,16 +119,12 @@ theorem det_shearDeriv {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ}
           ((1 : Matrix (Fin d) (Fin d) ℝ) j + c) := by
     ext i k
     rw [LinearMap.toMatrix_apply]
-    simp only [hb, OrthonormalBasis.coe_toBasis_repr_apply, EuclideanSpace.basisFun_repr,
-      OrthonormalBasis.coe_toBasis, EuclideanSpace.basisFun_apply, LinearMap.coe_coe,
-      shearDeriv, ContinuousLinearMap.add_apply, ContinuousLinearMap.coe_id', id_eq,
-      ContinuousLinearMap.smulRight_apply, PiLp.add_apply, PiLp.smul_apply, smul_eq_mul,
-      EuclideanSpace.single_apply]
+    simp only [hb, shearDeriv]
     by_cases hij : i = j
     · subst hij
-      simp [Matrix.updateRow_apply, Matrix.one_apply, hc, hbk, eq_comm]
+      simp [Matrix.updateRow_apply, Matrix.one_apply, hc, hbk]
     · rw [Matrix.updateRow_ne hij]
-      simp [Matrix.one_apply, hij, Ne.symm hij, eq_comm]
+      simp [Matrix.one_apply, hij]
   have hdet : (Matrix.updateRow (1 : Matrix (Fin d) (Fin d) ℝ) j
       ((1 : Matrix (Fin d) (Fin d) ℝ) j + c)).det = 1 := by
     rw [Matrix.det_updateRow_add]
