@@ -80,6 +80,7 @@ import EllipticPdes.Campanato.Holder
 import EllipticPdes.Campanato.Converse
 import EllipticPdes.Embedding.GagliardoNirenberg
 import EllipticPdes.Embedding.SobolevLadder
+import EllipticPdes.Embedding.SobolevLadderCompactSupport
 import EllipticPdes.Embedding.SobolevLadderFullStep
 import EllipticPdes.Embedding.SobolevLadderGeneral
 import EllipticPdes.Embedding.HolderGeneral

@@ -226,124 +226,38 @@ section Bootstrap
 
 open EllipticPdes.Regularity (exists_isTestFn_one_nhdsSet_of_isCompact)
 
-/-- **From `Lᵖ` to the Sobolev conjugate `Lᵖ'` (Evans, *Partial Differential Equations*
-(2nd ed.), §5.6.1 Thm 1).** On a ball `Metric.ball c R` of `ℝᵈ` with `d ≥ 1`, a function `v` with
-an `Lᵖ` weak gradient `g` lies in `Lᵖ'` of the smaller ball `Metric.ball c r`, where the exponents
-satisfy `1/p' = 1/p - 1/d`, with a bound linear in `‖v‖_{Lᵖ} + ∑ₖ ‖gₖ‖_{Lᵖ}` and a constant
-depending only on `d`, `p`, `c`, `r` and `R`.
+/-- **Gagliardo-Nirenberg-Sobolev for a compactly supported weak gradient.** A compactly
+supported `w` on `ℝᵈ` whose weak gradient `G` lies in `Lᵖ` lies in `Lᵖ'`, where
+`1/p' = 1/p - 1/d`, bounded by the gradient alone with a constant depending only on `d` and
+`p`.
 
-The inequality itself is Mathlib's `MeasureTheory.eLpNorm_le_eLpNorm_fderiv_of_eq`, which asks
-for `ContDiff ℝ 1` and compact support. Two devices transport it to a weak gradient on a ball: a
-smooth cutoff supported in `Metric.ball c R` and equal to `1` on `Metric.closedBall c r`, and a
-mollification, whose classical partials are the mollified weak gradient and whose `Lᵖ` seminorms
-Young's inequality keeps bounded uniformly in the mollifier radius. Fatou passes the resulting
-`Lᵖ'` bound to the almost-everywhere limit.
+Mathlib's `MeasureTheory.eLpNorm_le_eLpNorm_fderiv_of_eq` asks for `ContDiff ℝ 1`, so a weak
+gradient reaches it through a mollification, whose classical partials are the mollified weak
+gradient (`partialD_convolution_eq_of_hasWeakGradOn`) and whose `Lᵖ` seminorms Young's
+inequality keeps bounded uniformly in the mollifier radius. Fatou passes the bound to the
+almost-everywhere limit.
 
-Outside the range `1 ≤ p < d` the hypothesis `1/p' = 1/p - 1/d` forces `p' = 0` and the
-conclusion degenerates. -/
-theorem exists_eLpNorm_sobolevConj_le (hd : 0 < d) (c : EuclideanSpace ℝ (Fin d))
-    {p p' : ℝ≥0} (hp : 1 ≤ p) (hpp' : (p' : ℝ)⁻¹ = (p : ℝ)⁻¹ - (d : ℝ)⁻¹)
-    {r R : ℝ} (hr : 0 < r) (hrR : r < R) :
-    ∃ K : ℝ≥0, ∀ (v : EuclideanSpace ℝ (Fin d) → ℝ)
-        (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
-      MemLp v p (volume.restrict (Metric.ball c R)) →
-      (∀ k, MemLp (g k) p (volume.restrict (Metric.ball c R))) →
-      HasWeakGradOn (Metric.ball c R) v g →
-      MemLp v p' (volume.restrict (Metric.ball c r)) ∧
-        eLpNorm v p' (volume.restrict (Metric.ball c r))
-          ≤ (K : ℝ≥0∞) * (eLpNorm v p (volume.restrict (Metric.ball c R))
-              + ∑ k, eLpNorm (g k) p (volume.restrict (Metric.ball c R))) := by
+No cutoff enters, so the conclusion is on the whole space and the bound has no `‖w‖_{Lᵖ}`
+term. `exists_eLpNorm_sobolevConj_le` is this statement composed with a cutoff, and the cutoff
+is what costs the smaller ball and the extra term. -/
+theorem exists_eLpNorm_sobolevConj_le_compactSupport (hd : 0 < d)
+    {p p' : ℝ≥0} (hp : 1 ≤ p) (hpp' : (p' : ℝ)⁻¹ = (p : ℝ)⁻¹ - (d : ℝ)⁻¹) :
+    ∃ K : ℝ≥0, ∀ (w : EuclideanSpace ℝ (Fin d) → ℝ)
+        (G : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
+      HasCompactSupport w → Integrable w volume → MemLp w p volume →
+      (∀ k, MemLp (G k) p volume) → HasWeakGradOn Set.univ w G →
+      MemLp w p' volume ∧
+        eLpNorm w p' volume ≤ (K : ℝ≥0∞) * ∑ k, eLpNorm (G k) p volume := by
   classical
   have hpR : (1 : ℝ) ≤ (p : ℝ) := by exact_mod_cast hp
   have hp1 : (1 : ℝ≥0∞) ≤ (p : ℝ≥0∞) := by exact_mod_cast hp
   have hpofReal : ENNReal.ofReal (p : ℝ) = (p : ℝ≥0∞) := ENNReal.ofReal_coe_nnreal
-  set B : Set (EuclideanSpace ℝ (Fin d)) := Metric.ball c R with hBdef
-  have hBm : MeasurableSet B := measurableSet_ball
-  have hR : 0 < R := hr.trans hrR
-  haveI : IsFiniteMeasure (volume.restrict B) :=
-    ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
-  -- The cutoff, equal to `1` on the inner ball and supported in the outer one.
-  obtain ⟨η, hηtest, hη1, hηIcc⟩ := exists_isTestFn_one_nhdsSet_of_isCompact
-    (K := Metric.closedBall c r) (U := B) (isCompact_closedBall c r) Metric.isOpen_ball
-    (Metric.closedBall_subset_ball hrR)
-  obtain ⟨hηc, hηcs, hηs⟩ := hηtest
-  have hηone : ∀ x ∈ Metric.closedBall c r, η x = 1 := hη1.self_of_nhdsSet
-  have hηnorm : ∀ x, ‖η x‖ ≤ 1 := fun x => by
-    rw [Real.norm_eq_abs, abs_of_nonneg (hηIcc x).1]; exact (hηIcc x).2
-  -- A uniform bound on the cutoff's partial derivatives.
-  have hfdc : Continuous (fun x => fderiv ℝ η x) := hηc.continuous_fderiv (by simp)
-  obtain ⟨M, hM⟩ := (hηcs.fderiv ℝ).exists_bound_of_continuous hfdc
-  have hM0 : (0 : ℝ) ≤ M := (norm_nonneg _).trans (hM 0)
-  have hMk : ∀ (k : Fin d) (x : EuclideanSpace ℝ (Fin d)), ‖partialD k η x‖ ≤ M := by
-    intro k x
-    calc ‖partialD k η x‖ ≤ ‖fderiv ℝ η x‖ * ‖EuclideanSpace.single k (1 : ℝ)‖ :=
-          ContinuousLinearMap.le_opNorm _ _
-      _ = ‖fderiv ℝ η x‖ := by simp
-      _ ≤ M := hM x
   set Kg : ℝ≥0 :=
     SNormLESNormFDerivOfEqConst ℝ (volume : Measure (EuclideanSpace ℝ (Fin d))) (p : ℝ)
     with hKgdef
-  set Mn : ℝ≥0 := max 1 (Real.toNNReal ((d : ℝ) * M)) with hMndef
-  refine ⟨Kg * Mn, fun v g hv hg hwg => ?_⟩
-  -- The cut-off function and its whole-space weak gradient.
-  set w : EuclideanSpace ℝ (Fin d) → ℝ := fun x => η x * B.indicator v x with hwdef
-  set G : Fin d → EuclideanSpace ℝ (Fin d) → ℝ :=
-    fun k x => η x * B.indicator (g k) x + partialD k η x * B.indicator v x with hGdef
-  have hvint : IntegrableOn v B volume := hv.integrable hp1
-  have hgint : ∀ k, IntegrableOn (g k) B volume := fun k => (hg k).integrable hp1
-  have hwg' : HasWeakGradOn Set.univ w G :=
-    hasWeakGradOn_univ_mul_cutoff hBm hηc hηcs hηs hvint hgint hwg
-  -- `w` is compactly supported and integrable, and both `w` and `G` lie in `L²`.
-  have hvB : MemLp (B.indicator v) p volume := (memLp_indicator_iff_restrict hBm).mpr hv
-  have hgB : ∀ k, MemLp (B.indicator (g k)) p volume :=
-    fun k => (memLp_indicator_iff_restrict hBm).mpr (hg k)
-  have hwmeas : AEStronglyMeasurable w volume :=
-    hηc.continuous.aestronglyMeasurable.mul hvB.aestronglyMeasurable
-  have hwL2 : MemLp w p volume := by
-    refine ⟨hwmeas, lt_of_le_of_lt (eLpNorm_mono (g := B.indicator v) fun x => ?_) hvB.2⟩
-    rw [hwdef, norm_mul]
-    exact mul_le_of_le_one_left (norm_nonneg _) (hηnorm x)
-  have hwcs : HasCompactSupport w := hηcs.mul_right
-  have hwint : Integrable w volume :=
-    (hvint.integrable_indicator hBm).bdd_mul hηc.continuous.aestronglyMeasurable
-      (Filter.Eventually.of_forall hηnorm)
-  have hGmeas : ∀ k, AEStronglyMeasurable (G k) volume := fun k =>
-    (hηc.continuous.aestronglyMeasurable.mul (hgB k).aestronglyMeasurable).add
-      (((hηc.continuous_fderiv (by simp)).clm_apply
-        continuous_const).aestronglyMeasurable.mul hvB.aestronglyMeasurable)
-  have hGbound : ∀ k, eLpNorm (G k) p volume
-      ≤ eLpNorm (g k) p (volume.restrict B)
-        + ENNReal.ofReal M * eLpNorm v p (volume.restrict B) := by
-    intro k
-    have h1 : eLpNorm (fun x => η x * B.indicator (g k) x) p volume
-        ≤ eLpNorm (g k) p (volume.restrict B) := by
-      refine (eLpNorm_mono (g := B.indicator (g k)) fun x => ?_).trans_eq
-        (eLpNorm_indicator_eq_eLpNorm_restrict hBm)
-      rw [norm_mul]
-      exact mul_le_of_le_one_left (norm_nonneg _) (hηnorm x)
-    have h2 : eLpNorm (fun x => partialD k η x * B.indicator v x) p volume
-        ≤ ENNReal.ofReal M * eLpNorm v p (volume.restrict B) := by
-      have hstep : eLpNorm (fun x => partialD k η x * B.indicator v x) p volume
-          ≤ eLpNorm (fun x => M * B.indicator v x) p volume := by
-        refine eLpNorm_mono fun x => ?_
-        rw [norm_mul, norm_mul, Real.norm_eq_abs M, abs_of_nonneg hM0]
-        exact mul_le_mul_of_nonneg_right (hMk k x) (norm_nonneg _)
-      refine hstep.trans (le_of_eq ?_)
-      rw [show (fun x => M * B.indicator v x) = M • (B.indicator v) from rfl,
-        eLpNorm_const_smul, eLpNorm_indicator_eq_eLpNorm_restrict hBm]
-      congr 1
-      rw [Real.enorm_eq_ofReal hM0]
-    refine (eLpNorm_add_le (hηc.continuous.aestronglyMeasurable.mul (hgB k).aestronglyMeasurable)
-      (((hηc.continuous_fderiv (by simp)).clm_apply
-        continuous_const).aestronglyMeasurable.mul hvB.aestronglyMeasurable)
-      hp1).trans (add_le_add h1 h2)
+  refine ⟨Kg, fun w G hwcs hwint hwL hGL hwg' => ?_⟩
   have hGL2 : ∀ k, MemLp (G k) (ENNReal.ofReal (p : ℝ)) volume := by
-    intro k
-    refine ⟨hGmeas k, ?_⟩
-    rw [hpofReal]
-    refine lt_of_le_of_lt (hGbound k) ?_
-    exact ENNReal.add_lt_top.mpr ⟨(hg k).2, ENNReal.mul_lt_top ENNReal.ofReal_lt_top hv.2⟩
-  -- The shrinking mollifier family.
+    intro k; rw [hpofReal]; exact hGL k
   set L := ContinuousLinearMap.lsmul ℝ ℝ (E := ℝ) with hLdef
   have hLflip : L.flip = L := by
     refine ContinuousLinearMap.ext fun a => ContinuousLinearMap.ext fun b => ?_
@@ -434,6 +348,126 @@ theorem exists_eLpNorm_sobolevConj_le (hd : 0 < d) (c : EuclideanSpace ℝ (Fin 
   have hwsix : eLpNorm w p' volume ≤ (Kg : ℝ≥0∞) * ∑ k, eLpNorm (G k) p volume :=
     MeasureTheory.Lp.eLpNorm_le_of_ae_tendsto (Filter.Eventually.of_forall hbound)
       (fun n => (hWsmooth n).continuous.aestronglyMeasurable) hae
+  refine ⟨⟨hwL.1, ?_⟩, hwsix⟩
+  exact lt_of_le_of_lt hwsix (ENNReal.mul_lt_top ENNReal.coe_lt_top
+    (ENNReal.sum_lt_top.mpr fun k _ => (hGL k).2))
+
+
+/-- **From `Lᵖ` to the Sobolev conjugate `Lᵖ'` (Evans, *Partial Differential Equations*
+(2nd ed.), §5.6.1 Thm 1).** On a ball `Metric.ball c R` of `ℝᵈ` with `d ≥ 1`, a function `v` with
+an `Lᵖ` weak gradient `g` lies in `Lᵖ'` of the smaller ball `Metric.ball c r`, where the exponents
+satisfy `1/p' = 1/p - 1/d`, with a bound linear in `‖v‖_{Lᵖ} + ∑ₖ ‖gₖ‖_{Lᵖ}` and a constant
+depending only on `d`, `p`, `c`, `r` and `R`.
+
+The inequality itself is Mathlib's `MeasureTheory.eLpNorm_le_eLpNorm_fderiv_of_eq`, which asks
+for `ContDiff ℝ 1` and compact support. Two devices transport it to a weak gradient on a ball: a
+smooth cutoff supported in `Metric.ball c R` and equal to `1` on `Metric.closedBall c r`, and a
+mollification, whose classical partials are the mollified weak gradient and whose `Lᵖ` seminorms
+Young's inequality keeps bounded uniformly in the mollifier radius. Fatou passes the resulting
+`Lᵖ'` bound to the almost-everywhere limit.
+
+Outside the range `1 ≤ p < d` the hypothesis `1/p' = 1/p - 1/d` forces `p' = 0` and the
+conclusion degenerates. -/
+theorem exists_eLpNorm_sobolevConj_le (hd : 0 < d) (c : EuclideanSpace ℝ (Fin d))
+    {p p' : ℝ≥0} (hp : 1 ≤ p) (hpp' : (p' : ℝ)⁻¹ = (p : ℝ)⁻¹ - (d : ℝ)⁻¹)
+    {r R : ℝ} (hr : 0 < r) (hrR : r < R) :
+    ∃ K : ℝ≥0, ∀ (v : EuclideanSpace ℝ (Fin d) → ℝ)
+        (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
+      MemLp v p (volume.restrict (Metric.ball c R)) →
+      (∀ k, MemLp (g k) p (volume.restrict (Metric.ball c R))) →
+      HasWeakGradOn (Metric.ball c R) v g →
+      MemLp v p' (volume.restrict (Metric.ball c r)) ∧
+        eLpNorm v p' (volume.restrict (Metric.ball c r))
+          ≤ (K : ℝ≥0∞) * (eLpNorm v p (volume.restrict (Metric.ball c R))
+              + ∑ k, eLpNorm (g k) p (volume.restrict (Metric.ball c R))) := by
+  classical
+  have hp1 : (1 : ℝ≥0∞) ≤ (p : ℝ≥0∞) := by exact_mod_cast hp
+  set B : Set (EuclideanSpace ℝ (Fin d)) := Metric.ball c R with hBdef
+  have hBm : MeasurableSet B := measurableSet_ball
+  have hR : 0 < R := hr.trans hrR
+  haveI : IsFiniteMeasure (volume.restrict B) :=
+    ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
+  -- The cutoff, equal to `1` on the inner ball and supported in the outer one.
+  obtain ⟨η, hηtest, hη1, hηIcc⟩ := exists_isTestFn_one_nhdsSet_of_isCompact
+    (K := Metric.closedBall c r) (U := B) (isCompact_closedBall c r) Metric.isOpen_ball
+    (Metric.closedBall_subset_ball hrR)
+  obtain ⟨hηc, hηcs, hηs⟩ := hηtest
+  have hηone : ∀ x ∈ Metric.closedBall c r, η x = 1 := hη1.self_of_nhdsSet
+  have hηnorm : ∀ x, ‖η x‖ ≤ 1 := fun x => by
+    rw [Real.norm_eq_abs, abs_of_nonneg (hηIcc x).1]; exact (hηIcc x).2
+  -- A uniform bound on the cutoff's partial derivatives.
+  have hfdc : Continuous (fun x => fderiv ℝ η x) := hηc.continuous_fderiv (by simp)
+  obtain ⟨M, hM⟩ := (hηcs.fderiv ℝ).exists_bound_of_continuous hfdc
+  have hM0 : (0 : ℝ) ≤ M := (norm_nonneg _).trans (hM 0)
+  have hMk : ∀ (k : Fin d) (x : EuclideanSpace ℝ (Fin d)), ‖partialD k η x‖ ≤ M := by
+    intro k x
+    calc ‖partialD k η x‖ ≤ ‖fderiv ℝ η x‖ * ‖EuclideanSpace.single k (1 : ℝ)‖ :=
+          ContinuousLinearMap.le_opNorm _ _
+      _ = ‖fderiv ℝ η x‖ := by simp
+      _ ≤ M := hM x
+  obtain ⟨Kg, hKg⟩ := exists_eLpNorm_sobolevConj_le_compactSupport hd hp hpp'
+  set Mn : ℝ≥0 := max 1 (Real.toNNReal ((d : ℝ) * M)) with hMndef
+  refine ⟨Kg * Mn, fun v g hv hg hwg => ?_⟩
+  -- The cut-off function and its whole-space weak gradient.
+  set w : EuclideanSpace ℝ (Fin d) → ℝ := fun x => η x * B.indicator v x with hwdef
+  set G : Fin d → EuclideanSpace ℝ (Fin d) → ℝ :=
+    fun k x => η x * B.indicator (g k) x + partialD k η x * B.indicator v x with hGdef
+  have hvint : IntegrableOn v B volume := hv.integrable hp1
+  have hgint : ∀ k, IntegrableOn (g k) B volume := fun k => (hg k).integrable hp1
+  have hwg' : HasWeakGradOn Set.univ w G :=
+    hasWeakGradOn_univ_mul_cutoff hBm hηc hηcs hηs hvint hgint hwg
+  -- `w` is compactly supported and integrable, and both `w` and `G` lie in `L²`.
+  have hvB : MemLp (B.indicator v) p volume := (memLp_indicator_iff_restrict hBm).mpr hv
+  have hgB : ∀ k, MemLp (B.indicator (g k)) p volume :=
+    fun k => (memLp_indicator_iff_restrict hBm).mpr (hg k)
+  have hwmeas : AEStronglyMeasurable w volume :=
+    hηc.continuous.aestronglyMeasurable.mul hvB.aestronglyMeasurable
+  have hwL2 : MemLp w p volume := by
+    refine ⟨hwmeas, lt_of_le_of_lt (eLpNorm_mono (g := B.indicator v) fun x => ?_) hvB.2⟩
+    rw [hwdef, norm_mul]
+    exact mul_le_of_le_one_left (norm_nonneg _) (hηnorm x)
+  have hwcs : HasCompactSupport w := hηcs.mul_right
+  have hwint : Integrable w volume :=
+    (hvint.integrable_indicator hBm).bdd_mul hηc.continuous.aestronglyMeasurable
+      (Filter.Eventually.of_forall hηnorm)
+  have hGmeas : ∀ k, AEStronglyMeasurable (G k) volume := fun k =>
+    (hηc.continuous.aestronglyMeasurable.mul (hgB k).aestronglyMeasurable).add
+      (((hηc.continuous_fderiv (by simp)).clm_apply
+        continuous_const).aestronglyMeasurable.mul hvB.aestronglyMeasurable)
+  have hGbound : ∀ k, eLpNorm (G k) p volume
+      ≤ eLpNorm (g k) p (volume.restrict B)
+        + ENNReal.ofReal M * eLpNorm v p (volume.restrict B) := by
+    intro k
+    have h1 : eLpNorm (fun x => η x * B.indicator (g k) x) p volume
+        ≤ eLpNorm (g k) p (volume.restrict B) := by
+      refine (eLpNorm_mono (g := B.indicator (g k)) fun x => ?_).trans_eq
+        (eLpNorm_indicator_eq_eLpNorm_restrict hBm)
+      rw [norm_mul]
+      exact mul_le_of_le_one_left (norm_nonneg _) (hηnorm x)
+    have h2 : eLpNorm (fun x => partialD k η x * B.indicator v x) p volume
+        ≤ ENNReal.ofReal M * eLpNorm v p (volume.restrict B) := by
+      have hstep : eLpNorm (fun x => partialD k η x * B.indicator v x) p volume
+          ≤ eLpNorm (fun x => M * B.indicator v x) p volume := by
+        refine eLpNorm_mono fun x => ?_
+        rw [norm_mul, norm_mul, Real.norm_eq_abs M, abs_of_nonneg hM0]
+        exact mul_le_mul_of_nonneg_right (hMk k x) (norm_nonneg _)
+      refine hstep.trans (le_of_eq ?_)
+      rw [show (fun x => M * B.indicator v x) = M • (B.indicator v) from rfl,
+        eLpNorm_const_smul, eLpNorm_indicator_eq_eLpNorm_restrict hBm]
+      congr 1
+      rw [Real.enorm_eq_ofReal hM0]
+    refine (eLpNorm_add_le (hηc.continuous.aestronglyMeasurable.mul (hgB k).aestronglyMeasurable)
+      (((hηc.continuous_fderiv (by simp)).clm_apply
+        continuous_const).aestronglyMeasurable.mul hvB.aestronglyMeasurable)
+      hp1).trans (add_le_add h1 h2)
+  have hGLp : ∀ k, MemLp (G k) p volume := by
+    intro k
+    refine ⟨hGmeas k, ?_⟩
+    refine lt_of_le_of_lt (hGbound k) ?_
+    exact ENNReal.add_lt_top.mpr ⟨(hg k).2, ENNReal.mul_lt_top ENNReal.ofReal_lt_top hv.2⟩
+  -- The whole-space inequality, applied to the cut-off function.
+  have hwsix : eLpNorm w p' volume ≤ (Kg : ℝ≥0∞) * ∑ k, eLpNorm (G k) p volume :=
+    (hKg w G hwcs hwint hwL2 hGLp hwg').2
   -- Bound the whole-space gradient terms by the data on the outer ball.
   have hMn1 : (1 : ℝ≥0∞) ≤ (Mn : ℝ≥0∞) := by
     rw [← ENNReal.coe_one]; exact ENNReal.coe_le_coe.mpr (le_max_left _ _)
