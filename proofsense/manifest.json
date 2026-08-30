@@ -387,6 +387,18 @@
       "source_id": "evans-2010",
       "locator": "§6.5.1 Thm 2",
       "claim": "instantiates clauses (i) and (ii) at L = -Delta with Dirichlet data on a bounded measurable domain, where embL2_isCompact discharges the compact embedding and the test-function Poincare bound discharges coercivity. Evans states the theorem for the general symmetric divergence-form L, so this is that statement at one operator. The eigenvalue named is that of the graph inner product on H_0^1, which exceeds the eigenvalue of -Delta by one, the function coordinate being a summand of the graph norm"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.euler_lagrange_of_norm_min",
+      "source_id": "evans-2010",
+      "locator": "§8.4.1 Thm 2",
+      "claim": "formalises the Lagrange multiplier equation (10) in the abstract setting the proof needs: a vector minimising the norm of a real inner product space over the unit sphere of the image of a continuous linear map into L^q satisfies (U, V) = lambda times the integral of |TU|^{q-2} (TU)(TV) for every V. Evans states the constraint as the vanishing of the integral of a smooth G obeying the growth bound (3), which at G(z) = |z|^q / q minus a constant gives g(z) = |z|^{q-2} z and this constraint. Two differences: the functional is a squared norm rather than the Dirichlet energy, and the multiplier is named rather than merely asserted to exist, being the square of the minimum. Evans differentiates the constraint by the implicit function theorem, which the homogeneity of the L^q norm replaces here, rescaling U + tV back to the sphere"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.exists_weakSolution_semilinear_of_lt",
+      "source_id": "evans-2010",
+      "locator": "§8.4.1 Thm 2",
+      "claim": "instantiates the Lagrange multiplier equation (10) at the subcritical minimiser on the unit ball, so the pair (u, lambda) solves the nonlinear eigenvalue problem of the Remark after the theorem. The equation differs from -Delta u = lambda g(u) by the lower-order term: the inner product of the graph encoding is the integral of uv plus the integral of the gradients, so the identity is the weak form of -Delta u + u = lambda |u|^{q-2} u. The multiplier is the square of the H_0^1 norm of the minimiser, where Evans asserts only that some real lambda exists, and the exponent is restricted to q below the Sobolev conjugate, which is where the compactness supplying the minimiser is spent"
     }
   ]
 }

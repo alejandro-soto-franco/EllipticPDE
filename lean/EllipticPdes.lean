@@ -100,6 +100,8 @@ import EllipticPdes.Embedding.H01Sobolev
 import EllipticPdes.Embedding.SobolevSolution
 import EllipticPdes.Embedding.RellichLq
 import EllipticPdes.Embedding.SobolevSharp
+import EllipticPdes.Analysis.LqDerivative
+import EllipticPdes.Analysis.LqEulerLagrange
 import EllipticPdes.Embedding.DirectMethod
 import EllipticPdes.Regularity.InteriorHolderSolution
 import EllipticPdes.Spectrum.Variational

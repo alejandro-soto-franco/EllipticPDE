@@ -328,3 +328,15 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Sobolev.dirichlet_poincare_sharp' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Sobolev.dirichlet_poincare_sharp
+
+/-- info: 'EllipticPdes.Analysis.hasDerivAt_integral_abs_rpow' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Analysis.hasDerivAt_integral_abs_rpow
+
+/-- info: 'EllipticPdes.Analysis.euler_lagrange_of_norm_min' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Analysis.euler_lagrange_of_norm_min
+
+/-- info: 'EllipticPdes.Embedding.exists_weakSolution_semilinear_of_lt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.exists_weakSolution_semilinear_of_lt

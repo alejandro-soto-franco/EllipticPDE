@@ -125,6 +125,14 @@ EXEMPT = {
         "Taibleson and Weiss, which is not transcribed, so no transcribed "
         "statement matches the direction this declaration proves"
     ),
+    "EllipticPdes.Analysis.hasDerivAt_integral_abs_rpow": (
+        "differentiation under the integral sign for the L^q functional, a "
+        "step Evans takes inside the proof of 8.4.1 Theorem 2 and states as "
+        "no numbered result; the dominated convergence he cites is 'the "
+        "dominated convergence theorem' of Appendix E.3, which is not "
+        "transcribed. The theorem it serves is warranted at "
+        "euler_lagrange_of_norm_min"
+    ),
     "EllipticPdes.Sobolev.dirichlet_poincare_sharp": (
         "reads the principal eigenvalue as the optimal constant in the "
         "Poincare inequality. Evans records 0 < lambda_1 in the definition "

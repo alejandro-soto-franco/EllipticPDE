@@ -80,6 +80,13 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   `rellichEmbL_isCompact_of_lt`. At $2^{\star}$ the second step fails, which is
   the exponent restriction Guo writes as $p + 1 < 2^{\star}$ for
   $-\Delta u = u^p$,
+- the Euler-Lagrange equation of that minimiser, as
+  `EllipticPdes.Embedding.exists_weakSolution_semilinear_of_lt`: it is a weak
+  solution of $-\Delta u + u = \lambda|u|^{q-2}u$ with
+  $\lambda = \|u\|_{H_0^1}^2$, so the multiplier is named rather than merely
+  asserted to exist. The constraint is differentiated by
+  `EllipticPdes.Analysis.hasDerivAt_integral_abs_rpow`, and the abstract form of
+  the equation is `EllipticPdes.Analysis.euler_lagrange_of_norm_min`,
 - the variational principle for the principal eigenvalue, as
   `EllipticPdes.Sobolev.exists_principal_eigenpair`: for a symmetric coercive
   form with the Rellich compact embedding, the infimum
@@ -163,6 +170,18 @@ is what covers that case. Smoothness in the interior is the half-step ladder
 followed by
 `EllipticPdes.Embedding.hasFDerivAt_of_continuousOn_hasWeakGradOn`, which turns a
 continuous weak gradient back into a classical derivative.
+
+Differentiating the `L^q` constraint is the one analytic step the direct method
+needs beyond compactness. The integrand's derivative in `t` is bounded on
+$|t| < 1$ by $q(|u| + |v|)^{q-1}|v|$, whose first factor sits in $L^{q/(q-1)}$
+and whose second sits in $L^q$, so Hölder's inequality supplies a dominating
+function and mathlib's `hasDerivAt_abs_rpow` supplies the pointwise derivative,
+including at the origin. Fermat's theorem then applies to
+$t \mapsto \|U + tV\|^2 - \lambda\|T(U + tV)\|_{L^q}^2$, which vanishes at
+$t = 0$ and is nonnegative everywhere, since rescaling $U + tV$ back to the
+constraint set is admissible wherever its image is nonzero. Homogeneity of the
+`L^q` norm is what makes that rescaling available and replaces the implicit
+function theorem Evans applies to a general constraint.
 
 The eigenvalue chapter has two independent routes to the Dirichlet spectrum.
 `solOp_spectral` runs the spectral theorem for the compact self-adjoint solution
