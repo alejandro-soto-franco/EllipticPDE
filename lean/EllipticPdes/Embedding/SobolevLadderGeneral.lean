@@ -215,8 +215,8 @@ theorem memLp_of_gradClosed_general (hd : 1 < d) (c : EuclideanSpace ℝ (Fin d)
 /-! ### The exponent of case (i) -/
 
 /-- **The ladder at the exponent case (i) names.** Under the strict rung condition
-`p₀ s < d`, which is the `k < n/p` of Evans §5.6.3 Theorem 6, the reciprocal `1/p₀ - s/d` is positive
-and names a finite exponent; the ladder lands on it. -/
+`p₀ s < d`, which is the `k < n/p` of Evans §5.6.3 Theorem 6, the reciprocal `1/p₀ - s/d` is
+positive and names a finite exponent; the ladder lands on it. -/
 theorem memLp_of_gradClosed_general_ideal (hd : 1 < d) (c : EuclideanSpace ℝ (Fin d))
     {ι : Type*} {F : ι → EuclideanSpace ℝ (Fin d) → ℝ} {nxt : ι → Fin d → ι}
     {dep : ι → ℕ} {m : ℕ} {p₀ : ℝ≥0} (hp₀ : 1 ≤ p₀)

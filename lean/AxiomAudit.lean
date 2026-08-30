@@ -415,3 +415,11 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Extension.tendsto_eLpNorm_translate_convolution_sub' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Extension.tendsto_eLpNorm_translate_convolution_sub
+
+/-- info: 'EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed_general' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed_general
+
+/-- info: 'EllipticPdes.Embedding.morreyExponent_eq_ladder' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.morreyExponent_eq_ladder

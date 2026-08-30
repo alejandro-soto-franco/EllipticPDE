@@ -165,6 +165,14 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   a boundary chart reflect across the image of a hyperplane. Translation moves a
   weak gradient with no sign and no Jacobian, which is what the shift into the
   domain of the global approximation theorem needs,
+- both cases of the order-$k$ embedding off `p = 2`. Case (ii) is
+  `EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed_general`: the ladder
+  runs for $s$ rungs from $L^{p_0}$ and Morrey reads the Hölder exponent off the
+  exponent it reaches, which `morreyExponent_eq_ladder` identifies as
+  $s + 1 - d/p_0$, the $\lfloor n/p \rfloor + 1 - n/p$ of Evans §5.6.3
+  Theorem 6 at $s = \lfloor d/p_0 \rfloor$. When $d/p_0$ is an integer the
+  ladder reaches every finite exponent and the Hölder exponent is free in
+  $(0,1)$, which is the other case that statement separates out,
 - the Sobolev ladder off `p = 2`, as
   `EllipticPdes.Embedding.memLp_of_gradClosed_general`: the rung iterates from
   any base exponent $p_0 \in [1, \infty)$, and

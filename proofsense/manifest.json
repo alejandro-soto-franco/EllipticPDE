@@ -483,6 +483,18 @@
       "source_id": "evans-2010",
       "locator": "§5.6.3 Thm 6",
       "claim": "clause (i) at the exponent Evans names: under the strict rung condition p_0 s < d, which is his k < n/p, the reciprocal 1/p_0 - s/d is positive and the ladder lands on the exponent naming it, which is his 1/q = 1/p - k/n. Guo states the same as Theorem IV.2.3 case (i). Three differences from Evans: the conclusion is on a ball inside a ball rather than on a bounded C^1 domain, so no extension operator is involved; it is membership rather than the norm estimate, which exists_const_eLpNorm_le_of_gradClosed_fullStep supplies at p_0 = 2; and the object iterated on is a family closed under weak differentiation with a depth function in place of the symbol D^alpha u at every order"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed_general",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "clause (ii) at a general base exponent. Evans states, for u in W^{k,p}(U) with k > n/p, that u lies in C^{k-1-floor(n/p), gamma}(closure U); this runs the ladder for s rungs from L^{p_0} over a family closed under weak differentiation and reads the Holder exponent off Morrey's inequality at the exponent the ladder reaches. The rung count and the landing exponent are free, so the statement covers both of the cases Evans separates: the exponent floor(n/p) + 1 - n/p when n/p is not an integer, and every value in (0,1) when it is, since the ladder then reaches every finite exponent. Three differences from Evans: the conclusion is on a ball inside a ball rather than on a bounded C^1 domain and its closure, so no extension operator is involved; it is Holder continuity of a representative rather than the norm estimate; and the object is a family closed under weak differentiation with a depth function in place of D^alpha u at every order"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.morreyExponent_eq_ladder",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "the arithmetic identifying the exponent the ladder lands on with the one clause (ii) names: at the landing reciprocal 1/P = 1/p_0 - s/d, Morrey's exponent 1 - d/P equals s + 1 - d/p_0, which at s = floor(d/p_0) is Evans's floor(n/p) + 1 - n/p. Evans records the exponent in the statement and does not derive it, the derivation being one line of the proof"
     }
   ]
 }
