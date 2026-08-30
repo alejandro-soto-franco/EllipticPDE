@@ -453,6 +453,24 @@
       "source_id": "evans-2010",
       "locator": "§6.5.1 Thm 1",
       "claim": "clauses (ii) and (iii) at L = -Delta on the unit ball of R^d for d > 2, with no hypothesis beyond the dimension: for every n an L^2-orthonormal family of n weak solutions of -Delta w = lambda w with 0 < lambda_1 <= ... <= lambda_n. The infinite dimensionality of H_0^1 that exists_eigen_family and dirichlet_eigen_family_of_bounded take as a hypothesis is discharged by n bumps at the points ((2k+1)/(2n) - 1/2)e_i with disjoint supports, so this is the ordering Evans states with every side condition met. Two parts of Evans are still absent: the family is finite at each stage rather than an orthonormal basis of L^2(U), and the divergence of lambda_k stays open. Evans supposes the coefficients smooth and U connected and reads the sequence off the spectral theorem for L^{-1}; here each eigenvalue is an infimum of the Rayleigh quotient over the vectors orthogonal to its predecessors"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.weak_eigenvalue_pos",
+      "source_id": "evans-2010",
+      "locator": "§6.5.1 Thm 1",
+      "claim": "the positivity clause of (ii), 0 < lambda_1, in the form the variational route gives it: every weak eigenvalue of a symmetric coercive form on H_0^1(Omega) is positive, being at least the principal eigenvalue, which exceeds the coercivity constant. Evans reads the same positivity off the spectral theorem for the compact self-adjoint inverse S = L^{-1} together with the energy estimate, and states it inside clause (ii) rather than separately. The statement here quantifies over weak eigenpairs of the form directly, so it covers the eigenvalues of solOp through solOp_weak_eigen without passing through S"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.solOp_finiteDimensional_eigenspace",
+      "source_id": "evans-2010",
+      "locator": "§6.5.1 Thm 1",
+      "claim": "the finite-multiplicity clause of (ii): each eigenspace of the solution operator at a nonzero eigenvalue is finite dimensional, so repeating each eigenvalue according to its multiplicity, as Evans does in (ii), lists each one finitely often. Evans states the finiteness parenthetically and attributes it to the same compactness; the proof here is Mathlib's ContinuousLinearMap.finite_dimensional_eigenspace applied to solOp, whose compactness comes from the Rellich embedding. The eigenspace is that of the solution operator, which solOp_weak_eigen identifies with the weak eigenspace of L at the reciprocal eigenvalue"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.dirichlet_eigenvalue_pos_ball",
+      "source_id": "evans-2010",
+      "locator": "§6.5.1 Thm 1",
+      "claim": "the positivity clause of (ii) at L = -Delta on the unit ball of R^d for d > 2, with no hypothesis beyond the dimension and the eigenpair: coercivity comes from the Poincare inequality and the nonemptiness from a renormalised bump, so nothing is assumed. Evans states the positivity for the general symmetric divergence-form operator on a bounded connected smooth domain with smooth coefficients"
     }
   ]
 }

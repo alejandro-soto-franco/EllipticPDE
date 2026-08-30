@@ -375,3 +375,15 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Sobolev.dirichlet_eigen_family_ball' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Sobolev.dirichlet_eigen_family_ball
+
+/-- info: 'EllipticPdes.Sobolev.weak_eigenvalue_pos' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.weak_eigenvalue_pos
+
+/-- info: 'EllipticPdes.Sobolev.solOp_finiteDimensional_eigenspace' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.solOp_finiteDimensional_eigenspace
+
+/-- info: 'EllipticPdes.Sobolev.dirichlet_eigenvalue_pos_ball' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.dirichlet_eigenvalue_pos_ball

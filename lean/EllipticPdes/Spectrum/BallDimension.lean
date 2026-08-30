@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
 import EllipticPdes.Spectrum.BallSpectrum
+import EllipticPdes.Spectrum.Multiplicity
 import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
 
 /-!
@@ -29,6 +30,8 @@ to all `m` vectors, and orthogonality of the bumps makes that combination nonzer
 * `EllipticPdes.Sobolev.orth_family_nonempty_ball`: the hypothesis of `exists_eigen_family`.
 * `EllipticPdes.Sobolev.dirichlet_eigen_family_ball`: the Dirichlet eigenvalue sequence of the
   unit ball, with `2 < d` the only hypothesis.
+* `EllipticPdes.Sobolev.dirichlet_eigenvalue_pos_ball`: every weak Dirichlet eigenvalue of the
+  unit ball is positive.
 
 ## References
 
@@ -335,5 +338,14 @@ theorem dirichlet_eigen_family_ball (hd : 2 < d) (n : ℕ) :
   obtain ⟨p, rfl⟩ : ∃ p, d = p + 1 := ⟨d - 1, by omega⟩
   exact dirichlet_eigen_family_of_bounded _ measurableSet_ball isBounded_ball
     (fun k v => orth_family_nonempty_ball hd k v) n
+
+/-- **Every weak Dirichlet eigenvalue of the unit ball is positive**, with `2 < d` the only
+hypothesis beyond the eigenpair. -/
+theorem dirichlet_eigenvalue_pos_ball (hd : 2 < d) {lam : ℝ} {U : H01 B1} (hU : U ≠ 0)
+    (heig : ∀ V : H01 B1, dirichletBilin B1 U V = lam * ⟪embL2 B1 U, embL2 B1 V⟫) :
+    0 < lam := by
+  have hne := exists_embL2_ne_zero_ball hd
+  obtain ⟨p, rfl⟩ : ∃ p, d = p + 1 := ⟨d - 1, by omega⟩
+  exact dirichlet_eigenvalue_pos_of_bounded _ isBounded_ball hne hU heig
 
 end EllipticPdes.Sobolev

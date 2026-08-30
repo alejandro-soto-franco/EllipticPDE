@@ -130,6 +130,13 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   solves the weak eigenvalue problem. `exists_embL2_ne_zero_ball` discharges the
   nonemptiness the general statements assume, which a domain of measure zero
   fails,
+- positivity and finite multiplicity of the Dirichlet eigenvalues, as
+  `EllipticPdes.Sobolev.weak_eigenvalue_pos` and
+  `EllipticPdes.Sobolev.solOp_finiteDimensional_eigenspace`: every weak
+  eigenvalue of a symmetric coercive form is at least $\lambda_1 > 0$, and each
+  eigenspace of the solution operator at a nonzero eigenvalue is finite
+  dimensional, the operator being compact. On the unit ball
+  `dirichlet_eigenvalue_pos_ball` asks for $d > 2$ and nothing else,
 - the optimal constant in the Poincaré inequality, as
   `EllipticPdes.Sobolev.dirichlet_poincare_sharp` with the equality case
   `dirichlet_poincare_attained`: $\lambda_1 \|u\|_{L^2}^2 \le \int |\nabla u|^2$
