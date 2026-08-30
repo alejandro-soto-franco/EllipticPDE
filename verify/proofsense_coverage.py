@@ -39,6 +39,13 @@ MANIFEST = ROOT / "proofsense" / "manifest.json"
 # that no transcribed statement matches it, which the README under
 # proofsense/ has to justify in prose.
 EXEMPT = {
+    "EllipticPdes.Extension.hasWeakGradOn_comp_translate": (
+        "the change of variables for a weak gradient under a translation. Evans shifts the "
+        "function into the domain in the proof of 5.3.3 Theorem 3 and reads the shifted "
+        "derivative off without stating a lemma, so no transcribed statement matches it. It is "
+        "the second of the two rigid motions the extension operator runs on, beside "
+        "hasWeakGradOn_comp_reflect"
+    ),
     "EllipticPdes.Extension.hasWeakGradOn_comp_reflect": (
         "the change of variables for a weak gradient under a coordinate reflection. Evans "
         "5.4 Theorem 1 reflects a C^1 function across the flat boundary of a half-ball and "

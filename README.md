@@ -141,13 +141,16 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   `EllipticPdes.Sobolev.dirichlet_poincare_sharp` with the equality case
   `dirichlet_poincare_attained`: $\lambda_1 \|u\|_{L^2}^2 \le \int |\nabla u|^2$
   on all of $H_0^1(\Omega)$, and some $u$ of unit $L^2$ norm meets it,
-- the first step of the extension operator, as
+- the two rigid motions the extension operator runs on, as
+  `EllipticPdes.Extension.hasWeakGradOn_comp_translate` and
   `EllipticPdes.Extension.hasWeakGradOn_comp_reflect`: reflection in a
   coordinate hyperplane sends a weak gradient on a set to a weak gradient on the
   preimage, with the sign negative exactly in the reflected direction. The
   reflection is a linear isometry, so it preserves Lebesgue measure and every
   $L^p$ seminorm, and the statement asks nothing of the set, which is what lets
-  a boundary chart reflect across the image of a hyperplane,
+  a boundary chart reflect across the image of a hyperplane. Translation moves a
+  weak gradient with no sign and no Jacobian, which is what the shift into the
+  domain of the global approximation theorem needs,
 - the Sobolev ladder off `p = 2`, as
   `EllipticPdes.Embedding.memLp_of_gradClosed_general`: the rung iterates from
   any base exponent $p_0 \in [1, \infty)$, and

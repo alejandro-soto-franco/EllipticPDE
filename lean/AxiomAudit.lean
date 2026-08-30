@@ -403,3 +403,7 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Extension.partialD_comp_reflect' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Extension.partialD_comp_reflect
+
+/-- info: 'EllipticPdes.Extension.hasWeakGradOn_comp_translate' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Extension.hasWeakGradOn_comp_translate
