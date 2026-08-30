@@ -117,7 +117,8 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   a Rayleigh quotient over the vectors orthogonal to its predecessors. The
   recursion asks at each stage for a vector of nonzero $L^2$ class orthogonal to
   the family built so far, which on a bounded domain is the infinite
-  dimensionality of $H_0^1(\Omega)$,
+  dimensionality of $H_0^1(\Omega)$. `dirichlet_eigen_family_of_bounded` is the
+  instance at $-\Delta$, reading $0 < \lambda_1 \le \cdots \le \lambda_n$,
 - the optimal constant in the Poincaré inequality, as
   `EllipticPdes.Sobolev.dirichlet_poincare_sharp` with the equality case
   `dirichlet_poincare_attained`: $\lambda_1 \|u\|_{L^2}^2 \le \int |\nabla u|^2$

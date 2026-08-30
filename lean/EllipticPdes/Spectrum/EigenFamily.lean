@@ -29,6 +29,10 @@ of a single vector at each stage rather than as a dimension count.
 * `EllipticPdes.Sobolev.orthSubmodule_snoc_subset`: appending shrinks the constraint.
 * `EllipticPdes.Sobolev.exists_eigen_family`: the orthonormal family and its increasing
   eigenvalues.
+* `EllipticPdes.Sobolev.principalEigenvalue_le_of_eigen_family`: every eigenvalue of such a
+  family is at least the principal one.
+* `EllipticPdes.Sobolev.dirichlet_eigen_family_of_bounded`: the instance at `-Δ` on a bounded
+  measurable domain, reading `0 < λ₁ ≤ ⋯ ≤ λₙ`.
 
 ## References
 
@@ -158,5 +162,39 @@ theorem exists_eigen_family (hco : IsCoercive B) (hsymm : ∀ U V : H01 Ω, B U 
       · intro i
         rw [Fin.snoc_castSucc]
         exact (h5 i).trans hmuv
+
+/-- **Every eigenvalue of an orthonormal family is at least the principal one.** A member of the
+family has unit `L²` norm and so is nonzero, which is what
+`principalEigenvalue_le_of_weak_eigen` asks for. -/
+theorem principalEigenvalue_le_of_eigen_family (hco : IsCoercive B) {n : ℕ} {w : Fin n → H01 Ω}
+    {lam : Fin n → ℝ} (hwnorm : ∀ i, ‖embL2 Ω (w i)‖ = 1)
+    (hweig : ∀ i, ∀ V : H01 Ω, B (w i) V = lam i * ⟪embL2 Ω (w i), embL2 Ω V⟫) (i : Fin n) :
+    principalEigenvalue B ≤ lam i := by
+  refine principalEigenvalue_le_of_weak_eigen hco (fun h0 => ?_) (hweig i)
+  have h := hwnorm i
+  rw [h0] at h
+  simp at h
+
+/-- **The Dirichlet eigenvalue sequence on a bounded domain.** For every `n` there is an
+`L²`-orthonormal family of `n` weak solutions of `-Δw = λw` with `0 < λ₁ ≤ ⋯ ≤ λₙ`. Boundedness
+and measurability of `Ω` discharge coercivity and the compact embedding; `hdim` is the infinite
+dimensionality of `H₀¹(Ω)`, stated as a vector at each stage. -/
+theorem dirichlet_eigen_family_of_bounded {m : ℕ} (Ω : Set (EuclideanSpace ℝ (Fin (m + 1))))
+    (hΩm : MeasurableSet Ω) (hΩb : Bornology.IsBounded Ω)
+    (hdim : ∀ (k : ℕ) (v : Fin k → H01 Ω), ∃ U ∈ orthSubmodule v, embL2 Ω U ≠ 0) (n : ℕ) :
+    ∃ (w : Fin n → H01 Ω) (lam : Fin n → ℝ),
+      (∀ i, ‖embL2 Ω (w i)‖ = 1) ∧
+      (∀ i j, i ≠ j → ⟪embL2 Ω (w i), embL2 Ω (w j)⟫ = 0) ∧
+      (∀ i, 0 < lam i) ∧
+      (∀ i j, i ≤ j → lam i ≤ lam j) ∧
+      (∀ i, ∀ V : H01 Ω, dirichletBilin Ω (w i) V
+        = lam i * ⟪embL2 Ω (w i), embL2 Ω V⟫) := by
+  have hco := EllipticPdes.Poincare.dirichletBilin_coercive_of_bounded hΩb
+  obtain ⟨U0, -, hU0⟩ := hdim 0 Fin.elim0
+  have hne : ∃ V : H01 Ω, embL2 Ω V ≠ 0 := ⟨U0, hU0⟩
+  obtain ⟨w, lam, h1, h2, h3, h4, -⟩ :=
+    exists_eigen_family hco (dirichletBilin_symm Ω) (embL2_isCompact hΩm hΩb) hdim n
+  exact ⟨w, lam, h1, h2, fun i => lt_of_lt_of_le (principalEigenvalue_pos hco hne)
+    (principalEigenvalue_le_of_eigen_family hco h1 h3 i), h4, h3⟩
 
 end EllipticPdes.Sobolev
