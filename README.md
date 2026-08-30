@@ -111,6 +111,13 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   $\lambda_1$. The multipliers of the extra constraints drop out, since
   $B[u, w_i] = \lambda_i \langle u, w_i \rangle_{L^2} = 0$ on the admissible
   complement, so the minimiser is a weak eigenfunction of the whole space,
+- the eigenvalue sequence, as `EllipticPdes.Sobolev.exists_eigen_family`:
+  iterating that step gives, for every $n$, an $L^2$-orthonormal family of $n$
+  weak eigenfunctions with $\lambda_1 \le \cdots \le \lambda_n$, each named by
+  a Rayleigh quotient over the vectors orthogonal to its predecessors. The
+  recursion asks at each stage for a vector of nonzero $L^2$ class orthogonal to
+  the family built so far, which on a bounded domain is the infinite
+  dimensionality of $H_0^1(\Omega)$,
 - the optimal constant in the Poincaré inequality, as
   `EllipticPdes.Sobolev.dirichlet_poincare_sharp` with the equality case
   `dirichlet_poincare_attained`: $\lambda_1 \|u\|_{L^2}^2 \le \int |\nabla u|^2$
@@ -213,8 +220,9 @@ lower semicontinuity of the form is the expansion of
 $0 \le B[u_k - w, u_k - w]$ against $B[u_k, w] \to B[w, w]$, and the
 Euler-Lagrange step is one variable, the map
 $t \mapsto B[u + tv, u + tv] - \lambda_1\|u + tv\|_{L^2}^2$ being a quadratic
-that vanishes at $t = 0$ and is nonnegative everywhere.
-`exists_bilin_minimiser` states the direct method once, for a symmetric
+that vanishes at $t = 0$ and is nonnegative everywhere. Repeating the step
+against the eigenfunctions already found names every later eigenvalue the same
+way. `exists_bilin_minimiser` states the direct method once, for a symmetric
 coercive form and any compact constraint map into a normed space, and both the
 Rayleigh problem and the semilinear problem are instances of it. Positivity of
 the minimiser and simplicity of $\lambda_1$, the remaining clauses of Evans

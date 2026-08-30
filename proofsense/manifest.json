@@ -429,6 +429,12 @@
       "source_id": "evans-2010",
       "locator": "§6.5.1 Thm 2",
       "claim": "instantiates clauses (i) and (ii) at L = -Delta with Dirichlet data, with boundedness and measurability of Omega as the only hypotheses: the Poincare inequality of poincare_H01_of_bounded discharges coercivity and embL2_isCompact discharges the compact embedding, where dirichlet_principal_eigenpair takes both as abstract hypotheses. The positivity of lambda_1 that Evans states in the Definition preceding the theorem is included. Two clauses of Evans are absent: the positivity of w_1 within U and the simplicity of lambda_1, both of which rest on the maximum principle. The eigenvalue named is that of the graph inner product on H_0^1, which exceeds the eigenvalue of -Delta by one, the function coordinate being a summand of the graph norm"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.exists_eigen_family",
+      "source_id": "evans-2010",
+      "locator": "§6.5.1 Thm 1",
+      "claim": "gives clauses (ii) and (iii) for a finite initial segment and by the variational route: for every n there is an L^2-orthonormal family of n weak eigenfunctions of a symmetric coercive form in H_0^1(Omega) whose eigenvalues increase with the index, each eigenvalue being the infimum of the Rayleigh quotient over the vectors L^2-orthogonal to its predecessors. Evans obtains the same sequence from the spectral theorem for the compact self-adjoint inverse S = L^{-1}, so no eigenvalue of his is named by a formula, where solOp_spectral is that route. Three parts of Evans are absent: the family is finite at each stage rather than an orthonormal basis of L^2(U), the divergence of lambda_k is not stated, and the recursion takes as a hypothesis the existence at each stage of a vector of nonzero L^2 class orthogonal to the family built so far, which on a bounded domain is the infinite dimensionality of H_0^1(Omega)"
     }
   ]
 }

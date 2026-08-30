@@ -108,6 +108,7 @@ import EllipticPdes.Embedding.DirichletSemilinear
 import EllipticPdes.Regularity.InteriorHolderSolution
 import EllipticPdes.Spectrum.Variational
 import EllipticPdes.Spectrum.HigherEigenvalues
+import EllipticPdes.Spectrum.EigenFamily
 
 /-!
 # EllipticPdes

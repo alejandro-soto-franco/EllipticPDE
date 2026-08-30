@@ -360,3 +360,6 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Sobolev.dirichlet_principal_eigenpair_of_bounded' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Sobolev.dirichlet_principal_eigenpair_of_bounded
+/-- info: 'EllipticPdes.Sobolev.exists_eigen_family' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.exists_eigen_family
