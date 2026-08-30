@@ -39,6 +39,13 @@ MANIFEST = ROOT / "proofsense" / "manifest.json"
 # that no transcribed statement matches it, which the README under
 # proofsense/ has to justify in prose.
 EXEMPT = {
+    "EllipticPdes.Analysis.tendsto_eLpNorm_translate_sub": (
+        "continuity of translation in L^p. Evans uses it inside the proof of 5.3.3 Theorem 3, "
+        "where the shift into the domain must be small in the norm, and states no "
+        "lemma; Brezis states it as Lemma 4.3, which is not transcribed. Mathlib has the two "
+        "halves, translation as an L^p isometry and density of the continuous compactly "
+        "supported functions, and not the statement"
+    ),
     "EllipticPdes.Extension.hasWeakGradOn_comp_translate": (
         "the change of variables for a weak gradient under a translation. Evans shifts the "
         "function into the domain in the proof of 5.3.3 Theorem 3 and reads the shifted "

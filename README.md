@@ -141,6 +141,13 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   `EllipticPdes.Sobolev.dirichlet_poincare_sharp` with the equality case
   `dirichlet_poincare_attained`: $\lambda_1 \|u\|_{L^2}^2 \le \int |\nabla u|^2$
   on all of $H_0^1(\Omega)$, and some $u$ of unit $L^2$ norm meets it,
+- continuity of translation in $L^p$, as
+  `EllipticPdes.Analysis.tendsto_eLpNorm_translate_sub`: the $L^p$ distance
+  between a function and its translate tends to zero with the translation, which
+  is what bounds the shift into the domain of the global approximation theorem.
+  Mathlib has the two halves, translation as an $L^p$ isometry
+  and density of the continuous compactly supported functions, and not the
+  statement,
 - the two rigid motions the extension operator runs on, as
   `EllipticPdes.Extension.hasWeakGradOn_comp_translate` and
   `EllipticPdes.Extension.hasWeakGradOn_comp_reflect`: reflection in a
