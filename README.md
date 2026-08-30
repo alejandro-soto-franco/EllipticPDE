@@ -119,6 +119,12 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   the family built so far, which on a bounded domain is the infinite
   dimensionality of $H_0^1(\Omega)$. `dirichlet_eigen_family_of_bounded` is the
   instance at $-\Delta$, reading $0 < \lambda_1 \le \cdots \le \lambda_n$,
+- the Dirichlet spectrum of the unit ball with no side hypothesis, as
+  `EllipticPdes.Sobolev.dirichlet_principal_eigenpair_ball`: for $d > 2$ the
+  Rayleigh infimum on $H_0^1(B_1)$ is attained, is positive, and its minimiser
+  solves the weak eigenvalue problem. `exists_embL2_ne_zero_ball` discharges the
+  nonemptiness the general statements assume, which a domain of measure zero
+  fails,
 - the optimal constant in the Poincaré inequality, as
   `EllipticPdes.Sobolev.dirichlet_poincare_sharp` with the equality case
   `dirichlet_poincare_attained`: $\lambda_1 \|u\|_{L^2}^2 \le \int |\nabla u|^2$

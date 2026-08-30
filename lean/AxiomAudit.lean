@@ -367,3 +367,7 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Sobolev.dirichlet_eigen_family_of_bounded' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Sobolev.dirichlet_eigen_family_of_bounded
+
+/-- info: 'EllipticPdes.Sobolev.dirichlet_principal_eigenpair_ball' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.dirichlet_principal_eigenpair_ball
