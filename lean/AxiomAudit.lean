@@ -387,3 +387,11 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Sobolev.dirichlet_eigenvalue_pos_ball' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Sobolev.dirichlet_eigenvalue_pos_ball
+
+/-- info: 'EllipticPdes.Embedding.memLp_of_gradClosed_general' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.memLp_of_gradClosed_general
+
+/-- info: 'EllipticPdes.Embedding.memLp_of_gradClosed_general_ideal' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.memLp_of_gradClosed_general_ideal

@@ -471,6 +471,18 @@
       "source_id": "evans-2010",
       "locator": "§6.5.1 Thm 1",
       "claim": "the positivity clause of (ii) at L = -Delta on the unit ball of R^d for d > 2, with no hypothesis beyond the dimension and the eigenpair: coercivity comes from the Poincare inequality and the nonemptiness from a renormalised bump, so nothing is assumed. Evans states the positivity for the general symmetric divergence-form operator on a bounded connected smooth domain with smooth coefficients"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.memLp_of_gradClosed_general",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "the machinery behind clause (i), with the target exponent left free. Evans states, for u in W^{k,p}(U) with k < n/p, that u lies in L^q(U) for 1/q = 1/p - k/n; this iterates the single rung of §5.6.1 Theorem 1 from an arbitrary base exponent p_0 in [1, infinity) over a family closed under weak differentiation and to bounded depth, landing on any q >= p_0 whose reciprocal is at least 1/p_0 - s/d after s rungs with p_0 s <= d. Evans works on a bounded C^1 domain and concludes there; the statement here is on a ball inside a ball, so no extension operator is involved. Two regimes appear that the classical account does not separate: when the target sits at or above the conjugate exponent d/(d-1) the rung runs onto it, and below that the rung from p_0 overshoots and the exponent is lowered by the finiteness of the ball's measure. Dimension one is excluded, where the conjugate of 1 has reciprocal zero and the rung produces a finite exponent"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.memLp_of_gradClosed_general_ideal",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "clause (i) at the exponent Evans names: under the strict rung condition p_0 s < d, which is his k < n/p, the reciprocal 1/p_0 - s/d is positive and the ladder lands on the exponent naming it, which is his 1/q = 1/p - k/n. Guo states the same as Theorem IV.2.3 case (i). Three differences from Evans: the conclusion is on a ball inside a ball rather than on a bounded C^1 domain, so no extension operator is involved; it is membership rather than the norm estimate, which exists_const_eLpNorm_le_of_gradClosed_fullStep supplies at p_0 = 2; and the object iterated on is a family closed under weak differentiation with a depth function in place of the symbol D^alpha u at every order"
     }
   ]
 }

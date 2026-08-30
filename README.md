@@ -141,6 +141,14 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   `EllipticPdes.Sobolev.dirichlet_poincare_sharp` with the equality case
   `dirichlet_poincare_attained`: $\lambda_1 \|u\|_{L^2}^2 \le \int |\nabla u|^2$
   on all of $H_0^1(\Omega)$, and some $u$ of unit $L^2$ norm meets it,
+- the Sobolev ladder off `p = 2`, as
+  `EllipticPdes.Embedding.memLp_of_gradClosed_general`: the rung iterates from
+  any base exponent $p_0 \in [1, \infty)$, and
+  `memLp_of_gradClosed_general_ideal` lands on the exponent
+  $1/q = 1/p_0 - s/d$ that Evans §5.6.3 Theorem 6 clause (i) names, under his
+  strict rung condition $p_0 s < d$. Below $p_0 = 2$ a target can sit under the
+  conjugate exponent $d/(d-1)$, where the rung from $p_0$ overshoots and the
+  exponent is lowered onto the target by the finiteness of the ball's measure,
 - the two general Sobolev estimates with their constants, as
   `EllipticPdes.Embedding.exists_const_eLpNorm_le_of_gradClosed_fullStep` and
   `EllipticPdes.Embedding.exists_const_holderOnWith_of_gradClosed_of_bound`: one
