@@ -395,3 +395,11 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Embedding.memLp_of_gradClosed_general_ideal' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Embedding.memLp_of_gradClosed_general_ideal
+
+/-- info: 'EllipticPdes.Extension.hasWeakGradOn_comp_reflect' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Extension.hasWeakGradOn_comp_reflect
+
+/-- info: 'EllipticPdes.Extension.partialD_comp_reflect' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Extension.partialD_comp_reflect

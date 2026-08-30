@@ -39,6 +39,19 @@ MANIFEST = ROOT / "proofsense" / "manifest.json"
 # that no transcribed statement matches it, which the README under
 # proofsense/ has to justify in prose.
 EXEMPT = {
+    "EllipticPdes.Extension.hasWeakGradOn_comp_reflect": (
+        "the change of variables for a weak gradient under a coordinate reflection. Evans "
+        "5.4 Theorem 1 reflects a C^1 function across the flat boundary of a half-ball and "
+        "computes with classical derivatives throughout, stating no lemma about weak ones, so "
+        "no transcribed statement matches it. It is the first step of the extension operator "
+        "and is stated for an arbitrary set, since the boundary charts of that construction "
+        "reflect across the image of a hyperplane"
+    ),
+    "EllipticPdes.Extension.partialD_comp_reflect": (
+        "the chain rule for a partial derivative under a coordinate reflection, which is the "
+        "classical computation Evans performs inline in the proof of 5.4 Theorem 1 and states "
+        "as no lemma of its own"
+    ),
     "EllipticPdes.Regularity.caccioppoli": (
         "states a first-derivative Caccioppoli estimate, which Evans proves "
         "inside 6.3.1 Theorem 1 rather than stating as a numbered result; "
