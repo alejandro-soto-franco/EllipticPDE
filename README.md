@@ -118,7 +118,12 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   recursion asks at each stage for a vector of nonzero $L^2$ class orthogonal to
   the family built so far, which on a bounded domain is the infinite
   dimensionality of $H_0^1(\Omega)$. `dirichlet_eigen_family_of_bounded` is the
-  instance at $-\Delta$, reading $0 < \lambda_1 \le \cdots \le \lambda_n$,
+  instance at $-\Delta$, reading $0 < \lambda_1 \le \cdots \le \lambda_n$, and
+  `dirichlet_eigen_family_ball` discharges the last side condition on the unit
+  ball: `orth_family_nonempty_ball` puts $n$ bumps at the points
+  $((2k+1)/(2n) - 1/2)e_i$, whose supports are disjoint because the centres are
+  $1/n$ apart and the radii are $1/(2n)$, so a combination of $m+1$ of them is
+  orthogonal to any $m$ given vectors,
 - the Dirichlet spectrum of the unit ball with no side hypothesis, as
   `EllipticPdes.Sobolev.dirichlet_principal_eigenpair_ball`: for $d > 2$ the
   Rayleigh infimum on $H_0^1(B_1)$ is attained, is positive, and its minimiser

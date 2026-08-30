@@ -110,6 +110,7 @@ import EllipticPdes.Spectrum.Variational
 import EllipticPdes.Spectrum.HigherEigenvalues
 import EllipticPdes.Spectrum.EigenFamily
 import EllipticPdes.Spectrum.BallSpectrum
+import EllipticPdes.Spectrum.BallDimension
 
 /-!
 # EllipticPdes

@@ -447,6 +447,12 @@
       "source_id": "evans-2010",
       "locator": "§6.5.1 Thm 2",
       "claim": "clauses (i) and (ii) at L = -Delta on the unit ball of R^d for d > 2, with no hypothesis beyond the dimension: the Rayleigh infimum is attained, is positive, and its minimiser solves the weak eigenvalue problem. The nonemptiness that dirichlet_principal_eigenpair and dirichlet_principal_eigenpair_of_bounded take as a hypothesis is discharged here by a renormalised bump, so this is the first fully unconditional instance of Evans's theorem in the development. The positivity of w_1 within U and the simplicity of lambda_1 remain absent, both resting on the maximum principle. The eigenvalue named is that of the graph inner product on H_0^1, which exceeds the eigenvalue of -Delta by one, the function coordinate being a summand of the graph norm"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.dirichlet_eigen_family_ball",
+      "source_id": "evans-2010",
+      "locator": "§6.5.1 Thm 1",
+      "claim": "clauses (ii) and (iii) at L = -Delta on the unit ball of R^d for d > 2, with no hypothesis beyond the dimension: for every n an L^2-orthonormal family of n weak solutions of -Delta w = lambda w with 0 < lambda_1 <= ... <= lambda_n. The infinite dimensionality of H_0^1 that exists_eigen_family and dirichlet_eigen_family_of_bounded take as a hypothesis is discharged by n bumps at the points ((2k+1)/(2n) - 1/2)e_i with disjoint supports, so this is the ordering Evans states with every side condition met. Two parts of Evans are still absent: the family is finite at each stage rather than an orthonormal basis of L^2(U), and the divergence of lambda_k stays open. Evans supposes the coefficients smooth and U connected and reads the sequence off the spectral theorem for L^{-1}; here each eigenvalue is an infimum of the Rayleigh quotient over the vectors orthogonal to its predecessors"
     }
   ]
 }
