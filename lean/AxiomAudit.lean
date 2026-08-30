@@ -312,3 +312,19 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Embedding.exists_minimiser_of_lt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Embedding.exists_minimiser_of_lt
+
+/-- info: 'EllipticPdes.Sobolev.exists_principal_eigenpair' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.exists_principal_eigenpair
+
+/-- info: 'EllipticPdes.Sobolev.principalEigenvalue_le_of_weak_eigen' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.principalEigenvalue_le_of_weak_eigen
+
+/-- info: 'EllipticPdes.Sobolev.dirichlet_principal_eigenpair' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.dirichlet_principal_eigenpair
+
+/-- info: 'EllipticPdes.Sobolev.dirichlet_poincare_sharp' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.dirichlet_poincare_sharp

@@ -125,6 +125,15 @@ EXEMPT = {
         "Taibleson and Weiss, which is not transcribed, so no transcribed "
         "statement matches the direction this declaration proves"
     ),
+    "EllipticPdes.Sobolev.dirichlet_poincare_sharp": (
+        "reads the principal eigenvalue as the optimal constant in the "
+        "Poincare inequality. Evans records 0 < lambda_1 in the definition "
+        "preceding 6.5.1 Theorem 2 and never states it as a Poincare "
+        "constant, and the transcribed Poincare inequalities, 5.6.1 Theorem 3 "
+        "and 5.8.1 Theorems 1 and 2, name no constant at all, so no "
+        "transcribed statement matches it. The variational principle it reads "
+        "is warranted at exists_principal_eigenpair"
+    ),
 }
 
 # A statement locator names one statement, never a whole section. Three forms

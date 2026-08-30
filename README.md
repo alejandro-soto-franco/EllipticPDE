@@ -80,6 +80,18 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   `rellichEmbL_isCompact_of_lt`. At $2^{\star}$ the second step fails, which is
   the exponent restriction Guo writes as $p + 1 < 2^{\star}$ for
   $-\Delta u = u^p$,
+- the variational principle for the principal eigenvalue, as
+  `EllipticPdes.Sobolev.exists_principal_eigenpair`: for a symmetric coercive
+  form with the Rellich compact embedding, the infimum
+  $\lambda_1 = \inf\{B[u,u] : \|u\|_{L^2} = 1\}$ is attained and a minimiser
+  solves $B[u,v] = \lambda_1 (u,v)$ for every $v$, with
+  `principalEigenvalue_le_of_weak_eigen` placing $\lambda_1$ below every weak
+  eigenvalue and `dirichlet_principal_eigenpair` the instance at $-\Delta$ on a
+  bounded measurable domain,
+- the optimal constant in the Poincaré inequality, as
+  `EllipticPdes.Sobolev.dirichlet_poincare_sharp` with the equality case
+  `dirichlet_poincare_attained`: $\lambda_1 \|u\|_{L^2}^2 \le \int |\nabla u|^2$
+  on all of $H_0^1(\Omega)$, and some $u$ of unit $L^2$ norm meets it,
 - the two general Sobolev estimates with their constants, as
   `EllipticPdes.Embedding.exists_const_eLpNorm_le_of_gradClosed_fullStep` and
   `EllipticPdes.Embedding.exists_const_holderOnWith_of_gradClosed_of_bound`: one
@@ -151,6 +163,19 @@ is what covers that case. Smoothness in the interior is the half-step ladder
 followed by
 `EllipticPdes.Embedding.hasFDerivAt_of_continuousOn_hasWeakGradOn`, which turns a
 continuous weak gradient back into a classical derivative.
+
+The eigenvalue chapter has two independent routes to the Dirichlet spectrum.
+`solOp_spectral` runs the spectral theorem for the compact self-adjoint solution
+operator and produces the whole orthonormal basis of eigenfunctions with no
+formula for any eigenvalue. The variational route names the first one: the same
+direct method as `exists_minimiser_of_lt`, at a quadratic constraint, where weak
+lower semicontinuity of the form is the expansion of
+$0 \le B[u_k - w, u_k - w]$ against $B[u_k, w] \to B[w, w]$, and the
+Euler-Lagrange step is one variable, the map
+$t \mapsto B[u + tv, u + tv] - \lambda_1\|u + tv\|_{L^2}^2$ being a quadratic
+that vanishes at $t = 0$ and is nonnegative everywhere. Positivity of the
+minimiser and simplicity of $\lambda_1$, the remaining clauses of Evans §6.5.1
+Theorem 2, need the maximum principle and are open.
 
 Boundary $H^2$ regularity has its foundations in place and its headline estimate
 open: the half-ball geometry, tangential difference quotients with their $H_0^1$

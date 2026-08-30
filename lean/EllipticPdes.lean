@@ -102,6 +102,7 @@ import EllipticPdes.Embedding.RellichLq
 import EllipticPdes.Embedding.SobolevSharp
 import EllipticPdes.Embedding.DirectMethod
 import EllipticPdes.Regularity.InteriorHolderSolution
+import EllipticPdes.Spectrum.Variational
 
 /-!
 # EllipticPdes

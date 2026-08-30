@@ -369,6 +369,24 @@
       "source_id": "evans-2010",
       "locator": "§8.4.1 Thm 1",
       "claim": "formalises the existence of a constrained minimiser, with three differences from the statement as written. The constraint is the unit sphere of L^q rather than the vanishing of an integral of a general G, which is that constraint at G(z) = |z|^q minus a constant; the functional minimised is the H_0^1 norm rather than the Dirichlet energy, and Poincare makes the two equivalent on a bounded domain; and the exponent is restricted to q below the Sobolev conjugate, which is where rellichEmbL_isCompact_of_lt takes the constraint to the weak limit and where Evans' growth condition on G is spent. The domain is the unit ball, where the constraint set is inhabited by a renormalised bump"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.exists_principal_eigenpair",
+      "source_id": "evans-2010",
+      "locator": "§6.5.1 Thm 2",
+      "claim": "formalises clauses (i) and (ii): the infimum of B[u, u] over the functions of unit L^2 norm is attained, and a minimiser solves the weak eigenvalue problem B[u, v] = lambda_1 (u, v) for every v. The definition of lambda_1 as that infimum is the identity Evans writes in (5); that this infimum is the first eigenvalue of the operator is principalEigenvalue_le_of_weak_eigen. Two parts of the theorem are absent: the minimiser is not shown positive within the domain, which needs the maximum principle, and clause (iii), the simplicity of lambda_1, is not stated. The form is a general symmetric coercive form on H_0^1 with the Rellich compact embedding taken as a hypothesis, where Evans fixes the divergence-form L with c >= 0 on a bounded open set and has the embedding from the smoothness of the boundary"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.principalEigenvalue_le_of_weak_eigen",
+      "source_id": "evans-2010",
+      "locator": "§6.5.1 Thm 2",
+      "claim": "formalises the reading of clause (i) as a minimum over the eigenvalues rather than over the constraint set: any nonzero weak solution of B[u, v] = lambda (u, v) has lambda >= lambda_1, so the infimum of the Rayleigh quotient is the smallest eigenvalue and the name principal eigenvalue is earned. Evans obtains this from the orthonormal basis of eigenfunctions of Theorem 1 and the ordering 0 < lambda_1 <= lambda_2 <= ... that precedes the definition; the proof here needs no basis, being the Rayleigh bound applied to the eigenfunction itself. Coercivity rules out a nonzero element with vanishing L^2 class, which is where the divergence-form hypotheses are spent"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.dirichlet_principal_eigenpair",
+      "source_id": "evans-2010",
+      "locator": "§6.5.1 Thm 2",
+      "claim": "instantiates clauses (i) and (ii) at L = -Delta with Dirichlet data on a bounded measurable domain, where embL2_isCompact discharges the compact embedding and the test-function Poincare bound discharges coercivity. Evans states the theorem for the general symmetric divergence-form L, so this is that statement at one operator. The eigenvalue named is that of the graph inner product on H_0^1, which exceeds the eigenvalue of -Delta by one, the function coordinate being a summand of the graph norm"
     }
   ]
 }
