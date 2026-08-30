@@ -286,4 +286,70 @@ theorem hasWeakGradOn_evenExt {j : Fin d} {u : EuclideanSpace ℝ (Fin d) → �
     ring
   · exact integral_partialD_of_ne hk hu (hg k) hwg hψsmooth hψcs
 
+/-! ### The bound -/
+
+/-- The extension is, almost everywhere, the sum of the class and its reflection, each on its
+own side of the interface. -/
+theorem evenExt_ae_eq (j : Fin d) (u : EuclideanSpace ℝ (Fin d) → ℝ) :
+    evenExt j u =ᵐ[volume] fun x => (halfSpace j).indicator u x
+      + (halfSpaceNeg j).indicator (fun y => u (reflectLI j y)) x := by
+  have hnull : volume {x : EuclideanSpace ℝ (Fin d) | x j = 0} = 0 := volume_interface j
+  refine (MeasureTheory.ae_iff).mpr (measure_mono_null ?_ hnull)
+  intro x hx
+  simp only [Set.mem_setOf_eq]
+  by_contra hne
+  refine hx ?_
+  rcases lt_trichotomy (x j) 0 with h | h | h
+  · have h1 : ¬ (0 : ℝ) ≤ x j := by linarith
+    have h2 : x ∉ halfSpace j := by
+      intro hmem
+      exact absurd (lt_trans hmem h) (lt_irrefl 0)
+    change (if 0 ≤ x j then u x else u (reflectLI j x))
+      = (halfSpace j).indicator u x + (halfSpaceNeg j).indicator (fun y => u (reflectLI j y)) x
+    have hmemNeg : x ∈ halfSpaceNeg j := h
+    rw [if_neg h1, Set.indicator_of_notMem h2, Set.indicator_of_mem hmemNeg, zero_add]
+  · exact absurd h hne
+  · have h2 : x ∉ halfSpaceNeg j := by
+      intro hmem
+      exact absurd (lt_trans h hmem) (lt_irrefl 0)
+    change (if 0 ≤ x j then u x else u (reflectLI j x))
+      = (halfSpace j).indicator u x + (halfSpaceNeg j).indicator (fun y => u (reflectLI j y)) x
+    have hmemPos : x ∈ halfSpace j := h
+    rw [if_pos h.le, Set.indicator_of_notMem h2, Set.indicator_of_mem hmemPos, add_zero]
+
+/-- **The extension costs a factor of two in every `Lᵖ` seminorm.** The reflection preserves
+measure, so each side contributes the seminorm on the half space. -/
+theorem eLpNorm_evenExt_le {j : Fin d} {u : EuclideanSpace ℝ (Fin d) → ℝ} {p : ℝ≥0∞}
+    (hp : 1 ≤ p) (hu : AEStronglyMeasurable u (volume.restrict (halfSpace j))) :
+    eLpNorm (evenExt j u) p volume ≤ 2 * eLpNorm u p (volume.restrict (halfSpace j)) := by
+  have hmp : MeasurePreserving (reflectLI j) (volume.restrict (halfSpaceNeg j))
+      (volume.restrict (halfSpace j)) := by
+    have h := (measurePreserving_reflectLI j).restrict_preimage_emb
+      (measurableEmbedding_reflectLI j) (halfSpace j)
+    rwa [show reflectLI j ⁻¹' halfSpace j = halfSpaceNeg j from by
+      rw [← preimage_reflectLI_halfSpaceNeg j, reflectLI_preimage_preimage]] at h
+  have hu' : AEStronglyMeasurable (fun y => u (reflectLI j y))
+      (volume.restrict (halfSpaceNeg j)) := hu.comp_measurePreserving hmp
+  have h1 : AEStronglyMeasurable ((halfSpace j).indicator u) volume :=
+    (aestronglyMeasurable_indicator_iff (measurableSet_halfSpace j)).mpr hu
+  have h2 : AEStronglyMeasurable
+      ((halfSpaceNeg j).indicator (fun y => u (reflectLI j y))) volume :=
+    (aestronglyMeasurable_indicator_iff (measurableSet_halfSpaceNeg j)).mpr hu'
+  calc eLpNorm (evenExt j u) p volume
+      = eLpNorm (fun x => (halfSpace j).indicator u x
+          + (halfSpaceNeg j).indicator (fun y => u (reflectLI j y)) x) p volume :=
+        eLpNorm_congr_ae (evenExt_ae_eq j u)
+    _ ≤ eLpNorm ((halfSpace j).indicator u) p volume
+        + eLpNorm ((halfSpaceNeg j).indicator (fun y => u (reflectLI j y))) p volume :=
+        eLpNorm_add_le h1 h2 hp
+    _ = eLpNorm u p (volume.restrict (halfSpace j))
+        + eLpNorm u p (volume.restrict (halfSpace j)) := by
+        have hcomp : eLpNorm (fun y => u (reflectLI j y)) p (volume.restrict (halfSpaceNeg j))
+            = eLpNorm u p (volume.restrict (halfSpace j)) :=
+          eLpNorm_comp_measurePreserving hu hmp
+        rw [eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_halfSpace j),
+          eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_halfSpaceNeg j), hcomp]
+    _ = 2 * eLpNorm u p (volume.restrict (halfSpace j)) := by
+        rw [two_mul]
+
 end EllipticPdes.Extension
