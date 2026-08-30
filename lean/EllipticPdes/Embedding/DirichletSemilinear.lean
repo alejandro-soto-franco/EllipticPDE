@@ -114,7 +114,7 @@ theorem exists_weakSolution_dirichlet_of_lt
     (bilin_self_nonneg hco) hU hmin V
   simpa using h
 
-/-- **The semilinear Dirichlet problem, written over the gradient coordinates.** The identity of
+/-- **The semilinear Dirichlet problem written over the gradient coordinates.** The identity of
 `exists_weakSolution_dirichlet_of_lt` with both sides unfolded: `∫ ∇u · ∇v = λ ∫ |u|^{q-2}uv` for
 every `v ∈ H₀¹`, with `λ = ∫ |∇u|²`. -/
 theorem exists_weakSolution_dirichlet_of_lt'

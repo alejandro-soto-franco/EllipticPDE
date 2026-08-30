@@ -146,7 +146,7 @@ theorem interiorRegularityAt_zero (Op : FullEllipticOp (n + 1))
 set_option maxHeartbeats 1600000 in
 -- The step has the tower, its collar, four cutoffs, the inductive family on two sets and the
 -- datum, and the closed form of the gradient is checked against all of them.
-/-- **The differentiated equation, as a weak formulation for a cutoff derivative.** For a weak
+/-- **The differentiated equation as a weak formulation for a cutoff derivative.** For a weak
 solution `u` of `L u = f` and each direction `ℓ`, there is an element `U ∈ H₀¹(Ω)` agreeing with
 `∂_ℓ u` on `V`, a datum `F ∈ L²(Ω)` with `k` weak derivatives, and a weak formulation `B[U, w] =
 ⟪F, w⟫` for every `w ∈ H₀¹(Ω)`, with both `‖U‖` and the `H^k` bound on `F` controlled by the

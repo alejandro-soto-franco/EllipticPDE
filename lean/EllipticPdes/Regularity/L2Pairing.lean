@@ -177,7 +177,7 @@ theorem setIntegral_weight_mul_congr_of_cutoff_ae {θ : EuclideanSpace ℝ (Fin 
     ring
   rw [← e (X x : ℝ), hx, e (Y x : ℝ)]
 
-/-- **A sum of two weighted classes, paired against a cut-off test function.** The
+/-- **A sum of two weighted classes paired against a cut-off test function.** The
 differentiated equation groups its datum two terms at a time, one with a derivative of a
 coefficient and one with a derivative of the solution, and the datum of the induction step names
 them separately. This is the split, with the cutoff moved to the front where the datum has it. -/

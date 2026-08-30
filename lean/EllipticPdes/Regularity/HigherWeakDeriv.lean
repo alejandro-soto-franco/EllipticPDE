@@ -108,7 +108,7 @@ def deriv (hu : HasIteratedWeakDerivOn V (k + 1) u) (l : Fin d) :
       simpa [List.length_append] using Nat.succ_lt_succ hα
     simpa using hu.D_step m (α ++ [l]) hlen
 
-/-- **A first derivative, at two orders down.** The datum of the induction step multiplies
+/-- **A first derivative two orders down.** The datum of the induction step multiplies
 derivatives of the solution of order at most two, and asks each of them for `k` weak
 derivatives of its own. Naming the two cases here rather than inlining them keeps the
 definitional unfolding of `deriv` out of the assembly, where it is repeated a dozen times. -/

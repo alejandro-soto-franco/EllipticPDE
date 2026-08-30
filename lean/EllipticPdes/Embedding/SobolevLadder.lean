@@ -186,7 +186,7 @@ theorem memLp_of_gradClosed (hd : 0 < d) (c : EuclideanSpace ℝ (Fin d))
     exact (hK (F i) (fun k => F (nxt i k)) (hQmem i) (fun k => hQmem (nxt i k))
       ((hgrad i).mono (Metric.ball_subset_ball hr'R.le))).1
 
-/-- **The ladder, run to the top.** A family closed under differentiation, in `L²` on
+/-- **The ladder run to the top.** A family closed under differentiation, in `L²` on
 `Metric.ball c R`, lies in `L^{2d}` on any smaller concentric ball. Since `2d > d`, this is the
 exponent `EllipticPdes.Embedding.morrey_ball` asks for, in every dimension.
 

@@ -54,7 +54,7 @@ open EllipticPdes.Sobolev EllipticPdes.Embedding
 
 variable {d : ℕ}
 
-/-- **The second case, in multi-index form.** An `L²` class with weak derivatives up to order
+/-- **The second case in multi-index form.** An `L²` class with weak derivatives up to order
 `m` on `V`, and `k + 1 + ⌊d/2⌋ ≤ m`, has on any ball compactly inside `V` a family of
 representatives indexed by lists of directions: the empty list represents the class, every list
 of length at most `k` is Hölder-`1/2` and of class `C^{k - |α|}`, and each is the classical
@@ -89,7 +89,7 @@ theorem exists_contDiffOn_holder_ball_of_hasIteratedWeakDerivOn (hd : 0 < d)
   rw [← hF0]
   exact h0
 
-/-- **The second case, at the root.** An `L²` class `u` on `V` with weak derivatives to order
+/-- **The second case at the root.** An `L²` class `u` on `V` with weak derivatives to order
 `m`, and `k + 1 + ⌊d/2⌋ ≤ m`, has on any ball whose enlargement sits inside `V` a representative
 of class `C^k`, Hölder-`1/2` there.
 

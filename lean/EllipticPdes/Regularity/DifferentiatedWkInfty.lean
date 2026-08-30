@@ -121,7 +121,7 @@ end IsWkInfty
 
 /-! ### Three terms -/
 
-/-- **Principal term, for a `W^{1,∞}` coefficient.** For every direction pair the weighted first
+/-- **Principal term for a `W^{1,∞}` coefficient.** For every direction pair the weighted first
 derivative `a_{ij}·∂ᵢu` has weak `ℓ`-derivative `(∂_ℓ a_{ij})·∂ᵢu + a_{ij}·∂_ℓ∂ᵢu`, with the
 coefficient derivative read off the family rather than taken classically. Testing against `∂ⱼφ`
 and summing gives
@@ -155,7 +155,7 @@ theorem principal_move_wkInfty {V : Set (EuclideanSpace ℝ (Fin d))}
     _ = - ∑ i, ∑ j, ∫ x in V, (comm i j x : ℝ) * partialD j φ x := by
         simp only [Finset.sum_neg_distrib]
 
-/-- **Transport term, for a `W^{1,∞}` coefficient.**
+/-- **Transport term for a `W^{1,∞}` coefficient.**
 `∫_V b_i(∂ᵢu) ∂_ℓφ = -∫_V [(∂_ℓ b_i)(∂ᵢu) + b_i(∂ₗ∂ᵢu)] φ`, with the coefficient derivative read
 off the family. -/
 theorem transport_move_wkInfty {V : Set (EuclideanSpace ℝ (Fin d))} (ℓ : Fin d)
@@ -173,7 +173,7 @@ theorem transport_move_wkInfty {V : Set (EuclideanSpace ℝ (Fin d))} (ℓ : Fin
     (hbi.hasWeakPartial_D ℓ) hbi.ae_abs_le (hbi.ae_abs_D_singleton_le ℓ) bDu hbDu comm hcomm
     φ hφc hφcs hφV
 
-/-- **Zeroth-order term, for a `W^{1,∞}` coefficient.**
+/-- **Zeroth-order term for a `W^{1,∞}` coefficient.**
 `∫_V c·u·∂_ℓφ = -∫_V [(∂_ℓ c)·u + c·(∂ₗu)] φ`, with the coefficient derivative read off the
 family. -/
 theorem zeroth_move_wkInfty {V : Set (EuclideanSpace ℝ (Fin d))} (ℓ : Fin d)
@@ -193,7 +193,7 @@ theorem zeroth_move_wkInfty {V : Set (EuclideanSpace ℝ (Fin d))} (ℓ : Fin d)
 
 /-! ### Principal commutator -/
 
-/-- **Moving `∂ⱼ` off the principal commutator, for a `W^{2,∞}` coefficient.** The coefficient
+/-- **Moving `∂ⱼ` off the principal commutator for a `W^{2,∞}` coefficient.** The coefficient
 derivative `∂_ℓ a_{ij}` is itself a `W^{1,∞}` weight, so the product `(∂_ℓ a_{ij})·∂ᵢu` has a weak
 `j`-derivative and testing against `φ` moves `∂ⱼ` onto the product:
 `∫_V (∂_ℓ a_{ij})(∂ᵢu) ∂ⱼφ = -∫_V [(∂ⱼ∂_ℓ a_{ij})(∂ᵢu) + (∂_ℓ a_{ij})(∂ⱼ∂ᵢu)] φ`.
@@ -244,7 +244,7 @@ theorem commutator_move_wkInfty {V : Set (EuclideanSpace ℝ (Fin d))}
 
 /-! ### Differentiated identity -/
 
-/-- **Differentiated weak formulation (divergence-datum form), for `W^{1,∞}` coefficients.**
+/-- **Differentiated weak formulation (divergence-datum form) for `W^{1,∞}` coefficients.**
 Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 2, with every classical
 coefficient derivative replaced by the chosen representative the `W^{k,∞}` bundles supply. Given
 the localised weak identity `hLoc` for `u` on `V` together with the first and second weak

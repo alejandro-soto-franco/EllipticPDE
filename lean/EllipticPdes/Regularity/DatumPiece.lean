@@ -109,7 +109,7 @@ theorem exists_datum_piece {Ω N : Set (EuclideanSpace ℝ (Fin d))}
   filter_upwards [mulL2_coeFn ha.measurable_self ha.ae_abs_le p] with x hx
   rw [hx]
 
-/-- **A finite family of pieces, assembled.** The datum of the induction step is a fixed finite
+/-- **A finite family of pieces assembled.** The datum of the induction step is a fixed finite
 list of shapes, each a cutoff against a coefficient against a derivative, and only the
 derivatives depend on the solution. Quantifying the constant before the derivatives is what
 carries that through: the cutoffs and coefficients are data of the operator and the tower, so

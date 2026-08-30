@@ -218,7 +218,7 @@ private theorem potential_inner_cov {φ : EuclideanSpace ℝ (Fin d) → ℝ}
     rw [mul_assoc, ← pow_succ, ← zpow_natCast t (d + 1), ← zpow_add₀ ht.ne', hz, zpow_zero]
   rw [harith, ENNReal.ofReal_one, one_mul]
 
-/-- **Tail bound, `lintegral` form.** The ENNReal integral of the singular kernel over `Ioc a 1`
+/-- **Tail bound in `lintegral` form.** The ENNReal integral of the singular kernel over `Ioc a 1`
 is bounded by `ofReal (a^{-d}/d)`. This is `tail_integral_bound` transported to `ℝ≥0∞`, ready to
 feed the per-point Riesz estimate in the kernel bound. -/
 private theorem tail_lintegral_bound (hd : 0 < d) {a : ℝ} (ha : 0 < a) :

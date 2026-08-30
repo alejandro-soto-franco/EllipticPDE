@@ -139,7 +139,7 @@ theorem setIntegral_principal_entry {Ω W : Set (EuclideanSpace ℝ (Fin d))}
     setIntegral_mul_cutoff_partialD_split Aig hξW.1 hξW.2.1 hvc j]
   ring
 
-/-- **One entry of the principal block, in the shape the datum pairs against.** The general
+/-- **One entry of the principal block in the shape the datum pairs against.** The general
 entry is instantiated at the operator's coefficient, its weak derivative is supplied by the
 `W^{k,∞}` bundle through the Leibniz rule, and the three integrals it returns are split into the
 five the datum names.

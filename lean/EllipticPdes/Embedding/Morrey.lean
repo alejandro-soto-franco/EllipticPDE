@@ -506,7 +506,7 @@ theorem norm_fderiv_le_sum_partialD (u : EuclideanSpace ℝ (Fin d) → ℝ)
     _ = (∑ k, ‖partialD k u y‖) * ‖x‖ := by
         rw [Finset.sum_mul]; exact Finset.sum_congr rfl fun k _ => mul_comm _ _
 
-/-- **Morrey on a ball, smooth case.** A smooth `u` with gradient components `gₖ = ∂ₖu`
+/-- **Morrey on a ball in the smooth case.** A smooth `u` with gradient components `gₖ = ∂ₖu`
 in `Lᵖ(ball c r)` (`p > d`) is Hölder-`(1−d/p)` on the ball, with constant linear in
 `∑ₖ ‖gₖ‖_{Lᵖ(ball c r)}`. This lifts `exists_holder_smooth` to the coordinate-partial form
 consumed by the weak-gradient statement, by dominating the operator-norm `Lᵖ` seminorm of the

@@ -269,7 +269,7 @@ theorem rellichEmbL_isCompact_of_le (hΩm : MeasurableSet Ω) (hΩb : IsBounded 
   rw [hfun]
   exact (embL2_isCompact hΩm hΩb).clm_comp (lqOfL2 (Ω := Ω) hq2)
 
-/-- **Rellich-Kondrachov, Guo's range.** On a bounded measurable domain in dimension greater than
+/-- **Rellich-Kondrachov in Guo's range.** On a bounded measurable domain in dimension greater than
 two, the embedding `H₀¹(Ω) ↪ L^q(Ω)` is compact at every exponent `q` strictly below the Sobolev
 conjugate `2⋆`.
 

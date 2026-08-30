@@ -87,7 +87,7 @@ section GraphIdentity
 
 variable {d : ℕ} {r : ℝ} {ζ φ : EuclideanSpace ℝ (Fin (d + 1)) → ℝ}
 
-/-- **Discrete graph identity, tangential.** On a test-function graph, the cutoff of the
+/-- **Tangential discrete graph identity.** On a test-function graph, the cutoff of the
 tangential difference quotient is the graph of the product `ζ · Dₖ^h φ`. Coordinatewise the
 restricted difference quotient of `φ`'s classes equals the difference quotient of `φ`
 (its extension by zero being `φ` itself), and the Leibniz rule
@@ -164,7 +164,7 @@ private lemma cutoffMulOn_tangDiffQuotG_testGraph (hζ : IsTestFn (Metric.ball 0
 
 /-! ### Crux admissibility -/
 
-/-- **Crux admissibility, tangential.** For `U ∈ H₀¹(halfBall d r)`, the cutoff of its
+/-- **Tangential crux admissibility.** For `U ∈ H₀¹(halfBall d r)`, the cutoff of its
 tangential difference quotient is again in `H₀¹(halfBall d r)`. Since
 `cutoffMulOn Ω ζ ∘ tangDiffQuotG` is continuous and sends every test-function graph into
 `H₀¹` (by `cutoffMulOn_tangDiffQuotG_testGraph`, as `ζ · Dₖ^h φ` is a test function on the

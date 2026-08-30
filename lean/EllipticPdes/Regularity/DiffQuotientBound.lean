@@ -158,7 +158,7 @@ private theorem sq_fderiv_hshift {φ : EuclideanSpace ℝ (Fin d) → ℝ} (k : 
     simp [hshift, partialD]
   rw [hfv]; ring
 
-/-- **Difference-quotient bound, smooth compactly supported case.** For `φ` smooth with
+/-- **Difference-quotient bound in the smooth compactly supported case.** For `φ` smooth with
 compact support, the `L²` norm of the difference quotient `Dₖʰφ` is bounded by the `L²`
 norm of the `k`-th classical partial derivative: `‖Dₖʰφ‖ ≤ ‖∂ₖφ‖`. The argument is the
 fundamental-theorem-of-calculus proof of Evans, *Partial Differential Equations* (2nd
@@ -345,7 +345,7 @@ private theorem integrable_uncurry_transDiff {ψ : EuclideanSpace ℝ (Fin d) �
   rw [integrable_congr hae]
   exact (integrable_indicator_iff hCcomp.measurableSet).mpr hIntOn
 
-/-- **Difference-quotient minus derivative, squared `L²` bound.** For `φ` smooth with compact
+/-- **Squared `L²` bound on the difference quotient minus the derivative.** For `φ` smooth with compact
 support and `h ≠ 0`, the squared `L²` distance from the difference quotient `Dₖʰφ` to the
 partial derivative `∂ₖφ` is bounded by the integral over `t ∈ [0, 1]` of the squared `L²`
 translation defects `‖τ_{t h eₖ} ∂ₖφ - ∂ₖφ‖²`. This is the fundamental-theorem-of-calculus
@@ -805,7 +805,7 @@ private theorem inner_diffQuot_le_smooth (k : Fin d) (g g' : EucL2 d)
           intervalIntegrable_const hbd
     _ = ‖g'‖ * ‖ζLp‖ := by rw [intervalIntegral.integral_const]; simp
 
-/-- **Difference-quotient bound, weak-derivative case (Evans §5.8.2, direction i).** A function `g`
+/-- **Difference-quotient bound in the weak-derivative case (Evans §5.8.2, direction i).** A function `g`
 with `L²` weak `k`-derivative `g'` has difference quotients bounded in `L²` by the derivative:
 `‖Dₖʰ g‖ ≤ ‖g'‖`, uniformly in the step `h`. This is the general form of the tight single-direction
 bound `norm_diffQuot_le_of_contDiff`, obtained by testing `Dₖʰ g` against the smooth compactly

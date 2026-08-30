@@ -49,7 +49,7 @@ open EllipticPdes.Sobolev EllipticPdes.Embedding
 
 variable {n : ℕ}
 
-/-- **Interior `C^{k,1/2}` regularity of the weak solution, in every dimension.** With
+/-- **Interior `C^{k,1/2}` regularity of the weak solution in every dimension.** With
 coefficients of enough `W^{k,∞}` regularity and a datum with enough weak derivatives, the weak
 solution of `L u = f` has a representative on every interior ball that is `C^k` there and whose
 `k`-th derivatives are Hölder of exponent `1/2`.

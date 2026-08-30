@@ -138,7 +138,7 @@ private lemma mulTestPartial_theta_diffQuotD (hΩm : MeasurableSet Ω) (hθ : Is
 
 /-! ### Discrete integration by parts -/
 
-/-- **Discrete integration by parts, principal term.** For a class `p` whose whole-space
+/-- **Discrete integration by parts on the principal term.** For a class `p` whose whole-space
 extension stays supported inside `Ω` after the backward shift, the restricted-domain pairing
 of the coefficient action against the backward interior difference quotient of `p` transfers,
 via the extension isometry and the whole-space adjoint relation `diffQuot_inner_adjoint`,
@@ -187,7 +187,7 @@ private lemma diffQuotG_cutoffSq_supp (hξ : IsTestFn Ω ξ) (hΩm : MeasurableS
         (fun hc => hxS (tsupport_partialD_subset i _ hc))
     rw [hadd, Pi.add_apply, hmt, hmtp, hsq, hpsq, zero_mul, zero_mul, add_zero]
 
-/-- **Evans test element, successor coordinate.** Under the outer-cutoff reachability
+/-- **Evans test element at the successor coordinate.** Under the outer-cutoff reachability
 conditions (`θ ≡ 1`, hence `∂θ = 0`, on the shift-reachable part of `tsupport ξ²`), the
 `j+1` coordinate of the admissible test element reduces to a single backward difference
 quotient of the inner block: `(v_h)_{j+1} = -Dₖ^{-h}((ξ²·Dₖ^h u)_{j+1})`. This is the
@@ -272,7 +272,7 @@ private lemma diffQuotD_eq_restrictL2_diffQuot (hΩm : MeasurableSet Ω) (k : Fi
     ae_restrict_of_ae (coeFn_extendL2 hΩm g), ae_restrict_mem hΩm] with x hx1 hx2 hx3 hx4 hx5
   rw [hx1, hx2, hx3, hx4, Set.indicator_of_mem hx5]
 
-/-- **Evans test element, zeroth coordinate.** The function value of the test element is a
+/-- **Evans test element at the zeroth coordinate.** The function value of the test element is a
 single backward difference quotient of the inner block, `(v_h)₀ = -Dₖ^{-h}((ξ²·Dₖ^h u)₀)`,
 by θ-chop invisibility (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1). -/
 private lemma evansTest_zero_eq (hΩm : MeasurableSet Ω) (hξ : IsTestFn Ω ξ) (hθ : IsTestFn Ω θ)
@@ -292,7 +292,7 @@ private lemma evansTest_zero_eq (hΩm : MeasurableSet Ω) (hξ : IsTestFn Ω ξ)
   rw [mulTest_theta_diffQuotD hΩm hθ k (Z 0)
     (diffQuotG_cutoffSq_supp hξ hΩm k h (u : H1amb Ω) 0) hθ1]
 
-/-- **Evans bilinear identity, restricted-domain form.** Bringing the whole-space pairing of
+/-- **Evans bilinear identity in restricted-domain form.** Bringing the whole-space pairing of
 `evansTest_bilin_ibp` back to `L²(Ω)` through the extension adjoint and the identity
 `diffQuotD = restrict ∘ diffQuot ∘ extendL2`, the principal form testing against the Evans
 element is the restricted-domain pairing of the inner cutoff block against the interior
@@ -516,7 +516,7 @@ private lemma norm_mulTest_sq_le (hξ : IsTestFn Ω ξ) (g : L2D Ω) :
     ‖mulTest (isTestFn_mul hξ hξ) g‖ ≤ (exists_abs_bound hξ).choose * ‖mulTest hξ g‖ := by
   rw [mulTest_mul_eq hξ g]; exact norm_mulTest_le hξ _
 
-/-- **The coefficient difference-quotient commutator, `L²(Ω)` norm bound.** The interior
+/-- **The `L²(Ω)` norm bound on the coefficient difference-quotient commutator.** The interior
 difference quotient of a coefficient-multiplied field splits into the translated coefficient
 acting on the field's difference quotient plus a commutator whose `L²(Ω)` norm is controlled
 by the `C¹` gradient bound `A₁`: `‖Dₖʰ(aᵢⱼ g) − (τ_{h eₖ}aᵢⱼ) Dₖʰ g‖ ≤ A₁ ‖g‖`. This is the

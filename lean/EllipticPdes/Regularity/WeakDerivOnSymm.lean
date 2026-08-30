@@ -161,7 +161,7 @@ theorem mulTest_weakDerivOn_unique {V : Set (EuclideanSpace ℝ (Fin d))} (hVm :
 
 /-! ### Mixed second weak derivatives commute -/
 
-/-- **Mixed second weak derivatives commute, after a cutoff.** Where `uᵢ` and `u_ℓ` are weak
+/-- **Mixed second weak derivatives commute after a cutoff.** Where `uᵢ` and `u_ℓ` are weak
 first derivatives of `u` on `V`, and `u_{ℓi}` is a weak `ℓ`-derivative of `uᵢ` while `u_{iℓ}`
 is a weak `i`-derivative of `u_ℓ`, the two agree once multiplied by any test function supported
 in `V`.

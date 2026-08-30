@@ -92,7 +92,7 @@ theorem restrictL2_extendL2_congr_of_weakDerivOn {W N : Set (EuclideanSpace ℝ 
   restrictL2_extendL2_eq_of_mulTest_eq hWm hNm hNW hθW hθN
     (mulTest_weakDerivOn_unique hWm hθW hX hY)
 
-/-- **A family and its bound, moved to a subregion.** Both halves of the restriction, packaged
+/-- **A family and its bound moved to a subregion.** Both halves of the restriction, packaged
 so the elaborator does the unification once. Applied inline in the induction step, where the
 context has the tower and the datum, the same two lines take minutes. -/
 theorem exists_restrictFamily {Ω N : Set (EuclideanSpace ℝ (Fin d))}
@@ -102,7 +102,7 @@ theorem exists_restrictFamily {Ω N : Set (EuclideanSpace ℝ (Fin d))}
       IteratedL2Bound HN C :=
   ⟨H.restrict hΩm hNm hNΩ, IteratedL2Bound.restrict hC⟩
 
-/-- **The inductive family, moved to the collar.** A family on `W` for the whole-space
+/-- **The inductive family moved to the collar.** A family on `W` for the whole-space
 extension of `g`, restricted to `N`, is a family there for the same class, with the same bound,
 and its first entries are the given weak derivatives of `g`.
 

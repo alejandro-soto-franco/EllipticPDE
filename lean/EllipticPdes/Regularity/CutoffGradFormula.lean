@@ -94,7 +94,7 @@ theorem extendL2_mulTest_eq {Ω W : Set (EuclideanSpace ℝ (Fin d))}
     · rw [Set.indicator_of_mem hxΩ, h3 hxΩ, hξx, zero_mul]
     · rw [Set.indicator_of_notMem hxΩ]
 
-/-- **The gradient of a cut-off class, in closed form.** Let `ξ` be a cutoff supported in
+/-- **The gradient of a cut-off class in closed form.** Let `ξ` be a cutoff supported in
 `W ⊆ Ω`, let `g ∈ L²(Ω)` have weak derivatives `Dg i` on `W`, and let `Uamb` be an ambient
 element whose function coordinate is `ξ·g` and whose gradient coordinates are the weak
 derivatives of that product. Then each gradient coordinate is `(∂ᵢξ)·g + ξ·(∂ᵢg)`.

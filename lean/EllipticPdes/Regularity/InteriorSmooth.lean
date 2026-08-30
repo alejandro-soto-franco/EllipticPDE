@@ -110,7 +110,7 @@ theorem exists_contDiffOn_ball_of_hasIteratedWeakDerivOn
   obtain ⟨v, hvae, hvc⟩ := exists_contDiffOn_of_locally_ae Metric.isOpen_ball _ hloc
   exact ⟨v, hvc, hvae⟩
 
-/-- **The Sobolev ladder, qualitative form.** An `L²` class on `V` with weak derivatives of
+/-- **The Sobolev ladder in qualitative form.** An `L²` class on `V` with weak derivatives of
 every order has a representative smooth on the interior of `V`. No bound is asked and none is
 produced: the estimate lives in `higher_interior_regularity`, and smoothness on a fixed set
 follows from the existence of the derivatives alone.

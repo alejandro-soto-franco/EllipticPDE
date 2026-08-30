@@ -68,7 +68,7 @@ theorem extendL2_ae_eq_zero {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩm : Meas
 
 /-! ### Carrying the Caccioppoli energy onto whole-space classes -/
 
-/-- **The Caccioppoli energy, on whole-space classes.** Feeding the interior energy estimate
+/-- **The Caccioppoli energy on whole-space classes.** Feeding the interior energy estimate
 `EllipticPdes.Regularity.caccioppoli` through the norm-preserving extension bridge, the
 cutoff-weighted gradient energy of a weak solution `u ∈ H₀¹(Ω)` of `L u = f`, measured on the
 whole-space `EucL2 d` classes `extendL2 hΩm (ζ · ∂ᵢu)`, is bounded by the data:
@@ -127,7 +127,7 @@ theorem extendL2_actL {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩm : Measurable
     exact hact_x hxΩ
   · rw [Set.indicator_of_notMem hxΩ, Set.indicator_of_notMem hxΩ, mul_zero]
 
-/-- **Discrete Leibniz for coefficient × field, whole space.** Splits the difference
+/-- **Discrete Leibniz for coefficient × field on the whole space.** Splits the difference
 quotient of a coefficient-multiplied extension into the elliptic leading term (the
 coefficient translated to the shifted point, times the difference quotient of the field)
 and the commutator term (the coefficient's own difference quotient, times the field),

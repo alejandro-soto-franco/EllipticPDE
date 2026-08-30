@@ -311,7 +311,7 @@ theorem exists_const_holderOnWith_of_gradClosed (hd : 0 < d) (c : EuclideanSpace
   exact hC (F i) (fun k => F (nxt i k)) hFint hgradP hgradr
 
 
-/-- **Guo's clause (ii) with its constant, against the `L²` data.** Composing the ladder's
+/-- **Guo's clause (ii) with its constant against the `L²` data.** Composing the ladder's
 constant with Morrey's gives one constant, depending on the dimension, the rung count, the
 exponent and the two radii, bounding the Hölder seminorm of every member by a uniform `L²` bound
 on the family over the outer ball. This is the shape of Guo's
