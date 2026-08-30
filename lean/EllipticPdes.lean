@@ -85,6 +85,7 @@ import EllipticPdes.Embedding.SobolevLadderGeneral
 import EllipticPdes.Extension.Reflect
 import EllipticPdes.Extension.Translate
 import EllipticPdes.Analysis.LpTranslationContinuity
+import EllipticPdes.Extension.ShiftMollify
 import EllipticPdes.Embedding.WeakGradUnique
 import EllipticPdes.Embedding.ClassicalDeriv
 import EllipticPdes.Embedding.SmoothOfGradClosed

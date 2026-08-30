@@ -39,6 +39,11 @@ MANIFEST = ROOT / "proofsense" / "manifest.json"
 # that no transcribed statement matches it, which the README under
 # proofsense/ has to justify in prose.
 EXEMPT = {
+    "EllipticPdes.Extension.tendsto_eLpNorm_translate_convolution_sub": (
+        "a shifted mollification converges in L^p to the function it started from. Evans "
+        "performs the shift and the mollification together inside the proof of 5.3.3 Theorem 3 "
+        "and states no lemma for their composition, so no transcribed statement matches it"
+    ),
     "EllipticPdes.Analysis.tendsto_eLpNorm_translate_sub": (
         "continuity of translation in L^p. Evans uses it inside the proof of 5.3.3 Theorem 3, "
         "where the shift into the domain must be small in the norm, and states no "

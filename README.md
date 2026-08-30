@@ -141,6 +141,13 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   `EllipticPdes.Sobolev.dirichlet_poincare_sharp` with the equality case
   `dirichlet_poincare_attained`: $\lambda_1 \|u\|_{L^2}^2 \le \int |\nabla u|^2$
   on all of $H_0^1(\Omega)$, and some $u$ of unit $L^2$ norm meets it,
+- the local step of global approximation, as
+  `EllipticPdes.Extension.tendsto_eLpNorm_translate_convolution_sub`: a
+  mollification of a shift converges in $L^p$ to the function, as the shift and
+  the radius go to zero together, which is what lets a mollifier near the
+  boundary see only points where the function is defined. Convolution commutes
+  with translation, so the mollification error of the shift is the shift of the
+  mollification error and has the same norm,
 - continuity of translation in $L^p$, as
   `EllipticPdes.Analysis.tendsto_eLpNorm_translate_sub`: the $L^p$ distance
   between a function and its translate tends to zero with the translation, which

@@ -411,3 +411,7 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Analysis.tendsto_eLpNorm_translate_sub' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Analysis.tendsto_eLpNorm_translate_sub
+
+/-- info: 'EllipticPdes.Extension.tendsto_eLpNorm_translate_convolution_sub' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Extension.tendsto_eLpNorm_translate_convolution_sub
