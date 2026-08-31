@@ -22,8 +22,9 @@ returns the identity as the mollification shrinks.
 
 ## Main declarations
 
-* `EllipticPdes.Extension.indepCoord_partialD`: a partial derivative of a chart independent of
-  the `j`-th coordinate is itself independent of it.
+* `EllipticPdes.Extension.fderiv_eq_of_indepCoord`: the derivative of a chart independent of the
+  `j`-th coordinate is itself independent of it.
+* `EllipticPdes.Extension.indepCoord_partialD`: the same for a partial derivative.
 * `EllipticPdes.Extension.indepCoord_convolution`: mollification preserves that independence.
 * `EllipticPdes.Extension.integral_mul_indepCoord`: the identity of a weak gradient in the
   `j`-th direction, against a test function scaled by such a factor.
@@ -53,18 +54,21 @@ local notation "Lsm" => ContinuousLinearMap.lsmul ℝ ℝ (E := ℝ)
 
 /-- **Independence of the `j`-th coordinate passes to a partial derivative.** Translating along
 `eⱼ` leaves the chart alone, so it leaves the derivative alone. -/
-theorem indepCoord_partialD {j k : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ}
-    (hγ : Differentiable ℝ γ) (hind : IndepCoord j γ) : IndepCoord j (partialD k γ) := by
-  intro y t
+theorem fderiv_eq_of_indepCoord {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hγ : Differentiable ℝ γ) (hind : IndepCoord j γ) (y : EuclideanSpace ℝ (Fin d)) (t : ℝ) :
+    fderiv ℝ γ (y + t • EuclideanSpace.single j (1 : ℝ)) = fderiv ℝ γ y := by
   set c : EuclideanSpace ℝ (Fin d) := t • EuclideanSpace.single j (1 : ℝ) with hc
   have hfun : (fun z => γ (z + c)) = γ := funext fun z => hind z t
   have h1 : HasFDerivAt (fun z => γ (z + c)) (fderiv ℝ γ (y + c)) y := by
     have h := (hγ (y + c)).hasFDerivAt.comp y ((hasFDerivAt_id y).add_const c)
     simpa [Function.comp_def] using h
   rw [hfun] at h1
-  have h2 : fderiv ℝ γ (y + c) = fderiv ℝ γ y := h1.fderiv.symm
-  change partialD k γ (y + c) = partialD k γ y
-  simp only [partialD, h2]
+  exact h1.fderiv.symm
+
+theorem indepCoord_partialD {j k : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hγ : Differentiable ℝ γ) (hind : IndepCoord j γ) : IndepCoord j (partialD k γ) := by
+  intro y t
+  simp only [partialD, fderiv_eq_of_indepCoord hγ hind y t]
 
 /-- **Mollification preserves independence of a coordinate.** The convolution averages the
 factor over translations, each of which leaves it alone. -/
