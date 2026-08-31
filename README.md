@@ -240,8 +240,18 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   positive: in dimension zero a chart has no direction to take its graph in and
   none exists. `C1Chart.fits_ball` reads a chart in the original coordinates,
   the motion being an isometry and so pulling the ball about an image point
-  back to the ball about the point. The partition of unity over that cover, and
-  the sum of the local pieces against it, are what remain of the operator,
+  back to the ball about the point,
+- the partition of unity over that cover, as
+  `EllipticPdes.Extension.nonempty_boundaryPartition`: for a bounded open domain
+  with $C^1$ boundary, a `BoundaryPartition` bundles the charts, their centres
+  and a smooth partition of unity subordinate to the charts' balls together with
+  the domain itself, adding to one on $\overline{\Omega}$. The index is an
+  option: the piece indexed by nothing sits inside the domain away from the
+  boundary, and the piece indexed by a centre sits in that chart's ball. Mathlib
+  proves such partitions for a manifold and a normed space is one over itself,
+  so `exists_smooth_partition` reads the smoothness of each piece back as
+  $C^\infty$ and nothing downstream of that file meets a manifold. The sum of the
+  local extensions against those pieces is what remains of the operator,
 - both cases of the order-$k$ embedding off `p = 2`. Case (ii) is
   `EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed_general`: the ladder
   runs for $s$ rungs from $L^{p_0}$ and Morrey reads the Hölder exponent off the

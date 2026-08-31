@@ -90,6 +90,13 @@ EXEMPT = {
         "gradient. The patching over a finite cover of the boundary, which is the remaining "
         "step of that theorem, is not formalised"
     ),
+    "EllipticPdes.Extension.nonempty_boundaryPartition": (
+        "the cover and the partition of unity that step 3 of Guo's proof of III.2.2 glues with, "
+        "bundled. Guo takes the partition for granted in one clause of that step and states no "
+        "lemma for it, so no transcribed statement matches it. Mathlib proves the partition for "
+        "a manifold; a normed space is one over itself, and the smoothness of each piece is read "
+        "back as ContDiff so that nothing downstream meets a manifold"
+    ),
     "EllipticPdes.Extension.exists_finite_chart_cover": (
         "the finite subcover of the boundary that opens step 3 of Guo's proof of III.2.2, where "
         "he writes that the boundary being compact there are finitely many points whose "
