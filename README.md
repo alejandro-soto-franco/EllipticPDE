@@ -192,8 +192,22 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   steps for a function smooth up to the boundary and reaches $W^{1,p}$ by
   density, which is why his reflection is the higher-order one that keeps the
   extension $C^1$; a statement about weak gradients throughout needs no such
-  matching, and the plain even reflection serves. The patching over a finite
-  cover of $\partial\Omega$ is what remains of the operator,
+  matching, and the plain even reflection serves. The bound is componentwise,
+  as `EllipticPdes.Extension.eLpNorm_chartExtGrad_le`: twice the seminorm of
+  the matching component of the gradient plus four times the chart's bound
+  against the normal one, the shear contributing that bound once, the
+  reflection doubling, and the inverse shear contributing it again. The normal component
+  travels through the shear untouched, the chart having no partial derivative
+  in the direction it is a graph in,
+- the hypothesis those charts satisfy, as
+  `EllipticPdes.Extension.HasC1Boundary`: every boundary point admits a chart,
+  which is an isometry relabelling and reorienting the axes, a direction, a
+  $C^1$ graph of the remaining coordinates with bounded gradient, and a radius
+  on whose ball the domain and the region above the graph agree. That is the
+  hypothesis of Guo's Theorem III.2.2 and of Evans §5.4 Theorem 1. The region
+  above a graph and the half space are charts at every point, and the boundary
+  of a bounded domain is compact. The patching over a finite cover of
+  $\partial\Omega$ is what remains of the operator,
 - both cases of the order-$k$ embedding off `p = 2`. Case (ii) is
   `EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed_general`: the ladder
   runs for $s$ rungs from $L^{p_0}$ and Morrey reads the Hölder exponent off the

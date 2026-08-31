@@ -432,6 +432,14 @@ import EllipticPdes
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Extension.hasWeakGradOn_chartExt
 
+/-- info: 'EllipticPdes.Extension.eLpNorm_chartExt_le' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Extension.eLpNorm_chartExt_le
+
+/-- info: 'EllipticPdes.Extension.eLpNorm_chartExtGrad_le' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Extension.eLpNorm_chartExtGrad_le
+
 /-- info: 'EllipticPdes.Analysis.tendsto_eLpNorm_translate_sub' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Analysis.tendsto_eLpNorm_translate_sub

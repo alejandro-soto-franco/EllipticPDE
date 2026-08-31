@@ -66,6 +66,20 @@ EXEMPT = {
         "and is stated for an arbitrary set, since the boundary charts of that construction "
         "reflect across the image of a hyperplane"
     ),
+    "EllipticPdes.Extension.eLpNorm_chartExt_le": (
+        "the local half of clause (iii) of Evans 5.4 Theorem 1 for the class itself: the "
+        "extension across one C^1 chart is bounded by twice the seminorm over the region above "
+        "the graph, both shears preserving measure and the reflection doubling. Evans states "
+        "the bound for the assembled operator over the whole domain and proves the local pieces "
+        "inline, so no transcribed statement matches a single chart"
+    ),
+    "EllipticPdes.Extension.eLpNorm_chartExtGrad_le": (
+        "the same clause for the gradient: componentwise, twice the seminorm of the matching "
+        "component plus four times the chart's gradient bound against the normal one. The three "
+        "maps each contribute, the shear costing the chart's bound against the normal component, "
+        "the reflection doubling, and the inverse shear costing the bound once more. Evans "
+        "states no local bound of this shape"
+    ),
     "EllipticPdes.Extension.hasWeakGradOn_chartExt": (
         "the local half of the extension operator: a class with a weak gradient above the graph "
         "of a C^1 chart extends across that graph, the extension being the flattened class "

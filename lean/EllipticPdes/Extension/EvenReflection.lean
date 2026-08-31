@@ -28,6 +28,7 @@ disappears.
 * `EllipticPdes.Extension.hasWeakGradOn_evenExt`: the weak gradient of the extension.
 * `EllipticPdes.Extension.eLpNorm_evenExt_le`: its bound in every `Lᵖ` seminorm.
 * `EllipticPdes.Extension.aestronglyMeasurable_evenExt`: the extension is measurable.
+* `EllipticPdes.Extension.eLpNorm_evenExtGrad_le`: the gradient's bound in every `Lᵖ` seminorm.
 * `EllipticPdes.Extension.integrable_evenExt` and
   `EllipticPdes.Extension.integrable_evenExtGrad`: the extension and its gradient are
   integrable on the whole space whenever the class is integrable on the half space.
@@ -438,5 +439,66 @@ theorem integrable_evenExtGrad {j : Fin d} {g : Fin d → EuclideanSpace ℝ (Fi
       fun y => reflectSign j k * g k (reflectLI j y)) volume :=
     hr1.integrable_indicator (measurableSet_halfSpaceNeg j)
   exact (h1.add h2).congr (evenExtGrad_ae_eq j g k).symm
+
+/-! ### The gradient's bound -/
+
+/-- The sign a reflection attaches to a direction has absolute value `1`. -/
+theorem abs_reflectSign (j k : Fin d) : |reflectSign j k| = 1 := by
+  rw [reflectSign]
+  split_ifs <;> norm_num
+
+/-- **Measurability of the extended gradient**, componentwise. -/
+theorem aestronglyMeasurable_evenExtGrad {j : Fin d} {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
+    (k : Fin d) (hg : AEStronglyMeasurable (g k) (volume.restrict (halfSpace j))) :
+    AEStronglyMeasurable (evenExtGrad j g k) volume := by
+  have hmp := measurePreserving_reflectLI_halfSpaceNeg j
+  have hg' : AEStronglyMeasurable (fun y => g k (reflectLI j y))
+      (volume.restrict (halfSpaceNeg j)) := hg.comp_measurePreserving hmp
+  have h1 : AEStronglyMeasurable ((halfSpace j).indicator (g k)) volume :=
+    (aestronglyMeasurable_indicator_iff (measurableSet_halfSpace j)).mpr hg
+  have h2 : AEStronglyMeasurable ((halfSpaceNeg j).indicator
+      fun y => reflectSign j k * g k (reflectLI j y)) volume :=
+    (aestronglyMeasurable_indicator_iff (measurableSet_halfSpaceNeg j)).mpr
+      (hg'.const_mul (reflectSign j k))
+  exact (h1.add h2).congr (evenExtGrad_ae_eq j g k).symm
+
+/-- **Bound on the extended gradient in every `Lᵖ` seminorm.** The reflection preserves measure
+and the sign has absolute value `1`, so each side contributes the seminorm on the half space. -/
+theorem eLpNorm_evenExtGrad_le {j : Fin d} {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
+    (k : Fin d) {p : ℝ≥0∞} (hp : 1 ≤ p)
+    (hg : AEStronglyMeasurable (g k) (volume.restrict (halfSpace j))) :
+    eLpNorm (evenExtGrad j g k) p volume
+      ≤ 2 * eLpNorm (g k) p (volume.restrict (halfSpace j)) := by
+  have hmp := measurePreserving_reflectLI_halfSpaceNeg j
+  have hg' : AEStronglyMeasurable (fun y => g k (reflectLI j y))
+      (volume.restrict (halfSpaceNeg j)) := hg.comp_measurePreserving hmp
+  have h1 : AEStronglyMeasurable ((halfSpace j).indicator (g k)) volume :=
+    (aestronglyMeasurable_indicator_iff (measurableSet_halfSpace j)).mpr hg
+  have h2 : AEStronglyMeasurable ((halfSpaceNeg j).indicator
+      fun y => reflectSign j k * g k (reflectLI j y)) volume :=
+    (aestronglyMeasurable_indicator_iff (measurableSet_halfSpaceNeg j)).mpr
+      (hg'.const_mul (reflectSign j k))
+  have hsign : eLpNorm (fun y => reflectSign j k * g k (reflectLI j y)) p
+      (volume.restrict (halfSpaceNeg j))
+      ≤ eLpNorm (fun y => g k (reflectLI j y)) p (volume.restrict (halfSpaceNeg j)) := by
+    refine eLpNorm_mono_ae (Filter.Eventually.of_forall fun y => ?_)
+    rw [norm_mul, Real.norm_eq_abs (reflectSign j k), abs_reflectSign, one_mul]
+  calc eLpNorm (evenExtGrad j g k) p volume
+      = eLpNorm (fun x => (halfSpace j).indicator (g k) x
+          + (halfSpaceNeg j).indicator (fun y => reflectSign j k * g k (reflectLI j y)) x)
+          p volume := eLpNorm_congr_ae (evenExtGrad_ae_eq j g k)
+    _ ≤ eLpNorm ((halfSpace j).indicator (g k)) p volume
+        + eLpNorm ((halfSpaceNeg j).indicator
+            fun y => reflectSign j k * g k (reflectLI j y)) p volume := eLpNorm_add_le h1 h2 hp
+    _ ≤ eLpNorm (g k) p (volume.restrict (halfSpace j))
+        + eLpNorm (g k) p (volume.restrict (halfSpace j)) := by
+        rw [eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_halfSpace j),
+          eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_halfSpaceNeg j)]
+        have hstep : eLpNorm (fun y => reflectSign j k * g k (reflectLI j y)) p
+            (volume.restrict (halfSpaceNeg j))
+            ≤ eLpNorm (g k) p (volume.restrict (halfSpace j)) :=
+          hsign.trans (le_of_eq (eLpNorm_comp_measurePreserving hg hmp))
+        exact add_le_add le_rfl hstep
+    _ = 2 * eLpNorm (g k) p (volume.restrict (halfSpace j)) := by rw [two_mul]
 
 end EllipticPdes.Extension
