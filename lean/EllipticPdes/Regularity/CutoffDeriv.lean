@@ -96,7 +96,7 @@ theorem inner_mulTest_comm {η : EuclideanSpace ℝ (Fin d) → ℝ} (hη : IsTe
 
 /-! ### One-neighbourhood shift margin -/
 
-/-- **A one-neighbourhood shift margin.** If the cutoff `η` is `≡ 1` on a neighbourhood of a
+/-- **One-neighbourhood shift margin.** If the cutoff `η` is `≡ 1` on a neighbourhood of a
 compact set `K`, then there is a positive margin `δ` such that `η` is locally constant `≡ 1`
 near every point within `δ` of `K`. This restates, for use outside
 `EllipticPdes.Regularity.Interior.NormBound`, the localisation fact that shifting a support

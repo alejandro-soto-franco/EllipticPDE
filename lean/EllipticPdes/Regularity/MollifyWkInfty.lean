@@ -110,7 +110,7 @@ theorem abs_convolution_le_of_measurable
     _ = M * 1 := by rw [integral_sub_left_eq_self ρ volume x, hρ1]
     _ = M := mul_one M
 
-/-- **A mollification is local.** If the kernel vanishes outside the ball of radius `r` and two
+/-- **Locality of a mollification.** If the kernel vanishes outside the ball of radius `r` and two
 weights agree on the ball of radius `r` about `x`, their mollifications agree at `x`. This is
 what lets a globally bounded weight, which lies in no `Lᵖ` on the whole space, be replaced near
 a compact set by a truncation that does, without changing the mollification there. -/

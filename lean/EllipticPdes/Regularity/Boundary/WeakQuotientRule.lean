@@ -58,7 +58,7 @@ variable {d : ℕ}
 
 /-! ### Everywhere bound from an almost-everywhere bound -/
 
-/-- **A continuous function bounded below almost everywhere is bounded below everywhere.**
+/-- **Pointwise lower bound for a continuous function bounded below almost everywhere.**
 The set where the bound holds is closed, and it is dense because its complement is null and
 `volume` charges every nonempty open set, so it is the whole space. This is what turns the
 almost-everywhere ellipticity of `EllipticCoeff` into the everywhere positivity that

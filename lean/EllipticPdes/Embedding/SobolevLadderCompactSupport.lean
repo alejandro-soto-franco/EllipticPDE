@@ -68,7 +68,7 @@ theorem memLp_mono_exponent_compactSupport {f : EuclideanSpace ℝ (Fin d) → �
     (s := tsupport f) (fun _ hx => image_eq_zero_of_notMem_tsupport hx)
     hcs.isCompact.measure_lt_top.ne hpq
 
-/-- **A compactly supported `Lᵖ` class is integrable**, for any `p ≥ 1`. -/
+/-- **Integrability of a compactly supported `Lᵖ` class**, for any `p ≥ 1`. -/
 theorem integrable_of_memLp_compactSupport {f : EuclideanSpace ℝ (Fin d) → ℝ}
     (hcs : HasCompactSupport f) {p : ℝ≥0} (hp : 1 ≤ p) (hf : MemLp f p volume) :
     Integrable f volume := by

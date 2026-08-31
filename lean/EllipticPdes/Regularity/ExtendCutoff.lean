@@ -151,7 +151,7 @@ theorem setIntegral_mul_mulTest_partialD {W : Set (EuclideanSpace ℝ (Fin d))}
 
 /-! ### One derivative across the cutoff -/
 
-/-- **A cutoff carries one weak derivative from `W` up to `Ω`.** For a test function `χ`
+/-- **Transport of one weak derivative from `W` up to `Ω` by a cutoff.** For a test function `χ`
 supported in `W ⊆ Ω` and a weak `ℓ`-derivative `p'` of `p` on `W`, any `L²(Ω)` class
 representing `χ·p` has `(∂_ℓχ)·p + χ·p'` as its weak `ℓ`-derivative on `Ω`.
 
@@ -207,9 +207,9 @@ theorem HasWeakDerivOn.extend_mulTest {W Ω : Set (EuclideanSpace ℝ (Fin d))}
   rw [hL, hR]
   exact setIntegral_mul_mulTest_partialD hχ h hφc
 
-/-- **A cutoff carries one weak derivative from `W` up to the whole space.** The same identity
-as `HasWeakDerivOn.extend_mulTest` with the ambient set taken to be everything, which is the
-form `EllipticPdes.Regularity.HasWeakDeriv.unique` consumes.
+/-- **Transport of one weak derivative from `W` up to the whole space by a cutoff.** The same
+identity as `HasWeakDerivOn.extend_mulTest` with the ambient set taken to be everything, which is
+the form `EllipticPdes.Regularity.HasWeakDeriv.unique` consumes.
 
 Stated separately rather than instantiated, because `L²(univ)` and `L²(ℝᵈ)` are different types
 and the conversion is longer than the proof. -/
@@ -258,7 +258,7 @@ theorem hasWeakDeriv_extend_mulTest {W : Set (EuclideanSpace ℝ (Fin d))}
 
 /-! ### Order-`k` family across the cutoff -/
 
-/-- **A cutoff carries `k` weak derivatives from `W` up to `Ω`.** For a test function `χ`
+/-- **Transport of `k` weak derivatives from `W` up to `Ω` by a cutoff.** For a test function `χ`
 supported in `W ⊆ Ω` there is a constant `K`, depending on `χ` and `k` alone, such that whenever
 `p` has weak derivatives to order `k` on `W` bounded by `M`, every `L²(Ω)` class representing
 `χ·p` has weak derivatives to order `k` on `Ω` bounded by `K·M`.

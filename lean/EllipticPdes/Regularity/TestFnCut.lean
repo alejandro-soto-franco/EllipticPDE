@@ -44,7 +44,7 @@ variable {d : ℕ}
 
 /-! ### Two pointwise facts -/
 
-/-- **A cutoff identically `1` near `K` has vanishing partials on `K`.** At a point of `K` the
+/-- **Vanishing partials on `K` of a cutoff identically `1` near it.** At a point of `K` the
 function agrees with the constant `1` on a whole neighbourhood, so its Fréchet derivative is
 the derivative of a constant. -/
 theorem partialD_eq_zero_of_eventually_one {K : Set (EuclideanSpace ℝ (Fin d))}

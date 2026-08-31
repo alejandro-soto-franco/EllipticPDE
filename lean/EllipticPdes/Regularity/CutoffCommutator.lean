@@ -74,7 +74,7 @@ theorem CutoffTower.exists_isOpen_collar {Ω V : Set (EuclideanSpace ℝ (Fin d)
   rw [Function.mem_support, hNθ hx]
   exact one_ne_zero
 
-/-- **A cutoff that is one where a weight lives is invisible against it.** Every identification
+/-- **Invisibility of a cutoff that is one where the weight lives.** Every identification
 the induction step makes holds only after a cutoff, and every weight it pairs against is
 supported where that cutoff is identically one, so the cutoff never reaches the conclusion. -/
 theorem mul_eq_self_of_eqOn_one {χ : EuclideanSpace ℝ (Fin d) → ℝ}

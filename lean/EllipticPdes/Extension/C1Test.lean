@@ -61,7 +61,7 @@ theorem partialD_convolution_normed (ρ : ContDiffBump (0 : EuclideanSpace ℝ (
       (EuclideanSpace.single k (1 : ℝ))]
   rfl
 
-/-- **A mollification is bounded by what it mollifies.** The normed bump is a probability
+/-- **Bound on a mollification by what it mollifies.** The normed bump is a probability
 density, so the convolution is an average and inherits the bound. -/
 theorem norm_convolution_normed_le (ρ : ContDiffBump (0 : EuclideanSpace ℝ (Fin d)))
     {h : EuclideanSpace ℝ (Fin d) → ℝ} (hc : Continuous h) (hcs : HasCompactSupport h)

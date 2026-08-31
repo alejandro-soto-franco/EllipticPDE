@@ -33,7 +33,7 @@ variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))}
 
 /-! ### Uniform difference-quotient norm bound for the limit passage -/
 
-/-- **A one-neighbourhood shift margin.** If the cutoff `η` is `≡ 1` on a neighbourhood of a
+/-- **One-neighbourhood shift margin.** If the cutoff `η` is `≡ 1` on a neighbourhood of a
 compact set `K`, then there is a positive margin `δ` such that `η` is locally constant `≡ 1`
 near every point within `δ` of `K`. This localises the tower cutoffs: shifting a support point
 of one cutoff by less than the margin lands where the next cutoff is identically `1` (Evans,

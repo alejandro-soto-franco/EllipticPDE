@@ -108,7 +108,7 @@ def deriv (hu : HasIteratedWeakDerivOn V (k + 1) u) (l : Fin d) :
       simpa [List.length_append] using Nat.succ_lt_succ hα
     simpa using hu.D_step m (α ++ [l]) hlen
 
-/-- **A first derivative two orders down.** The datum of the induction step multiplies
+/-- **First derivative two orders down.** The datum of the induction step multiplies
 derivatives of the solution of order at most two, and asks each of them for `k` weak
 derivatives of its own. Naming the two cases here rather than inlining them keeps the
 definitional unfolding of `deriv` out of the assembly, where it is repeated a dozen times. -/
@@ -172,7 +172,7 @@ def ofDeriv {u : L2D V} {Du : Fin d → L2D V} (hu : ∀ ℓ, HasWeakDerivOn V �
 
 end HasIteratedWeakDerivOn
 
-/-- **A uniform `L²` bound on an iterated family.** Every derivative up to order `k` is
+/-- **Uniform `L²` bound on an iterated family.** Every derivative up to order `k` is
 bounded by `C` in `L²(V)`. Kept apart from `HasIteratedWeakDerivOn` so that existence and
 estimate can be proved and consumed separately, matching the shape of
 `interior_H2_estimate`, which returns the derivative and its bound as separate conjuncts. -/

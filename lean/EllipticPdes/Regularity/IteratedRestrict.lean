@@ -35,7 +35,7 @@ open EllipticPdes.Sobolev
 
 variable {d : ℕ} {W V : Set (EuclideanSpace ℝ (Fin d))} {k : ℕ} {ℓ : Fin d}
 
-/-- **A weak derivative restricts to a smaller region.** Test functions supported in `V` are
+/-- **Restriction of a weak derivative to a smaller region.** Test functions supported in `V` are
 test functions supported in `W`, and each integral over `W` collapses to one over `V` because
 its integrand vanishes off the support. -/
 theorem HasWeakDerivOn.restrict (hWm : MeasurableSet W) (hVm : MeasurableSet V) (hVW : V ⊆ W)

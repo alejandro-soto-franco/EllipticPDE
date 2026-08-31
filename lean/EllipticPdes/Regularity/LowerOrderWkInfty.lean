@@ -99,7 +99,7 @@ def deriv (hf : IsWkInfty f (k + 1)) (m : Fin d) : IsWkInfty (hf.D [m]) k where
     have h := hf.ess_bdd (α ++ [m]) (by simpa [List.length_append] using Nat.succ_le_succ hα)
     simpa [List.length_append] using h
 
-/-- **A `Cᵏ` function with bounded derivatives is in `W^{k,∞}`.** The classical iterated
+/-- **`Cᵏ` function with bounded derivatives in `W^{k,∞}`.** The classical iterated
 partials serve as the family, through `hasWeakPartial_partialD`, and the pointwise
 `iteratedFDeriv` bounds transfer through `abs_iterPartial_le`. Order zero is included here,
 unlike in `IsCkCoeff`, where `EllipticCoeff.Λ` already has it. -/
@@ -123,7 +123,7 @@ def ofContDiff {B : ℕ → ℝ} (hf : ContDiff ℝ ((k : ℕ) : ℕ∞) f) (hB 
     Filter.Eventually.of_forall fun x =>
       (abs_iterPartial_le α hα hf x).trans (hbd α.length hα x)
 
-/-- **A constant lies in `W^{k,∞}` at every order.** Its derivatives past the zeroth vanish, so
+/-- **Constants in `W^{k,∞}` at every order.** Its derivatives past the zeroth vanish, so
 one bound serves every order. The datum of the induction step has a term with no coefficient at
 all, namely the derivative of the datum itself, and this is what lets it be treated as a
 weighted term like the rest. -/
@@ -138,7 +138,7 @@ def const (c : ℝ) (k : ℕ) : IsWkInfty (fun _ : EuclideanSpace ℝ (Fin d) =>
 
 end IsWkInfty
 
-/-- **A single entry of the coefficient matrix is a `W^{k,∞}` function.** The matrix bundle
+/-- **Single entry of the coefficient matrix as a `W^{k,∞}` function.** The matrix bundle
 already has a family for each entry, so the scalar bundle is that family read at a fixed pair of
 indices. -/
 def IsWkInftyCoeff.entry {A : EllipticCoeff d} {k : ℕ} (hA : IsWkInftyCoeff A k) (i j : Fin d) :

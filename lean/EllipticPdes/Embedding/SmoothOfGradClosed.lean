@@ -36,7 +36,7 @@ namespace EllipticPdes.Embedding
 
 variable {d : ℕ}
 
-/-- **A family closed under weak differentiation has smooth representatives.** Let `F` assign a
+/-- **Smooth representatives of a family closed under weak differentiation.** Let `F` assign a
 function to each index, let `nxt i k` name a weak `k`-derivative of `F i` on `Metric.ball c R`,
 and let every member lie in `L²` there. Then on any smaller concentric ball every member has a
 representative smooth to every order.

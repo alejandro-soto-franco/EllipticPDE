@@ -60,7 +60,7 @@ theorem gradCLM_apply_single (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ)
     gradCLM g y (EuclideanSpace.single j (1 : ℝ)) = g j y := by
   simp [gradCLM]
 
-/-- **A functional is controlled by its coordinate values.** On `EuclideanSpace ℝ (Fin d)` every
+/-- **Control of a functional by its coordinate values.** On `EuclideanSpace ℝ (Fin d)` every
 vector is the sum of its coordinates against the standard directions, so the operator norm is at
 most the sum of the absolute values of the coordinate readings. -/
 theorem opNorm_le_sum_apply_single (L : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ) :
@@ -148,7 +148,7 @@ theorem tendstoUniformlyOn_indicator_convolution
 
 /-! ### Classical derivative -/
 
-/-- **A continuous weak gradient is a classical derivative.** On an open region, a function that
+/-- **Continuous weak gradient as a classical derivative.** On an open region, a function that
 is continuous and integrable, with a weak gradient that is continuous and integrable, is Fréchet
 differentiable at every point, with derivative the functional the gradient names.
 

@@ -75,7 +75,7 @@ theorem univ_ae_eq_union (j : Fin d) :
     rw [this]
     simp
 
-/-- **An integral over the whole space splits at the interface.** -/
+/-- **Splitting of an integral over the whole space at the interface.** -/
 theorem integral_split_interface {j : Fin d} {f : EuclideanSpace ℝ (Fin d) → ℝ}
     (h1 : IntegrableOn f (halfSpace j) volume) (h2 : IntegrableOn f (halfSpaceNeg j) volume) :
     ∫ x, f x = (∫ x in halfSpace j, f x) + ∫ x in halfSpaceNeg j, f x := by
@@ -101,7 +101,7 @@ theorem preimage_reflectLI_halfSpaceNeg (j : Fin d) :
     rw [reflectLI_apply, reflectSign, if_pos rfl]; ring
   simp only [Set.mem_preimage, halfSpaceNeg, halfSpace, Set.mem_setOf_eq, h, neg_lt_zero]
 
-/-- **An integral over the lower half space is the reflected integral over the upper one.** -/
+/-- **Integral over the lower half space as the reflected integral over the upper one.** -/
 theorem setIntegral_halfSpaceNeg (j : Fin d) (f : EuclideanSpace ℝ (Fin d) → ℝ) :
     ∫ x in halfSpaceNeg j, f x = ∫ y in halfSpace j, f (reflectLI j y) := by
   have h := (measurePreserving_reflectLI j).setIntegral_preimage_emb

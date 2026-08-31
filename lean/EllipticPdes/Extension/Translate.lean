@@ -88,8 +88,8 @@ lemma tsupport_comp_translate_subset {φ : EuclideanSpace ℝ (Fin d) → ℝ}
 
 /-! ### The weak gradient of a translate -/
 
-/-- **A weak gradient translates.** If `u` has weak gradient `g` on `B`, then `u(· + h)` has weak
-gradient `k ↦ gₖ(· + h)` on the preimage of `B` under the translation.
+/-- **Translation of a weak gradient.** If `u` has weak gradient `g` on `B`, then `u(· + h)` has
+weak gradient `k ↦ gₖ(· + h)` on the preimage of `B` under the translation.
 
 The proof is the change of variables under a measure-preserving translation, twice: once to move
 the test function onto `B`, where the hypothesis applies, and once to move the conclusion back. -/

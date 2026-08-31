@@ -59,7 +59,7 @@ theorem restrictL2_extendL2_trans {Ω W N : Set (EuclideanSpace ℝ (Fin d))}
     ae_restrict_of_ae hrW, ae_restrict_mem hNm] with x h1 h2 h3 h4 h5
   rw [h1, h2, h3, Set.indicator_of_mem (hNW h5), h4 (hNW h5)]
 
-/-- **An identification after a cutoff is an equality on the collar.** Where `θ` is identically
+/-- **Identification after a cutoff as an equality on the collar.** Where `θ` is identically
 `1` on `N ⊆ W`, two classes with `θ·X = θ·Y` restrict to the same class on `N`. -/
 theorem restrictL2_extendL2_eq_of_mulTest_eq {W N : Set (EuclideanSpace ℝ (Fin d))}
     (hWm : MeasurableSet W) (hNm : MeasurableSet N) (hNW : N ⊆ W)
@@ -92,7 +92,7 @@ theorem restrictL2_extendL2_congr_of_weakDerivOn {W N : Set (EuclideanSpace ℝ 
   restrictL2_extendL2_eq_of_mulTest_eq hWm hNm hNW hθW hθN
     (mulTest_weakDerivOn_unique hWm hθW hX hY)
 
-/-- **A family and its bound moved to a subregion.** Both halves of the restriction, packaged
+/-- **Family and its bound moved to a subregion.** Both halves of the restriction, packaged
 so the elaborator does the unification once. Applied inline in the induction step, where the
 context has the tower and the datum, the same two lines take minutes. -/
 theorem exists_restrictFamily {Ω N : Set (EuclideanSpace ℝ (Fin d))}

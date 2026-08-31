@@ -70,7 +70,7 @@ variable {d : ℕ}
 
 /-! ### Restriction of a weak gradient -/
 
-/-- **A weak gradient restricts to a subset.** Both integration-by-parts integrals localise to
+/-- **Restriction of a weak gradient to a subset.** Both integration-by-parts integrals localise to
 the support of the test function, which lies in the smaller set, so the identity over the larger
 set transfers verbatim. No measurability of either set is needed: each integrand vanishes off
 `tsupport φ`, and `setIntegral_eq_integral_of_forall_compl_eq_zero` collapses both set integrals
@@ -95,10 +95,11 @@ theorem HasWeakGradOn.mono {B B' : Set (EuclideanSpace ℝ (Fin d))} (hsub : B' 
     setIntegral_eq_integral_of_forall_compl_eq_zero hphiB] at key
   exact key
 
-/-- **A weak gradient depends only on the almost-everywhere classes.** Replacing `u` and `g` by
-functions agreeing with them almost everywhere on `B` leaves the integration-by-parts identity
-untouched. This moves a statement about a restricted `Lp` class onto whichever representative is
-convenient, in particular onto the extension by zero, which is shared across every set. -/
+/-- **Dependence of a weak gradient on the almost-everywhere classes alone.** Replacing `u` and
+`g` by functions agreeing with them almost everywhere on `B` leaves the integration-by-parts
+identity untouched. This moves a statement about a restricted `Lp` class onto whichever
+representative is convenient, in particular onto the extension by zero, which is shared across
+every set. -/
 theorem HasWeakGradOn.congr_ae {B : Set (EuclideanSpace ℝ (Fin d))}
     {u u' : EuclideanSpace ℝ (Fin d) → ℝ} {g g' : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
     (h : HasWeakGradOn B u g) (hu : u =ᵐ[volume.restrict B] u')

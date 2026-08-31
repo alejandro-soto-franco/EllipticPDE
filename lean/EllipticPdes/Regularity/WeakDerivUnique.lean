@@ -37,7 +37,7 @@ open EllipticPdes.Sobolev (partialD)
 
 variable {d : ℕ}
 
-/-- **An `L²` class orthogonal to every test class vanishes.** The classes of smooth compactly
+/-- **Vanishing of an `L²` class orthogonal to every test class.** The classes of smooth compactly
 supported functions are dense in `L²(ℝᵈ)`, and `y ↦ ⟪w, y⟫` is continuous, so a pairing that
 vanishes on that family vanishes everywhere, in particular against `w` itself. -/
 theorem annihilates_of_forall_testCls {w : EucL2 d}

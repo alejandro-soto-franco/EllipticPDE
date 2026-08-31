@@ -88,7 +88,7 @@ def HasIteratedWeakDerivOn.add {V : Set (EuclideanSpace ℝ (Fin d))} {k : ℕ} 
 
 /-! ### Bounded weight acting on an `L²` class -/
 
-/-- **A bounded measurable weight acting on `L²(V)`.** The bound is asked on the whole space
+/-- **Bounded measurable weight acting on `L²(V)`.** The bound is asked on the whole space
 rather than on `V`, which is the form every `W^{k,∞}` bundle has. -/
 def mulL2 {V : Set (EuclideanSpace ℝ (Fin d))} {a : EuclideanSpace ℝ (Fin d) → ℝ}
     (ham : Measurable a) {M : ℝ}
@@ -120,10 +120,10 @@ theorem norm_le_of_ae_mul {V : Set (EuclideanSpace ℝ (Fin d))}
 
 /-! ### Product rule at every order -/
 
-/-- **A `W^{k,∞}` weight preserves `k` weak derivatives.** For `a ∈ W^{k,∞}` there is a constant
-`K`, depending on the bundle alone, such that whenever `g` has weak derivatives to order `k` on
-`V` bounded by `M`, every class representing `a·g` has weak derivatives to order `k` bounded by
-`K·M`.
+/-- **Preservation of `k` weak derivatives by a `W^{k,∞}` weight.** For `a ∈ W^{k,∞}` there is a
+constant `K`, depending on the bundle alone, such that whenever `g` has weak derivatives to order
+`k` on `V` bounded by `M`, every class representing `a·g` has weak derivatives to order `k`
+bounded by `K·M`.
 
 The induction is on `k`. The step applies `HasWeakDerivOn.mul_isWkInfty_left` once to obtain
 `∂_ℓ(a·g) = (∂_ℓ a)·g + a·(∂_ℓ g)`, then the induction hypothesis to each summand, the first with

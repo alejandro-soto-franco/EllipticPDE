@@ -54,9 +54,9 @@ theorem convolution_comp_translate (f ρ : EuclideanSpace ℝ (Fin d) → ℝ)
   refine integral_congr_ae (Filter.Eventually.of_forall (fun t => ?_))
   simp only [harg]
 
-/-- **A shifted mollification converges.** For `f` in `Lᵖ`, translating by `hᵢ` and mollifying at
-radius `(φ i).rOut` gives a family converging to `f` in `Lᵖ`, as soon as both the shift and the
-radius tend to zero.
+/-- **Convergence of a shifted mollification.** For `f` in `Lᵖ`, translating by `hᵢ` and
+mollifying at radius `(φ i).rOut` gives a family converging to `f` in `Lᵖ`, as soon as both the
+shift and the radius tend to zero.
 
 The error splits into the mollification error of the shift and the shift error. The first is the
 shift of the mollification error, by `convolution_comp_translate`, and translation is an `Lᵖ`

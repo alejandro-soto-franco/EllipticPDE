@@ -39,7 +39,7 @@ open EllipticPdes.Sobolev
 
 variable {d : ℕ} {V : Set (EuclideanSpace ℝ (Fin d))}
 
-/-- **An `L²` class against a test function is integrable.** Hölder with the two exponents `2`
+/-- **Integrability of an `L²` class against a test function.** Hölder with the two exponents `2`
 and the continuous compactly supported factor in `L²`. -/
 theorem integrable_mul_testFn (F : L2D V) {φ : EuclideanSpace ℝ (Fin d) → ℝ}
     (hφc : ContDiff ℝ (⊤ : ℕ∞) φ) (hφcs : HasCompactSupport φ) :
@@ -105,7 +105,7 @@ theorem setIntegral_sum_mul_testFn {ι : Type*} [Fintype ι] (F : ι → L2D V)
     (∫ x in V, ((∑ i, F i) x : ℝ) * φ x) = ∑ i, ∫ x in V, (F i x : ℝ) * φ x :=
   setIntegral_finsetSum_mul_testFn Finset.univ F hφc hφcs
 
-/-- **An extension by zero pairs over the set it came from.** A whole-space integral of a
+/-- **Pairing of an extension by zero over its original set.** A whole-space integral of a
 weight against the extension of an `L²(S)` class collapses to an integral over `S`. Stated with
 a weight on each side, which is the shape every block of the bilinear form takes. -/
 theorem integral_extendL2_mul_mul (hVm : MeasurableSet V) (F : L2D V)
@@ -120,7 +120,7 @@ theorem integral_extendL2_mul_mul (hVm : MeasurableSet V) (F : L2D V)
     · rw [Set.indicator_of_notMem hxV, Set.indicator_of_notMem hxV, mul_zero, zero_mul]
   rw [integral_congr_ae hae, integral_indicator hVm]
 
-/-- **A cutoff splits off a derivative of the test function.** Writing `χ ∂ⱼv` as
+/-- **Splitting off a derivative of the test function by a cutoff.** Writing `χ ∂ⱼv` as
 `∂ⱼ(χv) - (∂ⱼχ)v` moves the pairing onto the cut-off test function, which is the form the
 differentiated equation is stated against. -/
 theorem setIntegral_mul_cutoff_partialD_split (P : L2D V) {χ v : EuclideanSpace ℝ (Fin d) → ℝ}
@@ -177,7 +177,7 @@ theorem setIntegral_weight_mul_congr_of_cutoff_ae {θ : EuclideanSpace ℝ (Fin 
     ring
   rw [← e (X x : ℝ), hx, e (Y x : ℝ)]
 
-/-- **A sum of two weighted classes paired against a cut-off test function.** The
+/-- **Sum of two weighted classes paired against a cut-off test function.** The
 differentiated equation groups its datum two terms at a time, one with a derivative of a
 coefficient and one with a derivative of the solution, and the datum of the induction step names
 them separately. This is the split, with the cutoff moved to the front where the datum has it. -/

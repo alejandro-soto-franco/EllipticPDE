@@ -182,7 +182,7 @@ theorem norm_weakLimit_le {M : ℝ} (hM : ∀ k, ‖u k‖ ≤ M)
         (mul_le_mul_of_nonneg_right (hM k) (norm_nonneg _))
     nlinarith
 
-/-- **A weak limit stays in a closed subspace.** -/
+/-- **Stability of a closed subspace under weak limits.** -/
 theorem mem_of_weakLimit {K : Submodule ℝ H} (hK : IsClosed (K : Set H)) (hu : ∀ k, u k ∈ K)
     (hw : ∀ v : H, Tendsto (fun k => ⟪u k, v⟫) atTop (𝓝 ⟪w, v⟫)) :
     w ∈ K := by

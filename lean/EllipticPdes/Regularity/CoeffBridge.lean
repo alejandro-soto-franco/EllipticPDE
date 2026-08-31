@@ -190,7 +190,7 @@ theorem hasWeakPartial_partialD {f : EuclideanSpace ℝ (Fin d) → ℝ}
 
 /-! ### Bridge -/
 
-/-- **A `Cᵏ` coefficient bundle is a `W^{k,∞}` coefficient bundle.** The classical iterated
+/-- **`Cᵏ` coefficient bundle as a `W^{k,∞}` bundle.** The classical iterated
 partial derivatives serve as the weak derivative family, each step is integration by parts,
 and the pointwise `iteratedFDeriv` bound of `IsCkCoeff` is in particular an essential bound.
 

@@ -59,7 +59,7 @@ theorem extendL2_restrictL2_extendL2_ae {Ω W : Set (EuclideanSpace ℝ (Fin d))
       Set.indicator_of_mem (hWΩ hxW)]
   · rw [Set.indicator_of_notMem hxW, Set.indicator_of_notMem hxW]
 
-/-- **A cut-off class is the cut-off restriction.** For a cutoff supported in `W ⊆ Ω`, the
+/-- **Cut-off class as the cut-off restriction.** For a cutoff supported in `W ⊆ Ω`, the
 whole-space extension of `ξ·g` is the whole-space extension of `ξ` against the restriction of
 `g` to `W`. The cutoff kills everything outside `W`, so nothing is lost.
 

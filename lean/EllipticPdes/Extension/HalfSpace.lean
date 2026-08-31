@@ -85,7 +85,7 @@ theorem preimage_reflectLI_halfSpace (j : Fin d) :
 variable {j : Fin d} {u : EuclideanSpace ℝ (Fin d) → ℝ}
   {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ} {ψ : EuclideanSpace ℝ (Fin d) → ℝ}
 
-/-- **A `C¹` class vanishing on the interface is bounded by its gradient and the distance to
+/-- **`C¹` class vanishing on the interface is bounded by its gradient and the distance to
 it.** This is what makes the boundary term vanish in the limit. -/
 theorem abs_le_of_vanishes_on_interface (hψ : Differentiable ℝ ψ) {M : ℝ}
     (hM : ∀ z, ‖fderiv ℝ ψ z‖ ≤ M) (hzero : ∀ z : EuclideanSpace ℝ (Fin d), z j = 0 → ψ z = 0)

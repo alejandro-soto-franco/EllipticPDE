@@ -143,7 +143,7 @@ lemma tsupport_comp_reflect_subset {φ : EuclideanSpace ℝ (Fin d) → ℝ}
 
 /-! ### The weak gradient of a reflected function -/
 
-/-- **A weak gradient reflects.** If `u` has weak gradient `g` on `B`, then `u ∘ Rⱼ` has weak
+/-- **Reflection of a weak gradient.** If `u` has weak gradient `g` on `B`, then `u ∘ Rⱼ` has weak
 gradient `k ↦ ±(gₖ ∘ Rⱼ)` on the preimage of `B`, with the sign negative exactly at `k = j`.
 
 The proof is the change of variables under a measure-preserving involution, twice: once to move

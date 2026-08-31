@@ -69,7 +69,7 @@ theorem bijective_shear {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ} (h
   Function.bijective_iff_has_inverse.mpr
     ⟨shear j (fun z => -γ z), shear_shear_neg hind, shear_neg_shear hind⟩
 
-/-- **A function independent of the `j`-th coordinate has vanishing `j`-th partial.** -/
+/-- **Vanishing `j`-th partial of a function independent of that coordinate.** -/
 theorem partialD_eq_zero_of_indepCoord {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ}
     (hγ : Differentiable ℝ γ) (hind : IndepCoord j γ) (y : EuclideanSpace ℝ (Fin d)) :
     fderiv ℝ γ y (EuclideanSpace.single j (1 : ℝ)) = 0 := by
