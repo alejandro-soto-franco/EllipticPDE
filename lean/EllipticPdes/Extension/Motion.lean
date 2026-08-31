@@ -26,6 +26,8 @@ through an integral, which is where the integrability hypotheses enter.
 * `EllipticPdes.Extension.partialD_comp_linearIsometry`: the chain rule through an isometry.
 * `EllipticPdes.Extension.hasWeakGradOn_comp_linearIsometry`: the weak gradient through an
   isometry.
+* `EllipticPdes.Extension.eLpNorm_grad_comp_linearIsometry_le`: its `Lᵖ` seminorm, bounded by
+  the sum over the components the isometry mixes.
 
 ## References
 
@@ -35,6 +37,7 @@ and reorientation of the axes appears; Y. Guo, *Partial Differential Equations I
 -/
 
 open MeasureTheory Set
+open scoped ENNReal NNReal
 
 noncomputable section
 
@@ -174,5 +177,50 @@ theorem hasWeakGradOn_comp_linearIsometry {B : Set (EuclideanSpace ℝ (Fin d))}
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [hwg ψ hψsm hψcs hψs i]
   ring
+
+/-! ### The gradient's seminorm -/
+
+/-- A coordinate of a vector is bounded by its norm. -/
+theorem abs_coord_le_norm (v : EuclideanSpace ℝ (Fin d)) (i : Fin d) : |v i| ≤ ‖v‖ := by
+  rw [EuclideanSpace.norm_eq]
+  have h : ‖v i‖ ^ 2 ≤ ∑ j, ‖v j‖ ^ 2 :=
+    Finset.single_le_sum (f := fun j => ‖v j‖ ^ 2) (fun j _ => sq_nonneg _) (Finset.mem_univ i)
+  have h2 : |v i| = Real.sqrt (‖v i‖ ^ 2) := by
+    rw [Real.sqrt_sq_eq_abs, Real.norm_eq_abs, abs_abs]
+  rw [h2]
+  exact Real.sqrt_le_sqrt h
+
+/-- **Seminorm of the gradient through a linear isometry.** Each coordinate of the
+image of a unit direction is at most one, so the transported component is bounded by the sum of
+the components it mixes. -/
+theorem eLpNorm_grad_comp_linearIsometry_le {p : ℝ≥0∞} (hp : 1 ≤ p)
+    {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
+    (hgm : ∀ i, AEStronglyMeasurable (g i) volume)
+    (e : EuclideanSpace ℝ (Fin d) ≃ₗᵢ[ℝ] EuclideanSpace ℝ (Fin d)) (k : Fin d) :
+    eLpNorm (fun y => ∑ i, e (EuclideanSpace.single k (1 : ℝ)) i * g i (e y)) p volume
+      ≤ ∑ i, eLpNorm (g i) p volume := by
+  have hmp : MeasurePreserving
+      (e : EuclideanSpace ℝ (Fin d) → EuclideanSpace ℝ (Fin d)) volume volume :=
+    e.measurePreserving
+  have hcoord : ∀ i, |e (EuclideanSpace.single k (1 : ℝ)) i| ≤ 1 := by
+    intro i
+    refine (abs_coord_le_norm _ i).trans ?_
+    rw [e.norm_map, PiLp.norm_single, norm_one]
+  have hstep : ∀ i, eLpNorm (fun y => e (EuclideanSpace.single k (1 : ℝ)) i * g i (e y)) p volume
+      ≤ eLpNorm (g i) p volume := by
+    intro i
+    have h1 : eLpNorm (fun y => e (EuclideanSpace.single k (1 : ℝ)) i * g i (e y)) p volume
+        ≤ eLpNorm (fun y => g i (e y)) p volume := by
+      refine eLpNorm_mono_ae (Filter.Eventually.of_forall fun y => ?_)
+      rw [norm_mul, Real.norm_eq_abs (e (EuclideanSpace.single k (1 : ℝ)) i)]
+      exact mul_le_of_le_one_left (norm_nonneg _) (hcoord i)
+    exact h1.trans (le_of_eq (eLpNorm_comp_measurePreserving (hgm i) hmp))
+  have hfun : (fun y => ∑ i, e (EuclideanSpace.single k (1 : ℝ)) i * g i (e y))
+      = ∑ i, fun y => e (EuclideanSpace.single k (1 : ℝ)) i * g i (e y) := by
+    funext y
+    rw [Finset.sum_apply]
+  rw [hfun]
+  refine le_trans (eLpNorm_sum_le ?_ hp) (Finset.sum_le_sum fun i _ => hstep i)
+  exact fun i _ => ((hgm i).comp_measurePreserving hmp).const_mul _
 
 end EllipticPdes.Extension
