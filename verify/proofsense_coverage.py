@@ -90,6 +90,14 @@ EXEMPT = {
         "gradient. The patching over a finite cover of the boundary, which is the remaining "
         "step of that theorem, is not formalised"
     ),
+    "EllipticPdes.Extension.exists_localExtension": (
+        "step 2 of Guo's proof of III.2.2: near a boundary point the class extends across the "
+        "boundary, agreeing with the original on the part of the domain the neighbourhood meets. "
+        "That is a step of a proof rather than a numbered statement, and Evans 5.4 Theorem 1 "
+        "performs the same passage inside its own proof, so no transcribed statement matches it. "
+        "Guo runs the step on a function smooth up to the boundary and reads the chain rule off "
+        "it; every step here is a weak gradient"
+    ),
     "EllipticPdes.Extension.nonempty_boundaryPartition": (
         "the cover and the partition of unity that step 3 of Guo's proof of III.2.2 glues with, "
         "bundled. Guo takes the partition for granted in one clause of that step and states no "

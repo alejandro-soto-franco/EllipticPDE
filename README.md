@@ -250,8 +250,21 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   boundary, and the piece indexed by a centre sits in that chart's ball. Mathlib
   proves such partitions for a manifold and a normed space is one over itself,
   so `exists_smooth_partition` reads the smoothness of each piece back as
-  $C^\infty$ and nothing downstream of that file meets a manifold. The sum of the
-  local extensions against those pieces is what remains of the operator,
+  $C^\infty$ and nothing downstream of that file meets a manifold,
+- the local extension those pieces are summed against, as
+  `EllipticPdes.Extension.exists_localExtension`, which is the whole content of
+  Guo's second step: near a boundary point the class extends across the
+  boundary, to a class with a weak gradient on any ball strictly inside the
+  chart's, agreeing with the original on the part of the domain that ball
+  meets. The proof composes the chapter. A cutoff between two balls makes the
+  class reach the whole region above the chart's graph, the rigid motion takes
+  it into the coordinates the graph is written in, the reflection extends it
+  across the graph, and the motion takes the result back. Guo runs that step on
+  a function smooth up to the boundary and reads the chain rule off it; every
+  step here is a weak gradient. The chart asks nothing of the gradient of its
+  graph, so the proof runs on the bounded graph `exists_bounded_graph` supplies,
+  whose region agrees with the chart's on exactly the ball in play. The sum of
+  those local extensions against the partition is what remains of the operator,
 - both cases of the order-$k$ embedding off `p = 2`. Case (ii) is
   `EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed_general`: the ladder
   runs for $s$ rungs from $L^{p_0}$ and Morrey reads the Hölder exponent off the
