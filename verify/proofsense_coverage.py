@@ -90,6 +90,13 @@ EXEMPT = {
         "gradient. The patching over a finite cover of the boundary, which is the remaining "
         "step of that theorem, is not formalised"
     ),
+    "EllipticPdes.Extension.exists_extension_subset": (
+        "clauses (i) and (ii) of Guo III.2.2 together: the extension agrees with the class on the "
+        "domain and is supported inside any open set the closure of the domain sits in. Guo "
+        "reaches (ii) by multiplying by a cutoff equal to one on the domain, which is what this "
+        "does. Clause (iii), the norm bound, is not formalised, and the operator is not built as "
+        "a bounded linear map, so the statement is an existence rather than the theorem"
+    ),
     "EllipticPdes.Extension.exists_extension": (
         "step 3 of Guo's proof of III.2.2, the sum of the local extensions against a partition of "
         "unity, which extends the class across the whole boundary and agrees with it on the "

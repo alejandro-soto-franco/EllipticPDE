@@ -273,8 +273,14 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   the sum agree: where a piece of the partition is nonzero the point lies in
   that chart's ball, where the local extension agrees with the class, and off
   the ball both sides vanish, so the pieces add to $u$ because the partition
-  adds to one. What remains of the extension operator is its support clause and
-  its norm bound,
+  adds to one,
+- the support clause, as `EllipticPdes.Extension.exists_extension_subset`,
+  which with the previous item is clauses (i) and (ii) of Guo's Theorem
+  III.2.2: any open set the closure of the domain sits in admits a smooth
+  cutoff equal to one on that closure, and multiplying by it moves the support
+  inside without disturbing the agreement. The norm bound, clause (iii), is
+  what remains of the theorem, and the operator is not yet built as a bounded
+  linear map,
 - both cases of the order-$k$ embedding off `p = 2`. Case (ii) is
   `EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed_general`: the ladder
   runs for $s$ rungs from $L^{p_0}$ and Morrey reads the Hölder exponent off the
