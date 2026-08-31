@@ -89,6 +89,7 @@ import EllipticPdes.Extension.Cutoff
 import EllipticPdes.Extension.HalfSpace
 import EllipticPdes.Extension.EvenReflection
 import EllipticPdes.Extension.Shear
+import EllipticPdes.Extension.ShearWeakGrad
 import EllipticPdes.Extension.Reflect
 import EllipticPdes.Extension.Translate
 import EllipticPdes.Analysis.LpTranslationContinuity

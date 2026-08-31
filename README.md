@@ -165,6 +165,22 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   a boundary chart reflect across the image of a hyperplane. Translation moves a
   weak gradient with no sign and no Jacobian, which is what the shift into the
   domain of the global approximation theorem needs,
+- the third map that operator runs on, as
+  `EllipticPdes.Extension.hasWeakGradOn_comp_shear`: the shear
+  $S(y) = y + \gamma(y) e_j$ that flattens a $C^1$ boundary sends a weak
+  gradient on a set to a weak gradient on the preimage, the transpose of its
+  derivative applied to the gradient, so
+  $\partial_k (u \circ S) = \partial_k u \circ S + (\partial_j u \circ S)\,
+  \partial_k \gamma$. Its derivative is not an isometry, so
+  `measurePreserving_shear` reads the change of variables off the determinant
+  $1$ of `det_shearDeriv`, and a smooth test function pulled back through it is
+  $C^1$ and no better, which is the class `hasWeakGradOn_contDiffOne` integrates
+  by parts against. One term of the chain rule scales the test function by
+  $\partial_k \gamma$, continuous and no better for a $C^1$ chart, so the
+  product sits outside that class too. That factor does not depend on the $j$-th
+  coordinate, mollification leaves it independent of that coordinate and makes
+  it smooth, and `integral_mul_indepCoord` reads the identity off the product
+  rule in the limit,
 - both cases of the order-$k$ embedding off `p = 2`. Case (ii) is
   `EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed_general`: the ladder
   runs for $s$ rungs from $L^{p_0}$ and Morrey reads the Hölder exponent off the

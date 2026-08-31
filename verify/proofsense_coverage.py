@@ -66,6 +66,19 @@ EXEMPT = {
         "and is stated for an arbitrary set, since the boundary charts of that construction "
         "reflect across the image of a hyperplane"
     ),
+    "EllipticPdes.Extension.hasWeakGradOn_comp_shear": (
+        "the change of variables for a weak gradient under the shear that flattens a C^1 "
+        "boundary. Evans 5.4 Theorem 1 straightens the boundary near a boundary point and works "
+        "with the straightened function from there on, stating no lemma about the weak gradient "
+        "of a composition with the chart, so no transcribed statement matches it. It is the third "
+        "of the three maps the extension operator runs on, beside hasWeakGradOn_comp_reflect and "
+        "hasWeakGradOn_comp_translate, and the only one whose derivative is not an isometry"
+    ),
+    "EllipticPdes.Extension.partialD_comp_shear": (
+        "the chain rule for a partial derivative under the shear that flattens a C^1 boundary, "
+        "which is the classical computation Evans performs inline in the proof of 5.4 Theorem 1 "
+        "and states as no lemma of its own"
+    ),
     "EllipticPdes.Extension.partialD_comp_reflect": (
         "the chain rule for a partial derivative under a coordinate reflection, which is the "
         "classical computation Evans performs inline in the proof of 5.4 Theorem 1 and states "
