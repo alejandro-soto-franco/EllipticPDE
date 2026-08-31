@@ -367,8 +367,11 @@ mollification, whose classical partials are the mollified weak gradient and whos
 Young's inequality keeps bounded uniformly in the mollifier radius. Fatou passes the resulting
 `Lᵖ'` bound to the almost-everywhere limit.
 
-Outside the range `1 ≤ p < d` the hypothesis `1/p' = 1/p - 1/d` forces `p' = 0` and the
-conclusion degenerates. -/
+Outside the range `1 ≤ p < d`, which is the range Evans' statement takes, the hypothesis
+`1/p' = 1/p - 1/d` says nothing about a Sobolev conjugate. At `p = d` it forces `p' = 0` and
+the conclusion degenerates, `eLpNorm` at exponent zero being zero; above `p = d` its right
+side is negative while the left is a reciprocal of a nonnegative number, so no `p'` meets it
+and the statement is vacuous. -/
 theorem exists_eLpNorm_sobolevConj_le (hd : 0 < d) (c : EuclideanSpace ℝ (Fin d))
     {p p' : ℝ≥0} (hp : 1 ≤ p) (hpp' : (p' : ℝ)⁻¹ = (p : ℝ)⁻¹ - (d : ℝ)⁻¹)
     {r R : ℝ} (hr : 0 < r) (hrR : r < R) :
