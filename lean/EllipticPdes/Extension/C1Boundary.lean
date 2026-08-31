@@ -34,8 +34,10 @@ the chart constrains nothing.
 * `EllipticPdes.Extension.C1Chart`: a boundary chart.
 * `EllipticPdes.Extension.C1Chart.Fits`: the chart describes the domain near a point.
 * `EllipticPdes.Extension.HasC1Boundary`: every boundary point admits a chart.
-* `EllipticPdes.Extension.isCompact_frontier`: the boundary of a bounded domain is compact,
-  which is what a finite subcover of charts needs.
+* `EllipticPdes.Extension.C1Chart.fits_ball`: the chart read in the original coordinates.
+* `EllipticPdes.Extension.isCompact_frontier`: the boundary of a bounded domain is compact.
+* `EllipticPdes.Extension.exists_finite_chart_cover`: finitely many charts' balls cover the
+  boundary.
 
 ## References
 
@@ -215,6 +217,14 @@ theorem exists_bounded_graph {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → �
     rw [hζone y hy]
     constructor <;> intro h <;> linarith [h]
 
+/-- An isometry pulls a ball about an image point back to the ball about the point. -/
+theorem preimage_motion_ball
+    (e : EuclideanSpace ℝ (Fin d) ≃ₗᵢ[ℝ] EuclideanSpace ℝ (Fin d))
+    (x : EuclideanSpace ℝ (Fin d)) (r : ℝ) :
+    (e : EuclideanSpace ℝ (Fin d) → EuclideanSpace ℝ (Fin d)) ⁻¹' ball (e x) r = ball x r := by
+  ext y
+  simp only [Set.mem_preimage, mem_ball, e.dist_map]
+
 /-! ### The boundary chart -/
 
 /-- **Boundary chart of class `C¹`.** The isometry is the relabelling and reorientation of the
@@ -247,6 +257,18 @@ def region : Set (EuclideanSpace ℝ (Fin d)) := aboveGraph c.dir c.graph
 region above the graph agree on the ball of the chart's radius. -/
 def Fits (Ω : Set (EuclideanSpace ℝ (Fin d))) (x : EuclideanSpace ℝ (Fin d)) : Prop :=
   c.motion '' Ω ∩ ball (c.motion x) c.radius = c.region ∩ ball (c.motion x) c.radius
+
+/-- **Chart read in the original coordinates.** On the ball about `x`, the domain agrees
+with the region above the graph pulled back through the motion. -/
+theorem fits_ball {Ω : Set (EuclideanSpace ℝ (Fin d))} {x : EuclideanSpace ℝ (Fin d)}
+    (h : c.Fits Ω x) :
+    Ω ∩ ball x c.radius
+      = (c.motion : EuclideanSpace ℝ (Fin d) → EuclideanSpace ℝ (Fin d)) ⁻¹' c.region
+        ∩ ball x c.radius := by
+  have himg := congrArg (fun s =>
+    (c.motion : EuclideanSpace ℝ (Fin d) → EuclideanSpace ℝ (Fin d)) ⁻¹' s) h
+  simpa [Set.preimage_inter, Set.preimage_image_eq _ c.motion.injective,
+    preimage_motion_ball] using himg
 
 /-- The graph is differentiable, being of class `C¹`. -/
 theorem graph_differentiable : Differentiable ℝ c.graph :=
@@ -306,5 +328,42 @@ theorem isCompact_frontier {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩ : Bornol
     IsCompact (frontier Ω) :=
   Metric.isCompact_of_isClosed_isBounded isClosed_frontier
     (hΩ.closure.subset (frontier_subset_closure))
+
+/-- **Finite cover of the boundary by charts.** The boundary of a bounded domain is compact
+and a domain with `C¹` boundary has a chart at each of its points, so finitely many of the
+charts' balls cover it. The chart is returned as a function on the whole space, which asks the
+dimension to be positive: in dimension zero there is no direction for a graph to be taken in,
+and no chart at all. -/
+theorem exists_finite_chart_cover (hd : 0 < d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    (hΩ : Bornology.IsBounded Ω) (hC1 : HasC1Boundary Ω) :
+    ∃ (F : Finset (EuclideanSpace ℝ (Fin d)))
+      (c : EuclideanSpace ℝ (Fin d) → C1Chart d),
+      (∀ x ∈ F, x ∈ frontier Ω) ∧ (∀ x ∈ F, (c x).Fits Ω x) ∧
+      frontier Ω ⊆ ⋃ x ∈ F, ball x (c x).radius := by
+  classical
+  choose C hC using hC1
+  -- a chart to fall back on away from the boundary, which needs a direction to exist
+  set cjunk : C1Chart d :=
+    graphChart (j := ⟨0, hd⟩) (γ := fun _ => (0 : ℝ)) contDiff_const (fun _ _ => rfl) with hjunk
+  set c : EuclideanSpace ℝ (Fin d) → C1Chart d :=
+    fun x => if hx : x ∈ frontier Ω then C x hx else cjunk with hcdef
+  have hcfits : ∀ x (hx : x ∈ frontier Ω), (c x).Fits Ω x := by
+    intro x hx
+    rw [hcdef]
+    simp only [dif_pos hx]
+    exact hC x hx
+  have hcover : frontier Ω ⊆ ⋃ x ∈ frontier Ω, ball x (c x).radius := fun x hx =>
+    Set.mem_biUnion hx (mem_ball_self (c x).radius_pos)
+  obtain ⟨t, hts, htfin, htcover⟩ :=
+    (isCompact_frontier hΩ).elim_finite_subcover_image
+      (fun x _ => isOpen_ball) hcover
+  refine ⟨htfin.toFinset, c, ?_, ?_, ?_⟩
+  · intro x hx
+    exact hts (htfin.mem_toFinset.mp hx)
+  · intro x hx
+    exact hcfits x (hts (htfin.mem_toFinset.mp hx))
+  · intro y hy
+    obtain ⟨x, hx, hyx⟩ := Set.mem_iUnion₂.mp (htcover hy)
+    exact Set.mem_biUnion (htfin.mem_toFinset.mpr hx) hyx
 
 end EllipticPdes.Extension

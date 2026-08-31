@@ -448,6 +448,10 @@ import EllipticPdes
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Extension.hasWeakGradOn_mul_cutoff_inter
 
+/-- info: 'EllipticPdes.Extension.exists_finite_chart_cover' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Extension.exists_finite_chart_cover
+
 /-- info: 'EllipticPdes.Analysis.tendsto_eLpNorm_translate_sub' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Analysis.tendsto_eLpNorm_translate_sub

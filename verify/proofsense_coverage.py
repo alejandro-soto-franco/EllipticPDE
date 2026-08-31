@@ -90,6 +90,13 @@ EXEMPT = {
         "gradient. The patching over a finite cover of the boundary, which is the remaining "
         "step of that theorem, is not formalised"
     ),
+    "EllipticPdes.Extension.exists_finite_chart_cover": (
+        "the finite subcover of the boundary that opens step 3 of Guo's proof of III.2.2, where "
+        "he writes that the boundary being compact there are finitely many points whose "
+        "neighbourhoods cover it. That is a step of a proof rather than a statement of its own, "
+        "so no transcribed statement matches it. The dimension is asked to be positive, since a "
+        "chart names a direction for its graph and dimension zero has none"
+    ),
     "EllipticPdes.Extension.hasWeakGradOn_mul_cutoff_inter": (
         "the product rule for a weak gradient against a cutoff whose support straddles the "
         "boundary of the set, which is what a boundary chart's ball does. Guo glues the local "

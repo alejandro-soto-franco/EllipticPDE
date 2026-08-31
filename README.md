@@ -230,9 +230,18 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   only $W$, the cutoff and its derivative vanishing off it.
   `hasWeakGradOn_univ_mul_cutoff` is the case where the cutoff sits inside $B$
   and the conclusion reaches the whole space; a boundary chart's ball straddles
-  $\partial\Omega$ instead, which is what this covers. The finite cover of
-  $\partial\Omega$ and the partition of unity over it are what remain of the
-  operator,
+  $\partial\Omega$ instead, which is what this covers,
+- the cover that step opens with, as
+  `EllipticPdes.Extension.exists_finite_chart_cover`: for a bounded domain with
+  $C^1$ boundary, finitely many charts' balls cover $\partial\Omega$, each with
+  its chart fitting at the centre. The boundary is closed and bounded, hence
+  compact, and a chart at each of its points supplies the open cover. The chart
+  comes back as a function on the whole space, which asks the dimension to be
+  positive: in dimension zero a chart has no direction to take its graph in and
+  none exists. `C1Chart.fits_ball` reads a chart in the original coordinates,
+  the motion being an isometry and so pulling the ball about an image point
+  back to the ball about the point. The partition of unity over that cover, and
+  the sum of the local pieces against it, are what remain of the operator,
 - both cases of the order-$k$ embedding off `p = 2`. Case (ii) is
   `EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed_general`: the ladder
   runs for $s$ rungs from $L^{p_0}$ and Morrey reads the Hölder exponent off the
