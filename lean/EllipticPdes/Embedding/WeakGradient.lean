@@ -48,6 +48,36 @@ def HasWeakGradOn (B : Set (EuclideanSpace ℝ (Fin d)))
     tsupport φ ⊆ B → ∀ k : Fin d,
       ∫ x in B, u x * partialD k φ x = - ∫ x in B, g k x * φ x
 
+/-- **Additivity of a weak gradient.** Two classes with weak gradients on the same set add, and
+so do their gradients. The finite sum of local pieces the extension operator glues is built by
+iterating this. -/
+theorem HasWeakGradOn.add {B : Set (EuclideanSpace ℝ (Fin d))}
+    {u v : EuclideanSpace ℝ (Fin d) → ℝ} {g h : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
+    (hu : IntegrableOn u B volume) (hv : IntegrableOn v B volume)
+    (hg : ∀ k, IntegrableOn (g k) B volume) (hh : ∀ k, IntegrableOn (h k) B volume)
+    (hU : HasWeakGradOn B u g) (hV : HasWeakGradOn B v h) :
+    HasWeakGradOn B (fun x => u x + v x) (fun k x => g k x + h k x) := by
+  intro φ hφc hφcs hφs k
+  have hφcont : Continuous φ := hφc.continuous
+  have hφpc : Continuous (partialD k φ) :=
+    (hφc.continuous_fderiv (by simp)).clm_apply continuous_const
+  have hφpcs : HasCompactSupport (partialD k φ) :=
+    hφcs.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single k (1 : ℝ))
+  obtain ⟨N, hN⟩ := hφpcs.exists_bound_of_continuous hφpc
+  obtain ⟨P, hP⟩ := hφcs.exists_bound_of_continuous hφcont
+  have hL : ∫ x in B, (u x + v x) * partialD k φ x
+      = (∫ x in B, u x * partialD k φ x) + ∫ x in B, v x * partialD k φ x := by
+    rw [← integral_add (integrableOn_mul_bounded hu hφpc hN)
+      (integrableOn_mul_bounded hv hφpc hN)]
+    exact integral_congr_ae (Filter.Eventually.of_forall fun x => by ring)
+  have hR : ∫ x in B, (g k x + h k x) * φ x
+      = (∫ x in B, g k x * φ x) + ∫ x in B, h k x * φ x := by
+    rw [← integral_add (integrableOn_mul_bounded (hg k) hφcont hP)
+      (integrableOn_mul_bounded (hh k) hφcont hP)]
+    exact integral_congr_ae (Filter.Eventually.of_forall fun x => by ring)
+  rw [hL, hR, hU φ hφc hφcs hφs k, hV φ hφc hφcs hφs k]
+  ring
+
 /-- The Morrey/Hölder exponent `γ = 1 - d/p`, as a `ℝ≥0` (faithful when `p > d`). -/
 def morreyExponent (d : ℕ) (p : ℝ) : ℝ≥0 := Real.toNNReal (1 - (d : ℝ) / p)
 
