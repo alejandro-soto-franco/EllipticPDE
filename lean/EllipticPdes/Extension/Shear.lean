@@ -23,6 +23,9 @@ variables costs nothing.
 * `EllipticPdes.Extension.shear_shear_neg`: the shear by `-γ` inverts it.
 * `EllipticPdes.Extension.det_shearDeriv`: the derivative has determinant `1`.
 * `EllipticPdes.Extension.integral_comp_shear`: the change of variables.
+* `EllipticPdes.Extension.shearHomeomorph`: the shear as a homeomorphism of the whole space.
+* `EllipticPdes.Extension.measurePreserving_shear`: the shear preserves Lebesgue measure.
+* `EllipticPdes.Extension.partialD_comp_shear`: the chain rule through a shear.
 
 ## References
 
@@ -156,5 +159,95 @@ theorem integral_comp_shear {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ
   rw [himg, Measure.restrict_univ] at h
   simp only [det_shearDeriv hγ hind, abs_one, one_smul] at h
   exact h.symm
+
+/-! ### The shear as a homeomorphism, and its measure -/
+
+/-- The shear is continuous when the chart is. -/
+theorem continuous_shear {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ} (hγ : Continuous γ) :
+    Continuous (shear j γ) :=
+  continuous_id.add (hγ.smul continuous_const)
+
+/-- The shear is `C^n` when the chart is. -/
+theorem contDiff_shear {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ} {n : ℕ∞}
+    (hγ : ContDiff ℝ n γ) : ContDiff ℝ n (shear j γ) :=
+  contDiff_id.add (hγ.smul contDiff_const)
+
+/-- Negating a chart preserves independence of the `j`-th coordinate. -/
+theorem IndepCoord.neg {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ} (hind : IndepCoord j γ) :
+    IndepCoord j fun z => -γ z := by
+  intro y t
+  change -γ (y + t • EuclideanSpace.single j (1 : ℝ)) = -γ y
+  rw [hind y t]
+
+/-- **Shear as a homeomorphism of the whole space**, inverted by the shear by `-γ`. -/
+def shearHomeomorph {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ} (hγ : Continuous γ)
+    (hind : IndepCoord j γ) : EuclideanSpace ℝ (Fin d) ≃ₜ EuclideanSpace ℝ (Fin d) where
+  toFun := shear j γ
+  invFun := shear j fun z => -γ z
+  left_inv := shear_shear_neg hind
+  right_inv := shear_neg_shear hind
+  continuous_toFun := continuous_shear hγ
+  continuous_invFun := continuous_shear hγ.neg
+
+/-- The shear is a measurable embedding, being a homeomorphism. -/
+theorem measurableEmbedding_shear {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hγ : Continuous γ) (hind : IndepCoord j γ) : MeasurableEmbedding (shear j γ) :=
+  (shearHomeomorph hγ hind).measurableEmbedding
+
+/-- **Preservation of Lebesgue measure by a shear.** Its inverse is the shear by `-γ`, whose
+derivative has determinant `1`, so the image of a measurable set has the measure of the set. -/
+theorem measurePreserving_shear {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hγ : Differentiable ℝ γ) (hind : IndepCoord j γ) :
+    MeasurePreserving (shear j γ) volume volume := by
+  have hcont : Continuous (shear j γ) := continuous_shear hγ.continuous
+  have hnegd : Differentiable ℝ fun z => -γ z := hγ.neg
+  refine ⟨hcont.measurable, ?_⟩
+  refine Measure.ext fun s hs => ?_
+  rw [Measure.map_apply hcont.measurable hs]
+  have hpre : shear j γ ⁻¹' s = shear j (fun z => -γ z) '' s := by
+    ext x
+    constructor
+    · intro hx
+      exact ⟨shear j γ x, hx, shear_shear_neg hind x⟩
+    · rintro ⟨y, hy, rfl⟩
+      rw [Set.mem_preimage, shear_neg_shear hind y]
+      exact hy
+  have hfd : ∀ x ∈ s, HasFDerivWithinAt (shear j fun z => -γ z)
+      (shearDeriv j (fun z => -γ z) x) s x :=
+    fun x _ => (hasFDerivAt_shear hnegd x).hasFDerivWithinAt
+  have hinj : Set.InjOn (shear j fun z => -γ z) s :=
+    (bijective_shear hind.neg).injective.injOn
+  have h := lintegral_image_eq_lintegral_abs_det_fderiv_mul (μ := volume) hs hfd hinj
+    (fun _ => 1)
+  have hdet1 : ∀ x : EuclideanSpace ℝ (Fin d),
+      ENNReal.ofReal |(shearDeriv j (fun z => -γ z) x).det| * 1 = 1 := by
+    intro x
+    rw [det_shearDeriv hnegd hind.neg x, abs_one, ENNReal.ofReal_one, mul_one]
+  rw [hpre]
+  calc volume (shear j (fun z => -γ z) '' s)
+      = ∫⁻ _ in shear j (fun z => -γ z) '' s, (1 : ℝ≥0∞) := (setLIntegral_one _).symm
+    _ = ∫⁻ x in s, ENNReal.ofReal |(shearDeriv j (fun z => -γ z) x).det| * 1 := h
+    _ = ∫⁻ _ in s, (1 : ℝ≥0∞) := by
+        simp only [hdet1]
+    _ = volume s := setLIntegral_one _
+
+/-! ### The chain rule through a shear -/
+
+/-- **Partial derivatives through a shear.** The derivative of the shear is the identity plus a
+rank-one map in the direction `eⱼ`, so a partial derivative of a composition adds to the
+corresponding partial of the outer function the `j`-th one times the partial of the chart. -/
+theorem partialD_comp_shear {j : Fin d} {γ φ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hγ : Differentiable ℝ γ) (hφ : Differentiable ℝ φ) (k : Fin d)
+    (y : EuclideanSpace ℝ (Fin d)) :
+    partialD k (fun z => φ (shear j γ z)) y
+      = partialD k φ (shear j γ y) + partialD j φ (shear j γ y) * partialD k γ y := by
+  have hcomp : HasFDerivAt (fun z => φ (shear j γ z))
+      ((fderiv ℝ φ (shear j γ y)).comp (shearDeriv j γ y)) y :=
+    (hφ (shear j γ y)).hasFDerivAt.comp y (hasFDerivAt_shear hγ y)
+  rw [partialD, hcomp.fderiv]
+  simp only [ContinuousLinearMap.coe_comp', Function.comp_apply, shearDeriv,
+    ContinuousLinearMap.add_apply, ContinuousLinearMap.coe_id', id_eq,
+    ContinuousLinearMap.smulRight_apply, map_add, map_smul, smul_eq_mul, partialD]
+  ring
 
 end EllipticPdes.Extension
