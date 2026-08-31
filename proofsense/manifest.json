@@ -173,6 +173,12 @@
       "claim": "formalises the same inequality fed by data at an exponent q above p, the ball's finite measure supplying the factor |B|^(1/p - 1/q) that the constant absorbs"
     },
     {
+      "decl": "EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_compactSupport",
+      "source_id": "evans-2010",
+      "locator": "§5.6.1 Thm 1",
+      "claim": "formalises the inequality on the whole space, which is where Evans states it: for a compactly supported class with a weak gradient on R^d, the L^{p'} seminorm is bounded by the sum of the L^p seminorms of the gradient alone, at a general exponent pair with 1/p' = 1/p - 1/d and a constant depending on d and p. Evans asks for u in C_c^1(R^n); a weak gradient reaches the estimate through a mollification, whose classical partials are the mollified weak gradient and whose L^p seminorms Young's inequality bounds uniformly in the radius. No cutoff enters, so the bound has no ‖w‖_{L^p} term, which is what separates it from exists_eLpNorm_sobolevConj_le"
+    },
+    {
       "decl": "EllipticPdes.Embedding.exists_eLpNorm_six_le",
       "source_id": "fernandezreal-2023-reg-the-ell",
       "locator": "§1.1 Thm (Sobolev inequality)",
@@ -483,6 +489,18 @@
       "source_id": "evans-2010",
       "locator": "§5.6.3 Thm 6",
       "claim": "clause (i) at the exponent Evans names: under the strict rung condition p_0 s < d, which is his k < n/p, the reciprocal 1/p_0 - s/d is positive and the ladder lands on the exponent naming it, which is his 1/q = 1/p - k/n. Guo states the same as Theorem IV.2.3 case (i). Three differences from Evans: the conclusion is on a ball inside a ball rather than on a bounded C^1 domain, so no extension operator is involved; it is membership rather than the norm estimate, which exists_const_eLpNorm_le_of_gradClosed_fullStep supplies at p_0 = 2; and the object iterated on is a family closed under weak differentiation with a depth function in place of the symbol D^alpha u at every order"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.memLp_of_gradClosed_compactSupport",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "the machinery behind clause (i) on the whole space, with the target exponent left free. Evans states, for u in W^{k,p}(U) with k < n/p, that u lies in L^q(U) for 1/q = 1/p - k/n; this iterates the single rung of §5.6.1 Theorem 1 from an arbitrary base exponent p_0 in [1, infinity) over a compactly supported family closed under weak differentiation and to bounded depth, landing on any q >= p_0 whose reciprocal is at least 1/p_0 - s/d after s rungs with p_0 s <= d. Two differences from Evans: the domain is R^d rather than a bounded C^1 domain, so no extension operator is involved and no rung shrinks the domain, a compactly supported class needing none of the cutoff the ball version applies at every rung; and the object iterated on is a family closed under weak differentiation with a depth function in place of the symbol D^alpha u at every order. This is the half of the order-k embedding that asks nothing of a boundary"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.memLp_of_gradClosed_compactSupport_ideal",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "clause (i) at the exponent Evans names, on the whole space: under the strict rung condition p_0 s < d, which is his k < n/p, the reciprocal 1/p_0 - s/d is positive and the ladder lands on the exponent naming it, which is his 1/q = 1/p - k/n. Guo states the same as Theorem IV.2.3 case (i). Three differences from Evans: the domain is R^d and the family compactly supported, so no extension operator is involved and no rung shrinks the domain; it is membership rather than the norm estimate; and the object iterated on is a family closed under weak differentiation with a depth function in place of D^alpha u at every order"
     },
     {
       "decl": "EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed_general",
