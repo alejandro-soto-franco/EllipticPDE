@@ -27,6 +27,7 @@ extensions needs.
 
 * `EllipticPdes.Extension.exists_smooth_partition`: a smooth partition of unity subordinate to a
   finite open cover, stated with `ContDiff`.
+* `EllipticPdes.Extension.exists_cutoff_one_on_ball`: a smooth cutoff between two balls.
 * `EllipticPdes.Extension.BoundaryPartition`: the cover and the partition together.
 * `EllipticPdes.Extension.nonempty_boundaryPartition`: every bounded domain with `C¹` boundary
   admits one.
@@ -67,6 +68,28 @@ theorem exists_smooth_partition {ι : Type} [Fintype ι]
     rw [← finsum_eq_sum_of_fintype]
     exact f.sum_eq_one hx
 
+
+/-- **Smooth cutoff equal to one on a closed ball and supported in a larger one.** Guo's third
+step asks the support of each piece of the partition to sit compactly inside its neighbourhood,
+and the local extension of step 2 reads the class on a neighbourhood of that support, so a
+cutoff between two balls is what mediates the two. -/
+theorem exists_cutoff_one_on_ball (x : EuclideanSpace ℝ (Fin d)) {r R : ℝ} (hrR : r < R) :
+    ∃ ξ : EuclideanSpace ℝ (Fin d) → ℝ, ContDiff ℝ (⊤ : ℕ∞) ξ ∧
+      (∀ y ∈ closedBall x r, ξ y = 1) ∧ tsupport ξ ⊆ ball x R := by
+  obtain ⟨t, hrt, htR⟩ := exists_between hrR
+  obtain ⟨f, hf0, hf1, -⟩ :=
+    exists_contMDiffMap_zero_one_of_isClosed (I := 𝓘(ℝ, EuclideanSpace ℝ (Fin d)))
+      (isOpen_ball (x := x) (ε := t)).isClosed_compl
+      (isClosed_closedBall (x := x) (ε := r))
+      (by
+        rw [Set.disjoint_compl_left_iff_subset]
+        exact closedBall_subset_ball hrt)
+  refine ⟨fun y => f y, contMDiff_iff_contDiff.mp f.contMDiff, fun y hy => hf1 hy, ?_⟩
+  refine (closure_minimal ?_ (isClosed_closedBall (x := x) (ε := t))).trans
+    (closedBall_subset_ball htR)
+  intro y hy
+  by_contra hc
+  exact hy (hf0 fun hcc => hc (ball_subset_closedBall hcc))
 
 /-- **Data Guo's third step glues with.** A finite family of boundary charts whose balls
 cover the boundary, and a smooth partition of unity subordinate to those balls together with the

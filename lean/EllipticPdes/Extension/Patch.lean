@@ -23,8 +23,10 @@ does.
 
 ## Main declarations
 
+* `EllipticPdes.Extension.integrableOn_of_vanishing_off`: integrability spreads from the part
+  of a set inside a neighbourhood when the class vanishes outside it.
 * `EllipticPdes.Extension.hasWeakGradOn_mul_cutoff_inter`: the weak gradient of a class cut off
-  inside a neighbourhood, on the whole of the surrounding set.
+  inside a neighbourhood, on the surrounding set.
 
 ## References
 
@@ -43,6 +45,19 @@ open EllipticPdes.Embedding (HasWeakGradOn partialD_mul integrableOn_mul_bounded
 open EllipticPdes.Sobolev (partialD)
 
 variable {d : ℕ}
+
+/-- **Integrability from a neighbourhood the class vanishes outside.** A class integrable on the
+part of a set inside `W` and vanishing off `W` is integrable on the whole set, the rest of it
+contributing nothing. -/
+theorem integrableOn_of_vanishing_off {B W : Set (EuclideanSpace ℝ (Fin d))}
+    (hB : MeasurableSet B) (hW : MeasurableSet W) {f : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hf : IntegrableOn f (B ∩ W) volume) (hoff : ∀ x, x ∉ W → f x = 0) :
+    IntegrableOn f B volume := by
+  have hdiff : IntegrableOn f (B \ W) volume := by
+    refine (integrableOn_zero (μ := volume) (s := B \ W)).congr_fun ?_ (hB.diff hW)
+    intro x hx
+    exact (hoff x hx.2).symm
+  exact Set.inter_union_diff B W ▸ hf.union hdiff
 
 /-- **Weak gradient of a class cut off inside a neighbourhood.** If `u` has weak gradient `g` on
 `B ∩ W` and `η` is smooth with `tsupport η ⊆ W`, then `η u` has weak gradient
