@@ -155,9 +155,9 @@ It enters there because the spectral theorem for compact self-adjoint operators 
 bilinear form to be symmetric, and `bilin` is symmetric exactly when `a` is (with the drift
 vanishing). Every other result of the library is proved for an arbitrary `a`: Gårding,
 existence and uniqueness, Fredholm, the resolvent bound, and the whole
-interior-regularity chain. With `a` non-symmetric the formal adjoint `L* v = -Dᵢ(aᵢⱼ Dⱼv) - bⁱ Dᵢv + (c - Dᵢbⁱ)v`
-has principal part built from the transpose, which is the transpose problem the Fredholm
-solvability criterion states. -/
+interior-regularity chain. With `a` non-symmetric the formal adjoint
+`L* v = -Dᵢ(aᵢⱼ Dⱼv) - bⁱ Dᵢv + (c - Dᵢbⁱ)v` has principal part built from the
+transpose, which is the transpose problem the Fredholm solvability criterion states. -/
 structure EllipticCoeff (d : ℕ) where
   /-- The coefficient matrix entries. -/
   a : EuclideanSpace ℝ (Fin d) → Fin d → Fin d → ℝ
