@@ -48,7 +48,7 @@ noncomputable section
 
 namespace EllipticPdes.Extension
 
-open EllipticPdes.Embedding (HasWeakGradOn)
+open EllipticPdes.Embedding (HasWeakGradOn integrableOn_mul_bounded)
 open EllipticPdes.Sobolev (partialD)
 
 variable {d : ℕ}
@@ -111,12 +111,6 @@ def chartExtGrad (j : Fin d) (γ : EuclideanSpace ℝ (Fin d) → ℝ)
 theorem partialD_neg {γ : EuclideanSpace ℝ (Fin d) → ℝ} (k : Fin d)
     (y : EuclideanSpace ℝ (Fin d)) : partialD k (fun z => -γ z) y = -partialD k γ y := by
   simp only [partialD, fderiv_fun_neg, ContinuousLinearMap.neg_apply]
-
-private theorem integrableOn_mul_bounded {B : Set (EuclideanSpace ℝ (Fin d))}
-    {w h : EuclideanSpace ℝ (Fin d) → ℝ} (hw : IntegrableOn w B volume) (hc : Continuous h)
-    {C : ℝ} (hC : ∀ x, ‖h x‖ ≤ C) : IntegrableOn (fun x => w x * h x) B volume := by
-  have hbd := hw.bdd_mul (f := h) hc.aestronglyMeasurable (Filter.Eventually.of_forall hC)
-  exact hbd.congr (Filter.Eventually.of_forall fun x => mul_comm (h x) (w x))
 
 /-- **Weak gradient of the extension across a `C¹` boundary chart**, on the whole space. The
 class travels through the shear onto the half space, the reflection extends it across the

@@ -221,8 +221,18 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   linear isometry is its own derivative, so the chain rule gives the formula at
   once; the work is that a finite sum has to travel through an integral, which
   is where integrability of the class and of its gradient enters. Reflection is
-  the case where the sum has a single term and a sign. The patching over a
-  finite cover of $\partial\Omega$ is what remains of the operator,
+  the case where the sum has a single term and a sign,
+- the first step of that patching, as
+  `EllipticPdes.Extension.hasWeakGradOn_mul_cutoff_inter`: a cutoff supported in
+  $W$ sends a weak gradient on $B \cap W$ to a weak gradient on all of $B$, with
+  the product rule supplying the extra term. A test function on $B$ multiplied by
+  the cutoff is a test function on $B \cap W$, and both sides of the identity see
+  only $W$, the cutoff and its derivative vanishing off it.
+  `hasWeakGradOn_univ_mul_cutoff` is the case where the cutoff sits inside $B$
+  and the conclusion reaches the whole space; a boundary chart's ball straddles
+  $\partial\Omega$ instead, which is what this covers. The finite cover of
+  $\partial\Omega$ and the partition of unity over it are what remain of the
+  operator,
 - both cases of the order-$k$ embedding off `p = 2`. Case (ii) is
   `EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed_general`: the ladder
   runs for $s$ rungs from $L^{p_0}$ and Morrey reads the Hölder exponent off the

@@ -29,6 +29,15 @@ open EllipticPdes.Sobolev (partialD)
 
 variable {d : ℕ}
 
+/-- **Integrability against a bounded factor.** An integrable class stays integrable when
+multiplied by a bounded measurable one, which is how every test function and every cutoff of
+this development enters an integral. -/
+theorem integrableOn_mul_bounded {B : Set (EuclideanSpace ℝ (Fin d))}
+    {w h : EuclideanSpace ℝ (Fin d) → ℝ} (hw : IntegrableOn w B volume) (hc : Continuous h)
+    {C : ℝ} (hC : ∀ x, ‖h x‖ ≤ C) : IntegrableOn (fun x => w x * h x) B volume := by
+  have hbd := hw.bdd_mul (f := h) hc.aestronglyMeasurable (Filter.Eventually.of_forall hC)
+  exact hbd.congr (Filter.Eventually.of_forall fun x => mul_comm (h x) (w x))
+
 /-- `g` is the pointwise weak gradient of `u` on `B`: integration by parts holds
 against every smooth compactly supported test function whose support lies in `B`. This
 mirrors `EllipticPdes.Regularity.HasWeakDerivOn` component-wise but for pointwise

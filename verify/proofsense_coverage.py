@@ -90,6 +90,14 @@ EXEMPT = {
         "gradient. The patching over a finite cover of the boundary, which is the remaining "
         "step of that theorem, is not formalised"
     ),
+    "EllipticPdes.Extension.hasWeakGradOn_mul_cutoff_inter": (
+        "the product rule for a weak gradient against a cutoff whose support straddles the "
+        "boundary of the set, which is what a boundary chart's ball does. Guo glues the local "
+        "extensions with a partition of unity in step 3 of the proof of III.2.2 and states no "
+        "lemma for the cutoff of a single piece, so no transcribed statement matches it. "
+        "hasWeakGradOn_univ_mul_cutoff is the case where the cutoff sits inside the set, where "
+        "the conclusion reaches the whole space"
+    ),
     "EllipticPdes.Extension.hasWeakGradOn_comp_linearIsometry": (
         "the change of variables for a weak gradient under the relabelling and reorientation of "
         "the coordinate axes, which Evans C.1 asks for in the definition of a C^1 boundary and "

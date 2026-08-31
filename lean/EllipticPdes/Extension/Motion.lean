@@ -40,7 +40,7 @@ noncomputable section
 
 namespace EllipticPdes.Extension
 
-open EllipticPdes.Embedding (HasWeakGradOn)
+open EllipticPdes.Embedding (HasWeakGradOn integrableOn_mul_bounded)
 open EllipticPdes.Sobolev (partialD)
 
 variable {d : ℕ}
@@ -71,12 +71,6 @@ theorem partialD_comp_linearIsometry {φ : EuclideanSpace ℝ (Fin d) → ℝ}
     (hφ (e y)).hasFDerivAt.comp y e.toContinuousLinearEquiv.hasFDerivAt
   rw [partialD, hcomp.fderiv, ContinuousLinearMap.coe_comp', Function.comp_apply]
   exact clm_apply_eq_sum (fderiv ℝ φ (e y)) _
-
-private theorem integrableOn_mul_bdd {B : Set (EuclideanSpace ℝ (Fin d))}
-    {w h : EuclideanSpace ℝ (Fin d) → ℝ} (hw : IntegrableOn w B volume) (hc : Continuous h)
-    {C : ℝ} (hC : ∀ x, ‖h x‖ ≤ C) : IntegrableOn (fun x => w x * h x) B volume := by
-  have hbd := hw.bdd_mul (f := h) hc.aestronglyMeasurable (Filter.Eventually.of_forall hC)
-  exact hbd.congr (Filter.Eventually.of_forall fun x => mul_comm (h x) (w x))
 
 /-- **Weak gradient through a linear isometry.** The isometry is its own derivative, so the
 gradient transforms by its transpose, which in coordinates is the sum over the directions the
@@ -138,7 +132,7 @@ theorem hasWeakGradOn_comp_linearIsometry {B : Set (EuclideanSpace ℝ (Fin d))}
       u x * (e (EuclideanSpace.single k (1 : ℝ)) i * partialD i ψ x)) B volume := by
     intro i
     obtain ⟨N, hN⟩ := (hdcs i).exists_bound_of_continuous (hdc i)
-    exact integrableOn_mul_bdd hu (continuous_const.mul (hdc i))
+    exact integrableOn_mul_bounded hu (continuous_const.mul (hdc i))
       (C := ‖e (EuclideanSpace.single k (1 : ℝ)) i‖ * N) (fun x => by
         rw [norm_mul]
         exact mul_le_mul_of_nonneg_left (hN x) (norm_nonneg _))
@@ -146,7 +140,7 @@ theorem hasWeakGradOn_comp_linearIsometry {B : Set (EuclideanSpace ℝ (Fin d))}
       e (EuclideanSpace.single k (1 : ℝ)) i * (g i x * ψ x)) B volume := by
     intro i
     obtain ⟨P, hP⟩ := hψcs.exists_bound_of_continuous hψc
-    exact ((integrableOn_mul_bdd (hgi i) hψc hP).const_mul _)
+    exact ((integrableOn_mul_bounded (hgi i) hψc hP).const_mul _)
   -- both sides, moved onto `B`
   have hLeft : ∫ y in (e : EuclideanSpace ℝ (Fin d) → EuclideanSpace ℝ (Fin d)) ⁻¹' B,
         u (e y) * partialD k φ y
