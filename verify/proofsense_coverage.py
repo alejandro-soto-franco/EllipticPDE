@@ -66,6 +66,16 @@ EXEMPT = {
         "and is stated for an arbitrary set, since the boundary charts of that construction "
         "reflect across the image of a hyperplane"
     ),
+    "EllipticPdes.Extension.hasWeakGradOn_chartExt": (
+        "the local half of the extension operator: a class with a weak gradient above the graph "
+        "of a C^1 chart extends across that graph, the extension being the flattened class "
+        "reflected across the interface and returned through the inverse chart. Evans 5.4 "
+        "Theorem 1 performs the straightening and the reflection inside one proof and states no "
+        "lemma for the composite, and it works throughout with a function smooth up to the "
+        "boundary, reaching W^{1,p} by density, so no transcribed statement matches a weak "
+        "gradient. The patching over a finite cover of the boundary, which is the remaining "
+        "step of that theorem, is not formalised"
+    ),
     "EllipticPdes.Extension.hasWeakGradOn_comp_shear": (
         "the change of variables for a weak gradient under the shear that flattens a C^1 "
         "boundary. Evans 5.4 Theorem 1 straightens the boundary near a boundary point and works "

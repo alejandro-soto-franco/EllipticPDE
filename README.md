@@ -181,6 +181,19 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   coordinate, mollification leaves it independent of that coordinate and makes
   it smooth, and `integral_mul_indepCoord` reads the identity off the product
   rule in the limit,
+- the local half of the extension operator, as
+  `EllipticPdes.Extension.hasWeakGradOn_chartExt`: a class with a weak gradient
+  on the region above the graph of a $C^1$ chart extends across that graph to a
+  class with a weak gradient on the whole space, agreeing with the original above
+  the graph and bounded by twice its seminorm in every $L^p$. The three maps
+  compose there: the shear pulls the region back to the half space, the even
+  reflection crosses the interface, and the inverse shear returns the result,
+  each step contributing its own half of the gradient. Guo assembles the same
+  steps for a function smooth up to the boundary and reaches $W^{1,p}$ by
+  density, which is why his reflection is the higher-order one that keeps the
+  extension $C^1$; a statement about weak gradients throughout needs no such
+  matching, and the plain even reflection serves. The patching over a finite
+  cover of $\partial\Omega$ is what remains of the operator,
 - both cases of the order-$k$ embedding off `p = 2`. Case (ii) is
   `EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed_general`: the ladder
   runs for $s$ rungs from $L^{p_0}$ and Morrey reads the Hölder exponent off the

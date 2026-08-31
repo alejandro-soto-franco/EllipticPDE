@@ -90,6 +90,7 @@ import EllipticPdes.Extension.HalfSpace
 import EllipticPdes.Extension.EvenReflection
 import EllipticPdes.Extension.Shear
 import EllipticPdes.Extension.ShearWeakGrad
+import EllipticPdes.Extension.BoundaryChart
 import EllipticPdes.Extension.Reflect
 import EllipticPdes.Extension.Translate
 import EllipticPdes.Analysis.LpTranslationContinuity

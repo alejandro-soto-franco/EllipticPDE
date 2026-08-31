@@ -27,6 +27,7 @@ disappears.
 * `EllipticPdes.Extension.integral_split_interface`: an integral splits at the interface.
 * `EllipticPdes.Extension.hasWeakGradOn_evenExt`: the weak gradient of the extension.
 * `EllipticPdes.Extension.eLpNorm_evenExt_le`: its bound in every `Lᵖ` seminorm.
+* `EllipticPdes.Extension.aestronglyMeasurable_evenExt`: the extension is measurable.
 * `EllipticPdes.Extension.integrable_evenExt` and
   `EllipticPdes.Extension.integrable_evenExtGrad`: the extension and its gradient are
   integrable on the whole space whenever the class is integrable on the half space.
@@ -394,6 +395,20 @@ theorem evenExtGrad_ae_eq (j : Fin d) (g : Fin d → EuclideanSpace ℝ (Fin d) 
       = (halfSpace j).indicator (g k) x
         + (halfSpaceNeg j).indicator (fun y => reflectSign j k * g k (reflectLI j y)) x
     rw [if_pos h.le, Set.indicator_of_notMem h2, Set.indicator_of_mem hmemPos, add_zero]
+
+/-- **Measurability of the reflected extension**, from the description of it as a sum of two
+indicators. -/
+theorem aestronglyMeasurable_evenExt {j : Fin d} {u : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hu : AEStronglyMeasurable u (volume.restrict (halfSpace j))) :
+    AEStronglyMeasurable (evenExt j u) volume := by
+  have hmp := measurePreserving_reflectLI_halfSpaceNeg j
+  have hu' : AEStronglyMeasurable (fun y => u (reflectLI j y))
+      (volume.restrict (halfSpaceNeg j)) := hu.comp_measurePreserving hmp
+  have h1 : AEStronglyMeasurable ((halfSpace j).indicator u) volume :=
+    (aestronglyMeasurable_indicator_iff (measurableSet_halfSpace j)).mpr hu
+  have h2 : AEStronglyMeasurable ((halfSpaceNeg j).indicator fun y => u (reflectLI j y)) volume :=
+    (aestronglyMeasurable_indicator_iff (measurableSet_halfSpaceNeg j)).mpr hu'
+  exact (h1.add h2).congr (evenExt_ae_eq j u).symm
 
 /-- **Integrability of the reflected extension.** Each side of the interface contributes the
 integral over the half space, the reflection preserving measure. -/
