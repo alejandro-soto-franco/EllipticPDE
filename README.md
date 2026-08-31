@@ -213,7 +213,15 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   coordinate is bounded on a cylinder around that coordinate's axis, factoring
   through the projection that kills it, and a closed ball of that projection is
   compact. The region above a graph and the half space are charts at every
-  point, and the boundary of a bounded domain is compact. The patching over a
+  point, and the boundary of a bounded domain is compact,
+- the relabelling and reorientation itself, as
+  `EllipticPdes.Extension.hasWeakGradOn_comp_linearIsometry`: a weak gradient
+  moves through a linear isometry by the transpose of that isometry, which in
+  coordinates is the sum over the directions it sends the $k$-th one to. A
+  linear isometry is its own derivative, so the chain rule gives the formula at
+  once; the work is that a finite sum has to travel through an integral, which
+  is where integrability of the class and of its gradient enters. Reflection is
+  the case where the sum has a single term and a sign. The patching over a
   finite cover of $\partial\Omega$ is what remains of the operator,
 - both cases of the order-$k$ embedding off `p = 2`. Case (ii) is
   `EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed_general`: the ladder

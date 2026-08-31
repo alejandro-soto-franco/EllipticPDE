@@ -90,6 +90,14 @@ EXEMPT = {
         "gradient. The patching over a finite cover of the boundary, which is the remaining "
         "step of that theorem, is not formalised"
     ),
+    "EllipticPdes.Extension.hasWeakGradOn_comp_linearIsometry": (
+        "the change of variables for a weak gradient under the relabelling and reorientation of "
+        "the coordinate axes, which Evans C.1 asks for in the definition of a C^1 boundary and "
+        "which every chart of that definition begins with. Both texts change the axes without "
+        "comment and state no lemma about what it does to a weak gradient, so no transcribed "
+        "statement matches it. It generalises hasWeakGradOn_comp_reflect, whose sum has a single "
+        "term and a sign"
+    ),
     "EllipticPdes.Extension.hasWeakGradOn_comp_shear": (
         "the change of variables for a weak gradient under the shear that flattens a C^1 "
         "boundary. Evans 5.4 Theorem 1 straightens the boundary near a boundary point and works "

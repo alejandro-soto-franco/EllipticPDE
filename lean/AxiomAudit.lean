@@ -440,6 +440,10 @@ import EllipticPdes
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Extension.eLpNorm_chartExtGrad_le
 
+/-- info: 'EllipticPdes.Extension.hasWeakGradOn_comp_linearIsometry' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Extension.hasWeakGradOn_comp_linearIsometry
+
 /-- info: 'EllipticPdes.Analysis.tendsto_eLpNorm_translate_sub' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Analysis.tendsto_eLpNorm_translate_sub

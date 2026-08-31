@@ -92,6 +92,7 @@ import EllipticPdes.Extension.Shear
 import EllipticPdes.Extension.ShearWeakGrad
 import EllipticPdes.Extension.BoundaryChart
 import EllipticPdes.Extension.C1Boundary
+import EllipticPdes.Extension.Motion
 import EllipticPdes.Extension.Reflect
 import EllipticPdes.Extension.Translate
 import EllipticPdes.Analysis.LpTranslationContinuity
