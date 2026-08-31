@@ -263,8 +263,18 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   a function smooth up to the boundary and reads the chain rule off it; every
   step here is a weak gradient. The chart asks nothing of the gradient of its
   graph, so the proof runs on the bounded graph `exists_bounded_graph` supplies,
-  whose region agrees with the chart's on exactly the ball in play. The sum of
-  those local extensions against the partition is what remains of the operator,
+  whose region agrees with the chart's on exactly the ball in play,
+- the sum those pieces are glued by, as
+  `EllipticPdes.Extension.exists_extension`, which is Guo's third step: on a
+  bounded open domain with $C^1$ boundary, a class with a weak gradient on
+  $\Omega$ extends to one with a weak gradient on $\mathbb{R}^d$ agreeing with
+  it on $\Omega$. Each piece is a local extension cut down by its piece of the
+  partition, the cutoff coming after the extension. That order is what makes
+  the sum agree: where a piece of the partition is nonzero the point lies in
+  that chart's ball, where the local extension agrees with the class, and off
+  the ball both sides vanish, so the pieces add to $u$ because the partition
+  adds to one. What remains of the extension operator is its support clause and
+  its norm bound,
 - both cases of the order-$k$ embedding off `p = 2`. Case (ii) is
   `EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed_general`: the ladder
   runs for $s$ rungs from $L^{p_0}$ and Morrey reads the Hölder exponent off the

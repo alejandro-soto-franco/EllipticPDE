@@ -90,6 +90,13 @@ EXEMPT = {
         "gradient. The patching over a finite cover of the boundary, which is the remaining "
         "step of that theorem, is not formalised"
     ),
+    "EllipticPdes.Extension.exists_extension": (
+        "step 3 of Guo's proof of III.2.2, the sum of the local extensions against a partition of "
+        "unity, which extends the class across the whole boundary and agrees with it on the "
+        "domain. That is clause (i) of the theorem together with the existence of the extension's "
+        "weak gradient; clause (ii) on the support and clause (iii) on the norm are not "
+        "formalised. Steps of a proof are not transcribed statements, so no locator matches"
+    ),
     "EllipticPdes.Extension.exists_localExtension": (
         "step 2 of Guo's proof of III.2.2: near a boundary point the class extends across the "
         "boundary, agreeing with the original on the part of the domain the neighbourhood meets. "

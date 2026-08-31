@@ -78,6 +78,41 @@ theorem HasWeakGradOn.add {B : Set (EuclideanSpace ℝ (Fin d))}
   rw [hL, hR, hU φ hφc hφcs hφs k, hV φ hφc hφcs hφs k]
   ring
 
+/-- **Zero as its own weak gradient.** -/
+theorem hasWeakGradOn_zero {B : Set (EuclideanSpace ℝ (Fin d))} :
+    HasWeakGradOn B (fun _ => (0 : ℝ)) (fun _ _ => (0 : ℝ)) := by
+  intro φ _ _ _ k
+  simp
+
+/-- **Finite sum of classes with weak gradients**, whose gradient is the sum. This is
+what glues the local pieces of the extension operator. -/
+theorem hasWeakGradOn_finsetSum {ι : Type*} (s : Finset ι)
+    {B : Set (EuclideanSpace ℝ (Fin d))} {U : ι → EuclideanSpace ℝ (Fin d) → ℝ}
+    {G : ι → Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
+    (hU : ∀ i ∈ s, IntegrableOn (U i) B volume)
+    (hG : ∀ i ∈ s, ∀ k, IntegrableOn (G i k) B volume)
+    (h : ∀ i ∈ s, HasWeakGradOn B (U i) (G i)) :
+    HasWeakGradOn B (fun y => ∑ i ∈ s, U i y) (fun k y => ∑ i ∈ s, G i k y) := by
+  classical
+  induction s using Finset.induction_on with
+  | empty => simpa using hasWeakGradOn_zero (B := B)
+  | insert a t ha ih =>
+    have hUt : ∀ i ∈ t, IntegrableOn (U i) B volume := fun i hi =>
+      hU i (Finset.mem_insert_of_mem hi)
+    have hGt : ∀ i ∈ t, ∀ k, IntegrableOn (G i k) B volume := fun i hi =>
+      hG i (Finset.mem_insert_of_mem hi)
+    have hht : ∀ i ∈ t, HasWeakGradOn B (U i) (G i) := fun i hi =>
+      h i (Finset.mem_insert_of_mem hi)
+    have hsum : HasWeakGradOn B (fun y => U a y + ∑ i ∈ t, U i y)
+        (fun k y => G a k y + ∑ i ∈ t, G i k y) :=
+      (h a (Finset.mem_insert_self a t)).add
+        (hU a (Finset.mem_insert_self a t))
+        (MeasureTheory.integrable_finsetSum _ fun i hi => hUt i hi)
+        (fun k => hG a (Finset.mem_insert_self a t) k)
+        (fun k => MeasureTheory.integrable_finsetSum _ fun i hi => hGt i hi k)
+        (ih hUt hGt hht)
+    simpa [Finset.sum_insert ha] using hsum
+
 /-- The Morrey/Hölder exponent `γ = 1 - d/p`, as a `ℝ≥0` (faithful when `p > d`). -/
 def morreyExponent (d : ℕ) (p : ℝ) : ℝ≥0 := Real.toNNReal (1 - (d : ℝ) / p)
 

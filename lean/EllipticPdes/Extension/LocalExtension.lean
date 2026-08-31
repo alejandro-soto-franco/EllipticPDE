@@ -60,7 +60,8 @@ theorem exists_localExtension (c : C1Chart d) {Ω : Set (EuclideanSpace ℝ (Fin
     (hu : IntegrableOn u Ω volume) (hgi : ∀ k, IntegrableOn (g k) Ω volume)
     (hwg : HasWeakGradOn Ω u g) :
     ∃ (U : EuclideanSpace ℝ (Fin d) → ℝ) (G : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
-      HasWeakGradOn (ball x r) U G ∧ ∀ y ∈ Ω ∩ ball x r, U y = u y := by
+      HasWeakGradOn (ball x r) U G ∧ Integrable U volume ∧
+        (∀ k, Integrable (G k) volume) ∧ ∀ y ∈ Ω ∩ ball x r, U y = u y := by
   classical
   obtain ⟨γ, M, hγC1, hγind, hγb, hγeq⟩ :=
     exists_bounded_graph c.graph_contDiff c.graph_indep (c.motion x) c.radius_pos
@@ -203,7 +204,16 @@ theorem exists_localExtension (c : C1Chart d) {Ω : Set (EuclideanSpace ℝ (Fin
   have hfinal := hasWeakGradOn_comp_linearIsometry hIext.integrableOn
     (fun k => (hIextG k).integrableOn) hext c.motion
   rw [Set.preimage_univ] at hfinal
-  refine ⟨_, _, hfinal.mono (Set.subset_univ _), ?_⟩
+  have hmpM : MeasurePreserving
+      (c.motion : EuclideanSpace ℝ (Fin d) → EuclideanSpace ℝ (Fin d)) volume volume :=
+    c.motion.measurePreserving
+  have hmeM : MeasurableEmbedding
+      (c.motion : EuclideanSpace ℝ (Fin d) → EuclideanSpace ℝ (Fin d)) :=
+    c.motion.toHomeomorph.measurableEmbedding
+  refine ⟨_, _, hfinal.mono (Set.subset_univ _),
+    (hmpM.integrable_comp_emb hmeM).mpr hIext,
+    fun k => MeasureTheory.integrable_finsetSum _ fun i _ =>
+      ((hmpM.integrable_comp_emb hmeM).mpr (hIextG i)).const_mul _, ?_⟩
   intro y hy
   have hyA' : y ∈ A' := by
     have hmem : y ∈ Ω ∩ ball x c.radius := ⟨hy.1, ball_subset_ball hrc.le hy.2⟩
