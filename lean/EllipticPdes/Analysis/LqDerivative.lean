@@ -57,7 +57,7 @@ private lemma rpow_sub_two_mul_abs_le {r : ℝ} (hr : 1 < r) {y a : ℝ} (hy : �
     rw [hsplit, show r - 2 + 1 = r - 1 by ring]
     exact Real.rpow_le_rpow (norm_nonneg y) hy (by linarith)
 
-/-- **The dominating function is integrable.** With `u` and `v` in `L^q`, the product
+/-- **Integrability of the dominating function.** With `u` and `v` in `L^q`, the product
 `(|u| + |v|)^{q-1}|v|` is integrable: the first factor lies in `L^{q/(q-1)}` and the second in
 `L^q`, whose reciprocals sum to one. -/
 theorem integrable_abs_rpow_sub_one_mul {p : ℝ≥0∞} (hptop : p ≠ ∞) (hp1 : 1 < p.toReal)
@@ -90,7 +90,7 @@ theorem integrable_abs_rpow_sub_one_mul {p : ℝ≥0∞} (hptop : p ≠ ∞) (hp
     simp
   exact (MemLp.integrable_mul hmem hv.norm).congr (Eventually.of_forall (fun _ => rfl))
 
-/-- **The derivative of the `L^q` functional along a line.** For `u` and `v` in `L^q(μ)` with
+/-- **Derivative of the `L^q` functional along a line.** For `u` and `v` in `L^q(μ)` with
 `q > 1`, the map `t ↦ ∫ |u + tv|^q` is differentiable at `0` with derivative
 `q ∫ |u|^{q-2} u v`. -/
 theorem hasDerivAt_integral_abs_rpow {p : ℝ≥0∞} (hp0 : p ≠ 0) (hptop : p ≠ ∞)

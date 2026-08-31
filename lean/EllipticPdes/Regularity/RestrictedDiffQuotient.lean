@@ -93,7 +93,7 @@ theorem extendL2_inner_restrictL2 (hΩm : MeasurableSet Ω) (g : L2D Ω) (w : Eu
 
 /-! ### Interior difference quotient on `L2D Ω` -/
 
-/-- **The interior difference quotient** `Dₖʰ` on `L2D Ω`: extend by zero, translate on the
+/-- **Interior difference quotient** `Dₖʰ` on `L2D Ω`: extend by zero, translate on the
 whole space, restrict back. A bounded operator for every `h` (no support hypothesis needed
 for boundedness; the identity with the whole-space difference quotient needs a
 support condition, see `extendL2_diffQuotD_eq`). Evans, *Partial Differential Equations*
@@ -126,7 +126,7 @@ theorem coeFn_diffQuotD (k : Fin d) (h : ℝ) (hΩm : MeasurableSet Ω) (g : L2D
 
 /-! ### Graph-level interior difference quotient -/
 
-/-- **The graph-level interior difference quotient** `diffQuotG k h : H1amb Ω →L[ℝ] H1amb Ω`,
+/-- **Graph-level interior difference quotient** `diffQuotG k h : H1amb Ω →L[ℝ] H1amb Ω`,
 applying `diffQuotD k h` in every ambient coordinate. Assembled exactly as `cutoffMul`
 (`EllipticPdes.Regularity.cutoffMul`), by conjugating the coordinatewise pi-map with
 `PiLp.continuousLinearEquiv`. Since `Dₖʰ` commutes with weak differentiation coordinatewise,

@@ -109,7 +109,7 @@ lemma solOp_inner_self_nonneg (hco : IsCoercive B) (f : L2D Ω) :
 
 /-! ### Spectral theorem and eigenfunction correspondence -/
 
-/-- **The spectral theorem for the symmetric elliptic Dirichlet problem** (Evans §6.5). Given the
+/-- **Spectral theorem for the symmetric elliptic Dirichlet problem** (Evans §6.5). Given the
 Rellich compact embedding, the eigenspaces of the solution operator span `L²(Ω)`: their
 orthogonal complement is trivial. Equivalently, `L²(Ω)` has an orthonormal basis of
 eigenfunctions of the solution operator. -/

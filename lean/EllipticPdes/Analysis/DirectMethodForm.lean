@@ -96,7 +96,7 @@ theorem bilin_le_of_weakLimit (hco : IsCoercive B) (hsymm : ∀ U V : H, B U V =
 
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
 
-/-- **The direct method for a coercive symmetric form.** With `T` compact and its image meeting
+/-- **Direct method for a coercive symmetric form.** With `T` compact and its image meeting
 the unit sphere of `E`, the form attains its minimum on `{U : ‖T U‖ = 1}`. -/
 theorem exists_bilin_minimiser (hco : IsCoercive B) (hsymm : ∀ U V : H, B U V = B V U)
     (T : H →L[ℝ] E) (hT : IsCompactOperator T.toLinearMap) (hne : ∃ V : H, ‖T V‖ = 1) :

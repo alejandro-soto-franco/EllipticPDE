@@ -83,7 +83,7 @@ theorem exists_bound_deriv_stepProfile : ∃ C : ℝ, 0 ≤ C ∧ ∀ t, |deriv 
 
 /-! ### The cutoff on the space -/
 
-/-- **The cutoff excluding the slab `xⱼ ≤ ε`.** It depends on the `j`-th coordinate alone. -/
+/-- **Cutoff excluding the slab `xⱼ ≤ ε`.** It depends on the `j`-th coordinate alone. -/
 def slabCut (j : Fin d) (ε : ℝ) (x : EuclideanSpace ℝ (Fin d)) : ℝ := stepProfile (x j / ε)
 
 theorem contDiff_slabCut (j : Fin d) (ε : ℝ) : ContDiff ℝ (⊤ : ℕ∞) (slabCut j ε) := by
@@ -133,13 +133,13 @@ theorem partialD_slabCut {j : Fin d} {ε : ℝ} (_hε : 0 < ε) (k : Fin d)
   simp only [ContinuousLinearMap.smul_apply, smul_eq_mul, hval]
   ring
 
-/-- **The cutoff is constant along the interface.** -/
+/-- **Constancy of the cutoff along the interface.** -/
 theorem partialD_slabCut_of_ne {j : Fin d} {ε : ℝ} (hε : 0 < ε) {k : Fin d} (hk : k ≠ j)
     (x : EuclideanSpace ℝ (Fin d)) : partialD k (slabCut j ε) x = 0 := by
   rw [partialD_slabCut hε k x, if_neg (Ne.symm hk)]
   simp
 
-/-- **The remaining partial derivative is `C/ε`.** -/
+/-- **Bound `C/ε` on the remaining partial derivative.** -/
 theorem norm_partialD_slabCut_le {j : Fin d} {ε : ℝ} (hε : 0 < ε) {C : ℝ}
     (hC : ∀ t, |deriv stepProfile t| ≤ C) (k : Fin d) (x : EuclideanSpace ℝ (Fin d)) :
     |partialD k (slabCut j ε) x| ≤ C / ε := by
@@ -153,14 +153,14 @@ theorem norm_partialD_slabCut_le {j : Fin d} {ε : ℝ} (hε : 0 < ε) {C : ℝ}
       ≤ C * (1 / ε) := mul_le_mul (hC _) h1 (abs_nonneg _) h0
     _ = C / ε := by ring
 
-/-- **The cutoff's derivative is supported in the slab.** -/
+/-- **Support of the cutoff's derivative in the slab.** -/
 theorem partialD_slabCut_eq_zero_of_gt {j : Fin d} {ε : ℝ} (hε : 0 < ε) (k : Fin d)
     {x : EuclideanSpace ℝ (Fin d)} (hx : 2 * ε < x j) : partialD k (slabCut j ε) x = 0 := by
   rw [partialD_slabCut hε k x, deriv_stepProfile_eq_zero_of_gt, zero_mul]
   rw [lt_div_iff₀ hε]
   linarith
 
-/-- **The cutoff vanishes off the open half space**, so a test function multiplied by it is
+/-- **Vanishing of the cutoff off the open half space**, so a test function multiplied by it is
 supported where the hypothesis of a weak gradient applies. -/
 theorem tsupport_mul_slabCut_subset {j : Fin d} {ε : ℝ} (hε : 0 < ε)
     (ψ : EuclideanSpace ℝ (Fin d) → ℝ) :

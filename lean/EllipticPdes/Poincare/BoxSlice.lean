@@ -92,7 +92,7 @@ lemma hasDerivAt_slice {φ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ} (hφ : Di
   rw [partialD, ← hv]
   exact hcomp
 
-/-- **The per-direction Poincaré bound on an open box** (the slice bound `hslice`). For a test
+/-- **Per-direction Poincaré bound on an open box** (the slice bound `hslice`). For a test
 function `φ` supported in the open box `∏ₖ (aₖ, bₖ)` of `EuclideanSpace ℝ (Fin (n+1))`,
 `∫ φ² ≤ (bᵢ - aᵢ)² / 2 · ∫ (∂ᵢφ)²`. This is `poincare_box_dir` (the 1-D/Fubini bound on the plain
 product) transported across the measure-preserving `toLp`. -/
@@ -179,7 +179,7 @@ theorem dirichletBilin_coercive_euclBox (a b : Fin (n + 1) → ℝ) (hab : ∀ k
     _ ≤ C * ∫ x in euclBox a b, (partialD i φ x) ^ 2 :=
         mul_le_mul_of_nonneg_right (hC i) (integral_nonneg (fun x => sq_nonneg _))
 
-/-- **The Poincaré inequality on a box** (Theorem `thm: poincare`). For every
+/-- **Poincaré inequality on a box** (Theorem `thm: poincare`). For every
 `U ∈ H₀¹(Ω)` of the open coordinate box `Ω = ∏ₖ (aₖ, bₖ)` whose side lengths are bounded
 by `L`,
 

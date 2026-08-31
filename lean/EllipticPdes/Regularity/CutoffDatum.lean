@@ -38,7 +38,7 @@ open EllipticPdes.Sobolev
 
 variable {n : ℕ}
 
-/-- **The datum of the induction step.** For a cutoff `ξ` supported in the collar `N ⊆ Ω`, there
+/-- **Datum of the induction step.** For a cutoff `ξ` supported in the collar `N ⊆ Ω`, there
 is a constant such that every family of derivatives of the solution on `N` bounded by `B`, and
 every derivative of the datum bounded by `B`, produce an `L²(Ω)` class with `k` weak derivatives
 bounded by `K·B` and pairing against a test function as the twelve shapes.

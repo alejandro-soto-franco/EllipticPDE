@@ -110,7 +110,7 @@ private theorem abs_ballAverage_sub_dyadic (hα : 0 < α) (hM : 0 ≤ M)
               field_simp
               ring
 
-/-- **The telescoped estimate.** For every radius `s` below `r`, with `B(x, r) ⊆ Ω`, the two means
+/-- **Telescoped estimate.** For every radius `s` below `r`, with `B(x, r) ⊆ Ω`, the two means
 differ by at most `campanatoLimitConst d α · M · r^α`. The bound is uniform in `s`, which is what
 makes the means converge as the radius shrinks. -/
 theorem abs_ballAverage_sub_le_of_le_radius (hα : 0 < α) (hM : 0 ≤ M)
@@ -168,7 +168,7 @@ theorem abs_ballAverage_sub_le_of_le_radius (hα : 0 < α) (hM : 0 ≤ M)
 
 end Telescope
 
-/-- **The Campanato limit.** The limit of the means of `u` over the balls `B(x, 2^{-k})`. Under the
+/-- **Campanato limit.** The limit of the means of `u` over the balls `B(x, 2^{-k})`. Under the
 Campanato hypothesis this limit exists at every point of the open set, equals `u` almost
 everywhere, and is the Hölder representative. -/
 def campanatoLimit (u : EuclideanSpace ℝ (Fin d) → ℝ) (x : EuclideanSpace ℝ (Fin d)) : ℝ :=
@@ -225,7 +225,7 @@ theorem tendsto_ballAverage_campanatoLimit (hα : 0 < α) (hM : 0 ≤ M) (hΩ : 
       _ < δ := hδ'
   exact tendsto_nhds_limUnder (cauchySeq_tendsto_of_complete hcauchy)
 
-/-- **The mean at any admissible radius sits within `M r^α` of the limit.** This is the estimate
+/-- **Distance from the mean at any admissible radius to the limit.** This is the estimate
 the Hölder bound consumes: the representative is reached from every scale at the Campanato rate. -/
 theorem abs_ballAverage_sub_campanatoLimit_le (hα : 0 < α) (hM : 0 ≤ M) (hΩ : IsOpen Ω)
     (hu : MemLp u 2 (volume.restrict Ω)) (hcamp : CampanatoOn Ω u α M)

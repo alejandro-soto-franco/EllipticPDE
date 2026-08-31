@@ -188,7 +188,7 @@ lemma gardingγ_nonneg : 0 ≤ Op.gardingγ := by
     div_nonneg (by positivity) this.le
   linarith [Op.Csup_nonneg]
 
-/-- **The Gårding inequality** (Evans §6.2.2, Theorem 2(ii)). With `β = λ/2` and `γ` the
+/-- **Gårding inequality** (Evans §6.2.2, Theorem 2(ii)). With `β = λ/2` and `γ` the
 shift constant, `β ‖U‖²_{H¹} ≤ B[U, U] + γ ‖u₀‖²_{L²}` for every `U ∈ H₀¹(Ω)`. -/
 theorem garding (Ω : Set (EuclideanSpace ℝ (Fin d))) (U : H01 Ω) :
     Op.lam / 2 * ‖U‖ ^ 2
@@ -326,7 +326,7 @@ theorem weak_solution (Ω : Set (EuclideanSpace ℝ (Fin d))) {μ : ℝ}
 Examples remark)
 -/
 
-/-- **The lower-order form is nonnegative** when the transport field vanishes (`b = 0`
+/-- **Nonnegativity of the lower-order form** when the transport field vanishes (`b = 0`
 a.e. on `Ω`) and the zeroth coefficient is nonnegative (`c ≥ 0` a.e. on `Ω`): the
 transport terms `⟪bᵢ ∂ᵢu, u₀⟫` are zero and `⟪c u₀, u₀⟫ = ∫_Ω c u₀² ≥ 0`. -/
 lemma lowerBilin_self_nonneg (Ω : Set (EuclideanSpace ℝ (Fin d)))
@@ -429,7 +429,7 @@ theorem weak_solution_of_nonneg_zeroth (Ω : Set (EuclideanSpace ℝ (Fin d)))
     refine ext_inner_right (𝕜 := ℝ) (fun w => ?_)
     rw [hco.continuousLinearEquivOfBilin_apply, hu w, ← hgrep w]
 
-/-- **The a-priori estimate for the weak solution** (general uniformly elliptic operator,
+/-- **A-priori estimate for the weak solution** (general uniformly elliptic operator,
 `b ≡ 0`, `c ≥ 0`; the Lax-Milgram a-priori bound of Evans §6.2.1, Theorem 1). Under the
 hypotheses of
 [`weak_solution_of_nonneg_zeroth`], any weak solution obeys the Lax-Milgram estimate
@@ -544,7 +544,7 @@ theorem weak_solution_of_nonneg_zeroth_of_subset_euclBox {n : ℕ}
     fun u hu =>
       Op.weak_solution_of_nonneg_zeroth_bound Ω hb hc _ hCP hbase hu⟩
 
-/-- **The `L²` right-hand-side instance on any domain inside a coordinate box.** For
+/-- **`L²` right-hand-side instance on any domain inside a coordinate box.** For
 `f ∈ L²(Ω)` entering through the pairing `⟨f, v⟩ = ∫_Ω f · v₀` ([`l2Functional`]), the
 weak problem has a unique solution with `‖u‖_{H₀¹} ≤ α⁻¹ ‖f‖_{L²}`,
 `α = λ / (C / (n + 1) + 1)`. Derived from

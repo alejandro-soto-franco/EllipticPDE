@@ -91,7 +91,7 @@ lemma integral_grad_norm_sq_eq {Ω : Set (EuclideanSpace ℝ (Fin d))}
       (EuclideanSpace.single i 1)).trans h.2.2) hc)
   simp [image_eq_zero_of_notMem_tsupport hxts]
 
-/-- **The per-test-function translation modulus (squared).** Through the extension by zero, the
+/-- **Per-test-function translation modulus (squared).** Through the extension by zero, the
 squared `L²(ℝᵈ)` translation increment of a test class is controlled by `‖hvec‖²` times the sum of
 its partial-derivative class norms. This is `integral_sq_sub_translation_le` transported to the
 extended class. -/
@@ -117,7 +117,7 @@ lemma mod_sq {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩm : MeasurableSet Ω)
         integral_sq_sub_translation_le (h.1.of_le (by exact_mod_cast le_top)) h.2.1 hvec
     _ = ‖hvec‖ ^ 2 * ∑ i, ‖h.partialCls i‖ ^ 2 := by rw [integral_grad_norm_sq_eq h]
 
-/-- **The translation modulus of an `H₀¹` element.** For `U ∈ H₀¹(Ω)`, the extension by zero of
+/-- **Translation modulus of an `H₀¹` element.** For `U ∈ H₀¹(Ω)`, the extension by zero of
 `embL2 Ω U = U 0` is Lipschitz under translation with modulus `‖U‖`. The bound comes from the smooth
 approximants of `U` (density of test graphs) through `transL2_sub_le_of_tendsto'`. -/
 lemma trans_mod {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩm : MeasurableSet Ω) (U : H01 Ω)
@@ -196,7 +196,7 @@ lemma embL2_norm_le {Ω : Set (EuclideanSpace ℝ (Fin d))} (U : H01 Ω) : ‖em
   exact Finset.single_le_sum (f := fun i : Fin (d + 1) => ‖(↑U : H1amb Ω) i‖ ^ 2)
     (fun j _ => sq_nonneg _) (Finset.mem_univ (0 : Fin (d + 1)))
 
-/-- **The Rellich-Kondrachov compact embedding.** For bounded measurable `Ω`, the embedding
+/-- **Rellich-Kondrachov compact embedding.** For bounded measurable `Ω`, the embedding
 `embL2 Ω : H₀¹(Ω) →L[ℝ] L²(Ω)` is a compact operator. This discharges the single analytic
 hypothesis of the Fredholm theory in `Compactness.lean` and `Spectrum.lean`. -/
 theorem embL2_isCompact {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩm : MeasurableSet Ω)

@@ -55,7 +55,7 @@ variable {d : ℕ}
 
 /-! ### Open collar the identifications use -/
 
-/-- **The tower has an open collar around the middle cutoff.** There is an open `N` with
+/-- **Open collar around the middle cutoff.** There is an open `N` with
 `tsupport ξ ⊆ N ⊆ tsupport θ` on which `θ` is identically `1`.
 
 Every identification the induction step makes holds only after a cutoff, and `N` is where the
@@ -273,7 +273,7 @@ theorem setIntegral_lower_entry {Ω W : Set (EuclideanSpace ℝ (Fin d))}
     (∫ x in Ω, a x * (F x : ℝ) * v x) = ∫ x in W, a x * (G x : ℝ) * v x := by
   rw [← integral_extendL2_mul_mul hΩm F a v, hFG, integral_extendL2_mul_mul hWm G a v]
 
-/-- **The three blocks of the bilinear form on the cut-off element.** Summing the principal
+/-- **Three blocks of the bilinear form on the cut-off element.** Summing the principal
 entry over both directions and adding the transport and zeroth-order blocks, which need no
 integration by parts, gives the whole pairing as eight sums, each of them a shape the datum of
 the induction step names.

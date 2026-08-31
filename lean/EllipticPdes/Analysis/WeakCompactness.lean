@@ -167,7 +167,7 @@ theorem exists_weakLimit {u : ℕ → H} {M : ℝ} (hM : ∀ n, ‖u n‖ ≤ M)
 variable {u : ℕ → H} {w : H}
 
 omit [CompleteSpace H] in
-/-- **The norm is weakly lower semicontinuous.** A bound along the sequence bounds the weak
+/-- **Weak lower semicontinuity of the norm.** A bound along the sequence bounds the weak
 limit. -/
 theorem norm_weakLimit_le {M : ℝ} (hM : ∀ k, ‖u k‖ ≤ M)
     (hw : ∀ v : H, Tendsto (fun k => ⟪u k, v⟫) atTop (𝓝 ⟪w, v⟫)) :

@@ -156,7 +156,7 @@ theorem norm_le_of_isHnegRepr {Ω : Set (EuclideanSpace ℝ (Fin d))} {F : H1amb
       ≤ ‖gradFlip F‖ * ‖(v : H1amb Ω)‖ := norm_inner_le_norm _ _
     _ = ‖F‖ * ‖v‖ := by rw [norm_gradFlip]; rfl
 
-/-- **The dual norm is the least tuple norm.** The set of norms of representing tuples
+/-- **Dual norm as the least tuple norm.** The set of norms of representing tuples
 has `‖f‖_{H⁻¹}` as a member (the Riesz representative) and as a lower bound (minimality):
 the infimum is attained. -/
 theorem hneg_norm_isLeast (Ω : Set (EuclideanSpace ℝ (Fin d))) (f : H01 Ω →L[ℝ] ℝ) :

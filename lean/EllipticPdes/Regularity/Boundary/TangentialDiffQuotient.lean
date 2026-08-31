@@ -20,7 +20,7 @@ a test function a test function again.
 Two things separate this from the interior layer (`Regularity/RestrictedDiffQuotient.lean`,
 `Regularity/RestrictedDiffQuotientMem.lean`), which the whole file otherwise mirrors.
 
-* **The cutoff reaches the flat boundary.** Evans' `ζ` satisfies `ζ ≡ 1` on `B(0, 1/2)` and
+* **Reach of the cutoff to the flat boundary.** Evans' `ζ` satisfies `ζ ≡ 1` on `B(0, 1/2)` and
   `ζ ≡ 0` off `B(0, 1)`, so it vanishes near the curved part of `∂U` and is unconstrained on
   the flat part `{xₙ = 0}`. It is therefore a test function on the *ball* `B(0, r)` rather
   than on the half-ball, and `mulTest` / `cutoffMul`
@@ -189,7 +189,7 @@ theorem add_hshift_succ_apply_zero (k : Fin d) (h : ℝ)
     (x + hshift k.succ h) (0 : Fin (d + 1)) = x (0 : Fin (d + 1)) := by
   rw [PiLp.add_apply, hshift_succ_apply_zero, add_zero]
 
-/-- **The tangential difference quotient on `L²` of the half-ball**, `Dₖʰ` for a tangential
+/-- **Tangential difference quotient on `L²` of the half-ball**, `Dₖʰ` for a tangential
 direction `k.succ`: the restricted-domain difference quotient
 (`EllipticPdes.Regularity.diffQuotD`) of the interior chain, run on `Ω = halfBall d r` and
 restricted to directions parallel to the flat boundary (Evans, *Partial Differential
@@ -198,7 +198,7 @@ def tangDiffQuotD (d : ℕ) (r : ℝ) (k : Fin d) (h : ℝ) :
     L2D (halfBall d r) →L[ℝ] L2D (halfBall d r) :=
   diffQuotD k.succ h (measurableSet_halfBall d r)
 
-/-- **The tangential difference quotient on the graph space of the half-ball**, applying
+/-- **Tangential difference quotient on the graph space of the half-ball**, applying
 `tangDiffQuotD` in every ambient coordinate. -/
 def tangDiffQuotG (d : ℕ) (r : ℝ) (k : Fin d) (h : ℝ) :
     H1amb (halfBall d r) →L[ℝ] H1amb (halfBall d r) :=
@@ -292,7 +292,7 @@ theorem tsupport_tangDiffQuotFn_subset_halfSpace (hφ : IsTestFn (halfBall d r) 
     rwa [add_hshift_succ_apply_zero k h x] at hpos
   · exact (hφ.2.2 hx).2
 
-/-- **The cutoff of a tangential difference quotient is a test function on the half-ball.**
+/-- **Cutoff of a tangential difference quotient as a test function on the half-ball.**
 For Evans' cutoff `ζ` (a test function on `B(0, r)`, reaching the flat boundary) and a test
 function `φ` on the half-ball, the product `ζ · Dₖ^h φ` in a tangential direction `k.succ` is
 smooth, compactly supported, and supported inside the half-ball: `ζ` supplies the ball

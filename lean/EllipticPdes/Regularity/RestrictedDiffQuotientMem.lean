@@ -74,7 +74,7 @@ private lemma contDiff_diffQuotFn (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (k : Fi
     ContDiff ℝ (⊤ : ℕ∞) (fun x => (φ (x + hshift k h) - φ x) / h) :=
   ((hφ.comp (contDiff_id.add contDiff_const)).sub hφ).div_const h
 
-/-- **The cutoff of a difference quotient is a test function.** For a cutoff `ζ` (a test
+/-- **Cutoff of a difference quotient as a test function.** For a cutoff `ζ` (a test
 function) and a smooth `φ` (a test function), `ζ · Dₖ^h φ` is smooth (`ContDiff.mul`),
 compactly supported (inherited from `ζ`), and supported inside `tsupport ζ ⊆ Ω`; the cutoff
 `ζ` localises the support of the difference quotient uniformly in `φ`. -/
@@ -85,7 +85,7 @@ private lemma isTestFn_cutoff_diffQuotFn (hζ : IsTestFn Ω ζ) (hφ : IsTestFn 
   · exact HasCompactSupport.mul_right hζ.2.1
   · exact (closure_mono (Function.support_mul_subset_left _ _)).trans hζ.2.2
 
-/-- **The difference quotient commutes with the partial derivative.**
+/-- **Commutation of the difference quotient with the partial derivative.**
 `∂ᵢ(Dₖ^h φ) = Dₖ^h(∂ᵢφ)`: the shift map has derivative the identity, so the shift and the
 derivative commute, and dividing by `h` scales the derivative. -/
 private lemma partialD_diffQuotFn (hφ : Differentiable ℝ φ) (i k : Fin d) (h : ℝ) :

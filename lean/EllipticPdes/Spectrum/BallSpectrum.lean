@@ -45,7 +45,7 @@ variable {d : ℕ}
 /-- The unit ball of `ℝ^d`. -/
 local notation "B1" => ball (0 : EuclideanSpace ℝ (Fin d)) 1
 
-/-- **The unit ball supports a function of nonzero `L²` class.** A renormalised bump has unit
+/-- **Function of nonzero `L²` class on the unit ball.** A renormalised bump has unit
 `L²` norm, and the `L²` class of its graph is the function it represents. -/
 theorem exists_embL2_ne_zero_ball (hd : 2 < d) : ∃ V : H01 B1, embL2 B1 V ≠ 0 := by
   have hΩb : IsBounded (ball (0 : EuclideanSpace ℝ (Fin d)) 1) := isBounded_ball
@@ -76,7 +76,7 @@ theorem exists_embL2_ne_zero_ball (hd : 2 < d) : ∃ V : H01 B1, embL2 B1 V ≠ 
   rw [hV] at hnorm
   exact one_ne_zero hnorm
 
-/-- **The principal Dirichlet eigenvalue of the unit ball**, with `2 < d` the only hypothesis:
+/-- **Principal Dirichlet eigenvalue of the unit ball**, with `2 < d` the only hypothesis:
 there is a `U` of unit `L²` norm attaining the infimum of the Rayleigh quotient, the infimum is
 positive, and `U` solves the weak eigenvalue problem. -/
 theorem dirichlet_principal_eigenpair_ball (hd : 2 < d) :

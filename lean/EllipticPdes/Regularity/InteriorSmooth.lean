@@ -57,7 +57,7 @@ open EllipticPdes.Sobolev
 
 variable {n : ℕ}
 
-/-- **The Sobolev ladder on a ball.** An `L²` class with weak derivatives of every order has a
+/-- **Sobolev ladder on a ball.** An `L²` class with weak derivatives of every order has a
 smooth representative on any ball whose closure sits inside the region.
 
 This is the analytic content of Evans's Theorem 3, and it is three steps.
@@ -110,7 +110,7 @@ theorem exists_contDiffOn_ball_of_hasIteratedWeakDerivOn
   obtain ⟨v, hvae, hvc⟩ := exists_contDiffOn_of_locally_ae Metric.isOpen_ball _ hloc
   exact ⟨v, hvc, hvae⟩
 
-/-- **The Sobolev ladder in qualitative form.** An `L²` class on `V` with weak derivatives of
+/-- **Sobolev ladder in qualitative form.** An `L²` class on `V` with weak derivatives of
 every order has a representative smooth on the interior of `V`. No bound is asked and none is
 produced: the estimate lives in `higher_interior_regularity`, and smoothness on a fixed set
 follows from the existence of the derivatives alone.

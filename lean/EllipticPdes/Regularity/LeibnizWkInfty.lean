@@ -70,7 +70,7 @@ theorem memLp_two_restrict_of_continuous_hasCompactSupport
     MemLp h 2 (volume.restrict V) :=
   (hc.memLp_of_hasCompactSupport (μ := volume) hcs).restrict V
 
-/-- **The Leibniz identity for a `C^∞` weight.** If `g` has weak `ℓ`-derivative `g'` on `V` and
+/-- **Leibniz identity for a `C^∞` weight.** If `g` has weak `ℓ`-derivative `g'` on `V` and
 `b` is smooth, then for every test function `φ` supported in `V`,
 
 `∫_V g · (b · ∂_ℓφ) = - ∫_V (g' · b + g · ∂_ℓ b) · φ`.
@@ -173,7 +173,7 @@ theorem memLp_two_restrict_mul_of_ae_bound {V : Set (EuclideanSpace ℝ (Fin d))
 
 /-! ### Mollification limit for a measurable weight -/
 
-/-- **The mollification limit against an `L²` class.** For a measurable, essentially bounded `c`,
+/-- **Mollification limit against an `L²` class.** For a measurable, essentially bounded `c`,
 an `L²(V)` class `h` and a continuous compactly supported `η`,
 
 `∫_V h · ((c ⋆ ρ_ε) · η) → ∫_V h · (c · η)`.

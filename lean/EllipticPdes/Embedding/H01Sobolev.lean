@@ -118,7 +118,7 @@ lemma eLpNorm_testGraph_zero (q : ℝ≥0∞) {φ : EuclideanSpace ℝ (Fin d) �
   rw [IsTestFn.testGraph_zero, IsTestFn.testCls]
   exact eLpNorm_congr_ae h.mem_lp.coeFn_toLp
 
-/-- **The Gagliardo-Nirenberg-Sobolev inequality on a test function**, read off the graph
+/-- **Gagliardo-Nirenberg-Sobolev inequality on a test function**, read off the graph
 coordinates: the `L^{2⋆}(Ω)` seminorm of the function coordinate is bounded by the sum of the
 `L²(Ω)` norms of the gradient coordinates. -/
 theorem eLpNorm_testGraph_le (hΩm : MeasurableSet Ω) (hd : 0 < d)
@@ -140,7 +140,7 @@ theorem eLpNorm_testGraph_le (hΩm : MeasurableSet Ω) (hd : 0 < d)
         gcongr
         exact eLpNorm_fderiv_le_sum hΩm h
 
-/-- **The Gagliardo-Nirenberg-Sobolev inequality on a test function at a subcritical exponent.**
+/-- **Gagliardo-Nirenberg-Sobolev inequality on a test function at a subcritical exponent.**
 On a bounded domain the estimate is available at every `q` with `1/q ≥ 1/2 - 1/d`, the critical
 exponent included, since the domain has finite measure. The dimension must exceed `2`, which is
 what the critical exponent asks for. -/
@@ -176,7 +176,7 @@ lemma norm_apply_le (U : H1amb Ω) (j : Fin (d + 1)) : ‖U j‖ ≤ ‖U‖ := 
   exact Finset.single_le_sum (f := fun i : Fin (d + 1) => ‖U i‖ ^ 2)
     (fun _ _ => sq_nonneg _) (Finset.mem_univ j)
 
-/-- **The transfer principle.** An estimate of the function coordinate by the gradient
+/-- **Transfer principle.** An estimate of the function coordinate by the gradient
 coordinates, valid on every test graph, is valid on all of `H₀¹(Ω)`.
 
 The two sides live at different exponents, so the estimate is not a closed condition on a
@@ -225,14 +225,14 @@ theorem eLpNorm_le_of_mem_H01_of_forall_testFn {q : ℝ≥0∞} {C : ℝ≥0}
   filter_upwards [hrhs.eventually_lt_const hb] with n hn
   exact (hVbound n).trans hn.le
 
-/-- **The Sobolev estimate on `H₀¹(Ω)` at the critical exponent.** -/
+/-- **Sobolev estimate on `H₀¹(Ω)` at the critical exponent.** -/
 theorem eLpNorm_le_of_mem_H01 (hΩm : MeasurableSet Ω) (hd : 0 < d)
     (hp' : (p' : ℝ)⁻¹ = ((2 : ℝ≥0) : ℝ)⁻¹ - (d : ℝ)⁻¹)
     {U : H1amb Ω} (hU : U ∈ H01 Ω) :
     eLpNorm (U 0) p' (volume.restrict Ω) ≤ sobolevConst d * ∑ i : Fin d, ‖U i.succ‖ₑ :=
   eLpNorm_le_of_mem_H01_of_forall_testFn (fun h => eLpNorm_testGraph_le hΩm hd hp' h) hU
 
-/-- **The Sobolev estimate on `H₀¹(Ω)` at every exponent up to the critical one**, on a bounded
+/-- **Sobolev estimate on `H₀¹(Ω)` at every exponent up to the critical one**, on a bounded
 domain. -/
 theorem eLpNorm_le_of_mem_H01_of_isBounded (hΩm : MeasurableSet Ω)
     (hΩb : Bornology.IsBounded Ω) (hd : 2 < d) {q : ℝ≥0}
@@ -272,7 +272,7 @@ lemma sum_enorm_succ_le (U : H01 Ω) :
         rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul,
           ← ENNReal.ofReal_natCast d, ← ENNReal.ofReal_mul (Nat.cast_nonneg d), hnorm]
 
-/-- **The Sobolev embedding `H₀¹(Ω) →L[ℝ] L^q(Ω)`**, built from an estimate of the function
+/-- **Sobolev embedding `H₀¹(Ω) →L[ℝ] L^q(Ω)`**, built from an estimate of the function
 coordinate by the gradient coordinates. The map sends an element of `H₀¹(Ω)` to its function
 coordinate, read at the exponent `q`.
 

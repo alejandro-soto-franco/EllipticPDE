@@ -48,7 +48,7 @@ variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))}
 
 /-! ### Restricted and whole-space difference quotients -/
 
-/-- **The interior difference quotient is the restriction of the whole-space one.** Both sides
+/-- **Interior difference quotient as a restriction of the whole-space one.** Both sides
 evaluate to `((extendL2 g)(x + h eₖ) - g x) / h` almost everywhere on `Ω`, because extension by
 zero agrees with the class there. No support hypothesis is needed: the identity is read on `Ω`
 only (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1). -/
@@ -85,7 +85,7 @@ theorem norm_diffQuotD_le_grad (hΩm : MeasurableSet Ω) (k : Fin d) (u : H01 Ω
 
 /-! ### Self-adjointness of the cutoff multipliers -/
 
-/-- **The cutoff multiplier is self-adjoint on `L²(Ω)`.** Both pairings are the integral of the
+/-- **Self-adjointness of the cutoff multiplier on `L²(Ω)`.** Both pairings are the integral of the
 triple product `∫_Ω η · g · w`. -/
 theorem inner_mulTest_comm {η : EuclideanSpace ℝ (Fin d) → ℝ} (hη : IsTestFn Ω η)
     (g w : L2D Ω) : ⟪mulTest hη g, w⟫ = ⟪g, mulTest hη w⟫ := by
@@ -380,7 +380,7 @@ theorem interior_cutoffGrad_mem_H01 (Op : FullEllipticOp d)
 
 /-! ### Triviality of the cutoff on the base set -/
 
-/-- **The middle tower cutoff is identically `1` on the base set.** `ζ ≡ 1` on `V`, so `V` sits
+/-- **Middle tower cutoff as `1` on the base set.** `ζ ≡ 1` on `V`, so `V` sits
 inside `tsupport ζ`, where `ξ ≡ 1`. -/
 theorem CutoffTower.xi_eqOn_one_base {V : Set (EuclideanSpace ℝ (Fin d))}
     (T : CutoffTower Ω V) : Set.EqOn T.ξ 1 V := by
@@ -389,7 +389,7 @@ theorem CutoffTower.xi_eqOn_one_base {V : Set (EuclideanSpace ℝ (Fin d))}
   rw [Function.mem_support, T.zeta_eqOn_one hx]
   exact one_ne_zero
 
-/-- **The cutoff is invisible on the base set.** Because `ξ ≡ 1` on `V`, the `V`-restriction of
+/-- **Invisibility of the cutoff on the base set.** Because `ξ ≡ 1` on `V`, the `V`-restriction of
 the whole-space extension of `ξ · g` agrees with that of `g`. Applied to the function coordinate
 of `interior_cutoffGrad_mem_H01`, this says that the admissible element has `∂_ℓ u` itself on
 `V`, so nothing is lost on the region of interest.

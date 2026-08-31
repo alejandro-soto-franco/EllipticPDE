@@ -336,7 +336,7 @@ private lemma exists_bump_integral_one (hpq : p < q) :
   rw [← integral_eq_intervalIntegral_of_tsupport_subset hpq.le htsupp]
   exact hbump.integral_normed
 
-/-- **The one-dimensional du Bois-Reymond lemma.** If `v` is locally integrable on `(p, q)` and
+/-- **One-dimensional du Bois-Reymond lemma.** If `v` is locally integrable on `(p, q)` and
 its weak derivative vanishes there (tested against every smooth compactly supported bump), then
 `v` agrees a.e. on `(p, q)` with a constant. This is the key step recovering a
 representative of `u` from a weak derivative: applied to `v = u - (\text{primitive of } g)`, it

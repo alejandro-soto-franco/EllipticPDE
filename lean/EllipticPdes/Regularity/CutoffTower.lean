@@ -101,7 +101,7 @@ theorem exists_margin_of_isCompact_subset_isOpen {K Ω : Set (EuclideanSpace ℝ
 
 /-! ### Nested cutoff tower -/
 
-/-- **The nested cutoff tower.** Three test functions on `Ω`: `ζ` equal to `1` on the base
+/-- **Nested cutoff tower.** Three test functions on `Ω`: `ζ` equal to `1` on the base
 compact set `V`, `ξ` equal to `1` on the support of `ζ`, `θ` equal to `1` on the support of
 `ξ`, together with a positive coordinate-shift margin valid on the support of `θ`. This is
 exactly the tower `ζ`, `ξ`, `θ` nested in that support-inclusion order, localising the

@@ -40,7 +40,7 @@ open EllipticPdes.Sobolev (partialD)
 
 variable {d : ℕ}
 
-/-- **The shear of a boundary chart.** The point `y` moves along the `j`-th axis by `γ y`. -/
+/-- **Shear of a boundary chart.** The point `y` moves along the `j`-th axis by `γ y`. -/
 def shear (j : Fin d) (γ : EuclideanSpace ℝ (Fin d) → ℝ) (y : EuclideanSpace ℝ (Fin d)) :
     EuclideanSpace ℝ (Fin d) :=
   y + γ y • EuclideanSpace.single j (1 : ℝ)
@@ -50,13 +50,13 @@ shear and its derivative nilpotent. -/
 def IndepCoord (j : Fin d) (γ : EuclideanSpace ℝ (Fin d) → ℝ) : Prop :=
   ∀ (y : EuclideanSpace ℝ (Fin d)) (t : ℝ), γ (y + t • EuclideanSpace.single j (1 : ℝ)) = γ y
 
-/-- **The shear by `-γ` inverts the shear by `γ`.** -/
+/-- **Inversion of the shear by `γ`.** -/
 theorem shear_shear_neg {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ} (hind : IndepCoord j γ)
     (y : EuclideanSpace ℝ (Fin d)) : shear j (fun z => -γ z) (shear j γ y) = y := by
   simp only [shear, hind y (γ y)]
   module
 
-/-- **The shear by `γ` inverts the shear by `-γ`.** -/
+/-- **Inversion of the shear by `-γ`.** -/
 theorem shear_neg_shear {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ} (hind : IndepCoord j γ)
     (y : EuclideanSpace ℝ (Fin d)) : shear j γ (shear j (fun z => -γ z) y) = y := by
   simp only [shear]
@@ -90,14 +90,14 @@ def shearDeriv (j : Fin d) (γ : EuclideanSpace ℝ (Fin d) → ℝ) (y : Euclid
   ContinuousLinearMap.id ℝ (EuclideanSpace ℝ (Fin d))
     + (fderiv ℝ γ y).smulRight (EuclideanSpace.single j (1 : ℝ))
 
-/-- **The shear is differentiable, with the stated derivative.** -/
+/-- **Derivative of the shear.** -/
 theorem hasFDerivAt_shear {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ}
     (hγ : Differentiable ℝ γ) (y : EuclideanSpace ℝ (Fin d)) :
     HasFDerivAt (shear j γ) (shearDeriv j γ y) y := by
   exact (hasFDerivAt_id y).add (((hγ y).hasFDerivAt).smul_const
     (EuclideanSpace.single j (1 : ℝ)))
 
-/-- **The shear derivative has determinant `1`.** In the standard basis the matrix is the
+/-- **Determinant `1` of the shear derivative.** In the standard basis the matrix is the
 identity with row `j` replaced by `eⱼ + ∇γ`. Multilinearity in that row splits the determinant
 into `det 1` and the determinant of the identity with row `j` replaced by `∇γ`, and the latter
 reads off as the `j`-th component of `∇γ`, which vanishes. -/
@@ -140,7 +140,7 @@ theorem det_shearDeriv {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ}
     rw [h1, h2, add_zero]
   rw [ContinuousLinearMap.det, ← LinearMap.det_toMatrix b, hmat, hdet]
 
-/-- **The change of variables through a shear.** The Jacobian determinant is `1`, so the shear
+/-- **Change of variables through a shear.** The Jacobian determinant is `1`, so the shear
 leaves every integral unchanged. -/
 theorem integral_comp_shear {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ}
     (hγ : Differentiable ℝ γ) (hind : IndepCoord j γ) (g : EuclideanSpace ℝ (Fin d) → ℝ) :

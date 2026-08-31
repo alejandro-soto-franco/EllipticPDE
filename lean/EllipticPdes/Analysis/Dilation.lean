@@ -36,7 +36,7 @@ open EllipticPdes.Sobolev
 
 variable {d : ℕ}
 
-/-- **The `Lᵖ` seminorm of a dilate.** Scaling the argument by `r` multiplies the seminorm by
+/-- **`Lᵖ` seminorm of a dilate.** Scaling the argument by `r` multiplies the seminorm by
 `|r^d|^{-1/p}`. -/
 theorem eLpNorm_comp_smul {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : Measurable f)
     {r : ℝ} (hr : r ≠ 0) {p : ℝ≥0∞} (hp0 : p ≠ 0) (hpt : p ≠ ∞) :
@@ -52,7 +52,7 @@ theorem eLpNorm_comp_smul {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : Measura
     MeasureTheory.Measure.map_addHaar_smul volume hr, lintegral_smul_measure, smul_eq_mul,
     finrank_euclideanSpace_fin, ENNReal.mul_rpow_of_nonneg _ _ (by positivity)]
 
-/-- **The partial derivatives of a dilate.** -/
+/-- **Partial derivatives of a dilate.** -/
 theorem partialD_comp_smul {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : Differentiable ℝ f)
     (r : ℝ) (i : Fin d) :
     partialD i (fun x => f (r • x)) = fun x => r * partialD i f (r • x) := by
@@ -67,7 +67,7 @@ theorem partialD_comp_smul {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : Differ
     ContinuousLinearMap.coe_smul', Pi.smul_apply, ContinuousLinearMap.coe_id', id_eq,
     map_smul, smul_eq_mul]
 
-/-- **The support of a dilate.** For `1 ≤ r`, a function supported in the unit ball dilates to one
+/-- **Support of a dilate.** For `1 ≤ r`, a function supported in the unit ball dilates to one
 supported in the ball of radius `r⁻¹`. -/
 theorem tsupport_comp_smul_subset {f : EuclideanSpace ℝ (Fin d) → ℝ} {r : ℝ} (hr : 0 < r)
     (hf : tsupport f ⊆ closedBall 0 1) :

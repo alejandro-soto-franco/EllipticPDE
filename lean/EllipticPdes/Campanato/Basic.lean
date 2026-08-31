@@ -68,13 +68,13 @@ instance isFiniteMeasure_restrict_ball (x : EuclideanSpace ℝ (Fin d)) (r : ℝ
     IsFiniteMeasure (volume.restrict (Metric.ball x r)) :=
   ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
 
-/-- **The mean of `u` over the ball `B(x, r)`.** Campanato's hypothesis measures the oscillation
+/-- **Mean of `u` over the ball `B(x, r)`.** Campanato's hypothesis measures the oscillation
 of `u` about this value, and the characterisation produces the Hölder representative as the limit
 of these means as `r → 0`. -/
 def ballAverage (u : EuclideanSpace ℝ (Fin d) → ℝ) (x : EuclideanSpace ℝ (Fin d)) (r : ℝ) : ℝ :=
   ⨍ y in Metric.ball x r, u y
 
-/-- **The Campanato decay hypothesis.** The mean oscillation of `u` over every ball contained in
+/-- **Campanato decay hypothesis.** The mean oscillation of `u` over every ball contained in
 `Ω` decays at the rate `r^{d + 2α}`, with constant `M`. For `0 < α ≤ 1` this forces `u` to have a
 Hölder representative of exponent `α` on the interior of `Ω`; that is the content of
 `EllipticPdes.Campanato.campanato_holderOnWith`. -/

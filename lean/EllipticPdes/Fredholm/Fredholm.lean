@@ -99,7 +99,7 @@ lemma opA_factor :
 
 /-! ### Fredholm alternative -/
 
-/-- **The Fredholm alternative for the elliptic Dirichlet problem** (Evans §6.2.3,
+/-- **Fredholm alternative for the elliptic Dirichlet problem** (Evans §6.2.3,
 Theorem 4). Assume the
 operator `opK` is compact: the Rellich-Kondrachov input, that `H₀¹(Ω) ↪ L²(Ω)` is a compact
 embedding. Then exactly one of two alternatives holds: either the homogeneous problem `Lu = 0`

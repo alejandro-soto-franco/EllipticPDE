@@ -60,7 +60,7 @@ theorem dirichlet_weak_solution
     refine ext_inner_right (𝕜 := ℝ) (fun w => ?_)
     rw [hco.continuousLinearEquivOfBilin_apply, hu w, ← hgrep w]
 
-/-- **The a-priori estimate for the weak solution (Poisson form).** Under the hypotheses
+/-- **A-priori estimate for the weak solution (Poisson form).** Under the hypotheses
 of [`dirichlet_weak_solution`], any weak solution obeys `‖u‖_{H₀¹} ≤ α⁻¹ ‖f‖` with the
 coercivity constant `α = 1 / (C_P + 1)`, i.e. `‖u‖_{H₀¹} ≤ (C_P + 1) ‖f‖`. -/
 theorem dirichlet_weak_solution_bound

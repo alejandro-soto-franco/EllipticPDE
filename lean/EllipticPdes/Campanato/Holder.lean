@@ -57,7 +57,7 @@ theorem closedBall_ae_eq_ball (hd : 0 < d) (x : EuclideanSpace ℝ (Fin d)) (r :
   · rw [Set.diff_eq_empty.mpr Metric.ball_subset_closedBall]
     exact measure_empty
 
-/-- **The Campanato limit is a representative of `u`.** By the Lebesgue differentiation theorem the
+/-- **Campanato limit as a representative of `u`.** By the Lebesgue differentiation theorem the
 ball means converge to `u` almost everywhere, and by `tendsto_ballAverage_campanatoLimit` they
 converge to `campanatoLimit u` everywhere on the open set, so the two agree almost everywhere. -/
 theorem campanatoLimit_ae_eq (hd : 0 < d) (hα : 0 < α) (hM : 0 ≤ M) (hΩ : IsOpen Ω)
@@ -119,7 +119,7 @@ section Pair
 
 variable {Ω : Set (EuclideanSpace ℝ (Fin d))} {u : EuclideanSpace ℝ (Fin d) → ℝ} {α M : ℝ}
 
-/-- **The pair estimate.** Two values of the Campanato limit differ by at most
+/-- **Pair estimate.** Two values of the Campanato limit differ by at most
 `campanatoHolderConst d α · M · |x - y|^α`, provided the balls of radius `2 |x - y|` about the two
 points lie in `Ω`. Both means at that radius are within reach of their limits by the telescoped
 estimate, and they are within reach of each other by the two-centre comparison. -/

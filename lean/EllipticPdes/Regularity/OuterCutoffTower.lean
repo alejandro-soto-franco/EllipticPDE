@@ -39,7 +39,7 @@ variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))}
 
 /-! ### Outer tower -/
 
-/-- **The outer cutoff tower.** A tower based at the compact set `tsupport T.ξ` of a given
+/-- **Outer cutoff tower.** A tower based at the compact set `tsupport T.ξ` of a given
 tower `T`. Its innermost cutoff is identically `1` on `tsupport T.ξ`
 (`CutoffTower.zeta_eqOn_one`), which is what makes it invisible to every term of the
 differentiated equation. -/
@@ -49,7 +49,7 @@ noncomputable def outerCutoffTower {V : Set (EuclideanSpace ℝ (Fin d))} (hΩo 
 
 /-! ### Second derivatives at the outer tower -/
 
-/-- **The interior second derivatives at the outer tower.** For every direction pair `(k, i)`
+/-- **Interior second derivatives at the outer tower.** For every direction pair `(k, i)`
 the whole-space extension of `ζ' · ∂ᵢu`, with `ζ'` the innermost cutoff of the outer tower, has
 an `L²` weak `k`-derivative bounded by the data, with a single constant covering the whole index
 square. The constant is quantified before the solution and the datum, so it depends only on the
@@ -81,7 +81,7 @@ theorem outer_secondWeakDeriv (Op : FullEllipticOp d) (hΩm : MeasurableSet Ω) 
         Finset.single_le_sum (f := fun k' => ∑ i' : Fin d, Cd k' i')
           (fun k' _ => Finset.sum_nonneg (fun i' _ => hCd0 k' i')) (Finset.mem_univ k)
 
-/-- **The interior `H²` estimate on `tsupport T.ξ`.** The middle cutoff of a tower has
+/-- **Interior `H²` estimate on `tsupport T.ξ`.** The middle cutoff of a tower has
 compact support inside `Ω`, so the interior `H²` estimate applies at that set: the second
 weak derivatives of `u` exist in `L²(tsupport T.ξ)` and are bounded by the data. This is the
 regularity of `u` the differentiated equation consumes on the region where the cutoff

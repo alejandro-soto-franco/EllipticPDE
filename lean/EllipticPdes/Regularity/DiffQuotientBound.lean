@@ -805,7 +805,7 @@ private theorem inner_diffQuot_le_smooth (k : Fin d) (g g' : EucL2 d)
           intervalIntegrable_const hbd
     _ = ‖g'‖ * ‖ζLp‖ := by rw [intervalIntegral.integral_const]; simp
 
-/-- **The weak-derivative difference-quotient bound (Evans §5.8.2, direction i).** A function `g`
+/-- **Weak-derivative difference-quotient bound (Evans §5.8.2, direction i).** A function `g`
 with `L²` weak `k`-derivative `g'` has difference quotients bounded in `L²` by the derivative:
 `‖Dₖʰ g‖ ≤ ‖g'‖`, uniformly in the step `h`. This is the general form of the tight single-direction
 bound `norm_diffQuot_le_of_contDiff`, obtained by testing `Dₖʰ g` against the smooth compactly

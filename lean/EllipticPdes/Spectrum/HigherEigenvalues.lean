@@ -62,7 +62,7 @@ def orthSubmodule {n : ℕ} (w : Fin n → H01 Ω) : Submodule ℝ (H01 Ω) wher
 @[simp] lemma mem_orthSubmodule {n : ℕ} {w : Fin n → H01 Ω} {U : H01 Ω} :
     U ∈ orthSubmodule w ↔ ∀ i, ⟪embL2 Ω U, embL2 Ω (w i)⟫ = 0 := Iff.rfl
 
-/-- **The orthogonality constraint passes to weak limits.** Testing the weak convergence against
+/-- **Passage of the orthogonality constraint to weak limits.** Testing the weak convergence against
 the adjoint image of each `wᵢ` turns it into convergence of the `L²` inner products. -/
 lemma orthSubmodule_weaklyClosed {n : ℕ} (w : Fin n → H01 Ω) (u : ℕ → H01 Ω) (z : H01 Ω)
     (hu : ∀ k, u k ∈ orthSubmodule w)
@@ -80,7 +80,7 @@ lemma orthSubmodule_weaklyClosed {n : ℕ} (w : Fin n → H01 Ω) (u : ℕ → H
 
 /-! ### The Rayleigh bound and the equation inside a submodule -/
 
-/-- **The Rayleigh bound inside a submodule.** Rescaling stays in the submodule, so the bound of
+/-- **Rayleigh bound inside a submodule.** Rescaling stays in the submodule, so the bound of
 `principalEigenvalue_mul_norm_sq_le` runs there unchanged. -/
 theorem eigenvalueOn_mul_norm_sq_le (hco : IsCoercive B) (K : Submodule ℝ (H01 Ω)) {U : H01 Ω}
     (hUK : U ∈ K) :
@@ -104,7 +104,7 @@ theorem eigenvalueOn_mul_norm_sq_le (hco : IsCoercive B) (K : Submodule ℝ (H01
           mul_le_mul_of_nonneg_right hle hs2.le
       _ = B U U := by field_simp
 
-/-- **The Euler-Lagrange equation inside a submodule.** A minimiser over the unit `L²` sphere of
+/-- **Euler-Lagrange equation inside a submodule.** A minimiser over the unit `L²` sphere of
 `K` satisfies the eigenvalue identity against every test vector of `K`. -/
 theorem rayleigh_euler_lagrange_on (hco : IsCoercive B) (hsymm : ∀ U V : H01 Ω, B U V = B V U)
     (K : Submodule ℝ (H01 Ω)) {U : H01 Ω} (hU : ‖embL2 Ω U‖ = 1) (hUK : U ∈ K)
@@ -139,7 +139,7 @@ theorem rayleigh_euler_lagrange_on (hco : IsCoercive B) (hsymm : ∀ U V : H01 �
 
 /-! ### The equation on the whole space -/
 
-/-- **The constrained minimiser is a weak eigenfunction of the whole space.** Split a test vector
+/-- **Constrained minimiser as a weak eigenfunction of the whole space.** Split a test vector
 into its admissible part and a combination of the `wᵢ`; the second half contributes nothing to
 either side. `B[U, wᵢ]` vanishes because `wᵢ` is an eigenfunction and `U` is orthogonal to it, and
 `⟪U, wᵢ⟫_{L²}` vanishes by the constraint. -/
@@ -199,7 +199,7 @@ theorem euler_lagrange_of_orthogonal_eigen (hco : IsCoercive B)
 
 /-! ### The constrained eigenpair -/
 
-/-- **The later eigenpair.** Minimising over the part of the unit `L²` sphere orthogonal to a
+/-- **Later eigenpair.** Minimising over the part of the unit `L²` sphere orthogonal to a
 finite orthonormal family of eigenfunctions produces another eigenpair, whose eigenvalue is at
 least the principal one. Iterating the step produces the whole sequence. -/
 theorem exists_higher_eigenpair (hco : IsCoercive B) (hsymm : ∀ U V : H01 Ω, B U V = B V U)

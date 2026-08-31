@@ -88,7 +88,7 @@ theorem abs_sub_ballAverage_le_of_holderOnWith {Ω : Set (EuclideanSpace ℝ (Fi
   rw [h1, abs_mul, abs_of_pos hvolpos] at h2
   exact le_of_mul_le_mul_left h2 hvolpos
 
-/-- **The converse of Campanato's characterisation.** A function that is Hölder of exponent `α`
+/-- **Converse of Campanato's characterisation.** A function that is Hölder of exponent `α`
 with constant `K` on `Ω` satisfies the Campanato decay hypothesis on `Ω` with constant
 `K · 2^α · √|B(0,1)|`. Squaring the mean-oscillation bound `K (2r)^α` and integrating over a ball
 of volume `r^d |B(0,1)|` is the whole proof. -/

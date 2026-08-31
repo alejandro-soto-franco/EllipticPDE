@@ -45,7 +45,7 @@ variable {d : ℕ}
 
 local notation "Lsm" => ContinuousLinearMap.lsmul ℝ ℝ (E := ℝ)
 
-/-- **The partial derivative of a mollification.** For `ψ` of class `C¹` with compact support,
+/-- **Partial derivative of a mollification.** For `ψ` of class `C¹` with compact support,
 `ρ ⋆ ψ` is differentiable and its partial derivatives are the mollified partial derivatives. -/
 theorem partialD_convolution_normed (ρ : ContDiffBump (0 : EuclideanSpace ℝ (Fin d)))
     {ψ : EuclideanSpace ℝ (Fin d) → ℝ} (hψ : ContDiff ℝ 1 ψ) (hψcs : HasCompactSupport ψ)

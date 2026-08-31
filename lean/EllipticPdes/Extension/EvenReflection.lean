@@ -84,12 +84,12 @@ theorem integral_split_interface {j : Fin d} {f : EuclideanSpace ℝ (Fin d) →
 
 /-! ### The reflected extension -/
 
-/-- **The reflected extension of a function**: below the interface it takes the value at the
+/-- **Reflected extension of a function**: below the interface it takes the value at the
 mirror image. -/
 def evenExt (j : Fin d) (u : EuclideanSpace ℝ (Fin d) → ℝ) : EuclideanSpace ℝ (Fin d) → ℝ :=
   fun x => if 0 ≤ x j then u x else u (reflectLI j x)
 
-/-- **The reflected extension of a gradient**, with a sign in the normal direction. -/
+/-- **Reflected extension of a gradient**, with a sign in the normal direction. -/
 def evenExtGrad (j : Fin d) (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (k : Fin d) :
     EuclideanSpace ℝ (Fin d) → ℝ :=
   fun x => if 0 ≤ x j then g k x else reflectSign j k * g k (reflectLI j x)
@@ -136,7 +136,7 @@ theorem reflectLI_eq_self_of_interface {j : Fin d} {x : EuclideanSpace ℝ (Fin 
   · subst hm; rw [if_pos rfl, hx]; ring
   · rw [if_neg hm]; ring
 
-/-- **The reflected extension has a weak gradient on the whole space.** Splitting the integral
+/-- **Weak gradient of the reflected extension on the whole space.** Splitting the integral
 at the interface and reflecting the lower half tests the class against `φ + s (φ ∘ R)`, which in
 the normal direction is odd and so vanishes on the interface. That is the hypothesis under which
 no boundary term survives. -/
@@ -317,7 +317,7 @@ theorem evenExt_ae_eq (j : Fin d) (u : EuclideanSpace ℝ (Fin d) → ℝ) :
     have hmemPos : x ∈ halfSpace j := h
     rw [if_pos h.le, Set.indicator_of_notMem h2, Set.indicator_of_mem hmemPos, add_zero]
 
-/-- **The extension costs a factor of two in every `Lᵖ` seminorm.** The reflection preserves
+/-- **Cost of the extension in every `Lᵖ` seminorm.** The reflection preserves
 measure, so each side contributes the seminorm on the half space. -/
 theorem eLpNorm_evenExt_le {j : Fin d} {u : EuclideanSpace ℝ (Fin d) → ℝ} {p : ℝ≥0∞}
     (hp : 1 ≤ p) (hu : AEStronglyMeasurable u (volume.restrict (halfSpace j))) :

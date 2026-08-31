@@ -46,7 +46,7 @@ open EllipticPdes.Embedding (HasWeakGradOn partialD_mul)
 
 variable {d : ℕ}
 
-/-- **The open half space above the interface `{xⱼ = 0}`.** -/
+/-- **Open half space above the interface `{xⱼ = 0}`.** -/
 def halfSpace (j : Fin d) : Set (EuclideanSpace ℝ (Fin d)) := {x | 0 < x j}
 
 theorem isOpen_halfSpace (j : Fin d) : IsOpen (halfSpace j) :=
@@ -55,7 +55,7 @@ theorem isOpen_halfSpace (j : Fin d) : IsOpen (halfSpace j) :=
 theorem measurableSet_halfSpace (j : Fin d) : MeasurableSet (halfSpace j) :=
   (isOpen_halfSpace j).measurableSet
 
-/-- **The interface is null**, being a proper linear subspace. -/
+/-- **Nullity of the interface**, being a proper linear subspace. -/
 theorem volume_interface (j : Fin d) :
     volume {x : EuclideanSpace ℝ (Fin d) | x j = 0} = 0 := by
   set K : Submodule ℝ (EuclideanSpace ℝ (Fin d)) :=
@@ -121,7 +121,7 @@ private theorem cutoff_identity (hwg : HasWeakGradOn (halfSpace j) u g)
   rw [partialD_mul k ((contDiff_slabCut j ε).differentiable (by simp) x)
     (hψ.differentiable (by simp) x)]
 
-/-- **The weak-gradient identity against a test function that need not vanish near the
+/-- **Weak-gradient identity against a test function that need not vanish near the
 interface**, given that the boundary term it leaves goes to zero. -/
 private theorem integral_partialD_aux {k : Fin d} (hu : IntegrableOn u (halfSpace j) volume)
     (hg : IntegrableOn (g k) (halfSpace j) volume) (hwg : HasWeakGradOn (halfSpace j) u g)

@@ -129,7 +129,7 @@ theorem dirichletBilin_coercive (Ω : Set (EuclideanSpace ℝ (Fin d)))
 
 /-! ### Lax-Milgram a-priori estimate -/
 
-/-- **The Lax-Milgram a-priori estimate.** If the bilinear form `B` satisfies the
+/-- **Lax-Milgram a-priori estimate.** If the bilinear form `B` satisfies the
 quantitative coercivity bound `α ‖U‖² ≤ B[U, U]` with `α > 0`, then any weak solution
 `u` of `B[u, v] = f v` obeys `‖u‖ ≤ α⁻¹ ‖f‖`: coercivity gives
 `α ‖u‖² ≤ B[u, u] = f u ≤ ‖f‖ ‖u‖`, and dividing by `‖u‖` gives the bound. This is the

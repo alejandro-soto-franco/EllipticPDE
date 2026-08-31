@@ -48,7 +48,7 @@ theorem testGraph_mem_H01 {v : EuclideanSpace ℝ (Fin d) → ℝ} (hv : IsTestF
     hv.testGraph ∈ H01 Ω :=
   Submodule.le_topologicalClosure _ (Submodule.subset_span ⟨v, hv, rfl⟩)
 
-/-- **The datum functional.** Pairing against `f` in the function coordinate, `w ↦ ∫_Ω f w₀`, is
+/-- **Datum functional.** Pairing against `f` in the function coordinate, `w ↦ ∫_Ω f w₀`, is
 continuous linear on `H₀¹(Ω)`: it is the inner product against the ambient vector with `f` in
 coordinate `0` and zero elsewhere, restricted to the subspace. -/
 def datumL (f : L2D Ω) : H01 Ω →L[ℝ] ℝ :=
@@ -95,7 +95,7 @@ theorem eq_of_eq_on_testGraphs (F G : H01 Ω →L[ℝ] ℝ)
   refine tendsto_nhds_unique ?_ h2
   simpa only [hFG] using h1
 
-/-- **The bilinear pairing against a test-function graph as plain integrals.** Each block of
+/-- **Bilinear pairing against a test-function graph as plain integrals.** Each block of
 `Op.fullBilin` is an inner product of a coefficient action against a coordinate of the graph,
 and each such inner product is an integral over `Ω` of the coefficient against the two
 representatives. The gradient coordinate of a test function's graph is the classical partial
@@ -154,7 +154,7 @@ theorem fullBilin_testGraph_eq (Op : FullEllipticOp d) (U : H01 Ω)
     Finset.sum_congr rfl (fun i _ => htrans i), hzero]
   ring
 
-/-- **The weak formulation from test functions to `H₀¹(Ω)`.** An identity `B[u, φ] = ∫_Ω f φ`
+/-- **Weak formulation from test functions to `H₀¹(Ω)`.** An identity `B[u, φ] = ∫_Ω f φ`
 valid for every test function extends to every `w ∈ H₀¹(Ω)`. This is the shape
 `InteriorRegularityAt` consumes, and the shape the differentiated equation does not directly
 produce, since a differentiated equation is derived by testing. -/

@@ -122,7 +122,7 @@ def EllipticCoeff.bilin (A : EllipticCoeff d)
   simp only [EllipticCoeff.bilin, LinearMap.mkContinuous₂_apply,
     EllipticCoeff.bilinₗ, LinearMap.mk₂_apply]
 
-/-- **The energy identity:** `B_A[U, U] = ∫_Ω ∑ᵢⱼ aᵢⱼ ∂ᵢu ∂ⱼu`. -/
+/-- **Energy identity:** `B_A[U, U] = ∫_Ω ∑ᵢⱼ aᵢⱼ ∂ᵢu ∂ⱼu`. -/
 private lemma EllipticCoeff.bilin_self_eq_integral (A : EllipticCoeff d)
     {Ω : Set (EuclideanSpace ℝ (Fin d))} (U : H01 Ω) :
     A.bilin Ω U U = ∫ x in Ω, ∑ i : Fin d, ∑ j : Fin d,

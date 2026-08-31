@@ -93,7 +93,7 @@ lemma measurableEmbedding_reflectLI (j : Fin d) :
 
 /-! ### Derivatives and supports -/
 
-/-- **The partial derivatives of a reflected function.** -/
+/-- **Partial derivatives of a reflected function.** -/
 theorem partialD_comp_reflect {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφ : Differentiable ℝ φ)
     (j k : Fin d) (x : EuclideanSpace ℝ (Fin d)) :
     partialD k (fun y => φ (reflectLI j y)) x

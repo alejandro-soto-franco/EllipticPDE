@@ -16,7 +16,7 @@ no analysis.
 
 Two observations do the work.
 
-* **The local representatives agree where they overlap.** Both are continuous on the
+* **Agreement of the local representatives on their overlap.** Both are continuous on the
   intersection of their balls, which is open, and agree almost everywhere with the same class
   there. A nonempty open set has positive Lebesgue measure, so two continuous functions agreeing
   almost everywhere on one agree on it.

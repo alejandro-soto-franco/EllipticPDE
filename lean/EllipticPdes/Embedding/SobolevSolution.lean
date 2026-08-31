@@ -39,7 +39,7 @@ open EllipticPdes.Sobolev
 
 variable {n : ℕ}
 
-/-- **The weak solution above `L²`.** On a bounded measurable domain in dimension greater than
+/-- **Weak solution above `L²`.** On a bounded measurable domain in dimension greater than
 two, with no drift and a nonnegative zeroth-order coefficient, the weak solution of `L u = f`
 lies in `L^q(Ω)` for every exponent `q` up to the Sobolev conjugate of `2`, and its `L^q`
 seminorm is bounded by the `L²` norm of the datum.

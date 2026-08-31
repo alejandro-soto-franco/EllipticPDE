@@ -55,7 +55,7 @@ theorem partialD_eq_zero_of_eventually_one {K : Set (EuclideanSpace ℝ (Fin d))
     hloc.fderiv_eq
   simp [partialD, hfd]
 
-/-- **The cut of a smooth function is a test function on `V`.** Smoothness is `ContDiff.mul`,
+/-- **Cut of a smooth function as a test function on `V`.** Smoothness is `ContDiff.mul`,
 compact support comes from `χ`, and the support inclusion is the one `χ` has. Unlike
 `isTestFn_mul`, the second factor need not be compactly supported. -/
 theorem isTestFn_cut {V : Set (EuclideanSpace ℝ (Fin d))}
@@ -93,7 +93,7 @@ theorem mul_partialD_cut_eq {K : Set (EuclideanSpace ℝ (Fin d))}
 
 /-! ### Integral forms for an almost-everywhere supported weight -/
 
-/-- **The integral form of `mul_cut_eq`.** The weight is only required to vanish almost
+/-- **Integral form of `mul_cut_eq`.** The weight is only required to vanish almost
 everywhere off `K`, which is the form an `L²` class supported in `K` supplies. -/
 theorem setIntegral_mul_cut_eq {S K : Set (EuclideanSpace ℝ (Fin d))}
     {χ φ w : EuclideanSpace ℝ (Fin d) → ℝ} (hχ : ∀ᶠ x in 𝓝ˢ K, χ x = 1)
@@ -105,7 +105,7 @@ theorem setIntegral_mul_cut_eq {S K : Set (EuclideanSpace ℝ (Fin d))}
   · rw [hχ.self_of_nhdsSet x hxK, one_mul]
   · rw [hx hxK, zero_mul, zero_mul]
 
-/-- **The integral form of `mul_partialD_cut_eq`.** The weight is only required to vanish
+/-- **Integral form of `mul_partialD_cut_eq`.** The weight is only required to vanish
 almost everywhere off `K`. -/
 theorem setIntegral_mul_partialD_cut_eq {S K : Set (EuclideanSpace ℝ (Fin d))}
     {χ φ w : EuclideanSpace ℝ (Fin d) → ℝ} (hχd : Differentiable ℝ χ)

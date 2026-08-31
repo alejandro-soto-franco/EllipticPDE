@@ -164,7 +164,7 @@ private theorem integrable_uncurry_segment (hf : ContDiff ℝ 1 f)
   rw [integrable_congr hae]
   exact (integrable_indicator_iff hCcomp.measurableSet).mpr hIntOn
 
-/-- **The `L²` translation estimate.** For a continuously differentiable, compactly
+/-- **`L²` translation estimate.** For a continuously differentiable, compactly
 supported `f : ℝⁿ → ℝ`,
 `∫ x, (f (x + h) - f x) ^ 2 ≤ ‖h‖ ^ 2 * ∫ x, ‖fderiv ℝ f x‖ ^ 2`. -/
 theorem integral_sq_sub_translation_le (hf : ContDiff ℝ 1 f)

@@ -69,7 +69,7 @@ open EllipticPdes.Sobolev
 
 variable {n : ℕ}
 
-/-- **The order-`k` interior conclusion.** For every compact `V ⋐ Ω` there is a constant,
+/-- **Order-`k` interior conclusion.** For every compact `V ⋐ Ω` there is a constant,
 quantified before the solution and the datum, bounding every weak derivative of `u` of order at
 most `k + 2` on `V` by `‖f‖_{H^k} + ‖u‖_{L²}`. The datum's `H^k` norm enters through a bound
 `M` on its own iterated family, which `IteratedL2Bound.norm_le` shows to dominate `‖f‖`. -/
@@ -146,7 +146,7 @@ theorem interiorRegularityAt_zero (Op : FullEllipticOp (n + 1))
 set_option maxHeartbeats 1600000 in
 -- The step has the tower, its collar, four cutoffs, the inductive family on two sets and the
 -- datum, and the closed form of the gradient is checked against all of them.
-/-- **The differentiated equation as a weak formulation for a cutoff derivative.** For a weak
+/-- **Differentiated equation as a weak formulation for a cutoff derivative.** For a weak
 solution `u` of `L u = f` and each direction `ℓ`, there is an element `U ∈ H₀¹(Ω)` agreeing with
 `∂_ℓ u` on `V`, a datum `F ∈ L²(Ω)` with `k` weak derivatives, and a weak formulation `B[U, w] =
 ⟪F, w⟫` for every `w ∈ H₀¹(Ω)`, with both `‖U‖` and the `H^k` bound on `F` controlled by the

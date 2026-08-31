@@ -81,7 +81,7 @@ theorem MeasureTheory.sq_intervalIntegral_le {a x : ℝ} (hax : a ≤ x) {f : �
   rw [intervalIntegral.integral_const, smul_eq_mul, mul_one, mul_comm] at h
   exact h
 
-/-- **The one-dimensional Poincaré inequality.** If `u` has derivative `u'` at
+/-- **One-dimensional Poincaré inequality.** If `u` has derivative `u'` at
 every point of `[a, b]` with `u'` continuous there, and `u a = 0`, then
 `∫ x in a..b, (u x) ^ 2 ≤ (b - a) ^ 2 / 2 * ∫ x in a..b, (u' x) ^ 2`.
 

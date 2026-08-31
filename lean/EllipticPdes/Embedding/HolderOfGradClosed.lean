@@ -176,7 +176,7 @@ theorem contDiffOn_holder_of_gradClosed (hd : 0 < d) (c : EuclideanSpace ℝ (Fi
 
 /-! ### The Hölder exponent Guo leaves open -/
 
-/-- **The Hölder clause at a general exponent.** The ladder run for `s` rungs lands at any `P`
+/-- **Hölder clause at a general exponent.** The ladder run for `s` rungs lands at any `P`
 the reciprocal relation `1/2 - s/d ≤ 1/P` admits, and Morrey at `P > d` reads off the exponent
 `1 - d/P`. The fixed exponent `1/2` of `contDiffOn_holder_of_gradClosed` is this at `s = ⌊d/2⌋`
 and `P = 2d`. -/
@@ -269,7 +269,7 @@ theorem exists_holderOnWith_of_gradClosed_even (hd : 0 < d) (hdeven : 2 * (d / 2
   rwa [hexp] at hwhol
 
 
-/-- **The Hölder estimate with its constant**, in the shape Guo states: one constant, depending
+/-- **Hölder estimate with its constant**, in the shape Guo states: one constant, depending
 on the dimension, the exponent and the ball alone, bounding the Hölder seminorm of every member
 of every family by the `L^P` norms of that member's first derivatives.
 

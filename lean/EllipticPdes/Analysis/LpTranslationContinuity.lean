@@ -55,7 +55,7 @@ lemma memLp_comp_translate {p : ℝ≥0∞} {f : EuclideanSpace ℝ (Fin d) → 
   rw [eLpNorm_comp_translate hf.1 h p]
   exact hf.2
 
-/-- **The compactly supported case.** For a continuous `g` with compact support, the `Lᵖ`
+/-- **Compactly supported case.** For a continuous `g` with compact support, the `Lᵖ`
 distance to its translates tends to zero: uniform continuity bounds the difference uniformly,
 and every difference with `‖h‖ ≤ 1` is supported in one compact set. -/
 theorem tendsto_eLpNorm_translate_sub_of_hasCompactSupport {p : ℝ≥0∞}

@@ -67,7 +67,7 @@ private theorem coe_toNNReal_inv_gen {t : ℝ} (ht : 0 < t) :
 
 /-! ### The ladder -/
 
-/-- **The Sobolev ladder from a general base exponent.** Let `F` assign a function to each index
+/-- **Sobolev ladder from a general base exponent.** Let `F` assign a function to each index
 of `ι`, let `nxt i k` name a weak `k`-derivative of `F i` on `Metric.ball c R`, and let `dep`
 record how far an index sits above the root. If every index of depth at most `m` lies in
 `L^{p₀}` there and every index of depth below `m` has its weak gradient in the family, then at
@@ -214,7 +214,7 @@ theorem memLp_of_gradClosed_general (hd : 1 < d) (c : EuclideanSpace ℝ (Fin d)
 
 /-! ### The exponent of case (i) -/
 
-/-- **The ladder at the exponent case (i) names.** Under the strict rung condition
+/-- **Ladder at the exponent case (i) names.** Under the strict rung condition
 `p₀ s < d`, which is the `k < n/p` of Evans §5.6.3 Theorem 6, the reciprocal `1/p₀ - s/d` is
 positive and names a finite exponent; the ladder lands on it. -/
 theorem memLp_of_gradClosed_general_ideal (hd : 1 < d) (c : EuclideanSpace ℝ (Fin d))

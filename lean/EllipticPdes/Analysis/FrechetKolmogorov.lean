@@ -353,7 +353,7 @@ theorem integrableOn_cube_sq_sub (η : ℝ) (k : Fin n → ℤ) (g : EucL2 n) (c
     memLp_const c
   exact (hg2.sub hc2).integrable_sq
 
-/-- **The approximation error decomposes as a sum of cube variances.** When `g` is supported in
+/-- **Approximation error as a sum of cube variances.** When `g` is supported in
 the union of the grid cubes, the squared `L²` distance from `g` to its cube-average is the sum
 over cubes of the squared deviation of `g` from its average on that cube. -/
 theorem norm_sq_sub_avg_eq {η : ℝ} (hη : 0 < η) {K : Finset (Fin n → ℤ)} {g : EucL2 n}
@@ -418,7 +418,7 @@ theorem integrableOn_prod_sq_sub (g : EucL2 n) {s t : Set (EuclideanSpace ℝ (F
   rw [Real.norm_eq_abs, abs_of_nonneg (by positivity)]
   nlinarith [sq_nonneg (g p.1 - g p.2), sq_nonneg (g p.1 + g p.2)]
 
-/-- **The displacement product integrability.** The squared difference `(g x - g (x + w)) ^ 2`
+/-- **Displacement product integrability.** The squared difference `(g x - g (x + w)) ^ 2`
 is integrable over `ℝⁿ × D` for any finite-measure `D` of displacements. This is what admits the
 Tonelli swap in the cube-translation estimate: the `w`-marginal of the integrand is the constant
 `‖g‖ ^ 2` (translation is an `L²` isometry), so `integrable_prod_iff'` closes. -/
@@ -549,7 +549,7 @@ theorem integral_displacement_marginal (g : EucL2 n) {D : Set (EuclideanSpace �
   rw [norm_sq_transL2_sub]
   exact integral_congr_ae (Filter.Eventually.of_forall fun x => by ring)
 
-/-- **The cube-translation bound.** Summing the per-cube double integrals over the grid is
+/-- **Cube-translation bound.** Summing the per-cube double integrals over the grid is
 controlled by the translation modulus integrated over the displacement box. -/
 theorem sum_cube_double_le_translation {η : ℝ} (hη : 0 < η) (K : Finset (Fin n → ℤ)) (g : EucL2 n) :
     ∑ k ∈ K, ∫ x in cube η k, ∫ y in cube η k, (g x - g y) ^ 2
@@ -641,7 +641,7 @@ theorem cube_variance_le {η : ℝ} (hη : 0 < η) (k : Fin n → ℤ) (g : EucL
     _ = (η ^ n)⁻¹ * ∫ x in cube η k, ∫ y in cube η k, (g x - g y) ^ 2 := by
         rw [integral_const_mul]
 
-/-- **The uniform approximation estimate.** For `g` supported in the union of the grid cubes, the
+/-- **Uniform approximation estimate.** For `g` supported in the union of the grid cubes, the
 squared `L²` distance from `g` to its cube-average is controlled by the translation modulus over the
 displacement box. -/
 theorem norm_sq_sub_avg_le_translation {η : ℝ} (hη : 0 < η) {K : Finset (Fin n → ℤ)} {g : EucL2 n}
@@ -666,7 +666,7 @@ theorem integrableOn_dbox_translation_modulus {η : ℝ} (g : EucL2 n) :
   rw [norm_sq_transL2_sub]
   exact integral_congr_ae (Filter.Eventually.of_forall fun x => by ring)
 
-/-- **The constant approximation bound.** With a uniform Lipschitz translation modulus `Λ`, the
+/-- **Constant approximation bound.** With a uniform Lipschitz translation modulus `Λ`, the
 cube-average approximates `g` within `2 ^ n * n * Λ ^ 2 * η ^ 2` in squared `L²` norm. -/
 theorem norm_sq_sub_avg_le_const {η : ℝ} (hη : 0 < η) {K : Finset (Fin n → ℤ)} {g : EucL2 n}
     {Λ : ℝ}
@@ -745,7 +745,7 @@ theorem closedBall_subset_iUnion_cube {η : ℝ} (hη : 0 < η) (R : ℝ) :
     exact_mod_cast h4.le
   exact ⟨hlb, le_trans hub (by omega)⟩
 
-/-- **The Fréchet-Kolmogorov precompactness criterion.** A family `S` of `L²(ℝⁿ)` functions that
+/-- **Fréchet-Kolmogorov precompactness criterion.** A family `S` of `L²(ℝⁿ)` functions that
 is uniformly bounded in norm, uniformly supported in a fixed closed ball, and uniformly Lipschitz
 under translation (with modulus `Λ`) is totally bounded. This is the precompactness engine behind
 the Rellich-Kondrachov compact embedding. -/

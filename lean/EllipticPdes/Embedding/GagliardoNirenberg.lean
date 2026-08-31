@@ -516,7 +516,7 @@ theorem exists_eLpNorm_sobolevConj_le (hd : 0 < d) (c : EuclideanSpace ℝ (Fin 
   · refine lt_of_le_of_lt hfinal (ENNReal.mul_lt_top ENNReal.coe_lt_top ?_)
     exact ENNReal.add_lt_top.mpr ⟨hv.2, ENNReal.sum_lt_top.mpr fun k _ => (hg k).2⟩
 
-/-- **The bootstrap fed by a higher exponent.** The ball has finite measure, so `Lq` data with
+/-- **Bootstrap fed by a higher exponent.** The ball has finite measure, so `Lq` data with
 `p ≤ q` is `Lᵖ` data, at the price of a factor `|B|^{1/p - 1/q}` which the constant absorbs.
 This is the form the dimension-two chain uses: the interior `H²` estimate delivers `L²` data,
 while the exponent that reaches Morrey through `1/p' = 1/p - 1/d` is `p = 4/3`. -/

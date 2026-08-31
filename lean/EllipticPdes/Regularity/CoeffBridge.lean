@@ -115,7 +115,7 @@ theorem contDiff_iterPartial {f : EuclideanSpace ℝ (Fin d) → ℝ} :
       h3.clm_apply contDiff_const
     exact h4
 
-/-- **The iterated partial derivative is a value of `iteratedFDeriv`.** Applying `partialD`
+/-- **Iterated partial derivative as a value of `iteratedFDeriv`.** Applying `partialD`
 once per entry of `α` produces `iteratedFDeriv ℝ |α| f x` evaluated on the unit vectors `α`
 names. The proof peels the head with `iteratedFDeriv_succ_apply_left`, which differentiates
 the `|α|`-th derivative once more, and commutes that derivative past the evaluation at a

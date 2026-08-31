@@ -73,7 +73,7 @@ def rayleighSphere (Ω : Set (EuclideanSpace ℝ (Fin d))) : Set (H01 Ω) :=
 def rayleighValues (B : H01 Ω →L[ℝ] H01 Ω →L[ℝ] ℝ) : Set ℝ :=
   (fun U => B U U) '' rayleighSphere Ω
 
-/-- **The principal eigenvalue** of a symmetric coercive form on `H₀¹(Ω)`: the infimum of the
+/-- **Principal eigenvalue** of a symmetric coercive form on `H₀¹(Ω)`: the infimum of the
 Rayleigh quotient `B[U, U]` over the functions of unit `L²` norm. -/
 def principalEigenvalue (B : H01 Ω →L[ℝ] H01 Ω →L[ℝ] ℝ) : ℝ := sInf (rayleighValues B)
 
@@ -100,7 +100,7 @@ lemma principalEigenvalue_le (hco : IsCoercive B) {U : H01 Ω} (hU : ‖embL2 Ω
     principalEigenvalue B ≤ B U U :=
   csInf_le (rayleighValues_bddBelow hco) ⟨U, hU, rfl⟩
 
-/-- **The Rayleigh bound off the constraint set**: `λ₁‖U‖²_{L²} ≤ B[U, U]` for every `U`. On the
+/-- **Rayleigh bound off the constraint set**: `λ₁‖U‖²_{L²} ≤ B[U, U]` for every `U`. On the
 constraint set this is the definition of the infimum, and elsewhere it follows by rescaling. -/
 theorem principalEigenvalue_mul_norm_sq_le (hco : IsCoercive B) (U : H01 Ω) :
     principalEigenvalue B * ‖embL2 Ω U‖ ^ 2 ≤ B U U := by
@@ -157,7 +157,7 @@ lemma eq_zero_of_quadratic_nonneg {a b : ℝ} (h : ∀ t : ℝ, 0 ≤ 2 * t * b 
   have hneg := h (-(1 / (|a| + 1) * b))
   nlinarith [mul_pos (mul_pos hεpos hb2) (show (0 : ℝ) < 2 - 1 / (|a| + 1) * a by linarith)]
 
-/-- **The Euler-Lagrange equation of the Rayleigh problem.** A minimiser on the unit `L²` sphere is
+/-- **Euler-Lagrange equation of the Rayleigh problem.** A minimiser on the unit `L²` sphere is
 a weak eigenfunction at the principal eigenvalue: `B[U, V] = λ₁⟪U, V⟫_{L²}` for every `V`. -/
 theorem rayleigh_euler_lagrange (hco : IsCoercive B) (hsymm : ∀ U V : H01 Ω, B U V = B V U)
     {U : H01 Ω} (hU : ‖embL2 Ω U‖ = 1) (hmin : B U U = principalEigenvalue B) (V : H01 Ω) :
@@ -226,7 +226,7 @@ lemma principalEigenvalue_le_eigenvalueOn (hco : IsCoercive B) {S : Set (H01 Ω)
 
 /-! ### Existence of a minimiser -/
 
-/-- **The infimum of the Rayleigh quotient over a weakly closed set is attained.** Coercivity
+/-- **Attainment of the infimum of the Rayleigh quotient over a weakly closed set.** Coercivity
 bounds a minimising sequence, weak compactness supplies a limit, the constraint `S` passes to that
 limit by hypothesis, and the Rellich compact embedding takes the unit `L²` norm to it. -/
 theorem exists_rayleigh_minimiser_on (hco : IsCoercive B) (hsymm : ∀ U V : H01 Ω, B U V = B V U)
@@ -311,7 +311,7 @@ theorem exists_rayleigh_minimiser_on (hco : IsCoercive B) (hsymm : ∀ U V : H01
     simpa [Function.comp_def] using hBUU.comp hφ.tendsto_atTop
   exact ⟨w, hwnorm, hwS, le_antisymm hlsc (eigenvalueOn_le hco hwnorm hwS)⟩
 
-/-- **The infimum of the Rayleigh quotient is attained.** The unconstrained case. -/
+/-- **Attainment of the infimum of the Rayleigh quotient.** The unconstrained case. -/
 theorem exists_rayleigh_minimiser (hco : IsCoercive B) (hsymm : ∀ U V : H01 Ω, B U V = B V U)
     (hRellich : IsCompactOperator (embL2 Ω)) (hne : ∃ V : H01 Ω, embL2 Ω V ≠ 0) :
     ∃ U : H01 Ω, ‖embL2 Ω U‖ = 1 ∧ B U U = principalEigenvalue B := by
@@ -322,7 +322,7 @@ theorem exists_rayleigh_minimiser (hco : IsCoercive B) (hsymm : ∀ U V : H01 Ω
       (fun _ _ _ _ => Set.mem_univ _) hne'
   exact ⟨U, hU, by rwa [eigenvalueOn_univ] at hmin⟩
 
-/-- **The principal eigenpair.** For a symmetric coercive form with the Rellich compact embedding
+/-- **Principal eigenpair.** For a symmetric coercive form with the Rellich compact embedding
 there is a `U` of unit `L²` norm attaining the infimum of the Rayleigh quotient, and it solves the
 weak eigenvalue problem at that value. -/
 theorem exists_principal_eigenpair (hco : IsCoercive B) (hsymm : ∀ U V : H01 Ω, B U V = B V U)
@@ -332,7 +332,7 @@ theorem exists_principal_eigenpair (hco : IsCoercive B) (hsymm : ∀ U V : H01 �
   obtain ⟨U, hU, hmin⟩ := exists_rayleigh_minimiser hco hsymm hRellich hne
   exact ⟨U, hU, hmin, fun V => rayleigh_euler_lagrange hco hsymm hU hmin V⟩
 
-/-- **The principal eigenvalue is the smallest one.** Any nonzero weak eigenfunction has eigenvalue
+/-- **Minimality of the principal eigenvalue.** Any nonzero weak eigenfunction has eigenvalue
 at least `λ₁`. Coercivity rules out a nonzero element with vanishing `L²` class, so the Rayleigh
 bound applies. -/
 theorem principalEigenvalue_le_of_weak_eigen (hco : IsCoercive B) {lam : ℝ} {U : H01 Ω}
@@ -355,7 +355,7 @@ theorem principalEigenvalue_le_of_weak_eigen (hco : IsCoercive B) {lam : ℝ} {U
 
 /-! ### The Dirichlet Laplacian on a bounded measurable domain -/
 
-/-- **The principal Dirichlet eigenvalue of `-Δ`** on a bounded measurable domain, with the compact
+/-- **Principal Dirichlet eigenvalue of `-Δ`** on a bounded measurable domain, with the compact
 embedding discharged by `embL2_isCompact`. The eigenvalue of `-Δ` itself is `λ₁ - 1`, since the
 graph norm on `H₀¹(Ω)` includes the function coordinate: the identity below reads
 `∫ ∇u · ∇v = (λ₁ - 1) ∫ u v` once `⟪U, V⟫_{H₀¹}` is split off. -/
@@ -371,7 +371,7 @@ theorem dirichlet_principal_eigenpair (Ω : Set (EuclideanSpace ℝ (Fin d)))
   exists_principal_eigenpair (dirichletBilin_coercive Ω CP hCP hbase) (dirichletBilin_symm Ω)
     (embL2_isCompact hΩm hΩb) hne
 
-/-- **The Poincaré inequality with its optimal constant.** The principal Dirichlet eigenvalue is
+/-- **Poincaré inequality with its optimal constant.** The principal Dirichlet eigenvalue is
 the largest constant for which `λ‖u‖²_{L²} ≤ ∫ |∇u|²` on all of `H₀¹(Ω)`, since
 `dirichlet_poincare_attained` produces an equality case. -/
 theorem dirichlet_poincare_sharp (Ω : Set (EuclideanSpace ℝ (Fin d))) (CP : ℝ) (hCP : 0 ≤ CP)
@@ -405,7 +405,7 @@ theorem dirichlet_principalEigenvalue_pos (Ω : Set (EuclideanSpace ℝ (Fin d))
     0 < principalEigenvalue (dirichletBilin Ω) :=
   principalEigenvalue_pos (dirichletBilin_coercive Ω CP hCP hbase) hne
 
-/-- **The principal Dirichlet eigenpair on a bounded domain**, with no abstract Poincaré
+/-- **Principal Dirichlet eigenpair on a bounded domain**, with no abstract Poincaré
 hypothesis: `EllipticPdes.Poincare.dirichletBilin_coercive_of_bounded` names the constant, so
 boundedness and measurability of `Ω` are the whole input. This is the statement Evans makes, and
 it includes the positivity of `λ₁`. -/

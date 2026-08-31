@@ -308,7 +308,7 @@ private lemma integrable_mul_of_compactSupport
     Integrable (fun x => u x * w x) volume :=
   (hu.mul hw).integrable_of_hasCompactSupport (hws.mul_left)
 
-/-- **The classical gradient of a test function is a weak gradient.** Hence every test
+/-- **Classical gradient of a test function as a weak gradient.** Hence every test
 function's graph lies in `W^{1,2}(Ω)`. This is the integration-by-parts step (no boundary
 term, by compact support). -/
 lemma testGraph_mem_W12 {Ω : Set (EuclideanSpace ℝ (Fin d))}

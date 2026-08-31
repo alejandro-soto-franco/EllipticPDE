@@ -75,7 +75,7 @@ private theorem coe_toNNReal_inv_fullStep {t : ℝ} (ht : 0 < t) :
 
 /-! ### Ladder -/
 
-/-- **The Sobolev ladder at the full step to bounded depth.** Let `F` assign a function to each
+/-- **Sobolev ladder at the full step to bounded depth.** Let `F` assign a function to each
 index of `ι`, let `nxt i k` name a weak `k`-derivative of `F i` on `Metric.ball c R`, and let
 `dep` record how far an index sits above the root, so that differentiating adds at most one. If
 every index of depth at most `m` lies in `L²` there and every index of depth below `m` has its
@@ -189,7 +189,7 @@ theorem memLp_of_gradClosed_fullStep (hd : 0 < d) (c : EuclideanSpace ℝ (Fin d
       (fun k => hQmem (nxt i k) (by have := hdep i k; omega))
       ((hgrad i (by omega)).mono (Metric.ball_subset_ball hr'R.le))).1
 
-/-- **The full-step ladder run to the top.** An index of depth at most `m - ⌊d/2⌋` in a family
+/-- **Full-step ladder run to the top.** An index of depth at most `m - ⌊d/2⌋` in a family
 closed under weak differentiation as far as `m`, with every member of depth at most `m` in `L²`
 on `Metric.ball c R`, lies in `L^{2d}` on any smaller concentric ball. Since `2d > d`, this is
 the exponent `EllipticPdes.Embedding.morrey_ball` asks for, in every dimension.
@@ -228,7 +228,7 @@ theorem memLp_two_mul_of_gradClosed_fullStep (hd : 0 < d) (c : EuclideanSpace �
 
 /-! ### The ladder with its constant -/
 
-/-- **The full-step ladder with a constant.** One constant, depending on the dimension, the rung
+/-- **Full-step ladder with a constant.** One constant, depending on the dimension, the rung
 count, the exponent and the two radii alone, takes a uniform `L²` bound on the family over the
 outer ball to an `L^q` bound on the inner one, at every index the rungs reach.
 

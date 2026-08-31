@@ -64,7 +64,7 @@ lemma norm_testGraph_succ_sq_eq {Ω : Set (EuclideanSpace ℝ (Fin d))}
     inner_toLp_eq (h.memLp_partialD i) (h.memLp_partialD i)]
   exact integral_congr_ae (Filter.Eventually.of_forall fun x => (pow_two _).symm)
 
-/-- **The test-function Poincaré bound from box geometry.** If on the box `Ω` every test
+/-- **Test-function Poincaré bound from box geometry.** If on the box `Ω` every test
 function obeys the per-direction slice bound `∫_Ω φ² ≤ C ∫_Ω (∂ᵢφ)²` (the geometric content
 of `poincare_box_dir`), then it obeys the graph-coordinate bound `hbase` with Poincaré
 constant `C_P = C / d`. This is `poincare_domain` (averaging the `d` directions) re-expressed
@@ -85,7 +85,7 @@ theorem poincare_testfn {Ω : Set (EuclideanSpace ℝ (Fin d))} (hd : 0 < d) (C 
   apply le_of_eq
   ring
 
-/-- **The wiring closes the loop:** on a box with the per-direction slice bound, the Poisson
+/-- **Closing the loop:** on a box with the per-direction slice bound, the Poisson
 (Dirichlet) form is coercive *unconditionally* (no abstract Poincaré hypothesis), with
 constant `1 / (C/d + 1)`. The slice bound is the only geometric input, supplied by
 `poincare_box_dir`. -/

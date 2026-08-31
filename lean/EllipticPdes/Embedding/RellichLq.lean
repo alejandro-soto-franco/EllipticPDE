@@ -77,7 +77,7 @@ lemma coeFn_rellichEmbL_sub (hΩm : MeasurableSet Ω) (hΩb : IsBounded Ω) (hd 
   rw [hsub, Pi.sub_apply, hU, hV, show ((U - V : H01 Ω) : H1amb Ω) 0
     = (U : H1amb Ω) 0 - (V : H1amb Ω) 0 from rfl, hcoord, Pi.sub_apply]
 
-/-- **The interpolation estimate on the unit ball.** With `1/q = θ/2 + (1-θ)/2⋆`, the distance in
+/-- **Interpolation estimate on the unit ball.** With `1/q = θ/2 + (1-θ)/2⋆`, the distance in
 `L^q(Ω)` between the images of two elements of the unit ball is bounded by the `θ`-th power of
 their distance in `L²(Ω)`, times a constant. -/
 theorem norm_rellichEmbL_sub_le (hΩm : MeasurableSet Ω) (hΩb : IsBounded Ω) (hd : 2 < d)

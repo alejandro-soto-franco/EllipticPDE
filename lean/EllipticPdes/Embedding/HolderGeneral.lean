@@ -46,7 +46,7 @@ namespace EllipticPdes.Embedding
 
 variable {d : ℕ}
 
-/-- **The Hölder clause at a general base exponent.** The ladder run for `s` rungs from `L^{p₀}`
+/-- **Hölder clause at a general base exponent.** The ladder run for `s` rungs from `L^{p₀}`
 lands at any `P` the reciprocal relation `1/p₀ - s/d ≤ 1/P` admits, and Morrey at `P > d` reads
 off the exponent `1 - d/P`. -/
 theorem exists_holderOnWith_of_gradClosed_general (hd : 1 < d) (c : EuclideanSpace ℝ (Fin d))
@@ -86,7 +86,7 @@ theorem exists_holderOnWith_of_gradClosed_general (hd : 1 < d) (c : EuclideanSpa
   obtain ⟨w, hwae, hwhol⟩ := hC (F i) (fun k => F (nxt i k)) hFint hgradP hgradr
   exact ⟨w, hwae, ⟨_, hwhol⟩⟩
 
-/-- **The exponent the ladder lands on is the one the cited statements name.** At the landing
+/-- **Agreement of the ladder's exponent with the cited one.** At the landing
 reciprocal `1/P = 1/p₀ - s/d`, Morrey's exponent is `s + 1 - d/p₀`, which at `s = ⌊d/p₀⌋` is the
 `⌊n/p⌋ + 1 - n/p` of Evans §5.6.3 Theorem 6 and Guo Theorem IV.2.3. -/
 theorem morreyExponent_eq_ladder (hd : 0 < d) {p₀ P : ℝ≥0} {s : ℕ}

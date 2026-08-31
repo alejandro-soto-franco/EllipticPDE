@@ -47,7 +47,7 @@ def embL2 (Ω : Set (EuclideanSpace ℝ (Fin d))) : H01 Ω →L[ℝ] L2D Ω :=
     embL2 Ω U = (U : H1amb Ω) 0 := by
   simp only [embL2, ContinuousLinearMap.comp_apply, Submodule.subtypeL_apply, PiLp.proj_apply]
 
-/-- **The `L²` form factors through the embedding**: `opT = (embL2)† ∘ embL2`. Indeed
+/-- **Factorisation of the `L²` form through the embedding**: `opT = (embL2)† ∘ embL2`. Indeed
 `⟪opT U, V⟫ = ⟪U₀, V₀⟫_{L²} = ⟪embL2 U, embL2 V⟫ = ⟪(embL2)† (embL2 U), V⟫`. -/
 lemma opT_eq_adjoint_comp (Ω : Set (EuclideanSpace ℝ (Fin d))) :
     FullEllipticOp.opT Ω = (embL2 Ω).adjoint.comp (embL2 Ω) := by
@@ -75,7 +75,7 @@ lemma opK_isCompact (hRellich : IsCompactOperator (embL2 Ω)) :
   have hT : IsCompactOperator (FullEllipticOp.opT Ω) := opT_isCompact Ω hRellich
   exact (hT.clm_comp ((Op.opE Ω).symm : H01 Ω →L[ℝ] H01 Ω)).smul Op.gardingγ
 
-/-- **The Fredholm alternative on the Rellich embedding hypothesis** (Evans §6.2.3,
+/-- **Fredholm alternative on the Rellich embedding hypothesis** (Evans §6.2.3,
 Theorem 4). Identical to
 `fredholm_alternative`, but conditioned on the single analytic input `IsCompactOperator (embL2 Ω)`
 (the Rellich-Kondrachov compact embedding for bounded `Ω`) rather than the opaque

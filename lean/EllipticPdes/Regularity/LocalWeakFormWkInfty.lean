@@ -35,7 +35,7 @@ namespace EllipticPdes.Regularity
 
 open EllipticPdes.Sobolev
 
-/-- **The differentiated-equation identity for a weak solution with `W^{k,∞}` coefficients.**
+/-- **Differentiated-equation identity for a weak solution with `W^{k,∞}` coefficients.**
 For a weak solution `u ∈ H₀¹(Ω)` of `L u = f` and any compact `V ⋐ Ω`, the second weak
 derivatives of `u` on `V` exist and are bounded by the data, and for every direction `ℓ` in
 which the datum has a weak derivative `Df`, the pair `(∂_ℓ∂ᵢu, Df)` satisfies Evans's equation

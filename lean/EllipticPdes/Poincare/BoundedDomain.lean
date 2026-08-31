@@ -31,7 +31,7 @@ open EllipticPdes.Sobolev
 
 variable {n : ℕ}
 
-/-- **The per-direction Poincaré bound for a subset of a box.** A test function of any
+/-- **Per-direction Poincaré bound for a subset of a box.** A test function of any
 `Ω` inside the open box obeys the box slice bound with the integrals taken over `Ω`. -/
 theorem slice_bound_of_subset_euclBox {a b : Fin (n + 1) → ℝ} (hab : ∀ k, a k ≤ b k)
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hsub : Ω ⊆ euclBox a b)
@@ -59,7 +59,7 @@ theorem slice_bound_of_subset_euclBox {a b : Fin (n + 1) → ℝ} (hab : ∀ k, 
         slice_bound_euclBox a b hab hbox i
     _ = (b i - a i) ^ 2 / 2 * ∫ x in Ω, (partialD i φ x) ^ 2 := by rw [hdeq]
 
-/-- **The Poincaré inequality on `H₀¹(Ω)` for `Ω` inside a box** with sides at most `L`:
+/-- **Poincaré inequality on `H₀¹(Ω)` for `Ω` inside a box** with sides at most `L`:
 `‖U₀‖² ≤ L²/(2(n+1)) · ∑ᵢ ‖Uᵢ‖²`. -/
 theorem poincare_H01_of_subset_euclBox {a b : Fin (n + 1) → ℝ} (hab : ∀ k, a k ≤ b k)
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hsub : Ω ⊆ euclBox a b)
@@ -130,7 +130,7 @@ theorem exists_euclBox_superset {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))}
     linarith [le_trans habs hxR]
   exact ⟨by simpa using (abs_lt.mp hlt).1, (abs_lt.mp hlt).2⟩
 
-/-- **The Poincaré inequality on `H₀¹` of an arbitrary bounded domain** (the
+/-- **Poincaré inequality on `H₀¹` of an arbitrary bounded domain** (the
 Friedrichs inequality, `p = q = 2`): some constant `C ≥ 0` controls the function part
 by the gradient part, uniformly over `H₀¹(Ω)`.
 

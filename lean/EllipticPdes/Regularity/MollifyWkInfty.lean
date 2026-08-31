@@ -129,7 +129,7 @@ theorem convolution_congr_of_eqOn {a b ρ : EuclideanSpace ℝ (Fin d) → ℝ}
 
 /-! ### Derivative of a mollification from the weak derivative -/
 
-/-- **The reflected kernel is a test function.** For a smooth compactly supported `ρ`, the map
+/-- **Reflected kernel as a test function.** For a smooth compactly supported `ρ`, the map
 `t ↦ ρ (x - t)` is smooth with compact support, so `HasWeakPartial` may be applied to it. -/
 theorem contDiff_reflect {ρ : EuclideanSpace ℝ (Fin d) → ℝ} (hρcd : ContDiff ℝ (⊤ : ℕ∞) ρ)
     (x : EuclideanSpace ℝ (Fin d)) : ContDiff ℝ (⊤ : ℕ∞) (fun t => ρ (x - t)) :=
@@ -149,7 +149,7 @@ theorem partialD_reflect {ρ : EuclideanSpace ℝ (Fin d) → ℝ} (hρcd : Cont
   simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.neg_apply,
     ContinuousLinearMap.id_apply, map_neg]
 
-/-- **The derivative of a mollified `W^{1,∞}` weight is the mollification of its weak
+/-- **Derivative of a mollified `W^{1,∞}` weight is the mollification of its weak
 derivative.** For `a` with weak `ℓ`-derivative `a'` and a smooth compactly supported kernel `ρ`,
 `∂_ℓ (a ⋆ ρ) = a' ⋆ ρ`.
 

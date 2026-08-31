@@ -323,7 +323,7 @@ theorem orth_family_nonempty_ball (hd : 2 < d) (m : ℕ) (v : Fin m → H01 B1) 
       exact pow_ne_zero 2 hnorm
     exact this hpair.symm
 
-/-- **The Dirichlet eigenvalue sequence of the unit ball**, with `2 < d` the only hypothesis: for
+/-- **Dirichlet eigenvalue sequence of the unit ball**, with `2 < d` the only hypothesis: for
 every `n` an `L²`-orthonormal family of `n` weak solutions of `-Δw = λw` with
 `0 < λ₁ ≤ ⋯ ≤ λₙ`. Every side condition of the chapter is discharged here, boundedness by the
 ball itself and the infinite dimensionality by `orth_family_nonempty_ball`. -/

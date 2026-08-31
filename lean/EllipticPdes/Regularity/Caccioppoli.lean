@@ -299,7 +299,7 @@ private lemma bAct_transport_regroup (Op : FullEllipticOp d)
 
 /-! ### Interior energy (Caccioppoli) estimate -/
 
-/-- **The interior energy (Caccioppoli) estimate.** For a weak solution `u ∈ H₀¹(Ω)` of
+/-- **Interior energy (Caccioppoli) estimate.** For a weak solution `u ∈ H₀¹(Ω)` of
 `L u = f` and a cutoff `ζ` (a test function), the cutoff-weighted gradient energy
 `(λ/2) ∫_Ω ζ² |∇u|²` is bounded by `C · (‖f‖²_{L²} + ‖u₀‖²_{L²})`. The constant is quantified
 before the solution and the datum, so it depends only on `λ`, `Λ`, `‖b‖∞`, `‖c‖∞`, `‖ζ‖∞`,

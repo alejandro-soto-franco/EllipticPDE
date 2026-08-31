@@ -37,7 +37,7 @@ variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))}
 
 /-! ### Admissible Evans test element -/
 
-/-- **The admissible Evans test element** `v_h = -Dₖ^{-h}(ξ² Dₖ^h u) ∈ H₀¹(Ω)`. The inner
+/-- **Admissible Evans test element** `v_h = -Dₖ^{-h}(ξ² Dₖ^h u) ∈ H₀¹(Ω)`. The inner
 cutoff `ξ²` and the outer cutoff `θ` (which is `≡ 1` on `tsupport ξ`) localise the two
 difference quotients so that the composite stays inside `H₀¹(Ω)`; membership is two
 applications of the crux admissibility lemma `cutoffMul_diffQuotG_mem_H01`, together with
@@ -423,7 +423,7 @@ theorem hasWeakDeriv_extendL2_of_mem_H01 (hΩm : MeasurableSet Ω) (k : Fin d)
   rw [hLconv, hRconv] at hzero
   linarith [hzero]
 
-/-- **The first-order global energy estimate.** For a weak solution `u ∈ H₀¹(Ω)` of
+/-- **First-order global energy estimate.** For a weak solution `u ∈ H₀¹(Ω)` of
 `L u = f` whose transport field `b` vanishes and whose zeroth-order coefficient `c` is
 nonnegative (a.e. on `Ω`), the full gradient energy is bounded by the data:
 `λ ∑ᵢ ‖u_{i+1}‖² ≤ ‖f‖ · ‖u₀‖`. Testing the weak formulation with `u` itself, ellipticity
@@ -456,7 +456,7 @@ theorem firstOrder_energy_le (Op : FullEllipticOp d) (u : H01 Ω) (f : L2D Ω)
     mul_nonneg (by have := Op.lam_pos; linarith) (sq_nonneg _)
   linarith [hg, hfu, hdrop]
 
-/-- **The difference quotient of `u₀` is controlled by the gradient.** For `u ∈ H₀¹(Ω)`,
+/-- **Gradient control of the difference quotient of `u₀`.** For `u ∈ H₀¹(Ω)`,
 the interior difference quotient of the function value is bounded in `L²` by the `k`-th
 gradient component, uniformly in the step `h`: `‖Dₖ^h u₀‖ ≤ ‖u_{k+1}‖`. This composes the
 weak-derivative difference-quotient bound `norm_diffQuot_le_of_hasWeakDeriv` with the
@@ -516,7 +516,7 @@ private lemma norm_mulTest_sq_le (hξ : IsTestFn Ω ξ) (g : L2D Ω) :
     ‖mulTest (isTestFn_mul hξ hξ) g‖ ≤ (exists_abs_bound hξ).choose * ‖mulTest hξ g‖ := by
   rw [mulTest_mul_eq hξ g]; exact norm_mulTest_le hξ _
 
-/-- **The `L²(Ω)` norm bound on the coefficient difference-quotient commutator.** The interior
+/-- **`L²(Ω)` norm bound on the coefficient difference-quotient commutator.** The interior
 difference quotient of a coefficient-multiplied field splits into the translated coefficient
 acting on the field's difference quotient plus a commutator whose `L²(Ω)` norm is controlled
 by the `C¹` gradient bound `A₁`: `‖Dₖʰ(aᵢⱼ g) − (τ_{h eₖ}aᵢⱼ) Dₖʰ g‖ ≤ A₁ ‖g‖`. This is the
@@ -573,7 +573,7 @@ set_option maxHeartbeats 500000 in
 -- The final Young-absorption assembly chains the full toolkit (bilinear identity,
 -- ellipticity lower bound, five Cauchy-Schwarz/Peter-Paul term families) in one term, whose
 -- elaboration exceeds the default `maxHeartbeats`.
-/-- **The master interior difference-quotient energy estimate.** For a `C¹`-coefficient
+/-- **Master interior difference-quotient energy estimate.** For a `C¹`-coefficient
 weak solution `u ∈ H₀¹(Ω)` of `L u = f`, an inner cutoff `ξ` and an
 outer cutoff `θ ≡ 1` on the shift-reachable part of `tsupport ξ²`, the cutoff-weighted energy
 of the interior difference quotient of the gradient is bounded by the data, uniformly in the

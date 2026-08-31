@@ -239,7 +239,7 @@ theorem spectrum_diff_eq_eigenvalues (hK : IsCompactOperator K) :
   · rintro ⟨heig, h0⟩
     exact ⟨(hK.hasEigenvalue_iff_mem_spectrum h0).mp heig, h0⟩
 
-/-- **The spectrum of a compact operator (Evans Appendix D.5, Theorem 6).** On an
+/-- **Spectrum of a compact operator (Evans Appendix D.5, Theorem 6).** On an
 infinite-dimensional real Hilbert space, a compact operator `K` has `0` in its real
 spectrum; away from zero the spectrum consists exactly of the eigenvalues; the nonzero
 spectrum is countable; and only finitely many spectral points have `|μ| ≥ δ` for each
@@ -288,7 +288,7 @@ lemma gardingγ_pos : 0 < Op.gardingγ := by
   unfold gardingγ
   linarith
 
-/-- **The set `Σ` of Existence III**: the real `λ` for which `γ/(γ+λ)` is an
+/-- **Set `Σ` of Existence III**: the real `λ` for which `γ/(γ+λ)` is an
 eigenvalue of the compact part `opK` of the reduction, equivalently (see
 `notMem_sigmaSet_iff_solvable`), the `λ` for which the weak problem `Lu = λu + f`
 fails to be uniquely solvable for every right-hand side. -/

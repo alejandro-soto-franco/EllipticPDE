@@ -122,7 +122,7 @@ private lemma abs_convolution_le
     _ = M * 1 := by rw [integral_sub_left_eq_self ρ volume x, hρ1]
     _ = M := mul_one M
 
-/-- **The derivative of a mollified `C¹` function is the mollification of its derivative.** For
+/-- **Derivative of a mollified `C¹` function as the mollification of its derivative.** For
 `a ∈ C¹` and a smooth compactly supported kernel `ρ`, `∂_ℓ (a ⋆ ρ) = (∂_ℓ a) ⋆ ρ`. The derivative
 first passes to the kernel (`∂_ℓ (a ⋆ ρ) = a ⋆ ∂_ℓ ρ`), and integration by parts in the
 convolution variable moves it back onto `a`. -/

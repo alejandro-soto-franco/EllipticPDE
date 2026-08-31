@@ -68,7 +68,7 @@ theorem extendL2_ae_eq_zero {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩm : Meas
 
 /-! ### Carrying the Caccioppoli energy onto whole-space classes -/
 
-/-- **The Caccioppoli energy on whole-space classes.** Feeding the interior energy estimate
+/-- **Caccioppoli energy on whole-space classes.** Feeding the interior energy estimate
 `EllipticPdes.Regularity.caccioppoli` through the norm-preserving extension bridge, the
 cutoff-weighted gradient energy of a weak solution `u ∈ H₀¹(Ω)` of `L u = f`, measured on the
 whole-space `EucL2 d` classes `extendL2 hΩm (ζ · ∂ᵢu)`, is bounded by the data:

@@ -90,7 +90,7 @@ def congr {g : L2D V} (hu : HasIteratedWeakDerivOn V k u) (h : u = g) :
   D_nil := hu.D_nil.trans h
   D_step := hu.D_step
 
-/-- **The induction step.** From weak derivatives up to order `k + 1` of `u`, the direction
+/-- **Induction step.** From weak derivatives up to order `k + 1` of `u`, the direction
 `l` first derivative `D [l]` has weak derivatives up to order `k`, with family
 `α ↦ D (α ++ [l])`. Appending on the right rather than consing on the left is what makes the
 lengths line up: `(α ++ [l]).length < k + 1` is exactly `α.length < k`, so every step the new
@@ -136,7 +136,7 @@ private def famAux (u : L2D V) (E : Fin d → List (Fin d) → L2D V) :
   | [] => u
   | (ℓ :: βr) => E ℓ βr.reverse
 
-/-- **The inverse of `deriv`.** Weak derivatives in every direction, each with its own order-`k`
+/-- **Inverse of `deriv`.** Weak derivatives in every direction, each with its own order-`k`
 family, assemble into an order-`k + 1` family of the function itself. The index of the assembled
 family reads `β ++ [ℓ]` as the `β`-entry of the family of `∂_ℓ u`, which is the convention
 `deriv` uses in the other direction.

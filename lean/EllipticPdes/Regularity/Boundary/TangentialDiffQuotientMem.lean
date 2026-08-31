@@ -59,7 +59,7 @@ private lemma extendL2_toLp_ae_eq_halfBall {n : ℕ} {Ω : Set (EuclideanSpace �
 
 /-! ### Commutation of the difference quotient with the partial derivative -/
 
-/-- **The difference quotient along a fixed vector commutes with the partial derivative.**
+/-- **Commutation of the difference quotient along a fixed vector with the partial derivative.**
 `∂ᵢ(D^v φ) = D^v(∂ᵢφ)`: the shift map has derivative the identity, so the shift and the
 derivative commute, and dividing by `h` scales the derivative. -/
 private lemma partialD_shiftDiffQuotFn {n : ℕ} {φ : EuclideanSpace ℝ (Fin n) → ℝ}

@@ -170,7 +170,7 @@ theorem HasWeakDerivOn.of_mul_contDiff_left {V : Set (EuclideanSpace ℝ (Fin d)
     ring
   exact HasWeakDerivOn.mul_contDiff_left hVm ℓ hd hbC1 hbM hdbM v hvrep v' hv'rep
 
-/-- **The quotient class exists and is estimated.** Under the hypotheses of
+/-- **Existence and estimate of the quotient class.** Under the hypotheses of
 `HasWeakDerivOn.of_mul_contDiff_left`, the weak `ℓ`-derivative of `v` is an `L²(V)` class
 with
 `‖∂_ℓ v‖ ≤ θ⁻¹ ‖∂_ℓ(a·v)‖ + (M/θ) ‖v‖`.
@@ -225,7 +225,7 @@ theorem exists_hasWeakDerivOn_of_mul_contDiff_left {V : Set (EuclideanSpace ℝ 
     · exact norm_mulCoeffL_le hbmeas hbM dav
     · exact norm_mulCoeffL_le hcmeas hcM v
 
-/-- **The packaged form for a `C¹` elliptic bundle.** With `a := a_{kk}` the `k`-th diagonal
+/-- **Packaged form for a `C¹` elliptic bundle.** With `a := a_{kk}` the `k`-th diagonal
 coefficient entry, ellipticity supplies the lower bound `a_{kk} ≥ lam > 0` (Evans (54)) and
 `IsC1Coeff` supplies both the `C¹` regularity and the gradient bound `A₁`, so the division runs
 on the data the boundary programme already has. At `ℓ = k = n` this is exactly the passage from

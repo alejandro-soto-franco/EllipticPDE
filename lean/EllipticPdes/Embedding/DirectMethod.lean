@@ -64,7 +64,7 @@ private lemma norm_rellichEmbL_eq (hΩb : IsBounded (ball (0 : EuclideanSpace �
 set_option maxHeartbeats 1000000 in
 -- The minimising sequence, the weak limit and the strong limit are one argument over graphs in
 -- `H₀¹`, and elaborating it needs more than the default.
-/-- **The direct method.** Below the critical exponent the `H₀¹` norm attains its minimum on the
+/-- **Direct method.** Below the critical exponent the `H₀¹` norm attains its minimum on the
 functions of unit `L^q` norm. -/
 theorem exists_minimiser_of_lt (hΩb : IsBounded (ball (0 : EuclideanSpace ℝ (Fin d)) 1))
     (hd : 2 < d) (hq : ((2 : ℝ≥0) : ℝ)⁻¹ - (d : ℝ)⁻¹ ≤ (q : ℝ)⁻¹) (hq0 : q ≠ 0)
@@ -237,7 +237,7 @@ theorem exists_norm_rellichEmbL_eq_one
   rw [map_smul, norm_smul, Real.norm_eq_abs, abs_of_pos (inv_pos.mpr hpos),
     inv_mul_cancel₀ hpos.ne']
 
-/-- **The minimiser is a weak solution.** Differentiating the constraint through
+/-- **Minimiser as a weak solution.** Differentiating the constraint through
 `EllipticPdes.Analysis.euler_lagrange_of_norm_min` turns the subcritical minimiser into a weak
 solution of `-Δu + u = λ|u|^{q-2}u` on the unit ball, with `λ = ‖u‖²_{H₀¹}`: the graph inner
 product `⟪U, V⟫` is `∫ uv + ∫ ∇u · ∇v`, so the identity below is the weak form of that equation.

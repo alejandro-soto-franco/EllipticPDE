@@ -51,7 +51,7 @@ theorem weak_eigenvalue_pos (hco : IsCoercive B) (hne : ∃ V : H01 Ω, embL2 Ω
   lt_of_lt_of_le (principalEigenvalue_pos hco hne)
     (principalEigenvalue_le_of_weak_eigen hco hU heig)
 
-/-- **The eigenvalues have finite multiplicity.** The eigenspace of the solution operator at a
+/-- **Finite multiplicity of the eigenvalues.** The eigenspace of the solution operator at a
 nonzero eigenvalue is finite dimensional, the operator being compact. -/
 theorem solOp_finiteDimensional_eigenspace (hco : IsCoercive B)
     (hRellich : IsCompactOperator (embL2 Ω)) {μ : ℝ} (hμ : μ ≠ 0) :

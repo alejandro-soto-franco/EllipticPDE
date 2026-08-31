@@ -273,7 +273,7 @@ lemma adjoint_one_sub (K : E →L[ℝ] E) :
       = 1 - ContinuousLinearMap.adjoint K := by
   rw [map_sub, ContinuousLinearMap.adjoint_one]
 
-/-- **The two kernels have equal (finite) dimension**, one inequality. If
+/-- **Equal (finite) dimension of the two kernels**, one inequality. If
 `dim ker(1-K) < dim ker(1-K†)` then an injective, non-surjective linear map
 `Λ : ker(1-K) → ker(1-K†)` composed with the orthogonal projection gives a finite-rank
 perturbation `S = K + Λ∘P` with `1 - S` injective; the Fredholm alternative makes

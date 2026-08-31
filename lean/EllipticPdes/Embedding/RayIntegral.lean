@@ -430,7 +430,7 @@ theorem kernel_bound_convex {φ : EuclideanSpace ℝ (Fin d) → ℝ}
             (((continuous_id.sub continuous_const).enorm).measurable.pow_const _)
         rw [lintegral_const_mul _ hg]
 
-/-- **The Riesz potential is integrable.** For smooth `φ` and `x` in the ball, the singular
+/-- **Integrability of the Riesz potential.** For smooth `φ` and `x` in the ball, the singular
 integrand `‖∇φ‖ / dist x ·^{d-1}` is integrable on the ball: the singularity `dist x ·^{-(d-1)}`
 has exponent `d - 1 < d`, and `‖∇φ‖` is bounded on the compact closure. This is what makes the
 right-hand side of the potential estimate finite (hence the estimate meaningful). -/

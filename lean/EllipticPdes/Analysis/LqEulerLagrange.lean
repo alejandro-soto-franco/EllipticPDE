@@ -53,7 +53,7 @@ namespace EllipticPdes.Analysis
 
 variable {α : Type*} [MeasurableSpace α] {μ : Measure α}
 
-/-- **The `L^q` norm to the `q`-th power is the integral of the `q`-th power.** -/
+/-- **`L^q` norm to the `q`-th power as an integral.** -/
 theorem norm_lp_rpow_eq_integral {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp0 : p ≠ 0) (hptop : p ≠ ∞)
     (f : Lp ℝ p μ) :
     ‖f‖ ^ p.toReal = ∫ x, ‖f x‖ ^ p.toReal ∂μ := by
@@ -74,7 +74,7 @@ section Quadratic
 
 variable {H : Type*} [NormedAddCommGroup H] [NormedSpace ℝ H]
 
-/-- **The Euler-Lagrange equation of a quadratic minimiser under an `L^q` constraint.** Let `Q` be
+/-- **Euler-Lagrange equation of a quadratic minimiser under an `L^q` constraint.** Let `Q` be
 nonnegative and homogeneous of degree two, and let `U` minimise `Q` over the vectors whose image
 has unit `L^q` norm. If `Q (U + tV) = Q U + 2tL + t²S`, then
 
@@ -167,7 +167,7 @@ theorem euler_lagrange_of_quadratic_min {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp0 :
   rw [hcancel] at hzero
   linarith
 
-/-- **The Euler-Lagrange equation of a bilinear minimiser under an `L^q` constraint.** For a
+/-- **Euler-Lagrange equation of a bilinear minimiser under an `L^q` constraint.** For a
 symmetric positive semidefinite `B`, a minimiser of `B[·, ·]` on the unit `L^q` sphere satisfies
 
 `B[U, V] = B[U, U] ∫ |TU|^{q-2} (TU) (TV)`.
@@ -198,7 +198,7 @@ section Inner
 
 variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℝ H]
 
-/-- **The Euler-Lagrange equation of a norm minimiser under an `L^q` constraint.** If `U`
+/-- **Euler-Lagrange equation of a norm minimiser under an `L^q` constraint.** If `U`
 minimises `‖·‖` over the vectors whose image has unit `L^q` norm, then for every `V`
 
 `⟪U, V⟫ = ‖U‖² ∫ |TU|^{q-2} (TU) (TV)`.

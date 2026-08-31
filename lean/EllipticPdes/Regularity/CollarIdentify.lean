@@ -102,7 +102,7 @@ theorem exists_restrictFamily {Ω N : Set (EuclideanSpace ℝ (Fin d))}
       IteratedL2Bound HN C :=
   ⟨H.restrict hΩm hNm hNΩ, IteratedL2Bound.restrict hC⟩
 
-/-- **The inductive family moved to the collar.** A family on `W` for the whole-space
+/-- **Inductive family moved to the collar.** A family on `W` for the whole-space
 extension of `g`, restricted to `N`, is a family there for the same class, with the same bound,
 and its first entries are the given weak derivatives of `g`.
 

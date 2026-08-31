@@ -60,7 +60,7 @@ variable [Fact (1 ≤ (q : ℝ≥0∞))]
 /-- The unit ball of `ℝ^d`, where the argument runs. -/
 local notation "B1" => ball (0 : EuclideanSpace ℝ (Fin d)) 1
 
-/-- **The direct method at the Dirichlet energy.** Below the critical exponent the Dirichlet
+/-- **Direct method at the Dirichlet energy.** Below the critical exponent the Dirichlet
 energy attains its minimum on the functions of unit `L^q` norm. -/
 theorem exists_dirichlet_minimiser_of_lt
     (hΩb : IsBounded (ball (0 : EuclideanSpace ℝ (Fin d)) 1))
@@ -75,7 +75,7 @@ theorem exists_dirichlet_minimiser_of_lt
     (rellichEmbL_isCompact_of_lt measurableSet_ball hΩb hd hq hq0 hp' hp'0 hqlt)
     (exists_norm_rellichEmbL_eq_one hΩb hd hq0 hq)
 
-/-- **The semilinear Dirichlet problem.** The minimiser of the Dirichlet energy on the unit
+/-- **Semilinear Dirichlet problem.** The minimiser of the Dirichlet energy on the unit
 `L^q` sphere is a weak solution of `-Δu = λ|u|^{q-2}u`, with `λ = ∫ |∇u|²` the minimum itself,
 which is positive. -/
 theorem exists_weakSolution_dirichlet_of_lt
@@ -114,7 +114,7 @@ theorem exists_weakSolution_dirichlet_of_lt
     (bilin_self_nonneg hco) hU hmin V
   simpa using h
 
-/-- **The semilinear Dirichlet problem written over the gradient coordinates.** The identity of
+/-- **Semilinear Dirichlet problem written over the gradient coordinates.** The identity of
 `exists_weakSolution_dirichlet_of_lt` with both sides unfolded: `∫ ∇u · ∇v = λ ∫ |u|^{q-2}uv` for
 every `v ∈ H₀¹`, with `λ = ∫ |∇u|²`. -/
 theorem exists_weakSolution_dirichlet_of_lt'

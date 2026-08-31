@@ -139,7 +139,7 @@ private theorem setIntegral_sub_mul_testFn_symm {V : Set (EuclideanSpace ℝ (Fi
     rw [hx, Pi.sub_apply, sub_mul]
   rw [hcong, integral_sub hi1 hi2]
 
-/-- **The weak derivative on a region is unique after a cutoff.** Two weak `ℓ`-derivatives of
+/-- **Uniqueness of the weak derivative on a region after a cutoff.** Two weak `ℓ`-derivatives of
 the same class pair identically with every test function supported in the region, so their
 difference is killed by any cutoff supported there.
 

@@ -79,7 +79,7 @@ private theorem coe_toNNReal_inv_aux {t : ℝ} (ht : 0 < t) :
 
 /-! ### Ladder -/
 
-/-- **The Sobolev ladder on a family closed under differentiation.** Let `F` assign a function to
+/-- **Sobolev ladder on a family closed under differentiation.** Let `F` assign a function to
 each index of `ι`, let `nxt i k` name a weak `k`-derivative of `F i` on `Metric.ball c R`, and let
 every `F i` lie in `L²` there. Then at rung `s < d` every `F i` lies in `Lq` on `Metric.ball c r`,
 for any exponent `q ≥ 2` whose reciprocal is at least `1/2 - s/(2d)`.
@@ -186,7 +186,7 @@ theorem memLp_of_gradClosed (hd : 0 < d) (c : EuclideanSpace ℝ (Fin d))
     exact (hK (F i) (fun k => F (nxt i k)) (hQmem i) (fun k => hQmem (nxt i k))
       ((hgrad i).mono (Metric.ball_subset_ball hr'R.le))).1
 
-/-- **The ladder run to the top.** A family closed under differentiation, in `L²` on
+/-- **Ladder run to the top.** A family closed under differentiation, in `L²` on
 `Metric.ball c R`, lies in `L^{2d}` on any smaller concentric ball. Since `2d > d`, this is the
 exponent `EllipticPdes.Embedding.morrey_ball` asks for, in every dimension.
 

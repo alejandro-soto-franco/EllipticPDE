@@ -80,7 +80,7 @@ lemma orthSubmodule_snoc_subset {n : ℕ} (w : Fin n → H01 Ω) (U : H01 Ω) :
 
 /-! ### The family -/
 
-/-- **The eigenvalue sequence.** For every `n` there is an `L²`-orthonormal family of `n` weak
+/-- **Eigenvalue sequence.** For every `n` there is an `L²`-orthonormal family of `n` weak
 eigenfunctions of `B` whose eigenvalues increase with the index. The hypothesis `hdim` supplies,
 at each stage, a vector of nonzero `L²` class orthogonal to the family built so far; on a bounded
 domain it is the infinite dimensionality of `H₀¹(Ω)`.
@@ -175,7 +175,7 @@ theorem principalEigenvalue_le_of_eigen_family (hco : IsCoercive B) {n : ℕ} {w
   rw [h0] at h
   simp at h
 
-/-- **The Dirichlet eigenvalue sequence on a bounded domain.** For every `n` there is an
+/-- **Dirichlet eigenvalue sequence on a bounded domain.** For every `n` there is an
 `L²`-orthonormal family of `n` weak solutions of `-Δw = λw` with `0 < λ₁ ≤ ⋯ ≤ λₙ`. Boundedness
 and measurability of `Ω` discharge coercivity and the compact embedding; `hdim` is the infinite
 dimensionality of `H₀¹(Ω)`, stated as a vector at each stage. -/

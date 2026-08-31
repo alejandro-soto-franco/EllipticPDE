@@ -166,7 +166,7 @@ theorem abs_ballAverage_sub_le_of_le {Ω : Set (EuclideanSpace ℝ (Fin d))}
           rw [sq_campanatoConst_mul]
     _ = (campanatoConst d * M * r ^ α) ^ 2 * (s ^ (d : ℝ) * unitBallVolume d) := by ring
 
-/-- **The dyadic step.** Halving the radius moves the mean by at most
+/-- **Dyadic step.** Halving the radius moves the mean by at most
 `campanatoConst d · M · r^α`. This is the estimate the telescoping sums. -/
 theorem abs_ballAverage_sub_half_le {Ω : Set (EuclideanSpace ℝ (Fin d))}
     {u : EuclideanSpace ℝ (Fin d) → ℝ} {α M : ℝ} (hα : 0 ≤ α) (hM : 0 ≤ M)

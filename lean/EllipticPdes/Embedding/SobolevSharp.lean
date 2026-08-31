@@ -63,7 +63,7 @@ theorem isTestFn_dilate {φ : EuclideanSpace ℝ (Fin d) → ℝ}
     rw [mem_ball, dist_zero_right]
     linarith
 
-/-- **The `Lᵖ` seminorm of a dilate**, over the unit ball, where both sides see the whole space
+/-- **`Lᵖ` seminorm of a dilate**, over the unit ball, where both sides see the whole space
 since the supports lie inside. -/
 theorem eLpNorm_dilate {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφ : Measurable φ)
     {lam : ℝ} (hlam0 : 0 < lam) {p : ℝ≥0∞} (hp0 : p ≠ 0) (hpt : p ≠ ∞) :
@@ -73,7 +73,7 @@ theorem eLpNorm_dilate {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφ : Measurab
   congr 2
   rw [inv_pow, inv_inv, abs_of_nonneg (by positivity)]
 
-/-- **The partial derivatives of a dilate**, in `Lᵖ`. -/
+/-- **Partial derivatives of a dilate**, in `Lᵖ`. -/
 theorem eLpNorm_partialD_dilate {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφ : ContDiff ℝ 1 φ)
     (i : Fin d) (hmeas : Measurable (partialD i φ))
     {lam : ℝ} (hlam0 : 0 < lam) {p : ℝ≥0∞} (hp0 : p ≠ 0) (hpt : p ≠ ∞) :
@@ -290,7 +290,7 @@ end Crit
 set_option maxHeartbeats 1000000 in
 -- The family, its three norm identities and the extraction are one argument over the graphs of
 -- dilated bump functions, and elaborating it needs more than the default.
-/-- **The Sobolev embedding is not compact at the critical exponent.** The renormalised dilates
+/-- **Failure of compactness at the critical exponent.** The renormalised dilates
 stay in the unit ball of `H₀¹`, keep the `L^{2⋆}` norm of the bump, and lose their `L²` norm, so
 their images have no convergent subsequence.
 

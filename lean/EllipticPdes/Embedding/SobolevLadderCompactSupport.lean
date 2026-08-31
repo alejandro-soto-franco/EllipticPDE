@@ -58,7 +58,7 @@ private theorem coe_toNNReal_inv_cs {t : ℝ} (ht : 0 < t) :
 
 /-! ### Compact support in place of a finite measure -/
 
-/-- **The exponent of a compactly supported class lowers freely.** The support has finite
+/-- **Free lowering of the exponent of a compactly supported class.** The support has finite
 measure, so Hölder's inequality on it gives the smaller exponent, with no hypothesis on the
 measure of the whole space. -/
 theorem memLp_mono_exponent_compactSupport {f : EuclideanSpace ℝ (Fin d) → ℝ}
@@ -97,7 +97,7 @@ theorem memLp_sobolevConj_of_le_compactSupport (hd : 0 < d) {p q p' : ℝ≥0}
 
 /-! ### The ladder -/
 
-/-- **The Sobolev ladder on the whole space.** Let `F` assign a function to each index of `ι`,
+/-- **Sobolev ladder on the whole space.** Let `F` assign a function to each index of `ι`,
 let `nxt i k` name a weak `k`-derivative of `F i` on `Set.univ`, and let `dep` record how far
 an index sits above the root. If every member of the family is compactly supported, every
 index of depth at most `m` lies in `L^{p₀}`, and every index of depth below `m` has its weak
@@ -222,7 +222,7 @@ theorem memLp_of_gradClosed_compactSupport (hd : 1 < d)
 
 /-! ### The exponent of case (i) -/
 
-/-- **The whole-space ladder at the exponent case (i) names.** Under the strict rung condition
+/-- **Whole-space ladder at the exponent case (i) names.** Under the strict rung condition
 `p₀ s < d`, which is the `k < n/p` of Evans §5.6.3 Theorem 6, the reciprocal `1/p₀ - s/d` is
 positive and names a finite exponent, and the ladder lands on it with no loss of domain. -/
 theorem memLp_of_gradClosed_compactSupport_ideal (hd : 1 < d)

@@ -50,7 +50,7 @@ lemma measurableEmbedding_translate (h : EuclideanSpace ℝ (Fin d)) :
 
 /-! ### Derivatives and supports -/
 
-/-- **The partial derivatives of a translate.** Translation has derivative the identity, so a
+/-- **Partial derivatives of a translate.** Translation has derivative the identity, so a
 partial derivative translates with no factor. -/
 theorem partialD_comp_translate {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφ : Differentiable ℝ φ)
     (h : EuclideanSpace ℝ (Fin d)) (k : Fin d) (x : EuclideanSpace ℝ (Fin d)) :
