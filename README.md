@@ -47,8 +47,8 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
 - interior Hölder continuity of finite order in every dimension, as
   `EllipticPdes.Regularity.exists_contDiffOn_holder_ball`: $m$ orders of weak
   derivative on $V$ give a $C^{k,1/2}$ representative on a ball whenever
-  $k + 1 + \lfloor n/2 \rfloor \le m$. This is case (ii) of Guo's Sobolev
-  embedding (Theorem IV.2.3) at $p = 2$,
+  $k + 1 + \lfloor n/2 \rfloor \le m$. This is case (ii) of the order-$k$ Sobolev
+  embedding at $p = 2$,
 - the same estimate for the weak solution itself, as
   `EllipticPdes.Regularity.interior_holder_of_weakSolution`, which discharges
   that supply of weak derivatives from the equation through
@@ -252,7 +252,8 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   so `exists_smooth_partition` reads the smoothness of each piece back as
   $C^\infty$ and nothing downstream of that file meets a manifold,
 - the local extension those pieces are summed against, as
-  `EllipticPdes.Extension.exists_localExtension`, which is the whole content of
+  `EllipticPdes.Extension.exists_localExtension` and its form with a constant
+  `exists_localExtension_bound`, which is the whole content of
   Guo's second step: near a boundary point the class extends across the
   boundary, to a class with a weak gradient on any ball strictly inside the
   chart's, agreeing with the original on the part of the domain that ball
@@ -278,9 +279,52 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   which with the previous item is clauses (i) and (ii) of Guo's Theorem
   III.2.2: any open set the closure of the domain sits in admits a smooth
   cutoff equal to one on that closure, and multiplying by it moves the support
-  inside without disturbing the agreement. The norm bound, clause (iii), is
-  what remains of the theorem, and the operator is not yet built as a bounded
-  linear map,
+  inside without disturbing the agreement,
+- the norm bound, clause (iii), as
+  `EllipticPdes.Extension.exists_extension_subset_bound`, which completes
+  Theorem III.2.2: one constant, depending on the domain and the exponent and
+  quantified before the class, bounds the extension and its gradient in every
+  $L^p$ seminorm by the class and its gradient over $\Omega$. The chart, its
+  bounded graph, its two cutoffs, the partition of unity and the supremum of
+  each piece and of its partials depend on $\Omega$ alone, so
+  `exists_localExtension_bound` fixes them before the class appears and
+  `exists_extension_bound` sums the local constants over the finitely many
+  pieces. The five estimates the chain threads are the cutoff's supremum, the
+  rigid motion, the reflection, the shear and the sum over the coordinates the
+  motion mixes. The operator is still not packaged as a bounded linear map: the
+  statement gives a constant and an extension for each class, and no linear map
+  between the two spaces,
+- the Gagliardo-Nirenberg-Sobolev inequality on a bounded domain with $C^1$
+  boundary, as
+  `EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_domain`, the single rung
+  the order-$k$ embedding iterates: a class on $\Omega$ with an $L^p$ weak
+  gradient lies in $L^{p'}(\Omega)$ at $1/p' = 1/p - 1/d$, with a constant. On a
+  ball the same
+  inequality shrinks the ball, the cutoff feeding the whole-space statement
+  being one only inside; the extension operator supplies that cutoff once and
+  the estimate is on $\Omega$ throughout,
+- the Sobolev ladder on that domain, as
+  `EllipticPdes.Embedding.exists_const_memLp_of_gradClosed_domain`: the rung
+  iterated $s$ times with no ball shrinking, so one constant takes a uniform
+  $L^{p_0}$ bound on the family to an $L^q$ bound on the member,
+- Hölder continuity up to the boundary, as
+  `EllipticPdes.Embedding.exists_const_holderOnWith_of_gradClosed_domain`: the
+  ladder reaches an exponent above the dimension, the extension puts the member
+  and its first derivatives on the whole space, and Morrey on a ball containing
+  $\overline{\Omega}$ produces the representative, whose Hölder seminorm on
+  $\overline{\Omega}$ one constant bounds by the uniform $L^{p_0}$ bound,
+- both clauses of the order-$k$ Sobolev embedding on a bounded $C^1$ domain, as
+  `EllipticPdes.Embedding.exists_const_memLp_of_gradClosed_domain_ideal`,
+  `exists_const_holderOnWith_domain_ideal` and
+  `exists_const_holderOnWith_domain_free`. Clause (i) lands on the exponent
+  $1/q = 1/p - k/n$ under the strict rung condition $pk < n$; clause (ii) gives
+  the Hölder exponent $\lfloor n/p \rfloor - n/p + 1$ when $n/p$ is not an
+  integer and any $\gamma \in (0,1)$ when it is, on $\overline{\Omega}$ and
+  at every order up to $k - 1 - \lfloor n/p \rfloor$, bounding the supremum and
+  the Hölder seminorm together, which is the whole $C^{0,\gamma}$ norm. A member
+  of $W^{k,p}(\Omega)$ is read as a family closed under weak differentiation,
+  with a depth function in place of
+  $D^\alpha u$, which is the vocabulary the interior statements already use,
 - both cases of the order-$k$ embedding off `p = 2`. Case (ii) is
   `EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed_general`: the ladder
   runs for $s$ rungs from $L^{p_0}$ and Morrey reads the Hölder exponent off the
