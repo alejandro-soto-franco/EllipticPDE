@@ -513,6 +513,54 @@
       "source_id": "evans-2010",
       "locator": "§5.6.3 Thm 6",
       "claim": "the arithmetic identifying the exponent the ladder lands on with the one clause (ii) names: at the landing reciprocal 1/P = 1/p_0 - s/d, Morrey's exponent 1 - d/P equals s + 1 - d/p_0, which at s = floor(d/p_0) is Evans's floor(n/p) + 1 - n/p. Evans records the exponent in the statement and does not derive it, the derivation being one line of the proof"
+    },
+    {
+      "decl": "EllipticPdes.Extension.exists_extension_bound",
+      "source_id": "evans-2010",
+      "locator": "§5.4 Thm 1",
+      "claim": "formalises the theorem without its support clause: for a bounded domain with C^1 boundary and a class with a weak gradient on it, an extension to the whole space agrees with the class on the domain, has a weak gradient there, and satisfies the estimate of clause (iii) with a constant depending on the domain, the dimension and the exponent alone. Evans builds the operator as a bounded linear map on W^{1,p}(U); this states the existence of an extension and its estimate, which is what the embedding uses"
+    },
+    {
+      "decl": "EllipticPdes.Extension.exists_extension_subset_bound",
+      "source_id": "evans-2010",
+      "locator": "§5.4 Thm 1",
+      "claim": "formalises the theorem in full: the extension agrees with the class on the domain, is supported inside any open set the closure of the domain sits in, and satisfies the norm bound. The constant is quantified before the class, which is the uniformity Evans reads off the operator norm of a bounded linear map"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_domain",
+      "source_id": "evans-2010",
+      "locator": "§5.6.1 Thm 2",
+      "claim": "formalises the estimate on a bounded domain with C^1 boundary at 1 <= p < d: the L^{p'} seminorm of the class is bounded by its L^p seminorm together with those of its weak gradient, at 1/p' = 1/p - 1/d. Evans extends the class to one of compact support on R^n and applies Theorem 1 there, which is the route here, so the constant depends on the domain"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.exists_const_memLp_of_gradClosed_domain",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "the iteration on the domain at a general target exponent, which both cases of the theorem read through: a family closed under weak differentiation to order m and uniformly bounded in L^{p} on the domain lands in L^{q} for every q at or above the base exponent whose reciprocal is at least 1/p - s/d, with one constant depending on the domain, the dimension and the two exponents"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.exists_const_holderOnWith_of_gradClosed_domain",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "case (ii) of the theorem at a general exponent above the dimension: the iteration on the domain followed by Morrey's inequality places a member of depth at most m - 1 - s in C^{0,1-d/P} on the closure of the domain. The same constant bounds the supremum, so the estimate is on the whole Hölder norm rather than the seminorm alone"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.exists_const_memLp_of_gradClosed_domain_ideal",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "case (i) of the theorem at the exponent it names: for k < n/p the class lies in L^q on the domain at 1/q = 1/p - k/n, with the L^q seminorm bounded by the W^{k,p} norm. The strict condition p k < n is exactly positivity of the landing reciprocal, which is what makes the exponent finite"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.exists_const_holderOnWith_domain_ideal",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "case (ii) of the theorem where n/p is no integer: the class lies in C^{k-1-[n/p],gamma} on the closure of the domain at gamma = [n/p] - n/p + 1, with the Hölder norm bounded by the W^{k,p} norm. The two hypotheses p k < n < p (k+1) pin the rung count to [n/p]"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.exists_const_holderOnWith_domain_free",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "case (ii) of the theorem where n/p is an integer, where the Hölder exponent is free in (0,1): the class lies in C^{k-1-[n/p],gamma} on the closure of the domain for every such gamma. Evans reaches every exponent by dropping to L^s on the finite measure of the domain and taking one further application; the route here counts n/p applications, whose landing reciprocal is zero and so admits every finite exponent"
     }
   ]
 }

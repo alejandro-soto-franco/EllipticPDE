@@ -483,3 +483,43 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Embedding.morreyExponent_eq_ladder' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Embedding.morreyExponent_eq_ladder
+
+/-! ### Norm bound of the extension operator -/
+
+/-- info: 'EllipticPdes.Extension.exists_localExtension_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Extension.exists_localExtension_bound
+
+/-- info: 'EllipticPdes.Extension.exists_extension_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Extension.exists_extension_bound
+
+/-- info: 'EllipticPdes.Extension.exists_extension_subset_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Extension.exists_extension_subset_bound
+
+/-! ### Sobolev embedding on a bounded `C¹` domain -/
+
+/-- info: 'EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_domain' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_domain
+
+/-- info: 'EllipticPdes.Embedding.exists_const_memLp_of_gradClosed_domain' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.exists_const_memLp_of_gradClosed_domain
+
+/-- info: 'EllipticPdes.Embedding.exists_const_holderOnWith_of_gradClosed_domain' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.exists_const_holderOnWith_of_gradClosed_domain
+
+/-- info: 'EllipticPdes.Embedding.exists_const_memLp_of_gradClosed_domain_ideal' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.exists_const_memLp_of_gradClosed_domain_ideal
+
+/-- info: 'EllipticPdes.Embedding.exists_const_holderOnWith_domain_ideal' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.exists_const_holderOnWith_domain_ideal
+
+/-- info: 'EllipticPdes.Embedding.exists_const_holderOnWith_domain_free' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.exists_const_holderOnWith_domain_free

@@ -87,22 +87,30 @@ EXEMPT = {
         "Theorem 1 performs the straightening and the reflection inside one proof and states no "
         "lemma for the composite, and it works throughout with a function smooth up to the "
         "boundary, reaching W^{1,p} by density, so no transcribed statement matches a weak "
-        "gradient. The patching over a finite cover of the boundary, which is the remaining "
-        "step of that theorem, is not formalised"
+        "gradient. exists_extension_bound patches the local pieces over a finite cover of the "
+        "boundary, which is the remaining step of that theorem"
     ),
     "EllipticPdes.Extension.exists_extension_subset": (
         "clauses (i) and (ii) of Guo III.2.2 together: the extension agrees with the class on the "
         "domain and is supported inside any open set the closure of the domain sits in. Guo "
         "reaches (ii) by multiplying by a cutoff equal to one on the domain, which is what this "
-        "does. Clause (iii), the norm bound, is not formalised, and the operator is not built as "
-        "a bounded linear map, so the statement is an existence rather than the theorem"
+        "does. exists_extension_subset_bound adds clause (iii), the norm bound. Neither builds the "
+        "operator as a bounded linear map, so each statement is an existence with an estimate"
     ),
     "EllipticPdes.Extension.exists_extension": (
         "step 3 of Guo's proof of III.2.2, the sum of the local extensions against a partition of "
         "unity, which extends the class across the whole boundary and agrees with it on the "
         "domain. That is clause (i) of the theorem together with the existence of the extension's "
-        "weak gradient; clause (ii) on the support and clause (iii) on the norm are not "
-        "formalised. Steps of a proof are not transcribed statements, so no locator matches"
+        "weak gradient; exists_extension_subset states clause (ii) on the support and "
+        "exists_extension_bound clause (iii) on the norm. Steps of a proof are not "
+        "transcribed statements, so no locator matches"
+    ),
+    "EllipticPdes.Extension.exists_localExtension_bound": (
+        "the local half of clause (iii) of Guo III.2.2, at every exponent p >= 1: near a "
+        "boundary point the extension is bounded by the class and its gradient over the "
+        "domain, with a constant reading off the chart alone. Evans 5.4 Theorem 1 and Guo "
+        "both prove the local bound inside the proof of the assembled operator and state no "
+        "lemma for a single chart, so no transcribed statement matches it"
     ),
     "EllipticPdes.Extension.exists_localExtension": (
         "step 2 of Guo's proof of III.2.2: near a boundary point the class extends across the "
