@@ -19,22 +19,32 @@ the class, so the piece equals `Pᵢ u` there and off the ball both sides vanish
 add to `u` because the partition adds to one.
 
 `supp(Pᵢ) ⋐ Wᵢ` is compact containment, and the local extension of step 2 lives on a ball
-strictly inside the chart's, so the support is first pushed into a smaller ball. A compact subset
-of an open ball admits one.
+strictly inside the chart's, so the support is first pushed into a smaller ball. A compact
+subset of an open ball admits one.
 
 The support clause follows by one more cutoff, which is how Guo reaches it: any open set the
 closure of the domain sits in admits a smooth cutoff equal to one on that closure, and
-multiplying by it moves the support inside without disturbing the agreement. What remains of Theorem III.2.2
-after this file is the norm bound.
+multiplying by it moves the support inside without disturbing the agreement.
+
+## Constant of clause (iii)
+
+The partition, the charts, the radii and the supremum of each piece and of its partials all
+depend on the domain alone, so `exists_extension_bound` fixes them before the class appears and
+sums the local constants of `exists_localExtension_bound` over the finitely many pieces. That is
+clause (iii): one constant, depending on the domain and the exponent, bounding the extension and
+its gradient by the class and its gradient over the domain.
 
 ## Main declarations
 
 * `EllipticPdes.Extension.exists_lt_radius_of_isCompact_subset_ball`: a compact subset of an open
   ball sits in a strictly smaller one.
-* `EllipticPdes.Extension.exists_extension`: the class extends across the whole boundary.
+* `EllipticPdes.Extension.exists_extension_bound`: the class extends across the whole boundary,
+  with a constant taken before the class.
+* `EllipticPdes.Extension.exists_extension`: the same with the constant discarded.
 * `EllipticPdes.Extension.exists_cutoff_one_on_compact`: a smooth cutoff between a compact set
   and an open one.
-* `EllipticPdes.Extension.exists_extension_subset`: clauses (i) and (ii) of the theorem.
+* `EllipticPdes.Extension.exists_extension_subset_bound`: the three clauses of the theorem.
+* `EllipticPdes.Extension.exists_extension_subset`: clauses (i) and (ii).
 
 ## References
 
@@ -44,7 +54,7 @@ Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theore
 -/
 
 open MeasureTheory Metric Set
-open scoped Manifold
+open scoped Manifold NNReal ENNReal
 
 noncomputable section
 
@@ -77,6 +87,230 @@ private theorem intMul {B : Set (EuclideanSpace ℝ (Fin d))}
   exact (integrableOn_mul_bounded hw hc hC).congr
     (Filter.Eventually.of_forall fun x => mul_comm (w x) (h x))
 
+/-- **One bound for a smooth compactly supported factor and for each of its partials.** The
+product rule against a piece of the partition uses both, and a single number bounds them. -/
+private theorem exists_bound_with_partials {h : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hc : ContDiff ℝ (⊤ : ℕ∞) h) (hcs : HasCompactSupport h) :
+    ∃ C : ℝ, 0 ≤ C ∧ (∀ y, ‖h y‖ ≤ C) ∧ ∀ (k : Fin d) (y : EuclideanSpace ℝ (Fin d)),
+      ‖partialD k h y‖ ≤ C := by
+  classical
+  have hpc : ∀ k : Fin d, Continuous (partialD k h) := fun k =>
+    (hc.continuous_fderiv (by simp)).clm_apply continuous_const
+  have hpcs : ∀ k : Fin d, HasCompactSupport (partialD k h) := fun k =>
+    hcs.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single k (1 : ℝ))
+  obtain ⟨C₀, hC₀⟩ := hcs.exists_bound_of_continuous hc.continuous
+  choose Ck hCk using fun k => (hpcs k).exists_bound_of_continuous (hpc k)
+  have hC₀0 : (0 : ℝ) ≤ C₀ := (norm_nonneg _).trans (hC₀ 0)
+  have hCk0 : ∀ k, (0 : ℝ) ≤ Ck k := fun k => (norm_nonneg _).trans (hCk k 0)
+  have hsum0 : (0 : ℝ) ≤ ∑ k, Ck k := Finset.sum_nonneg fun k _ => hCk0 k
+  refine ⟨C₀ + ∑ k, Ck k, by linarith, fun y => (hC₀ y).trans (by linarith), fun k y => ?_⟩
+  have h1 : Ck k ≤ ∑ j, Ck j :=
+    Finset.single_le_sum (f := fun j => Ck j) (fun j _ => hCk0 j) (Finset.mem_univ k)
+  exact (hCk k y).trans (by linarith)
+
+/-- **Guo's third step with its constant** (Theorem III.2.2, proof step 3, p. 22): the local
+extensions glued with the partition of unity extend the class across the whole boundary, and one
+constant, taken before the class, bounds the extension and its gradient by the class and its
+gradient over the domain. -/
+theorem exists_extension_bound (hd : 0 < d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBounded Ω) (hC1 : HasC1Boundary Ω)
+    {p : ℝ≥0∞} (hp : 1 ≤ p) :
+    ∃ K : ℝ≥0, ∀ (u : EuclideanSpace ℝ (Fin d) → ℝ)
+        (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
+      IntegrableOn u Ω volume → (∀ k, IntegrableOn (g k) Ω volume) → HasWeakGradOn Ω u g →
+      ∃ (U : EuclideanSpace ℝ (Fin d) → ℝ) (G : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
+        HasWeakGradOn Set.univ U G ∧ Integrable U volume ∧
+          (∀ k, Integrable (G k) volume) ∧ (∀ y ∈ Ω, U y = u y) ∧
+          eLpNorm U p volume ≤ (K : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
+            + ∑ i, eLpNorm (g i) p (volume.restrict Ω)) ∧
+          ∀ k, eLpNorm (G k) p volume ≤ (K : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
+            + ∑ i, eLpNorm (g i) p (volume.restrict Ω)) := by
+  classical
+  obtain ⟨P⟩ := nonempty_boundaryPartition hd hΩopen hΩb hC1
+  obtain ⟨Rb, hRb⟩ := hΩb.subset_closedBall (0 : EuclideanSpace ℝ (Fin d))
+  have hpiece : ∀ i : Option {x // x ∈ P.centres}, ∃ Ki : ℝ≥0,
+      ∀ (u : EuclideanSpace ℝ (Fin d) → ℝ) (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
+        IntegrableOn u Ω volume → (∀ k, IntegrableOn (g k) Ω volume) → HasWeakGradOn Ω u g →
+        ∃ (Ui : EuclideanSpace ℝ (Fin d) → ℝ) (Gi : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
+          HasWeakGradOn Set.univ Ui Gi ∧ Integrable Ui volume ∧
+            (∀ k, Integrable (Gi k) volume) ∧
+            (∀ y ∈ Ω, Ui y = P.part i y * u y) ∧
+            eLpNorm Ui p volume ≤ (Ki : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
+              + ∑ j, eLpNorm (g j) p (volume.restrict Ω)) ∧
+            ∀ k, eLpNorm (Gi k) p volume ≤ (Ki : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
+              + ∑ j, eLpNorm (g j) p (volume.restrict Ω)) := by
+    rintro (_ | x)
+    · -- The interior piece, applied to the class extended by zero.
+      have hcs : HasCompactSupport (P.part none) :=
+        (isCompact_closedBall (0 : EuclideanSpace ℝ (Fin d)) Rb).of_isClosed_subset
+          (isClosed_tsupport _) (P.part_interior.trans hRb)
+      have hpc : Continuous (P.part none) := (P.part_contDiff none).continuous
+      have hpd : ∀ k : Fin d, Continuous (partialD k (P.part none)) := fun k =>
+        ((P.part_contDiff none).continuous_fderiv (by simp)).clm_apply continuous_const
+      have hpdcs : ∀ k : Fin d, HasCompactSupport (partialD k (P.part none)) := fun k =>
+        hcs.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single k (1 : ℝ))
+      obtain ⟨C, hC0, hCb, hCd⟩ := exists_bound_with_partials (P.part_contDiff none) hcs
+      refine ⟨Real.toNNReal C, fun u g hu hgi hwg => ?_⟩
+      have hcoe : ((Real.toNNReal C : ℝ≥0) : ℝ≥0∞) = ENNReal.ofReal C := rfl
+      have hiu : IntegrableOn (Ω.indicator u) Set.univ volume :=
+        (hu.integrable_indicator hΩopen.measurableSet).integrableOn
+      have hig : ∀ k, IntegrableOn (Ω.indicator (g k)) Set.univ volume := fun k =>
+        ((hgi k).integrable_indicator hΩopen.measurableSet).integrableOn
+      have hind : ∀ w : EuclideanSpace ℝ (Fin d) → ℝ,
+          eLpNorm (Ω.indicator w) p volume = eLpNorm w p (volume.restrict Ω) := fun w =>
+        eLpNorm_indicator_eq_eLpNorm_restrict hΩopen.measurableSet
+      refine ⟨fun y => P.part none y * Ω.indicator u y,
+        fun k y => P.part none y * Ω.indicator (g k) y
+          + partialD k (P.part none) y * Ω.indicator u y,
+        hasWeakGradOn_univ_mul_cutoff hΩopen.measurableSet (P.part_contDiff none) hcs
+          P.part_interior hu hgi hwg,
+        integrableOn_univ.mp (intMul hiu hcs hpc),
+        fun k => integrableOn_univ.mp ((intMul (hig k) hcs hpc).add (intMul hiu (hpdcs k) (hpd k))),
+        ?_, ?_, ?_⟩
+      · intro y hy
+        dsimp only
+        rw [Set.indicator_of_mem hy]
+      · rw [hcoe]
+        calc eLpNorm (fun y => P.part none y * Ω.indicator u y) p volume
+            ≤ ENNReal.ofReal C * eLpNorm (Ω.indicator u) p volume :=
+              eLpNorm_bounded_mul_le hC0 hCb
+          _ ≤ ENNReal.ofReal C * (eLpNorm u p (volume.restrict Ω)
+              + ∑ j, eLpNorm (g j) p (volume.restrict Ω)) := by
+              rw [hind]
+              exact mul_le_mul_right le_self_add _
+      · intro k
+        rw [hcoe]
+        have hm1 : AEStronglyMeasurable
+            (fun y => P.part none y * Ω.indicator (g k) y) volume :=
+          (integrableOn_univ.mp (intMul (hig k) hcs hpc)).1
+        have hm2 : AEStronglyMeasurable
+            (fun y => partialD k (P.part none) y * Ω.indicator u y) volume :=
+          (integrableOn_univ.mp (intMul hiu (hpdcs k) (hpd k))).1
+        calc eLpNorm (fun y => P.part none y * Ω.indicator (g k) y
+                + partialD k (P.part none) y * Ω.indicator u y) p volume
+            ≤ eLpNorm (fun y => P.part none y * Ω.indicator (g k) y) p volume
+              + eLpNorm (fun y => partialD k (P.part none) y * Ω.indicator u y) p volume :=
+              eLpNorm_add_le hm1 hm2 hp
+          _ ≤ ENNReal.ofReal C * eLpNorm (Ω.indicator (g k)) p volume
+              + ENNReal.ofReal C * eLpNorm (Ω.indicator u) p volume :=
+              add_le_add (eLpNorm_bounded_mul_le hC0 hCb)
+                (eLpNorm_bounded_mul_le hC0 (hCd k))
+          _ ≤ ENNReal.ofReal C * (eLpNorm u p (volume.restrict Ω)
+              + ∑ j, eLpNorm (g j) p (volume.restrict Ω)) := by
+              have hgk : eLpNorm (g k) p (volume.restrict Ω)
+                  ≤ ∑ j, eLpNorm (g j) p (volume.restrict Ω) :=
+                Finset.single_le_sum (f := fun j => eLpNorm (g j) p (volume.restrict Ω))
+                  (fun _ _ => zero_le) (Finset.mem_univ k)
+              rw [hind, hind, ← mul_add]
+              refine mul_le_mul_right ?_ _
+              calc eLpNorm (g k) p (volume.restrict Ω) + eLpNorm u p (volume.restrict Ω)
+                  ≤ (∑ j, eLpNorm (g j) p (volume.restrict Ω))
+                    + eLpNorm u p (volume.restrict Ω) := add_le_add_left hgk _
+                _ = eLpNorm u p (volume.restrict Ω)
+                    + ∑ j, eLpNorm (g j) p (volume.restrict Ω) := add_comm _ _
+    · -- A boundary piece, applied to the local extension of its chart.
+      have hcs : HasCompactSupport (P.part (some x)) :=
+        (isCompact_closedBall (x : EuclideanSpace ℝ (Fin d)) (P.chart x).radius).of_isClosed_subset
+          (isClosed_tsupport _) ((P.part_boundary x).trans ball_subset_closedBall)
+      obtain ⟨r, hrlt, hrpos, hrsub⟩ := exists_lt_radius_of_isCompact_subset_ball
+        (P.chart x).radius_pos hcs (P.part_boundary x)
+      obtain ⟨Kx, hKx⟩ := exists_localExtension_bound (P.chart x) hΩopen.measurableSet
+        (P.chart_fits x x.2) hrlt hp
+      have hpc : Continuous (P.part (some x)) := (P.part_contDiff (some x)).continuous
+      have hpd : ∀ k : Fin d, Continuous (partialD k (P.part (some x))) := fun k =>
+        ((P.part_contDiff (some x)).continuous_fderiv (by simp)).clm_apply continuous_const
+      have hpdcs : ∀ k : Fin d, HasCompactSupport (partialD k (P.part (some x))) := fun k =>
+        hcs.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single k (1 : ℝ))
+      obtain ⟨C, hC0, hCb, hCd⟩ := exists_bound_with_partials (P.part_contDiff (some x)) hcs
+      refine ⟨(Real.toNNReal C + Real.toNNReal C) * Kx, fun u g hu hgi hwg => ?_⟩
+      have hcoe : (((Real.toNNReal C + Real.toNNReal C) * Kx : ℝ≥0) : ℝ≥0∞)
+          = (ENNReal.ofReal C + ENNReal.ofReal C) * (Kx : ℝ≥0∞) := by
+        rw [ENNReal.coe_mul, ENNReal.coe_add]; rfl
+      obtain ⟨Ux, Gx, hUxwg, hUxint, hGxint, hUxag, hUxb, hGxb⟩ := hKx u g hu hgi hwg
+      have hUxOn : IntegrableOn Ux (ball (x : EuclideanSpace ℝ (Fin d)) r) volume :=
+        MeasureTheory.Integrable.integrableOn hUxint
+      have hGxOn : ∀ k, IntegrableOn (Gx k) (ball (x : EuclideanSpace ℝ (Fin d)) r) volume :=
+        fun k => MeasureTheory.Integrable.integrableOn (hGxint k)
+      have hiu : IntegrableOn ((ball (x : EuclideanSpace ℝ (Fin d)) r).indicator Ux)
+          Set.univ volume :=
+        integrableOn_univ.mpr ((integrable_indicator_iff measurableSet_ball).mpr hUxOn)
+      have hig : ∀ k, IntegrableOn
+          ((ball (x : EuclideanSpace ℝ (Fin d)) r).indicator (Gx k)) Set.univ volume := fun k =>
+        integrableOn_univ.mpr ((integrable_indicator_iff measurableSet_ball).mpr (hGxOn k))
+      -- the indicator leaves the seminorm alone
+      have hind : ∀ w : EuclideanSpace ℝ (Fin d) → ℝ,
+          eLpNorm ((ball (x : EuclideanSpace ℝ (Fin d)) r).indicator w) p volume
+            ≤ eLpNorm w p volume := by
+        intro w
+        rw [eLpNorm_indicator_eq_eLpNorm_restrict measurableSet_ball]
+        exact eLpNorm_mono_measure _ Measure.restrict_le_self
+      refine ⟨fun y => P.part (some x) y * (ball (x : EuclideanSpace ℝ (Fin d)) r).indicator Ux y,
+        fun k y => P.part (some x) y * (ball (x : EuclideanSpace ℝ (Fin d)) r).indicator (Gx k) y
+          + partialD k (P.part (some x)) y
+            * (ball (x : EuclideanSpace ℝ (Fin d)) r).indicator Ux y,
+        hasWeakGradOn_univ_mul_cutoff measurableSet_ball (P.part_contDiff (some x)) hcs
+          hrsub hUxOn hGxOn hUxwg,
+        integrableOn_univ.mp (intMul hiu hcs hpc),
+        fun k => integrableOn_univ.mp ((intMul (hig k) hcs hpc).add (intMul hiu (hpdcs k) (hpd k))),
+        ?_, ?_, ?_⟩
+      · intro y hy
+        dsimp only
+        by_cases hyb : y ∈ ball (x : EuclideanSpace ℝ (Fin d)) r
+        · rw [Set.indicator_of_mem hyb, hUxag y ⟨hy, hyb⟩]
+        · rw [Set.indicator_of_notMem hyb,
+            image_eq_zero_of_notMem_tsupport (fun hc => hyb (hrsub hc)), zero_mul, zero_mul]
+      · rw [hcoe, mul_assoc]
+        refine le_trans (eLpNorm_bounded_mul_le hC0 hCb) ?_
+        refine le_trans (mul_le_mul_right ((hind Ux).trans hUxb) (ENNReal.ofReal C)) ?_
+        exact mul_le_mul_left le_self_add _
+      · intro k
+        rw [hcoe, mul_assoc]
+        have hm1 : AEStronglyMeasurable (fun y => P.part (some x) y
+            * (ball (x : EuclideanSpace ℝ (Fin d)) r).indicator (Gx k) y) volume :=
+          (integrableOn_univ.mp (intMul (hig k) hcs hpc)).1
+        have hm2 : AEStronglyMeasurable (fun y => partialD k (P.part (some x)) y
+            * (ball (x : EuclideanSpace ℝ (Fin d)) r).indicator Ux y) volume :=
+          (integrableOn_univ.mp (intMul hiu (hpdcs k) (hpd k))).1
+        refine le_trans (eLpNorm_add_le hm1 hm2 hp) ?_
+        refine le_trans (add_le_add (eLpNorm_bounded_mul_le hC0 hCb)
+          (eLpNorm_bounded_mul_le hC0 (hCd k))) ?_
+        refine le_trans (add_le_add (mul_le_mul_right ((hind (Gx k)).trans (hGxb k)) _)
+          (mul_le_mul_right ((hind Ux).trans hUxb) _)) ?_
+        rw [add_mul]
+  choose Ki hKi using hpiece
+  refine ⟨∑ i, Ki i, ?_⟩
+  intro u g hu hgi hwg
+  choose Ui Gi hwgi hint hgint hag hUb hGb using fun i => hKi i u g hu hgi hwg
+  have hsumfun : ∀ w : Option {x // x ∈ P.centres} → EuclideanSpace ℝ (Fin d) → ℝ,
+      (fun y => ∑ i, w i y) = ∑ i, w i := by
+    intro w
+    funext y
+    rw [Finset.sum_apply]
+  have hbound : ∀ w : Option {x // x ∈ P.centres} → EuclideanSpace ℝ (Fin d) → ℝ,
+      (∀ i, AEStronglyMeasurable (w i) volume) →
+      (∀ i, eLpNorm (w i) p volume ≤ (Ki i : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
+        + ∑ j, eLpNorm (g j) p (volume.restrict Ω))) →
+      eLpNorm (fun y => ∑ i, w i y) p volume
+        ≤ ((∑ i, Ki i : ℝ≥0) : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
+          + ∑ j, eLpNorm (g j) p (volume.restrict Ω)) := by
+    intro w hwm hwb
+    rw [hsumfun w]
+    refine le_trans (eLpNorm_sum_le (fun i _ => hwm i) hp) ?_
+    refine le_trans (Finset.sum_le_sum fun i _ => hwb i) ?_
+    rw [← Finset.sum_mul, ENNReal.coe_finsetSum]
+  refine ⟨fun y => ∑ i, Ui i y, fun k y => ∑ i, Gi i k y, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  · exact hasWeakGradOn_finsetSum Finset.univ (fun i _ => (hint i).integrableOn)
+      (fun i _ k => (hgint i k).integrableOn) (fun i _ => hwgi i)
+  · exact MeasureTheory.integrable_finsetSum _ fun i _ => hint i
+  · exact fun k => MeasureTheory.integrable_finsetSum _ fun i _ => hgint i k
+  · intro y hy
+    calc (∑ i, Ui i y) = ∑ i, P.part i y * u y :=
+          Finset.sum_congr rfl fun i _ => hag i y hy
+      _ = (∑ i, P.part i y) * u y := (Finset.sum_mul _ _ _).symm
+      _ = u y := by rw [P.part_sum y (subset_closure hy), one_mul]
+  · exact hbound Ui (fun i => (hint i).1) hUb
+  · exact fun k => hbound (fun i => Gi i k) (fun i => (hgint i k).1) (fun i => hGb i k)
+
 /-- **Guo's third step** (Theorem III.2.2, proof step 3, p. 22): the local extensions glued with
 the partition of unity extend the class across the whole boundary. -/
 theorem exists_extension (hd : 0 < d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
@@ -87,81 +321,9 @@ theorem exists_extension (hd : 0 < d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
     ∃ (U : EuclideanSpace ℝ (Fin d) → ℝ) (G : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
       HasWeakGradOn Set.univ U G ∧ Integrable U volume ∧
         (∀ k, Integrable (G k) volume) ∧ ∀ y ∈ Ω, U y = u y := by
-  classical
-  obtain ⟨P⟩ := nonempty_boundaryPartition hd hΩopen hΩb hC1
-  obtain ⟨Rb, hRb⟩ := hΩb.subset_closedBall (0 : EuclideanSpace ℝ (Fin d))
-  have hpiece : ∀ i : Option {x // x ∈ P.centres},
-      ∃ (Ui : EuclideanSpace ℝ (Fin d) → ℝ) (Gi : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
-        HasWeakGradOn Set.univ Ui Gi ∧ IntegrableOn Ui Set.univ volume ∧
-          (∀ k, IntegrableOn (Gi k) Set.univ volume) ∧
-          (∀ y ∈ Ω, Ui y = P.part i y * u y) := by
-    rintro (_ | x)
-    · have hcs : HasCompactSupport (P.part none) :=
-        (isCompact_closedBall (0 : EuclideanSpace ℝ (Fin d)) Rb).of_isClosed_subset
-          (isClosed_tsupport _) (P.part_interior.trans hRb)
-      have hpc : Continuous (P.part none) := (P.part_contDiff none).continuous
-      have hpd : ∀ k : Fin d, Continuous (partialD k (P.part none)) := fun k =>
-        ((P.part_contDiff none).continuous_fderiv (by simp)).clm_apply continuous_const
-      have hpdcs : ∀ k : Fin d, HasCompactSupport (partialD k (P.part none)) := fun k =>
-        hcs.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single k (1 : ℝ))
-      have hiu : IntegrableOn (Ω.indicator u) Set.univ volume :=
-        (hu.integrable_indicator hΩopen.measurableSet).integrableOn
-      have hig : ∀ k, IntegrableOn (Ω.indicator (g k)) Set.univ volume := fun k =>
-        ((hgi k).integrable_indicator hΩopen.measurableSet).integrableOn
-      refine ⟨fun y => P.part none y * Ω.indicator u y,
-        fun k y => P.part none y * Ω.indicator (g k) y
-          + partialD k (P.part none) y * Ω.indicator u y,
-        hasWeakGradOn_univ_mul_cutoff hΩopen.measurableSet (P.part_contDiff none) hcs
-          P.part_interior hu hgi hwg,
-        intMul hiu hcs hpc,
-        fun k => (intMul (hig k) hcs hpc).add (intMul hiu (hpdcs k) (hpd k)), ?_⟩
-      intro y hy
-      dsimp only
-      rw [Set.indicator_of_mem hy]
-    · have hcs : HasCompactSupport (P.part (some x)) :=
-        (isCompact_closedBall (x : EuclideanSpace ℝ (Fin d)) (P.chart x).radius).of_isClosed_subset
-          (isClosed_tsupport _) ((P.part_boundary x).trans ball_subset_closedBall)
-      obtain ⟨r, hrlt, hrpos, hrsub⟩ := exists_lt_radius_of_isCompact_subset_ball
-        (P.chart x).radius_pos hcs (P.part_boundary x)
-      obtain ⟨Ux, Gx, hUxwg, hUxint, hGxint, hUxag⟩ :=
-        exists_localExtension (P.chart x) (P.chart_fits x x.2) hrlt hu hgi hwg
-      have hpc : Continuous (P.part (some x)) := (P.part_contDiff (some x)).continuous
-      have hpd : ∀ k : Fin d, Continuous (partialD k (P.part (some x))) := fun k =>
-        ((P.part_contDiff (some x)).continuous_fderiv (by simp)).clm_apply continuous_const
-      have hpdcs : ∀ k : Fin d, HasCompactSupport (partialD k (P.part (some x))) := fun k =>
-        hcs.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single k (1 : ℝ))
-      have hiu : IntegrableOn ((ball (x : EuclideanSpace ℝ (Fin d)) r).indicator Ux)
-          Set.univ volume :=
-        (hUxint.integrableOn.integrable_indicator measurableSet_ball).integrableOn
-      have hig : ∀ k, IntegrableOn
-          ((ball (x : EuclideanSpace ℝ (Fin d)) r).indicator (Gx k)) Set.univ volume := fun k =>
-        ((hGxint k).integrableOn.integrable_indicator measurableSet_ball).integrableOn
-      refine ⟨fun y => P.part (some x) y * (ball (x : EuclideanSpace ℝ (Fin d)) r).indicator Ux y,
-        fun k y => P.part (some x) y * (ball (x : EuclideanSpace ℝ (Fin d)) r).indicator (Gx k) y
-          + partialD k (P.part (some x)) y
-            * (ball (x : EuclideanSpace ℝ (Fin d)) r).indicator Ux y,
-        hasWeakGradOn_univ_mul_cutoff measurableSet_ball (P.part_contDiff (some x)) hcs
-          hrsub hUxint.integrableOn (fun k => (hGxint k).integrableOn) hUxwg,
-        intMul hiu hcs hpc,
-        fun k => (intMul (hig k) hcs hpc).add (intMul hiu (hpdcs k) (hpd k)), ?_⟩
-      intro y hy
-      dsimp only
-      by_cases hyb : y ∈ ball (x : EuclideanSpace ℝ (Fin d)) r
-      · rw [Set.indicator_of_mem hyb, hUxag y ⟨hy, hyb⟩]
-      · rw [Set.indicator_of_notMem hyb,
-          image_eq_zero_of_notMem_tsupport (fun hc => hyb (hrsub hc)), zero_mul, zero_mul]
-  choose Ui Gi hwgi hint hgint hag using hpiece
-  refine ⟨fun y => ∑ i, Ui i y, fun k y => ∑ i, Gi i k y, ?_, ?_, ?_, ?_⟩
-  · exact hasWeakGradOn_finsetSum Finset.univ (fun i _ => hint i) (fun i _ k => hgint i k)
-      (fun i _ => hwgi i)
-  · exact MeasureTheory.integrable_finsetSum _ fun i _ => integrableOn_univ.mp (hint i)
-  · exact fun k => MeasureTheory.integrable_finsetSum _ fun i _ =>
-      integrableOn_univ.mp (hgint i k)
-  · intro y hy
-    calc (∑ i, Ui i y) = ∑ i, P.part i y * u y :=
-          Finset.sum_congr rfl fun i _ => hag i y hy
-      _ = (∑ i, P.part i y) * u y := (Finset.sum_mul _ _ _).symm
-      _ = u y := by rw [P.part_sum y (subset_closure hy), one_mul]
+  obtain ⟨K, hK⟩ := exists_extension_bound hd hΩopen hΩb hC1 (p := 1) le_rfl
+  obtain ⟨U, G, hwgU, hUint, hGint, hag, -, -⟩ := hK u g hu hgi hwg
+  exact ⟨U, G, hwgU, hUint, hGint, hag⟩
 
 /-- **Cutting between a compact set and an open one.** A smooth cutoff equal to one on the
 compact set and compactly supported inside the open one. -/
@@ -185,7 +347,87 @@ theorem exists_cutoff_one_on_compact {K U : Set (EuclideanSpace ℝ (Fin d))}
     hLc.of_isClosed_subset (isClosed_tsupport _) hsupp, hsupp.trans hLU,
     fun y hy => hf1 hy⟩
 
-/-- **Guo's Theorem III.2.2, clauses (i) and (ii)** (p. 20). The extension agrees with the class
+/-- **Guo's Theorem III.2.2** (p. 20), all three clauses. The extension agrees with the class on
+the domain, is supported inside any open set the closure of the domain sits in, and is bounded
+in every `Lᵖ` seminorm, together with its gradient, by the class and its gradient over the
+domain, with one constant taken before the class. -/
+theorem exists_extension_subset_bound (hd : 0 < d) {Ω Ω' : Set (EuclideanSpace ℝ (Fin d))}
+    (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBounded Ω) (hC1 : HasC1Boundary Ω)
+    (hΩ'open : IsOpen Ω') (hsub : closure Ω ⊆ Ω') {p : ℝ≥0∞} (hp : 1 ≤ p) :
+    ∃ K : ℝ≥0, ∀ (u : EuclideanSpace ℝ (Fin d) → ℝ)
+        (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
+      IntegrableOn u Ω volume → (∀ k, IntegrableOn (g k) Ω volume) → HasWeakGradOn Ω u g →
+      ∃ (U : EuclideanSpace ℝ (Fin d) → ℝ) (G : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
+        HasWeakGradOn Set.univ U G ∧ HasCompactSupport U ∧ tsupport U ⊆ Ω' ∧
+          Integrable U volume ∧ (∀ k, Integrable (G k) volume) ∧ (∀ y ∈ Ω, U y = u y) ∧
+          eLpNorm U p volume ≤ (K : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
+            + ∑ i, eLpNorm (g i) p (volume.restrict Ω)) ∧
+          ∀ k, eLpNorm (G k) p volume ≤ (K : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
+            + ∑ i, eLpNorm (g i) p (volume.restrict Ω)) := by
+  classical
+  obtain ⟨K₀, hK₀⟩ := exists_extension_bound hd hΩopen hΩb hC1 hp
+  obtain ⟨Rb, hRb⟩ := hΩb.subset_closedBall (0 : EuclideanSpace ℝ (Fin d))
+  have hclc : IsCompact (closure Ω) :=
+    (isCompact_closedBall (0 : EuclideanSpace ℝ (Fin d)) Rb).of_isClosed_subset isClosed_closure
+      (closure_minimal hRb (isClosed_closedBall))
+  obtain ⟨χ, hχc, hχcs, hχs, hχ1⟩ := exists_cutoff_one_on_compact hclc hΩ'open hsub
+  obtain ⟨C, hC0, hCb, hCd⟩ := exists_bound_with_partials hχc hχcs
+  have hχpc : ∀ k : Fin d, Continuous (partialD k χ) := fun k =>
+    (hχc.continuous_fderiv (by simp)).clm_apply continuous_const
+  have hχpcs : ∀ k : Fin d, HasCompactSupport (partialD k χ) := fun k =>
+    hχcs.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single k (1 : ℝ))
+  refine ⟨(Real.toNNReal C + Real.toNNReal C) * K₀, fun u g hu hgi hwg => ?_⟩
+  have hcoe : (((Real.toNNReal C + Real.toNNReal C) * K₀ : ℝ≥0) : ℝ≥0∞)
+      = (ENNReal.ofReal C + ENNReal.ofReal C) * (K₀ : ℝ≥0∞) := by
+    rw [ENNReal.coe_mul, ENNReal.coe_add]; rfl
+  obtain ⟨U₀, G₀, hwg0, hint0, hgint0, hag0, hUb0, hGb0⟩ := hK₀ u g hu hgi hwg
+  have hmul := hasWeakGradOn_univ_mul_cutoff (B := Set.univ) MeasurableSet.univ hχc hχcs
+    (Set.subset_univ _) hint0.integrableOn (fun k => (hgint0 k).integrableOn) hwg0
+  simp only [Set.indicator_univ] at hmul
+  have hprod : ∀ (w : EuclideanSpace ℝ (Fin d) → ℝ) (h : EuclideanSpace ℝ (Fin d) → ℝ),
+      Integrable w volume → HasCompactSupport h → Continuous h →
+      Integrable (fun y => h y * w y) volume := by
+    intro w h hw hcs hc
+    obtain ⟨C', hC'⟩ := hcs.exists_bound_of_continuous hc
+    exact integrableOn_univ.mp ((integrableOn_mul_bounded hw.integrableOn hc hC').congr
+      (Filter.Eventually.of_forall fun y => mul_comm (w y) (h y)))
+  have hsuppU : tsupport (fun y => χ y * U₀ y) ⊆ Ω' := by
+    refine subset_trans (closure_mono ?_) hχs
+    intro y hy
+    simp only [Function.mem_support] at hy ⊢
+    intro hc
+    exact hy (by rw [hc, zero_mul])
+  refine ⟨fun y => χ y * U₀ y, fun k y => χ y * G₀ k y + partialD k χ y * U₀ y, hmul,
+    hχcs.of_isClosed_subset (isClosed_tsupport _) ?_, hsuppU,
+    hprod _ _ hint0 hχcs hχc.continuous,
+    fun k => (hprod _ _ (hgint0 k) hχcs hχc.continuous).add
+      (hprod _ _ hint0 (hχpcs k) (hχpc k)), ?_, ?_, ?_⟩
+  · refine subset_trans (closure_mono ?_) subset_rfl
+    intro y hy
+    simp only [Function.mem_support] at hy ⊢
+    intro hc
+    exact hy (by rw [hc, zero_mul])
+  · intro y hy
+    dsimp only
+    rw [hχ1 y (subset_closure hy), one_mul, hag0 y hy]
+  · rw [hcoe, mul_assoc]
+    refine le_trans (eLpNorm_bounded_mul_le hC0 hCb) ?_
+    refine le_trans (mul_le_mul_right hUb0 (ENNReal.ofReal C)) ?_
+    exact mul_le_mul_left le_self_add _
+  · intro k
+    rw [hcoe, mul_assoc]
+    have hm1 : AEStronglyMeasurable (fun y => χ y * G₀ k y) volume :=
+      (hprod _ _ (hgint0 k) hχcs hχc.continuous).1
+    have hm2 : AEStronglyMeasurable (fun y => partialD k χ y * U₀ y) volume :=
+      (hprod _ _ hint0 (hχpcs k) (hχpc k)).1
+    refine le_trans (eLpNorm_add_le hm1 hm2 hp) ?_
+    refine le_trans (add_le_add (eLpNorm_bounded_mul_le hC0 hCb)
+      (eLpNorm_bounded_mul_le hC0 (hCd k))) ?_
+    refine le_trans (add_le_add (mul_le_mul_right (hGb0 k) _)
+      (mul_le_mul_right hUb0 _)) ?_
+    rw [add_mul]
+
+/-- **Clauses (i) and (ii) of Guo's Theorem III.2.2** (p. 20). The extension agrees with the class
 on the domain and is supported inside any open set the closure of the domain sits in. -/
 theorem exists_extension_subset (hd : 0 < d) {Ω Ω' : Set (EuclideanSpace ℝ (Fin d))}
     (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBounded Ω) (hC1 : HasC1Boundary Ω)
@@ -196,46 +438,9 @@ theorem exists_extension_subset (hd : 0 < d) {Ω Ω' : Set (EuclideanSpace ℝ (
     ∃ (U : EuclideanSpace ℝ (Fin d) → ℝ) (G : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
       HasWeakGradOn Set.univ U G ∧ HasCompactSupport U ∧ tsupport U ⊆ Ω' ∧
         Integrable U volume ∧ (∀ k, Integrable (G k) volume) ∧ ∀ y ∈ Ω, U y = u y := by
-  obtain ⟨U0, G0, hwg0, hint0, hgint0, hag0⟩ :=
-    exists_extension hd hΩopen hΩb hC1 hu hgi hwg
-  obtain ⟨Rb, hRb⟩ := hΩb.subset_closedBall (0 : EuclideanSpace ℝ (Fin d))
-  have hclc : IsCompact (closure Ω) :=
-    (isCompact_closedBall (0 : EuclideanSpace ℝ (Fin d)) Rb).of_isClosed_subset isClosed_closure
-      (closure_minimal hRb (isClosed_closedBall))
-  obtain ⟨χ, hχc, hχcs, hχs, hχ1⟩ := exists_cutoff_one_on_compact hclc hΩ'open hsub
-  have hmul := hasWeakGradOn_univ_mul_cutoff (B := Set.univ) MeasurableSet.univ hχc hχcs
-    (Set.subset_univ _) hint0.integrableOn (fun k => (hgint0 k).integrableOn) hwg0
-  simp only [Set.indicator_univ] at hmul
-  obtain ⟨Cχ, hCχ⟩ := hχcs.exists_bound_of_continuous hχc.continuous
-  have hχpc : ∀ k : Fin d, Continuous (partialD k χ) := fun k =>
-    (hχc.continuous_fderiv (by simp)).clm_apply continuous_const
-  have hχpcs : ∀ k : Fin d, HasCompactSupport (partialD k χ) := fun k =>
-    hχcs.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single k (1 : ℝ))
-  have hprod : ∀ (w : EuclideanSpace ℝ (Fin d) → ℝ) (h : EuclideanSpace ℝ (Fin d) → ℝ),
-      Integrable w volume → HasCompactSupport h → Continuous h →
-      Integrable (fun y => h y * w y) volume := by
-    intro w h hw hcs hc
-    obtain ⟨C, hC⟩ := hcs.exists_bound_of_continuous hc
-    exact integrableOn_univ.mp ((integrableOn_mul_bounded hw.integrableOn hc hC).congr
-      (Filter.Eventually.of_forall fun y => mul_comm (w y) (h y)))
-  have hsuppU : tsupport (fun y => χ y * U0 y) ⊆ Ω' := by
-    refine subset_trans (closure_mono ?_) hχs
-    intro y hy
-    simp only [Function.mem_support] at hy ⊢
-    intro hc
-    exact hy (by rw [hc, zero_mul])
-  refine ⟨fun y => χ y * U0 y, fun k y => χ y * G0 k y + partialD k χ y * U0 y, hmul,
-    hχcs.of_isClosed_subset (isClosed_tsupport _) ?_, hsuppU,
-    hprod _ _ hint0 hχcs hχc.continuous,
-    fun k => (hprod _ _ (hgint0 k) hχcs hχc.continuous).add
-      (hprod _ _ hint0 (hχpcs k) (hχpc k)), ?_⟩
-  · refine subset_trans (closure_mono ?_) subset_rfl
-    intro y hy
-    simp only [Function.mem_support] at hy ⊢
-    intro hc
-    exact hy (by rw [hc, zero_mul])
-  · intro y hy
-    dsimp only
-    rw [hχ1 y (subset_closure hy), one_mul, hag0 y hy]
+  obtain ⟨K, hK⟩ :=
+    exists_extension_subset_bound hd hΩopen hΩb hC1 hΩ'open hsub (p := 1) le_rfl
+  obtain ⟨U, G, hwgU, hcsU, hsuppU, hUint, hGint, hag, -, -⟩ := hK u g hu hgi hwg
+  exact ⟨U, G, hwgU, hcsU, hsuppU, hUint, hGint, hag⟩
 
 end EllipticPdes.Extension
