@@ -313,6 +313,17 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   and its first derivatives on the whole space, and Morrey on a ball containing
   $\overline{\Omega}$ produces the representative, whose Hölder seminorm on
   $\overline{\Omega}$ one constant bounds by the uniform $L^{p_0}$ bound,
+- the representatives of clause (ii) as classical derivatives, as
+  `EllipticPdes.Embedding.exists_const_contDiffOn_holderOnWith_of_gradClosed_domain`
+  and its two clause forms
+  `exists_const_contDiffOn_holderOnWith_domain_ideal` and
+  `exists_const_contDiffOn_holderOnWith_domain_free`. One family of
+  representatives serves every index at once, so the member is $n$ times
+  continuously differentiable on $\Omega$ whenever the supply leaves $n$ orders
+  above it, the derivative of one representative being the next. That is what
+  $u \in C^{k-1-\lfloor n/p \rfloor, \gamma}(\overline{\Omega})$ asserts,
+  where the per-member statement gives only a Hölder representative of each
+  derivative separately,
 - both clauses of the order-$k$ Sobolev embedding on a bounded $C^1$ domain, as
   `EllipticPdes.Embedding.exists_const_memLp_of_gradClosed_domain_ideal`,
   `exists_const_holderOnWith_domain_ideal` and

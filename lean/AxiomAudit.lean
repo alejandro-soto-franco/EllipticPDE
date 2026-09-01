@@ -523,3 +523,17 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Embedding.exists_const_holderOnWith_domain_free' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Embedding.exists_const_holderOnWith_domain_free
+
+/-! ### Classical derivatives up to the boundary -/
+
+/-- info: 'EllipticPdes.Embedding.exists_const_contDiffOn_holderOnWith_of_gradClosed_domain' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.exists_const_contDiffOn_holderOnWith_of_gradClosed_domain
+
+/-- info: 'EllipticPdes.Embedding.exists_const_contDiffOn_holderOnWith_domain_ideal' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.exists_const_contDiffOn_holderOnWith_domain_ideal
+
+/-- info: 'EllipticPdes.Embedding.exists_const_contDiffOn_holderOnWith_domain_free' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.exists_const_contDiffOn_holderOnWith_domain_free

@@ -561,6 +561,24 @@
       "source_id": "evans-2010",
       "locator": "§5.6.3 Thm 6",
       "claim": "case (ii) of the theorem where n/p is an integer, where the Hölder exponent is free in (0,1): the class lies in C^{k-1-[n/p],gamma} on the closure of the domain for every such gamma. Evans reaches every exponent by dropping to L^s on the finite measure of the domain and taking one further application; the route here counts n/p applications, whose landing reciprocal is zero and so admits every finite exponent"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.exists_const_contDiffOn_holderOnWith_of_gradClosed_domain",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "case (ii) of the theorem as a statement about one function. The Hölder representatives of the members are chosen once, and they are the classical partial derivatives of one another on the domain, so a member is n times continuously differentiable there whenever n orders remain above it, and bounded and Hölder on the closure under the constant the clause names. Evans writes the conclusion as membership of C^{k-1-[n/p],gamma} on the closure, which is what this states"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.exists_const_contDiffOn_holderOnWith_domain_ideal",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "case (ii) of the theorem where n/p is no integer, as membership of C^{k-1-[n/p],gamma} on the closure of the domain: the representatives are differentiable to order k - 1 - [n/p] on the domain, the derivative of one being the next, and they are Hölder at gamma = [n/p] - n/p + 1 on the closure, with the constant quantified before the class"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.exists_const_contDiffOn_holderOnWith_domain_free",
+      "source_id": "evans-2010",
+      "locator": "§5.6.3 Thm 6",
+      "claim": "the same statement where n/p is an integer, where the theorem leaves the Hölder exponent free: the representatives are differentiable to order k - 1 - n/p on the domain and Hölder on the closure at every exponent in (0,1)"
     }
   ]
 }
