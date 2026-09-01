@@ -222,9 +222,9 @@ theorem memLp_of_gradClosed_compactSupport (hd : 1 < d)
 
 /-! ### The exponent of case (i) -/
 
-/-- **Whole-space ladder at the exponent case (i) names.** Under the strict rung condition
+/-- **Whole-space bootstrap at the exponent case (i) names.** Under the strict step condition
 `p₀ s < d`, which is the `k < n/p` of Evans §5.6.3 Theorem 6, the reciprocal `1/p₀ - s/d` is
-positive and names a finite exponent, and the ladder lands on it with no loss of domain.
+positive and names a finite exponent, and the bootstrap lands on it with no loss of domain.
 
 The cited statement takes a bounded `Ω` with `C¹` boundary and concludes on it, with a norm
 estimate. The statement here asks nothing of a boundary, takes a family of compact support on

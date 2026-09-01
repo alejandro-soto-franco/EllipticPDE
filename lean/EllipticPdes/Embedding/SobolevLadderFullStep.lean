@@ -75,18 +75,18 @@ private theorem coe_toNNReal_inv_fullStep {t : ℝ} (ht : 0 < t) :
 
 /-! ### Ladder -/
 
-/-- **Sobolev ladder at the full step to bounded depth.** Let `F` assign a function to each
+/-- **Sobolev bootstrap at the full step to bounded depth.** Let `F` assign a function to each
 index of `ι`, let `nxt i k` name a weak `k`-derivative of `F i` on `Metric.ball c R`, and let
 `dep` record how far an index sits above the root, so that differentiating adds at most one. If
 every index of depth at most `m` lies in `L²` there and every index of depth below `m` has its
-weak gradient in the family, then at rung `s` with `2 * s ≤ d` every index of depth at most
+weak gradient in the family, then at step `s` with `2 * s ≤ d` every index of depth at most
 `m - s` lies in `Lq` on `Metric.ball c r`, for any exponent `q ≥ 2` whose reciprocal is at least
 `1/2 - s/d`.
 
-The induction is on the rung. Each step splits the gap `r < R` at its midpoint, applies the
-hypothesis at rung `s` on the outer half to the index and to its derivatives, and takes one
+The induction is on the step. Each one splits the gap `r < R` at its midpoint, applies the
+hypothesis at step `s` on the outer half to the index and to its derivatives, and takes one
 Gagliardo-Nirenberg-Sobolev step on the inner half. The depth bookkeeping is what replaces
-closure at every order: a derivative sits one level higher, so a rung fewer is available to it,
+closure at every order: a derivative sits one level higher, so a step fewer is available to it,
 and that is what the recursive call is given. -/
 theorem memLp_of_gradClosed_fullStep (hd : 0 < d) (c : EuclideanSpace ℝ (Fin d))
     {ι : Type*} {F : ι → EuclideanSpace ℝ (Fin d) → ℝ} {nxt : ι → Fin d → ι}
