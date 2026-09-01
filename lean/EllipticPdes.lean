@@ -106,6 +106,10 @@ import EllipticPdes.Embedding.ClassicalDeriv
 import EllipticPdes.Embedding.SmoothOfGradClosed
 import EllipticPdes.Embedding.HolderOfGradClosed
 import EllipticPdes.Embedding.InteriorHolder
+import EllipticPdes.Embedding.DomainSobolev
+import EllipticPdes.Embedding.DomainLadder
+import EllipticPdes.Embedding.DomainHolder
+import EllipticPdes.Embedding.SobolevEmbedding
 import EllipticPdes.Fredholm.Fredholm
 import EllipticPdes.Fredholm.FredholmComplete
 import EllipticPdes.Spectrum.SpectrumSigma
