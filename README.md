@@ -29,7 +29,62 @@ problem the Fredholm results state.
 ## Results
 
 Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
-`sorry` in the library:
+`sorry` in the library. Declarations are named without their `EllipticPdes.`
+prefix.
+
+| Result | Declaration |
+|---|---|
+| Existence and uniqueness of the weak solution | `Sobolev.FullEllipticOp.weak_solution_L2_of_nonneg_zeroth_of_bounded` |
+| Gårding inequality | `Sobolev.FullEllipticOp.garding` |
+| Complete Fredholm alternative: kernel, index and solvability | `Sobolev.FullEllipticOp.fredholm_alternative` |
+| Resolvent bound | `Sobolev.FullEllipticOp.resolvent_bound` |
+| Spectral compactness | `Sobolev.spectrum_compact_operator` |
+| Interior $H^2$ regularity | `Regularity.interior_H2_estimate` |
+| Higher interior regularity at every order | `Regularity.higher_interior_regularity` |
+| Infinite differentiability in the interior | `Regularity.interior_smooth` |
+| Interior Hölder continuity at exponent $\tfrac12$, dimensions one to three | `Embedding.interior_holder_estimate_one` |
+| Interior Hölder continuity of finite order, every dimension | `Regularity.exists_contDiffOn_holder_ball` |
+| The same estimate for the weak solution | `Regularity.interior_holder_of_weakSolution` |
+| Sobolev embedding of $H_0^1(\Omega)$ | `Embedding.eLpNorm_le_of_mem_H01` |
+| Integrability of the weak solution above $L^2$ | `Embedding.eLpNorm_weakSolution_le` |
+| Rellich-Kondrachov below the critical exponent | `Embedding.rellichEmbL_isCompact_of_lt` |
+| Weak sequential compactness | `Analysis.exists_weakLimit` |
+| Direct method under a subcritical constraint | `Embedding.exists_minimiser_of_lt` |
+| Euler-Lagrange equation of that minimiser | `Embedding.exists_weakSolution_semilinear_of_lt` |
+| The same equation with no lower-order term | `Embedding.exists_weakSolution_dirichlet_of_lt` |
+| Variational principle for the principal eigenvalue | `Sobolev.exists_principal_eigenpair` |
+| Later eigenvalues by constrained minimisation | `Sobolev.exists_higher_eigenpair` |
+| The eigenvalue sequence | `Sobolev.exists_eigen_family` |
+| Dirichlet spectrum of the unit ball | `Sobolev.dirichlet_principal_eigenpair_ball` |
+| Positivity and finite multiplicity of the Dirichlet eigenvalues | `Sobolev.weak_eigenvalue_pos` |
+| Optimal constant in the Poincaré inequality | `Sobolev.dirichlet_poincare_sharp` |
+| Local step of global approximation | `Extension.tendsto_eLpNorm_translate_convolution_sub` |
+| Continuity of translation in $L^p$ | `Analysis.tendsto_eLpNorm_translate_sub` |
+| The two rigid motions of the extension operator | `Extension.hasWeakGradOn_comp_translate` |
+| The shear, the third map it runs on | `Extension.hasWeakGradOn_comp_shear` |
+| Local half of the extension operator | `Extension.hasWeakGradOn_chartExt` |
+| The $C^1$ boundary hypothesis | `Extension.HasC1Boundary` |
+| Relabelling and reorientation | `Extension.hasWeakGradOn_comp_linearIsometry` |
+| First step of the patching | `Extension.hasWeakGradOn_mul_cutoff_inter` |
+| The finite chart cover | `Extension.exists_finite_chart_cover` |
+| Partition of unity over that cover | `Extension.nonempty_boundaryPartition` |
+| The local extension | `Extension.exists_localExtension` |
+| The glued extension | `Extension.exists_extension` |
+| The support clause | `Extension.exists_extension_subset` |
+| The norm bound, clause (iii) | `Extension.exists_extension_subset_bound` |
+| The operator as a linear map | `Extension.extLinear` |
+| Gagliardo-Nirenberg-Sobolev on a bounded $C^1$ domain | `Embedding.exists_eLpNorm_sobolevConj_le_domain` |
+| Sobolev ladder on that domain | `Embedding.exists_const_memLp_of_gradClosed_domain` |
+| Hölder continuity up to the boundary | `Embedding.exists_const_holderOnWith_of_gradClosed_domain` |
+| Clause (ii) with classical derivatives | `Embedding.exists_const_contDiffOn_holderOnWith_of_gradClosed_domain` |
+| Both clauses of the order-$k$ embedding on a bounded $C^1$ domain | `Embedding.exists_const_memLp_of_gradClosed_domain_ideal` |
+| Both cases of the order-$k$ embedding off $p = 2$ | `Embedding.exists_holderOnWith_of_gradClosed_general` |
+| Sobolev ladder off $p = 2$ | `Embedding.memLp_of_gradClosed_general` |
+| The two general Sobolev estimates with their constants | `Embedding.exists_const_eLpNorm_le_of_gradClosed_fullStep` |
+| Hölder exponent in even dimension | `Embedding.exists_holderOnWith_of_gradClosed_even` |
+
+<details>
+<summary>Each result in full, with its reading against the cited statement</summary>
 
 - existence and uniqueness of the weak solution,
 - the Gårding inequality,
@@ -478,6 +533,8 @@ admissibility, and the weak quotient rule dividing a $C^1$ weight out of a weak
 derivative. The boundary estimate itself is not reached, and Schauder
 $C^{k,\alpha}$ estimates remain a roadmap item.
 
+</details>
+
 ## Dependency chain
 
 The analytic content reduces to the one-dimensional Poincaré inequality. From
@@ -521,7 +578,7 @@ coordinates as a sum of integrals, and leaves each statement `sorry`. Every resu
 but the Gårding inequality is stated for a bounded open $\Omega$, so the
 Rellich-Kondrachov compact embedding is discharged rather than assumed. Openness is
 what gives those five conclusions content: a test function has
-$\operatorname{tsupport} \varphi \subseteq \Omega$, so on a set of positive measure
+`tsupport φ ⊆ Ω`, so on a set of positive measure
 with empty interior every test function vanishes and $H_0^1(\Omega)$ is zero.
 `lean/Solution.lean` states the same six statements under the same names and proves
 them from the library.
