@@ -7,6 +7,7 @@ import EllipticPdes.Extension.PartitionOfUnity
 import EllipticPdes.Extension.Patch
 import EllipticPdes.Extension.Motion
 import EllipticPdes.Extension.BoundaryChart
+import EllipticPdes.Extension.Linearity
 
 /-!
 # Local boundary extension
@@ -120,27 +121,97 @@ theorem eLpNorm_bounded_mul_le {μ : Measure (EuclideanSpace ℝ (Fin d))}
 
 /-! ### The local extension -/
 
+/-- **The local extension, as a formula in the class.** The class is read in the chart's
+coordinates, cut off there, extended across the flattened boundary, and returned. Every step
+but the class itself is fixed by the chart, its graph `γ` and the cutoff `ξ`, so the whole is
+linear in the class. -/
+def localExtFun (c : C1Chart d) (γ ξ u : EuclideanSpace ℝ (Fin d) → ℝ) :
+    EuclideanSpace ℝ (Fin d) → ℝ :=
+  fun y => chartExt c.dir γ
+    (fun z => ξ (c.motion.symm z) * u (c.motion.symm z)) (c.motion y)
+
+/-- **The gradient of the local extension.** The cutoff contributes its own derivative by the
+product rule, the chart's rigid motion mixes the coordinates on the way in and on the way
+out, and the shear and the reflection supply the rest. -/
+def localExtGradFun (c : C1Chart d) (γ ξ u : EuclideanSpace ℝ (Fin d) → ℝ)
+    (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (k : Fin d) :
+    EuclideanSpace ℝ (Fin d) → ℝ :=
+  fun y => ∑ i, c.motion (EuclideanSpace.single k (1 : ℝ)) i *
+    chartExtGrad c.dir γ
+      (fun k' z => ∑ i', c.motion.symm (EuclideanSpace.single k' (1 : ℝ)) i' *
+        (ξ (c.motion.symm z) * g i' (c.motion.symm z)
+          + partialD i' ξ (c.motion.symm z) * u (c.motion.symm z))) i (c.motion y)
+
+
+/-- The bounded graph the chart's extension runs on. A chart's own graph need not have a
+bounded gradient, which every statement about the shear asks for, and `exists_bounded_graph`
+supplies one agreeing with it on the chart's ball. The choice is made from the chart alone,
+before any class appears, which is what keeps the extension linear. -/
+def chartGraph (c : C1Chart d) (x : EuclideanSpace ℝ (Fin d)) :
+    EuclideanSpace ℝ (Fin d) → ℝ :=
+  (exists_bounded_graph c.graph_contDiff c.graph_indep (c.motion x) c.radius_pos).choose
+
+/-- What `chartGraph` was chosen for. -/
+theorem chartGraph_spec (c : C1Chart d) (x : EuclideanSpace ℝ (Fin d)) :
+    ∃ M : ℝ, ContDiff ℝ 1 (chartGraph c x) ∧ IndepCoord c.dir (chartGraph c x) ∧
+      (∀ (k : Fin d) (y : EuclideanSpace ℝ (Fin d)),
+        ‖partialD k (chartGraph c x) y‖ ≤ M) ∧
+      aboveGraph c.dir (chartGraph c x) ∩ ball (c.motion x) c.radius
+        = aboveGraph c.dir c.graph ∩ ball (c.motion x) c.radius :=
+  (exists_bounded_graph c.graph_contDiff c.graph_indep (c.motion x) c.radius_pos).choose_spec
+
+/-- The cutoff between the ball the extension is asked for and the chart's own. Chosen from
+the two radii alone, before any class appears. -/
+def chartCutoff (x : EuclideanSpace ℝ (Fin d)) {r R : ℝ} (hrR : r < R) :
+    EuclideanSpace ℝ (Fin d) → ℝ :=
+  (exists_cutoff_one_on_ball x hrR).choose
+
+/-- What `chartCutoff` was chosen for. -/
+theorem chartCutoff_spec (x : EuclideanSpace ℝ (Fin d)) {r R : ℝ} (hrR : r < R) :
+    ContDiff ℝ (⊤ : ℕ∞) (chartCutoff x hrR) ∧
+      (∀ y ∈ closedBall x r, chartCutoff x hrR y = 1) ∧
+      tsupport (chartCutoff x hrR) ⊆ ball x R :=
+  (exists_cutoff_one_on_ball x hrR).choose_spec
+
+/-- **The local extension of a class.** `localExtFun` at the graph and the cutoff the chart
+fixes, so the only argument left is the class. -/
+def localExt (c : C1Chart d) (x : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hrc : r < c.radius)
+    (u : EuclideanSpace ℝ (Fin d) → ℝ) : EuclideanSpace ℝ (Fin d) → ℝ :=
+  localExtFun c (chartGraph c x) (chartCutoff x hrc) u
+
+/-- **The gradient of the local extension of a class.** -/
+def localExtGrad (c : C1Chart d) (x : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hrc : r < c.radius)
+    (u : EuclideanSpace ℝ (Fin d) → ℝ) (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) :
+    Fin d → EuclideanSpace ℝ (Fin d) → ℝ :=
+  localExtGradFun c (chartGraph c x) (chartCutoff x hrc) u g
+
 /-- **Guo's local boundary extension with its constant** (Theorem III.2.2, proof step 2, p. 21).
 Near a boundary point the class extends across the boundary: on any ball strictly inside the
-chart's, there is a class with a weak gradient there agreeing with the original on the part of
-the domain the ball meets, and both it and its gradient are bounded in every `Lᵖ` seminorm by
-the class and its gradient over the domain, with one constant taken before the class. -/
-theorem exists_localExtension_bound (c : C1Chart d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
+chart's, `localExt` has a weak gradient there and agrees with the original on the part of the
+domain the ball meets, and both it and its gradient are bounded in every `Lᵖ` seminorm by the
+class and its gradient over the domain, with one constant taken before the class.
+
+The extension is named rather than existentially quantified, which is what lets the operator
+be assembled as a linear map. -/
+theorem localExtension_bound (c : C1Chart d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
     (hΩm : MeasurableSet Ω) {x : EuclideanSpace ℝ (Fin d)} (hfits : c.Fits Ω x) {r : ℝ}
     (hrc : r < c.radius) {p : ℝ≥0∞} (hp : 1 ≤ p) :
     ∃ K : ℝ≥0, ∀ (u : EuclideanSpace ℝ (Fin d) → ℝ)
         (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
       IntegrableOn u Ω volume → (∀ k, IntegrableOn (g k) Ω volume) → HasWeakGradOn Ω u g →
-      ∃ (U : EuclideanSpace ℝ (Fin d) → ℝ) (G : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
-        HasWeakGradOn (ball x r) U G ∧ Integrable U volume ∧
-          (∀ k, Integrable (G k) volume) ∧ (∀ y ∈ Ω ∩ ball x r, U y = u y) ∧
-          eLpNorm U p volume ≤ (K : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
+      HasWeakGradOn (ball x r) (localExt c x hrc u) (localExtGrad c x hrc u g) ∧
+        Integrable (localExt c x hrc u) volume ∧
+          (∀ k, Integrable (localExtGrad c x hrc u g k) volume) ∧
+          (∀ y ∈ Ω ∩ ball x r, localExt c x hrc u y = u y) ∧
+          eLpNorm (localExt c x hrc u) p volume ≤ (K : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
             + ∑ i, eLpNorm (g i) p (volume.restrict Ω)) ∧
-          ∀ k, eLpNorm (G k) p volume ≤ (K : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
-            + ∑ i, eLpNorm (g i) p (volume.restrict Ω)) := by
+          ∀ k, eLpNorm (localExtGrad c x hrc u g k) p volume
+            ≤ (K : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
+              + ∑ i, eLpNorm (g i) p (volume.restrict Ω)) := by
   classical
-  obtain ⟨γ, M, hγC1, hγind, hγb, hγeq⟩ :=
-    exists_bounded_graph c.graph_contDiff c.graph_indep (c.motion x) c.radius_pos
+  simp only [localExt, localExtGrad, localExtFun]
+  obtain ⟨M, hγC1, hγind, hγb, hγeq⟩ := chartGraph_spec c x
+  set γ : EuclideanSpace ℝ (Fin d) → ℝ := chartGraph c x with hγdef
   have hM0 : (0 : ℝ) ≤ M := (norm_nonneg _).trans (hγb c.dir 0)
   -- the region of the bounded graph, in the original coordinates
   set A : Set (EuclideanSpace ℝ (Fin d)) := aboveGraph c.dir γ with hAdef
@@ -158,7 +229,8 @@ theorem exists_localExtension_bound (c : C1Chart d) {Ω : Set (EuclideanSpace �
       ← c.fits_ball hfits]
   have hsub : A' ∩ ball x c.radius ⊆ Ω := by rw [hAW]; exact Set.inter_subset_left
   -- the cutoff between the two balls
-  obtain ⟨ξ, hξC1, hξ1, hξs⟩ := exists_cutoff_one_on_ball x hrc
+  obtain ⟨hξC1, hξ1, hξs⟩ := chartCutoff_spec x hrc
+  set ξ : EuclideanSpace ℝ (Fin d) → ℝ := chartCutoff x hrc with hξdef
   have hξcs : HasCompactSupport ξ :=
     (isCompact_closedBall x c.radius).of_isClosed_subset (isClosed_tsupport ξ)
       (hξs.trans ball_subset_closedBall)
@@ -444,7 +516,7 @@ theorem exists_localExtension_bound (c : C1Chart d) {Ω : Set (EuclideanSpace �
           rw [hKredef]
           gcongr
           exact le_add_self
-  refine ⟨_, _, hfinal.mono (Set.subset_univ _),
+  refine ⟨hfinal.mono (Set.subset_univ _),
     (hmpM.integrable_comp_emb hmeM).mpr hIext,
     fun k => MeasureTheory.integrable_finsetSum _ fun i _ =>
       ((hmpM.integrable_comp_emb hmeM).mpr (hIextG i)).const_mul _, ?_, hUbound, hGbound⟩
@@ -457,6 +529,118 @@ theorem exists_localExtension_bound (c : C1Chart d) {Ω : Set (EuclideanSpace �
   rw [chartExt_eq_of_mem hγind hyA', hVdef]
   simp only [LinearIsometryEquiv.symm_apply_apply]
   rw [hξ1 y (ball_subset_closedBall hy.2), one_mul]
+
+/-! ### Linearity of the local extension -/
+
+/-- The chart extension of a class read through the chart is additive in the class. -/
+theorem localExtFun_add (c : C1Chart d) (γ ξ u v : EuclideanSpace ℝ (Fin d) → ℝ) :
+    localExtFun c γ ξ (fun y => u y + v y)
+      = fun y => localExtFun c γ ξ u y + localExtFun c γ ξ v y := by
+  have h : (fun z => ξ (c.motion.symm z) * (u (c.motion.symm z) + v (c.motion.symm z)))
+      = fun z => ξ (c.motion.symm z) * u (c.motion.symm z)
+        + ξ (c.motion.symm z) * v (c.motion.symm z) := by
+    funext z; ring
+  funext y
+  simp only [localExtFun, h, chartExt_add]
+
+/-- The chart extension of a class read through the chart commutes with a scalar. -/
+theorem localExtFun_smul (c : C1Chart d) (a : ℝ) (γ ξ u : EuclideanSpace ℝ (Fin d) → ℝ) :
+    localExtFun c γ ξ (fun y => a * u y) = fun y => a * localExtFun c γ ξ u y := by
+  have h : (fun z => ξ (c.motion.symm z) * (a * u (c.motion.symm z)))
+      = fun z => a * (ξ (c.motion.symm z) * u (c.motion.symm z)) := by
+    funext z; ring
+  funext y
+  simp only [localExtFun, h, chartExt_smul]
+
+/-- The gradient of that extension is additive in the class and its gradient. -/
+theorem localExtGradFun_add (c : C1Chart d) (γ ξ u v : EuclideanSpace ℝ (Fin d) → ℝ)
+    (g h : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (k : Fin d) :
+    localExtGradFun c γ ξ (fun y => u y + v y) (fun i y => g i y + h i y) k
+      = fun y => localExtGradFun c γ ξ u g k y + localExtGradFun c γ ξ v h k y := by
+  have hfam : (fun k' z => ∑ i', c.motion.symm (EuclideanSpace.single k' (1 : ℝ)) i' *
+        (ξ (c.motion.symm z) * (g i' (c.motion.symm z) + h i' (c.motion.symm z))
+          + partialD i' ξ (c.motion.symm z) * (u (c.motion.symm z) + v (c.motion.symm z))))
+      = fun k' z => (∑ i', c.motion.symm (EuclideanSpace.single k' (1 : ℝ)) i' *
+          (ξ (c.motion.symm z) * g i' (c.motion.symm z)
+            + partialD i' ξ (c.motion.symm z) * u (c.motion.symm z)))
+        + ∑ i', c.motion.symm (EuclideanSpace.single k' (1 : ℝ)) i' *
+          (ξ (c.motion.symm z) * h i' (c.motion.symm z)
+            + partialD i' ξ (c.motion.symm z) * v (c.motion.symm z)) := by
+    funext k' z
+    rw [← Finset.sum_add_distrib]
+    exact Finset.sum_congr rfl fun i' _ => by ring
+  funext y
+  simp only [localExtGradFun, hfam, chartExtGrad_add]
+  rw [← Finset.sum_add_distrib]
+  exact Finset.sum_congr rfl fun i _ => by ring
+
+/-- The gradient of that extension commutes with a scalar. -/
+theorem localExtGradFun_smul (c : C1Chart d) (a : ℝ) (γ ξ u : EuclideanSpace ℝ (Fin d) → ℝ)
+    (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (k : Fin d) :
+    localExtGradFun c γ ξ (fun y => a * u y) (fun i y => a * g i y) k
+      = fun y => a * localExtGradFun c γ ξ u g k y := by
+  have hfam : (fun k' z => ∑ i', c.motion.symm (EuclideanSpace.single k' (1 : ℝ)) i' *
+        (ξ (c.motion.symm z) * (a * g i' (c.motion.symm z))
+          + partialD i' ξ (c.motion.symm z) * (a * u (c.motion.symm z))))
+      = fun k' z => a * ∑ i', c.motion.symm (EuclideanSpace.single k' (1 : ℝ)) i' *
+          (ξ (c.motion.symm z) * g i' (c.motion.symm z)
+            + partialD i' ξ (c.motion.symm z) * u (c.motion.symm z)) := by
+    funext k' z
+    rw [Finset.mul_sum]
+    exact Finset.sum_congr rfl fun i' _ => by ring
+  funext y
+  simp only [localExtGradFun, hfam, chartExtGrad_smul]
+  rw [Finset.mul_sum]
+  exact Finset.sum_congr rfl fun i _ => by ring
+
+/-- **The local extension is additive in the class.** -/
+theorem localExt_add (c : C1Chart d) (x : EuclideanSpace ℝ (Fin d)) {r : ℝ}
+    (hrc : r < c.radius) (u v : EuclideanSpace ℝ (Fin d) → ℝ) :
+    localExt c x hrc (fun y => u y + v y)
+      = fun y => localExt c x hrc u y + localExt c x hrc v y :=
+  localExtFun_add c _ _ u v
+
+/-- **The local extension commutes with a scalar.** -/
+theorem localExt_smul (c : C1Chart d) (x : EuclideanSpace ℝ (Fin d)) {r : ℝ}
+    (hrc : r < c.radius) (a : ℝ) (u : EuclideanSpace ℝ (Fin d) → ℝ) :
+    localExt c x hrc (fun y => a * u y) = fun y => a * localExt c x hrc u y :=
+  localExtFun_smul c a _ _ u
+
+/-- **The gradient of the local extension is additive in the class and its gradient.** -/
+theorem localExtGrad_add (c : C1Chart d) (x : EuclideanSpace ℝ (Fin d)) {r : ℝ}
+    (hrc : r < c.radius) (u v : EuclideanSpace ℝ (Fin d) → ℝ)
+    (g h : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (k : Fin d) :
+    localExtGrad c x hrc (fun y => u y + v y) (fun i y => g i y + h i y) k
+      = fun y => localExtGrad c x hrc u g k y + localExtGrad c x hrc v h k y :=
+  localExtGradFun_add c _ _ u v g h k
+
+/-- **The gradient of the local extension commutes with a scalar.** -/
+theorem localExtGrad_smul (c : C1Chart d) (x : EuclideanSpace ℝ (Fin d)) {r : ℝ}
+    (hrc : r < c.radius) (a : ℝ) (u : EuclideanSpace ℝ (Fin d) → ℝ)
+    (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (k : Fin d) :
+    localExtGrad c x hrc (fun y => a * u y) (fun i y => a * g i y) k
+      = fun y => a * localExtGrad c x hrc u g k y :=
+  localExtGradFun_smul c a _ _ u g k
+
+/-- **Guo's local boundary extension with its constant**, with the extension quantified away.
+This is the form the gluing of step 3 consumes. -/
+theorem exists_localExtension_bound (c : C1Chart d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    (hΩm : MeasurableSet Ω) {x : EuclideanSpace ℝ (Fin d)} (hfits : c.Fits Ω x) {r : ℝ}
+    (hrc : r < c.radius) {p : ℝ≥0∞} (hp : 1 ≤ p) :
+    ∃ K : ℝ≥0, ∀ (u : EuclideanSpace ℝ (Fin d) → ℝ)
+        (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
+      IntegrableOn u Ω volume → (∀ k, IntegrableOn (g k) Ω volume) → HasWeakGradOn Ω u g →
+      ∃ (U : EuclideanSpace ℝ (Fin d) → ℝ) (G : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
+        HasWeakGradOn (ball x r) U G ∧ Integrable U volume ∧
+          (∀ k, Integrable (G k) volume) ∧ (∀ y ∈ Ω ∩ ball x r, U y = u y) ∧
+          eLpNorm U p volume ≤ (K : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
+            + ∑ i, eLpNorm (g i) p (volume.restrict Ω)) ∧
+          ∀ k, eLpNorm (G k) p volume ≤ (K : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
+            + ∑ i, eLpNorm (g i) p (volume.restrict Ω)) := by
+  obtain ⟨K, hK⟩ := localExtension_bound c hΩm hfits hrc hp
+  refine ⟨K, fun u g hu hgi hwg => ?_⟩
+  obtain ⟨h1, h2, h3, h4, h5, h6⟩ := hK u g hu hgi hwg
+  exact ⟨_, _, h1, h2, h3, h4, h5, h6⟩
 
 /-- **Guo's local boundary extension** (Theorem III.2.2, proof step 2, p. 21). Near a boundary
 point the class extends across the boundary: on any ball strictly inside the chart's, there is a
