@@ -84,7 +84,7 @@ prefix.
 | Hölder exponent in even dimension | `Embedding.exists_holderOnWith_of_gradClosed_even` |
 
 <details>
-<summary>Each result in full, with its reading against the cited statement</summary>
+<summary>Each result with its reading against the cited statement</summary>
 
 - existence and uniqueness of the weak solution,
 - the Gårding inequality,
