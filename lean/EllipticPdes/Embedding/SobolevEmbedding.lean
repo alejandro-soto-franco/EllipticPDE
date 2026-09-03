@@ -13,8 +13,8 @@ For `Ω ⊆ ℝⁿ` open and bounded with `∂Ω` of class `C¹`, `p ∈ [1, ∞
 `u ∈ W^{k,p}(Ω)`,
 
 * if `k < n/p` then `u ∈ L^q(Ω)` with `1/q = 1/p - k/n` and `‖u‖_{L^q} ≤ C‖u‖_{W^{k,p}}`;
-* if `k > n/p` then `u ∈ C^{k-1-⌊n/p⌋,γ}(Ω̄)` with `γ` any value in `(0,1)` when `n/p ∈ ℕ` and
-  `γ = ⌊n/p⌋ - n/p + 1` otherwise, and `‖u‖_{C^{k-1-⌊n/p⌋,γ}} ≤ C‖u‖_{W^{k,p}}`.
+* if `k > n/p` then `u ∈ C^{k-1-⌊n/p⌋,γ}(closure Ω)` with `γ` any value in `(0,1)` when
+  `n/p ∈ ℕ` and `γ = ⌊n/p⌋ - n/p + 1` otherwise, and `‖u‖_{C^{k-1-⌊n/p⌋,γ}} ≤ C‖u‖_{W^{k,p}}`.
 
 This file states both clauses at the exponents the theorem names. Theorem IV.2.3 of the lecture
 notes cited below is the form followed here.

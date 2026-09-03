@@ -10,19 +10,21 @@ import EllipticPdes.Embedding.ClassicalDeriv
 # Classical derivatives up to the boundary
 
 `EllipticPdes.Embedding.exists_const_holderOnWith_of_gradClosed_domain` produces a bounded
-Hölder representative of each member separately. `u ∈ C^{k-1-⌊n/p⌋,γ}(Ω̄)` says more: one
+Hölder representative of each member separately. `u ∈ C^{k-1-⌊n/p⌋,γ}(closure Ω)` says more: one
 function, differentiable to order `k - 1 - ⌊n/p⌋` on `Ω`, whose derivatives are the members
-themselves and whose top derivatives are `γ`-Hölder on `Ω̄`. This file supplies that.
+themselves and whose top derivatives are `γ`-Hölder on `closure Ω`. This file supplies that.
 
 The representatives are chosen once, before any of them is read, so a single family `v` serves
-every index. Each `v i` is continuous on `Ω̄`, hence on `Ω`, and integrable there, and it has the
-weak gradient `fun k => v (nxt i k)` because a weak gradient sees only the almost-everywhere
-class. `EllipticPdes.Embedding.hasFDerivAt_of_continuousOn_hasWeakGradOn` then makes the weak
+every index. Each `v i` is continuous on `closure Ω`, hence on `Ω`, and integrable there, and
+it has the weak gradient `fun k => v (nxt i k)` because a weak gradient sees only the
+almost-everywhere class.
+`EllipticPdes.Embedding.hasFDerivAt_of_continuousOn_hasWeakGradOn` then makes the weak
 gradient a classical one at every point of `Ω`, and an induction on the order remaining reads
 `ContDiffOn` off the chain.
 
 The estimate is the one the clause states: the constant is quantified before the family, and it
-bounds the supremum and the Hölder seminorm of every member on `Ω̄` by a uniform `L^{p₀}` bound.
+bounds the supremum and the Hölder seminorm of every member on `closure Ω` by a uniform
+`L^{p₀}` bound.
 
 ## References
 
@@ -42,8 +44,9 @@ open EllipticPdes.Extension (HasC1Boundary)
 variable {d : ℕ}
 
 /-- **Clause (ii) of the embedding with classical derivatives.** One family of representatives
-serves every index: each is bounded and Hölder on `Ω̄` under the constant the clause names, each
-of low enough depth is differentiable on `Ω` with the next members as its partial derivatives,
+serves every index: each is bounded and Hölder on `closure Ω` under the constant the clause
+names, each of low enough depth is differentiable on `Ω` with the next members as its partial
+derivatives,
 and each is `n` times continuously differentiable on `Ω` whenever the supply leaves `n` orders
 above it. -/
 theorem exists_const_contDiffOn_holderOnWith_of_gradClosed_domain (hd : 1 < d)
