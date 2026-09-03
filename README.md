@@ -291,9 +291,23 @@ Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
   `exists_extension_bound` sums the local constants over the finitely many
   pieces. The five estimates the chain threads are the cutoff's supremum, the
   rigid motion, the reflection, the shear and the sum over the coordinates the
-  motion mixes. The operator is still not packaged as a bounded linear map: the
-  statement gives a constant and an extension for each class, and no linear map
-  between the two spaces,
+  motion mixes,
+- the operator itself, as `EllipticPdes.Extension.extLinear` and
+  `EllipticPdes.Extension.exists_extLinear`, which is §5.4 Theorem 1 of Evans
+  as he states it: one $\mathbb{R}$-linear map and one constant serving every
+  class. The named forms `localExtension_bound`, `extension_bound` and
+  `extension_subset_bound` state the three clauses against
+  `EllipticPdes.Extension.extSubsetFun` in place of an existential, and the
+  three earlier `exists_` forms are corollaries of them, so nothing downstream
+  changed. Linearity is available because the partition, the charts, the
+  bounded graphs, the radii and the two cutoffs are all chosen from the domain
+  alone, before any class appears: what is left is multiplication by fixed
+  functions, precomposition with fixed maps, and a finite sum. The map acts on
+  `EllipticPdes.Extension.SobolevPair`, a class paired with a candidate
+  gradient, because this development relates the two through `HasWeakGradOn`
+  rather than through a bundled Sobolev space; the bound is therefore stated on
+  the pair in place of an operator norm, and it is stated at every exponent
+  rather than at $2$,
 - the Gagliardo-Nirenberg-Sobolev inequality on a bounded domain with $C^1$
   boundary, as
   `EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_domain`, the single rung

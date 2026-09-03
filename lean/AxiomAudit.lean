@@ -498,6 +498,24 @@ import EllipticPdes
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Extension.exists_extension_subset_bound
 
+/-! ### The extension operator as a linear map -/
+
+/-- info: 'EllipticPdes.Extension.localExtension_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Extension.localExtension_bound
+
+/-- info: 'EllipticPdes.Extension.extension_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Extension.extension_bound
+
+/-- info: 'EllipticPdes.Extension.extension_subset_bound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Extension.extension_subset_bound
+
+/-- info: 'EllipticPdes.Extension.exists_extLinear' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Extension.exists_extLinear
+
 /-! ### Sobolev embedding on a bounded `C¹` domain -/
 
 /-- info: 'EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_domain' depends on axioms: [propext, Classical.choice, Quot.sound] -/

@@ -579,6 +579,30 @@
       "source_id": "evans-2010",
       "locator": "§5.6.3 Thm 6",
       "claim": "the same statement where n/p is an integer, where the theorem leaves the Hölder exponent free: the representatives are differentiable to order k - 1 - n/p on the domain and Hölder on the closure at every exponent in (0,1)"
+    },
+    {
+      "decl": "EllipticPdes.Extension.localExtension_bound",
+      "source_id": "evans-2010",
+      "locator": "§5.4 Thm 1",
+      "claim": "formalises the local half of the theorem, on one boundary chart, against a named extension rather than an existentially quantified one. Evans reflects across a flattened boundary with the higher-order formula that keeps the extension C^1; this reflects evenly, which is what a statement about weak gradients throughout needs, and the chart's graph and cutoff are chosen from the chart alone so that the extension is a formula in the class"
+    },
+    {
+      "decl": "EllipticPdes.Extension.extension_bound",
+      "source_id": "evans-2010",
+      "locator": "§5.4 Thm 1",
+      "claim": "formalises the theorem without its support clause, against a named extension: the pieces of a given partition of unity are summed, and the estimate of clause (iii) has its constant quantified before the class. The partition is an argument rather than a choice inside the proof, which is what lets the sum be read as a function of the class"
+    },
+    {
+      "decl": "EllipticPdes.Extension.extension_subset_bound",
+      "source_id": "evans-2010",
+      "locator": "§5.4 Thm 1",
+      "claim": "formalises the theorem in full against a named extension: agreement on the domain, support inside any open set the closure of the domain sits in, and the norm bound on the class and its gradient. The partition and the outer cutoff are arguments, so the statement names the function the operator sends the class to"
+    },
+    {
+      "decl": "EllipticPdes.Extension.exists_extLinear",
+      "source_id": "evans-2010",
+      "locator": "§5.4 Thm 1",
+      "claim": "formalises the theorem as Evans states it, as one linear map and one constant serving every class. The cited statement gives a bounded linear operator between W^{1,p}(U) and W^{1,p}(R^n); the statement here gives an R-linear map on the pair of a class and its gradient, with the three clauses and the bound holding of every pair that has a weak gradient on the domain, at every exponent. The difference is the space: this development relates a class to its gradient through HasWeakGradOn rather than through a bundled Sobolev space, so the bound is stated on the pair in place of an operator norm"
     }
   ]
 }

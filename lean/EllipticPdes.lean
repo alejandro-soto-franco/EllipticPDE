@@ -91,12 +91,14 @@ import EllipticPdes.Extension.EvenReflection
 import EllipticPdes.Extension.Shear
 import EllipticPdes.Extension.ShearWeakGrad
 import EllipticPdes.Extension.BoundaryChart
+import EllipticPdes.Extension.Linearity
 import EllipticPdes.Extension.C1Boundary
 import EllipticPdes.Extension.Motion
 import EllipticPdes.Extension.Patch
 import EllipticPdes.Extension.PartitionOfUnity
 import EllipticPdes.Extension.LocalExtension
 import EllipticPdes.Extension.Operator
+import EllipticPdes.Extension.LinearOperator
 import EllipticPdes.Extension.Reflect
 import EllipticPdes.Extension.Translate
 import EllipticPdes.Analysis.LpTranslationContinuity

@@ -108,37 +108,114 @@ private theorem exists_bound_with_partials {h : EuclideanSpace ℝ (Fin d) → �
     Finset.single_le_sum (f := fun j => Ck j) (fun j _ => hCk0 j) (Finset.mem_univ k)
   exact (hCk k y).trans (by linarith)
 
+/-! ### The partition, the radii and the pieces, all fixed by the domain -/
+
+/-- A boundary piece of the partition is supported in its chart's ball, hence compactly. -/
+theorem hasCompactSupport_part_some {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    (P : BoundaryPartition d Ω) (x : {x // x ∈ P.centres}) :
+    HasCompactSupport (P.part (some x)) :=
+  (isCompact_closedBall (x : EuclideanSpace ℝ (Fin d)) (P.chart x).radius).of_isClosed_subset
+    (isClosed_tsupport _) ((P.part_boundary x).trans ball_subset_closedBall)
+
+/-- The ball the local extension of a boundary piece is taken on: strictly inside the chart's,
+and still containing the support of the piece. Chosen from the partition alone. -/
+def pieceRadius {Ω : Set (EuclideanSpace ℝ (Fin d))} (P : BoundaryPartition d Ω)
+    (x : {x // x ∈ P.centres}) : ℝ :=
+  (exists_lt_radius_of_isCompact_subset_ball (P.chart x).radius_pos
+    (hasCompactSupport_part_some P x) (P.part_boundary x)).choose
+
+/-- What `pieceRadius` was chosen for. -/
+theorem pieceRadius_spec {Ω : Set (EuclideanSpace ℝ (Fin d))} (P : BoundaryPartition d Ω)
+    (x : {x // x ∈ P.centres}) :
+    pieceRadius P x < (P.chart x).radius ∧ 0 < pieceRadius P x ∧
+      tsupport (P.part (some x)) ⊆ ball (x : EuclideanSpace ℝ (Fin d)) (pieceRadius P x) :=
+  (exists_lt_radius_of_isCompact_subset_ball (P.chart x).radius_pos
+    (hasCompactSupport_part_some P x) (P.part_boundary x)).choose_spec
+
+/-- The chosen ball sits strictly inside the chart's. -/
+theorem pieceRadius_lt {Ω : Set (EuclideanSpace ℝ (Fin d))} (P : BoundaryPartition d Ω)
+    (x : {x // x ∈ P.centres}) : pieceRadius P x < (P.chart x).radius :=
+  (pieceRadius_spec P x).1
+
+/-- The chosen ball still contains the support of the piece. -/
+theorem tsupport_part_subset_pieceRadius {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    (P : BoundaryPartition d Ω) (x : {x // x ∈ P.centres}) :
+    tsupport (P.part (some x)) ⊆ ball (x : EuclideanSpace ℝ (Fin d)) (pieceRadius P x) :=
+  (pieceRadius_spec P x).2.2
+
+/-- **One piece of the glued extension.** The interior piece is the class extended by zero and
+cut down by its piece of the partition; a boundary piece is the local extension of its chart,
+cut down the same way. The cutoff comes after the extension, which is what makes the piece
+agree with `Pᵢ u` on the domain. -/
+def extPiece {Ω : Set (EuclideanSpace ℝ (Fin d))} (P : BoundaryPartition d Ω)
+    (i : Option {x // x ∈ P.centres}) (u : EuclideanSpace ℝ (Fin d) → ℝ) :
+    EuclideanSpace ℝ (Fin d) → ℝ :=
+  match i with
+  | none => fun y => P.part none y * Ω.indicator u y
+  | some x => fun y => P.part (some x) y *
+      (ball (x : EuclideanSpace ℝ (Fin d)) (pieceRadius P x)).indicator
+        (localExt (P.chart x) x (pieceRadius_lt P x) u) y
+
+/-- **The gradient of one piece**, with the product rule's second term. -/
+def extPieceGrad {Ω : Set (EuclideanSpace ℝ (Fin d))} (P : BoundaryPartition d Ω)
+    (i : Option {x // x ∈ P.centres}) (u : EuclideanSpace ℝ (Fin d) → ℝ)
+    (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (k : Fin d) :
+    EuclideanSpace ℝ (Fin d) → ℝ :=
+  match i with
+  | none => fun y => P.part none y * Ω.indicator (g k) y
+      + partialD k (P.part none) y * Ω.indicator u y
+  | some x => fun y => P.part (some x) y *
+      (ball (x : EuclideanSpace ℝ (Fin d)) (pieceRadius P x)).indicator
+        (localExtGrad (P.chart x) x (pieceRadius_lt P x) u g k) y
+      + partialD k (P.part (some x)) y *
+        (ball (x : EuclideanSpace ℝ (Fin d)) (pieceRadius P x)).indicator
+          (localExt (P.chart x) x (pieceRadius_lt P x) u) y
+
+/-- **The glued extension.** The pieces add to the class on the domain because the partition
+adds to one there. -/
+def extFun {Ω : Set (EuclideanSpace ℝ (Fin d))} (P : BoundaryPartition d Ω)
+    (u : EuclideanSpace ℝ (Fin d) → ℝ) : EuclideanSpace ℝ (Fin d) → ℝ :=
+  fun y => ∑ i, extPiece P i u y
+
+/-- **The gradient of the glued extension.** -/
+def extFunGrad {Ω : Set (EuclideanSpace ℝ (Fin d))} (P : BoundaryPartition d Ω)
+    (u : EuclideanSpace ℝ (Fin d) → ℝ) (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ)
+    (k : Fin d) : EuclideanSpace ℝ (Fin d) → ℝ :=
+  fun y => ∑ i, extPieceGrad P i u g k y
+
 /-- **Guo's third step with its constant** (Theorem III.2.2, proof step 3, p. 22): the local
 extensions glued with the partition of unity extend the class across the whole boundary, and one
 constant, taken before the class, bounds the extension and its gradient by the class and its
 gradient over the domain. -/
-theorem exists_extension_bound (hd : 0 < d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
-    (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBounded Ω) (hC1 : HasC1Boundary Ω)
+theorem extension_bound {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBounded Ω) (P : BoundaryPartition d Ω)
     {p : ℝ≥0∞} (hp : 1 ≤ p) :
     ∃ K : ℝ≥0, ∀ (u : EuclideanSpace ℝ (Fin d) → ℝ)
         (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
       IntegrableOn u Ω volume → (∀ k, IntegrableOn (g k) Ω volume) → HasWeakGradOn Ω u g →
-      ∃ (U : EuclideanSpace ℝ (Fin d) → ℝ) (G : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
-        HasWeakGradOn Set.univ U G ∧ Integrable U volume ∧
-          (∀ k, Integrable (G k) volume) ∧ (∀ y ∈ Ω, U y = u y) ∧
-          eLpNorm U p volume ≤ (K : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
+        HasWeakGradOn Set.univ (extFun P u) (extFunGrad P u g) ∧
+          Integrable (extFun P u) volume ∧
+          (∀ k, Integrable (extFunGrad P u g k) volume) ∧
+          (∀ y ∈ Ω, extFun P u y = u y) ∧
+          eLpNorm (extFun P u) p volume ≤ (K : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
             + ∑ i, eLpNorm (g i) p (volume.restrict Ω)) ∧
-          ∀ k, eLpNorm (G k) p volume ≤ (K : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
-            + ∑ i, eLpNorm (g i) p (volume.restrict Ω)) := by
+          ∀ k, eLpNorm (extFunGrad P u g k) p volume
+            ≤ (K : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
+              + ∑ i, eLpNorm (g i) p (volume.restrict Ω)) := by
   classical
-  obtain ⟨P⟩ := nonempty_boundaryPartition hd hΩopen hΩb hC1
   obtain ⟨Rb, hRb⟩ := hΩb.subset_closedBall (0 : EuclideanSpace ℝ (Fin d))
   have hpiece : ∀ i : Option {x // x ∈ P.centres}, ∃ Ki : ℝ≥0,
       ∀ (u : EuclideanSpace ℝ (Fin d) → ℝ) (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
         IntegrableOn u Ω volume → (∀ k, IntegrableOn (g k) Ω volume) → HasWeakGradOn Ω u g →
-        ∃ (Ui : EuclideanSpace ℝ (Fin d) → ℝ) (Gi : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
-          HasWeakGradOn Set.univ Ui Gi ∧ Integrable Ui volume ∧
-            (∀ k, Integrable (Gi k) volume) ∧
-            (∀ y ∈ Ω, Ui y = P.part i y * u y) ∧
-            eLpNorm Ui p volume ≤ (Ki : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
+          HasWeakGradOn Set.univ (extPiece P i u) (extPieceGrad P i u g) ∧
+            Integrable (extPiece P i u) volume ∧
+            (∀ k, Integrable (extPieceGrad P i u g k) volume) ∧
+            (∀ y ∈ Ω, extPiece P i u y = P.part i y * u y) ∧
+            eLpNorm (extPiece P i u) p volume ≤ (Ki : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
               + ∑ j, eLpNorm (g j) p (volume.restrict Ω)) ∧
-            ∀ k, eLpNorm (Gi k) p volume ≤ (Ki : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
-              + ∑ j, eLpNorm (g j) p (volume.restrict Ω)) := by
+            ∀ k, eLpNorm (extPieceGrad P i u g k) p volume
+              ≤ (Ki : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
+                + ∑ j, eLpNorm (g j) p (volume.restrict Ω)) := by
     rintro (_ | x)
     · -- The interior piece, applied to the class extended by zero.
       have hcs : HasCompactSupport (P.part none) :=
@@ -159,16 +236,13 @@ theorem exists_extension_bound (hd : 0 < d) {Ω : Set (EuclideanSpace ℝ (Fin d
       have hind : ∀ w : EuclideanSpace ℝ (Fin d) → ℝ,
           eLpNorm (Ω.indicator w) p volume = eLpNorm w p (volume.restrict Ω) := fun w =>
         eLpNorm_indicator_eq_eLpNorm_restrict hΩopen.measurableSet
-      refine ⟨fun y => P.part none y * Ω.indicator u y,
-        fun k y => P.part none y * Ω.indicator (g k) y
-          + partialD k (P.part none) y * Ω.indicator u y,
-        hasWeakGradOn_univ_mul_cutoff hΩopen.measurableSet (P.part_contDiff none) hcs
+      simp only [extPiece, extPieceGrad]
+      refine ⟨hasWeakGradOn_univ_mul_cutoff hΩopen.measurableSet (P.part_contDiff none) hcs
           P.part_interior hu hgi hwg,
         integrableOn_univ.mp (intMul hiu hcs hpc),
         fun k => integrableOn_univ.mp ((intMul (hig k) hcs hpc).add (intMul hiu (hpdcs k) (hpd k))),
         ?_, ?_, ?_⟩
       · intro y hy
-        dsimp only
         rw [Set.indicator_of_mem hy]
       · rw [hcoe]
         calc eLpNorm (fun y => P.part none y * Ω.indicator u y) p volume
@@ -212,9 +286,11 @@ theorem exists_extension_bound (hd : 0 < d) {Ω : Set (EuclideanSpace ℝ (Fin d
       have hcs : HasCompactSupport (P.part (some x)) :=
         (isCompact_closedBall (x : EuclideanSpace ℝ (Fin d)) (P.chart x).radius).of_isClosed_subset
           (isClosed_tsupport _) ((P.part_boundary x).trans ball_subset_closedBall)
-      obtain ⟨r, hrlt, hrpos, hrsub⟩ := exists_lt_radius_of_isCompact_subset_ball
-        (P.chart x).radius_pos hcs (P.part_boundary x)
-      obtain ⟨Kx, hKx⟩ := exists_localExtension_bound (P.chart x) hΩopen.measurableSet
+      set r : ℝ := pieceRadius P x with hrdef
+      have hrlt : r < (P.chart x).radius := pieceRadius_lt P x
+      have hrsub : tsupport (P.part (some x)) ⊆ ball (x : EuclideanSpace ℝ (Fin d)) r :=
+        tsupport_part_subset_pieceRadius P x
+      obtain ⟨Kx, hKx⟩ := localExtension_bound (P.chart x) hΩopen.measurableSet
         (P.chart_fits x x.2) hrlt hp
       have hpc : Continuous (P.part (some x)) := (P.part_contDiff (some x)).continuous
       have hpd : ∀ k : Fin d, Continuous (partialD k (P.part (some x))) := fun k =>
@@ -226,7 +302,10 @@ theorem exists_extension_bound (hd : 0 < d) {Ω : Set (EuclideanSpace ℝ (Fin d
       have hcoe : (((Real.toNNReal C + Real.toNNReal C) * Kx : ℝ≥0) : ℝ≥0∞)
           = (ENNReal.ofReal C + ENNReal.ofReal C) * (Kx : ℝ≥0∞) := by
         rw [ENNReal.coe_mul, ENNReal.coe_add]; rfl
-      obtain ⟨Ux, Gx, hUxwg, hUxint, hGxint, hUxag, hUxb, hGxb⟩ := hKx u g hu hgi hwg
+      obtain ⟨hUxwg, hUxint, hGxint, hUxag, hUxb, hGxb⟩ := hKx u g hu hgi hwg
+      set Ux : EuclideanSpace ℝ (Fin d) → ℝ := localExt (P.chart x) x hrlt u with hUxdef
+      set Gx : Fin d → EuclideanSpace ℝ (Fin d) → ℝ :=
+        localExtGrad (P.chart x) x hrlt u g with hGxdef
       have hUxOn : IntegrableOn Ux (ball (x : EuclideanSpace ℝ (Fin d)) r) volume :=
         MeasureTheory.Integrable.integrableOn hUxint
       have hGxOn : ∀ k, IntegrableOn (Gx k) (ball (x : EuclideanSpace ℝ (Fin d)) r) volume :=
@@ -244,17 +323,13 @@ theorem exists_extension_bound (hd : 0 < d) {Ω : Set (EuclideanSpace ℝ (Fin d
         intro w
         rw [eLpNorm_indicator_eq_eLpNorm_restrict measurableSet_ball]
         exact eLpNorm_mono_measure _ Measure.restrict_le_self
-      refine ⟨fun y => P.part (some x) y * (ball (x : EuclideanSpace ℝ (Fin d)) r).indicator Ux y,
-        fun k y => P.part (some x) y * (ball (x : EuclideanSpace ℝ (Fin d)) r).indicator (Gx k) y
-          + partialD k (P.part (some x)) y
-            * (ball (x : EuclideanSpace ℝ (Fin d)) r).indicator Ux y,
-        hasWeakGradOn_univ_mul_cutoff measurableSet_ball (P.part_contDiff (some x)) hcs
+      simp only [extPiece, extPieceGrad, ← hrdef, ← hUxdef, ← hGxdef]
+      refine ⟨hasWeakGradOn_univ_mul_cutoff measurableSet_ball (P.part_contDiff (some x)) hcs
           hrsub hUxOn hGxOn hUxwg,
         integrableOn_univ.mp (intMul hiu hcs hpc),
         fun k => integrableOn_univ.mp ((intMul (hig k) hcs hpc).add (intMul hiu (hpdcs k) (hpd k))),
         ?_, ?_, ?_⟩
       · intro y hy
-        dsimp only
         by_cases hyb : y ∈ ball (x : EuclideanSpace ℝ (Fin d)) r
         · rw [Set.indicator_of_mem hyb, hUxag y ⟨hy, hyb⟩]
         · rw [Set.indicator_of_notMem hyb,
@@ -280,7 +355,20 @@ theorem exists_extension_bound (hd : 0 < d) {Ω : Set (EuclideanSpace ℝ (Fin d
   choose Ki hKi using hpiece
   refine ⟨∑ i, Ki i, ?_⟩
   intro u g hu hgi hwg
-  choose Ui Gi hwgi hint hgint hag hUb hGb using fun i => hKi i u g hu hgi hwg
+  have hwgi : ∀ i, HasWeakGradOn Set.univ (extPiece P i u) (extPieceGrad P i u g) :=
+    fun i => (hKi i u g hu hgi hwg).1
+  have hint : ∀ i, Integrable (extPiece P i u) volume :=
+    fun i => (hKi i u g hu hgi hwg).2.1
+  have hgint : ∀ i k, Integrable (extPieceGrad P i u g k) volume :=
+    fun i => (hKi i u g hu hgi hwg).2.2.1
+  have hag : ∀ i, ∀ y ∈ Ω, extPiece P i u y = P.part i y * u y :=
+    fun i => (hKi i u g hu hgi hwg).2.2.2.1
+  have hUb : ∀ i, eLpNorm (extPiece P i u) p volume ≤ (Ki i : ℝ≥0∞)
+      * (eLpNorm u p (volume.restrict Ω) + ∑ j, eLpNorm (g j) p (volume.restrict Ω)) :=
+    fun i => (hKi i u g hu hgi hwg).2.2.2.2.1
+  have hGb : ∀ i k, eLpNorm (extPieceGrad P i u g k) p volume ≤ (Ki i : ℝ≥0∞)
+      * (eLpNorm u p (volume.restrict Ω) + ∑ j, eLpNorm (g j) p (volume.restrict Ω)) :=
+    fun i => (hKi i u g hu hgi hwg).2.2.2.2.2
   have hsumfun : ∀ w : Option {x // x ∈ P.centres} → EuclideanSpace ℝ (Fin d) → ℝ,
       (fun y => ∑ i, w i y) = ∑ i, w i := by
     intro w
@@ -298,18 +386,41 @@ theorem exists_extension_bound (hd : 0 < d) {Ω : Set (EuclideanSpace ℝ (Fin d
     refine le_trans (eLpNorm_sum_le (fun i _ => hwm i) hp) ?_
     refine le_trans (Finset.sum_le_sum fun i _ => hwb i) ?_
     rw [← Finset.sum_mul, ENNReal.coe_finsetSum]
-  refine ⟨fun y => ∑ i, Ui i y, fun k y => ∑ i, Gi i k y, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  simp only [extFun]
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
   · exact hasWeakGradOn_finsetSum Finset.univ (fun i _ => (hint i).integrableOn)
       (fun i _ k => (hgint i k).integrableOn) (fun i _ => hwgi i)
   · exact MeasureTheory.integrable_finsetSum _ fun i _ => hint i
   · exact fun k => MeasureTheory.integrable_finsetSum _ fun i _ => hgint i k
   · intro y hy
-    calc (∑ i, Ui i y) = ∑ i, P.part i y * u y :=
+    calc (∑ i, extPiece P i u y) = ∑ i, P.part i y * u y :=
           Finset.sum_congr rfl fun i _ => hag i y hy
       _ = (∑ i, P.part i y) * u y := (Finset.sum_mul _ _ _).symm
       _ = u y := by rw [P.part_sum y (subset_closure hy), one_mul]
-  · exact hbound Ui (fun i => (hint i).1) hUb
-  · exact fun k => hbound (fun i => Gi i k) (fun i => (hgint i k).1) (fun i => hGb i k)
+  · exact hbound (fun i => extPiece P i u) (fun i => (hint i).1) hUb
+  · exact fun k => hbound (fun i => extPieceGrad P i u g k)
+      (fun i => (hgint i k).1) (fun i => hGb i k)
+
+/-- **Guo's third step with its constant**, with the partition and the extension quantified
+away. This is the form the support clause and the embedding consume. -/
+theorem exists_extension_bound (hd : 0 < d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBounded Ω) (hC1 : HasC1Boundary Ω)
+    {p : ℝ≥0∞} (hp : 1 ≤ p) :
+    ∃ K : ℝ≥0, ∀ (u : EuclideanSpace ℝ (Fin d) → ℝ)
+        (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
+      IntegrableOn u Ω volume → (∀ k, IntegrableOn (g k) Ω volume) → HasWeakGradOn Ω u g →
+      ∃ (U : EuclideanSpace ℝ (Fin d) → ℝ) (G : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
+        HasWeakGradOn Set.univ U G ∧ Integrable U volume ∧
+          (∀ k, Integrable (G k) volume) ∧ (∀ y ∈ Ω, U y = u y) ∧
+          eLpNorm U p volume ≤ (K : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
+            + ∑ i, eLpNorm (g i) p (volume.restrict Ω)) ∧
+          ∀ k, eLpNorm (G k) p volume ≤ (K : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
+            + ∑ i, eLpNorm (g i) p (volume.restrict Ω)) := by
+  obtain ⟨P⟩ := nonempty_boundaryPartition hd hΩopen hΩb hC1
+  obtain ⟨K, hK⟩ := extension_bound hΩopen hΩb P hp
+  refine ⟨K, fun u g hu hgi hwg => ?_⟩
+  obtain ⟨h1, h2, h3, h4, h5, h6⟩ := hK u g hu hgi hwg
+  exact ⟨_, _, h1, h2, h3, h4, h5, h6⟩
 
 /-- **Guo's third step** (Theorem III.2.2, proof step 3, p. 22): the local extensions glued with
 the partition of unity extend the class across the whole boundary. -/
@@ -347,30 +458,54 @@ theorem exists_cutoff_one_on_compact {K U : Set (EuclideanSpace ℝ (Fin d))}
     hLc.of_isClosed_subset (isClosed_tsupport _) hsupp, hsupp.trans hLU,
     fun y hy => hf1 hy⟩
 
+/-- **The extension with its support cut into a given open set.** One more cutoff, equal to
+one on the closure of the domain, which leaves the agreement alone and moves the support. -/
+def extSubsetFun {Ω : Set (EuclideanSpace ℝ (Fin d))} (P : BoundaryPartition d Ω)
+    (χ u : EuclideanSpace ℝ (Fin d) → ℝ) : EuclideanSpace ℝ (Fin d) → ℝ :=
+  fun y => χ y * extFun P u y
+
+/-- **The gradient of that extension**, with the cutoff's own derivative. -/
+def extSubsetGrad {Ω : Set (EuclideanSpace ℝ (Fin d))} (P : BoundaryPartition d Ω)
+    (χ u : EuclideanSpace ℝ (Fin d) → ℝ) (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ)
+    (k : Fin d) : EuclideanSpace ℝ (Fin d) → ℝ :=
+  fun y => χ y * extFunGrad P u g k y + partialD k χ y * extFun P u y
+
+/-- `extSubsetFun` unapplied, which is the form the support statements read. -/
+theorem extSubsetFun_eq {Ω : Set (EuclideanSpace ℝ (Fin d))} (P : BoundaryPartition d Ω)
+    (χ u : EuclideanSpace ℝ (Fin d) → ℝ) :
+    extSubsetFun P χ u = fun y => χ y * extFun P u y := rfl
+
+/-- `extSubsetGrad` unapplied. -/
+theorem extSubsetGrad_eq {Ω : Set (EuclideanSpace ℝ (Fin d))} (P : BoundaryPartition d Ω)
+    (χ u : EuclideanSpace ℝ (Fin d) → ℝ) (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ)
+    (k : Fin d) :
+    extSubsetGrad P χ u g k
+      = fun y => χ y * extFunGrad P u g k y + partialD k χ y * extFun P u y := rfl
+
 /-- **Guo's Theorem III.2.2** (p. 20), all three clauses. The extension agrees with the class on
 the domain, is supported inside any open set the closure of the domain sits in, and is bounded
 in every `Lᵖ` seminorm, together with its gradient, by the class and its gradient over the
 domain, with one constant taken before the class. -/
-theorem exists_extension_subset_bound (hd : 0 < d) {Ω Ω' : Set (EuclideanSpace ℝ (Fin d))}
-    (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBounded Ω) (hC1 : HasC1Boundary Ω)
-    (hΩ'open : IsOpen Ω') (hsub : closure Ω ⊆ Ω') {p : ℝ≥0∞} (hp : 1 ≤ p) :
+theorem extension_subset_bound {Ω Ω' : Set (EuclideanSpace ℝ (Fin d))}
+    (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBounded Ω) (P : BoundaryPartition d Ω)
+    {χ : EuclideanSpace ℝ (Fin d) → ℝ} (hχc : ContDiff ℝ (⊤ : ℕ∞) χ)
+    (hχcs : HasCompactSupport χ) (hχs : tsupport χ ⊆ Ω')
+    (hχ1 : ∀ y ∈ closure Ω, χ y = 1) {p : ℝ≥0∞} (hp : 1 ≤ p) :
     ∃ K : ℝ≥0, ∀ (u : EuclideanSpace ℝ (Fin d) → ℝ)
         (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
       IntegrableOn u Ω volume → (∀ k, IntegrableOn (g k) Ω volume) → HasWeakGradOn Ω u g →
-      ∃ (U : EuclideanSpace ℝ (Fin d) → ℝ) (G : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
-        HasWeakGradOn Set.univ U G ∧ HasCompactSupport U ∧ tsupport U ⊆ Ω' ∧
-          Integrable U volume ∧ (∀ k, Integrable (G k) volume) ∧ (∀ y ∈ Ω, U y = u y) ∧
-          eLpNorm U p volume ≤ (K : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
+        HasWeakGradOn Set.univ (extSubsetFun P χ u) (extSubsetGrad P χ u g) ∧
+          HasCompactSupport (extSubsetFun P χ u) ∧ tsupport (extSubsetFun P χ u) ⊆ Ω' ∧
+          Integrable (extSubsetFun P χ u) volume ∧
+          (∀ k, Integrable (extSubsetGrad P χ u g k) volume) ∧
+          (∀ y ∈ Ω, extSubsetFun P χ u y = u y) ∧
+          eLpNorm (extSubsetFun P χ u) p volume ≤ (K : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
             + ∑ i, eLpNorm (g i) p (volume.restrict Ω)) ∧
-          ∀ k, eLpNorm (G k) p volume ≤ (K : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
-            + ∑ i, eLpNorm (g i) p (volume.restrict Ω)) := by
+          ∀ k, eLpNorm (extSubsetGrad P χ u g k) p volume
+            ≤ (K : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
+              + ∑ i, eLpNorm (g i) p (volume.restrict Ω)) := by
   classical
-  obtain ⟨K₀, hK₀⟩ := exists_extension_bound hd hΩopen hΩb hC1 hp
-  obtain ⟨Rb, hRb⟩ := hΩb.subset_closedBall (0 : EuclideanSpace ℝ (Fin d))
-  have hclc : IsCompact (closure Ω) :=
-    (isCompact_closedBall (0 : EuclideanSpace ℝ (Fin d)) Rb).of_isClosed_subset isClosed_closure
-      (closure_minimal hRb (isClosed_closedBall))
-  obtain ⟨χ, hχc, hχcs, hχs, hχ1⟩ := exists_cutoff_one_on_compact hclc hΩ'open hsub
+  obtain ⟨K₀, hK₀⟩ := extension_bound hΩopen hΩb P hp
   obtain ⟨C, hC0, hCb, hCd⟩ := exists_bound_with_partials hχc hχcs
   have hχpc : ∀ k : Fin d, Continuous (partialD k χ) := fun k =>
     (hχc.continuous_fderiv (by simp)).clm_apply continuous_const
@@ -380,7 +515,9 @@ theorem exists_extension_subset_bound (hd : 0 < d) {Ω Ω' : Set (EuclideanSpace
   have hcoe : (((Real.toNNReal C + Real.toNNReal C) * K₀ : ℝ≥0) : ℝ≥0∞)
       = (ENNReal.ofReal C + ENNReal.ofReal C) * (K₀ : ℝ≥0∞) := by
     rw [ENNReal.coe_mul, ENNReal.coe_add]; rfl
-  obtain ⟨U₀, G₀, hwg0, hint0, hgint0, hag0, hUb0, hGb0⟩ := hK₀ u g hu hgi hwg
+  obtain ⟨hwg0, hint0, hgint0, hag0, hUb0, hGb0⟩ := hK₀ u g hu hgi hwg
+  set U₀ : EuclideanSpace ℝ (Fin d) → ℝ := extFun P u with hU₀def
+  set G₀ : Fin d → EuclideanSpace ℝ (Fin d) → ℝ := extFunGrad P u g with hG₀def
   have hmul := hasWeakGradOn_univ_mul_cutoff (B := Set.univ) MeasurableSet.univ hχc hχcs
     (Set.subset_univ _) hint0.integrableOn (fun k => (hgint0 k).integrableOn) hwg0
   simp only [Set.indicator_univ] at hmul
@@ -397,7 +534,8 @@ theorem exists_extension_subset_bound (hd : 0 < d) {Ω Ω' : Set (EuclideanSpace
     simp only [Function.mem_support] at hy ⊢
     intro hc
     exact hy (by rw [hc, zero_mul])
-  refine ⟨fun y => χ y * U₀ y, fun k y => χ y * G₀ k y + partialD k χ y * U₀ y, hmul,
+  simp only [extSubsetFun_eq, extSubsetGrad_eq, ← hU₀def, ← hG₀def]
+  refine ⟨hmul,
     hχcs.of_isClosed_subset (isClosed_tsupport _) ?_, hsuppU,
     hprod _ _ hint0 hχcs hχc.continuous,
     fun k => (hprod _ _ (hgint0 k) hχcs hχc.continuous).add
@@ -408,7 +546,6 @@ theorem exists_extension_subset_bound (hd : 0 < d) {Ω Ω' : Set (EuclideanSpace
     intro hc
     exact hy (by rw [hc, zero_mul])
   · intro y hy
-    dsimp only
     rw [hχ1 y (subset_closure hy), one_mul, hag0 y hy]
   · rw [hcoe, mul_assoc]
     refine le_trans (eLpNorm_bounded_mul_le hC0 hCb) ?_
@@ -426,6 +563,32 @@ theorem exists_extension_subset_bound (hd : 0 < d) {Ω Ω' : Set (EuclideanSpace
     refine le_trans (add_le_add (mul_le_mul_right (hGb0 k) _)
       (mul_le_mul_right hUb0 _)) ?_
     rw [add_mul]
+
+/-- **Guo's Theorem III.2.2** (p. 20), all three clauses, with the partition, the cutoff and
+the extension quantified away. -/
+theorem exists_extension_subset_bound (hd : 0 < d) {Ω Ω' : Set (EuclideanSpace ℝ (Fin d))}
+    (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBounded Ω) (hC1 : HasC1Boundary Ω)
+    (hΩ'open : IsOpen Ω') (hsub : closure Ω ⊆ Ω') {p : ℝ≥0∞} (hp : 1 ≤ p) :
+    ∃ K : ℝ≥0, ∀ (u : EuclideanSpace ℝ (Fin d) → ℝ)
+        (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
+      IntegrableOn u Ω volume → (∀ k, IntegrableOn (g k) Ω volume) → HasWeakGradOn Ω u g →
+      ∃ (U : EuclideanSpace ℝ (Fin d) → ℝ) (G : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
+        HasWeakGradOn Set.univ U G ∧ HasCompactSupport U ∧ tsupport U ⊆ Ω' ∧
+          Integrable U volume ∧ (∀ k, Integrable (G k) volume) ∧ (∀ y ∈ Ω, U y = u y) ∧
+          eLpNorm U p volume ≤ (K : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
+            + ∑ i, eLpNorm (g i) p (volume.restrict Ω)) ∧
+          ∀ k, eLpNorm (G k) p volume ≤ (K : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
+            + ∑ i, eLpNorm (g i) p (volume.restrict Ω)) := by
+  obtain ⟨P⟩ := nonempty_boundaryPartition hd hΩopen hΩb hC1
+  obtain ⟨Rb, hRb⟩ := hΩb.subset_closedBall (0 : EuclideanSpace ℝ (Fin d))
+  have hclc : IsCompact (closure Ω) :=
+    (isCompact_closedBall (0 : EuclideanSpace ℝ (Fin d)) Rb).of_isClosed_subset isClosed_closure
+      (closure_minimal hRb (isClosed_closedBall))
+  obtain ⟨χ, hχc, hχcs, hχs, hχ1⟩ := exists_cutoff_one_on_compact hclc hΩ'open hsub
+  obtain ⟨K, hK⟩ := extension_subset_bound hΩopen hΩb P hχc hχcs hχs hχ1 hp
+  refine ⟨K, fun u g hu hgi hwg => ?_⟩
+  obtain ⟨h1, h2, h3, h4, h5, h6, h7, h8⟩ := hK u g hu hgi hwg
+  exact ⟨_, _, h1, h2, h3, h4, h5, h6, h7, h8⟩
 
 /-- **Clauses (i) and (ii) of Guo's Theorem III.2.2** (p. 20). The extension agrees with the class
 on the domain and is supported inside any open set the closure of the domain sits in. -/
