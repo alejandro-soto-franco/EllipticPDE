@@ -603,6 +603,12 @@
       "source_id": "evans-2010",
       "locator": "§5.4 Thm 1",
       "claim": "formalises the theorem as Evans states it, as one linear map and one constant serving every class. The cited statement gives a bounded linear operator between W^{1,p}(U) and W^{1,p}(R^n); the statement here gives an R-linear map on the pair of a class and its gradient, with the three clauses and the bound holding of every pair that has a weak gradient on the domain, at every exponent. The difference is the space: this development relates a class to its gradient through HasWeakGradOn rather than through a bundled Sobolev space, so the bound is stated on the pair in place of an operator norm"
+    },
+    {
+      "decl": "EllipticPdes.Regularity.exists_weakSolution_interior_smooth",
+      "source_id": "evans-2010",
+      "locator": "§6.3.1 Thm 3",
+      "claim": "composes the existence of a weak solution with the interior smoothness the cited theorem states: for an operator with no transport term and a nonnegative zeroth-order coefficient on a bounded domain, with a C^1 diffusion, coefficients in W^{k,infinity} at every order and a datum with weak derivatives of every order bounded in L^2, the Dirichlet problem has a weak solution whose class has a C^infinity representative on the interior of every compact subset. The cited statement assumes smooth coefficients and datum and concludes u in C^infinity(U); the statement here takes the weaker W^{k,infinity} hypotheses and concludes on the interior of a compact subset. The pointwise equation is not part of the statement: a smooth representative satisfies it by the fundamental lemma of the calculus of variations, which this development does not formalise"
     }
   ]
 }

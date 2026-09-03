@@ -516,6 +516,12 @@ import EllipticPdes
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Extension.exists_extLinear
 
+/-! ### Solvability and interior smoothness composed -/
+
+/-- info: 'EllipticPdes.Regularity.exists_weakSolution_interior_smooth' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.exists_weakSolution_interior_smooth
+
 /-! ### Sobolev embedding on a bounded `C¹` domain -/
 
 /-- info: 'EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_domain' depends on axioms: [propext, Classical.choice, Quot.sound] -/

@@ -228,8 +228,10 @@ positive and names a finite exponent, and the bootstrap lands on it with no loss
 
 The cited statement takes a bounded `Ω` with `C¹` boundary and concludes on it, with a norm
 estimate. The statement here asks nothing of a boundary, takes a family of compact support on
-the whole space, and is qualitative. The passage from the one to the other goes through an
-extension operator, which remains open. -/
+the whole space, and is qualitative. The passage from the one to the other goes through the
+extension operator, `EllipticPdes.Extension.exists_extension_subset_bound`, and the statement
+it reaches on a bounded `C¹` domain is
+`EllipticPdes.Embedding.exists_const_memLp_of_gradClosed_domain`. -/
 theorem memLp_of_gradClosed_compactSupport_ideal (hd : 1 < d)
     {ι : Type*} {F : ι → EuclideanSpace ℝ (Fin d) → ℝ} {nxt : ι → Fin d → ι}
     {dep : ι → ℕ} {m : ℕ} {p₀ : ℝ≥0} (hp₀ : 1 ≤ p₀)

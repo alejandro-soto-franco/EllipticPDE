@@ -55,6 +55,7 @@ import EllipticPdes.Regularity.SmoothGlue
 import EllipticPdes.Regularity.HigherInterior
 import EllipticPdes.Regularity.IteratedFamily
 import EllipticPdes.Regularity.InteriorSmooth
+import EllipticPdes.Regularity.ClassicalSolvability
 import EllipticPdes.Regularity.InteriorHolderFinite
 import EllipticPdes.Regularity.DifferentiatedEquation
 import EllipticPdes.Regularity.Boundary.HalfBall
