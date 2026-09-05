@@ -156,6 +156,7 @@ import EllipticPdes.Existence.WeakMaximumTransport
 import EllipticPdes.Existence.ClassicalMaximum
 import EllipticPdes.Existence.StrongMaximum
 import EllipticPdes.Existence.StrongMaximumCorollaries
+import EllipticPdes.Existence.AprioriBound
 
 /-!
 # EllipticPdes

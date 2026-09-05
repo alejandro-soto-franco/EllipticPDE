@@ -766,6 +766,16 @@ import EllipticPdes
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Classical.neumann_unique_of_exists_pos
 
+/-! ### A priori bound from the maximum principle -/
+
+/-- info: 'EllipticPdes.Classical.apriori_bound_sub' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Classical.apriori_bound_sub
+
+/-- info: 'EllipticPdes.Classical.apriori_bound_abs' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Classical.apriori_bound_abs
+
 /-- info: 'EllipticPdes.Classical.not_isLocalMax_of_nondivOp_neg' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Classical.not_isLocalMax_of_nondivOp_neg

@@ -108,6 +108,7 @@ prefix.
 | The avoidance principle | `Classical.avoidance_principle` |
 | Tangency at a boundary point forces equality | `Classical.eq_of_eq_of_fderiv_eq` |
 | Uniqueness for the classical Neumann problem | `Classical.neumann_unique` |
+| A priori bound from the maximum principle | `Classical.apriori_bound_abs` |
 | Gagliardo-Nirenberg-Sobolev on a bounded $C^1$ domain | `Embedding.exists_eLpNorm_sobolevConj_le_domain` |
 | Sobolev ladder on that domain | `Embedding.exists_const_memLp_of_gradClosed_domain` |
 | Hölder continuity up to the boundary | `Embedding.exists_const_holderOnWith_of_gradClosed_domain` |
@@ -606,6 +607,16 @@ prefix.
   attains its maximum over the closure, an interior nonnegative maximum makes
   it constant and a boundary maximum contradicts Hopf's lemma through the
   vanishing normal derivative,
+- the a priori bound from the maximum principle, as
+  `EllipticPdes.Classical.apriori_bound_sub` and
+  `EllipticPdes.Classical.apriori_bound_abs`, Guo's Theorem XI.5.1 and Gilbarg
+  and Trudinger's Theorem 3.7 in the case of a domain between two parallel
+  planes a distance $D$ apart: with $c \ge 0$ and $|f| \le F$, a solution of
+  $Lu = f$ is bounded by the boundary supremum of $|u|$ plus
+  $(e^{(B/\theta + 1) D} - 1) F/\theta$. The comparison function
+  $\sup u^+ + (F/\theta)(e^{\alpha D} - e^{\alpha (x_1 - m)})$ at
+  $\alpha = B/\theta + 1$ has image at least $F$ under $L$, so the comparison
+  principle applies,
 - the Gagliardo-Nirenberg-Sobolev inequality on a bounded domain with $C^1$
   boundary, as
   `EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_domain`, the single rung

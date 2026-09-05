@@ -917,6 +917,30 @@
       "source_id": "guo-2026",
       "locator": "§XI.4 Cor XI.4.8",
       "claim": "formalises the addendum of Remark XI.4.9 to the cited corollary: when c is nonzero at a point of the set the constant is zero, since L of the constant is c times it. The proof is the cited one"
+    },
+    {
+      "decl": "EllipticPdes.Classical.apriori_bound_sub",
+      "source_id": "guo-2026",
+      "locator": "§XI.5 Thm XI.5.1",
+      "claim": "formalises clause (i) of the cited theorem, whose L u >= f with c <= 0 is, in the sign convention of this development, L u <= f with a nonnegative zeroth-order coefficient, on a bounded open set inside a slab of width D in a coordinate direction: with |f| bounded by F, sup u <= sup of u^+ over the boundary + (exp((beta + 1) D) - 1) F/theta, stated as a boundary point y with u <= max (u y) 0 + (exp((B/theta + 1) D) - 1) F/theta on the closure. The source's beta is sup |b|/lambda and its d is the diameter, and its proof places the set in the slab 0 < x_1 < d after a translation, so the width D of a slab containing the set, which is at most the diameter, gives the constant the source names; the bound F on f is on f rather than |f|, which is what the proof uses. Connectedness, which the cited statement asks, is unused. The proof is the cited one: the comparison function sup u^+ + (F/theta)(exp(alpha D) - exp(alpha (x_1 - m))) at alpha = beta + 1 has image under L at least F on the set and dominates u on the boundary, so the comparison principle gives u <= v"
+    },
+    {
+      "decl": "EllipticPdes.Classical.apriori_bound_abs",
+      "source_id": "guo-2026",
+      "locator": "§XI.5 Thm XI.5.1",
+      "claim": "formalises clause (ii) of the cited theorem, for L u = f with c <= 0 in the source's sign and |f| <= F, on a bounded open set inside a slab of width D: sup |u| <= sup of |u| over the boundary + (exp((beta + 1) D) - 1) F/theta, stated as a boundary point y with |u| <= |u y| + (exp((B/theta + 1) D) - 1) F/theta on the closure, with the constant of clause (i). The proof is the cited one, clause (i) applied to u and to -u"
+    },
+    {
+      "decl": "EllipticPdes.Classical.apriori_bound_sub",
+      "source_id": "gilbarg-2001",
+      "locator": "§3.3 Thm 3.7",
+      "claim": "formalises the cited theorem in its case L u >= f and in the particular case the statement names, of a domain between two parallel planes a distance d apart, where the constant is exp((beta + 1) d) - 1: in the sign convention of this development the subsolution has L u <= f with a nonnegative zeroth-order coefficient, and sup u <= sup of u^+ over the boundary + C sup |f^-|/lambda is stated as a boundary point y with u <= max (u y) 0 + (exp((B/theta + 1) D) - 1) F/theta on the closure, with F a bound on f, which is the bound on the negative part of the source's f. The planes are taken perpendicular to a coordinate axis, which the source's proof arranges by a rotation and a translation, and the bounds on the coefficients are separate. The proof is the cited one, the comparison function sup u^+ + (exp(alpha d) - exp(alpha x_1)) sup |f^-|/lambda at alpha >= beta + 1 and the comparison principle"
+    },
+    {
+      "decl": "EllipticPdes.Classical.apriori_bound_abs",
+      "source_id": "gilbarg-2001",
+      "locator": "§3.3 Thm 3.7",
+      "claim": "formalises the cited theorem in its case L u = f, with the constant of the parallel-planes case: sup |u| <= sup of |u| over the boundary + C sup |f|/lambda, stated as a boundary point y with |u| <= |u y| + (exp((B/theta + 1) D) - 1) F/theta on the closure. The proof is the cited one, the case L u >= f applied to u and to -u"
     }
   ]
 }
