@@ -153,6 +153,7 @@ import EllipticPdes.Existence.WeakMaximum
 import EllipticPdes.Sobolev.H01Lattice
 import EllipticPdes.Existence.WeakMaximumTransport
 import EllipticPdes.Existence.ClassicalMaximum
+import EllipticPdes.Existence.StrongMaximum
 
 /-!
 # EllipticPdes

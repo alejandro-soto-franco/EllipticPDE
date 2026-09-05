@@ -713,3 +713,17 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Classical.weak_maximum_principle_of_nonneg' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Classical.weak_maximum_principle_of_nonneg
+
+/-! ### Hopf's lemma and the strong maximum principle -/
+
+/-- info: 'EllipticPdes.Classical.hopf_lemma_ball' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Classical.hopf_lemma_ball
+
+/-- info: 'EllipticPdes.Classical.hopf_lemma' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Classical.hopf_lemma
+
+/-- info: 'EllipticPdes.Classical.strong_maximum_principle' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Classical.strong_maximum_principle
