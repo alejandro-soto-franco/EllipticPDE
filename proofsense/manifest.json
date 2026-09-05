@@ -707,6 +707,30 @@
       "source_id": "gilbarg-2001",
       "locator": "§8.1 Thm 8.1",
       "claim": "formalises the cited theorem in the transport-free case the cited proof singles out, with the coefficients b^i and c^i of the cited operator both zero and the coefficient d nonpositive, which in the sign convention of this development is a nonnegative zeroth-order coefficient, and on a bounded open set. The subsolution is an element of the graph space W12 Omega, the H^1(Omega) of this development, whose bilinear pairing against every nonnegative element of H_0^1(Omega) is nonpositive; the cited statement tests against nonnegative C^1 functions with compact support and extends to W_0^{1,2} by density, and the density of the nonnegative test functions in the nonnegative cone is the step assumed here by taking the extended form as the hypothesis. The boundary inequality is read as the source defines it, u <= k on the boundary meaning that (u - k)^+ lies in W_0^{1,2}(Omega), and the conclusion sup u <= sup of u^+ over the boundary is stated as u <= k almost everywhere for every k >= 0 with (u - k)^+ the function coordinate of an element of H_0^1(Omega). The proof is the cited one: testing against v = (u - k)^+, the zeroth-order term is nonnegative, the principal term is the energy of v by the chain rule for the positive part, ellipticity makes the gradient of v vanish, and the Poincaré inequality on H_0^1 of the bounded domain makes v vanish. The general case with a transport term, which the cited proof runs through the Sobolev inequality and a limit in k, is not formalised"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.mem_H01_of_hasCompactSupport",
+      "source_id": "evans-2010",
+      "locator": "§5.3.1 Thm 1",
+      "claim": "applies the cited theorem, local approximation by mollification, to a class on the whole space with an L^2 weak gradient whose support is a compact subset of an open set: its mollifications at radii below the distance from the support to the complement are smooth with compact support in the set, hence test functions, and converge to the class in L^2 with their partial derivatives, which are the mollified weak gradient, converging to the gradient. The class with its gradient is therefore a limit of test-function graphs, which is membership in W_0^{1,2} of the set. The cited statement gives the W^{1,p}_loc convergence of the mollifications on the interior; the statement here takes p = 2, a class with compact support inside the set, and draws the membership conclusion"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.exists_mem_H01_posPart_sub_const",
+      "source_id": "gilbarg-2001",
+      "locator": "§8.1 Thm 8.1",
+      "claim": "supplies the membership the proof of the cited theorem asserts when it sets v = (u - k)^+ and states that v lies in W_0^{1,2}(Omega) by the chain rule: for an element of W_0^{1,2}(Omega) and k >= 0, the truncation (u - k)^+ together with the gradient of u on {u > k} and zero elsewhere is an element of W_0^{1,2}(Omega). The proof approximates the element by test functions, truncates them, which keeps compact support in the domain because k >= 0 and gives classes in W_0^{1,2} by the previous result, and passes to the limit: the function coordinates converge because truncation is 1-Lipschitz, the gradient coordinates along a subsequence converging almost everywhere by dominated convergence, the level set {u = k} giving nothing because the weak gradient vanishes there by Lemma 7.7"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.weak_maximum_principle_H01",
+      "source_id": "gilbarg-2001",
+      "locator": "§8.1 Thm 8.1",
+      "claim": "formalises the cited theorem, in the transport-free case and on a bounded open set, for a subsolution lying in W_0^{1,2}(Omega), which is the boundary inequality u <= 0 by the definition the source gives: the subsolution is nonpositive almost everywhere. The bilinear pairing is the one the development uses for the Dirichlet problem, tested against every nonnegative element of W_0^{1,2}(Omega); the truncation (u - 0)^+ lies in W_0^{1,2}(Omega) by the previous result, and the general statement applies"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.eq_zero_of_weakSolution_H01",
+      "source_id": "gilbarg-2001",
+      "locator": "§8.1 Cor 8.2",
+      "claim": "formalises the cited corollary in the transport-free case with nonnegative zeroth-order coefficient on a bounded open set: an element of W_0^{1,2}(Omega) whose bilinear pairing against every element of W_0^{1,2}(Omega) vanishes is zero. The proof is the cited one, the weak maximum principle applied to the solution and to its negative, which makes the function coordinate vanish, and uniqueness of the weak gradient, which then makes the gradient coordinates vanish"
     }
   ]
 }

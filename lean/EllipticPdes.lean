@@ -150,6 +150,7 @@ import EllipticPdes.Spectrum.PoincareWirtinger
 import EllipticPdes.Spectrum.PoincareBall
 import EllipticPdes.Embedding.ChainRule
 import EllipticPdes.Existence.WeakMaximum
+import EllipticPdes.Sobolev.H01Lattice
 
 /-!
 # EllipticPdes

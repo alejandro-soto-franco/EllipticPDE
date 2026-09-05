@@ -86,6 +86,10 @@ prefix.
 | Weak gradient of the positive part | `Embedding.hasWeakGradOn_posPart` |
 | The weak gradient vanishes on level sets | `Embedding.ae_eq_zero_of_eq_const_of_hasWeakGradOn` |
 | The weak maximum principle | `Sobolev.weak_maximum_principle` |
+| Compactly supported classes lie in $H^1_0$ | `Sobolev.mem_H01_of_hasCompactSupport` |
+| Truncation in $H^1_0$ | `Sobolev.exists_mem_H01_posPart_sub_const` |
+| The weak maximum principle in $H^1_0$ | `Sobolev.weak_maximum_principle_H01` |
+| Uniqueness of the generalised Dirichlet problem | `Sobolev.eq_zero_of_weakSolution_H01` |
 | Gagliardo-Nirenberg-Sobolev on a bounded $C^1$ domain | `Embedding.exists_eLpNorm_sobolevConj_le_domain` |
 | Sobolev ladder on that domain | `Embedding.exists_const_memLp_of_gradClosed_domain` |
 | Hölder continuity up to the boundary | `Embedding.exists_const_holderOnWith_of_gradClosed_domain` |
@@ -487,6 +491,24 @@ prefix.
   the Poincaré inequality on $H^1_0$ of the bounded domain makes $v$ vanish.
   The general case with a transport term, which runs through the Sobolev
   inequality and a limit in $k$, is open,
+- truncation in $H^1_0$, as
+  `EllipticPdes.Sobolev.exists_mem_H01_posPart_sub_const`: for $V$ in
+  $H^1_0(\Omega)$ and $k \ge 0$, the truncation $(v - k)^+$ with the gradient
+  of $v$ on $\{v > k\}$ and zero elsewhere is again in $H^1_0(\Omega)$, which
+  is the membership the proof of Theorem 8.1 asserts for its test function. A
+  class with $L^2$ weak gradient and compact support in $\Omega$ lies in
+  $H^1_0(\Omega)$ by mollification, as
+  `EllipticPdes.Sobolev.mem_H01_of_hasCompactSupport`, which is Evans's
+  §5.3.1 Theorem 1 applied; the truncations of approximating test functions
+  keep compact support because $k \ge 0$, and converge to the truncation of
+  the limit, the gradient coordinates along a subsequence converging almost
+  everywhere by dominated convergence, the level set $\{v = k\}$ giving
+  nothing because the weak gradient vanishes there. With it the principle
+  applies to every subsolution in $H^1_0(\Omega)$, as
+  `EllipticPdes.Sobolev.weak_maximum_principle_H01`, and their Corollary 8.2,
+  the uniqueness of the generalised Dirichlet problem, follows as
+  `EllipticPdes.Sobolev.eq_zero_of_weakSolution_H01` by applying the principle
+  to the solution and to its negative,
 - the Gagliardo-Nirenberg-Sobolev inequality on a bounded domain with $C^1$
   boundary, as
   `EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_domain`, the single rung

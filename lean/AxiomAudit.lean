@@ -655,3 +655,21 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Sobolev.weak_maximum_principle' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Sobolev.weak_maximum_principle
+
+/-! ### Truncation in `H₀¹` -/
+
+/-- info: 'EllipticPdes.Sobolev.mem_H01_of_hasCompactSupport' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.mem_H01_of_hasCompactSupport
+
+/-- info: 'EllipticPdes.Sobolev.exists_mem_H01_posPart_sub_const' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.exists_mem_H01_posPart_sub_const
+
+/-- info: 'EllipticPdes.Sobolev.weak_maximum_principle_H01' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.weak_maximum_principle_H01
+
+/-- info: 'EllipticPdes.Sobolev.eq_zero_of_weakSolution_H01' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.eq_zero_of_weakSolution_H01
