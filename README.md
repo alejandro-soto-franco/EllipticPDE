@@ -102,6 +102,12 @@ prefix.
 | Hopf's lemma | `Classical.hopf_lemma` |
 | The strong maximum principle | `Classical.strong_maximum_principle` |
 | The strong maximum principle with $c \ge 0$ | `Classical.strong_maximum_principle_of_nonneg` |
+| Uniqueness for the classical Dirichlet problem | `Classical.dirichlet_unique` |
+| Hopf's lemma at a zero boundary value | `Classical.hopf_lemma_of_zero` |
+| The strong maximum principle at a zero maximum | `Classical.strong_maximum_principle_of_zero` |
+| The avoidance principle | `Classical.avoidance_principle` |
+| Tangency at a boundary point forces equality | `Classical.eq_of_eq_of_fderiv_eq` |
+| Uniqueness for the classical Neumann problem | `Classical.neumann_unique` |
 | Gagliardo-Nirenberg-Sobolev on a bounded $C^1$ domain | `Embedding.exists_eLpNorm_sobolevConj_le_domain` |
 | Sobolev ladder on that domain | `Embedding.exists_const_memLp_of_gradClosed_domain` |
 | Hölder continuity up to the boundary | `Embedding.exists_const_holderOnWith_of_gradClosed_domain` |
@@ -586,7 +592,20 @@ prefix.
   below its maximum has a frontier point inside the domain by connectedness;
   the largest ball about a nearby point of that set touches the level set of
   the maximum at a point where Hopf's lemma gives a nonzero gradient, though
-  the point is an interior maximum,
+  the point is an interior maximum. Guo's chapter XI corollaries follow: the
+  clauses with $c$ of any sign and a zero extremal value, as
+  `EllipticPdes.Classical.hopf_lemma_of_zero` and
+  `EllipticPdes.Classical.strong_maximum_principle_of_zero`, through the
+  operator with $c$ replaced by its positive part, which lowers the image on a
+  nonpositive function; the avoidance principle
+  `EllipticPdes.Classical.avoidance_principle`; tangency at a boundary point
+  with an interior sphere, `EllipticPdes.Classical.eq_of_eq_of_fderiv_eq`;
+  uniqueness for the Dirichlet problem, `EllipticPdes.Classical.dirichlet_unique`;
+  and uniqueness up to a constant for the Neumann problem,
+  `EllipticPdes.Classical.neumann_unique`, where the difference of two solutions
+  attains its maximum over the closure, an interior nonnegative maximum makes
+  it constant and a boundary maximum contradicts Hopf's lemma through the
+  vanishing normal derivative,
 - the Gagliardo-Nirenberg-Sobolev inequality on a bounded domain with $C^1$
   boundary, as
   `EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_domain`, the single rung

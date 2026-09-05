@@ -736,6 +736,36 @@ import EllipticPdes
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Classical.strong_maximum_principle_of_nonneg
 
+/-! ### Corollaries of the strong maximum principle -/
+
+/-- info: 'EllipticPdes.Classical.dirichlet_unique' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Classical.dirichlet_unique
+
+/-- info: 'EllipticPdes.Classical.hopf_lemma_of_zero' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Classical.hopf_lemma_of_zero
+
+/-- info: 'EllipticPdes.Classical.strong_maximum_principle_of_zero' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Classical.strong_maximum_principle_of_zero
+
+/-- info: 'EllipticPdes.Classical.avoidance_principle' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Classical.avoidance_principle
+
+/-- info: 'EllipticPdes.Classical.eq_of_eq_of_fderiv_eq' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Classical.eq_of_eq_of_fderiv_eq
+
+/-- info: 'EllipticPdes.Classical.neumann_unique' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Classical.neumann_unique
+
+/-- info: 'EllipticPdes.Classical.neumann_unique_of_exists_pos' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Classical.neumann_unique_of_exists_pos
+
 /-- info: 'EllipticPdes.Classical.not_isLocalMax_of_nondivOp_neg' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Classical.not_isLocalMax_of_nondivOp_neg

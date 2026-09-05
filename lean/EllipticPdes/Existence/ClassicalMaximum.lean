@@ -654,6 +654,30 @@ theorem nondivOp_sub_const {U : Set (EuclideanSpace ℝ (Fin d))} (hU : IsOpen U
   rw [h]
   ring
 
+/-- The operator on a difference. -/
+theorem nondivOp_sub {U : Set (EuclideanSpace ℝ (Fin d))} (hU : IsOpen U)
+    {u v : EuclideanSpace ℝ (Fin d) → ℝ} (hu : ContDiffOn ℝ 2 u U) (hv : ContDiffOn ℝ 2 v U)
+    (a : EuclideanSpace ℝ (Fin d) → Fin d → Fin d → ℝ)
+    (b : EuclideanSpace ℝ (Fin d) → Fin d → ℝ) (c : EuclideanSpace ℝ (Fin d) → ℝ)
+    {x : EuclideanSpace ℝ (Fin d)} (hx : x ∈ U) :
+    nondivOp a b c (fun y => u y - v y) x = nondivOp a b c u x - nondivOp a b c v x := by
+  have h := nondivOp_add_smul hU hu hv a b c (-1) hx
+  have e : (fun y => u y + (-1) * v y) = fun y => u y - v y := by
+    funext y
+    ring
+  rw [e] at h
+  rw [h]
+  ring
+
+/-- Changing the zeroth-order coefficient changes the operator by the difference times the
+function. -/
+theorem nondivOp_congr_zeroth (a : EuclideanSpace ℝ (Fin d) → Fin d → Fin d → ℝ)
+    (b : EuclideanSpace ℝ (Fin d) → Fin d → ℝ) (c c' : EuclideanSpace ℝ (Fin d) → ℝ)
+    (u : EuclideanSpace ℝ (Fin d) → ℝ) (x : EuclideanSpace ℝ (Fin d)) :
+    nondivOp a b c' u x = nondivOp a b c u x + (c' x - c x) * u x := by
+  unfold nondivOp
+  ring
+
 /-- The operator on the negative. -/
 theorem nondivOp_neg {U : Set (EuclideanSpace ℝ (Fin d))} (hU : IsOpen U)
     {u : EuclideanSpace ℝ (Fin d) → ℝ} (hu : ContDiffOn ℝ 2 u U)
@@ -852,5 +876,25 @@ theorem weak_minimum_principle_of_nonneg (hd : 0 < d) {U : Set (EuclideanSpace �
   · rw [min_eq_right h0.le]
     rw [max_eq_right (by linarith)] at h
     linarith
+
+/-- **Uniqueness for the Dirichlet problem** (Guo Corollary XI.3.9). With `c ≥ 0`, two
+functions with the same image under `L` on the set and the same boundary values agree on the
+closure. -/
+theorem dirichlet_unique (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))}
+    (hU : IsOpen U) (hUb : Bornology.IsBounded U) (hUne : U.Nonempty)
+    {a : EuclideanSpace ℝ (Fin d) → Fin d → Fin d → ℝ} {b : EuclideanSpace ℝ (Fin d) → Fin d → ℝ}
+    {c : EuclideanSpace ℝ (Fin d) → ℝ}
+    {θ B : ℝ} (hθ : 0 < θ) (hsymm : ∀ x ∈ U, ∀ i j, a x i j = a x j i)
+    (hell : ∀ x ∈ U, ∀ ξ : Fin d → ℝ, θ * ∑ i, ξ i ^ 2 ≤ ∑ i, ∑ j, a x i j * ξ i * ξ j)
+    (hb : ∀ x ∈ U, ∀ i, |b x i| ≤ B) (hc : ∀ x ∈ U, 0 ≤ c x)
+    {u v : EuclideanSpace ℝ (Fin d) → ℝ} (hu : ContDiffOn ℝ 2 u U) (hv : ContDiffOn ℝ 2 v U)
+    (huc : ContinuousOn u (closure U)) (hvc : ContinuousOn v (closure U))
+    (hL : ∀ x ∈ U, nondivOp a b c u x = nondivOp a b c v x)
+    (hbd : ∀ x ∈ frontier U, u x = v x) : ∀ x ∈ closure U, u x = v x := fun x hx =>
+  le_antisymm
+    (comparison_principle hd hU hUb hUne hθ hsymm hell hb hc hu hv huc hvc
+      (fun x hx => (hL x hx).le) (fun x hx => (hbd x hx).le) x hx)
+    (comparison_principle hd hU hUb hUne hθ hsymm hell hb hc hv hu hvc huc
+      (fun x hx => (hL x hx).ge) (fun x hx => (hbd x hx).ge) x hx)
 
 end EllipticPdes.Classical

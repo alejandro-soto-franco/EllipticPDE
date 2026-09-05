@@ -155,6 +155,7 @@ import EllipticPdes.Embedding.H01SobolevTwo
 import EllipticPdes.Existence.WeakMaximumTransport
 import EllipticPdes.Existence.ClassicalMaximum
 import EllipticPdes.Existence.StrongMaximum
+import EllipticPdes.Existence.StrongMaximumCorollaries
 
 /-!
 # EllipticPdes

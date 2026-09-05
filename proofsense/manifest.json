@@ -827,6 +827,96 @@
       "source_id": "gilbarg-2001",
       "locator": "§8.1 Thm 8.1",
       "claim": "supplies the two-dimensional Sobolev inequality the remark on n = 2 in the proof of the cited theorem asks for, an inequality of the same form with an exponent above 2 in place of 2n/(n - 2): on a bounded domain in the plane, an element of W_0^{1,2} is bounded in L^4 by a constant times the sum of the L^2 norms of its gradient coordinates, the constant depending on the measure of the domain. The proof is the Gagliardo-Nirenberg-Sobolev inequality at p = 3/2, whose conjugate exponent 6 exceeds 4, together with Hölder's inequality from L^2 to L^{3/2} on the domain, first on test functions and then on the closure by the transfer principle of the critical case"
+    },
+    {
+      "decl": "EllipticPdes.Classical.weak_maximum_principle",
+      "source_id": "guo-2026",
+      "locator": "§XI.3 Thm XI.3.7",
+      "claim": "formalises clause (i) of the cited theorem, whose operator L u = a^{ij} D_{ij} u + b^i D_i u + c u with L u >= 0 for a subsolution is, in the sign convention of this development, the operator with a, -b and -c applied to a subsolution with nonpositive image: on a bounded open set with L elliptic and the ratio of |b| to the ellipticity constant bounded, a subsolution with c = 0 has its supremum over the closure attained on the boundary, stated as a boundary point y with u <= u y on the closure. The bound on |b|/lambda is read as separate bounds theta on the ellipticity and B on |b|; the cited proof is the one followed, the perturbation by exp(alpha x_1) with alpha large"
+    },
+    {
+      "decl": "EllipticPdes.Classical.weak_maximum_principle_of_nonneg",
+      "source_id": "guo-2026",
+      "locator": "§XI.3 Thm XI.3.7",
+      "claim": "formalises clause (ii) of the cited theorem, whose c <= 0 is the nonnegative zeroth-order coefficient of this development: sup u <= sup of u^+ over the boundary, stated as a boundary point y with u <= max (u y) 0 on the closure. The proof is the cited one, clause (i) on the set where u > 0"
+    },
+    {
+      "decl": "EllipticPdes.Classical.weak_minimum_principle",
+      "source_id": "guo-2026",
+      "locator": "§XI.3 Cor XI.3.13",
+      "claim": "formalises clause (i) of the cited corollary, for a supersolution with c = 0: the infimum over the closure is attained on the boundary, stated as a boundary point y with u y <= u on the closure. The proof is the cited one, the weak maximum principle applied to -u"
+    },
+    {
+      "decl": "EllipticPdes.Classical.weak_minimum_principle_of_nonneg",
+      "source_id": "guo-2026",
+      "locator": "§XI.3 Cor XI.3.13",
+      "claim": "formalises clause (ii) of the cited corollary, whose c <= 0 is the nonnegative zeroth-order coefficient of this development: inf u >= inf of -u^- over the boundary, stated as a boundary point y with min (u y) 0 <= u on the closure. The proof is the cited one, the weak maximum principle with c >= 0 applied to -u"
+    },
+    {
+      "decl": "EllipticPdes.Classical.abs_le_of_nondivOp_eq_zero",
+      "source_id": "guo-2026",
+      "locator": "§XI.3 Cor XI.3.13",
+      "claim": "formalises the final clause of the cited corollary, for a solution with the source's c <= 0: sup |u| = sup of |u| over the boundary, stated as a boundary point y with |u| <= |u y| on the closure, the equality following since the boundary lies in the closure. The proof is the cited one, the two clauses of the weak maximum principle for u and -u"
+    },
+    {
+      "decl": "EllipticPdes.Classical.comparison_principle",
+      "source_id": "guo-2026",
+      "locator": "§XI.3 Cor XI.3.11",
+      "claim": "formalises the cited corollary, whose c <= 0 is the nonnegative zeroth-order coefficient of this development and whose L u >= L v is, in the sign convention of this development, the inequality L u <= L v: with u <= v on the boundary, u <= v on the closure. The proof is the cited one, the weak maximum principle with c >= 0 applied to u - v"
+    },
+    {
+      "decl": "EllipticPdes.Classical.dirichlet_unique",
+      "source_id": "guo-2026",
+      "locator": "§XI.3 Cor XI.3.9",
+      "claim": "formalises the cited corollary, with the source's c <= 0 read as the nonnegative zeroth-order coefficient of this development: two functions C^2 on a bounded open set and continuous on its closure, with the same image under L on the set and the same boundary values, agree on the closure, which is the uniqueness of a solution of the Dirichlet problem. The proof is the cited one, the weak maximum principle with c >= 0 applied to u - v and to v - u, here through the comparison principle in both directions"
+    },
+    {
+      "decl": "EllipticPdes.Classical.hopf_lemma",
+      "source_id": "guo-2026",
+      "locator": "§XI.4 Lemma XI.4.3",
+      "claim": "formalises clauses (i) and (ii) of the cited lemma, with the interior sphere condition at the boundary point given by a ball inside the open set whose sphere passes through the point: with c = 0, or with the source's c <= 0 and u(y) >= 0, both read as c u(y) >= 0 for the nonnegative zeroth-order coefficient of this development, the derivative of u at y along the outward radius is positive. The cited statement asks u continuous on the boundary off y and the outer normal derivative when it exists, the derivative here is asked to exist at y and u is continuous on the closure; the bound on (|b| + |c|)/lambda is read as separate bounds. The proof is the cited one, the barrier exp(-alpha |x - z|^2) - exp(-alpha R^2) on the annulus and the comparison principle"
+    },
+    {
+      "decl": "EllipticPdes.Classical.hopf_lemma_of_zero",
+      "source_id": "guo-2026",
+      "locator": "§XI.4 Lemma XI.4.3",
+      "claim": "formalises clause (iii) of the cited lemma, with c of any sign bounded in absolute value and u(y) = 0, under the interior sphere condition given by a ball inside the open set whose sphere passes through y. The proof is the cited one: the operator with c replaced by its positive part, which in the source is c - c^+, has nonpositive image on u since u < u(y) = 0 on the set, and clause (ii) applies"
+    },
+    {
+      "decl": "EllipticPdes.Classical.strong_maximum_principle",
+      "source_id": "guo-2026",
+      "locator": "§XI.4 Thm XI.4.5",
+      "claim": "formalises clauses (i) and (ii) of the cited theorem, for a subsolution C^2 on a connected open set with c = 0, or with the source's c <= 0 and a nonnegative interior maximum, both read as c times the maximum nonnegative for the nonnegative zeroth-order coefficient of this development: the function is constant. The cited statement takes u continuous on the closure and the bound on (|b| + |c|)/lambda, read here as separate bounds and with the maximum over the open set. The proof is the cited one: the level set of the maximum is closed in the set, and a point of its complement whose distance to the level set is less than its distance to the boundary gives a ball touching the level set, where Hopf's lemma contradicts the vanishing gradient at an interior maximum"
+    },
+    {
+      "decl": "EllipticPdes.Classical.strong_maximum_principle_of_zero",
+      "source_id": "guo-2026",
+      "locator": "§XI.4 Thm XI.4.5",
+      "claim": "formalises clause (iii) of the cited theorem, with c of any sign bounded in absolute value and a zero interior maximum on a connected open set: the function is constant. The proof is the cited one, clause (ii) for the operator with c replaced by its positive part, which has nonpositive image on u since u <= 0 on the set"
+    },
+    {
+      "decl": "EllipticPdes.Classical.avoidance_principle",
+      "source_id": "guo-2026",
+      "locator": "§XI.4 Cor XI.4.6",
+      "claim": "formalises the cited corollary, whose L u >= L v is, in the sign convention of this development, L u <= L v, with c of any sign bounded in absolute value on a connected open set: two functions C^2 on the set with u <= v either agree everywhere or satisfy u < v everywhere. The proof is the cited one, the strong maximum principle at a zero maximum applied to u - v at a point where the two agree"
+    },
+    {
+      "decl": "EllipticPdes.Classical.eq_of_eq_of_fderiv_eq",
+      "source_id": "guo-2026",
+      "locator": "§XI.4 Cor XI.4.7",
+      "claim": "formalises the cited corollary with the interior sphere condition at the boundary point in place of a C^2 boundary, which the source uses only through that condition: two functions C^2 on a connected open set and continuous on its closure, with L u <= L v in the sign convention of this development, u <= v on the set, equal at a point y of the frontier on the sphere of a ball inside the set, differentiable at y with equal derivatives there, agree on the set. The proof is the cited one: by the avoidance principle either the two agree or u < v throughout, and in the second case Hopf's lemma at a zero boundary value gives a nonzero derivative of u - v at y"
+    },
+    {
+      "decl": "EllipticPdes.Classical.neumann_unique",
+      "source_id": "guo-2026",
+      "locator": "§XI.4 Cor XI.4.8",
+      "claim": "formalises the cited corollary, on a bounded connected open set with an interior sphere at every frontier point and the source's c <= 0 read as the nonnegative zeroth-order coefficient of this development: two functions C^2 on the set and continuous on the closure, with the same image under L on the set, differentiable at every frontier point with the same derivative along the radius of an interior sphere there, which is the normal derivative times the radius, differ by a constant on the closure. The cited statement takes u in C^1 of the closure and the normal derivative on the boundary; the source's proof is the one followed: the difference attains its maximum over the compact closure, a nonnegative maximum at an interior point makes it constant by the strong maximum principle and one attained only on the boundary contradicts Hopf's lemma through the vanishing normal derivative, and a negative maximum is handled through the negative of the difference"
+    },
+    {
+      "decl": "EllipticPdes.Classical.neumann_unique_of_exists_pos",
+      "source_id": "guo-2026",
+      "locator": "§XI.4 Cor XI.4.8",
+      "claim": "formalises the addendum of Remark XI.4.9 to the cited corollary: when c is nonzero at a point of the set the constant is zero, since L of the constant is c times it. The proof is the cited one"
     }
   ]
 }
