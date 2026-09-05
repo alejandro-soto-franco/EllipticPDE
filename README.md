@@ -524,12 +524,15 @@ prefix.
 - the weak maximum principle with a transport term, as
   `EllipticPdes.Sobolev.weak_maximum_principle_transport`, which is Theorem
   8.1 of Gilbarg and Trudinger with their coefficients $c^i$ present, in
-  dimension at least three. Testing against $v = (u - k)^+$ bounds the energy
+  dimension at least two. Testing against $v = (u - k)^+$ bounds the energy
   of $v$ by the transport bound times the gradient norm of $v$ times the $L^2$
   norm of $v$ over the set $\Gamma_k$ where $u > k$ and the gradient does not
   vanish; ellipticity, the Sobolev inequality on $H^1_0$ and Hölder's
   inequality then bound the measure of $\Gamma_k$ below by a constant
-  independent of $k$ whenever $v \ne 0$. As $k$ increases to the supremum $T$
+  independent of $k$ whenever $v \ne 0$; in dimension two the Sobolev
+  inequality is the embedding into $L^4$ through the inequality at
+  $p = 3/2$, as `EllipticPdes.Embedding.eLpNorm_le_of_mem_H01_two`, which is
+  the remark on $n = 2$ in their proof. As $k$ increases to the supremum $T$
   of the levels with nonzero truncation, the sets $\Gamma_k$ shrink into
   $\{u \ge T\}$ with nonvanishing gradient, which is null because $\{u > T\}$
   is null by the choice of $T$ and the gradient vanishes almost everywhere on

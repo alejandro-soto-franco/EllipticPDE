@@ -739,3 +739,7 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Classical.abs_le_of_nondivOp_eq_zero' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Classical.abs_le_of_nondivOp_eq_zero
+
+/-- info: 'EllipticPdes.Embedding.eLpNorm_le_of_mem_H01_two' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.eLpNorm_le_of_mem_H01_two
