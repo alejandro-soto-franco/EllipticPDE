@@ -19,9 +19,9 @@ of `k`, at every level whose superlevel set has positive measure.
 
 The bound is contradicted as `k` increases to the supremum `T` of the levels at which the
 superlevel set has positive measure: the sets `Γ_k` decrease to a subset of `{u ≥ T}` on which
-the gradient does not vanish, and this set is null because `{u > T}` is null by the choice of `T` and the
-gradient vanishes almost everywhere on `{u = T}`. So no level above the boundary value has a
-nonzero truncation, which is the conclusion.
+the gradient does not vanish, and this set is null because `{u > T}` is null by the choice of
+`T` and the gradient vanishes almost everywhere on `{u = T}`. So no level above the boundary
+value has a nonzero truncation, which is the conclusion.
 
 The membership of `(u - k)⁺` in `H₀¹(Ω)` for every `k` above the boundary value comes from the
 truncation lemma of `EllipticPdes.Sobolev.H01Lattice`.

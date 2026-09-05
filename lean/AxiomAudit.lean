@@ -683,3 +683,11 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Sobolev.weak_maximum_principle_transport' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Sobolev.weak_maximum_principle_transport
+
+/-- info: 'EllipticPdes.Embedding.hasWeakGradOn_negPart' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.hasWeakGradOn_negPart
+
+/-- info: 'EllipticPdes.Embedding.hasWeakGradOn_abs' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.hasWeakGradOn_abs

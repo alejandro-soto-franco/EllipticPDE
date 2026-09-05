@@ -84,6 +84,7 @@ prefix.
 | Poincaré's inequality on a ball | `Sobolev.poincare_ball` |
 | Chain rule for weak gradients | `Embedding.hasWeakGradOn_comp` |
 | Weak gradient of the positive part | `Embedding.hasWeakGradOn_posPart` |
+| Weak gradients of the negative part and the absolute value | `Embedding.hasWeakGradOn_abs` |
 | The weak gradient vanishes on level sets | `Embedding.ae_eq_zero_of_eq_const_of_hasWeakGradOn` |
 | The weak maximum principle | `Sobolev.weak_maximum_principle` |
 | Compactly supported classes lie in $H^1_0$ | `Sobolev.mem_H01_of_hasCompactSupport` |
@@ -475,7 +476,9 @@ prefix.
   Lemma 7.6 follows as `EllipticPdes.Embedding.hasWeakGradOn_posPart`, the
   weak gradient of $u^+$ being $\nabla u$ where $u > 0$ and zero elsewhere,
   through the $C^1$ functions $\sqrt{(t^+)^2 + \varepsilon^2} - \varepsilon$,
-  and their Lemma 7.7 as
+  with the clauses for $u^-$ and $|u|$ as
+  `EllipticPdes.Embedding.hasWeakGradOn_negPart` and
+  `EllipticPdes.Embedding.hasWeakGradOn_abs`, and their Lemma 7.7 as
   `EllipticPdes.Embedding.ae_eq_zero_of_eq_const_of_hasWeakGradOn`, the weak
   gradient vanishing almost everywhere on every level set,
 - the weak maximum principle, as

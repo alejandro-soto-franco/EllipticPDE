@@ -740,4 +740,52 @@ theorem ae_eq_zero_of_eq_const_of_hasWeakGradOn (hΩ : IsOpen Ω)
   rw [hx]
   simp [hxc]
 
+/-- **Weak gradient of the negative part** (Gilbarg and Trudinger Lemma 7.6, second clause).
+`u⁻ = min u 0` has the weak gradient `∇u` where `u < 0` and `0` elsewhere. -/
+theorem hasWeakGradOn_negPart (hΩ : IsOpen Ω) {u : EuclideanSpace ℝ (Fin d) → ℝ}
+    {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ} (hu : LocallyIntegrableOn u Ω volume)
+    (hg : ∀ k, LocallyIntegrableOn (g k) Ω volume) (hwg : HasWeakGradOn Ω u g) :
+    HasWeakGradOn Ω (fun x => min (u x) 0) (fun k x => if u x < 0 then g k x else 0) := by
+  have h := (hasWeakGradOn_posPart hΩ hu.neg (fun k => (hg k).neg) hwg.neg).neg
+  refine h.congr_ae (Eventually.of_forall fun x => ?_) fun k => Eventually.of_forall fun x => ?_
+  · simp only [Pi.neg_apply]
+    by_cases hx : u x ≤ 0
+    · rw [min_eq_left hx, max_eq_left (by linarith), neg_neg]
+    · have hx' : 0 < u x := not_le.mp hx
+      rw [min_eq_right hx'.le, max_eq_right (by linarith), neg_zero]
+  · simp only [Pi.neg_apply, neg_pos]
+    split_ifs <;> simp
+
+/-- Local integrability of the positive part. -/
+theorem locallyIntegrableOn_posPart (hΩ : IsOpen Ω) {u : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hu : LocallyIntegrableOn u Ω volume) :
+    LocallyIntegrableOn (fun x => max (u x) 0) Ω volume := by
+  have := locallyIntegrableOn_posPart_sub_const hΩ hu 0
+  simpa only [sub_zero] using this
+
+/-- **Weak gradient of the absolute value** (Gilbarg and Trudinger Lemma 7.6, third clause).
+`|u|` has the weak gradient `∇u` where `u > 0`, `-∇u` where `u < 0`, and `0` elsewhere. -/
+theorem hasWeakGradOn_abs (hΩ : IsOpen Ω) {u : EuclideanSpace ℝ (Fin d) → ℝ}
+    {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ} (hu : LocallyIntegrableOn u Ω volume)
+    (hg : ∀ k, LocallyIntegrableOn (g k) Ω volume) (hwg : HasWeakGradOn Ω u g) :
+    HasWeakGradOn Ω (fun x => |u x|)
+      fun k x => if 0 < u x then g k x else if u x < 0 then -g k x else 0 := by
+  have hpos := hasWeakGradOn_posPart hΩ hu hg hwg
+  have hneg := hasWeakGradOn_posPart hΩ hu.neg (fun k => (hg k).neg) hwg.neg
+  have hsum := hpos.add_of_locallyIntegrableOn (locallyIntegrableOn_posPart hΩ hu)
+    (locallyIntegrableOn_posPart hΩ hu.neg)
+    (fun k => locallyIntegrableOn_ite_lt hΩ hu.aestronglyMeasurable (hg k) 0)
+    (fun k => locallyIntegrableOn_ite_lt hΩ hu.neg.aestronglyMeasurable (hg k).neg 0) hneg
+  refine hsum.congr_ae (Eventually.of_forall fun x => ?_)
+    fun k => Eventually.of_forall fun x => ?_
+  · simp only [Pi.neg_apply]
+    exact max_zero_add_max_neg_zero_eq_abs_self (u x)
+  · simp only [Pi.neg_apply, neg_pos]
+    rcases lt_trichotomy (u x) 0 with h | h | h
+    · have h' : ¬ 0 < u x := not_lt.mpr h.le
+      simp [h, h']
+    · simp [h]
+    · have h' : ¬ u x < 0 := not_lt.mpr h.le
+      simp [h, h']
+
 end EllipticPdes.Embedding

@@ -694,7 +694,7 @@
       "decl": "EllipticPdes.Embedding.hasWeakGradOn_posPart",
       "source_id": "gilbarg-2001",
       "locator": "§7.4 Lemma 7.6",
-      "claim": "formalises the first clause of the cited lemma: on an open set, the positive part of a locally integrable class with a locally integrable weak gradient has the weak gradient equal to the gradient of the class where the class is positive and to zero elsewhere. The cited statement also lists the negative part and the absolute value, which follow from this clause by the identities the source names and are not stated separately here. The proof is the cited one, applying the chain rule to the C^1 functions sqrt((t^+)^2 + eps^2) - eps and letting eps tend to zero by dominated convergence on both sides"
+      "claim": "formalises the first clause of the cited lemma: on an open set, the positive part of a locally integrable class with a locally integrable weak gradient has the weak gradient equal to the gradient of the class where the class is positive and to zero elsewhere. The negative part and the absolute value, the other two clauses of the cited lemma, follow from this clause by the identities the source names and are stated as the next two results. The proof is the cited one, applying the chain rule to the C^1 functions sqrt((t^+)^2 + eps^2) - eps and letting eps tend to zero by dominated convergence on both sides"
     },
     {
       "decl": "EllipticPdes.Embedding.ae_eq_zero_of_eq_const_of_hasWeakGradOn",
@@ -743,6 +743,18 @@
       "source_id": "gilbarg-2001",
       "locator": "§8.1 Thm 8.1",
       "claim": "formalises the cited theorem with the transport term present, in dimension at least three, for the operators of this development, which have the coefficients b^i of the cited operator equal to zero, the coefficients c^i bounded and the coefficient d nonpositive, in the sign convention of this development a bounded transport field and a nonnegative zeroth-order coefficient; the cited condition (8.8) then reads d <= 0. The subsolution is an element of the graph space W12 Omega whose bilinear pairing against every nonnegative element of H_0^1(Omega) is nonpositive, the boundary inequality is read as the source defines it, and the conclusion sup u <= sup of u^+ over the boundary is stated as u <= k almost everywhere for every k >= 0 with (u - k)^+ the function coordinate of an element of H_0^1(Omega), as in the transport-free case. The proof is the cited one: testing against v = (u - k)^+, the inequality (8.10) bounds the energy of v by the transport bound times the gradient norm of v times the L^2 norm of v over the set Gamma where u > k and the gradient does not vanish; ellipticity, the Sobolev inequality on H_0^1 at the exponent 2n/(n - 1), which the cited proof takes at 2n/(n - 2) for n >= 3, and Hölder's inequality bound the measure of Gamma below by a constant independent of k at every level whose superlevel set has positive measure; and the bound is contradicted as k increases to the supremum of the levels with nonzero truncation, where the sets Gamma shrink into the level set, on which the gradient vanishes by Lemma 7.7. The cited remark on n = 2 is not formalised, and the domain is bounded, which the cited proof uses through the Sobolev inequality"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.hasWeakGradOn_negPart",
+      "source_id": "gilbarg-2001",
+      "locator": "§7.4 Lemma 7.6",
+      "claim": "formalises the second clause of the cited lemma: on an open set, the negative part min u 0 of a locally integrable class with a locally integrable weak gradient has the weak gradient equal to the gradient of the class where the class is negative and to zero elsewhere. The proof is the identity the source names, the negative part being the negative of the positive part of the negative"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.hasWeakGradOn_abs",
+      "source_id": "gilbarg-2001",
+      "locator": "§7.4 Lemma 7.6",
+      "claim": "formalises the third clause of the cited lemma: on an open set, the absolute value of a locally integrable class with a locally integrable weak gradient has the weak gradient equal to the gradient where the class is positive, to its negative where the class is negative, and to zero elsewhere. The proof is the identity the source names, the absolute value being the sum of the positive parts of the class and of its negative"
     }
   ]
 }
