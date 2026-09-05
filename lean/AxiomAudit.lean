@@ -579,3 +579,13 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Sobolev.embW12_isCompact' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Sobolev.embW12_isCompact
+
+/-! ### The Poincaré inequality with the mean subtracted -/
+
+/-- info: 'EllipticPdes.Embedding.ae_const_of_hasWeakGradOn_zero' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.ae_const_of_hasWeakGradOn_zero
+
+/-- info: 'EllipticPdes.Sobolev.poincare_wirtinger' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.poincare_wirtinger

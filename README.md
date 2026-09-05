@@ -76,6 +76,7 @@ prefix.
 | Global approximation by functions smooth up to the boundary | `Extension.exists_smooth_tendsto_of_hasWeakGradOn` |
 | Density of the smooth functions in $H^1(\Omega)$ | `Extension.exists_smooth_tendsto_of_mem_W12` |
 | Rellich-Kondrachov on $H^1(\Omega)$ | `Sobolev.embW12_isCompact` |
+| Poincaré's inequality with the mean subtracted | `Sobolev.poincare_wirtinger` |
 | Gagliardo-Nirenberg-Sobolev on a bounded $C^1$ domain | `Embedding.exists_eLpNorm_sobolevConj_le_domain` |
 | Sobolev ladder on that domain | `Embedding.exists_const_memLp_of_gradClosed_domain` |
 | Hölder continuity up to the boundary | `Embedding.exists_const_holderOnWith_of_gradClosed_domain` |
@@ -388,6 +389,22 @@ prefix.
   operator restores it, `transL2_toLp_sub_le_of_hasWeakGradOn_univ` being the
   modulus of a whole-space class with a weak gradient, and restriction to
   $\Omega$ is Lipschitz,
+- Poincaré's inequality with the mean subtracted, as
+  `EllipticPdes.Sobolev.poincare_wirtinger`, which is §5.8.1 Theorem 1 of
+  Evans at $p = 2$: on a bounded, connected, open domain with $C^1$ boundary
+  one constant bounds the $L^2$ distance of every element of $H^1(\Omega)$
+  from its mean by the $L^2$ norm of its gradient. The proof is Evans's, by
+  contradiction: a sequence of unit $L^2$ norm, zero mean and vanishing
+  gradient has an $L^2$-convergent subsequence by Rellich-Kondrachov on
+  $H^1(\Omega)$, the graph space is closed so the limit has zero weak
+  gradient, and `EllipticPdes.Embedding.ae_const_of_hasWeakGradOn_zero` makes
+  it constant on the connected domain, hence zero by its mean, against its
+  norm. That lemma is Evans's Problem 11 of Chapter 5: the mollifications of
+  the class have zero classical gradient on any ball whose double lies in the
+  domain, so each is constant there and so is their $L^1$ limit, the constants
+  spanning a closed line; the constant of a ball is locally constant in its
+  centre, hence one value on a preconnected set, and a countable subcover puts
+  the class equal to it almost everywhere,
 - the Gagliardo-Nirenberg-Sobolev inequality on a bounded domain with $C^1$
   boundary, as
   `EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_domain`, the single rung

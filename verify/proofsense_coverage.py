@@ -39,6 +39,12 @@ MANIFEST = ROOT / "proofsense" / "manifest.json"
 # that no transcribed statement matches it, which the README under
 # proofsense/ has to justify in prose.
 EXEMPT = {
+    "EllipticPdes.Embedding.ae_const_of_hasWeakGradOn_zero": (
+        "a class with zero weak gradient on a preconnected open set is constant almost "
+        "everywhere. Evans uses it in the proof of 5.8.1 Theorem 1 and refers it to Problem 11 "
+        "of Chapter 5, which is an exercise and not a numbered statement, so no transcribed "
+        "statement matches it"
+    ),
     "EllipticPdes.Extension.tendsto_eLpNorm_translate_convolution_sub": (
         "a shifted mollification converges in L^p to the function it started from. Evans "
         "performs the shift and the mollification together inside the proof of 5.3.3 Theorem 3 "

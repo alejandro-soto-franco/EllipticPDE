@@ -637,6 +637,12 @@
       "source_id": "evans-2010",
       "locator": "§5.7 Thm 1",
       "claim": "formalises the cited theorem at p = q = 2 for the graph space W12 Omega, the H^1(Omega) of this development: on a bounded open domain with C^1 boundary the embedding of W12 Omega into L^2(Omega) is a compact operator. The cited statement asks 1 <= p < n and concludes compactness into L^q(U) for every q below the Sobolev conjugate; the statement here takes p = 2 and q = 2, and asks nothing of the dimension, since the target exponent equals the source one. The proof extends each class to the whole space by 5.4 Theorem 1 and applies the Frechet-Kolmogorov criterion, where the cited proof mollifies and uses Arzela-Ascoli"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.poincare_wirtinger",
+      "source_id": "evans-2010",
+      "locator": "§5.8.1 Thm 1",
+      "claim": "formalises the cited theorem at p = 2 for the graph space W12 Omega, the H^1(Omega) of this development: on a bounded, connected, open domain with C^1 boundary, one constant bounds the L^2 distance of every element from its mean by the L^2 norm of its gradient, the gradient norm being read as the square root of the sum of the squared L^2 norms of its components. The cited statement takes 1 <= p <= infinity; the statement here takes p = 2, and asks the domain to be nonempty, which the cited statement leaves implicit in the mean. The proof is the cited one, by contradiction through the Rellich-Kondrachov theorem of 5.7 and the constancy of a class with zero weak gradient on a connected set, which the cited proof refers to Problem 11 of the chapter"
     }
   ]
 }
