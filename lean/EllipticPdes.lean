@@ -141,6 +141,7 @@ import EllipticPdes.Spectrum.EigenFamily
 import EllipticPdes.Spectrum.Multiplicity
 import EllipticPdes.Spectrum.BallSpectrum
 import EllipticPdes.Spectrum.BallDimension
+import EllipticPdes.Spectrum.RellichW12
 
 /-!
 # EllipticPdes

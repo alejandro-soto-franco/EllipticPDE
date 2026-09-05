@@ -75,6 +75,7 @@ prefix.
 | The operator as a linear map | `Extension.extLinear` |
 | Global approximation by functions smooth up to the boundary | `Extension.exists_smooth_tendsto_of_hasWeakGradOn` |
 | Density of the smooth functions in $H^1(\Omega)$ | `Extension.exists_smooth_tendsto_of_mem_W12` |
+| Rellich-Kondrachov on $H^1(\Omega)$ | `Sobolev.embW12_isCompact` |
 | Gagliardo-Nirenberg-Sobolev on a bounded $C^1$ domain | `Embedding.exists_eLpNorm_sobolevConj_le_domain` |
 | Sobolev ladder on that domain | `Embedding.exists_const_memLp_of_gradClosed_domain` |
 | Hölder continuity up to the boundary | `Embedding.exists_const_holderOnWith_of_gradClosed_domain` |
@@ -377,6 +378,16 @@ prefix.
   $\Omega$. `exists_smooth_tendsto_of_mem_W12` is the statement at $p = 2$
   for the graph space `W12`, which is density of the smooth functions in
   $H^1(\Omega)$,
+- Rellich-Kondrachov on $H^1(\Omega)$, as
+  `EllipticPdes.Sobolev.embW12_isCompact`, which is §5.7 Theorem 1 of Evans at
+  $p = q = 2$: on a bounded domain with $C^1$ boundary the embedding of the
+  graph space `W12` into $L^2(\Omega)$ is compact. `embL2_isCompact` is the
+  statement on $H_0^1(\Omega)$, whose proof extends by zero; an element of
+  $H^1(\Omega)$ extended by zero jumps at the boundary and loses the
+  translation modulus the Fréchet-Kolmogorov criterion asks for. The extension
+  operator restores it, `transL2_toLp_sub_le_of_hasWeakGradOn_univ` being the
+  modulus of a whole-space class with a weak gradient, and restriction to
+  $\Omega$ is Lipschitz,
 - the Gagliardo-Nirenberg-Sobolev inequality on a bounded domain with $C^1$
   boundary, as
   `EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_domain`, the single rung

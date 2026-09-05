@@ -10,6 +10,10 @@
     {
       "id": "fernandezreal-2023-reg-the-ell",
       "content_list": "../latex/litreview/sources/transcribed-mineru/fernandezreal-2023-reg-the-ell.tex"
+    },
+    {
+      "id": "gilbarg-2001",
+      "content_list": "../latex/litreview/sources/transcribed-mineru/gilbarg-2001-ell-par-dif.md"
     }
   ],
   "space_map": {
@@ -621,6 +625,18 @@
       "source_id": "evans-2010",
       "locator": "§5.3.3 Thm 3",
       "claim": "formalises the cited theorem at k = 1 and p = 2 for the graph space W12 Omega, the H^1(Omega) of this development: on a bounded open domain with C^1 boundary every element is the H^1(Omega) limit of smooth compactly supported functions on the whole space, the functions converging to its function coordinate in L^2(Omega) and their partial derivatives to its gradient coordinates. The cited statement produces functions in C^infinity of the closure of U; the functions here are restrictions of C_c^infinity(R^n) functions"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.transL2_toLp_sub_le_of_hasWeakGradOn_univ",
+      "source_id": "gilbarg-2001",
+      "locator": "§7.11 Lemma 7.23",
+      "claim": "formalises the difference-quotient estimate of the cited lemma for a compactly supported class on the whole space at p = 2, in the form of a translation modulus: the L^2 norm of the difference between the class and its translate by h is at most the length of h times the sum of the L^2 norms of the components of its weak gradient. The cited statement bounds the difference quotient in one coordinate direction on a subdomain at positive distance from the boundary by the L^p norm of the matching partial derivative; the statement here takes the whole space, an arbitrary direction, and the sum over the components in place of the one directional derivative. The proof mollifies the class and passes the smooth estimate to the limit, as the cited proof does"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.embW12_isCompact",
+      "source_id": "evans-2010",
+      "locator": "§5.7 Thm 1",
+      "claim": "formalises the cited theorem at p = q = 2 for the graph space W12 Omega, the H^1(Omega) of this development: on a bounded open domain with C^1 boundary the embedding of W12 Omega into L^2(Omega) is a compact operator. The cited statement asks 1 <= p < n and concludes compactness into L^q(U) for every q below the Sobolev conjugate; the statement here takes p = 2 and q = 2, and asks nothing of the dimension, since the target exponent equals the source one. The proof extends each class to the whole space by 5.4 Theorem 1 and applies the Frechet-Kolmogorov criterion, where the cited proof mollifies and uses Arzela-Ascoli"
     }
   ]
 }

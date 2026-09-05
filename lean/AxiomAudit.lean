@@ -571,3 +571,11 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Extension.exists_smooth_tendsto_of_mem_W12' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Extension.exists_smooth_tendsto_of_mem_W12
+
+/-- info: 'EllipticPdes.Sobolev.transL2_toLp_sub_le_of_hasWeakGradOn_univ' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.transL2_toLp_sub_le_of_hasWeakGradOn_univ
+
+/-- info: 'EllipticPdes.Sobolev.embW12_isCompact' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.embW12_isCompact

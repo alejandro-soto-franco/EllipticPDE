@@ -288,10 +288,12 @@ EXEMPT = {
 # name one, and a bare section number names none of them:
 #
 #   §6.3.1 Thm 1                  a numbered result inside a numbered section
+#   §7.11 Lemma 7.23              a result numbered by chapter inside a numbered section
 #   §1.1 Thm (Sobolev inequality) a named result in a section that numbers none
 #   App. A (H3)                   a labelled property in a lettered appendix
 #
-# The second and third forms arrived with the Fernandez-Real and Ros-Oton text,
+# The chapter-numbered form arrived with Gilbarg and Trudinger, who number every
+# result by chapter. The named and lettered forms arrived with the Fernandez-Real and Ros-Oton text,
 # which numbers its appendix properties (H1) to (H8) and leaves several chapter
 # theorems unnumbered. Restricting the rule to the first form would have forced
 # a warrant for either to cite the enclosing section, which is the failure this
@@ -299,7 +301,7 @@ EXEMPT = {
 _MARKER = r"Thm|Theorem|Lem|Lemma|Cor|Corollary|Def|Definition|Rmk|Remark|Prop|Proposition"
 STATEMENT_LOCATOR = re.compile(
     rf"""^(?:
-          §?\s*\d+(?:\.\d+)*\s+(?:{_MARKER})\s*(?:\d+|\([^)]+\))
+          §?\s*\d+(?:\.\d+)*\s+(?:{_MARKER})\s*(?:\d+(?:\.\d+)*|\([^)]+\))
         | (?:App\.?|Appendix)\s*[A-Z]\s*\([^)]+\)
       )$""",
     re.IGNORECASE | re.VERBOSE,
