@@ -1001,6 +1001,42 @@
       "source_id": "gilbarg-2001",
       "locator": "§3.2 Thm 3.6",
       "claim": "formalises the final clause of the cited theorem, that with c < 0 at some point in the source's sign, which is c nonzero at some point here, the constant is zero, since L of the constant is c times it; stated for the difference of two functions with the same image under L"
+    },
+    {
+      "decl": "EllipticPdes.Classical.weak_maximum_principle_subharmonic",
+      "source_id": "guo-2026",
+      "locator": "§XI.1 Lemma XI.1.7",
+      "claim": "formalises the cited lemma: on a bounded open set, a function C^2 on the set and continuous on its closure with nonnegative Laplacian, the Laplacian read as the sum of the second coordinate partials, has its supremum over the closure attained on the boundary, stated as a boundary point y with u <= u y on the closure. Connectedness, which the source's word domain includes, is unused. The proof is the classical weak maximum principle for the operator with the identity as coefficient matrix and no lower-order terms, whose image is the negative of the Laplacian; the source's own proof goes through the strong maximum principle, which is Lemma XI.1.5"
+    },
+    {
+      "decl": "EllipticPdes.Classical.strong_maximum_principle_subharmonic",
+      "source_id": "guo-2026",
+      "locator": "§XI.1 Lemma XI.1.5",
+      "claim": "formalises the cited lemma: a function C^2 on a connected open set with nonnegative Laplacian, read as the sum of the second coordinate partials, that attains its supremum over the set at an interior point is constant. The proof is the classical strong maximum principle for the operator with the identity as coefficient matrix and no lower-order terms, through Hopf's lemma, where the source argues through the mean value property"
+    },
+    {
+      "decl": "EllipticPdes.Classical.strong_minimum_principle_superharmonic",
+      "source_id": "guo-2026",
+      "locator": "§XI.1 Cor XI.1.6",
+      "claim": "formalises the first clause of the cited corollary: a function C^2 on a connected open set with nonpositive Laplacian that attains its infimum at an interior point is constant. It is Lemma XI.1.5 applied to -u"
+    },
+    {
+      "decl": "EllipticPdes.Classical.harmonic_const_of_max",
+      "source_id": "guo-2026",
+      "locator": "§XI.1 Cor XI.1.6",
+      "claim": "formalises the second clause of the cited corollary for the supremum: a harmonic function, with zero Laplacian read as the sum of the second coordinate partials, on a connected open set, attaining its supremum at an interior point, is constant. It is Lemma XI.1.5 since a harmonic function is subharmonic"
+    },
+    {
+      "decl": "EllipticPdes.Classical.harmonic_const_of_min",
+      "source_id": "guo-2026",
+      "locator": "§XI.1 Cor XI.1.6",
+      "claim": "formalises the second clause of the cited corollary for the infimum: a harmonic function on a connected open set attaining its infimum at an interior point is constant. It is the first clause since a harmonic function is superharmonic"
+    },
+    {
+      "decl": "EllipticPdes.Classical.dirichlet_unique_harmonic",
+      "source_id": "guo-2026",
+      "locator": "§XI.2 Lemma XI.2.4",
+      "claim": "formalises the uniqueness clause of the cited lemma: two functions C^2 on a bounded open set and continuous on its closure, with the same Laplacian on the set and the same boundary values, agree on the closure, so the Dirichlet problem for the Laplacian with continuous boundary data has at most one solution. The source states C^infinity on the set and the Laplacian zero; both are cases. The existence clause, which the source obtains by approximating the boundary data and passing to a uniform limit under an assumption on the boundary, remains open. The proof is the one the source names, the weak maximum principle of Lemma XI.1.7 applied to the difference in both directions"
     }
   ]
 }

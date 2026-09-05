@@ -776,6 +776,32 @@ import EllipticPdes
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Classical.apriori_bound_abs
 
+/-! ### Subharmonic and harmonic functions -/
+
+/-- info: 'EllipticPdes.Classical.weak_maximum_principle_subharmonic' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Classical.weak_maximum_principle_subharmonic
+
+/-- info: 'EllipticPdes.Classical.strong_maximum_principle_subharmonic' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Classical.strong_maximum_principle_subharmonic
+
+/-- info: 'EllipticPdes.Classical.strong_minimum_principle_superharmonic' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Classical.strong_minimum_principle_superharmonic
+
+/-- info: 'EllipticPdes.Classical.harmonic_const_of_max' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Classical.harmonic_const_of_max
+
+/-- info: 'EllipticPdes.Classical.harmonic_const_of_min' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Classical.harmonic_const_of_min
+
+/-- info: 'EllipticPdes.Classical.dirichlet_unique_harmonic' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Classical.dirichlet_unique_harmonic
+
 /-- info: 'EllipticPdes.Classical.not_isLocalMax_of_nondivOp_neg' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Classical.not_isLocalMax_of_nondivOp_neg

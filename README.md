@@ -109,6 +109,7 @@ prefix.
 | Tangency at a boundary point forces equality | `Classical.eq_of_eq_of_fderiv_eq` |
 | Uniqueness for the classical Neumann problem | `Classical.neumann_unique` |
 | A priori bound from the maximum principle | `Classical.apriori_bound_abs` |
+| The strong maximum principle for subharmonic functions | `Classical.strong_maximum_principle_subharmonic` |
 | Gagliardo-Nirenberg-Sobolev on a bounded $C^1$ domain | `Embedding.exists_eLpNorm_sobolevConj_le_domain` |
 | Sobolev ladder on that domain | `Embedding.exists_const_memLp_of_gradClosed_domain` |
 | Hölder continuity up to the boundary | `Embedding.exists_const_holderOnWith_of_gradClosed_domain` |
@@ -617,6 +618,14 @@ prefix.
   $\sup u^+ + (F/\theta)(e^{\alpha D} - e^{\alpha (x_1 - m)})$ at
   $\alpha = B/\theta + 1$ has image at least $F$ under $L$, so the comparison
   principle applies,
+- the maximum principles for subharmonic, superharmonic and harmonic functions,
+  Guo's Lemmas XI.1.5 and XI.1.7 and Corollary XI.1.6, as
+  `EllipticPdes.Classical.strong_maximum_principle_subharmonic`,
+  `EllipticPdes.Classical.weak_maximum_principle_subharmonic` and their
+  companions, and the uniqueness clause of Lemma XI.2.4 as
+  `EllipticPdes.Classical.dirichlet_unique_harmonic`: the Laplacian, read as the
+  sum of the second coordinate partials, is the negative of the operator with
+  the identity as coefficient matrix and no lower-order terms,
 - the Gagliardo-Nirenberg-Sobolev inequality on a bounded domain with $C^1$
   boundary, as
   `EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_domain`, the single rung
