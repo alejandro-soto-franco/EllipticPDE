@@ -941,6 +941,66 @@
       "source_id": "gilbarg-2001",
       "locator": "§3.3 Thm 3.7",
       "claim": "formalises the cited theorem in its case L u = f, with the constant of the parallel-planes case: sup |u| <= sup of |u| over the boundary + C sup |f|/lambda, stated as a boundary point y with |u| <= |u y| + (exp((B/theta + 1) D) - 1) F/theta on the closure. The proof is the cited one, the case L u >= f applied to u and to -u"
+    },
+    {
+      "decl": "EllipticPdes.Classical.weak_maximum_principle",
+      "source_id": "gilbarg-2001",
+      "locator": "§3.1 Thm 3.1",
+      "claim": "formalises the maximum clause of the cited theorem, whose L u >= 0 with c = 0 is, in the sign convention of this development, a subsolution with nonpositive image under the operator with a, -b and no zeroth-order term: on a bounded open set, for u in C^2 of the set and C^0 of the closure, the maximum of u over the closure is attained on the boundary, stated as a boundary point y with u <= u y on the closure. The cited hypothesis (3.3), |b|/lambda bounded, is read as separate bounds theta on the ellipticity and B on |b|. The proof is the cited one: a strict subsolution has no interior maximum, since the Hessian at an interior maximum is nonpositive against the positive semidefinite coefficient matrix, and u + eps exp(gamma x_1) is a strict subsolution for gamma large, so its maximum over the closure is on the boundary, and eps tends to zero"
+    },
+    {
+      "decl": "EllipticPdes.Classical.weak_minimum_principle",
+      "source_id": "gilbarg-2001",
+      "locator": "§3.1 Thm 3.1",
+      "claim": "formalises the minimum clause of the cited theorem, for L u <= 0 with c = 0, which is a supersolution in the sign convention of this development: the minimum of u over the closure is attained on the boundary, stated as a boundary point y with u y <= u on the closure. It is the maximum clause applied to -u"
+    },
+    {
+      "decl": "EllipticPdes.Classical.weak_maximum_principle_of_nonneg",
+      "source_id": "gilbarg-2001",
+      "locator": "§3.1 Cor 3.2",
+      "claim": "formalises the first inequality of (3.8) in the cited corollary, for L u >= 0 with c <= 0, which in the sign convention of this development is a subsolution with nonnegative zeroth-order coefficient: sup u <= sup of u^+ over the boundary, stated as a boundary point y with u <= max (u y) 0 on the closure. The proof is the cited one, Theorem 3.1 for the operator without zeroth-order term on the set where u > 0, whose boundary is inside the boundary of the set or the zero set of u"
+    },
+    {
+      "decl": "EllipticPdes.Classical.weak_minimum_principle_of_nonneg",
+      "source_id": "gilbarg-2001",
+      "locator": "§3.1 Cor 3.2",
+      "claim": "formalises the second inequality of (3.8) in the cited corollary, for L u <= 0 with c <= 0: inf u >= inf of u^- over the boundary, with u^- the minimum of u and zero, stated as a boundary point y with min (u y) 0 <= u on the closure. It is the first inequality applied to -u"
+    },
+    {
+      "decl": "EllipticPdes.Classical.hopf_lemma_of_zero",
+      "source_id": "gilbarg-2001",
+      "locator": "§3.2 Lemma 3.4",
+      "claim": "formalises the final clause of the cited lemma, for c of any sign with c/lambda bounded and u(x_0) = 0, under the interior sphere condition given by a ball inside the open set whose sphere passes through x_0: the derivative of u at x_0 along the outward radius is positive. The proof is the one the cited proof names, the argument with L replaced by L - c^+, which in this development is the operator with the positive part of the nonnegative-sign coefficient, whose image on u is at most that of L since u < 0 on the set"
+    },
+    {
+      "decl": "EllipticPdes.Classical.strong_maximum_principle",
+      "source_id": "gilbarg-2001",
+      "locator": "§3.2 Thm 3.5",
+      "claim": "formalises both maximum clauses of the cited theorem for a subsolution C^2 on a connected open set: with c = 0, or with c <= 0 in the source's sign, which is the nonnegative zeroth-order coefficient of this development, and a nonnegative maximum, both read as c times the maximum nonnegative, the function is constant if it attains its maximum over the set at an interior point. The cited statement takes the coefficients locally bounded relative to lambda and the domain unbounded if need be; the statement here takes uniform bounds theta, A, B, C on the set. The minimum clauses are the maximum clauses for -u. The proof is the cited one: the set where u is below its maximum M is open, and if nonempty and not the whole set has a point closer to the level set of M than to the boundary; the largest ball about it inside that set touches the level set at a point where Lemma 3.4 gives a nonzero gradient, though the point is an interior maximum"
+    },
+    {
+      "decl": "EllipticPdes.Classical.strong_maximum_principle_of_nonneg",
+      "source_id": "gilbarg-2001",
+      "locator": "§3.2 Thm 3.5",
+      "claim": "formalises the clause of the cited theorem with c <= 0 in the source's sign and a nonnegative maximum attained in the interior: the function is constant. It is the general form with c times the maximum the product of two nonnegative numbers"
+    },
+    {
+      "decl": "EllipticPdes.Classical.strong_maximum_principle_of_zero",
+      "source_id": "gilbarg-2001",
+      "locator": "§3.2 Thm 3.5",
+      "claim": "formalises the remark following the cited theorem, that with c of any sign a subsolution attaining the maximum zero at an interior point is constant, which the source reads off the proof through Lemma 3.4 at a zero value. The proof in this development is the theorem for the operator with the positive part of the coefficient, whose image on u is at most that of L since u <= 0 on the set"
+    },
+    {
+      "decl": "EllipticPdes.Classical.neumann_unique",
+      "source_id": "gilbarg-2001",
+      "locator": "§3.2 Thm 3.6",
+      "claim": "formalises the cited theorem for the difference of two functions with the same image under L, of which the source's single solution of L u = 0 is the case v = 0: on a bounded connected open set with an interior sphere at every frontier point, with c <= 0 in the source's sign and bounded, a function C^2 on the set and continuous on the closure, differentiable at every frontier point with vanishing derivative there along the radius of an interior sphere, which is the normal derivative times the radius, is constant on the closure. The cited statement asks the normal derivative defined everywhere on the boundary and takes c/lambda bounded; the statement here asks differentiability at the frontier points and separate bounds. The proof is the cited one: if u is not constant, either u or -u attains a nonnegative maximum M over the closure at a boundary point x_0 and is below M inside, by the strong maximum principle, and Lemma 3.4 at x_0 contradicts the vanishing normal derivative"
+    },
+    {
+      "decl": "EllipticPdes.Classical.neumann_unique_of_exists_pos",
+      "source_id": "gilbarg-2001",
+      "locator": "§3.2 Thm 3.6",
+      "claim": "formalises the final clause of the cited theorem, that with c < 0 at some point in the source's sign, which is c nonzero at some point here, the constant is zero, since L of the constant is c times it; stated for the difference of two functions with the same image under L"
     }
   ]
 }
