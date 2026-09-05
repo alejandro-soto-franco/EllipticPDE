@@ -39,6 +39,11 @@ MANIFEST = ROOT / "proofsense" / "manifest.json"
 # that no transcribed statement matches it, which the README under
 # proofsense/ has to justify in prose.
 EXEMPT = {
+    "EllipticPdes.Extension.mem_W12_of_hasWeakGradOn": (
+        "a class with an L^2 weak gradient, paired with it, lies in the graph space W12. It is "
+        "the converse of the unpacking of that space's defining constraint and states nothing "
+        "either text numbers; both define W^{1,2}(Omega) as the set of such classes"
+    ),
     "EllipticPdes.Extension.hasC1Boundary_ball": (
         "the unit ball has C^1 boundary in the sense of Evans C.1 and Guo III.1.1. Both texts "
         "define the notion and neither states a lemma that a ball satisfies it, so no transcribed "

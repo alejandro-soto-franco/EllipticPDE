@@ -617,3 +617,13 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Sobolev.poincare_wirtinger_ball' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Sobolev.poincare_wirtinger_ball
+
+/-! ### The extension operator between the graph spaces -/
+
+/-- info: 'EllipticPdes.Extension.mem_W12_of_hasWeakGradOn' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Extension.mem_W12_of_hasWeakGradOn
+
+/-- info: 'EllipticPdes.Extension.exists_extW12' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Extension.exists_extW12

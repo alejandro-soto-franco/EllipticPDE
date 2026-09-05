@@ -76,6 +76,7 @@ prefix.
 | The support clause | `Extension.exists_extension_subset` |
 | The norm bound, clause (iii) | `Extension.exists_extension_subset_bound` |
 | The operator as a linear map | `Extension.extLinear` |
+| The operator between the Sobolev spaces | `Extension.exists_extW12` |
 | Global approximation by functions smooth up to the boundary | `Extension.exists_smooth_tendsto_of_hasWeakGradOn` |
 | Density of the smooth functions in $H^1(\Omega)$ | `Extension.exists_smooth_tendsto_of_mem_W12` |
 | Rellich-Kondrachov on $H^1(\Omega)$ | `Sobolev.embW12_isCompact` |
@@ -395,6 +396,17 @@ prefix.
   rather than through a bundled Sobolev space; the bound is therefore stated on
   the pair in place of an operator norm, and it is stated at every exponent
   rather than at $2$,
+- the operator between the Sobolev spaces themselves, as
+  `EllipticPdes.Extension.exists_extW12`, which is Guo's Theorem III.2.2 at
+  $p = 2$ as he states it: a bounded linear map from the graph space `W12`
+  of the domain, the $H^1(\Omega)$ of this development, to the graph space of
+  the whole space, agreeing with the element on the domain in the function and
+  the gradient coordinates, with function coordinate vanishing outside the given
+  open set, and bounded by a constant times the norm. The map on classes is the
+  map on representatives, which descends because it is linear and bounded by the
+  seminorms over the domain: two representatives of one class differ by a pair of
+  seminorm zero, so their images differ by a function of seminorm zero. That
+  closes the difference of space the previous item records,
 - global approximation by functions smooth up to the boundary, as
   `EllipticPdes.Extension.exists_smooth_tendsto_of_hasWeakGradOn`, which is
   §5.3.3 Theorem 3 of Evans at order one: on a bounded domain with $C^1$

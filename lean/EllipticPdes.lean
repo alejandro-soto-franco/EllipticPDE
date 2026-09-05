@@ -103,6 +103,7 @@ import EllipticPdes.Extension.LocalExtension
 import EllipticPdes.Extension.Operator
 import EllipticPdes.Extension.LinearOperator
 import EllipticPdes.Extension.GlobalApproximation
+import EllipticPdes.Extension.GraphOperator
 import EllipticPdes.Extension.Reflect
 import EllipticPdes.Extension.Translate
 import EllipticPdes.Analysis.LpTranslationContinuity
