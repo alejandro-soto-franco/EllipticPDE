@@ -609,6 +609,18 @@
       "source_id": "evans-2010",
       "locator": "§6.3.1 Thm 3",
       "claim": "composes the existence of a weak solution with the interior smoothness the cited theorem states: for an operator with no transport term and a nonnegative zeroth-order coefficient on a bounded domain, with a C^1 diffusion, coefficients in W^{k,infinity} at every order and a datum with weak derivatives of every order bounded in L^2, the Dirichlet problem has a weak solution whose class has a C^infinity representative on the interior of every compact subset. The cited statement assumes smooth coefficients and datum and concludes u in C^infinity(U); the statement here takes the weaker W^{k,infinity} hypotheses and concludes on the interior of a compact subset. The pointwise equation is not part of the statement: a smooth representative satisfies it by the fundamental lemma of the calculus of variations, which this development does not formalise"
+    },
+    {
+      "decl": "EllipticPdes.Extension.exists_smooth_tendsto_of_hasWeakGradOn",
+      "source_id": "evans-2010",
+      "locator": "§5.3.3 Thm 3",
+      "claim": "formalises the cited theorem at order one: on a bounded domain with C^1 boundary, a class with an L^p weak gradient, 1 <= p < infinity, is the W^{1,p}(Omega) limit of a sequence of functions, the functions converging to the class in L^p(Omega) and their partial derivatives to the components of the weak gradient. The cited statement takes u in W^{k,p}(U) and produces u_m in C^infinity of the closure of U; the statement here takes k = 1 and produces smooth compactly supported functions on the whole space, whose restrictions lie in C^infinity of the closure, which is the stronger conclusion. The proof runs through the extension operator of 5.4 Theorem 1 and mollification in place of the shift and partition of unity of the cited proof"
+    },
+    {
+      "decl": "EllipticPdes.Extension.exists_smooth_tendsto_of_mem_W12",
+      "source_id": "evans-2010",
+      "locator": "§5.3.3 Thm 3",
+      "claim": "formalises the cited theorem at k = 1 and p = 2 for the graph space W12 Omega, the H^1(Omega) of this development: on a bounded open domain with C^1 boundary every element is the H^1(Omega) limit of smooth compactly supported functions on the whole space, the functions converging to its function coordinate in L^2(Omega) and their partial derivatives to its gradient coordinates. The cited statement produces functions in C^infinity of the closure of U; the functions here are restrictions of C_c^infinity(R^n) functions"
     }
   ]
 }

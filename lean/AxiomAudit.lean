@@ -561,3 +561,13 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Embedding.exists_const_contDiffOn_holderOnWith_domain_free' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Embedding.exists_const_contDiffOn_holderOnWith_domain_free
+
+/-! ### Global approximation and Rellich-Kondrachov on the graph space -/
+
+/-- info: 'EllipticPdes.Extension.exists_smooth_tendsto_of_hasWeakGradOn' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Extension.exists_smooth_tendsto_of_hasWeakGradOn
+
+/-- info: 'EllipticPdes.Extension.exists_smooth_tendsto_of_mem_W12' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Extension.exists_smooth_tendsto_of_mem_W12

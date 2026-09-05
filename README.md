@@ -73,6 +73,8 @@ prefix.
 | The support clause | `Extension.exists_extension_subset` |
 | The norm bound, clause (iii) | `Extension.exists_extension_subset_bound` |
 | The operator as a linear map | `Extension.extLinear` |
+| Global approximation by functions smooth up to the boundary | `Extension.exists_smooth_tendsto_of_hasWeakGradOn` |
+| Density of the smooth functions in $H^1(\Omega)$ | `Extension.exists_smooth_tendsto_of_mem_W12` |
 | Gagliardo-Nirenberg-Sobolev on a bounded $C^1$ domain | `Embedding.exists_eLpNorm_sobolevConj_le_domain` |
 | Sobolev ladder on that domain | `Embedding.exists_const_memLp_of_gradClosed_domain` |
 | Hölder continuity up to the boundary | `Embedding.exists_const_holderOnWith_of_gradClosed_domain` |
@@ -363,6 +365,18 @@ prefix.
   rather than through a bundled Sobolev space; the bound is therefore stated on
   the pair in place of an operator norm, and it is stated at every exponent
   rather than at $2$,
+- global approximation by functions smooth up to the boundary, as
+  `EllipticPdes.Extension.exists_smooth_tendsto_of_hasWeakGradOn`, which is
+  §5.3.3 Theorem 3 of Evans at order one: on a bounded domain with $C^1$
+  boundary a class with an $L^p$ weak gradient is the $W^{1,p}(\Omega)$ limit
+  of smooth compactly supported functions on $\mathbb{R}^d$. Evans shifts the
+  class into the domain near each boundary point, mollifies and patches with a
+  partition of unity. The extension operator makes the shift unnecessary: the
+  mollifications of the extension converge to it in $L^p(\mathbb{R}^d)$
+  together with their gradients, and the extension agrees with the class on
+  $\Omega$. `exists_smooth_tendsto_of_mem_W12` is the statement at $p = 2$
+  for the graph space `W12`, which is density of the smooth functions in
+  $H^1(\Omega)$,
 - the Gagliardo-Nirenberg-Sobolev inequality on a bounded domain with $C^1$
   boundary, as
   `EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_domain`, the single rung
