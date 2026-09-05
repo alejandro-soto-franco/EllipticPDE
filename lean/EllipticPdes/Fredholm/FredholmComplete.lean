@@ -442,6 +442,74 @@ lemma bijective_adjoint_of_equiv (e : E ≃L[ℝ] E) :
     rw [← ContinuousLinearMap.comp_apply, h1, ContinuousLinearMap.one_apply]
   exact ⟨hl.injective, hr.surjective⟩
 
+/-- **Fredholm alternative** (Evans Appendix D Theorem 5, Guo Theorem VII.4.4) for a compact
+operator `K` on a real Hilbert space: the kernel of `1 - K` is finite dimensional, the range of
+`1 - K` is closed and is the orthogonal complement of the kernel of `1 - K†`, `1 - K` is
+injective exactly when it is surjective, and the kernels of `1 - K` and `1 - K†` have the same
+dimension. -/
+theorem fredholm_alternative_compact (hK : IsCompactOperator K) :
+    FiniteDimensional ℝ (LinearMap.ker ((1 - K : E →L[ℝ] E)).toLinearMap) ∧
+    IsClosed (Set.range (1 - K : E →L[ℝ] E)) ∧
+    LinearMap.range ((1 - K : E →L[ℝ] E)).toLinearMap
+      = (LinearMap.ker ((1 - ContinuousLinearMap.adjoint K : E →L[ℝ] E)).toLinearMap)ᗮ ∧
+    (LinearMap.ker ((1 - K : E →L[ℝ] E)).toLinearMap = ⊥ ↔
+      LinearMap.range ((1 - K : E →L[ℝ] E)).toLinearMap = ⊤) ∧
+    Module.finrank ℝ
+        (LinearMap.ker ((1 - ContinuousLinearMap.adjoint K : E →L[ℝ] E)).toLinearMap)
+      = Module.finrank ℝ (LinearMap.ker ((1 - K : E →L[ℝ] E)).toLinearMap) := by
+  have hfin := finiteDimensional_ker_one_sub hK
+  have hcl := isClosed_range_one_sub hK
+  have hrange : LinearMap.range ((1 - K : E →L[ℝ] E)).toLinearMap
+      = (LinearMap.ker ((1 - ContinuousLinearMap.adjoint K : E →L[ℝ] E)).toLinearMap)ᗮ := by
+    rw [range_eq_orthogonal_ker_adjoint _ hcl, adjoint_one_sub]
+  have hrank := finrank_ker_one_sub_adjoint_eq hK
+  refine ⟨hfin, hcl, hrange, ⟨fun hker => ?_, fun hran => ?_⟩, hrank⟩
+  · -- injective implies surjective, through the dichotomy for the eigenvalue `1`
+    rcases hK.hasEigenvalue_or_mem_resolventSet (μ := (1 : ℝ)) one_ne_zero with he | hr
+    · exfalso
+      have h1 : Module.End.eigenspace (K : Module.End ℝ E) 1 ≠ ⊥ := he
+      rw [← ker_one_sub_eq_eigenspace] at h1
+      exact h1 hker
+    · rw [spectrum.mem_resolventSet_iff, map_one] at hr
+      obtain ⟨u, hu⟩ := hr
+      rw [LinearMap.range_eq_top]
+      intro y
+      refine ⟨u.inv y, ?_⟩
+      have : (1 - K : E →L[ℝ] E) * u.inv = 1 := by rw [← hu, Units.val_inv]
+      change ((1 - K : E →L[ℝ] E) * u.inv) y = y
+      rw [this, ContinuousLinearMap.one_apply]
+  · -- surjective implies injective, through the equality of dimensions
+    have h1 : (LinearMap.ker ((1 - ContinuousLinearMap.adjoint K : E →L[ℝ] E)).toLinearMap)ᗮ
+        = ⊤ := by rw [← hrange, hran]
+    rw [Submodule.orthogonal_eq_top_iff] at h1
+    rw [h1, finrank_bot] at hrank
+    exact Submodule.finrank_eq_zero.mp hrank.symm
+
+/-- **Fredholm dichotomy** (Evans Appendix D Theorem 5, the remark following it; Guo Theorem
+VII.4.4): either `(1 - K) u = h` has exactly one solution for every `h`, or the homogeneous
+equation has a nonzero solution. -/
+theorem fredholm_dichotomy_compact (hK : IsCompactOperator K) :
+    (∀ h : E, ∃! u : E, (1 - K : E →L[ℝ] E) u = h)
+      ∨ ∃ u : E, u ≠ 0 ∧ (1 - K : E →L[ℝ] E) u = 0 := by
+  obtain ⟨-, -, -, hiff, -⟩ := fredholm_alternative_compact hK
+  by_cases hker : LinearMap.ker ((1 - K : E →L[ℝ] E)).toLinearMap = ⊥
+  · left
+    have hran := hiff.mp hker
+    intro h
+    obtain ⟨u, hu⟩ := LinearMap.range_eq_top.mp hran h
+    have hu0 : (1 - K : E →L[ℝ] E) u = h := hu
+    refine ⟨u, hu0, fun u' hu' => ?_⟩
+    have hu1 : (1 - K : E →L[ℝ] E) u' = h := hu'
+    have hmem : u' - u ∈ LinearMap.ker ((1 - K : E →L[ℝ] E)).toLinearMap := by
+      rw [LinearMap.mem_ker, ContinuousLinearMap.coe_coe, map_sub]
+      change (1 - K : E →L[ℝ] E) u' - (1 - K : E →L[ℝ] E) u = 0
+      rw [hu1, hu0, sub_self]
+    rw [hker, Submodule.mem_bot, sub_eq_zero] at hmem
+    exact hmem
+  · right
+    obtain ⟨u, hu, hne⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hker
+    exact ⟨u, hne, hu⟩
+
 end RieszTheory
 
 variable {d : ℕ}

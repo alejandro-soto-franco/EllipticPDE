@@ -63,6 +63,14 @@ import EllipticPdes
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Sobolev.FullEllipticOp.solvable_iff_orthogonal_solSpaceStar
 
+/-- info: 'EllipticPdes.Sobolev.fredholm_alternative_compact' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.fredholm_alternative_compact
+
+/-- info: 'EllipticPdes.Sobolev.fredholm_dichotomy_compact' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.fredholm_dichotomy_compact
+
 /-- info: 'EllipticPdes.Sobolev.FullEllipticOp.fredholm_alternative_of_bounded' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Sobolev.FullEllipticOp.fredholm_alternative_of_bounded

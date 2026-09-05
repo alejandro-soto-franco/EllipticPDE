@@ -1361,6 +1361,30 @@
       "source_id": "guo-2026",
       "locator": "§VIII.3 Thm VIII.3.3",
       "claim": "formalises the cited theorem for a solution with zero boundary values, with the coefficients having bounded weak derivatives of every order on the set, which the source's C^infinity coefficients on a bounded set with bounded derivatives satisfy, and f with weak derivatives of every order bounded in L^2: the weak solution in H_0^1(Omega) of L u = f has a representative smooth on the interior of every compact subset of the set. The proof is the cited one, Theorem VIII.3.2 at every order and the Sobolev embedding; the estimate of Theorem VIII.3.2 at each finite order remains open in this form"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.fredholm_alternative_compact",
+      "source_id": "evans-2010",
+      "locator": "App. D (Thm 5)",
+      "claim": "formalises the cited theorem for a compact operator K on a real Hilbert space, all five clauses: the kernel of I - K is finite dimensional, the range of I - K is closed, the range of I - K is the orthogonal complement of the kernel of I - K^*, I - K is injective exactly when it is surjective, and the kernels of I - K and of I - K^* have the same dimension. The proof is the cited one: the Riesz argument for the finite dimensionality and the bound below on the orthogonal complement of the kernel, the duality of range and adjoint kernel, Mathlib's dichotomy for the eigenvalue 1 for one direction of clause (iv) and the equality of dimensions for the other, and the finite-rank perturbation argument for clause (v)"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.fredholm_dichotomy_compact",
+      "source_id": "evans-2010",
+      "locator": "App. D (Thm 5)",
+      "claim": "formalises the remark following the cited theorem, the alternative (alpha) or (beta): for a compact operator K on a real Hilbert space, either u - K u = f has exactly one solution for every f, or the homogeneous equation u - K u = 0 has a nonzero solution. It is clause (iv) of the theorem"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.fredholm_alternative_compact",
+      "source_id": "guo-2026",
+      "locator": "§VII.4 Thm VII.4.4",
+      "claim": "formalises the cited theorem for a compact operator K on a real Hilbert space: the finite dimensionality of the space of solutions of (Id - K) u = 0, the equality of its dimension with that of the solutions of (Id - K^*) u = 0, and the solvability of (Id - K) u = h exactly when h is orthogonal to the kernel of Id - K^*, which is the final clause, together with the closed range and the equivalence of injectivity and surjectivity of Id - K from which the dichotomy of clauses (i) and (ii) follows in fredholm_dichotomy_compact. The proof is the Riesz theory of compact operators"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.fredholm_dichotomy_compact",
+      "source_id": "guo-2026",
+      "locator": "§VII.4 Thm VII.4.4",
+      "claim": "formalises the dichotomy of the cited theorem, clauses (i) and (ii): for a compact operator K on a real Hilbert space, either (Id - K) u = h has exactly one solution for every h, or (Id - K) u = 0 has a nonzero solution. It is the equivalence of injectivity and surjectivity of Id - K"
     }
   ]
 }
