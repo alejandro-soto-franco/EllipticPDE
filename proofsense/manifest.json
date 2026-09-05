@@ -1037,6 +1037,102 @@
       "source_id": "guo-2026",
       "locator": "§XI.2 Lemma XI.2.4",
       "claim": "formalises the uniqueness clause of the cited lemma: two functions C^2 on a bounded open set and continuous on its closure, with the same Laplacian on the set and the same boundary values, agree on the closure, so the Dirichlet problem for the Laplacian with continuous boundary data has at most one solution. The source states C^infinity on the set and the Laplacian zero; both are cases. The existence clause, which the source obtains by approximating the boundary data and passing to a uniform limit under an assumption on the boundary, remains open. The proof is the one the source names, the weak maximum principle of Lemma XI.1.7 applied to the difference in both directions"
+    },
+    {
+      "decl": "EllipticPdes.Regularity.norm_diffQuot_le_of_hasWeakDeriv",
+      "source_id": "evans-2010",
+      "locator": "§5.8.2 Thm 3",
+      "claim": "formalises clause (i) of the cited theorem at p = 2 on the whole space, where the cited statement takes u in W^{1,p}(U) and V compactly inside U: an L^2 class on R^d with an L^2 weak k-th derivative has k-th difference quotients of every step bounded in L^2 by the norm of that derivative, with constant one where the source writes a constant C. The proof is the cited one, the segment-integral representation of the difference quotient against a smooth compactly supported test function, then density"
+    },
+    {
+      "decl": "EllipticPdes.Regularity.weakDeriv_of_diffQuot_bounded",
+      "source_id": "evans-2010",
+      "locator": "§5.8.2 Thm 3",
+      "claim": "formalises clause (ii) of the cited theorem at p = 2 on the whole space, where the cited statement takes u in L^p(U) and V compactly inside U: an L^2 class on R^d whose k-th difference quotients are bounded in L^2 by M for every nonzero step has an L^2 weak k-th derivative of norm at most M. The proof is the cited one, weak compactness of the bounded family of difference quotients and passage to the limit in the discrete integration by parts against a test function, whose own difference quotients converge in L^2 to its derivative"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.morrey_ball_contDiff",
+      "source_id": "evans-2010",
+      "locator": "§5.6.2 Thm 4",
+      "claim": "formalises the Hölder-seminorm clause of the cited inequality, for a smooth function on a ball rather than a C^1 function on R^n, in the sharper form the remark after the proof describes as trickier: the seminorm of u at the exponent 1 - n/p over the ball is bounded by a constant times the L^p norms of the partial derivatives over the same ball. The supremum clause of the C^{0,gamma} norm, which the source bounds by the W^{1,p} norm through the L^p norm of u, remains open. The proof is the cited one, the averaged estimate of |u(x) - u(y)| by the integral of |Du(z)|/|x - z|^{n-1} over a ball and Hölder's inequality"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.morrey_ball",
+      "source_id": "evans-2010",
+      "locator": "§5.6.2 Thm 5",
+      "claim": "formalises the cited theorem on a ball, which is a bounded open set with C^1 boundary, for the Hölder seminorm: an integrable function on the ball with an L^p weak gradient there, n < p, agrees almost everywhere on the ball with a function Hölder continuous on the ball at the exponent 1 - n/p, with seminorm bounded by a constant times the L^p norms of the gradient components over the ball. The source states the C^{0,gamma} norm on the closure bounded by the W^{1,p} norm; the supremum clause and the extension to the closure remain open. The proof is by mollification in the interior and the smooth estimate, where the source extends to R^n and applies Theorem 4"
+    },
+    {
+      "decl": "EllipticPdes.Regularity.norm_diffQuot_le_of_hasWeakDeriv",
+      "source_id": "gilbarg-2001",
+      "locator": "§7.11 Lemma 7.23",
+      "claim": "formalises the cited lemma at p = 2 with Omega and Omega' the whole space, for a class with an L^2 weak derivative in the direction of the difference quotient: the L^2 norm of the difference quotient at every step is at most the L^2 norm of the weak derivative. The source takes u in W^{1,p}(Omega) and the estimate on a subdomain at distance more than h from the boundary; on the whole space the restriction is vacuous. The proof is the cited one, the one-dimensional integral representation for smooth functions and approximation"
+    },
+    {
+      "decl": "EllipticPdes.Regularity.weakDeriv_of_diffQuot_bounded",
+      "source_id": "gilbarg-2001",
+      "locator": "§7.11 Lemma 7.24",
+      "claim": "formalises the cited lemma at p = 2 with Omega and Omega' the whole space: an L^2 class whose difference quotients in a coordinate direction are bounded in L^2 by K for every nonzero step has a weak derivative in that direction of L^2 norm at most K. The proof is the cited one, weak compactness of the bounded difference quotients and passage to the limit against a test function"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.eLpNorm_le_of_mem_H01_of_isBounded",
+      "source_id": "gilbarg-2001",
+      "locator": "§7.7 Thm 7.10",
+      "claim": "formalises the case p = 2 < n of the cited theorem, on a bounded measurable set: an element of H_0^1(Omega) lies in L^q(Omega) for every q with 1/q at least 1/2 - 1/n, in particular at q = 2n/(n - 2), with the L^q seminorm bounded by a constant depending on Omega and q times the sum of the L^2 norms of the gradient components, which is the estimate (7.26) with the norm of Du read componentwise. The clause p > n, the supremum bound, remains open. The proof is the cited one on test functions, Mathlib's Gagliardo-Nirenberg-Sobolev inequality, then the transfer to the closure"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.morrey_ball",
+      "source_id": "gilbarg-2001",
+      "locator": "§7.8 Thm 7.17",
+      "claim": "formalises the cited theorem on a ball in place of W_0^{1,p}(Omega), for p > n: a function on the ball with an L^p weak gradient there agrees almost everywhere with a function Hölder continuous on the ball at the exponent 1 - n/p, with seminorm bounded by a constant times the L^p norms of the gradient components over the ball, which is the estimate (7.42) in the form |u(x) - u(y)| <= C |x - y|^gamma ‖Du‖_p on the ball. The source states the oscillation over the intersection with a ball of radius R as C R^gamma ‖Du‖_p and takes u in W_0^{1,p}(Omega); the ball version here needs no vanishing on the boundary and is the local statement the source's proof establishes. The proof is by mollification and the potential estimate on the ball, where the source uses Lemma 7.16"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.rellichEmbL_isCompact",
+      "source_id": "gilbarg-2001",
+      "locator": "§7.10 Thm 7.22",
+      "claim": "formalises clause (i) of the cited theorem at p = 2 < n for 2 < q < 2n/(n - 2): the embedding of H_0^1(Omega) into L^q(Omega) is a compact operator on a bounded measurable set, the exponent q written through the interpolation parameter theta of the proof with 1/q = theta/2 + (1 - theta)/p^*. The endpoint q = 2 is the compactness of embL2 the spectral development takes as a hypothesis, and clause (ii), p > n, remains open. The proof is the cited one, compactness at the endpoint and the interpolation inequality (7.9) with the Sobolev inequality at p^*"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.FullEllipticOp.weak_solution_L2_of_nonneg_zeroth_of_bounded",
+      "source_id": "gilbarg-2001",
+      "locator": "§8.2 Thm 8.3",
+      "claim": "formalises the cited theorem for the operators of this development with g in L^2, f^i = 0 and boundary values phi = 0, under conditions (8.5), (8.6) and (8.8) read with the source's b^i and c^i zero and d <= 0, which in the sign convention of this development is a nonnegative zeroth-order coefficient: on a bounded set the generalised Dirichlet problem L u = g in W_0^{1,2}(Omega) has exactly one solution, with a bound on its norm by that of g. The reduction to zero boundary values and the terms D_i f^i remain open. The proof is by the Lax-Milgram theorem with the Poincaré inequality, where the source goes through the Fredholm alternative and Corollary 8.2"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.FullEllipticOp.existence_three_of_bounded",
+      "source_id": "gilbarg-2001",
+      "locator": "§8.2 Thm 8.6",
+      "claim": "formalises the first clause of the cited theorem, for the operators of this development on a bounded measurable set with zero boundary values and g in L^2: there is a countable set Sigma of real numbers, with finitely many members below any bound, such that the problem L u - sigma u = g in W_0^{1,2}(Omega) is uniquely solvable for every g exactly when sigma is outside Sigma, the sign of sigma being that of this development. The clause on sigma in Sigma is solvable_iff_orthogonal_solSpaceStar with finiteDimensional_solSpace, and the final clause, Sigma inside (-infinity, 0) under (8.8), is covered at sigma = 0 by weak_solution_L2_of_nonneg_zeroth_of_bounded and otherwise remains open. The proof is the cited one, the Fredholm alternative for the compact operator sigma_0 L_{sigma_0}^{-1} I"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.FullEllipticOp.solvable_iff_orthogonal_solSpaceStar",
+      "source_id": "gilbarg-2001",
+      "locator": "§8.2 Thm 8.6",
+      "claim": "formalises the solvability criterion of the cited theorem for sigma in Sigma, with the compactness of the operator opK as a hypothesis: the problem L u = F for a bounded functional F on W_0^{1,2}(Omega) has a solution exactly when F vanishes on the solutions of the homogeneous adjoint problem, which is the orthogonality condition (8.15) with the data read as a functional. The proof is the cited one, the Fredholm alternative for the compact perturbation of the identity"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.FullEllipticOp.finiteDimensional_solSpace",
+      "source_id": "gilbarg-2001",
+      "locator": "§8.2 Thm 8.6",
+      "claim": "formalises the finite dimensionality clause of the cited theorem, with the compactness of the operator opK as a hypothesis: the space of solutions of the homogeneous problem L u = 0 in W_0^{1,2}(Omega) is finite dimensional. The proof is the cited one, the Fredholm alternative"
+    },
+    {
+      "decl": "EllipticPdes.Regularity.interior_H2_estimate",
+      "source_id": "gilbarg-2001",
+      "locator": "§8.3 Thm 8.8",
+      "claim": "formalises the cited theorem for the operators of this development, whose divergence-form part has no coefficient b^i inside the divergence, with the leading coefficients of class C^1 where the source asks Lipschitz continuity, the lower-order coefficients bounded, f in L^2 and the solution in W_0^{1,2}(Omega) with zero boundary values: on a compact subset of the open set the solution has second weak derivatives in L^2 with the estimate (8.17), the right side here being the L^2 norm of u in place of its W^{1,2} norm, and the constant quantified before the data. The proof is the cited one, difference quotients of the weak form with a cutoff and the bound on their L^2 norms, then Lemma 7.24"
+    },
+    {
+      "decl": "EllipticPdes.Regularity.interior_smooth",
+      "source_id": "gilbarg-2001",
+      "locator": "§8.3 Thm 8.10",
+      "claim": "formalises the conclusion of the cited theorem at every order at once, which is its Corollary 8.11 for a solution with zero boundary values: with the coefficients of the operator having bounded weak derivatives of every order on the set, the source's C^{k,1} and C^{k-1,1} for every k, and f with weak derivatives of every order in L^2, the solution of L u = f in W_0^{1,2}(Omega) has a representative smooth on the interior of any compact subset. The estimate (8.24) at each finite order remains open in this form. The proof is the cited one, the induction of Theorem 8.8 through the differentiated equation"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.symmetric_fullElliptic_spectral",
+      "source_id": "gilbarg-2001",
+      "locator": "§8.12 Thm 8.37",
+      "claim": "formalises the spanning clause of the cited theorem for the operators of this development with symmetric leading coefficients, no transport term and nonnegative zeroth-order coefficient, under a Poincaré inequality on test functions and with the compactness of the embedding into L^2 as a hypothesis: the eigenspaces of the solution operator of the Dirichlet problem span a dense subspace of L^2(Omega), which is the completeness of the eigenfunctions in L^2 where the source states it in H = W_0^{1,2}(Omega). The eigenvalues are countable and discrete as the nonzero spectrum of a compact self-adjoint operator, which is spectrum_compact_operator. The proof is the cited one, the spectral theorem for the compact self-adjoint solution operator"
     }
   ]
 }

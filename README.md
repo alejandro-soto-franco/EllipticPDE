@@ -110,6 +110,8 @@ prefix.
 | Uniqueness for the classical Neumann problem | `Classical.neumann_unique` |
 | A priori bound from the maximum principle | `Classical.apriori_bound_abs` |
 | The strong maximum principle for subharmonic functions | `Classical.strong_maximum_principle_subharmonic` |
+| Difference quotients and weak derivatives | `Regularity.weakDeriv_of_diffQuot_bounded` |
+| Morrey's inequality on a ball | `Embedding.morrey_ball` |
 | Gagliardo-Nirenberg-Sobolev on a bounded $C^1$ domain | `Embedding.exists_eLpNorm_sobolevConj_le_domain` |
 | Sobolev ladder on that domain | `Embedding.exists_const_memLp_of_gradClosed_domain` |
 | Hölder continuity up to the boundary | `Embedding.exists_const_holderOnWith_of_gradClosed_domain` |

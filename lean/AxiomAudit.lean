@@ -576,6 +576,22 @@ import EllipticPdes
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Sobolev.transL2_toLp_sub_le_of_hasWeakGradOn_univ
 
+/-- info: 'EllipticPdes.Regularity.norm_diffQuot_le_of_hasWeakDeriv' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.norm_diffQuot_le_of_hasWeakDeriv
+
+/-- info: 'EllipticPdes.Regularity.weakDeriv_of_diffQuot_bounded' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.weakDeriv_of_diffQuot_bounded
+
+/-- info: 'EllipticPdes.Embedding.morrey_ball_contDiff' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.morrey_ball_contDiff
+
+/-- info: 'EllipticPdes.Embedding.morrey_ball' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.morrey_ball
+
 /-- info: 'EllipticPdes.Sobolev.embW12_isCompact' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Sobolev.embW12_isCompact
