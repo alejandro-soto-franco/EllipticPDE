@@ -39,6 +39,12 @@ MANIFEST = ROOT / "proofsense" / "manifest.json"
 # that no transcribed statement matches it, which the README under
 # proofsense/ has to justify in prose.
 EXEMPT = {
+    "EllipticPdes.Sobolev.hasWeakGradOn_comp_affineBall": (
+        "a weak gradient transported through the affine map of the unit ball onto a ball picks "
+        "up the factor r. Evans performs the change of variables inside the proof of 5.8.1 "
+        "Theorem 2, writing v(y) = u(x + r y) and reading Dv off without a lemma, so no "
+        "transcribed statement matches it"
+    ),
     "EllipticPdes.Extension.mem_W12_of_hasWeakGradOn": (
         "a class with an L^2 weak gradient, paired with it, lies in the graph space W12. It is "
         "the converse of the unpacking of that space's defining constraint and states nothing "

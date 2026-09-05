@@ -627,3 +627,13 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Extension.exists_extW12' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Extension.exists_extW12
+
+/-! ### Poincaré's inequality on a ball -/
+
+/-- info: 'EllipticPdes.Sobolev.hasWeakGradOn_comp_affineBall' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.hasWeakGradOn_comp_affineBall
+
+/-- info: 'EllipticPdes.Sobolev.poincare_ball' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.poincare_ball

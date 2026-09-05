@@ -677,6 +677,12 @@
       "source_id": "guo-2026",
       "locator": "§III.2 Thm III.2.2",
       "claim": "formalises the cited theorem at p = 2 as it is stated, as a bounded linear map between the Sobolev spaces: on a bounded open domain with C^1 boundary and for any open set the closure of the domain sits in, there is a bounded linear map from W12 Omega, the H^1(Omega) of this development, to the graph space of the whole space, whose image agrees with the element on the domain in the function and the gradient coordinates, whose function coordinate vanishes almost everywhere outside the open set, and which is bounded by a constant times the norm. The cited statement takes every p in [1, infinity) and writes the bound as an operator norm; the statement here takes p = 2, states clause (ii) for the function coordinate, and states the bound elementwise. The map on classes is the map on representatives of exists_extLinear, which descends because it is linear and bounded by the seminorms over the domain"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.poincare_ball",
+      "source_id": "evans-2010",
+      "locator": "§5.8.1 Thm 2",
+      "claim": "formalises the cited theorem at p = 2: one constant, depending on the dimension alone, bounds the L^2 distance of a class on any ball from its mean over the ball by the radius times the L^2 norm of its gradient, the class being given as a function with an L^2 weak gradient on the ball and the gradient norm read as the square root of the sum of the squared L^2 norms of its components. The cited statement takes 1 <= p <= infinity and a class in W^{1,p} of the open ball; the statement here takes p = 2. The proof is the cited one, carrying the unit-ball case onto the ball by the affine map, under which the measure scales by r^n, the mean is unchanged and the weak gradient picks up the factor r"
     }
   ]
 }

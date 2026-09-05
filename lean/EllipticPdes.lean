@@ -147,6 +147,7 @@ import EllipticPdes.Spectrum.BallDimension
 import EllipticPdes.Embedding.ConstOfGradZero
 import EllipticPdes.Spectrum.RellichW12
 import EllipticPdes.Spectrum.PoincareWirtinger
+import EllipticPdes.Spectrum.PoincareBall
 
 /-!
 # EllipticPdes

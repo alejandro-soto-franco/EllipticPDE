@@ -81,6 +81,7 @@ prefix.
 | Density of the smooth functions in $H^1(\Omega)$ | `Extension.exists_smooth_tendsto_of_mem_W12` |
 | Rellich-Kondrachov on $H^1(\Omega)$ | `Sobolev.embW12_isCompact` |
 | Poincaré's inequality with the mean subtracted | `Sobolev.poincare_wirtinger` |
+| Poincaré's inequality on a ball | `Sobolev.poincare_ball` |
 | Gagliardo-Nirenberg-Sobolev on a bounded $C^1$ domain | `Embedding.exists_eLpNorm_sobolevConj_le_domain` |
 | Sobolev ladder on that domain | `Embedding.exists_const_memLp_of_gradClosed_domain` |
 | Hölder continuity up to the boundary | `Embedding.exists_const_holderOnWith_of_gradClosed_domain` |
@@ -445,6 +446,15 @@ prefix.
   spanning a closed line; the constant of a ball is locally constant in its
   centre, hence one value on a preconnected set, and a countable subcover puts
   the class equal to it almost everywhere,
+- Poincaré's inequality on a ball, as `EllipticPdes.Sobolev.poincare_ball`,
+  which is §5.8.1 Theorem 2 of Evans at $p = 2$: one constant, depending on
+  the dimension alone, bounds the $L^2$ distance of a class on any ball from
+  its mean over the ball by the radius times the $L^2$ norm of its gradient.
+  The unit-ball case is the previous item, and the affine map $y \mapsto ry + x$
+  takes it onto the ball: it is a measure-preserving map from the unit ball
+  to the ball with Lebesgue measure scaled by $r^{-d}$, so the mean is
+  unchanged, the weak gradient picks up the factor $r$, and the seminorm
+  factor $r^{-d/2}$ cancels between the two sides,
 - the Gagliardo-Nirenberg-Sobolev inequality on a bounded domain with $C^1$
   boundary, as
   `EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_domain`, the single rung
