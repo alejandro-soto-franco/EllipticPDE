@@ -39,6 +39,12 @@ MANIFEST = ROOT / "proofsense" / "manifest.json"
 # that no transcribed statement matches it, which the README under
 # proofsense/ has to justify in prose.
 EXEMPT = {
+    "EllipticPdes.Regularity.hasWeakGradOn_of_contDiffOn": (
+        "the classical gradient of a C^1 function on an open set is a weak gradient there, by "
+        "integration by parts against a test function of compact support. Both texts read a "
+        "classical derivative as a weak one without stating a lemma, Evans in 5.2.1 after the "
+        "definition of the weak derivative and Guo in II.1, so no transcribed statement matches it"
+    ),
     "EllipticPdes.Embedding.ae_const_of_hasWeakGradOn_zero": (
         "a class with zero weak gradient on a preconnected open set is constant almost "
         "everywhere. Evans uses it in the proof of 5.8.1 Theorem 1 and refers it to Problem 11 "
@@ -295,11 +301,12 @@ EXEMPT = {
 #
 #   §6.3.1 Thm 1                  a numbered result inside a numbered section
 #   §7.11 Lemma 7.23              a result numbered by chapter inside a numbered section
+#   §I.2 Lemma I.2.4              the same with the chapter in roman numerals
 #   §1.1 Thm (Sobolev inequality) a named result in a section that numbers none
 #   App. A (H3)                   a labelled property in a lettered appendix
 #
 # The chapter-numbered form arrived with Gilbarg and Trudinger, who number every
-# result by chapter. The named and lettered forms arrived with the Fernandez-Real and Ros-Oton text,
+# result by chapter, and the roman form with Guo, whose chapters are roman. The named and lettered forms arrived with the Fernandez-Real and Ros-Oton text,
 # which numbers its appendix properties (H1) to (H8) and leaves several chapter
 # theorems unnumbered. Restricting the rule to the first form would have forced
 # a warrant for either to cite the enclosing section, which is the failure this
@@ -307,7 +314,7 @@ EXEMPT = {
 _MARKER = r"Thm|Theorem|Lem|Lemma|Cor|Corollary|Def|Definition|Rmk|Remark|Prop|Proposition"
 STATEMENT_LOCATOR = re.compile(
     rf"""^(?:
-          §?\s*\d+(?:\.\d+)*\s+(?:{_MARKER})\s*(?:\d+(?:\.\d+)*|\([^)]+\))
+          §?\s*(?:\d+|[IVX]+)(?:\.\d+)*\s+(?:{_MARKER})\s*(?:(?:\d+|[IVX]+)(?:\.\d+)*|\([^)]+\))
         | (?:App\.?|Appendix)\s*[A-Z]\s*\([^)]+\)
       )$""",
     re.IGNORECASE | re.VERBOSE,

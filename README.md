@@ -42,6 +42,8 @@ prefix.
 | Interior $H^2$ regularity | `Regularity.interior_H2_estimate` |
 | Higher interior regularity at every order | `Regularity.higher_interior_regularity` |
 | Infinite differentiability in the interior | `Regularity.interior_smooth` |
+| The pointwise equation of the smooth representative | `Regularity.weakSolution_ae_eq_of_contDiffOn` |
+| Classical solvability in the interior | `Regularity.exists_weakSolution_interior_classical` |
 | Interior Hölder continuity at exponent $\tfrac12$, dimensions one to three | `Embedding.interior_holder_estimate_one` |
 | Interior Hölder continuity of finite order, every dimension | `Regularity.exists_contDiffOn_holder_ball` |
 | The same estimate for the weak solution | `Regularity.interior_holder_of_weakSolution` |
@@ -108,6 +110,19 @@ prefix.
   derivative on $V$ give a $C^{k,1/2}$ representative on a ball whenever
   $k + 1 + \lfloor n/2 \rfloor \le m$. This is case (ii) of the order-$k$ Sobolev
   embedding at $p = 2$,
+- the pointwise equation of the smooth representative, as
+  `EllipticPdes.Regularity.weakSolution_ae_eq_of_contDiffOn`: a weak solution
+  whose function coordinate has a $C^2$ representative on an open subset of
+  the domain satisfies $-\sum_{i,j}\partial_j(a^{ij}\partial_i u) +
+  \sum_i b^i \partial_i u + c u = f$ there almost everywhere, the diffusion
+  being $C^1$. The classical gradient of the representative is a weak gradient
+  on the open set, so by uniqueness it is the weak gradient of the solution
+  there, the weak formulation tested against a function supported in the set
+  is integrated by parts once more, and the fundamental lemma of the calculus
+  of variations, Guo's Lemma I.2.4, makes the residual vanish.
+  `exists_weakSolution_interior_classical` composes it with
+  `exists_weakSolution_interior_smooth`, so classical solvability in the
+  interior is now closed on both halves, regularity and equation,
 - the same estimate for the weak solution itself, as
   `EllipticPdes.Regularity.interior_holder_of_weakSolution`, which discharges
   that supply of weak derivatives from the equation through

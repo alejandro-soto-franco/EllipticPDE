@@ -14,6 +14,10 @@
     {
       "id": "gilbarg-2001",
       "content_list": "../latex/litreview/sources/transcribed-mineru/gilbarg-2001-ell-par-dif.md"
+    },
+    {
+      "id": "guo-2026",
+      "content_list": "../latex/litreview/sources/transcribed-mineru/guo-2026-par-dif-equ.md"
     }
   ],
   "space_map": {
@@ -612,7 +616,7 @@
       "decl": "EllipticPdes.Regularity.exists_weakSolution_interior_smooth",
       "source_id": "evans-2010",
       "locator": "§6.3.1 Thm 3",
-      "claim": "composes the existence of a weak solution with the interior smoothness the cited theorem states: for an operator with no transport term and a nonnegative zeroth-order coefficient on a bounded domain, with a C^1 diffusion, coefficients in W^{k,infinity} at every order and a datum with weak derivatives of every order bounded in L^2, the Dirichlet problem has a weak solution whose class has a C^infinity representative on the interior of every compact subset. The cited statement assumes smooth coefficients and datum and concludes u in C^infinity(U); the statement here takes the weaker W^{k,infinity} hypotheses and concludes on the interior of a compact subset. The pointwise equation is not part of the statement: a smooth representative satisfies it by the fundamental lemma of the calculus of variations, which this development does not formalise"
+      "claim": "composes the existence of a weak solution with the interior smoothness the cited theorem states: for an operator with no transport term and a nonnegative zeroth-order coefficient on a bounded domain, with a C^1 diffusion, coefficients in W^{k,infinity} at every order and a datum with weak derivatives of every order bounded in L^2, the Dirichlet problem has a weak solution whose class has a C^infinity representative on the interior of every compact subset. The cited statement assumes smooth coefficients and datum and concludes u in C^infinity(U); the statement here takes the weaker W^{k,infinity} hypotheses and concludes on the interior of a compact subset. The pointwise equation is not part of this statement; exists_weakSolution_interior_classical adds it"
     },
     {
       "decl": "EllipticPdes.Extension.exists_smooth_tendsto_of_hasWeakGradOn",
@@ -643,6 +647,18 @@
       "source_id": "evans-2010",
       "locator": "§5.8.1 Thm 1",
       "claim": "formalises the cited theorem at p = 2 for the graph space W12 Omega, the H^1(Omega) of this development: on a bounded, connected, open domain with C^1 boundary, one constant bounds the L^2 distance of every element from its mean by the L^2 norm of its gradient, the gradient norm being read as the square root of the sum of the squared L^2 norms of its components. The cited statement takes 1 <= p <= infinity; the statement here takes p = 2, and asks the domain to be nonempty, which the cited statement leaves implicit in the mean. The proof is the cited one, by contradiction through the Rellich-Kondrachov theorem of 5.7 and the constancy of a class with zero weak gradient on a connected set, which the cited proof refers to Problem 11 of the chapter"
+    },
+    {
+      "decl": "EllipticPdes.Regularity.weakSolution_ae_eq_of_contDiffOn",
+      "source_id": "guo-2026",
+      "locator": "§I.2 Lemma I.2.4",
+      "claim": "applies the cited lemma, the fundamental lemma of the calculus of variations, to the residual of the equation: a weak solution of the Dirichlet problem whose function coordinate has a C^2 representative on an open subset of the domain satisfies the equation there almost everywhere in the classical divergence form, the diffusion being C^1. The cited statement says that a locally integrable function on an open set vanishes almost everywhere if and only if it integrates to zero against every test function; the statement here is the consequence for the residual, the integration by parts and the identification of the weak gradient with the classical one being the two steps in between, and only the direction from the vanishing integrals to the vanishing function is used"
+    },
+    {
+      "decl": "EllipticPdes.Regularity.exists_weakSolution_interior_classical",
+      "source_id": "evans-2010",
+      "locator": "§6.3.1 Thm 3",
+      "claim": "composes the existence of a weak solution with the interior smoothness the cited theorem states and with the pointwise equation: for an operator with no transport term and a nonnegative zeroth-order coefficient on a bounded domain, with a C^1 diffusion, coefficients in W^{k,infinity} at every order and a datum with weak derivatives of every order bounded in L^2, the Dirichlet problem has a weak solution whose class has a C^infinity representative on the interior of every compact subset, and that representative satisfies the equation there almost everywhere in the classical divergence form. The cited statement assumes smooth coefficients and datum and concludes u in C^infinity(U); the statement here takes the weaker W^{k,infinity} hypotheses, concludes on the interior of a compact subset, and adds the pointwise equation, which the cited statement leaves to the reader"
     }
   ]
 }

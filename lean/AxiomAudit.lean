@@ -589,3 +589,17 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Sobolev.poincare_wirtinger' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Sobolev.poincare_wirtinger
+
+/-! ### The pointwise equation of a smooth representative -/
+
+/-- info: 'EllipticPdes.Regularity.hasWeakGradOn_of_contDiffOn' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.hasWeakGradOn_of_contDiffOn
+
+/-- info: 'EllipticPdes.Regularity.weakSolution_ae_eq_of_contDiffOn' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.weakSolution_ae_eq_of_contDiffOn
+
+/-- info: 'EllipticPdes.Regularity.exists_weakSolution_interior_classical' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.exists_weakSolution_interior_classical

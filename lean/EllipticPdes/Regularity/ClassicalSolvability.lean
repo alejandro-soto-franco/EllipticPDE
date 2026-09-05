@@ -14,9 +14,10 @@ it. This file puts the two together, which is the regularity half of classical s
 coefficients and a datum of every order, the Dirichlet problem has a weak solution with a
 representative that is `C^∞` on the interior of every compact subset of the domain.
 
-The pointwise equation is the step this does not take. A `C^∞` representative on the interior
-satisfies the equation there by the fundamental lemma of the calculus of variations, and that
-passage is not formalised here.
+The pointwise equation is the step this file does not take. A `C^∞` representative on the
+interior satisfies the equation there by the fundamental lemma of the calculus of variations,
+which `EllipticPdes.Regularity.PointwiseEquation` proves and
+`EllipticPdes.Regularity.exists_weakSolution_interior_classical` composes with this result.
 
 ## Main declarations
 
