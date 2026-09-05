@@ -691,3 +691,25 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Embedding.hasWeakGradOn_abs' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Embedding.hasWeakGradOn_abs
+
+/-! ### The classical weak maximum principle -/
+
+/-- info: 'EllipticPdes.Classical.sum_mul_nonpos_of_posSemidef' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Classical.sum_mul_nonpos_of_posSemidef
+
+/-- info: 'EllipticPdes.Classical.sndFDeriv_nonpos_of_isLocalMax' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Classical.sndFDeriv_nonpos_of_isLocalMax
+
+/-- info: 'EllipticPdes.Classical.weak_maximum_principle' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Classical.weak_maximum_principle
+
+/-- info: 'EllipticPdes.Classical.weak_minimum_principle' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Classical.weak_minimum_principle
+
+/-- info: 'EllipticPdes.Classical.weak_maximum_principle_of_nonneg' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Classical.weak_maximum_principle_of_nonneg

@@ -92,6 +92,9 @@ prefix.
 | The weak maximum principle in $H^1_0$ | `Sobolev.weak_maximum_principle_H01` |
 | Uniqueness of the generalised Dirichlet problem | `Sobolev.eq_zero_of_weakSolution_H01` |
 | The weak maximum principle with a transport term | `Sobolev.weak_maximum_principle_transport` |
+| The classical weak maximum principle | `Classical.weak_maximum_principle` |
+| The classical weak minimum principle | `Classical.weak_minimum_principle` |
+| The classical weak maximum principle with $c \ge 0$ | `Classical.weak_maximum_principle_of_nonneg` |
 | Gagliardo-Nirenberg-Sobolev on a bounded $C^1$ domain | `Embedding.exists_eLpNorm_sobolevConj_le_domain` |
 | Sobolev ladder on that domain | `Embedding.exists_const_memLp_of_gradClosed_domain` |
 | Hölder continuity up to the boundary | `Embedding.exists_const_holderOnWith_of_gradClosed_domain` |
@@ -528,6 +531,25 @@ prefix.
   $\{u = T\}$; so no level above the boundary value has a nonzero truncation.
   The truncations at every level above the boundary value come from the
   truncation lemma, as `EllipticPdes.Sobolev.exists_truncation_mem_H01`,
+- the classical weak maximum principle, as
+  `EllipticPdes.Classical.weak_maximum_principle`, which is Evans's §6.4.1
+  Theorem 1, Gilbarg and Trudinger's Theorem 3.1 and Guo's Theorem XI.3.7: a
+  function $C^2$ on a bounded open set and continuous on its closure, with
+  $Lu \le 0$ for the non-divergence-form operator
+  $Lu = -a^{ij} u_{x_i x_j} + b^i u_{x_i}$ with symmetric uniformly elliptic
+  $a$ and bounded $b$, attains its maximum over the closure on the boundary.
+  At an interior local maximum the gradient vanishes and the Hessian is
+  negative semidefinite, as `EllipticPdes.Classical.sndFDeriv_nonpos_of_isLocalMax`
+  through the one-dimensional second-order test along lines, and the trace
+  inequality `EllipticPdes.Classical.sum_mul_nonpos_of_posSemidef`, proved
+  through the spectral theorem, makes the principal part nonnegative there; a
+  strict subsolution therefore has no interior maximum, and
+  $u + \varepsilon e^{\lambda x_1}$ is a strict subsolution for $\lambda$
+  large. The supersolution clause is
+  `EllipticPdes.Classical.weak_minimum_principle`, and Theorem 2, with
+  $c \ge 0$ and the positive part on the boundary, is
+  `EllipticPdes.Classical.weak_maximum_principle_of_nonneg`, through Theorem 1
+  on the set where $u > 0$,
 - the Gagliardo-Nirenberg-Sobolev inequality on a bounded domain with $C^1$
   boundary, as
   `EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_domain`, the single rung

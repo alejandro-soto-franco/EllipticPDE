@@ -39,6 +39,17 @@ MANIFEST = ROOT / "proofsense" / "manifest.json"
 # that no transcribed statement matches it, which the README under
 # proofsense/ has to justify in prose.
 EXEMPT = {
+    "EllipticPdes.Classical.sum_mul_nonpos_of_posSemidef": (
+        "the trace inequality for a positive semidefinite matrix against a negative semidefinite "
+        "one. Evans proves it inside step 2 of the proof of 6.4.1 Theorem 1 by orthogonal "
+        "diagonalisation, and Gilbarg and Trudinger assert it in the proof of Theorem 3.1; neither "
+        "numbers it."
+    ),
+    "EllipticPdes.Classical.sndFDeriv_nonpos_of_isLocalMax": (
+        "the Hessian of a C^2 function is negative semidefinite at an interior local maximum. "
+        "Evans states it as display (1) opening §6.4 without a number, and Gilbarg and Trudinger "
+        "use it in the proof of Theorem 3.1."
+    ),
     "EllipticPdes.Sobolev.hasWeakGradOn_comp_affineBall": (
         "a weak gradient transported through the affine map of the unit ball onto a ball picks "
         "up the factor r. Evans performs the change of variables inside the proof of 5.8.1 "

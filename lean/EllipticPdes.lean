@@ -152,6 +152,7 @@ import EllipticPdes.Embedding.ChainRule
 import EllipticPdes.Existence.WeakMaximum
 import EllipticPdes.Sobolev.H01Lattice
 import EllipticPdes.Existence.WeakMaximumTransport
+import EllipticPdes.Existence.ClassicalMaximum
 
 /-!
 # EllipticPdes

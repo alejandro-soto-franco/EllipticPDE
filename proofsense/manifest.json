@@ -755,6 +755,24 @@
       "source_id": "gilbarg-2001",
       "locator": "§7.4 Lemma 7.6",
       "claim": "formalises the third clause of the cited lemma: on an open set, the absolute value of a locally integrable class with a locally integrable weak gradient has the weak gradient equal to the gradient where the class is positive, to its negative where the class is negative, and to zero elsewhere. The proof is the identity the source names, the absolute value being the sum of the positive parts of the class and of its negative"
+    },
+    {
+      "decl": "EllipticPdes.Classical.weak_maximum_principle",
+      "source_id": "evans-2010",
+      "locator": "§6.4.1 Thm 1",
+      "claim": "formalises clause (i) of the cited theorem: on a bounded open nonempty set, a function C^2 on the set and continuous on its closure, with L u <= 0 for the non-divergence-form operator L u = -a^{ij} u_{x_i x_j} + b^i u_{x_i} with symmetric uniformly elliptic a and bounded b, attains its maximum over the closure on the boundary, stated as a boundary point at which u is at least every value on the closure. The cited statement asks the coefficients to be continuous, which the proof does not use, and the statement here asks only symmetry, uniform ellipticity and a bound on b on the set; the cited operator has c = 0, which is the zeroth-order coefficient zero here. The proof is the cited one: at an interior local maximum of a C^2 function the gradient vanishes and the Hessian is negative semidefinite, so the principal part is nonnegative by the trace inequality for a positive semidefinite against a negative semidefinite matrix, proved through the spectral theorem in place of the cited orthogonal diagonalisation; a strict subsolution therefore has no interior maximum; and u + eps exp(lambda x_1) is a strict subsolution for lambda large, whose maximum over the closure is on the boundary, and eps tends to zero"
+    },
+    {
+      "decl": "EllipticPdes.Classical.weak_minimum_principle",
+      "source_id": "evans-2010",
+      "locator": "§6.4.1 Thm 1",
+      "claim": "formalises clause (ii) of the cited theorem: under the hypotheses of clause (i), a function with L u >= 0 attains its minimum over the closure on the boundary. The proof is the cited one, clause (i) applied to -u, the operator being linear"
+    },
+    {
+      "decl": "EllipticPdes.Classical.weak_maximum_principle_of_nonneg",
+      "source_id": "evans-2010",
+      "locator": "§6.4.1 Thm 2",
+      "claim": "formalises clause (i) of the cited theorem: with the zeroth-order coefficient c nonnegative on the set and the other hypotheses of Theorem 1, a subsolution is bounded on the closure by the maximum of its positive part over the boundary, stated as a boundary point y with u <= max (u y) 0 on the closure. The proof is the cited one: on the open set V where u > 0 the operator without zeroth-order term has K u = L u - c u <= 0, so Theorem 1 on V puts the maximum of u over the closure of V on the frontier of V, whose points are either on the frontier of the set or interior points outside V where u <= 0; off the closure of V an interior point has u <= 0 and a boundary point is bounded by the boundary maximum"
     }
   ]
 }
