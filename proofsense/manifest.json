@@ -731,6 +731,18 @@
       "source_id": "gilbarg-2001",
       "locator": "§8.1 Cor 8.2",
       "claim": "formalises the cited corollary in the transport-free case with nonnegative zeroth-order coefficient on a bounded open set: an element of W_0^{1,2}(Omega) whose bilinear pairing against every element of W_0^{1,2}(Omega) vanishes is zero. The proof is the cited one, the weak maximum principle applied to the solution and to its negative, which makes the function coordinate vanish, and uniqueness of the weak gradient, which then makes the gradient coordinates vanish"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.exists_truncation_mem_H01",
+      "source_id": "gilbarg-2001",
+      "locator": "§8.1 Thm 8.1",
+      "claim": "supplies the truncations the proof of the cited theorem uses at every level k above the boundary value l: if (u - k_0)^+ is the function coordinate of an element of W_0^{1,2}(Omega), then for every k >= k_0 there is an element of W_0^{1,2}(Omega) whose function coordinate is (u - k)^+ and whose gradient coordinates are those of u on {u > k} and zero elsewhere. The gradient coordinates of the given element are identified by uniqueness of the weak gradient, and the truncation lemma of the previous result applied at the level k - k_0 gives the element"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.weak_maximum_principle_transport",
+      "source_id": "gilbarg-2001",
+      "locator": "§8.1 Thm 8.1",
+      "claim": "formalises the cited theorem with the transport term present, in dimension at least three, for the operators of this development, which have the coefficients b^i of the cited operator equal to zero, the coefficients c^i bounded and the coefficient d nonpositive, in the sign convention of this development a bounded transport field and a nonnegative zeroth-order coefficient; the cited condition (8.8) then reads d <= 0. The subsolution is an element of the graph space W12 Omega whose bilinear pairing against every nonnegative element of H_0^1(Omega) is nonpositive, the boundary inequality is read as the source defines it, and the conclusion sup u <= sup of u^+ over the boundary is stated as u <= k almost everywhere for every k >= 0 with (u - k)^+ the function coordinate of an element of H_0^1(Omega), as in the transport-free case. The proof is the cited one: testing against v = (u - k)^+, the inequality (8.10) bounds the energy of v by the transport bound times the gradient norm of v times the L^2 norm of v over the set Gamma where u > k and the gradient does not vanish; ellipticity, the Sobolev inequality on H_0^1 at the exponent 2n/(n - 1), which the cited proof takes at 2n/(n - 2) for n >= 3, and Hölder's inequality bound the measure of Gamma below by a constant independent of k at every level whose superlevel set has positive measure; and the bound is contradicted as k increases to the supremum of the levels with nonzero truncation, where the sets Gamma shrink into the level set, on which the gradient vanishes by Lemma 7.7. The cited remark on n = 2 is not formalised, and the domain is bounded, which the cited proof uses through the Sobolev inequality"
     }
   ]
 }

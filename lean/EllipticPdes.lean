@@ -151,6 +151,7 @@ import EllipticPdes.Spectrum.PoincareBall
 import EllipticPdes.Embedding.ChainRule
 import EllipticPdes.Existence.WeakMaximum
 import EllipticPdes.Sobolev.H01Lattice
+import EllipticPdes.Existence.WeakMaximumTransport
 
 /-!
 # EllipticPdes

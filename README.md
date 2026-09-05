@@ -90,6 +90,7 @@ prefix.
 | Truncation in $H^1_0$ | `Sobolev.exists_mem_H01_posPart_sub_const` |
 | The weak maximum principle in $H^1_0$ | `Sobolev.weak_maximum_principle_H01` |
 | Uniqueness of the generalised Dirichlet problem | `Sobolev.eq_zero_of_weakSolution_H01` |
+| The weak maximum principle with a transport term | `Sobolev.weak_maximum_principle_transport` |
 | Gagliardo-Nirenberg-Sobolev on a bounded $C^1$ domain | `Embedding.exists_eLpNorm_sobolevConj_le_domain` |
 | Sobolev ladder on that domain | `Embedding.exists_const_memLp_of_gradClosed_domain` |
 | Hölder continuity up to the boundary | `Embedding.exists_const_holderOnWith_of_gradClosed_domain` |
@@ -509,6 +510,21 @@ prefix.
   the uniqueness of the generalised Dirichlet problem, follows as
   `EllipticPdes.Sobolev.eq_zero_of_weakSolution_H01` by applying the principle
   to the solution and to its negative,
+- the weak maximum principle with a transport term, as
+  `EllipticPdes.Sobolev.weak_maximum_principle_transport`, which is Theorem
+  8.1 of Gilbarg and Trudinger with their coefficients $c^i$ present, in
+  dimension at least three. Testing against $v = (u - k)^+$ bounds the energy
+  of $v$ by the transport bound times the gradient norm of $v$ times the $L^2$
+  norm of $v$ over the set $\Gamma_k$ where $u > k$ and the gradient does not
+  vanish; ellipticity, the Sobolev inequality on $H^1_0$ and Hölder's
+  inequality then bound the measure of $\Gamma_k$ below by a constant
+  independent of $k$ whenever $v \ne 0$. As $k$ increases to the supremum $T$
+  of the levels with nonzero truncation, the sets $\Gamma_k$ shrink into
+  $\{u \ge T\}$ with nonvanishing gradient, which is null because $\{u > T\}$
+  is null by the choice of $T$ and the gradient vanishes almost everywhere on
+  $\{u = T\}$; so no level above the boundary value has a nonzero truncation.
+  The truncations at every level above the boundary value come from the
+  truncation lemma, as `EllipticPdes.Sobolev.exists_truncation_mem_H01`,
 - the Gagliardo-Nirenberg-Sobolev inequality on a bounded domain with $C^1$
   boundary, as
   `EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_domain`, the single rung

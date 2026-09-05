@@ -673,3 +673,13 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Sobolev.eq_zero_of_weakSolution_H01' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Sobolev.eq_zero_of_weakSolution_H01
+
+/-! ### The weak maximum principle with a transport term -/
+
+/-- info: 'EllipticPdes.Sobolev.exists_truncation_mem_H01' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.exists_truncation_mem_H01
+
+/-- info: 'EllipticPdes.Sobolev.weak_maximum_principle_transport' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.weak_maximum_principle_transport
