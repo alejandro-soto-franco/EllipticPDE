@@ -95,6 +95,9 @@ prefix.
 | The classical weak maximum principle | `Classical.weak_maximum_principle` |
 | The classical weak minimum principle | `Classical.weak_minimum_principle` |
 | The classical weak maximum principle with $c \ge 0$ | `Classical.weak_maximum_principle_of_nonneg` |
+| The strict maximum principle | `Classical.not_isLocalMax_of_nondivOp_neg` |
+| The comparison principle | `Classical.comparison_principle` |
+| Bound of a solution by its boundary values | `Classical.abs_le_of_nondivOp_eq_zero` |
 | Hopf's lemma | `Classical.hopf_lemma` |
 | The strong maximum principle | `Classical.strong_maximum_principle` |
 | Gagliardo-Nirenberg-Sobolev on a bounded $C^1$ domain | `Embedding.exists_eLpNorm_sobolevConj_le_domain` |
@@ -551,7 +554,12 @@ prefix.
   `EllipticPdes.Classical.weak_minimum_principle`, and Theorem 2, with
   $c \ge 0$ and the positive part on the boundary, is
   `EllipticPdes.Classical.weak_maximum_principle_of_nonneg`, through Theorem 1
-  on the set where $u > 0$,
+  on the set where $u > 0$. Three corollaries follow: Guo's strict maximum
+  principle XI.3.5 as `EllipticPdes.Classical.not_isLocalMax_of_nondivOp_neg`,
+  Gilbarg and Trudinger's comparison principle 3.3 as
+  `EllipticPdes.Classical.comparison_principle`, and the bound of a solution
+  by its boundary values, the second clause of their Corollary 3.2, as
+  `EllipticPdes.Classical.abs_le_of_nondivOp_eq_zero`,
 - Hopf's lemma and the strong maximum principle, as
   `EllipticPdes.Classical.hopf_lemma` and
   `EllipticPdes.Classical.strong_maximum_principle`, which are Evans's §6.4.2

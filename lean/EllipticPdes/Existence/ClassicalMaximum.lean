@@ -730,4 +730,73 @@ theorem weak_maximum_principle_of_nonneg (hd : 0 < d) {U : Set (EuclideanSpace �
     · exact (hnotV x hxU fun h => hxV (subset_closure h)).trans (le_max_right _ _)
     · exact (hymax hxfr).trans (le_max_left _ _)
 
+/-! ### Corollaries -/
+
+/-- **Strict maximum principle** (Guo Theorem XI.3.5). A strict subsolution, meaning
+`L u < 0` at a point, has no local maximum at that point whenever `c u ≥ 0` there: in
+particular when `c = 0`, when `c ≥ 0` and the maximum is nonnegative, and when the maximum is
+zero. -/
+theorem not_isLocalMax_of_nondivOp_neg {a : EuclideanSpace ℝ (Fin d) → Fin d → Fin d → ℝ}
+    {b : EuclideanSpace ℝ (Fin d) → Fin d → ℝ} {c : EuclideanSpace ℝ (Fin d) → ℝ}
+    {x₀ : EuclideanSpace ℝ (Fin d)} (hsymm : ∀ i j, a x₀ i j = a x₀ j i)
+    (hpsd : ∀ ξ : Fin d → ℝ, 0 ≤ ∑ i, ∑ j, a x₀ i j * ξ i * ξ j)
+    {u : EuclideanSpace ℝ (Fin d) → ℝ} (hu : ContDiffAt ℝ 2 u x₀) (hcu : 0 ≤ c x₀ * u x₀)
+    (hstrict : nondivOp a b c u x₀ < 0) : ¬ IsLocalMax u x₀ := fun hmax =>
+  absurd (le_nondivOp_of_isLocalMax hsymm hpsd hu hmax) (not_le.mpr (hstrict.trans_le hcu))
+
+/-- **Comparison principle** (Gilbarg and Trudinger Theorem 3.3, Guo Corollary XI.3.11). With
+`c ≥ 0`, if `L u ≤ L v` on the set and `u ≤ v` on the boundary, then `u ≤ v` on the closure. -/
+theorem comparison_principle (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))}
+    (hU : IsOpen U) (hUb : Bornology.IsBounded U) (hUne : U.Nonempty)
+    {a : EuclideanSpace ℝ (Fin d) → Fin d → Fin d → ℝ} {b : EuclideanSpace ℝ (Fin d) → Fin d → ℝ}
+    {c : EuclideanSpace ℝ (Fin d) → ℝ}
+    {θ B : ℝ} (hθ : 0 < θ) (hsymm : ∀ x ∈ U, ∀ i j, a x i j = a x j i)
+    (hell : ∀ x ∈ U, ∀ ξ : Fin d → ℝ, θ * ∑ i, ξ i ^ 2 ≤ ∑ i, ∑ j, a x i j * ξ i * ξ j)
+    (hb : ∀ x ∈ U, ∀ i, |b x i| ≤ B) (hc : ∀ x ∈ U, 0 ≤ c x)
+    {u v : EuclideanSpace ℝ (Fin d) → ℝ} (hu : ContDiffOn ℝ 2 u U) (hv : ContDiffOn ℝ 2 v U)
+    (huc : ContinuousOn u (closure U)) (hvc : ContinuousOn v (closure U))
+    (hL : ∀ x ∈ U, nondivOp a b c u x ≤ nondivOp a b c v x)
+    (hbd : ∀ x ∈ frontier U, u x ≤ v x) : ∀ x ∈ closure U, u x ≤ v x := by
+  have hsub : ∀ x ∈ U, nondivOp a b c (fun y => u y + (-1) * v y) x ≤ 0 := by
+    intro x hx
+    rw [nondivOp_add_smul hU hu hv a b c (-1) hx]
+    linarith [hL x hx]
+  obtain ⟨y, hy, hmax⟩ := weak_maximum_principle_of_nonneg hd hU hUb hUne hθ hsymm hell hb hc
+    (hu.add (contDiffOn_const.mul hv)) (huc.add (continuousOn_const.mul hvc)) hsub
+  intro x hx
+  have h1 := hmax x hx
+  have h2 : u y + (-1) * v y ≤ 0 := by linarith [hbd y hy]
+  rw [max_eq_right h2] at h1
+  linarith
+
+/-- **Bound by the boundary values** (Gilbarg and Trudinger Corollary 3.2, second clause). With
+`c ≥ 0`, a solution of `L u = 0` on a bounded open set is bounded in absolute value on the
+closure by the maximum of `|u|` over the boundary. -/
+theorem abs_le_of_nondivOp_eq_zero (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))}
+    (hU : IsOpen U) (hUb : Bornology.IsBounded U) (hUne : U.Nonempty)
+    {a : EuclideanSpace ℝ (Fin d) → Fin d → Fin d → ℝ} {b : EuclideanSpace ℝ (Fin d) → Fin d → ℝ}
+    {c : EuclideanSpace ℝ (Fin d) → ℝ}
+    {θ B : ℝ} (hθ : 0 < θ) (hsymm : ∀ x ∈ U, ∀ i j, a x i j = a x j i)
+    (hell : ∀ x ∈ U, ∀ ξ : Fin d → ℝ, θ * ∑ i, ξ i ^ 2 ≤ ∑ i, ∑ j, a x i j * ξ i * ξ j)
+    (hb : ∀ x ∈ U, ∀ i, |b x i| ≤ B) (hc : ∀ x ∈ U, 0 ≤ c x)
+    {u : EuclideanSpace ℝ (Fin d) → ℝ} (hu : ContDiffOn ℝ 2 u U)
+    (huc : ContinuousOn u (closure U)) (hsol : ∀ x ∈ U, nondivOp a b c u x = 0) :
+    ∃ y ∈ frontier U, ∀ x ∈ closure U, |u x| ≤ |u y| := by
+  have hcl : IsCompact (closure U) := hUb.isCompact_closure
+  have hfr : IsCompact (frontier U) :=
+    hcl.of_isClosed_subset isClosed_frontier frontier_subset_closure
+  obtain ⟨y, hyfr, hymax⟩ := hfr.exists_isMaxOn (frontier_nonempty_of_isBounded hd hUb hUne)
+    ((huc.mono frontier_subset_closure).abs)
+  refine ⟨y, hyfr, fun x hx => ?_⟩
+  obtain ⟨y₁, hy₁, h₁⟩ := weak_maximum_principle_of_nonneg hd hU hUb hUne hθ hsymm hell hb hc hu
+    huc fun z hz => (hsol z hz).le
+  obtain ⟨y₂, hy₂, h₂⟩ := weak_maximum_principle_of_nonneg hd hU hUb hUne hθ hsymm hell hb hc
+    hu.neg huc.neg fun z hz => by
+      rw [nondivOp_neg hU hu a b c hz, hsol z hz, neg_zero]
+  have hb₁ : u y₁ ≤ |u y| := (le_abs_self _).trans (hymax hy₁)
+  have hb₂ : -u y₂ ≤ |u y| := (neg_le_abs _).trans (hymax hy₂)
+  have hx₁ : u x ≤ |u y| := (h₁ x hx).trans (max_le hb₁ (abs_nonneg _))
+  have hx₂ : -u x ≤ |u y| := (h₂ x hx).trans (max_le hb₂ (abs_nonneg _))
+  exact abs_le.mpr ⟨by linarith, hx₁⟩
+
 end EllipticPdes.Classical

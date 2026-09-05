@@ -791,6 +791,24 @@
       "source_id": "evans-2010",
       "locator": "§6.4.2 Thm 3",
       "claim": "formalises clause (i) of the cited theorem: a subsolution C^2 on a connected open set, with the operator having no zeroth-order term and symmetric uniformly elliptic coefficients bounded on the set together with the transport coefficients, that attains its maximum over the set at an interior point is constant on the set. The cited statement takes u continuous on the closure and the maximum over the closure, and asks the coefficients to be continuous; the statement here takes the maximum over the open set, which is the same hypothesis at an interior maximum point, and bounds in place of continuity. The proof is the cited one: the set where u is below the maximum is open, and if nonempty has a frontier point inside the set by connectedness; a point of it near that frontier point is at distance r from the level set of the maximum, less than its distance to the boundary, so the ball of radius r about it lies below the maximum and touches the level set at a point where Hopf's lemma gives a nonzero gradient, though the point is an interior maximum. Clause (ii), with c >= 0 and a nonnegative maximum, remains open"
+    },
+    {
+      "decl": "EllipticPdes.Classical.not_isLocalMax_of_nondivOp_neg",
+      "source_id": "guo-2026",
+      "locator": "§XI.3 Thm XI.3.5",
+      "claim": "formalises the three clauses of the cited theorem at once: a strict subsolution of a non-divergence-form elliptic operator, which in the sign of this development means L u < 0 at a point, has no local maximum at that point whenever c u >= 0 there, which covers c = 0, the case c >= 0 with a nonnegative maximum, and the case of a zero maximum. The cited statement takes u in C^2 of the set and continuous on the closure and speaks of interior maxima over the set; the statement here is pointwise, at a point where u is C^2 and the coefficient matrix is symmetric positive semidefinite. The proof is the cited one: at a local maximum the gradient vanishes and the coefficient-weighted Hessian is nonpositive, so L u >= c u >= 0 there"
+    },
+    {
+      "decl": "EllipticPdes.Classical.comparison_principle",
+      "source_id": "gilbarg-2001",
+      "locator": "§3.1 Thm 3.3",
+      "claim": "formalises the cited theorem in the sign convention of this development: on a bounded open nonempty set, with c >= 0, two functions C^2 on the set and continuous on its closure with L u <= L v on the set and u <= v on the boundary have u <= v on the closure. The cited statement asks L elliptic with the coefficient of u nonpositive and continuity of the coefficients; the statement here asks symmetry, uniform ellipticity, a bound on the transport coefficients and nonnegativity of the zeroth-order coefficient on the set. The proof is the cited one, the weak maximum principle with nonnegative zeroth-order coefficient applied to u - v"
+    },
+    {
+      "decl": "EllipticPdes.Classical.abs_le_of_nondivOp_eq_zero",
+      "source_id": "gilbarg-2001",
+      "locator": "§3.1 Cor 3.2",
+      "claim": "formalises the second clause of the cited corollary in the sign convention of this development: on a bounded open nonempty set, with c >= 0, a solution of L u = 0, C^2 on the set and continuous on its closure, is bounded in absolute value on the closure by the maximum of |u| over the boundary, stated as a boundary point at which |u| is at least every value of |u| on the closure. The proof is the cited one, the first clause applied to u and to -u"
     }
   ]
 }

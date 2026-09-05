@@ -727,3 +727,15 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Classical.strong_maximum_principle' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Classical.strong_maximum_principle
+
+/-- info: 'EllipticPdes.Classical.not_isLocalMax_of_nondivOp_neg' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Classical.not_isLocalMax_of_nondivOp_neg
+
+/-- info: 'EllipticPdes.Classical.comparison_principle' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Classical.comparison_principle
+
+/-- info: 'EllipticPdes.Classical.abs_le_of_nondivOp_eq_zero' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Classical.abs_le_of_nondivOp_eq_zero
