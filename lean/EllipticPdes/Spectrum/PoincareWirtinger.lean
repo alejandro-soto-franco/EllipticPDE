@@ -5,6 +5,7 @@ Authors: Alejandro Soto Franco
 -/
 import EllipticPdes.Spectrum.RellichW12
 import EllipticPdes.Embedding.ConstOfGradZero
+import EllipticPdes.Extension.BallChart
 
 /-!
 # Poincaré's inequality with the mean subtracted
@@ -43,7 +44,8 @@ namespace EllipticPdes.Sobolev
 
 open EllipticPdes.Embedding (HasWeakGradOn isFiniteMeasure_restrict_of_isBounded
   ae_const_of_hasWeakGradOn_zero)
-open EllipticPdes.Extension (HasC1Boundary hasWeakGradOn_of_mem_W12 inner_L2D_eq_integral)
+open EllipticPdes.Extension (HasC1Boundary hasWeakGradOn_of_mem_W12 inner_L2D_eq_integral
+  hasC1Boundary_ball)
 
 variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))}
 
@@ -257,5 +259,15 @@ theorem poincare_wirtinger (hd : 0 < d) (hΩopen : IsOpen Ω) (hΩb : Bornology.
     exact tendsto_nhds_unique h1 h2
   rw [hvc, norm_zero] at hnorm1
   exact zero_ne_one hnorm1
+
+/-- **Inequality on the unit ball**, every hypothesis discharged: the ball is open, bounded,
+convex hence connected, nonempty, and has `C¹` boundary. -/
+theorem poincare_wirtinger_ball (hd : 0 < d) :
+    ∃ C : ℝ, ∀ U : W12 (ball (0 : EuclideanSpace ℝ (Fin d)) 1),
+      ‖embW12 _ U - constL2 isBounded_ball (meanL2 isBounded_ball (embW12 _ U))‖
+        ≤ C * Real.sqrt (∑ k : Fin d, ‖(U : H1amb (ball (0 : EuclideanSpace ℝ (Fin d)) 1))
+          k.succ‖ ^ 2) :=
+  poincare_wirtinger hd isOpen_ball isBounded_ball (hasC1Boundary_ball hd)
+    (convex_ball _ _).isPreconnected ⟨0, mem_ball_self one_pos⟩
 
 end EllipticPdes.Sobolev

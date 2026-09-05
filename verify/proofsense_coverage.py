@@ -39,6 +39,12 @@ MANIFEST = ROOT / "proofsense" / "manifest.json"
 # that no transcribed statement matches it, which the README under
 # proofsense/ has to justify in prose.
 EXEMPT = {
+    "EllipticPdes.Extension.hasC1Boundary_ball": (
+        "the unit ball has C^1 boundary in the sense of Evans C.1 and Guo III.1.1. Both texts "
+        "define the notion and neither states a lemma that a ball satisfies it, so no transcribed "
+        "statement matches it; it is the instance that shows the boundary hypothesis of every "
+        "bounded-domain theorem here is inhabited"
+    ),
     "EllipticPdes.Regularity.hasWeakGradOn_of_contDiffOn": (
         "the classical gradient of a C^1 function on an open set is a weak gradient there, by "
         "integration by parts against a test function of compact support. Both texts read a "

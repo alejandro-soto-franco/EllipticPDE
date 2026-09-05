@@ -66,6 +66,7 @@ prefix.
 | The shear, the third map it runs on | `Extension.hasWeakGradOn_comp_shear` |
 | Local half of the extension operator | `Extension.hasWeakGradOn_chartExt` |
 | The $C^1$ boundary hypothesis | `Extension.HasC1Boundary` |
+| The unit ball as an instance of it | `Extension.hasC1Boundary_ball` |
 | Relabelling and reorientation | `Extension.hasWeakGradOn_comp_linearIsometry` |
 | First step of the patching | `Extension.hasWeakGradOn_mul_cutoff_inter` |
 | The finite chart cover | `Extension.exists_finite_chart_cover` |
@@ -288,6 +289,18 @@ prefix.
   through the projection that kills it, and a closed ball of that projection is
   compact. The region above a graph and the half space are charts at every
   point, and the boundary of a bounded domain is compact,
+- the unit ball as an instance of that hypothesis, as
+  `EllipticPdes.Extension.hasC1Boundary_ball`. Until it, the half space was the
+  only domain shown to have $C^1$ boundary, and the half space is not bounded,
+  so no theorem on a bounded domain with $C^1$ boundary had a domain to be
+  applied to. The chart at a boundary point is the reflection in the hyperplane
+  bisecting the point and the south pole, which sends the point to the pole and
+  the ball to itself, with the graph of the lower hemisphere cut off in the
+  tangential directions so that it is $C^1$ on the whole space; on the ball of
+  radius one half about the pole the cutoff is inactive and membership of the
+  unit ball is $y_d > -\sqrt{1 - |y'|^2}$, since $|y|^2 = |y'|^2 + y_d^2$ with
+  $y_d < 0$. `embW12_isCompact_ball` and `poincare_wirtinger_ball` are the
+  instances with every hypothesis discharged,
 - the relabelling and reorientation itself, as
   `EllipticPdes.Extension.hasWeakGradOn_comp_linearIsometry`: a weak gradient
   moves through a linear isometry by the transpose of that isometry, which in

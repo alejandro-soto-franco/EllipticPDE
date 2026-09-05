@@ -95,6 +95,7 @@ import EllipticPdes.Extension.ShearWeakGrad
 import EllipticPdes.Extension.BoundaryChart
 import EllipticPdes.Extension.Linearity
 import EllipticPdes.Extension.C1Boundary
+import EllipticPdes.Extension.BallChart
 import EllipticPdes.Extension.Motion
 import EllipticPdes.Extension.Patch
 import EllipticPdes.Extension.PartitionOfUnity

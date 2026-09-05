@@ -7,6 +7,8 @@ import EllipticPdes.Extension.GlobalApproximation
 import EllipticPdes.Extension.LinearOperator
 import EllipticPdes.Spectrum.RellichDischarge
 import EllipticPdes.Embedding.H01Sobolev
+import EllipticPdes.Extension.BallChart
+import EllipticPdes.Regularity.RestrictedDiffQuotient
 
 /-!
 # Rellich-Kondrachov on the whole graph space
@@ -24,8 +26,9 @@ compact support in a fixed ball, a weak gradient on `ℝᵈ`, and a bound by the
 element. The whole-space translation estimate for a class with a weak gradient,
 `transL2_toLp_sub_le_of_hasWeakGradOn_univ`, proved by mollifying the class and passing the
 smooth estimate to the limit, gives the modulus, and the Fréchet-Kolmogorov criterion gives
-total boundedness of the extensions. Restricting back to `Ω` is Lipschitz, so the image of the
-unit ball of `W12 Ω` in `L²(Ω)` is totally bounded and the embedding is compact.
+total boundedness of the extensions. Restricting back to `Ω`, through the restriction map of
+the regularity chapter, is continuous, so the image of the unit ball of `W12 Ω` in `L²(Ω)` is
+totally bounded and the embedding is compact.
 
 ## Main declarations
 
@@ -51,7 +54,8 @@ namespace EllipticPdes.Sobolev
 open EllipticPdes.Embedding (HasWeakGradOn partialD_convolution_eq_of_hasWeakGradOn
   tendsto_eLpNorm_convolution_sub eLpNorm_convolution_le isFiniteMeasure_restrict_of_isBounded
   norm_apply_le)
-open EllipticPdes.Extension (HasC1Boundary exists_extLinear SobolevPair hasWeakGradOn_of_mem_W12)
+open EllipticPdes.Extension (HasC1Boundary exists_extLinear SobolevPair hasWeakGradOn_of_mem_W12
+  hasC1Boundary_ball)
 
 variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))}
 
@@ -200,18 +204,6 @@ def embW12 (Ω : Set (EuclideanSpace ℝ (Fin d))) : W12 Ω →L[ℝ] L2D Ω :=
     embW12 Ω U = (U : H1amb Ω) 0 := by
   simp only [embW12, ContinuousLinearMap.comp_apply, Submodule.subtypeL_apply, PiLp.proj_apply]
 
-/-- Restriction of an `L²(ℝᵈ)` class to `Ω`, as a function on the classes. -/
-def restrictL2 (Ω : Set (EuclideanSpace ℝ (Fin d))) (f : EucL2 d) : L2D Ω :=
-  ((Lp.memLp f).restrict Ω).toLp f
-
-/-- Restriction to a subset does not increase the `L²` distance. -/
-theorem lipschitzWith_restrictL2 (Ω : Set (EuclideanSpace ℝ (Fin d))) :
-    LipschitzWith 1 (restrictL2 Ω) := by
-  refine LipschitzWith.of_edist_le fun f g => ?_
-  simp only [restrictL2]
-  rw [Lp.edist_toLp_toLp, Lp.edist_def]
-  exact eLpNorm_mono_measure _ Measure.restrict_le_self
-
 /-- **Rellich-Kondrachov on `H¹(Ω)`** (Evans §5.7 Theorem 1 at `p = q = 2`, Guo Theorem
 IV.2.10). On a bounded open domain with `C¹` boundary, the embedding of the graph space
 `W12 Ω` into `L²(Ω)` is a compact operator. -/
@@ -307,13 +299,13 @@ theorem embW12_isCompact (hd : 0 < d) (hΩopen : IsOpen Ω) (hΩb : Bornology.Is
         _ ≤ d * (K * ((d + 1) * 1)) := by gcongr
         _ = d * (K * (d + 1)) := by ring
   -- the image of the unit ball in `L²(Ω)` is the restriction of that family
-  have himg : embW12 Ω '' closedBall (0 : W12 Ω) 1 ⊆ restrictL2 Ω '' S := by
+  have himg : embW12 Ω '' closedBall (0 : W12 Ω) 1
+      ⊆ Regularity.restrictL2 (Ω := Ω) '' S := by
     rintro f ⟨U, hU, rfl⟩
     refine ⟨Φ U, ⟨U, hU, rfl⟩, ?_⟩
     rw [embW12_apply]
     apply Lp.ext
-    simp only [restrictL2, hΦ]
-    have h1 := ((Lp.memLp ((hMF U).toLp (T (w U)).1)).restrict Ω).coeFn_toLp
+    have h1 := Regularity.coeFn_restrictL2 (Ω := Ω) (Φ U)
     have h2 : ((hMF U).toLp (T (w U)).1 : EuclideanSpace ℝ (Fin d) → ℝ)
         =ᵐ[volume.restrict Ω] (T (w U)).1 := ae_restrict_of_ae (hMF U).coeFn_toLp
     have h3 : (T (w U)).1 =ᵐ[volume.restrict Ω]
@@ -322,8 +314,13 @@ theorem embW12_isCompact (hd : 0 < d) (hΩopen : IsOpen Ω) (hΩb : Bornology.Is
         (Eventually.of_forall fun y hy => (hw U).2.2.2.2.2.1 y hy)
     exact (h1.trans h2).trans h3
   have hTB : TotallyBounded (embW12 Ω '' closedBall (0 : W12 Ω) 1) :=
-    (hSTB.image (lipschitzWith_restrictL2 Ω).uniformContinuous).subset himg
+    (hSTB.image (Regularity.restrictL2 (Ω := Ω)).uniformContinuous).subset himg
   exact (isCompactOperator_iff_isCompact_closure_image_closedBall (embW12 Ω).toLinearMap
     one_pos).mpr (hTB.closure.isCompact_of_isClosed isClosed_closure)
+
+/-- **Rellich-Kondrachov on `H¹` of the unit ball**, every hypothesis discharged. -/
+theorem embW12_isCompact_ball (hd : 0 < d) :
+    IsCompactOperator (embW12 (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) :=
+  embW12_isCompact hd isOpen_ball isBounded_ball (hasC1Boundary_ball hd)
 
 end EllipticPdes.Sobolev

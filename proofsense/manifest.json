@@ -659,6 +659,18 @@
       "source_id": "evans-2010",
       "locator": "§6.3.1 Thm 3",
       "claim": "composes the existence of a weak solution with the interior smoothness the cited theorem states and with the pointwise equation: for an operator with no transport term and a nonnegative zeroth-order coefficient on a bounded domain, with a C^1 diffusion, coefficients in W^{k,infinity} at every order and a datum with weak derivatives of every order bounded in L^2, the Dirichlet problem has a weak solution whose class has a C^infinity representative on the interior of every compact subset, and that representative satisfies the equation there almost everywhere in the classical divergence form. The cited statement assumes smooth coefficients and datum and concludes u in C^infinity(U); the statement here takes the weaker W^{k,infinity} hypotheses, concludes on the interior of a compact subset, and adds the pointwise equation, which the cited statement leaves to the reader"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.embW12_isCompact_ball",
+      "source_id": "evans-2010",
+      "locator": "§5.7 Thm 1",
+      "claim": "instantiates embW12_isCompact on the unit ball, the cited theorem at p = q = 2 with the domain fixed: the embedding of the graph space of the unit ball into L^2 is compact, with no hypothesis left. It is the check that the boundary hypothesis of the cited statement is inhabited by a bounded domain"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.poincare_wirtinger_ball",
+      "source_id": "evans-2010",
+      "locator": "§5.8.1 Thm 1",
+      "claim": "instantiates poincare_wirtinger on the unit ball, the cited theorem at p = 2 with the domain fixed, with no hypothesis left: the ball is open, bounded, convex hence connected, nonempty, and has C^1 boundary"
     }
   ]
 }

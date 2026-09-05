@@ -603,3 +603,17 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Regularity.exists_weakSolution_interior_classical' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Regularity.exists_weakSolution_interior_classical
+
+/-! ### The unit ball as an instance of a bounded domain with `C¹` boundary -/
+
+/-- info: 'EllipticPdes.Extension.hasC1Boundary_ball' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Extension.hasC1Boundary_ball
+
+/-- info: 'EllipticPdes.Sobolev.embW12_isCompact_ball' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.embW12_isCompact_ball
+
+/-- info: 'EllipticPdes.Sobolev.poincare_wirtinger_ball' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.poincare_wirtinger_ball
