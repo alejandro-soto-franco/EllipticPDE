@@ -113,6 +113,8 @@ prefix.
 | Difference quotients and weak derivatives | `Regularity.weakDeriv_of_diffQuot_bounded` |
 | Elementary properties of weak derivatives | `Embedding.HasWeakGradOn.add_of_locallyIntegrableOn` |
 | Completeness of $W^{1,2}$ and $H^1_0$ | `Sobolev.instCompleteSpaceW12` |
+| Existence for the shifted problem $Lu + \mu u = f$ | `Sobolev.FullEllipticOp.weak_solution` |
+| Rellich compactness of $H^1_0$ into $L^2$ | `Sobolev.embL2_isCompact` |
 | Morrey's inequality on a ball | `Embedding.morrey_ball` |
 | Gagliardo-Nirenberg-Sobolev on a bounded $C^1$ domain | `Embedding.exists_eLpNorm_sobolevConj_le_domain` |
 | Sobolev ladder on that domain | `Embedding.exists_const_memLp_of_gradClosed_domain` |

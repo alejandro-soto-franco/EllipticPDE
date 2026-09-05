@@ -1090,7 +1090,7 @@
       "decl": "EllipticPdes.Embedding.rellichEmbL_isCompact",
       "source_id": "gilbarg-2001",
       "locator": "§7.10 Thm 7.22",
-      "claim": "formalises clause (i) of the cited theorem at p = 2 < n for 2 < q < 2n/(n - 2): the embedding of H_0^1(Omega) into L^q(Omega) is a compact operator on a bounded measurable set, the exponent q written through the interpolation parameter theta of the proof with 1/q = theta/2 + (1 - theta)/p^*. The endpoint q = 2 is the compactness of embL2 the spectral development takes as a hypothesis, and clause (ii), p > n, remains open. The proof is the cited one, compactness at the endpoint and the interpolation inequality (7.9) with the Sobolev inequality at p^*"
+      "claim": "formalises clause (i) of the cited theorem at p = 2 < n for 2 < q < 2n/(n - 2): the embedding of H_0^1(Omega) into L^q(Omega) is a compact operator on a bounded measurable set, the exponent q written through the interpolation parameter theta of the proof with 1/q = theta/2 + (1 - theta)/p^*. The endpoint q = 2 is embL2_isCompact, and clause (ii), p > n, remains open. The proof is the cited one, compactness at the endpoint and the interpolation inequality (7.9) with the Sobolev inequality at p^*"
     },
     {
       "decl": "EllipticPdes.Sobolev.FullEllipticOp.weak_solution_L2_of_nonneg_zeroth_of_bounded",
@@ -1205,6 +1205,162 @@
       "source_id": "gilbarg-2001",
       "locator": "§7.3 Lemma 7.3",
       "claim": "formalises the cited lemma at first order: at a point whose closed ball of the mollifier's radius lies inside the set, the classical partial derivative of the mollification of u is the mollification of the weak partial derivative, which is the identity (7.17). The proof is the cited one, differentiation under the integral sign and the definition of the weak derivative"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.embL2_isCompact",
+      "source_id": "evans-2010",
+      "locator": "§5.7 Thm 1",
+      "claim": "formalises the cited theorem at p = q = 2 for the space W_0^{1,2}(Omega) on a bounded measurable set, where the source takes W^{1,p}(U) on a bounded open set with C^1 boundary and reaches W_0^{1,p} by the remark following the proof: the embedding of H_0^1(Omega) into L^2(Omega) is a compact operator. The proof is the cited one, extension by zero and the translation modulus of a class with a weak gradient, then total boundedness through mollification"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.embL2_isCompact",
+      "source_id": "gilbarg-2001",
+      "locator": "§7.10 Thm 7.22",
+      "claim": "formalises clause (i) of the cited theorem at p = q = 2: the embedding of W_0^{1,2}(Omega) into L^2(Omega) is compact on a bounded measurable set, with no condition on the boundary, as the source states. The proof is the cited one, the L^1 case through equicontinuity of the mollifications, here through the translation modulus, on the whole space after extension by zero"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.FullEllipticOp.weak_solution",
+      "source_id": "evans-2010",
+      "locator": "§6.2.2 Thm 3",
+      "claim": "formalises the cited theorem as stated, with the shift: there is gamma >= 0, the constant of Gårding's inequality, such that for every mu >= gamma and every bounded functional f on H_0^1(Omega), which is the source's H^{-1}(U), the shifted weak problem B[u, v] + mu (u, v) = f(v) has exactly one solution u in H_0^1(Omega). The operators are those of this development, whose coefficients are bounded and measurable with the leading part strictly elliptic. The proof is the cited one, coercivity of the shifted form from Gårding's inequality and the Lax-Milgram theorem"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.FullEllipticOp.weak_solution",
+      "source_id": "guo-2026",
+      "locator": "§VII.3 Thm VII.3.3",
+      "claim": "formalises the cited theorem: for the operators of this development, with bounded coefficients and strictly elliptic leading part, there is gamma >= 0 such that for mu >= gamma and f in H^{-1}(Omega), read as a bounded functional on H_0^1(Omega), the problem L u + mu u = f with zero boundary values has exactly one weak solution in H_0^1(Omega). The proof is the cited one, Gårding's inequality and the Lax-Milgram theorem"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.FullEllipticOp.garding",
+      "source_id": "guo-2026",
+      "locator": "§VII.2 Thm VII.2.5",
+      "claim": "formalises the cited inequality, named in the proof of Theorem VII.3.3 as Gårding's inequality from Theorem VII.2.5: for the operators of this development there are beta > 0 and gamma >= 0 with beta ‖u‖^2_{H_0^1} <= B(u, u) + gamma ‖u‖^2_{L^2} for every u in H_0^1(Omega). The proof is the cited one, ellipticity and Cauchy's inequality with epsilon on the lower-order terms"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.partialD_convolution_eq_of_hasWeakGradOn",
+      "source_id": "guo-2026",
+      "locator": "§II.3 Lemma II.3.8",
+      "claim": "formalises the identity behind clause (ii) of the cited lemma at first order: at a point whose closed ball of the mollifier's radius lies inside the set, the classical partial derivative of the mollification is the mollification of the weak partial derivative, so the mollification converges to u in W^{1,p} on compactly contained subsets once the mollifications of u and of its weak gradient converge in L^p, which is tendsto_eLpNorm_convolution_sub. Clause (i), the norm bound, remains open. The proof is differentiation under the integral sign and the definition of the weak derivative"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.tendsto_eLpNorm_convolution_sub",
+      "source_id": "guo-2026",
+      "locator": "§II.3 Lemma II.3.8",
+      "claim": "formalises the convergence in L^p of clause (ii) of the cited lemma on the whole space, which gives the local convergence on compactly contained subsets after extension: the mollifications of a class in L^p(R^d) converge to it in L^p as the radius tends to zero, for mollifiers with comparable inner and outer radii. The proof is continuity of translation in L^p"
+    },
+    {
+      "decl": "EllipticPdes.Extension.exists_smooth_tendsto_of_mem_W12",
+      "source_id": "guo-2026",
+      "locator": "§III.1 Thm III.1.3",
+      "claim": "formalises the cited theorem at k = 1 and p = 2 for a bounded open set with C^1 boundary: an element of W^{1,2}(Omega) is the limit in W^{1,2}(Omega) of smooth functions with compact support on R^n, whose restrictions to the closure are the source's C^infinity of the closure. The proof is the cited one, extension to the whole space and mollification"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_compactSupport",
+      "source_id": "guo-2026",
+      "locator": "§III.4 Thm III.4.3",
+      "claim": "formalises the cited inequality for p in [1, n), for a compactly supported integrable function on R^n in L^p with an L^p weak gradient, of which the source's C_c^1(R^n) is a case: the L^{p^*} norm is bounded by a constant depending on n and p times the sum of the L^p norms of the gradient components, which is the norm of Du read componentwise. The proof is Mathlib's Gagliardo-Nirenberg-Sobolev inequality for smooth functions and mollification, where the source integrates the fundamental theorem of calculus along the axes"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_domain",
+      "source_id": "guo-2026",
+      "locator": "§III.4 Thm III.4.5",
+      "claim": "formalises the cited theorem: on a bounded open set with C^1 boundary and p in [1, n), a function in L^p(Omega) with an L^p weak gradient lies in L^{p^*}(Omega), with the L^{p^*} norm bounded by a constant depending on Omega, p and n times the W^{1,p} norm, read as the L^p norm of u plus the L^p norms of the gradient components. The proof is the cited one, extension, mollification and the inequality on R^n"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.eLpNorm_le_of_mem_H01_of_isBounded",
+      "source_id": "guo-2026",
+      "locator": "§III.4 Thm III.4.6",
+      "claim": "formalises the cited inequality at p = 2 < n on a bounded measurable set, for every q with 1/q at least 1/2 - 1/n, which is q in (0, 2^*]: the L^q seminorm of an element of H_0^1(Omega) is bounded by a constant depending on Omega and q times the sum of the L^2 norms of its gradient components. The case q = p = 2 in every dimension is poincare_H01_of_bounded. The proof is the cited one, the inequality on test functions and their density"
+    },
+    {
+      "decl": "EllipticPdes.Poincare.poincare_H01_of_bounded",
+      "source_id": "guo-2026",
+      "locator": "§III.4 Thm III.4.6",
+      "claim": "formalises the cited inequality at p = q = 2 on a bounded set in every dimension, the case the source singles out: the L^2 norm of an element of H_0^1(Omega) is bounded by a constant depending on Omega times the L^2 norms of its gradient components. The proof is by the one-dimensional inequality along a coordinate on a box containing the set, on test functions, then density"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.morrey_ball_contDiff",
+      "source_id": "guo-2026",
+      "locator": "§IV.1 Thm IV.1.6",
+      "claim": "formalises the Hölder-seminorm clause of the cited inequality for a smooth function on a ball, in place of a C^1 function on R^n: the seminorm at the exponent 1 - n/p over the ball is bounded by a constant times the L^p norms of the partial derivatives over the ball. The supremum clause of the C^{0,gamma} norm remains open. The proof is the cited one, the averaged estimate of |u(x) - u(y)| by the potential of |Du| and Hölder's inequality"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.morrey_ball",
+      "source_id": "guo-2026",
+      "locator": "§IV.1 Thm IV.1.7",
+      "claim": "formalises the cited theorem on a ball, a bounded open set with C^1 boundary, for the Hölder seminorm: a function on the ball with an L^p weak gradient there, p > n, agrees almost everywhere with a function Hölder continuous on the ball at the exponent 1 - n/p, with seminorm bounded by a constant times the L^p norms of the gradient components over the ball. The supremum clause and the extension to the closure remain open, and the case p = infinity is outside the statement. The proof is by mollification in the interior, where the source extends and mollifies"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.embW12_isCompact",
+      "source_id": "guo-2026",
+      "locator": "§IV.2 Thm IV.2.10",
+      "claim": "formalises the first clause of the cited theorem at p = q = 2 on a bounded open set with C^1 boundary: the embedding of W^{1,2}(Omega) into L^2(Omega) is compact. The proof is the cited one, extension to the whole space and the translation modulus"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.rellichEmbL_isCompact",
+      "source_id": "guo-2026",
+      "locator": "§IV.2 Thm IV.2.10",
+      "claim": "formalises the first clause of the cited theorem for W_0^{1,2}(Omega) at 2 < q < 2^* on a bounded measurable set, with no condition on the boundary, through the interpolation parameter theta of the proof. The endpoint q = 2 is embL2_isCompact"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.embL2_isCompact",
+      "source_id": "guo-2026",
+      "locator": "§IV.2 Thm IV.2.10",
+      "claim": "formalises the final clause of the cited theorem at p = 2: the embedding of W_0^{1,2}(Omega) into L^2(Omega) is compact on a bounded measurable set, with no condition on the boundary. The proof is extension by zero and the translation modulus of a class with a weak gradient"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.exists_weakLimit",
+      "source_id": "guo-2026",
+      "locator": "§V.2 Thm V.2.5",
+      "claim": "formalises the cited theorem for a real Hilbert space, a case of a reflexive Banach space: a bounded sequence has a subsequence converging weakly, the weak convergence read through the inner product as Example V.2.3 does. The proof is by a diagonal argument on a countable dense set of the closed span, where the source cites the Banach-Alaoglu theorem"
+    },
+    {
+      "decl": "EllipticPdes.Regularity.norm_diffQuot_le_of_hasWeakDeriv",
+      "source_id": "guo-2026",
+      "locator": "§VI.1 Lemma VI.1.4",
+      "claim": "formalises clause (i) of the cited lemma at p = 2 on the whole space: the L^2 norm of the difference quotient of a class with an L^2 weak derivative in that direction is at most the L^2 norm of the derivative, with constant one. The source states the bound on a compactly contained subset with a constant depending on n and p. The proof is the cited one, the integral representation along the segment and approximation"
+    },
+    {
+      "decl": "EllipticPdes.Regularity.weakDeriv_of_diffQuot_bounded",
+      "source_id": "guo-2026",
+      "locator": "§VI.1 Lemma VI.1.4",
+      "claim": "formalises clause (ii) of the cited lemma at p = 2 on the whole space: an L^2 class whose difference quotients in a direction are bounded in L^2 by M for every nonzero step has a weak derivative in that direction of norm at most M. The proof is the cited one, weak compactness and passage to the limit against a test function"
+    },
+    {
+      "decl": "EllipticPdes.hneg_characterization",
+      "source_id": "guo-2026",
+      "locator": "§VII.1 Thm VII.1.6",
+      "claim": "formalises the cited theorem at the level of the representation (6) and of the norm: a bounded functional f on H_0^1(Omega) is represented by L^2 functions f_0, ..., f_n as the integral of f_0 v minus the sum of the integrals of f_i D_i v, and the representative given has the norm of f, which is at most the norm of every other representative; the norm of f in H^{-1} is therefore the infimum the source states, attained. The proof is the cited one, the Riesz representation in H_0^1(Omega) and the Cauchy-Schwarz inequality"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.spectrum_compact_operator",
+      "source_id": "guo-2026",
+      "locator": "§VII.5 Thm VII.5.3",
+      "claim": "formalises the cited theorem for a compact operator on an infinite-dimensional real Hilbert space: 0 lies in the spectrum, the nonzero spectrum consists of eigenvalues, and the nonzero spectrum is countable with finitely many points of modulus at least any positive delta, which is its convergence to 0. The proof is the Riesz theory of compact operators"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.FullEllipticOp.existence_three_of_bounded",
+      "source_id": "guo-2026",
+      "locator": "§VII.5 Thm VII.5.4",
+      "claim": "formalises the cited theorem for the operators of this development on a bounded measurable set: there is a countable set Sigma of real numbers such that for every f in L^2(Omega) the problem L u = lambda u + f with zero boundary values has exactly one weak solution in H_0^1(Omega) exactly when lambda is outside Sigma, and Sigma has finitely many members below any bound, which is clause (ii), the members increasing to infinity when Sigma is infinite. The proof is the cited one, the Fredholm alternative for the compact operator gamma L_gamma^{-1} and the spectrum of compact operators"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.FullEllipticOp.resolvent_bound_of_bounded",
+      "source_id": "guo-2026",
+      "locator": "§VII.5 Thm VII.5.6",
+      "claim": "formalises the cited theorem on a bounded measurable set: for lambda outside Sigma there is a constant C > 0 depending on lambda, Omega and L with ‖u‖_{L^2} <= C ‖f‖_{L^2} for the weak solution u in H_0^1(Omega) of L u = lambda u + f. The clause on the growth of C as lambda approaches Sigma remains open. The proof is the cited one, by contradiction through the compact embedding"
+    },
+    {
+      "decl": "EllipticPdes.Regularity.interior_H2_estimate",
+      "source_id": "guo-2026",
+      "locator": "§VIII.2 Thm VIII.2.2",
+      "claim": "formalises the cited theorem for a solution with zero boundary values, with the leading coefficients of class C^1 with bounded derivatives, a case of the source's W^{1,infinity}, and the lower-order coefficients bounded: a weak solution in H_0^1(Omega) of L u = f with f in L^2(Omega) has second weak derivatives in L^2 on any compact subset, with the estimate ‖u‖_{H^2} on the subset at most C times ‖f‖_{L^2} + ‖u‖_{L^2}, the constant depending on Omega, the subset and L. The proof is the cited one, difference quotients of the weak form with a cutoff and Lemma VI.1.4"
+    },
+    {
+      "decl": "EllipticPdes.Regularity.interior_smooth",
+      "source_id": "guo-2026",
+      "locator": "§VIII.3 Thm VIII.3.3",
+      "claim": "formalises the cited theorem for a solution with zero boundary values, with the coefficients having bounded weak derivatives of every order on the set, which the source's C^infinity coefficients on a bounded set with bounded derivatives satisfy, and f with weak derivatives of every order bounded in L^2: the weak solution in H_0^1(Omega) of L u = f has a representative smooth on the interior of every compact subset of the set. The proof is the cited one, Theorem VIII.3.2 at every order and the Sobolev embedding; the estimate of Theorem VIII.3.2 at each finite order remains open in this form"
     }
   ]
 }
