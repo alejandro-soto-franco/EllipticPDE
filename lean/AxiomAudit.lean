@@ -660,6 +660,44 @@ import EllipticPdes
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Embedding.hasWeakGradOn_comp
 
+/-! ### Elementary properties of weak derivatives -/
+
+/-- info: 'EllipticPdes.Embedding.hasWeakGradOn_unique_ae_of_locallyIntegrableOn' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.hasWeakGradOn_unique_ae_of_locallyIntegrableOn
+
+/-- info: 'EllipticPdes.Embedding.HasWeakGradOn.add_of_locallyIntegrableOn' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.HasWeakGradOn.add_of_locallyIntegrableOn
+
+/-- info: 'EllipticPdes.Embedding.HasWeakGradOn.neg' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.HasWeakGradOn.neg
+
+/-- info: 'EllipticPdes.Embedding.HasWeakGradOn.const_mul' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.HasWeakGradOn.const_mul
+
+/-- info: 'EllipticPdes.Embedding.HasWeakGradOn.mono' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.HasWeakGradOn.mono
+
+/-- info: 'EllipticPdes.Sobolev.instCompleteSpaceW12' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.instCompleteSpaceW12
+
+/-- info: 'EllipticPdes.Sobolev.instCompleteSpaceH01' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.instCompleteSpaceH01
+
+/-- info: 'EllipticPdes.Embedding.partialD_convolution_eq_of_hasWeakGradOn' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.partialD_convolution_eq_of_hasWeakGradOn
+
+/-- info: 'EllipticPdes.Embedding.tendsto_eLpNorm_convolution_sub' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.tendsto_eLpNorm_convolution_sub
+
 /-- info: 'EllipticPdes.Embedding.hasWeakGradOn_posPart' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Embedding.hasWeakGradOn_posPart

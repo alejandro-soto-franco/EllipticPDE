@@ -12,8 +12,8 @@ import Mathlib.MeasureTheory.Integral.Average
 # Pointwise weak gradients on a set
 
 The `Lᵖ`-scale, pointwise-function analogue of `HasWeakDerivOn`: a function `u` has weak
-gradient `g = (gₖ)` on `B` when integration by parts holds against every smooth test
-function supported in `B`. This is the interface the Morrey embedding consumes; it is
+gradient `g = (gₖ)` on `B` when the integration by parts identity is satisfied against every
+smooth test function supported in `B`. This is the interface the Morrey embedding consumes; it is
 stated for functions (not `Lp` classes) and for a full gradient tuple so that a
 general exponent `p > d` is expressible, which the `L²`-only `HasWeakDerivOn` cannot do.
 -/
@@ -47,6 +47,17 @@ def HasWeakGradOn (B : Set (EuclideanSpace ℝ (Fin d)))
   ∀ φ : EuclideanSpace ℝ (Fin d) → ℝ, ContDiff ℝ (⊤ : ℕ∞) φ → HasCompactSupport φ →
     tsupport φ ⊆ B → ∀ k : Fin d,
       ∫ x in B, u x * partialD k φ x = - ∫ x in B, g k x * φ x
+
+/-- **Scalar multiple of a weak gradient.** A constant multiple of a class with a weak gradient
+has the same multiple of the gradient. -/
+theorem HasWeakGradOn.const_mul {B : Set (EuclideanSpace ℝ (Fin d))}
+    {u : EuclideanSpace ℝ (Fin d) → ℝ} {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ} (c : ℝ)
+    (h : HasWeakGradOn B u g) :
+    HasWeakGradOn B (fun x => c * u x) (fun k x => c * g k x) := by
+  intro φ hφc hφcs hφs k
+  have e := h φ hφc hφcs hφs k
+  simp only [mul_assoc]
+  rw [integral_const_mul, integral_const_mul, e, mul_neg]
 
 /-- **Additivity of a weak gradient.** Two classes with weak gradients on the same set add, and
 so do their gradients. The finite sum of local pieces the extension operator glues is built by

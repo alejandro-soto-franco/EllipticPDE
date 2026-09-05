@@ -1133,6 +1133,78 @@
       "source_id": "gilbarg-2001",
       "locator": "§8.12 Thm 8.37",
       "claim": "formalises the spanning clause of the cited theorem for the operators of this development with symmetric leading coefficients, no transport term and nonnegative zeroth-order coefficient, under a Poincaré inequality on test functions and with the compactness of the embedding into L^2 as a hypothesis: the eigenspaces of the solution operator of the Dirichlet problem span a dense subspace of L^2(Omega), which is the completeness of the eigenfunctions in L^2 where the source states it in H = W_0^{1,2}(Omega). The eigenvalues are countable and discrete as the nonzero spectrum of a compact self-adjoint operator, which is spectrum_compact_operator. The proof is the cited one, the spectral theorem for the compact self-adjoint solution operator"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.hasWeakGradOn_unique_ae_of_locallyIntegrableOn",
+      "source_id": "evans-2010",
+      "locator": "§5.2.1 Thm 1",
+      "claim": "formalises the uniqueness of weak derivatives, which the cited theorem takes for granted in writing D^alpha u and the source establishes in the lemma of §5.2.1 preceding it, at first order for a weak gradient on an open set: two locally integrable weak gradients of the same function agree almost everywhere on the set, component by component. The proof is the cited one, the vanishing of the integral against every test function"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.HasWeakGradOn.add_of_locallyIntegrableOn",
+      "source_id": "evans-2010",
+      "locator": "§5.2.1 Thm 1",
+      "claim": "formalises the additive half of clause (ii) of the cited theorem at first order for locally integrable functions with locally integrable weak gradients on a set: the sum has a weak gradient, the sum of the two. The scalar half is HasWeakGradOn.const_mul. The proof is linearity of the integral"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.HasWeakGradOn.const_mul",
+      "source_id": "evans-2010",
+      "locator": "§5.2.1 Thm 1",
+      "claim": "formalises the scalar half of clause (ii) of the cited theorem at first order, for a weak gradient on any set: a constant multiple of the function has the same multiple of the gradient as weak gradient. With HasWeakGradOn.add_of_locallyIntegrableOn this is the clause lambda u + mu v. The proof is linearity of the integral"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.HasWeakGradOn.neg",
+      "source_id": "evans-2010",
+      "locator": "§5.2.1 Thm 1",
+      "claim": "formalises clause (ii) of the cited theorem at lambda = -1 and mu = 0, at first order for a weak gradient on any set. The proof is linearity of the integral"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.HasWeakGradOn.mono",
+      "source_id": "evans-2010",
+      "locator": "§5.2.1 Thm 1",
+      "claim": "formalises clause (iii) of the cited theorem at first order, for any subset in place of an open subset: a weak gradient on a set is a weak gradient on every subset, since the test functions supported in the subset are among those supported in the set. The integrability the source's W^{k,p}(V) includes is inherited by restriction"
+    },
+    {
+      "decl": "EllipticPdes.Extension.hasWeakGradOn_mul_cutoff_inter",
+      "source_id": "evans-2010",
+      "locator": "§5.2.1 Thm 1",
+      "claim": "formalises clause (iv) of the cited theorem at first order, Leibniz's formula (7) for the product of a function with an integrable weak gradient by a smooth function zeta, in the form the extension operator uses: zeta smooth with support in a set W, u with weak gradient on B ∩ W, and zeta u then has weak gradient zeta D u + u D zeta on all of B. The source takes zeta compactly supported in the open set, which is the case W = U = B. Clause (i), the commutation of weak derivatives, is outside a first-order development. The proof is the cited one, testing against zeta phi"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.instCompleteSpaceW12",
+      "source_id": "evans-2010",
+      "locator": "§5.2.3 Thm 2",
+      "claim": "formalises the cited theorem at k = 1 and p = 2: the space W^{1,2}(Omega), read as the graph space of L^2 classes with their weak gradients inside the product of d + 1 copies of L^2(Omega), is complete, and is a Hilbert space with the norm the source defines. The proof is the cited one, a Cauchy sequence converges in every coordinate and the limit satisfies the integration by parts identity"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.instCompleteSpaceH01",
+      "source_id": "evans-2010",
+      "locator": "§5.2.3 Thm 2",
+      "claim": "formalises the cited theorem for the space W_0^{1,2}(Omega), which the source defines in §5.2.2 as the closure of the test functions in W^{1,2}(Omega): it is complete, being a closed subspace of the complete graph space"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.partialD_convolution_eq_of_hasWeakGradOn",
+      "source_id": "evans-2010",
+      "locator": "§5.3.1 Thm 1",
+      "claim": "formalises the identity (1) of the cited proof at first order, which is the content of clause (ii): at a point whose closed ball of the mollifier's radius lies inside the set, the classical partial derivative of the mollification of u is the mollification of the weak partial derivative. The proof is the cited one, differentiation under the integral and the definition of the weak derivative against the translated mollifier"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.tendsto_eLpNorm_convolution_sub",
+      "source_id": "evans-2010",
+      "locator": "§5.3.1 Thm 1",
+      "claim": "formalises the convergence of clause (ii) on the whole space in L^p: for a class in L^p(R^d) and a family of mollifiers whose radii tend to zero with inner and outer radii comparable, the mollifications converge to the class in L^p. Together with the identity (1) this is the local convergence u^epsilon to u in W^{1,p}_loc(U), the mollification of the weak gradient converging to it in the same way; clause (i), smoothness of the mollification, is Mathlib's"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.tendsto_eLpNorm_convolution_sub",
+      "source_id": "gilbarg-2001",
+      "locator": "§7.2 Lemma 7.2",
+      "claim": "formalises the cited lemma on the whole space, which the source reaches by extending u by zero: the mollifications of a class in L^p(R^d) converge to it in L^p as the radius tends to zero, for mollifiers with comparable inner and outer radii. The source states convergence in L^p_loc(Omega) for u in L^p_loc(Omega); the whole-space statement gives the local one on any bounded subset. The proof is the cited one, continuity of translation in L^p"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.partialD_convolution_eq_of_hasWeakGradOn",
+      "source_id": "gilbarg-2001",
+      "locator": "§7.3 Lemma 7.3",
+      "claim": "formalises the cited lemma at first order: at a point whose closed ball of the mollifier's radius lies inside the set, the classical partial derivative of the mollification of u is the mollification of the weak partial derivative, which is the identity (7.17). The proof is the cited one, differentiation under the integral sign and the definition of the weak derivative"
     }
   ]
 }
