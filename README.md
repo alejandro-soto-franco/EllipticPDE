@@ -95,11 +95,13 @@ prefix.
 | The classical weak maximum principle | `Classical.weak_maximum_principle` |
 | The classical weak minimum principle | `Classical.weak_minimum_principle` |
 | The classical weak maximum principle with $c \ge 0$ | `Classical.weak_maximum_principle_of_nonneg` |
+| The classical weak minimum principle with $c \ge 0$ | `Classical.weak_minimum_principle_of_nonneg` |
 | The strict maximum principle | `Classical.not_isLocalMax_of_nondivOp_neg` |
 | The comparison principle | `Classical.comparison_principle` |
 | Bound of a solution by its boundary values | `Classical.abs_le_of_nondivOp_eq_zero` |
 | Hopf's lemma | `Classical.hopf_lemma` |
 | The strong maximum principle | `Classical.strong_maximum_principle` |
+| The strong maximum principle with $c \ge 0$ | `Classical.strong_maximum_principle_of_nonneg` |
 | Gagliardo-Nirenberg-Sobolev on a bounded $C^1$ domain | `Embedding.exists_eLpNorm_sobolevConj_le_domain` |
 | Sobolev ladder on that domain | `Embedding.exists_const_memLp_of_gradClosed_domain` |
 | Hölder continuity up to the boundary | `Embedding.exists_const_holderOnWith_of_gradClosed_domain` |
@@ -557,7 +559,9 @@ prefix.
   `EllipticPdes.Classical.weak_minimum_principle`, and Theorem 2, with
   $c \ge 0$ and the positive part on the boundary, is
   `EllipticPdes.Classical.weak_maximum_principle_of_nonneg`, through Theorem 1
-  on the set where $u > 0$. Three corollaries follow: Guo's strict maximum
+  on the set where $u > 0$, with its supersolution clause
+  `EllipticPdes.Classical.weak_minimum_principle_of_nonneg`. Three corollaries
+  follow: Guo's strict maximum
   principle XI.3.5 as `EllipticPdes.Classical.not_isLocalMax_of_nondivOp_neg`,
   Gilbarg and Trudinger's comparison principle 3.3 as
   `EllipticPdes.Classical.comparison_principle`, and the bound of a solution
@@ -567,11 +571,16 @@ prefix.
   `EllipticPdes.Classical.hopf_lemma` and
   `EllipticPdes.Classical.strong_maximum_principle`, which are Evans's §6.4.2
   Lemma and Theorem 3, and Gilbarg and Trudinger's Lemma 3.4 and Theorem 3.5,
-  with no zeroth-order term. The barrier
+  in both clauses: the zeroth-order coefficient is nonnegative and bounded with
+  $c\,u(x^0) \ge 0$, which covers $c = 0$ and, as
+  `EllipticPdes.Classical.strong_maximum_principle_of_nonneg`, $c \ge 0$ with a
+  nonnegative maximum. The barrier
   $e^{-\lambda|x - y|^2} - e^{-\lambda r^2}$ is a subsolution on the annulus
-  $r/2 < |x - y| < r$ for $\lambda$ large, vanishes on the outer sphere and is
+  $r/2 < |x - y| < r$ for $\lambda$ large, the zeroth-order term being at most
+  the bound on $c$ times the exponential, vanishes on the outer sphere and is
   positive on the inner one, so $u + \varepsilon v - u(x^0)$ is nonpositive on
-  the annulus by the weak maximum principle, and its one-sided derivative at
+  the annulus by the weak maximum principle with $c \ge 0$, and its one-sided
+  derivative at
   $x^0$ along the inward radius is nonpositive, which forces a positive
   outward derivative of $u$. For the strong principle, the set where $u$ is
   below its maximum has a frontier point inside the domain by connectedness;

@@ -628,6 +628,32 @@ theorem nondivOp_zero (a : EuclideanSpace ℝ (Fin d) → Fin d → Fin d → �
   unfold nondivOp
   simp [h0]
 
+/-- The operator on a constant. -/
+theorem nondivOp_const (a : EuclideanSpace ℝ (Fin d) → Fin d → Fin d → ℝ)
+    (b : EuclideanSpace ℝ (Fin d) → Fin d → ℝ) (c : EuclideanSpace ℝ (Fin d) → ℝ) (K : ℝ)
+    (x : EuclideanSpace ℝ (Fin d)) : nondivOp a b c (fun _ => K) x = c x * K := by
+  have h0 : ∀ (i : Fin d) (L : ℝ),
+      partialD i (fun _ : EuclideanSpace ℝ (Fin d) => L) = fun _ => 0 := fun i L => by
+      funext y
+      simp [partialD]
+  unfold nondivOp
+  simp [h0]
+
+/-- The operator on a function minus a constant. -/
+theorem nondivOp_sub_const {U : Set (EuclideanSpace ℝ (Fin d))} (hU : IsOpen U)
+    {u : EuclideanSpace ℝ (Fin d) → ℝ} (hu : ContDiffOn ℝ 2 u U)
+    (a : EuclideanSpace ℝ (Fin d) → Fin d → Fin d → ℝ)
+    (b : EuclideanSpace ℝ (Fin d) → Fin d → ℝ) (c : EuclideanSpace ℝ (Fin d) → ℝ) (K : ℝ)
+    {x : EuclideanSpace ℝ (Fin d)} (hx : x ∈ U) :
+    nondivOp a b c (fun y => u y - K) x = nondivOp a b c u x - c x * K := by
+  have h := nondivOp_add_smul hU hu (contDiffOn_const (c := (1 : ℝ))) a b c (-K) hx
+  have e : (fun y => u y + (-K) * (1 : ℝ)) = fun y => u y - K := by
+    funext y
+    ring
+  rw [e, nondivOp_const] at h
+  rw [h]
+  ring
+
 /-- The operator on the negative. -/
 theorem nondivOp_neg {U : Set (EuclideanSpace ℝ (Fin d))} (hU : IsOpen U)
     {u : EuclideanSpace ℝ (Fin d) → ℝ} (hu : ContDiffOn ℝ 2 u U)
@@ -798,5 +824,33 @@ theorem abs_le_of_nondivOp_eq_zero (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fi
   have hx₁ : u x ≤ |u y| := (h₁ x hx).trans (max_le hb₁ (abs_nonneg _))
   have hx₂ : -u x ≤ |u y| := (h₂ x hx).trans (max_le hb₂ (abs_nonneg _))
   exact abs_le.mpr ⟨by linarith, hx₁⟩
+
+/-- **Weak minimum principle with nonnegative zeroth-order coefficient** (Evans §6.4.1
+Theorem 2(ii)). With `c ≥ 0`, a supersolution is bounded below on the closure by the minimum
+of its negative part over the boundary. -/
+theorem weak_minimum_principle_of_nonneg (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))}
+    (hU : IsOpen U) (hUb : Bornology.IsBounded U) (hUne : U.Nonempty)
+    {a : EuclideanSpace ℝ (Fin d) → Fin d → Fin d → ℝ} {b : EuclideanSpace ℝ (Fin d) → Fin d → ℝ}
+    {c : EuclideanSpace ℝ (Fin d) → ℝ}
+    {θ B : ℝ} (hθ : 0 < θ) (hsymm : ∀ x ∈ U, ∀ i j, a x i j = a x j i)
+    (hell : ∀ x ∈ U, ∀ ξ : Fin d → ℝ, θ * ∑ i, ξ i ^ 2 ≤ ∑ i, ∑ j, a x i j * ξ i * ξ j)
+    (hb : ∀ x ∈ U, ∀ i, |b x i| ≤ B) (hc : ∀ x ∈ U, 0 ≤ c x)
+    {u : EuclideanSpace ℝ (Fin d) → ℝ} (hu : ContDiffOn ℝ 2 u U)
+    (huc : ContinuousOn u (closure U)) (hsup : ∀ x ∈ U, 0 ≤ nondivOp a b c u x) :
+    ∃ y ∈ frontier U, ∀ x ∈ closure U, min (u y) 0 ≤ u x := by
+  have hneg : ∀ x ∈ U, nondivOp a b c (fun y => -u y) x ≤ 0 := fun x hx => by
+    rw [nondivOp_neg hU hu a b c hx]
+    linarith [hsup x hx]
+  obtain ⟨y, hy, hmax⟩ := weak_maximum_principle_of_nonneg hd hU hUb hUne hθ hsymm hell hb hc
+    hu.neg huc.neg hneg
+  refine ⟨y, hy, fun x hx => ?_⟩
+  have h := hmax x hx
+  rcases le_or_gt (u y) 0 with h0 | h0
+  · rw [min_eq_left h0]
+    rw [max_eq_left (by linarith)] at h
+    linarith
+  · rw [min_eq_right h0.le]
+    rw [max_eq_right (by linarith)] at h
+    linarith
 
 end EllipticPdes.Classical
