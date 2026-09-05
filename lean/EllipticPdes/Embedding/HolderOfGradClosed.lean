@@ -15,7 +15,7 @@ The second reads a bounded supply of weak derivatives as classical ones: for `u 
 with `m > n/p`, the conclusion is `u ∈ C^{m-1-⌊n/p⌋, γ}(Ω)`. This file proves the second case at
 `p = 2`, locally, for a family closed under weak differentiation as far as `m`.
 
-## The order the supply pays for
+## Order the supply pays for
 
 The supply is spent in three places. Morrey asks for the weak gradient, so one order goes there;
 the ladder takes `⌊d/2⌋` more raising that gradient from `L²` to `L^{2d}`; and reading the `n`-th
@@ -23,7 +23,7 @@ classical derivative asks the same of every index `n` levels up. So an index of 
 reaches `C^n` while `dep i + n + 1 + ⌊d/2⌋ ≤ m`, and at `dep i = 0` that is
 `n = m - 1 - ⌊d/2⌋`, which is Guo's order exactly.
 
-## The Hölder exponent
+## Hölder exponent
 
 The ladder lands on `L^{2d}` and `EllipticPdes.Embedding.morrey_ball` reads off `1 - d/(2d)`, so
 the exponent is `1/2` in every dimension. For `d` odd this is Guo's `⌊d/2⌋ + 1 - d/2` on the
@@ -174,7 +174,7 @@ theorem contDiffOn_holder_of_gradClosed (hd : 0 < d) (c : EuclideanSpace ℝ (Fi
   exact ⟨v, hvae, hvhol, hcn, hfd⟩
 
 
-/-! ### The Hölder exponent Guo leaves open -/
+/-! ### Hölder exponent Guo leaves open -/
 
 /-- **Hölder clause at a general exponent.** The ladder run for `s` rungs lands at any `P`
 the reciprocal relation `1/2 - s/d ≤ 1/P` admits, and Morrey at `P > d` reads off the exponent

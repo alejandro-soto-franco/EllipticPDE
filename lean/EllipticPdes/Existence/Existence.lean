@@ -11,8 +11,8 @@ import EllipticPdes.Poincare.BoxSlice
 
 On the Hilbert space `H₀¹(Ω)` the Dirichlet bilinear form is bounded (continuous) and,
 given the Poincaré inequality, coercive (`dirichletBilin_coercive`). Mathlib's Lax-Milgram
-theorem `IsCoercive.continuousLinearEquivOfBilin` then yields, for every continuous linear
-functional `f` on `H₀¹(Ω)`, a unique weak solution `u` of `B[u, v] = f v` for all `v`.
+theorem `IsCoercive.continuousLinearEquivOfBilin` then yields for every continuous linear
+functional `f` on `H₀¹(Ω)` a unique weak solution `u` of `B[u, v] = f v` for all `v`.
 
 This is the abstract existence-and-uniqueness statement. The elliptic right-hand side
 `f ∈ L²(Ω)` enters as the continuous functional `v ↦ ∫_Ω f · v` (continuous by

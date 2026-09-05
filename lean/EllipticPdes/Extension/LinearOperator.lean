@@ -6,7 +6,7 @@ Authors: Alejandro Soto Franco
 import EllipticPdes.Extension.Operator
 
 /-!
-# The extension operator as a linear map
+# Extension operator as a linear map
 
 Guo's proof produces an extension of each class. Evans states the same theorem as a bounded
 linear operator, and this file packages it that way: the partition, the charts, the bounded
@@ -211,7 +211,7 @@ theorem extSubsetGrad_smul (P : BoundaryPartition d Ω) (a : ℝ)
 
 /-! ### The operator -/
 
-/-- **The extension operator.** A class and its gradient go to the extension and its gradient.
+/-- **Extension operator.** A class and its gradient go to the extension and its gradient.
 The partition, the charts, the graphs, the radii and the cutoff are fixed before the class, so
 the map is linear. -/
 def extLinear (P : BoundaryPartition d Ω) (χ : EuclideanSpace ℝ (Fin d) → ℝ) :
@@ -236,7 +236,7 @@ def extLinear (P : BoundaryPartition d Ω) (χ : EuclideanSpace ℝ (Fin d) → 
     (χ : EuclideanSpace ℝ (Fin d) → ℝ) (w : SobolevPair d) (k : Fin d) :
     (extLinear P χ w).2 k = extSubsetGrad P χ w.1 w.2 k := rfl
 
-/-- **The three clauses of the theorem, for the operator.** The constant is quantified before
+/-- **Three clauses of the theorem for the operator.** The constant is quantified before
 the class, so the map is bounded in the sense clause (iii) asserts. -/
 theorem extLinear_spec (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBounded Ω)
     (P : BoundaryPartition d Ω) {χ : EuclideanSpace ℝ (Fin d) → ℝ}

@@ -147,7 +147,7 @@ theorem tendsto_inner_of_dense_of_bounded {E : Type*} [NormedAddCommGroup E]
 `Dₖ^{ηₘ} g ⇀ g'` weakly in `L²`. Against a smooth compactly supported test the discrete
 integration-by-parts identity `⟪Dₖ^h g, φ⟫ = -⟪g, Dₖ^{-h} φ⟫` together with the strong
 convergence `Dₖ^{-ηₘ} φ → ∂ₖφ` gives the limit `-⟪g, ∂ₖφ⟫ = ⟪g', φ⟫`, and the uniform bound
-`‖Dₖ^h g‖ ≤ ‖g'‖` carries it to every test class by density. -/
+`‖Dₖ^h g‖ ≤ ‖g'‖` extends it to every test class by density. -/
 theorem tendsto_inner_diffQuot_of_hasWeakDeriv (k : Fin d) {g g' : EucL2 d}
     (hg : HasWeakDeriv k g g') {η : ℕ → ℝ} (hη0 : ∀ m, η m ≠ 0)
     (hηlim : Filter.Tendsto η Filter.atTop (nhds 0)) (y : EucL2 d) :

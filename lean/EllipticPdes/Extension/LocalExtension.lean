@@ -121,7 +121,7 @@ theorem eLpNorm_bounded_mul_le {μ : Measure (EuclideanSpace ℝ (Fin d))}
 
 /-! ### The local extension -/
 
-/-- **The local extension, as a formula in the class.** The class is read in the chart's
+/-- **Local extension as a formula in the class.** The class is read in the chart's
 coordinates, cut off there, extended across the flattened boundary, and returned. Every step
 but the class itself is fixed by the chart, its graph `γ` and the cutoff `ξ`, so the whole is
 linear in the class. -/
@@ -130,7 +130,7 @@ def localExtFun (c : C1Chart d) (γ ξ u : EuclideanSpace ℝ (Fin d) → ℝ) :
   fun y => chartExt c.dir γ
     (fun z => ξ (c.motion.symm z) * u (c.motion.symm z)) (c.motion y)
 
-/-- **The gradient of the local extension.** The cutoff contributes its own derivative by the
+/-- **Gradient of the local extension.** The cutoff contributes its own derivative by the
 product rule, the chart's rigid motion mixes the coordinates on the way in and on the way
 out, and the shear and the reflection supply the rest. -/
 def localExtGradFun (c : C1Chart d) (γ ξ u : EuclideanSpace ℝ (Fin d) → ℝ)
@@ -173,13 +173,13 @@ theorem chartCutoff_spec (x : EuclideanSpace ℝ (Fin d)) {r R : ℝ} (hrR : r <
       tsupport (chartCutoff x hrR) ⊆ ball x R :=
   (exists_cutoff_one_on_ball x hrR).choose_spec
 
-/-- **The local extension of a class.** `localExtFun` at the graph and the cutoff the chart
+/-- **Local extension of a class.** `localExtFun` at the graph and the cutoff the chart
 fixes, so the only argument left is the class. -/
 def localExt (c : C1Chart d) (x : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hrc : r < c.radius)
     (u : EuclideanSpace ℝ (Fin d) → ℝ) : EuclideanSpace ℝ (Fin d) → ℝ :=
   localExtFun c (chartGraph c x) (chartCutoff x hrc) u
 
-/-- **The gradient of the local extension of a class.** -/
+/-- **Gradient of the local extension of a class.** -/
 def localExtGrad (c : C1Chart d) (x : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hrc : r < c.radius)
     (u : EuclideanSpace ℝ (Fin d) → ℝ) (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) :
     Fin d → EuclideanSpace ℝ (Fin d) → ℝ :=
@@ -593,20 +593,20 @@ theorem localExtGradFun_smul (c : C1Chart d) (a : ℝ) (γ ξ u : EuclideanSpace
   rw [Finset.mul_sum]
   exact Finset.sum_congr rfl fun i _ => by ring
 
-/-- **The local extension is additive in the class.** -/
+/-- **Local extension is additive in the class.** -/
 theorem localExt_add (c : C1Chart d) (x : EuclideanSpace ℝ (Fin d)) {r : ℝ}
     (hrc : r < c.radius) (u v : EuclideanSpace ℝ (Fin d) → ℝ) :
     localExt c x hrc (fun y => u y + v y)
       = fun y => localExt c x hrc u y + localExt c x hrc v y :=
   localExtFun_add c _ _ u v
 
-/-- **The local extension commutes with a scalar.** -/
+/-- **Local extension commutes with a scalar.** -/
 theorem localExt_smul (c : C1Chart d) (x : EuclideanSpace ℝ (Fin d)) {r : ℝ}
     (hrc : r < c.radius) (a : ℝ) (u : EuclideanSpace ℝ (Fin d) → ℝ) :
     localExt c x hrc (fun y => a * u y) = fun y => a * localExt c x hrc u y :=
   localExtFun_smul c a _ _ u
 
-/-- **The gradient of the local extension is additive in the class and its gradient.** -/
+/-- **Gradient of the local extension is additive in the class and its gradient.** -/
 theorem localExtGrad_add (c : C1Chart d) (x : EuclideanSpace ℝ (Fin d)) {r : ℝ}
     (hrc : r < c.radius) (u v : EuclideanSpace ℝ (Fin d) → ℝ)
     (g h : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (k : Fin d) :
@@ -614,7 +614,7 @@ theorem localExtGrad_add (c : C1Chart d) (x : EuclideanSpace ℝ (Fin d)) {r : �
       = fun y => localExtGrad c x hrc u g k y + localExtGrad c x hrc v h k y :=
   localExtGradFun_add c _ _ u v g h k
 
-/-- **The gradient of the local extension commutes with a scalar.** -/
+/-- **Gradient of the local extension commutes with a scalar.** -/
 theorem localExtGrad_smul (c : C1Chart d) (x : EuclideanSpace ℝ (Fin d)) {r : ℝ}
     (hrc : r < c.radius) (a : ℝ) (u : EuclideanSpace ℝ (Fin d) → ℝ)
     (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (k : Fin d) :

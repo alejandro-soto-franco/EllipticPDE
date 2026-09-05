@@ -29,7 +29,7 @@ Two things separate this from the interior layer (`Regularity/RestrictedDiffQuot
   the two: the cutoff is a test function on an ambient set `Ω'`, the operators act on
   `L²(Ω)` for an unrelated `Ω`.
 * **Only tangential directions are admissible.** A translation in the normal direction can
-  carry a point of the half-ball across the flat boundary, a tangential one cannot
+  move a point of the half-ball across the flat boundary, a tangential one cannot
   (`tangential_add_hshift_mem_halfBall`, `Regularity/Boundary/HalfBall.lean`). The support
   calculus here turns that into the statement that the tangential difference quotient of a
   test function on the half-ball is still supported in the open half-space `{x | 0 < x 0}`,
@@ -158,7 +158,7 @@ theorem support_shiftDiffQuotFn_subset (φ : EuclideanSpace ℝ (Fin n) → ℝ)
     zero_div]
 
 /-- The topological support of a difference quotient along `v` sits inside the union of the
-back-shifted topological support and the topological support, a closed set. -/
+back-shifted topological support and the topological support, which is closed. -/
 theorem tsupport_shiftDiffQuotFn_subset (φ : EuclideanSpace ℝ (Fin n) → ℝ)
     (v : EuclideanSpace ℝ (Fin n)) (h : ℝ) :
     tsupport (fun x => (φ (x + v) - φ x) / h)

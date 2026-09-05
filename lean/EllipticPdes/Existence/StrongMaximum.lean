@@ -101,11 +101,6 @@ theorem fderiv_barrierExp_apply (lam : ℝ) (y x ξ : EuclideanSpace ℝ (Fin d)
   simp only [ContinuousLinearMap.smul_apply, ContinuousLinearMap.sum_apply, smul_eq_mul,
     proj_apply', Finset.mul_sum]
 
-/-- The exponential part is differentiable. -/
-theorem differentiable_barrierExp (lam : ℝ) (y : EuclideanSpace ℝ (Fin d)) :
-    Differentiable ℝ (barrierExp lam y) := fun x =>
-  (hasFDerivAt_barrierExp lam y x).differentiableAt
-
 /-- The first partials of the exponential part. -/
 theorem partialD_barrierExp (lam : ℝ) (y : EuclideanSpace ℝ (Fin d)) (i : Fin d)
     (x : EuclideanSpace ℝ (Fin d)) :

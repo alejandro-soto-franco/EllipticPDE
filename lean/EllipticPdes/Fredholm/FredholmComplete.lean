@@ -7,7 +7,9 @@ import EllipticPdes.Fredholm.Fredholm
 import Mathlib.Analysis.InnerProductSpace.Spectrum
 
 /-!
-# Complete Fredholm theory (Evans §6.2.3, Theorem 4)
+# Complete Fredholm theory
+
+Evans §6.2.3, Theorem 4.
 
 `Fredholm.lean` reduces the weak problem `Lu = f` to the compact-operator equation
 `(1 - opK)u = h` through the factorisation `opA = opE ∘ (1 - opK)` and derives the
@@ -62,7 +64,7 @@ omit [CompleteSpace E] in
 /-- `1 - K` is **bounded below on the orthogonal complement of its kernel**: the main step of
 the Riesz closed-range theorem, by the standard compactness contradiction. If not, normalised
 `xₙ ∈ (ker(1-K))ᗮ` have `(1-K)xₙ → 0`; compactness of `K` extracts `Kx_{φ(n)} → z`, so `x_{φ(n)}
-→ z` with `‖z‖ = 1`, `z ∈ ker(1-K)`, and `z ∈ (ker(1-K))ᗮ`, forcing `z = 0`, a contradiction. -/
+→ z` with `‖z‖ = 1`, `z ∈ ker(1-K)`, and `z ∈ (ker(1-K))ᗮ`, forcing `z = 0` against `‖z‖ = 1`. -/
 theorem exists_pos_bound_on_orthogonal_ker (hK : IsCompactOperator K) :
     ∃ c : ℝ, 0 < c ∧ ∀ x ∈ (LinearMap.ker ((1 - K : E →L[ℝ] E)).toLinearMap)ᗮ,
       c * ‖x‖ ≤ ‖(1 - K : E →L[ℝ] E) x‖ := by
@@ -655,7 +657,7 @@ set_option maxHeartbeats 1600000 in
 space of weak
 solutions of the homogeneous problem and the space of weak solutions of the transpose
 problem have the same (finite) dimension. The factorisation `opA = opE ∘ (1 - opK)`
-carries `solSpaceStar = ker(opA†)` onto `ker(1 - opK†)` along the bijection `(opE)†`,
+maps `solSpaceStar = ker(opA†)` onto `ker(1 - opK†)` along the bijection `(opE)†`,
 and the abstract index theorem `finrank_ker_one_sub_adjoint_eq` applies.
 
 Terminal result of the library, stated in the manuscript. Nothing else consumes it. -/

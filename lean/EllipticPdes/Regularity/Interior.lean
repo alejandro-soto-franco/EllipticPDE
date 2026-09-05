@@ -61,7 +61,7 @@ theorem interior_secondWeakDeriv (Op : FullEllipticOp d) (hΩm : MeasurableSet �
 /-! ### Assembly of the interior H² estimate -/
 
 /-- **Weak derivative on an open region.** `g'` is the weak `k`-derivative of `g` on `V` if
-integration by parts holds against every test function supported in `V`. This is the
+the integration by parts identity is satisfied against every test function in `V`. This is the
 `V`-restricted analogue of `HasWeakDeriv`, and is the `L²`-level statement of `∂ₖ g = g'` on
 `V`. -/
 def HasWeakDerivOn (V : Set (EuclideanSpace ℝ (Fin d))) (k : Fin d)

@@ -22,7 +22,7 @@ whole-space space `EucL2 d = Lp ℝ 2 volume`, while the weak solution, the cuto
 keystone, and the Caccioppoli estimate live on the restricted-domain space `L2D Ω = Lp ℝ 2
 (volume.restrict Ω)`. This file provides the bridge between them: extension by zero `L2D Ω
 →ₗᵢ[ℝ] EucL2 d`, packaged from the Mathlib linear isometry `MeasureTheory.lpExtendByZero`,
-together with the compatibility that carries the cutoff-weighted gradient energy of the
+together with the compatibility that moves the cutoff-weighted gradient energy of the
 Caccioppoli estimate onto whole-space `EucL2 d` classes with the `L²` norm preserved.
 -/
 
@@ -40,7 +40,7 @@ variable {d : ℕ}
 /-! ### Extension by zero as the restricted-to-whole-space bridge -/
 
 /-- **Extension by zero**, `L2D Ω →ₗᵢ[ℝ] EucL2 d`. A class on the restricted measure
-`volume.restrict Ω` is carried to the whole-space `L²(ℝ^d)` class of its extension by zero,
+`volume.restrict Ω` is sent to the whole-space `L²(ℝ^d)` class of its extension by zero,
 with the `L²` norm preserved. This is the substrate bridge that lets the whole-space
 difference-quotient engine act on restricted-domain gradient data (Evans, *Partial
 Differential Equations* (2nd ed.), §6.3.1). -/
@@ -66,7 +66,7 @@ theorem extendL2_ae_eq_zero {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩm : Meas
     ∀ᵐ x ∂volume, x ∉ Ω → (extendL2 hΩm g : EuclideanSpace ℝ (Fin d) → ℝ) x = 0 :=
   lpExtendByZero_ae_eq_zero hΩm g
 
-/-! ### Carrying the Caccioppoli energy onto whole-space classes -/
+/-! ### Caccioppoli energy on whole-space classes -/
 
 /-- **Caccioppoli energy on whole-space classes.** Feeding the interior energy estimate
 `EllipticPdes.Regularity.caccioppoli` through the norm-preserving extension bridge, the

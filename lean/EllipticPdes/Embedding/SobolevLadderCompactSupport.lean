@@ -6,7 +6,7 @@ Authors: Alejandro Soto Franco
 import EllipticPdes.Embedding.GagliardoNirenberg
 
 /-!
-# The Sobolev ladder for a compactly supported family
+# Sobolev ladder for a compactly supported family
 
 The ladder of `EllipticPdes.Embedding.SobolevLadderGeneral` runs on a ball and shrinks it at
 every rung, because each rung multiplies by a cutoff. A compactly supported class needs no

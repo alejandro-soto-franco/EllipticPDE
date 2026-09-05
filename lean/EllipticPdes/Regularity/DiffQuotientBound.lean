@@ -823,7 +823,7 @@ theorem norm_diffQuot_le_of_hasWeakDeriv (k : Fin d) (g g' : EucL2 d)
   have hdense : Dense S :=
     MeasureTheory.Lp.dense_hasCompactSupport_contDiff
       (F := ℝ) (μ := (volume : Measure (EuclideanSpace ℝ (Fin d)))) (by norm_num)
-  -- The inner-product bound holds against every smooth compactly supported test element.
+  -- The inner-product bound is first proved against smooth compactly supported test elements.
   have hbound : ∀ f : EucL2 d, f ∈ S → ⟪diffQuot k h g, f⟫ ≤ ‖g'‖ * ‖f‖ := by
     rintro f ⟨ρ, hfρ, hρcs, hρcd⟩
     have hρL2 : MemLp ρ 2 volume := hρcd.continuous.memLp_of_hasCompactSupport hρcs

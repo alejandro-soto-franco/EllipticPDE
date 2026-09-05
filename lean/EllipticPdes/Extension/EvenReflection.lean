@@ -333,7 +333,7 @@ theorem measurePreserving_reflectLI_halfSpaceNeg (j : Fin d) :
   rwa [show reflectLI j ⁻¹' halfSpace j = halfSpaceNeg j from by
     rw [← preimage_reflectLI_halfSpaceNeg j, reflectLI_preimage_preimage]] at h
 
-/-- **Cost of the extension in every `Lᵖ` seminorm.** The reflection preserves
+/-- **Bound for the extension in every `Lᵖ` seminorm.** The reflection preserves
 measure, so each side contributes the seminorm on the half space. -/
 theorem eLpNorm_evenExt_le {j : Fin d} {u : EuclideanSpace ℝ (Fin d) → ℝ} {p : ℝ≥0∞}
     (hp : 1 ≤ p) (hu : AEStronglyMeasurable u (volume.restrict (halfSpace j))) :

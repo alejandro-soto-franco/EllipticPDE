@@ -6,7 +6,9 @@ Authors: Alejandro Soto Franco
 import EllipticPdes.Form.BilinearForm
 
 /-!
-# Characterisation of `H⁻¹(Ω)` (Evans §5.9.1, Theorem 1)
+# Characterisation of `H⁻¹(Ω)`
+
+Evans §5.9.1, Theorem 1.
 
 `H⁻¹(Ω)` is the topological dual of `H₀¹(Ω)`; in the graph encoding it is the type
 `H01 Ω →L[ℝ] ℝ`. The characterisation theorem says every `f ∈ H⁻¹(Ω)` is represented by

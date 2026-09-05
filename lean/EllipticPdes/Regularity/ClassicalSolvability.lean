@@ -38,7 +38,7 @@ namespace EllipticPdes.Regularity
 
 open EllipticPdes.Sobolev
 
-/-- **A weak solution with a smooth interior representative.** On a bounded domain, for an
+/-- **Weak solution with a smooth interior representative.** On a bounded domain, for an
 operator with no transport term and a nonnegative zeroth-order coefficient, whose diffusion is
 `C¹` and whose coefficients lie in `W^{k,∞}` at every order, and for a datum with weak
 derivatives of every order bounded in `L²`, the Dirichlet problem has a weak solution whose

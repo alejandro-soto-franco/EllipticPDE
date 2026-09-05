@@ -140,7 +140,7 @@ Gagliardo-Nirenberg-Sobolev inequality. This declaration is its `p = q = 2` case
 on a different route and consequently in every dimension: Guo's hypothesis `p ∈ [1, n)`
 reads `n > 2` at `p = 2`, excluding `n = 1` and `n = 2`, because the GNS route needs a
 finite Sobolev conjugate. The route here goes through the one-dimensional inequality and
-Fubini, which asks nothing of the dimension, at the cost of the constant `L²/(2(n+1))`
+Fubini, which asks nothing of the dimension, with the constant `L²/(2(n+1))`
 in place of the sharp one. -/
 theorem poincare_H01_of_bounded {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))}
     (hΩb : Bornology.IsBounded Ω) :

@@ -146,9 +146,9 @@ theorem setIntegral_mul_cutoff_partialD_split (P : L2D V) {χ v : EuclideanSpace
 /-- **Two classes agreeing under a cutoff pair identically against anything the cutoff fixes.**
 Where `θ·X = θ·Y` almost everywhere and `θψ = ψ` pointwise, the pairings against `ψ` agree.
 
-This is how an identification that only holds after a cutoff is used: every weight the datum
+This is how an identification valid only after a cutoff is used: every weight the datum
 assembly pairs against is supported where the outer cutoff of the tower is identically `1`, so
-`θψ = ψ` holds and the cutoff disappears from the conclusion. -/
+`θψ = ψ` there and the cutoff disappears from the conclusion. -/
 theorem setIntegral_mul_congr_of_cutoff_ae {θ : EuclideanSpace ℝ (Fin d) → ℝ} {X Y : L2D V}
     (h : (fun x => θ x * (X x : ℝ)) =ᵐ[volume.restrict V] fun x => θ x * (Y x : ℝ))
     {ψ : EuclideanSpace ℝ (Fin d) → ℝ} (hψ : ∀ x, θ x * ψ x = ψ x) :

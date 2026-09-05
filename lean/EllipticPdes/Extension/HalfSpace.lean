@@ -8,14 +8,14 @@ import EllipticPdes.Extension.Reflect
 import EllipticPdes.Embedding.GagliardoNirenberg
 
 /-!
-# The half space and its interface
+# Half space and its interface
 
 The extension of a Sobolev class across a flat boundary is by reflection, and what has to be
 proved is that the reflected class has a weak gradient across the interface. The identity of a
 weak gradient on the open half space applies only to test functions supported strictly inside
 it, so the test function is first multiplied by `slabCut j ε` and the slab is then let shrink.
 
-Two terms survive the product rule. The one carrying the cutoff's own derivative vanishes
+Two terms survive the product rule. The one with the cutoff's own derivative vanishes
 identically in the directions along the interface, since the cutoff depends on the `j`-th
 coordinate alone. In the remaining direction it is the boundary term, and it vanishes in the
 limit whenever the test function vanishes on the interface, which is exactly what the odd part

@@ -6,14 +6,14 @@ Authors: Alejandro Soto Franco
 import EllipticPdes.Embedding.GagliardoNirenberg
 
 /-!
-# The Sobolev ladder at the full step
+# Sobolev ladder at the full step
 
 `EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le` raises the exponent from `p` to `p'` with
 `1/p' = 1/p - 1/d`. Iterating it `s` times lands on `1/p - s/d`, which is the exponent Guo's
 Sobolev embedding writes as `p^{∗⋯∗}` (Guo, *Partial Differential Equations*, Theorem IV.2.3).
 This file runs that iteration from `p = 2`, at the full step and to a bounded depth.
 
-## The rung condition
+## Rung condition
 
 A rung is available while the reciprocal below it stays positive, and `2 * s ≤ d` is what keeps
 it so: at the top rung the reciprocal is `1/2 - s/d ≥ 0`, and at every rung below it exceeds
@@ -260,7 +260,7 @@ theorem exists_const_eLpNorm_le_of_gradClosed_fullStep (hd : 0 < d)
       refine le_of_inv_le_inv_fullStep (by norm_num) hq0 ?_
       simpa using hqs
     have hqE : (q : ℝ≥0∞) ≤ 2 := by exact_mod_cast hq2'
-    -- The exponent drop costs one power of the ball's measure.
+    -- The exponent drop uses one power of the ball's measure.
     have he : (0 : ℝ) ≤ 1 / (q : ℝ≥0∞).toReal - 1 / (2 : ℝ≥0∞).toReal := by
       have h2 : (q : ℝ≥0∞).toReal ≤ (2 : ℝ≥0∞).toReal := ENNReal.toReal_mono (by simp) hqE
       have hqR : (q : ℝ≥0∞).toReal = (q : ℝ) := by simp

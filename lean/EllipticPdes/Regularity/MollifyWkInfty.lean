@@ -64,7 +64,7 @@ theorem convolution_lsmul_apply (F K : EuclideanSpace ℝ (Fin d) → ℝ)
 bounded by `M` almost everywhere, and `ρ` is a non-negative continuous compactly supported kernel
 of unit mass, then `h ⋆ ρ` is bounded by `M` at every point.
 
-Continuity of `h` is not needed. It entered the `C¹` version only to make the integrand
+Continuity of `h` is unused. It entered the `C¹` version only to make the integrand
 `|h t| · ρ (x - t)` integrable, and domination by `M · ρ (x - t)` does that under an essential
 bound alone. -/
 theorem abs_convolution_le_of_measurable

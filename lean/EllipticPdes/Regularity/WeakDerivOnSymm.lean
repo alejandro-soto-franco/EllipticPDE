@@ -166,7 +166,7 @@ first derivatives of `u` on `V`, and `u_{ℓi}` is a weak `ℓ`-derivative of `u
 is a weak `i`-derivative of `u_ℓ`, the two agree once multiplied by any test function supported
 in `V`.
 
-Two integrations by parts carry each of them onto `u`: `∫ u_{ℓi} φ = ∫ u ∂ᵢ∂_ℓφ` and
+Two integrations by parts move each of them onto `u`: `∫ u_{ℓi} φ = ∫ u ∂ᵢ∂_ℓφ` and
 `∫ u_{iℓ} φ = ∫ u ∂_ℓ∂ᵢφ`, admissibly, since a partial derivative of a test function supported
 in `V` is again one. `partialD_comm` identifies the two right-hand sides, so the difference
 annihilates every test function supported in `V`. -/
@@ -182,7 +182,7 @@ theorem mulTest_mixed_weakDeriv_comm {V : Set (EuclideanSpace ℝ (Fin d))}
     intro φ hφc hφcs hφV
     obtain ⟨hdℓc, hdℓcs, hdℓV⟩ := isTest_partialD hφc hφcs hφV ℓ
     obtain ⟨hdic, hdics, hdiV⟩ := isTest_partialD hφc hφcs hφV i
-    -- Each second derivative, carried onto `u` by two integrations by parts.
+    -- Each second derivative, moved onto `u` by two integrations by parts.
     have h1 : (∫ x in V, (uli x : ℝ) * φ x)
         = ∫ x in V, (u x : ℝ) * partialD i (partialD ℓ φ) x := by
       rw [hui (partialD ℓ φ) hdℓc hdℓcs hdℓV]

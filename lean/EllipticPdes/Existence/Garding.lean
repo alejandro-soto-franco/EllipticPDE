@@ -406,8 +406,8 @@ theorem fullBilin_coercive_of_nonneg_zeroth (Ω : Set (EuclideanSpace ℝ (Fin d
 /-- **Existence and uniqueness for the transport-free, nonnegative-zeroth operator**
 (the `γ = 0` specialisation of Evans's First Existence Theorem, §6.2.2). With `b ≡ 0`,
 `c ≥ 0`, and the test-function Poincaré bound, the full
-divergence form `B = B_A + c` is coercive with no spectral shift, so Lax-Milgram yields, for
-every continuous functional `f` on `H₀¹(Ω)`, a unique weak solution `u` of `Lu = f`. This is
+divergence form `B = B_A + c` is coercive with no spectral shift, so Lax-Milgram yields for
+every continuous functional `f` on `H₀¹(Ω)` a unique weak solution `u` of `Lu = f`. This is
 the existence theorem for `Lu = -Dⱼ(aᵢⱼ Dᵢu) + cu` with general uniformly elliptic `A`. -/
 theorem weak_solution_of_nonneg_zeroth (Ω : Set (EuclideanSpace ℝ (Fin d)))
     (hb : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)

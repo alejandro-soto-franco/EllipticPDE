@@ -63,7 +63,7 @@ theorem datumL_apply (f : L2D Ω) (w : H01 Ω) :
 
 /-- **Test-function graphs determine a continuous functional on `H₀¹(Ω)`.** Their span is
 dense by the definition of `H₀¹(Ω)` as a topological closure, so a sequence of graphs
-converges to any given `w`, and continuity carries the agreement across the limit. -/
+converges to any given `w`, and continuity keeps the agreement across the limit. -/
 theorem eq_of_eq_on_testGraphs (F G : H01 Ω →L[ℝ] ℝ)
     (h : ∀ (v : EuclideanSpace ℝ (Fin d) → ℝ) (hv : IsTestFn Ω v),
       F ⟨hv.testGraph, testGraph_mem_H01 hv⟩ = G ⟨hv.testGraph, testGraph_mem_H01 hv⟩)

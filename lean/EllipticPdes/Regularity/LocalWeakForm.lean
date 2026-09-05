@@ -46,7 +46,7 @@ variable {d : ℕ}
 
 /-! ### Localised plain-integral weak identity -/
 
-/-- **The localised weak formulation (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1,
+/-- **Localised weak formulation (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1,
 Theorem 2).** A weak solution `u ∈ H₀¹(Ω)` of `L u = f`, stated through the bilinear pairing
 `Op.fullBilin` over all of `Ω`, satisfies the plain-integral identity `∑_{i,j} ∫_V a_{ij}(∂ᵢu)
 ∂ⱼv + ∑_i ∫_V b_i (∂ᵢu) v + ∫_V c u v = ∫_V f v` on any measurable `V ⊆ Ω`, for every test
@@ -185,7 +185,7 @@ theorem localWeakForm_of_fullBilin (Op : FullEllipticOp d)
 
 /-! ### Differentiated-equation identity from the weak formulation -/
 
-/-- **The differentiated-equation identity for a weak solution (Evans, *Partial Differential
+/-- **Differentiated-equation identity for a weak solution (Evans, *Partial Differential
 Equations* (2nd ed.), §6.3.1, Theorem 2).** For a weak solution `u ∈ H₀¹(Ω)` of `L u = f` with
 `C²` principal coefficients and `C¹` lower-order coefficients, and any compact `V ⋐ Ω`, the
 second weak derivatives of `u` on `V` exist and are bounded by the data, and for every direction

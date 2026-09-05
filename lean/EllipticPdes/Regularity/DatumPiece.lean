@@ -112,7 +112,7 @@ theorem exists_datum_piece {Ω N : Set (EuclideanSpace ℝ (Fin d))}
 /-- **Finite family of pieces assembled.** The datum of the induction step is a fixed finite
 list of shapes, each a cutoff against a coefficient against a derivative, and only the
 derivatives depend on the solution. Quantifying the constant before the derivatives is what
-carries that through: the cutoffs and coefficients are data of the operator and the tower, so
+makes that work: the cutoffs and coefficients are data of the operator and the tower, so
 their constants are summed once.
 
 The pairing is asked of a test function rather than of an arbitrary weight, since splitting the

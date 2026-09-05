@@ -141,7 +141,7 @@ family, assemble into an order-`k + 1` family of the function itself. The index 
 family reads `β ++ [ℓ]` as the `β`-entry of the family of `∂_ℓ u`, which is the convention
 `deriv` uses in the other direction.
 
-This is the step that carries the conclusion of the induction of Guo, *Partial Differential
+This is the step that brings the conclusion of the induction of Guo, *Partial Differential
 Equations I and II* (Course Lecture Notes), Theorem VIII.3.2 (p. 65) back to the solution:
 the induction hypothesis is applied to each `∂_ℓ u` and its conclusions are reassembled here. -/
 def ofDeriv {u : L2D V} {Du : Fin d → L2D V} (hu : ∀ ℓ, HasWeakDerivOn V ℓ u (Du ℓ))
@@ -192,7 +192,7 @@ theorem norm_le {hu : HasIteratedWeakDerivOn V k u} (hC : IteratedL2Bound hu C) 
 theorem mono_const {hu : HasIteratedWeakDerivOn V k u} (hC : IteratedL2Bound hu C)
     (hCC : C ≤ C') : IteratedL2Bound hu C' := fun α hα => (hC α hα).trans hCC
 
-/-- Transport carries the bound: the family is unchanged. -/
+/-- Transport preserves the bound: the family is unchanged. -/
 theorem congr {g : L2D V} {hu : HasIteratedWeakDerivOn V k u} {h : u = g}
     (hC : IteratedL2Bound hu C) : IteratedL2Bound (hu.congr h) C := hC
 

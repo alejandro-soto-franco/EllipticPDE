@@ -29,7 +29,7 @@ reciprocal `1/2 - s/(2d)` stays strictly positive for `s < d`. Full steps would 
 in even dimensions and on `p' = d` exactly one rung earlier, both degenerate.
 
 A rung consumes two exponents: the data sits at `q_s` with `1/q_s = 1/2 - s/(2d)`, the inequality
-is applied at `p` with `1/p = 1/q_{s+1} + 1/d`, and `p ≤ q_s` holds by the half-step, so
+is applied at `p` with `1/p = 1/q_{s+1} + 1/d`, and `p ≤ q_s` follows from the half-step, so
 `EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_of_le` takes the drop from `q_s` to `p` on
 the ball's finite measure. That `p` may sit below `2`, which is why the ladder is stated against
 the exponent-lowering form of the bootstrap rather than the sharp one.

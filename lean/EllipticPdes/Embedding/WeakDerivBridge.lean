@@ -21,7 +21,7 @@ estimates are `EllipticPdes.Embedding.interior_holder_estimate_one`,
 `EllipticPdes.Embedding.interior_holder_estimate_two` and
 `EllipticPdes.Embedding.interior_holder_estimate`.
 
-Dimension four and above needs the step iterated, which costs a weak derivative per rung and so
+Dimension four and above needs the step iterated, which uses a weak derivative per rung and so
 asks for more than the `H²` estimate supplies. `EllipticPdes.Embedding.memLp_of_gradClosed` runs
 that ladder on a family closed under differentiation.
 -/

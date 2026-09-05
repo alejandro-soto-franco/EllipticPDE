@@ -318,7 +318,7 @@ private lemma evansTest_bilin_L2D (A : EllipticCoeff d) (hΩm : MeasurableSet Ω
 
 /-! ### Extension-by-zero weak derivative and the first-order global energy -/
 
-/-- **Extension by zero of an `H₀¹` element carries the weak gradient.** For `u ∈ H₀¹(Ω)`, the
+/-- **Extension by zero of an `H₀¹` element preserves the weak gradient.** For `u ∈ H₀¹(Ω)`, the
 whole-space extension by zero of the function value `u₀` has whole-space `L²` weak
 `k`-derivative equal to the extension by zero of the gradient component `u_{k+1}`. Because `u`
 vanishes at the boundary (it lies in the closure of the compactly supported test functions), no
@@ -1179,7 +1179,7 @@ theorem interior_diffQuot_energy_bound (Op : FullEllipticOp d) (hΩm : Measurabl
         * (‖f‖ ^ 2 + ‖(u : H1amb Ω) 0‖ ^ 2)
       = max 0 (4 / 3 * (Cf + Cb + Cc + Ccr + Cre)) * P from by rw [hPdef]; ring]
   -- Five Peter-Paul families each spend `λ/8` of the ellipticity lower bound `λ E`,
-  -- leaving `3λ/8 E`, so the target `λ/2 E` costs a factor `4/3` on the constant.
+  -- leaving `3λ/8 E`, so the target `λ/2 E` needs a factor `4/3` on the constant.
   have hsum : A.lam / 2 * E ≤ (4 / 3 * (Cf + Cb + Cc + Ccr + Cre)) * P := by
     have hdist : (4 / 3 * (Cf + Cb + Cc + Ccr + Cre)) * P
         = 4 / 3 * (Cf * P) + 4 / 3 * (Cb * P) + 4 / 3 * (Cc * P) + 4 / 3 * (Ccr * P)

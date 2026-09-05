@@ -98,7 +98,7 @@ theorem shearGrad_smul (j : Fin d) (γ : EuclideanSpace ℝ (Fin d) → ℝ) (c 
 
 /-! ### The chart extension -/
 
-/-- **The chart extension is additive in the class.** -/
+/-- **Chart extension is additive in the class.** -/
 theorem chartExt_add (j : Fin d) (γ u v : EuclideanSpace ℝ (Fin d) → ℝ) :
     chartExt j γ (fun x => u x + v x) = fun y => chartExt j γ u y + chartExt j γ v y := by
   funext y
@@ -107,7 +107,7 @@ theorem chartExt_add (j : Fin d) (γ u v : EuclideanSpace ℝ (Fin d) → ℝ) :
       = fun x => (fun z => u (shear j γ z)) x + (fun z => v (shear j γ z)) x := rfl
   rw [h, evenExt_add]
 
-/-- **The chart extension commutes with a scalar.** -/
+/-- **Chart extension commutes with a scalar.** -/
 theorem chartExt_smul (j : Fin d) (γ : EuclideanSpace ℝ (Fin d) → ℝ) (c : ℝ)
     (u : EuclideanSpace ℝ (Fin d) → ℝ) :
     chartExt j γ (fun x => c * u x) = fun y => c * chartExt j γ u y := by
@@ -117,7 +117,7 @@ theorem chartExt_smul (j : Fin d) (γ : EuclideanSpace ℝ (Fin d) → ℝ) (c :
       = fun x => c * (fun z => u (shear j γ z)) x := rfl
   rw [h, evenExt_smul]
 
-/-- **The gradient of the chart extension is additive in the gradient.** -/
+/-- **Gradient of the chart extension is additive in the gradient.** -/
 theorem chartExtGrad_add (j : Fin d) (γ : EuclideanSpace ℝ (Fin d) → ℝ)
     (g h : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (k : Fin d) :
     chartExtGrad j γ (fun i x => g i x + h i x) k
@@ -126,7 +126,7 @@ theorem chartExtGrad_add (j : Fin d) (γ : EuclideanSpace ℝ (Fin d) → ℝ)
   simp only [chartExtGrad, shearGrad_add, evenExtGrad_add]
   ring
 
-/-- **The gradient of the chart extension commutes with a scalar.** -/
+/-- **Gradient of the chart extension commutes with a scalar.** -/
 theorem chartExtGrad_smul (j : Fin d) (γ : EuclideanSpace ℝ (Fin d) → ℝ) (c : ℝ)
     (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (k : Fin d) :
     chartExtGrad j γ (fun i x => c * g i x) k = fun y => c * chartExtGrad j γ g k y := by

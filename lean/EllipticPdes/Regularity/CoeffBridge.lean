@@ -157,7 +157,7 @@ theorem abs_iterPartial_le {f : EuclideanSpace ℝ (Fin d) → ℝ} (α : List (
 
 /-- **Integration by parts for a `C¹` function against a test function.** The classical
 partial derivative of a continuously differentiable function is its weak partial derivative.
-No decay is asked of `f`, because the test function has compact support and carries every
+No decay is asked of `f`, because the test function has compact support and puts every
 integrand into `L¹`. -/
 theorem hasWeakPartial_partialD {f : EuclideanSpace ℝ (Fin d) → ℝ}
     (hf : ContDiff ℝ ((1 : ℕ) : ℕ∞) f) (l : Fin d) :

@@ -16,7 +16,7 @@ import EllipticPdes.Analysis.EuclideanFunctionalNorm
 file proves it for bounded measurable `Ω`, consuming the Fréchet-Kolmogorov engine built in
 `EllipticPdes.Analysis.*`.
 
-The argument carries `embL2 Ω U = U 0 ∈ L²(Ω)` to its extension by zero in `L²(ℝᵈ)`, where the
+The argument sends `embL2 Ω U = U 0 ∈ L²(Ω)` to its extension by zero in `L²(ℝᵈ)`, where the
 Fréchet-Kolmogorov criterion `totallyBounded_of_lipschitz_translation` applies: the family is
 uniformly bounded, supported in a fixed ball (`Ω` bounded), and uniformly Lipschitz under
 translation. The translation modulus comes from the gradient estimate

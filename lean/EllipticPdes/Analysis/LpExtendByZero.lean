@@ -16,7 +16,7 @@ equals the seminorm of the indicator on `μ`. We package it as a linear isometry
 `MeasureTheory.lpExtendByZero`.
 
 This is the bridge that lets a compact-embedding argument on a bounded domain `Ω` be run in
-the ambient space `Lᵖ(ℝⁿ)`: a class on `L²(Ω) = Lp ℝ 2 (volume.restrict Ω)` is carried to its
+the ambient space `Lᵖ(ℝⁿ)`: a class on `L²(Ω) = Lp ℝ 2 (volume.restrict Ω)` is sent to its
 extension by zero in `L²(ℝⁿ) = Lp ℝ 2 volume`, where the Fréchet-Kolmogorov criterion applies.
 
 ## Main definitions

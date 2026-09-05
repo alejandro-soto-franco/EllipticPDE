@@ -7,7 +7,9 @@ import EllipticPdes.Existence.Garding
 import Mathlib.Analysis.Normed.Operator.Compact.FredholmAlternative
 
 /-!
-# Fredholm alternative for the elliptic Dirichlet problem (Evans §6.2.3, Theorem 4)
+# Fredholm alternative for the elliptic Dirichlet problem
+
+Evans §6.2.3, Theorem 4.
 
 For the full divergence-form operator `Lu = -Dⱼ(aᵢⱼDᵢu) + bᵢDᵢu + cu` the Gårding inequality
 makes the shifted form `B_γ = B + γ⟨·,·⟩_{L²}` coercive (`shiftedBilin_coercive`), so `L + γ` is

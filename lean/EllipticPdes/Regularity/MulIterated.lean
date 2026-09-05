@@ -24,7 +24,7 @@ list `ℓ :: α` reads the order-`k` family built for the `ℓ`-derivative.
 
 No Leibniz formula over subsets of the index list appears, and none is needed. Naming the
 derivative of each order through the recursion avoids the combinatorial statement altogether,
-at the cost of a constant that is existentially quantified rather than computed. The estimate
+with a constant that is existentially quantified rather than computed. The estimate
 of Theorem VIII.3.2 quantifies its constant before the solution and the datum and says nothing
 about its size, so nothing is lost.
 

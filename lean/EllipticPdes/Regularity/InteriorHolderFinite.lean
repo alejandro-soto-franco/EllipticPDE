@@ -7,13 +7,13 @@ import EllipticPdes.Regularity.IteratedFamily
 import EllipticPdes.Embedding.HolderOfGradClosed
 
 /-!
-# Sobolev embedding of order k, second case
+# Second case of the Sobolev embedding of order k
 
 Guo, *Partial Differential Equations*, Theorem IV.2.3: for `u ∈ W^{m,p}(Ω)` with `m > n/p`, the
 conclusion is `u ∈ C^{m-1-⌊n/p⌋, γ}(Ω)`. This file states and proves the case `p = 2`, locally,
 from the supply of weak derivatives the interior regularity theory produces.
 
-## The order and the exponent
+## Order and exponent
 
 An order-`m` supply of weak derivatives in `L²` gives classical derivatives up to
 `k = m - 1 - ⌊d/2⌋`, and the top ones are Hölder-`1/2`. The order is the cited one on the nose,

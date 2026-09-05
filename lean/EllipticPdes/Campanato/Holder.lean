@@ -165,7 +165,7 @@ with `0 < α`. Then `campanatoLimit u` is a representative of `u` on every conce
 `B(c, ρ)` with `5ρ ≤ R`, and it is Hölder continuous there with exponent `α` and constant
 `campanatoHolderConst d α · M`.
 
-The factor `5` is what the hypothesis costs: the pair estimate at `x, y ∈ B(c, ρ)` uses the balls
+The factor `5` comes from the hypothesis: the pair estimate at `x, y ∈ B(c, ρ)` uses the balls
 of radius `2 |x - y| < 4ρ` about both points, and those lie in `B(c, R)` exactly when `5ρ ≤ R`. -/
 theorem campanato_holderOnWith (hd : 0 < d) {u : EuclideanSpace ℝ (Fin d) → ℝ} {α M : ℝ}
     (hα : 0 < α) (hM : 0 ≤ M) {c : EuclideanSpace ℝ (Fin d)} {R ρ : ℝ} (hρ : 0 < ρ)

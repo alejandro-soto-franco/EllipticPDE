@@ -307,7 +307,7 @@ and `‖∇ζ‖∞`. Testing the weak formulation with
 `ζ² u` (admissible by [`cutoffMul_mem_H01`]), the ellipticity lower bound [`energy_ge`]
 controls the principal part from below, and Cauchy-Schwarz together with the Peter-Paul
 (Young) inequality absorbs the cross, transport, zeroth-order, and right-hand terms into a
-`(λ/2) ∫_Ω ζ² |∇u|²` share. Since `ζ ≡ 1` on an interior set `V`, a consumer obtains
+`(λ/2) ∫_Ω ζ² |∇u|²` share. Since `ζ ≡ 1` on an interior set `V`, this gives
 `‖∇u‖_{L²(V)} ≤ C' (‖f‖ + ‖u₀‖)`. See Gilbarg-Trudinger, *Elliptic PDE of Second Order*,
 Theorem 8.8, and Evans, *Partial Differential Equations* (2nd ed.), §6.3.1.
 

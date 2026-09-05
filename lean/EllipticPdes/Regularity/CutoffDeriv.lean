@@ -73,7 +73,7 @@ theorem restrictL2_extendL2_eq (hΩm : MeasurableSet Ω) (g : L2D Ω) :
 
 /-- **First-order bound for the interior difference quotient.** For `u ∈ H₀¹(Ω)` the interior
 difference quotient of the function coordinate is bounded by the corresponding gradient
-coordinate, uniformly in the step: extension by zero carries the weak derivative
+coordinate, uniformly in the step: extension by zero preserves the weak derivative
 (`hasWeakDeriv_extendL2_of_mem_H01`), the whole-space bound `‖Dₖ^h g‖ ≤ ‖g'‖` applies, and
 restriction is non-expansive (Evans, *Partial Differential Equations* (2nd ed.), §5.8.2). -/
 theorem norm_diffQuotD_le_grad (hΩm : MeasurableSet Ω) (k : Fin d) (u : H01 Ω) (h : ℝ) :
@@ -245,7 +245,7 @@ private lemma exists_cutoffMul_diffQuotG_norm_bound (Op : FullEllipticOp d)
 
 /-! ### Membership of a cut-off directional derivative in `H₀¹(Ω)` -/
 
-/-- **The cutoff of a directional derivative is admissible (Evans, *Partial Differential
+/-- **Cutoff of a directional derivative is admissible (Evans, *Partial Differential
 Equations* (2nd ed.), §6.3.1, Theorem 2, step 3).** For a weak solution `u ∈ H₀¹(Ω)` of
 `L u = f` with `C¹` principal coefficients and a cutoff tower `T` for `V ⋐ Ω`, the product
 `ξ · ∂_ℓ u` of the middle tower cutoff with a directional derivative of `u` is again an element
@@ -352,7 +352,7 @@ theorem exists_mem_H01_mulTest_gradient (Op : FullEllipticOp d)
     rw [hval] at hA2
     exact tendsto_nhds_unique hA1 hA2
 
-/-- **The cutoff derivative is an `H₀¹` function with its weak gradient (Evans, *Partial
+/-- **Cutoff derivative is an `H₀¹` function with its weak gradient (Evans, *Partial
 Differential Equations* (2nd ed.), §6.3.1, Theorem 2, step 3).** For a weak solution
 `u ∈ H₀¹(Ω)` of `L u = f` with `C¹` principal coefficients and a cutoff tower `T` for
 `V ⋐ Ω`, the product `ξ · ∂_ℓ u` of the middle tower cutoff with a directional derivative of

@@ -163,7 +163,7 @@ differentiation lands on a coefficient, and the commutator with `ξ`. Each of th
 `W^{k,∞}` weight against a derivative of `u` of order at most two, so
 `EllipticPdes.Regularity.exists_iteratedWeakDeriv_mul` and
 `EllipticPdes.Regularity.HasIteratedWeakDerivOn.sum` assemble the family and its bound, and
-`EllipticPdes.Regularity.weakForm_of_testFn` carries the identity from test functions to
+`EllipticPdes.Regularity.weakForm_of_testFn` extends the identity from test functions to
 `H₀¹(Ω)`.
 
 ## Order-`k` conclusion as a hypothesis
@@ -254,7 +254,7 @@ theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
     change restrictL2 (Ω := V) (extendL2 hΩm (Uamb 0)) = _
     rw [hU0]
     exact restrictL2_extendL2_mulTest_xi hΩm hVm hVΩ T ((u : H1amb Ω) ℓ.succ)
-  · -- The weak formulation, carried from test functions by density.
+  · -- The weak formulation, extended from test functions by density.
     intro w
     refine weakForm_of_testFn Op ⟨Uamb, hUmem⟩ F (fun v hv => ?_) w
     have hgrad' : ∀ i : Fin (n + 1), extendL2 hΩm (Uamb i.succ)
@@ -376,10 +376,10 @@ theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
           mul_le_mul_of_nonneg_right
             (le_add_of_nonneg_left (mul_nonneg hKD0 (add_nonneg hC₁0 zero_le_one))) hMu
 
-/-- **Induction step.** Differentiating the equation once carries the order-`k` conclusion to
+/-- **Induction step.** Differentiating the equation once raises the order-`k` conclusion to
 order `k + 1`, under one more order of regularity on every coefficient.
 
-`∂_ℓ u` is not in `H₀¹(Ω)`: it is a first derivative of an `H₀¹` function and lies only in
+`∂_ℓ u` lies outside `H₀¹(Ω)`: it is a first derivative of an `H₀¹` function and lies only in
 `H¹_loc`, so `InteriorRegularityAt`, which quantifies over `H01 Ω`, cannot be applied to it.
 `exists_cutoffDeriv_weakForm` supplies the cutoff that can be, together with its datum, and
 this step is what remains once that is in hand.

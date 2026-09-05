@@ -35,7 +35,7 @@ Mathlib's `MeasureTheory.eLpNorm_le_eLpNorm_fderiv_of_eq` asks for `ContDiff ℝ
 support, neither of which an `Lᵖ` class with weak derivatives has. Two devices bridge that.
 
 * A smooth cutoff `η` supported in the ball turns a weak gradient on the ball into a compactly
-  supported weak gradient on the whole space, at the cost of the product-rule term `v ∂ₖη`
+  supported weak gradient on the whole space, with the product-rule term `v ∂ₖη`
   (`hasWeakGradOn_univ_mul_cutoff`).
 * Mollification turns that into a smooth compactly supported function whose classical partials
   are the mollified weak gradient (`partialD_convolution_eq_of_hasWeakGradOn` at `Set.univ`),
@@ -240,7 +240,7 @@ almost-everywhere limit.
 
 No cutoff enters, so the conclusion is on the whole space and the bound has no `‖w‖_{Lᵖ}`
 term. `exists_eLpNorm_sobolevConj_le` is this statement composed with a cutoff, and the cutoff
-is what costs the smaller ball and the extra term. -/
+is what forces the smaller ball and the extra term. -/
 theorem exists_eLpNorm_sobolevConj_le_compactSupport (hd : 0 < d)
     {p p' : ℝ≥0} (hp : 1 ≤ p) (hpp' : (p' : ℝ)⁻¹ = (p : ℝ)⁻¹ - (d : ℝ)⁻¹) :
     ∃ K : ℝ≥0, ∀ (w : EuclideanSpace ℝ (Fin d) → ℝ)

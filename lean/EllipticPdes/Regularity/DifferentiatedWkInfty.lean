@@ -10,7 +10,7 @@ import EllipticPdes.Regularity.LowerOrderWkInfty
 /-!
 # Moving a derivative onto the solution under Guo's coefficient hypothesis
 
-`EllipticPdes.Regularity.principal_move`, `transport_move` and `zeroth_move` carry `∂_ℓ` from
+`EllipticPdes.Regularity.principal_move`, `transport_move` and `zeroth_move` move `∂_ℓ` from
 the test function onto the solution in the three terms of the equation, each by one application
 of the Leibniz rule for a `C¹` weight. Guo, *Partial Differential Equations I and II* (Course
 Lecture Notes), Theorem VIII.3.2 (p. 65) asks only for `W^{k,∞}` coefficients, which have no

@@ -156,7 +156,7 @@ def extPiece {Ω : Set (EuclideanSpace ℝ (Fin d))} (P : BoundaryPartition d Ω
       (ball (x : EuclideanSpace ℝ (Fin d)) (pieceRadius P x)).indicator
         (localExt (P.chart x) x (pieceRadius_lt P x) u) y
 
-/-- **The gradient of one piece**, with the product rule's second term. -/
+/-- **Gradient of one piece**, with the product rule's second term. -/
 def extPieceGrad {Ω : Set (EuclideanSpace ℝ (Fin d))} (P : BoundaryPartition d Ω)
     (i : Option {x // x ∈ P.centres}) (u : EuclideanSpace ℝ (Fin d) → ℝ)
     (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (k : Fin d) :
@@ -171,13 +171,13 @@ def extPieceGrad {Ω : Set (EuclideanSpace ℝ (Fin d))} (P : BoundaryPartition 
         (ball (x : EuclideanSpace ℝ (Fin d)) (pieceRadius P x)).indicator
           (localExt (P.chart x) x (pieceRadius_lt P x) u) y
 
-/-- **The glued extension.** The pieces add to the class on the domain because the partition
+/-- **Glued extension.** The pieces add to the class on the domain because the partition
 adds to one there. -/
 def extFun {Ω : Set (EuclideanSpace ℝ (Fin d))} (P : BoundaryPartition d Ω)
     (u : EuclideanSpace ℝ (Fin d) → ℝ) : EuclideanSpace ℝ (Fin d) → ℝ :=
   fun y => ∑ i, extPiece P i u y
 
-/-- **The gradient of the glued extension.** -/
+/-- **Gradient of the glued extension.** -/
 def extFunGrad {Ω : Set (EuclideanSpace ℝ (Fin d))} (P : BoundaryPartition d Ω)
     (u : EuclideanSpace ℝ (Fin d) → ℝ) (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ)
     (k : Fin d) : EuclideanSpace ℝ (Fin d) → ℝ :=
@@ -458,13 +458,13 @@ theorem exists_cutoff_one_on_compact {K U : Set (EuclideanSpace ℝ (Fin d))}
     hLc.of_isClosed_subset (isClosed_tsupport _) hsupp, hsupp.trans hLU,
     fun y hy => hf1 hy⟩
 
-/-- **The extension with its support cut into a given open set.** One more cutoff, equal to
+/-- **Extension with its support cut into a given open set.** One more cutoff, equal to
 one on the closure of the domain, which leaves the agreement alone and moves the support. -/
 def extSubsetFun {Ω : Set (EuclideanSpace ℝ (Fin d))} (P : BoundaryPartition d Ω)
     (χ u : EuclideanSpace ℝ (Fin d) → ℝ) : EuclideanSpace ℝ (Fin d) → ℝ :=
   fun y => χ y * extFun P u y
 
-/-- **The gradient of that extension**, with the cutoff's own derivative. -/
+/-- **Gradient of that extension**, with the cutoff's own derivative. -/
 def extSubsetGrad {Ω : Set (EuclideanSpace ℝ (Fin d))} (P : BoundaryPartition d Ω)
     (χ u : EuclideanSpace ℝ (Fin d) → ℝ) (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ)
     (k : Fin d) : EuclideanSpace ℝ (Fin d) → ℝ :=

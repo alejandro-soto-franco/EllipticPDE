@@ -18,7 +18,7 @@ order reads that as `C^∞`.
 
 Only one ball is lost, at the Morrey step. The ladder shrinks internally between the two radii
 it is given, and the differentiability argument runs on the inner ball itself, since the
-derivative of a representative is a representative. Were the derivative to cost a further
+derivative of a representative is a representative. Were the derivative to force a further
 shrinking, no fixed ball would serve every order.
 
 ## Main declarations

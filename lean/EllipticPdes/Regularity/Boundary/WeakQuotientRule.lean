@@ -15,13 +15,13 @@ into (53), isolating `a^{nn} u_{x_n x_n}`, and then divides by `a^{nn} ≥ θ > 
 
 At the point that step is invoked only the tangential second derivatives are known to be
 `L²`, so (53) is available as a statement about the weak derivative of the *product*
-`a^{nn} u_{x_n}`, and the passage to `u_{x_n} ∈ H¹` costs a division. This file supplies
+`a^{nn} u_{x_n}`, and the passage to `u_{x_n} ∈ H¹` needs a division. This file supplies
 that division: the inverse of the weighted product rule
 `EllipticPdes.Regularity.HasWeakDerivOn.mul_contDiff_left`.
 
 The mathematical content is one line, `v = a⁻¹ · (a · v)`, and the whole difficulty sits in the
 hypotheses on `a`. A bounded measurable `a` bounded away from zero falls short, since
-differentiating `a⁻¹` costs a derivative of `a`. What the argument needs is
+differentiating `a⁻¹` needs a derivative of `a`. What the argument needs is
 
 * `a ∈ C¹`, so that `a⁻¹` is `C¹` wherever `a` does not vanish;
 * `a ≥ θ > 0` almost everywhere, which continuity of `a` upgrades to an everywhere bound
@@ -59,9 +59,9 @@ variable {d : ℕ}
 /-! ### Everywhere bound from an almost-everywhere bound -/
 
 /-- **Pointwise lower bound for a continuous function bounded below almost everywhere.**
-The set where the bound holds is closed, and it is dense because its complement is null and
-`volume` charges every nonempty open set, so it is the whole space. This is what turns the
-almost-everywhere ellipticity of `EllipticCoeff` into the everywhere positivity that
+The set on which the bound is satisfied is closed, and it is dense because its complement is
+null and `volume` charges every nonempty open set, so it is the whole space. This is what turns
+the almost-everywhere ellipticity of `EllipticCoeff` into the everywhere positivity that
 `ContDiff.inv` demands. -/
 theorem le_of_ae_le_of_continuous {a : EuclideanSpace ℝ (Fin d) → ℝ} (ha : Continuous a)
     {θ : ℝ} (h : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), θ ≤ a x)

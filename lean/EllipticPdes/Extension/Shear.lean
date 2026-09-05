@@ -8,14 +8,14 @@ import Mathlib.MeasureTheory.Function.Jacobian
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 
 /-!
-# The shear of a `C¹` boundary chart
+# Shear of a `C¹` boundary chart
 
 A bounded domain with `C¹` boundary is, near a boundary point and after relabelling the
 coordinates, the region above the graph of a `C¹` function `γ` of the remaining coordinates.
 The map that flattens the boundary is the shear `y ↦ y + γ(y) • eⱼ`, whose inverse is the shear
 by `-γ`, and whose derivative is the identity plus a rank-one map that annihilates its own
 direction. Its determinant is therefore `1`, so it preserves Lebesgue measure and the change of
-variables costs nothing.
+variables leaves every integral unchanged.
 
 ## Main declarations
 

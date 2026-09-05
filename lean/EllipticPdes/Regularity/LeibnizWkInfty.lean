@@ -31,7 +31,7 @@ the smooth case gives the identity for every `ε`, and what remains is to pass t
 
 ## Passing to the limit
 
-The `C¹` route mollifies and lets dominated convergence carry the limit, which needs
+The `C¹` route mollifies and lets dominated convergence take the limit, which needs
 `a ⋆ ρ_ε → a` pointwise and so needs `a` continuous. A merely measurable weight has no such
 convergence, and the limit is taken in `L²` instead: the pairing is bounded by Cauchy-Schwarz
 (`abs_setIntegral_mul_le`), leaving `‖a ⋆ ρ_ε - a‖_{L²}` on the support of the test function.
@@ -387,7 +387,7 @@ This is `HasWeakDerivOn.mul_contDiff_left` with the `C¹` hypothesis on the weig
 is what Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem VIII.3.2
 (p. 65) asks for. The weight is mollified, the smooth case
 `weakDerivOn_smul_test_contDiff` gives the identity at every radius, and
-`tendsto_setIntegral_mul_convolution_of_measurable` carries each of the three terms to its
+`tendsto_setIntegral_mul_convolution_of_measurable` sends each of the three terms to its
 limit. -/
 theorem HasWeakDerivOn.mul_isWkInfty_left {V : Set (EuclideanSpace ℝ (Fin d))} (ℓ : Fin d)
     {g g' : Lp ℝ 2 (volume.restrict V)} (hg : HasWeakDerivOn V ℓ g g')
