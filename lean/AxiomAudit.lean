@@ -637,3 +637,21 @@ import EllipticPdes
 /-- info: 'EllipticPdes.Sobolev.poincare_ball' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Sobolev.poincare_ball
+
+/-! ### The chain rule and the weak maximum principle -/
+
+/-- info: 'EllipticPdes.Embedding.hasWeakGradOn_comp' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.hasWeakGradOn_comp
+
+/-- info: 'EllipticPdes.Embedding.hasWeakGradOn_posPart' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.hasWeakGradOn_posPart
+
+/-- info: 'EllipticPdes.Embedding.ae_eq_zero_of_eq_const_of_hasWeakGradOn' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Embedding.ae_eq_zero_of_eq_const_of_hasWeakGradOn
+
+/-- info: 'EllipticPdes.Sobolev.weak_maximum_principle' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Sobolev.weak_maximum_principle

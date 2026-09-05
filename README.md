@@ -82,6 +82,10 @@ prefix.
 | Rellich-Kondrachov on $H^1(\Omega)$ | `Sobolev.embW12_isCompact` |
 | Poincaré's inequality with the mean subtracted | `Sobolev.poincare_wirtinger` |
 | Poincaré's inequality on a ball | `Sobolev.poincare_ball` |
+| Chain rule for weak gradients | `Embedding.hasWeakGradOn_comp` |
+| Weak gradient of the positive part | `Embedding.hasWeakGradOn_posPart` |
+| The weak gradient vanishes on level sets | `Embedding.ae_eq_zero_of_eq_const_of_hasWeakGradOn` |
+| The weak maximum principle | `Sobolev.weak_maximum_principle` |
 | Gagliardo-Nirenberg-Sobolev on a bounded $C^1$ domain | `Embedding.exists_eLpNorm_sobolevConj_le_domain` |
 | Sobolev ladder on that domain | `Embedding.exists_const_memLp_of_gradClosed_domain` |
 | Hölder continuity up to the boundary | `Embedding.exists_const_holderOnWith_of_gradClosed_domain` |
@@ -455,6 +459,34 @@ prefix.
   to the ball with Lebesgue measure scaled by $r^{-d}$, so the mean is
   unchanged, the weak gradient picks up the factor $r$, and the seminorm
   factor $r^{-d/2}$ cancels between the two sides,
+- the chain rule for weak gradients, as
+  `EllipticPdes.Embedding.hasWeakGradOn_comp`, which is Lemma 7.5 of Gilbarg
+  and Trudinger: on an open set, a $C^1$ function with bounded derivative,
+  composed with a locally integrable class with locally integrable weak
+  gradient, has the weak gradient $f'(u)\,\nabla u$. The class is mollified on
+  a compact neighbourhood of the support of the test function, the classical
+  identity holds for each mollification, and the two sides pass to the limit,
+  the gradient side along a subsequence converging almost everywhere. Their
+  Lemma 7.6 follows as `EllipticPdes.Embedding.hasWeakGradOn_posPart`, the
+  weak gradient of $u^+$ being $\nabla u$ where $u > 0$ and zero elsewhere,
+  through the $C^1$ functions $\sqrt{(t^+)^2 + \varepsilon^2} - \varepsilon$,
+  and their Lemma 7.7 as
+  `EllipticPdes.Embedding.ae_eq_zero_of_eq_const_of_hasWeakGradOn`, the weak
+  gradient vanishing almost everywhere on every level set,
+- the weak maximum principle, as
+  `EllipticPdes.Sobolev.weak_maximum_principle`, which is Theorem 8.1 of
+  Gilbarg and Trudinger in the transport-free case their proof singles out,
+  with nonnegative zeroth-order coefficient and on a bounded open set. The
+  boundary inequality $u \le k$ on $\partial\Omega$ is read as they define it,
+  as membership of $(u - k)^+$ in $H^1_0(\Omega)$, and the conclusion is
+  $u \le k$ almost everywhere for every such $k \ge 0$. The subsolution
+  inequality is taken against every nonnegative element of $H^1_0(\Omega)$,
+  the form their proof uses; testing against $v = (u - k)^+$, the zeroth-order
+  term is nonnegative, the principal term is the energy of $v$ by the chain
+  rule for the positive part, ellipticity makes the gradient of $v$ vanish, and
+  the Poincaré inequality on $H^1_0$ of the bounded domain makes $v$ vanish.
+  The general case with a transport term, which runs through the Sobolev
+  inequality and a limit in $k$, is open,
 - the Gagliardo-Nirenberg-Sobolev inequality on a bounded domain with $C^1$
   boundary, as
   `EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_domain`, the single rung

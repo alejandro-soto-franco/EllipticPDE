@@ -683,6 +683,30 @@
       "source_id": "evans-2010",
       "locator": "§5.8.1 Thm 2",
       "claim": "formalises the cited theorem at p = 2: one constant, depending on the dimension alone, bounds the L^2 distance of a class on any ball from its mean over the ball by the radius times the L^2 norm of its gradient, the class being given as a function with an L^2 weak gradient on the ball and the gradient norm read as the square root of the sum of the squared L^2 norms of its components. The cited statement takes 1 <= p <= infinity and a class in W^{1,p} of the open ball; the statement here takes p = 2. The proof is the cited one, carrying the unit-ball case onto the ball by the affine map, under which the measure scales by r^n, the mean is unchanged and the weak gradient picks up the factor r"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.hasWeakGradOn_comp",
+      "source_id": "gilbarg-2001",
+      "locator": "§7.4 Lemma 7.5",
+      "claim": "formalises the cited chain rule: on an open set, a C^1 function of the real line with bounded derivative, composed with a locally integrable class with a locally integrable weak gradient, has the weak gradient given by the derivative of the function at the class times the gradient of the class. The cited statement takes u in W^1(Omega), the locally integrable classes with locally integrable weak gradient, which is the hypothesis here, and f in C^1 with f' in L^infinity, taken here as a C^1 function with a uniform bound on the derivative. The proof is the cited one: the class is mollified on a compact neighbourhood of the support of the test function inside the domain, the partials of the mollifications are the mollified gradient there, the classical identity holds for each mollification, and the two sides pass to the limit, the function side by the Lipschitz bound and L^1 convergence, the gradient side along a subsequence converging almost everywhere by dominated convergence"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.hasWeakGradOn_posPart",
+      "source_id": "gilbarg-2001",
+      "locator": "§7.4 Lemma 7.6",
+      "claim": "formalises the first clause of the cited lemma: on an open set, the positive part of a locally integrable class with a locally integrable weak gradient has the weak gradient equal to the gradient of the class where the class is positive and to zero elsewhere. The cited statement also lists the negative part and the absolute value, which follow from this clause by the identities the source names and are not stated separately here. The proof is the cited one, applying the chain rule to the C^1 functions sqrt((t^+)^2 + eps^2) - eps and letting eps tend to zero by dominated convergence on both sides"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.ae_eq_zero_of_eq_const_of_hasWeakGradOn",
+      "source_id": "gilbarg-2001",
+      "locator": "§7.4 Lemma 7.7",
+      "claim": "formalises the cited lemma: on an open set, the weak gradient of a locally integrable class with a locally integrable weak gradient vanishes almost everywhere on the set where the class equals a given constant. The proof is the cited one, reducing to the constant zero, splitting the class into its positive and negative parts, and identifying the sum of their weak gradients with the gradient of the class by uniqueness of the weak gradient"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.weak_maximum_principle",
+      "source_id": "gilbarg-2001",
+      "locator": "§8.1 Thm 8.1",
+      "claim": "formalises the cited theorem in the transport-free case the cited proof singles out, with the coefficients b^i and c^i of the cited operator both zero and the coefficient d nonpositive, which in the sign convention of this development is a nonnegative zeroth-order coefficient, and on a bounded open set. The subsolution is an element of the graph space W12 Omega, the H^1(Omega) of this development, whose bilinear pairing against every nonnegative element of H_0^1(Omega) is nonpositive; the cited statement tests against nonnegative C^1 functions with compact support and extends to W_0^{1,2} by density, and the density of the nonnegative test functions in the nonnegative cone is the step assumed here by taking the extended form as the hypothesis. The boundary inequality is read as the source defines it, u <= k on the boundary meaning that (u - k)^+ lies in W_0^{1,2}(Omega), and the conclusion sup u <= sup of u^+ over the boundary is stated as u <= k almost everywhere for every k >= 0 with (u - k)^+ the function coordinate of an element of H_0^1(Omega). The proof is the cited one: testing against v = (u - k)^+, the zeroth-order term is nonnegative, the principal term is the energy of v by the chain rule for the positive part, ellipticity makes the gradient of v vanish, and the Poincaré inequality on H_0^1 of the bounded domain makes v vanish. The general case with a transport term, which the cited proof runs through the Sobolev inequality and a limit in k, is not formalised"
     }
   ]
 }
