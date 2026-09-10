@@ -25,6 +25,14 @@ jobs:
         working-directory: verify
         run: uv run --with pytest python -m pytest test_proofsense_coverage.py -q
 
+      # Every locator a warrant or a docstring cites names a statement its
+      # source numbers. It reads the transcriptions in the local Adduce
+      # library, which a runner does not have, so it is skipped there and run
+      # by `scripts/audit.sh` on a machine that does.
+      - name: The locator audit's own tests
+        working-directory: verify
+        run: uv run --with pytest python -m pytest test_locator_audit.py -q
+
       - name: The Palomar challenge and solution share one set of definitions
         run: uv run python verify/palomar_sync.py
 
