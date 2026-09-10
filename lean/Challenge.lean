@@ -95,7 +95,7 @@ lemma continuous_partialD (h : IsTestFn Ω φ) (i : Fin d) : Continuous (partial
 /-- Each partial derivative of a test function has compact support. -/
 lemma hasCompactSupport_partialD (h : IsTestFn Ω φ) (i : Fin d) :
     HasCompactSupport (partialD i φ) :=
-  h.2.1.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single i 1)
+  h.2.1.fderiv_apply ℝ (EuclideanSpace.single i 1)
 
 /-- A test function lies in `L²(Ω)`. -/
 lemma mem_lp (h : IsTestFn Ω φ) : MemLp φ 2 (volume.restrict Ω) :=

@@ -80,7 +80,7 @@ lemma continuous_partialD (h : IsTestFn Ω φ) (i : Fin d) : Continuous (partial
 /-- Each partial derivative of a test function has compact support. -/
 lemma hasCompactSupport_partialD (h : IsTestFn Ω φ) (i : Fin d) :
     HasCompactSupport (partialD i φ) :=
-  h.2.1.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single i 1)
+  h.2.1.fderiv_apply ℝ (EuclideanSpace.single i 1)
 
 /-- A test function lies in `L²(Ω)`. -/
 lemma mem_lp (h : IsTestFn Ω φ) : MemLp φ 2 (volume.restrict Ω) :=
@@ -306,7 +306,7 @@ theorem solvable_iff_orthogonal_transpose (Op : EllipticOperator d)
       rw [← (toFullEllipticOp Op).inner_opA Ω v w, ← ContinuousLinearMap.adjoint_inner_right,
         hw, inner_zero_right]
     · intro hw
-      refine ext_inner_right (𝕜 := ℝ) (fun v => ?_)
+      refine ext_inner_right ℝ (fun v => ?_)
       rw [ContinuousLinearMap.adjoint_inner_left, inner_zero_left, real_inner_comm,
         (toFullEllipticOp Op).inner_opA Ω v w, hw v]
   have hiff := (toFullEllipticOp Op).solvable_iff_orthogonal_solSpaceStar Ω hK f
