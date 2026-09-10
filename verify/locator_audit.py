@@ -99,6 +99,30 @@ def _numbering_style(text: str, kind: str) -> bool:
     return re.search(rf"\b{kind}\s+[0-9IVX]", text, re.IGNORECASE) is not None
 
 
+# The section part of a locator. Where a work numbers within a section, a
+# statement must be found inside that section: Evans has forty `THEOREM 1`s, and
+# six warrants cited `§5.2.1 Thm 1` where §5.2.1 numbers no theorem at all and
+# the statement they meant is `§5.2.3 Thm 1`. Asking the book as a whole passed
+# all six.
+_SECTION_RE = re.compile(r"§\s*([0-9]+(?:\.[0-9]+)*)")
+
+
+def _section_slice(text: str, section: str) -> str | None:
+    """The text of one numbered section, or nothing when it is not found.
+
+    The table of contents matches the heading too and comes first, so the body
+    heading is the last match.
+    """
+    heads = list(re.finditer(rf"(?m)^\s*{re.escape(section)}\.?\s+[A-Z(]", text))
+    if not heads:
+        return None
+    begin = heads[-1].start()
+    nxt = re.compile(r"(?m)^\s*[0-9]+\.[0-9]+(?:\.[0-9]+)?\.?\s+[A-Z]")
+    after = [m for m in nxt.finditer(text, begin + 1)
+             if not m.group(0).strip().startswith(section)]
+    return text[begin: after[0].start()] if after else text[begin:]
+
+
 def _states(text: str, kind: str, num: str) -> bool:
     """Whether the source numbers a statement of that kind at that number.
 
@@ -184,13 +208,24 @@ def audit(only: str | None = None) -> list[str]:
         num = m.group("num")
         if not _numbering_style(text, kind):
             continue  # the work numbers nothing of this kind
-        if not _states(text, kind, num):
+        # A bare number is section-local, so Evans's `§5.2.3 Thm 1` has to be
+        # found in §5.2.3 and the book's other forty `THEOREM 1`s do not answer
+        # for it. A dotted number already names its chapter, as Guo's `VII.3.1`
+        # and Gilbarg and Trudinger's `8.3` do, and Gilbarg and Trudinger number
+        # across a whole chapter, so `Thm 8.3` need not sit in §8.2.
+        scope, where = text, "the transcribed source"
+        sec = _SECTION_RE.search(loc)
+        if sec and "." not in num:
+            sliced = _section_slice(text, sec.group(1))
+            if sliced:
+                scope, where = sliced, f"section {sec.group(1)}"
+        if not _states(scope, kind, num):
             decls = sorted({
                 x["decl"].split(".")[-1] for x in manifest["warrants"]
                 if x["source_id"] == src and x["locator"] == loc
             })
             findings.append(
-                f"{src} [{loc}]: no {kind} {num} in the transcribed source "
+                f"{src} [{loc}]: no {kind} {num} in {where} "
                 f"({', '.join(decls[:3])})")
 
     # The same question of the docstrings, which cite the literature directly.

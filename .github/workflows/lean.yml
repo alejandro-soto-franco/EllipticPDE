@@ -33,6 +33,10 @@ jobs:
         working-directory: verify
         run: uv run --with pytest python -m pytest test_locator_audit.py -q
 
+      - name: The content review's own tests
+        working-directory: verify
+        run: uv run --with pytest python -m pytest test_warrant_review.py -q
+
       - name: The Palomar challenge and solution share one set of definitions
         run: uv run python verify/palomar_sync.py
 

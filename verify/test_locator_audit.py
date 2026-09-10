@@ -106,3 +106,47 @@ def test_a_docstring_citing_a_statement_the_source_numbers_passes(manifest, tmp_
         "/-- Guo, *Partial Differential Equations* (Notes), Theorem VIII.3.2 asks. -/\n"
         "theorem t : True := trivial\n", encoding="utf-8")
     assert la.audit() == []
+
+
+def test_a_bare_number_must_be_found_in_its_own_section(manifest):
+    """Six warrants cited Evans `§5.2.1 Thm 1`, and §5.2.1 numbers no theorem.
+
+    The book has forty other `THEOREM 1`s, so asking it as a whole passed all
+    six.
+    """
+    manifest([{"decl": "EllipticPdes.t", "source_id": "evans-2010",
+               "locator": "§5.2.1 Thm 1", "claim": "formalises it"}], "unused")
+    (la.OCR / "evans-2010-par-dif-equ.jsonl").write_text(
+        json.dumps({"page": 1, "blocks": [
+            {"text": "5.2.1. Weak derivatives."},
+            {"text": "LEMMA (Uniqueness of weak derivatives)."},
+            {"text": "5.2.3. Elementary properties."},
+            {"text": "THEOREM 1 (Properties of weak derivatives)."}]}) + "\n",
+        encoding="utf-8")
+    findings = la.audit()
+    assert findings and "section 5.2.1" in findings[0]
+
+
+def test_a_bare_number_found_in_its_own_section_passes(manifest):
+    manifest([{"decl": "EllipticPdes.t", "source_id": "evans-2010",
+               "locator": "§5.2.3 Thm 1", "claim": "formalises it"}], "unused")
+    (la.OCR / "evans-2010-par-dif-equ.jsonl").write_text(
+        json.dumps({"page": 1, "blocks": [
+            {"text": "5.2.3. Elementary properties."},
+            {"text": "THEOREM 1 (Properties of weak derivatives)."}]}) + "\n",
+        encoding="utf-8")
+    assert la.audit() == []
+
+
+def test_a_dotted_number_is_not_confined_to_the_cited_section(manifest):
+    """Gilbarg and Trudinger number across a chapter, so `Thm 8.3` may sit
+    outside §8.2."""
+    manifest([{"decl": "EllipticPdes.t", "source_id": "gilbarg-2001",
+               "locator": "§8.2 Thm 8.3", "claim": "formalises it"}], "unused")
+    (la.OCR / "gilbarg-2001-ell-par-dif.jsonl").write_text(
+        json.dumps({"page": 1, "blocks": [
+            {"text": "8.2. SOMETHING ELSE"},
+            {"text": "8.4. ANOTHER SECTION"},
+            {"text": "Theorem 8.3. The generalized Dirichlet problem."}]}) + "\n",
+        encoding="utf-8")
+    assert la.audit() == []
