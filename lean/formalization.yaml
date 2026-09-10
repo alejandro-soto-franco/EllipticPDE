@@ -1,8 +1,6 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
 #
-# Palomar requires the automation disclosure below to name the model the
-# development was written with, which the house-style linter otherwise refuses.
-# Waiving that one rule leaves every other rule in force.
+# Model names in the automation block, required by Palomar's schema.
 # prose-tics: allow ai-attribution
 version: "v0.4"
 
@@ -16,7 +14,7 @@ project:
 
     with A uniformly elliptic and every coefficient bounded and measurable. The drift b
     is unrestricted, so the bilinear form is in general non-symmetric and the problem
-    carries no variational structure; existence runs through Lax-Milgram.
+    has no variational structure; existence runs through Lax-Milgram.
 
     Proved with no `sorry` in the library: the Gårding inequality for the general
     operator on any domain; existence and uniqueness of the weak solution, which needs a
@@ -29,12 +27,22 @@ project:
     higher interior regularity at every order; infinite differentiability in the interior;
     and interior Hölder continuity at exponent 1/2 in dimensions one, two and three.
 
-    Supporting layers carry Morrey's inequality, the Gagliardo-Nirenberg-Sobolev estimate
+    Supporting layers supply Morrey's inequality, the Gagliardo-Nirenberg-Sobolev estimate
     in general dimension and at a general exponent pair, Campanato's characterisation of
     Hölder continuity with its converse, the Caccioppoli inequality, and the Poincaré
     chain down to the one-dimensional inequality. H_0^1(Ω) is realised as the closure of
-    the test-function graphs inside L²(Ω) × (L²(Ω))^d, so a member carries its weak
+    the test-function graphs inside L²(Ω) × (L²(Ω))^d, so a member has its weak
     gradient as data rather than through a weak-derivative predicate.
+
+    Three further layers sit above that base. The maximum principles: the weak principle
+    for the divergence-form operator with and without a transport term, the classical weak
+    and strong principles for the non-divergence operator, Hopf's lemma, the comparison
+    and avoidance principles, uniqueness for the classical Dirichlet and Neumann problems,
+    and the a priori bound. The W^{1,p} extension operator across a C¹ boundary, with the
+    global approximation by functions smooth up to the boundary it supplies, and with
+    Rellich-Kondrachov on H^1(Ω) and the Poincaré-Wirtinger inequality above it. The
+    variational spectral theory: the direct method under a subcritical constraint, the
+    Dirichlet eigenvalue sequence by Rayleigh quotients, and the sharp Poincaré constant.
 
     Boundary H² regularity has its foundations in place and its headline estimate open,
     and Schauder C^{k,α} estimates remain a roadmap item.
@@ -77,13 +85,18 @@ status:
   scope: >-
     Solvability theory of linear second-order elliptic operators in divergence form on a
     bounded domain, with bounded measurable coefficients and a non-zero drift, so the
-    bilinear form is in general non-symmetric. The library carries existence and
+    bilinear form is in general non-symmetric. The library proves existence and
     uniqueness through Lax-Milgram, the Gårding inequality, the Fredholm alternative with
     its index and solvability clauses, the resolvent bound, spectral compactness, interior
     H² regularity, higher interior regularity at every order, infinite differentiability
     in the interior, and interior Hölder continuity at exponent 1/2 in dimensions one, two
-    and three. Boundary H² regularity has its foundations in place and its headline
-    estimate open. This Comparator configuration selects six declarations, the
+    and three. Above that base it proves the maximum principles, weak and classical, with
+    Hopf's lemma and the uniqueness statements they give; the W^{1,p} extension operator
+    across a C¹ boundary, with global approximation, Rellich-Kondrachov on H^1(Ω) and the
+    Poincaré-Wirtinger inequality; and the variational spectral theory, the Dirichlet
+    eigenvalue sequence and the sharp Poincaré constant among it. Boundary H² regularity
+    has its foundations in place and its headline estimate open. This Comparator
+    configuration selects six declarations, the
     solvability theory listed above: the Gårding inequality, existence and uniqueness
     for a bounded domain with no drift and a nonnegative zeroth-order coefficient, the
     Fredholm alternative, solvability against the transpose problem, the discrete set of
@@ -95,8 +108,8 @@ status:
   # Headline results of the library. Each is pinned to the three axioms in
   # lean/AxiomAudit.lean and paired with its literature statement in
   # proofsense/manifest.json. Six appear in the Comparator configuration of this
-  # submission; the rest are listed so this entry reports the size of the development
-  # behind it.
+  # submission; the rest are listed so this entry reports the size of the library the
+  # six compared declarations sit in.
   main_results:
     - declaration: "Palomar.garding"
       file: "Solution.lean"
@@ -182,14 +195,14 @@ status:
 automation:
   methods:
     - method: "agent"
-      models: ["claude-opus-4-5"]
+      models: ["claude-opus-4-5", "claude-opus-5", "claude-fable-5-1", "claude-sonnet-5"]
       framework: "Claude Code"
       tool_setup: >-
         Claude Code in a terminal on a local workstation, running lake and the repository's
         own checks directly. No retrieval harness or proof-search tool was involved, and
-        no model beyond the one named.
+        no model beyond those named.
       cost:
-        wall_time: "about eleven weeks, 2026-06-01 to 2026-08-19"
+        wall_time: "about fourteen weeks, 2026-06-01 to 2026-09-10"
         spend_usd: "subscription"
         hardware: "API-only, on a local workstation"
       prompting_notes: >-
@@ -199,12 +212,14 @@ automation:
         branch, which CI enforces.
   spend_usd: "subscription-based usage"
   notes: >-
-    The development was written with substantial assistance from Claude Opus 4.5 under
-    Claude Code, directed and reviewed by the author throughout. Every statement in the
-    library was chosen and read by the author; the axiom set of each headline result is
-    pinned in `lean/AxiomAudit.lean` and each is paired with its literature statement in
+    The development was written with substantial assistance from the models named above,
+    under Claude Code, directed and reviewed by the author throughout. Claude Opus 4.5 wrote
+    the work to 2026-08-19 and Claude Opus 5 the work after it, with Claude Fable 5.1 and
+    Claude Sonnet 5 on a minority of edits and on search. Every statement in the library was
+    chosen and read by the author; the axiom set of each headline result is pinned in
+    `lean/AxiomAudit.lean` and each is paired with its literature statement in
     `proofsense/manifest.json`, both checked in CI. Wall time spans the private manuscript
-    repository from 2026-06-01; the public repository carries the library from 2026-08-02.
+    repository from 2026-06-01; the public repository dates from 2026-08-02.
 
 fidelity:
   divergences: >-
@@ -215,19 +230,19 @@ fidelity:
     theory for a bounded measurable Ω, and the compared statements narrow that to an open
     Ω, because a test function has tsupport φ ⊆ Ω: on a set of positive measure with
     empty interior every test function vanishes, H_0^1(Ω) collapses to zero and unique
-    solvability holds without expressing any Dirichlet problem. Openness is what makes the
+    solvability becomes vacuous, expressing no Dirichlet problem. Openness is what makes the
     conclusions have content. No statement in this submission takes
-    compactness, or any boundary regularity, as a hypothesis. The library does carry
+    compactness, or any boundary regularity, as a hypothesis. The library does state
     theorems conditioned on compactness directly, `fredholm_alternative_rellich` and
     `fredholm_alternative` among them, and those are not the declarations compared here.
-    Evans works on a bounded open U carrying the standing hypotheses of §6.2, which include
+    Evans works on a bounded open U under the standing hypotheses of §6.2, which include
     boundary regularity; the compared statements ask less of the domain than that.
     The right-hand side of the Fredholm alternative and of the solvability criterion is a
     bounded linear functional on H_0^1(Ω) rather than an f ∈ L²(Ω); the L² case is the
     image of f under the pairing v ↦ ∫_Ω f v. Coefficients are measurable and bounded on
-    ℝ^d, with the bounds holding almost everywhere for Lebesgue measure, rather than being
+    ℝ^d, with the bounds valid almost everywhere for Lebesgue measure, rather than being
     defined on Ω alone. H_0^1(Ω) is realised as the closure of the test-function graphs
-    inside L²(Ω) × (L²(Ω))^d, so a member carries its weak gradient as data rather than
+    inside L²(Ω) × (L²(Ω))^d, so a member has its weak gradient as data rather than
     through a weak-derivative predicate; the challenge spells that encoding out and reads
     the bilinear form off the graph coordinates.
 
@@ -273,7 +288,7 @@ alignment:
       status: "proved"
       note: >-
         Evans states the alternative for the operator L u = -(a^{ij} u_{x_i})_{x_j} +
-        b^i u_{x_i} + c u on the bounded open U carrying the standing hypotheses of §6.2,
+        b^i u_{x_i} + c u on the bounded open U under the standing hypotheses of §6.2,
         and for data f ∈ L²(U). The formal statement asks for a bounded open Ω and nothing
         further about its boundary, and quantifies the right-hand side over the dual of
         H_0^1(Ω), of which the L² data are the image under v ↦ ∫_Ω f v.
@@ -308,4 +323,4 @@ alignment:
 acknowledgements: >-
   Built on Mathlib. The Sobolev layer realises H_0^1(Ω) inside the graph space rather than
   through a weak-derivative predicate, so nothing in it depends on a Sobolev-space API
-  that Mathlib does not yet carry.
+  that Mathlib does not yet have.

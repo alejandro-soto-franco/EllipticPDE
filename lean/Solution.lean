@@ -25,7 +25,7 @@ this module restates the definitions rather than importing `Challenge`. Everythi
 `toFullEllipticOp` is character-for-character the text of `Challenge.lean`, which
 `verify/palomar_sync.py` checks.
 
-Three identifications carry the statements across.
+Three identifications take the statements across.
 
 * `Palomar.H01` unfolds to `EllipticPdes.Sobolev.H01`, so the two quantify over the same space.
 * `Palomar.EllipticOperator` has the fields of `EllipticPdes.Sobolev.FullEllipticOp` flattened,

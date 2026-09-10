@@ -14,17 +14,23 @@ The drift term is permitted to be non-zero, so $B$ is in general non-symmetric
 and the problem has no variational structure. Existence runs through
 Lax-Milgram.
 
-**Symmetry of $a^{ij}$ is never assumed.** Evans §6.1.1 assumes $a^{ij} =
-a^{ji}$ throughout, and Gilbarg-Trudinger ch. 8 assumes it for the principal
-part. `EllipticPdes.Sobolev.EllipticCoeff` takes an arbitrary measurable
-matrix: uniform ellipticity constrains the quadratic form $A(x)\xi\cdot\xi$
-and the entries, and neither condition sees the antisymmetric part of $A(x)$.
-Symmetry enters at one declaration and one only, the spectral theorem
-`symmetric_fullElliptic_spectral`, whose argument `hAsymm` asks $a^{ij} =
-a^{ji}$ a.e. on $\Omega$, and which needs it because the spectral theorem for
-compact self-adjoint operators does. With $A$ non-symmetric the formal adjoint
-$L^{*}$ has principal part built from $A^{\top}$, which is the transpose
-problem the Fredholm results state.
+**The solvability theory assumes no symmetry of $a^{ij}$.** Evans §6.1.1 assumes
+$a^{ij} = a^{ji}$ throughout, and Gilbarg-Trudinger ch. 8 assumes it for the
+principal part. `EllipticPdes.Sobolev.EllipticCoeff` takes an arbitrary
+measurable matrix: uniform ellipticity constrains the quadratic form
+$A(x)\xi\cdot\xi$ and the entries, and neither condition sees the antisymmetric
+part of $A(x)$. Nothing in the Gårding inequality, the existence theorems, the
+Fredholm alternative, the exceptional set or the resolvent bound asks about that
+part. Symmetry is a hypothesis further up, at each result whose proof needs it:
+the spectral theorems `Sobolev.symmetric_fullElliptic_spectral` and
+`Sobolev.symmetric_fullElliptic_spectral_of_bounded` take
+`hAsymm : a^{ij} = a^{ji}` a.e. on $\Omega$, since the spectral theorem for
+compact self-adjoint operators does; the variational eigenvalue layer above them
+asks the same of the bilinear form, as `hsymm : B U V = B V U`; and the classical
+maximum principles ask $a^{ij}(x) = a^{ji}(x)$ pointwise, the non-divergence
+operator being read through a symmetric second-derivative matrix. With $A$
+non-symmetric the formal adjoint $L^{*}$ has principal part built from
+$A^{\top}$, which is the transpose problem the Fredholm results state.
 
 ## Results
 
@@ -111,8 +117,9 @@ prefix.
 | A priori bound from the maximum principle | `Classical.apriori_bound_abs` |
 | The strong maximum principle for subharmonic functions | `Classical.strong_maximum_principle_subharmonic` |
 | Difference quotients and weak derivatives | `Regularity.weakDeriv_of_diffQuot_bounded` |
-| Elementary properties of weak derivatives | `Embedding.HasWeakGradOn.add_of_locallyIntegrableOn` |
-| Completeness of $W^{1,2}$ and $H^1_0$ | `Sobolev.instCompleteSpaceW12` |
+| Additivity of a weak gradient | `Embedding.HasWeakGradOn.add_of_locallyIntegrableOn` |
+| Completeness of $W^{1,2}$ | `Sobolev.instCompleteSpaceW12` |
+| Completeness of $H^1_0$ | `Sobolev.instCompleteSpaceH01` |
 | Existence for the shifted problem $Lu + \mu u = f$ | `Sobolev.FullEllipticOp.weak_solution` |
 | Rellich compactness of $H^1_0$ into $L^2$ | `Sobolev.embL2_isCompact` |
 | The Fredholm alternative for a compact operator | `Sobolev.fredholm_alternative_compact` |
