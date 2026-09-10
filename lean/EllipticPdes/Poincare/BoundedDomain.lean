@@ -151,7 +151,8 @@ theorem poincare_H01_of_bounded {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))}
   exact ⟨L ^ 2 / (2 * (n + 1)), by positivity, fun U hU =>
     poincare_H01_of_subset_euclBox hab hsub hL hU⟩
 
-/-- **Coercivity of the Dirichlet form on a bounded domain**, with no abstract Poincaré
+/-- **Coercivity of the bilinear form of the Laplacian on a bounded domain**, with no abstract
+Poincaré
 hypothesis. `poincare_H01_of_bounded` names the constant, so the only input is boundedness of
 `Ω`. This is the form of coercivity the direct method uses, where the domain is a ball and no
 box structure is at hand. -/

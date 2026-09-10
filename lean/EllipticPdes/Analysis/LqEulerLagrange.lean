@@ -23,7 +23,8 @@ Two instances follow. At `Q W = ‖W‖²` the coefficient is `⟪U, V⟫` and t
 `⟪U, V⟫ = ‖U‖² ∫ |TU|^{q-2} (TU) (TV)`. At `Q W = B[W, W]` for a symmetric positive semidefinite
 `B` it is `B[U, V] = B[U, U] ∫ |TU|^{q-2} (TU) (TV)`. On `H₀¹(Ω)` the first gives
 `-Δu + u = λ|u|^{q-2}u`, since the graph inner product is `∫uv + ∫∇u·∇v`, and the second at the
-Dirichlet form gives `-Δu = λ|u|^{q-2}u`, which is the equation of Guo's Section IX.1.
+bilinear form of the Laplacian gives `-Δu = λ|u|^{q-2}u`, which is the equation of Guo's Section
+IX.1.
 
 The argument is Fermat's theorem applied to `g(t) = Q (U + tV) - Q U ‖T(U + tV)‖²_{L^q}`, which
 vanishes at `t = 0` and is nonnegative everywhere: rescaling `U + tV` to the constraint set is
@@ -172,7 +173,7 @@ symmetric positive semidefinite `B`, a minimiser of `B[·, ·]` on the unit `L^q
 
 `B[U, V] = B[U, U] ∫ |TU|^{q-2} (TU) (TV)`.
 
-At the Dirichlet form on `H₀¹(Ω)` this is the weak form of `-Δu = λ|u|^{q-2}u`, with
+At the bilinear form of the Laplacian on `H₀¹(Ω)` this is the weak form of `-Δu = λ|u|^{q-2}u`, with
 `λ = ∫ |∇u|²`. -/
 theorem euler_lagrange_of_bilin_min {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp0 : p ≠ 0) (hptop : p ≠ ∞)
     (hp1 : 1 < p.toReal) (T : H →L[ℝ] Lp ℝ p μ) (B : H →L[ℝ] H →L[ℝ] ℝ)

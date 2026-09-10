@@ -307,20 +307,8 @@ any continuous functional `f` on `H₀¹(Ω)`, there is a unique `u ∈ H₀¹(�
 weak problem `B_μ[u, v] = f v` for all `v`. -/
 theorem weak_solution (Ω : Set (EuclideanSpace ℝ (Fin d))) {μ : ℝ}
     (hμ : Op.gardingγ ≤ μ) (f : H01 Ω →L[ℝ] ℝ) :
-    ∃! u : H01 Ω, ∀ v : H01 Ω, Op.shiftedBilin Ω μ u v = f v := by
-  have hco : IsCoercive (Op.shiftedBilin Ω μ) := Op.shiftedBilin_coercive Ω hμ
-  have hgrep : ∀ w : H01 Ω,
-      ⟪(InnerProductSpace.toDual ℝ (H01 Ω)).symm f, w⟫ = f w :=
-    fun w => InnerProductSpace.toDual_symm_apply
-  set g : H01 Ω := (InnerProductSpace.toDual ℝ (H01 Ω)).symm f with hg
-  refine ⟨hco.continuousLinearEquivOfBilin.symm g, ?_, ?_⟩
-  · intro v
-    rw [← hco.continuousLinearEquivOfBilin_apply, ContinuousLinearEquiv.apply_symm_apply, hgrep]
-  · intro u hu
-    apply hco.continuousLinearEquivOfBilin.injective
-    rw [ContinuousLinearEquiv.apply_symm_apply]
-    refine ext_inner_right (𝕜 := ℝ) (fun w => ?_)
-    rw [hco.continuousLinearEquivOfBilin_apply, hu w, ← hgrep w]
+    ∃! u : H01 Ω, ∀ v : H01 Ω, Op.shiftedBilin Ω μ u v = f v :=
+  EllipticPdes.lax_milgram (Op.shiftedBilin_coercive Ω hμ) f
 
 /-! ### Transport-free, nonnegative-zeroth coercive case (Evans §6.2.2, closing
 Examples remark)
@@ -415,19 +403,8 @@ theorem weak_solution_of_nonneg_zeroth (Ω : Set (EuclideanSpace ℝ (Fin d)))
     (hbase : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ),
       ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2)
     (f : H01 Ω →L[ℝ] ℝ) :
-    ∃! u : H01 Ω, ∀ v : H01 Ω, Op.fullBilin Ω u v = f v := by
-  have hco : IsCoercive (Op.fullBilin Ω) :=
-    Op.fullBilin_coercive_of_nonneg_zeroth Ω hb hc CP hCP hbase
-  set g : H01 Ω := (InnerProductSpace.toDual ℝ (H01 Ω)).symm f with hg
-  have hgrep : ∀ w : H01 Ω, ⟪g, w⟫ = f w := fun w => InnerProductSpace.toDual_symm_apply
-  refine ⟨hco.continuousLinearEquivOfBilin.symm g, ?_, ?_⟩
-  · intro v
-    rw [← hco.continuousLinearEquivOfBilin_apply, ContinuousLinearEquiv.apply_symm_apply, hgrep]
-  · intro u hu
-    apply hco.continuousLinearEquivOfBilin.injective
-    rw [ContinuousLinearEquiv.apply_symm_apply]
-    refine ext_inner_right (𝕜 := ℝ) (fun w => ?_)
-    rw [hco.continuousLinearEquivOfBilin_apply, hu w, ← hgrep w]
+    ∃! u : H01 Ω, ∀ v : H01 Ω, Op.fullBilin Ω u v = f v :=
+  EllipticPdes.lax_milgram (Op.fullBilin_coercive_of_nonneg_zeroth Ω hb hc CP hCP hbase) f
 
 /-- **A-priori estimate for the weak solution** (general uniformly elliptic operator,
 `b ≡ 0`, `c ≥ 0`; the Lax-Milgram a-priori bound of Evans §6.2.1, Theorem 1). Under the

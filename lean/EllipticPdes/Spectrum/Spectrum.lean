@@ -152,7 +152,7 @@ theorem solOp_eigenvalue_nonneg (hco : IsCoercive B) {μ : ℝ} {φ : L2D Ω}
 
 /-! ### Instantiation at the Dirichlet (Poisson) form `-Δ` -/
 
-/-- The Dirichlet form is symmetric. -/
+/-- The bilinear form of the Laplacian is symmetric. -/
 lemma dirichletBilin_symm (Ω : Set (EuclideanSpace ℝ (Fin d))) (U V : H01 Ω) :
     dirichletBilin Ω U V = dirichletBilin Ω V U := by
   rw [dirichletBilin_apply, dirichletBilin_apply]

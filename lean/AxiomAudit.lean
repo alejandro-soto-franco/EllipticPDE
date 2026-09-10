@@ -15,6 +15,12 @@ This module is a build target in its own right. It is not imported by
 -/
 import EllipticPdes
 
+/-! ### Lax-Milgram -/
+
+/-- info: 'EllipticPdes.lax_milgram' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.lax_milgram
+
 /-! ### Existence and uniqueness -/
 
 /-- info: 'EllipticPdes.dirichlet_weak_solution' depends on axioms: [propext, Classical.choice, Quot.sound] -/

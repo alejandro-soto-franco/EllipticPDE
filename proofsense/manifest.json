@@ -37,6 +37,12 @@
       "claim": "formalises"
     },
     {
+      "decl": "EllipticPdes.lax_milgram",
+      "source_id": "guo-2026",
+      "locator": "§VII.3 Thm VII.3.1",
+      "claim": "formalises the cited theorem: if H is a Hilbert space and B : H x H -> R is a bounded coercive bilinear form, that is B(u, u) >= beta ‖u‖^2_H, and f is in H*, then there is a unique u in H with B(u, v) = <f, v> for every v in H. Boundedness is the continuity of the type H ->L[R] H ->L[R] R and coercivity is IsCoercive. Symmetry of B is not assumed, which is Remark VII.3.2 there"
+    },
+    {
       "decl": "EllipticPdes.dirichlet_weak_solution",
       "source_id": "evans-2010",
       "locator": "§6.2.2 Thm 3",
