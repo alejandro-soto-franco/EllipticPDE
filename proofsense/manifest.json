@@ -130,13 +130,13 @@
       "decl": "EllipticPdes.Sobolev.dirichlet_spectral",
       "source_id": "evans-2010",
       "locator": "§6.5.1 Thm 1",
-      "claim": "formalises"
+      "claim": "gives clause (i) of the cited theorem only, in the form that the eigenspaces of the solution operator have trivial orthogonal complement, so their span is dense in L^2(Omega). Evans's orthonormal basis of L^2(Omega) as a single object, and the divergence of the eigenvalue sequence, are not stated; the finite orthonormal segments are at dirichlet_eigen_family_of_bounded"
     },
     {
       "decl": "EllipticPdes.Sobolev.dirichlet_spectral_of_bounded",
       "source_id": "evans-2010",
       "locator": "§6.5.1 Thm 1",
-      "claim": "formalises"
+      "claim": "gives clause (i) of the cited theorem only, in the form that the eigenspaces of the solution operator have trivial orthogonal complement, so their span is dense in L^2(Omega). Evans's orthonormal basis of L^2(Omega) as a single object, and the divergence of the eigenvalue sequence, are not stated; the finite orthonormal segments are at dirichlet_eigen_family_of_bounded"
     },
     {
       "decl": "EllipticPdes.Sobolev.symmetric_fullElliptic_spectral",
