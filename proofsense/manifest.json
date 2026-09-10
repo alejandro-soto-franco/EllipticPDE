@@ -34,7 +34,7 @@
       "decl": "EllipticPdes.Sobolev.FullEllipticOp.garding",
       "source_id": "evans-2010",
       "locator": "§6.2.2 Thm 2",
-      "claim": "formalises"
+      "claim": "formalises clause (ii) of the cited theorem, the Garding inequality beta ‖u‖^2_{H_0^1} <= B[u, u] + gamma ‖u‖^2_{L^2} for every u in H_0^1(Omega), at beta = lambda/2 and gamma = lambda/2 + ‖c‖_infinity + d ‖b‖^2_infinity/(2 lambda). Clause (i), boundedness of the form, is the continuity of the type fullBilin inhabits"
     },
     {
       "decl": "EllipticPdes.lax_milgram",
@@ -64,13 +64,13 @@
       "decl": "EllipticPdes.Sobolev.FullEllipticOp.solvable_iff_orthogonal_solSpaceStar",
       "source_id": "evans-2010",
       "locator": "§6.2.3 Thm 4",
-      "claim": "formalises"
+      "claim": "formalises clause (iii) of the cited theorem: the weak problem is solvable exactly when the datum annihilates the space of weak solutions of the adjoint problem. Clause (i) is at fredholm_alternative and clause (ii) at finrank_solSpaceStar_eq_finrank_solSpace"
     },
     {
       "decl": "EllipticPdes.Sobolev.FullEllipticOp.fredholm_alternative_of_bounded",
       "source_id": "evans-2010",
       "locator": "§6.2.3 Thm 4",
-      "claim": "formalises"
+      "claim": "formalises clause (i) of the cited theorem, the dichotomy that either the homogeneous problem has a nontrivial weak solution or every continuous functional is the datum of a unique weak solution, on a bounded measurable domain with no analytic hypothesis left standing"
     },
     {
       "decl": "EllipticPdes.Sobolev.FullEllipticOp.finiteDimensional_solSpace",
@@ -88,7 +88,7 @@
       "decl": "EllipticPdes.Sobolev.FullEllipticOp.existence_three_of_bounded",
       "source_id": "evans-2010",
       "locator": "§6.2.3 Thm 5",
-      "claim": "formalises"
+      "claim": "formalises clause (i) of the cited theorem, an at most countable Sigma with unique solvability of Lu = lambda u + f for every f in L^2(Omega) exactly when lambda is outside it, and gives clause (ii) in the form that Sigma meets every half-line (-infinity, C] in a finite set, which is what makes an infinite Sigma diverge. Evans's enumeration as a nondecreasing sequence is not stated"
     },
     {
       "decl": "EllipticPdes.Sobolev.FullEllipticOp.resolvent_bound",
@@ -100,7 +100,7 @@
       "decl": "EllipticPdes.Sobolev.FullEllipticOp.resolvent_bound_of_bounded",
       "source_id": "evans-2010",
       "locator": "§6.2.3 Thm 6",
-      "claim": "formalises"
+      "claim": "formalises the cited theorem: for lambda outside Sigma there is C > 0 with ‖u‖_{L^2(Omega)} <= C ‖f‖_{L^2(Omega)} for every f in L^2(Omega) and every weak solution u of Lu = lambda u + f, the constant quantified before the datum so it depends on lambda, Omega and the operator alone"
     },
     {
       "decl": "EllipticPdes.hneg_characterization",
@@ -112,7 +112,7 @@
       "decl": "EllipticPdes.Regularity.interior_H2_estimate",
       "source_id": "evans-2010",
       "locator": "§6.3.1 Thm 1",
-      "claim": "formalises"
+      "claim": "formalises the cited theorem in per-pair form: for each pair of directions the weak derivative of the first partial exists on a compact subset and is bounded, with the constant quantified before the solution and the datum, and summing over the pairs gives Evans's ‖u‖_{H^2(V)} <= C(‖f‖_{L^2} + ‖u‖_{L^2}). Two hypotheses are stronger than the cited ones: the solution is taken in H_0^1(Omega) where Evans asks only H^1(Omega) and notes in Remark (i) that no boundary condition is needed, and the coefficient bundle is global on R^n where the cited hypothesis is a^{ij} in C^1(U) and b, c in L^infinity(U)"
     },
     {
       "decl": "EllipticPdes.Sobolev.spectrum_compact_operator",
@@ -148,7 +148,7 @@
       "decl": "EllipticPdes.Campanato.campanato_holderOnWith",
       "source_id": "fernandezreal-2023-reg-the-ell",
       "locator": "App. A (H3)",
-      "claim": "formalises"
+      "claim": "formalises the cited property: an L^2 mean oscillation bounded by C_0 r^alpha on every ball gives a Holder-alpha representative with seminorm a multiple of C_0. The cited property concludes on B_1 from a hypothesis over all balls inside it; this concludes on an inner ball of radius rho with 5 rho <= R, and produces the continuous representative as the Campanato limit rather than asserting one exists"
     },
     {
       "decl": "EllipticPdes.Regularity.interior_cutoffGrad_mem_H01",
@@ -160,13 +160,13 @@
       "decl": "EllipticPdes.Embedding.interior_holder_estimate",
       "source_id": "evans-2010",
       "locator": "§5.6.3 Thm 6",
-      "claim": "formalises"
+      "claim": "instantiates clause (ii) of the cited theorem at d = 3 and p = 6 for a weak solution: the interior H^2 estimate puts the second derivatives in L^2, exists_eLpNorm_six_le raises the gradient to L^6, and Morrey applies at 6 > 3, so a weak solution has a Holder-1/2 representative on an interior ball with constant a multiple of ‖f‖ + ‖u‖. The cited theorem states the embedding for a W^{k,p} function on a domain with C^1 boundary; this is its use on a ball inside a ball, which asks nothing of a boundary"
     },
     {
       "decl": "EllipticPdes.Embedding.interior_holder_estimate_one",
       "source_id": "evans-2010",
       "locator": "§5.6.3 Thm 6",
-      "claim": "formalises"
+      "claim": "the same instantiation of clause (ii) in dimension one, where the exponent condition holds at p = 2 directly and no bootstrap is needed"
     },
     {
       "decl": "EllipticPdes.Embedding.interior_holder_estimate_two",
@@ -196,7 +196,7 @@
       "decl": "EllipticPdes.Embedding.exists_eLpNorm_six_le",
       "source_id": "fernandezreal-2023-reg-the-ell",
       "locator": "§1.1 Thm (Sobolev inequality)",
-      "claim": "formalises"
+      "claim": "formalises the cited inequality at n = 3 and p = 2, where the conjugate is 6, in the local form the bootstrap consumes: a function on B_R with an L^2 weak gradient lies in L^6(B_r) for r < R, with ‖v‖_{L^6(B_r)} <= K(‖v‖_{L^2(B_R)} + sum_k ‖g_k‖_{L^2(B_R)}). The cited statement is on R^n and bounds by the gradient alone; a local statement carries the L^2 term because the cutoff differentiates"
     },
     {
       "decl": "EllipticPdes.Embedding.exists_eLpNorm_four_le",
