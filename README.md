@@ -844,6 +844,16 @@ library is free of `sorry`, and pins every headline result to the axioms
 `propext`, `Classical.choice` and `Quot.sound` through `AxiomAudit.lean`, where
 each is pinned with `#guard_msgs`.
 
+CI then re-checks the library with
+[`con-leche`](https://github.com/leanprover/con-leche), an external checker for
+Lean's export format whose own consistency is proven in Lean: an accepted stream
+declares no constant of type `False`. It reads the dependency cone of every
+declaration `AxiomAudit.lean` pins, 58,597 declarations at present, admits
+`propext`, `Classical.choice` and `Quot.sound` alone, and rejects a stream that
+uses any other axiom, `sorryAx` included. The audit reaches that conclusion
+through the elaborator which produced the proofs; this reaches it through a
+second implementation with a machine-checked consistency proof.
+
 ## Palomar
 
 `lean/Challenge.lean` states six results of Evans §6.2 in Mathlib vocabulary alone:

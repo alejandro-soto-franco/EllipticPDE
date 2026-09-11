@@ -42,6 +42,14 @@ jobs:
 
   lean:
     runs-on: ubuntu-latest
+    # The two external checkers, pinned by revision. `lean4export` imports the
+    # oleans this job builds, so its revision is the one whose `lean-toolchain`
+    # matches `lean/lean-toolchain`; moving this library's toolchain moves that
+    # pin too. `con-leche` builds under its own toolchain, which elan resolves
+    # from its directory and which need not agree with this library's.
+    env:
+      CONLECHE_REV: 725f0f39be7f59cff1979c1a530c4ac84ac6d0fc
+      LEAN4EXPORT_REV: cd502a76e05515e7d3e09eaefee1dfd8349ca592
     steps:
       - uses: actions/checkout@v7
 
@@ -88,3 +96,64 @@ jobs:
       - name: Build the Palomar challenge and solution
         working-directory: lean
         run: lake build Challenge Solution
+
+      # An external check of the same development, by a checker whose own
+      # consistency is proven in Lean, rather than by the elaborator that
+      # produced these proofs. `con-leche` reads Lean's export format, and its
+      # main theorem states that an accepted stream declares no constant of type
+      # `False`, modelled in ZF without infinity and choice plus an ω-chain of
+      # Grothendieck universes. It admits `propext`, `Classical.choice` and
+      # `Quot.sound`, and rejects a stream that uses any other axiom, `sorryAx`
+      # included.
+      #
+      # The stream is the dependency cone of every declaration `AxiomAudit.lean`
+      # pins, read out of that file here, so a pin added there extends this
+      # check with no edit to this workflow. On the 205 pins as of this commit
+      # the cone is 58,597 declarations, 510 MB of stream, and checks in half a
+      # minute on four workers under 1 GB.
+      #
+      # Exit 1 rejects a declaration and exit 2 declines one the checker does
+      # not support. Both fail here: a decline says the check did not happen.
+      - name: Check out con-leche
+        uses: actions/checkout@v7
+        with:
+          repository: leanprover/con-leche
+          ref: ${{ env.CONLECHE_REV }}
+          path: con-leche
+
+      - name: Check out lean4export
+        uses: actions/checkout@v7
+        with:
+          repository: leanprover/lean4export
+          ref: ${{ env.LEAN4EXPORT_REV }}
+          path: lean4export
+
+      # 541 targets, so a cold build is the long step here and a warm one is a
+      # restore. The key is the pinned revision, which is what the build depends
+      # on.
+      - name: Cache the con-leche build
+        uses: actions/cache@v4
+        with:
+          path: con-leche/.lake
+          key: con-leche-${{ runner.os }}-${{ env.CONLECHE_REV }}
+
+      - name: Build the exporter and the checker
+        run: |
+          set -euo pipefail
+          (cd lean4export && lake build)
+          (cd con-leche && lake build)
+
+      - name: The audited declarations, checked by con-leche
+        working-directory: lean
+        run: |
+          set -euo pipefail
+          names=$(grep '#print axioms' AxiomAudit.lean | sed 's/#print axioms //')
+          # Word splitting is the point: one argument per declaration.
+          # shellcheck disable=SC2086
+          # Absolute, because `lake env` runs the command from the package
+          # root and a relative path would resolve against that.
+          lake env "$GITHUB_WORKSPACE/lean4export/.lake/build/bin/lean4export" \
+            EllipticPdes -- $names > "$RUNNER_TEMP/audited.ndjson"
+          "$GITHUB_WORKSPACE/con-leche/.lake/build/bin/con-leche" \
+            --verified "$RUNNER_TEMP/audited.ndjson"
+          rm -f "$RUNNER_TEMP/audited.ndjson"
