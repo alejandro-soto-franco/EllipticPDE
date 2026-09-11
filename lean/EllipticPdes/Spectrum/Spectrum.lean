@@ -30,7 +30,7 @@ complete orthogonal family of eigenfunctions.
   with the elliptic eigenvalue `λ = μ⁻¹`. Letting `μ → 0⁺` gives the Dirichlet eigenvalues
   `λ → +∞`.
 
-Instantiated on the Dirichlet (Poisson) form `dirichletBilin`, giving the eigenvalue theory of
+Instantiated on the Dirichlet (Poisson) form `laplaceBilin`, giving the eigenvalue theory of
 `-Δ` with Dirichlet boundary data (`dirichlet_spectral`). The compact embedding for bounded `Ω`
 is the single analytic input, threaded as the hypothesis `IsCompactOperator (embL2 Ω)`
 (Rellich-Kondrachov) exactly as in `Compactness.lean`.
@@ -153,9 +153,9 @@ theorem solOp_eigenvalue_nonneg (hco : IsCoercive B) {μ : ℝ} {φ : L2D Ω}
 /-! ### Instantiation at the Dirichlet (Poisson) form `-Δ` -/
 
 /-- The bilinear form of the Laplacian is symmetric. -/
-lemma dirichletBilin_symm (Ω : Set (EuclideanSpace ℝ (Fin d))) (U V : H01 Ω) :
-    dirichletBilin Ω U V = dirichletBilin Ω V U := by
-  rw [dirichletBilin_apply, dirichletBilin_apply]
+lemma laplaceBilin_symm (Ω : Set (EuclideanSpace ℝ (Fin d))) (U V : H01 Ω) :
+    laplaceBilin Ω U V = laplaceBilin Ω V U := by
+  rw [laplaceBilin_apply, laplaceBilin_apply]
   exact Finset.sum_congr rfl (fun i _ => real_inner_comm _ _)
 
 /-- **Spectral theorem for the Dirichlet Laplacian** (`-Δ` with Dirichlet data, Evans §6.5).
@@ -166,9 +166,9 @@ theorem dirichlet_spectral (Ω : Set (EuclideanSpace ℝ (Fin d))) (CP : ℝ) (h
       ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2)
     (hRellich : IsCompactOperator (embL2 Ω)) :
     (⨆ μ : ℝ, Module.End.eigenspace
-        (solOp (dirichletBilin Ω) (dirichletBilin_coercive Ω CP hCP hbase)
+        (solOp (laplaceBilin Ω) (laplaceBilin_coercive Ω CP hCP hbase)
           : Module.End ℝ (L2D Ω)) μ)ᗮ = ⊥ :=
-  solOp_spectral (dirichletBilin_coercive Ω CP hCP hbase) (dirichletBilin_symm Ω) hRellich
+  solOp_spectral (laplaceBilin_coercive Ω CP hCP hbase) (laplaceBilin_symm Ω) hRellich
 
 /-! ### Instantiation at the general symmetric divergence-form operator `-Dⱼ(aᵢⱼ Dᵢ·) + c` -/
 

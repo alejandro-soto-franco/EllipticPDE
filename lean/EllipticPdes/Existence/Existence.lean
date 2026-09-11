@@ -9,8 +9,8 @@ import EllipticPdes.Poincare.BoxSlice
 /-!
 # Existence and uniqueness via Lax-Milgram (dependency-chain step 6)
 
-On the Hilbert space `H₀¹(Ω)` the Dirichlet bilinear form is bounded (continuous) and,
-given the Poincaré inequality, coercive (`dirichletBilin_coercive`). Mathlib's Lax-Milgram
+On the Hilbert space `H₀¹(Ω)` the bilinear form of the Laplacian is bounded (continuous) and,
+given the Poincaré inequality, coercive (`laplaceBilin_coercive`). Mathlib's Lax-Milgram
 theorem `IsCoercive.continuousLinearEquivOfBilin` then yields for every continuous linear
 functional `f` on `H₀¹(Ω)` a unique weak solution `u` of `B[u, v] = f v` for all `v`.
 
@@ -38,15 +38,15 @@ bound in squared form with constant `C ≥ 0`, for every continuous linear funct
 `B[u, v] = ∑ᵢ ⟪∂ᵢu, ∂ᵢv⟫`.
 
 This is [`lax_milgram`] at that form: boundedness is the type, and the test-function
-bound supplies coercivity through [`dirichletBilin_coercive`], with constant
+bound supplies coercivity through [`laplaceBilin_coercive`], with constant
 `1 / (C + 1)`. The unsquared Poincaré constant is the square root of `C`. -/
 theorem dirichlet_weak_solution
     (Ω : Set (EuclideanSpace ℝ (Fin d))) (C : ℝ) (hC : 0 ≤ C)
     (hbase : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ),
       ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ C * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2)
     (f : H01 Ω →L[ℝ] ℝ) :
-    ∃! u : H01 Ω, ∀ v : H01 Ω, dirichletBilin Ω u v = f v :=
-  lax_milgram (dirichletBilin_coercive Ω C hC hbase) f
+    ∃! u : H01 Ω, ∀ v : H01 Ω, laplaceBilin Ω u v = f v :=
+  lax_milgram (laplaceBilin_coercive Ω C hC hbase) f
 
 /-- **A-priori estimate for the weak solution (Poisson form).** Under the hypotheses
 of [`dirichlet_weak_solution`], any weak solution obeys `‖u‖_{H₀¹} ≤ α⁻¹ ‖f‖` with the
@@ -56,10 +56,10 @@ theorem dirichlet_weak_solution_bound
     (hbase : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ),
       ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2)
     {f : H01 Ω →L[ℝ] ℝ} {u : H01 Ω}
-    (hu : ∀ v : H01 Ω, dirichletBilin Ω u v = f v) :
+    (hu : ∀ v : H01 Ω, laplaceBilin Ω u v = f v) :
     ‖u‖ ≤ (CP + 1) * ‖f‖ := by
   have h := norm_weak_solution_le (α := 1 / (CP + 1)) (by positivity)
-    (dirichletBilin_coercive_const Ω CP hCP hbase) hu
+    (laplaceBilin_coercive_const Ω CP hCP hbase) hu
   rwa [one_div, inv_inv] at h
 
 /-- **Unconditional existence, uniqueness, and a-priori bound on an open coordinate box.**
@@ -77,9 +77,9 @@ theorem dirichlet_weak_solution_euclBox {n : ℕ} (a b : Fin (n + 1) → ℝ)
     (hab : ∀ k, a k ≤ b k) (C : ℝ) (hC : ∀ i, (b i - a i) ^ 2 / 2 ≤ C)
     (f : H01 (euclBox a b) →L[ℝ] ℝ) :
     (∃! u : H01 (euclBox a b),
-      ∀ v : H01 (euclBox a b), dirichletBilin (euclBox a b) u v = f v)
+      ∀ v : H01 (euclBox a b), laplaceBilin (euclBox a b) u v = f v)
     ∧ ∀ u : H01 (euclBox a b),
-        (∀ v : H01 (euclBox a b), dirichletBilin (euclBox a b) u v = f v) →
+        (∀ v : H01 (euclBox a b), laplaceBilin (euclBox a b) u v = f v) →
           ‖u‖ ≤ (C / (n + 1) + 1) * ‖f‖ := by
   have hCnonneg : 0 ≤ C := le_trans (by positivity) (hC 0)
   have hbase : ∀ {φ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ} (h : IsTestFn (euclBox a b) φ),

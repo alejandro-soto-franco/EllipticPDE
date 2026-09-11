@@ -333,7 +333,7 @@ theorem dirichlet_eigen_family_ball (hd : 2 < d) (n : ℕ) :
       (∀ i j, i ≠ j → ⟪embL2 B1 (w i), embL2 B1 (w j)⟫ = 0) ∧
       (∀ i, 0 < lam i) ∧
       (∀ i j, i ≤ j → lam i ≤ lam j) ∧
-      (∀ i, ∀ V : H01 B1, dirichletBilin B1 (w i) V
+      (∀ i, ∀ V : H01 B1, laplaceBilin B1 (w i) V
         = lam i * ⟪embL2 B1 (w i), embL2 B1 V⟫) := by
   obtain ⟨p, rfl⟩ : ∃ p, d = p + 1 := ⟨d - 1, by omega⟩
   exact dirichlet_eigen_family_of_bounded _ measurableSet_ball isBounded_ball
@@ -342,7 +342,7 @@ theorem dirichlet_eigen_family_ball (hd : 2 < d) (n : ℕ) :
 /-- **Every weak Dirichlet eigenvalue of the unit ball is positive**, with `2 < d` the only
 hypothesis beyond the eigenpair. -/
 theorem dirichlet_eigenvalue_pos_ball (hd : 2 < d) {lam : ℝ} {U : H01 B1} (hU : U ≠ 0)
-    (heig : ∀ V : H01 B1, dirichletBilin B1 U V = lam * ⟪embL2 B1 U, embL2 B1 V⟫) :
+    (heig : ∀ V : H01 B1, laplaceBilin B1 U V = lam * ⟪embL2 B1 U, embL2 B1 V⟫) :
     0 < lam := by
   have hne := exists_embL2_ne_zero_ball hd
   obtain ⟨p, rfl⟩ : ∃ p, d = p + 1 := ⟨d - 1, by omega⟩

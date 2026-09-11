@@ -81,10 +81,10 @@ there is a `U` of unit `L²` norm attaining the infimum of the Rayleigh quotient
 positive, and `U` solves the weak eigenvalue problem. -/
 theorem dirichlet_principal_eigenpair_ball (hd : 2 < d) :
     ∃ U : H01 B1, ‖embL2 B1 U‖ = 1 ∧
-      dirichletBilin B1 U U = principalEigenvalue (dirichletBilin B1) ∧
-      0 < principalEigenvalue (dirichletBilin B1) ∧
-      ∀ V : H01 B1, dirichletBilin B1 U V
-        = principalEigenvalue (dirichletBilin B1) * ⟪embL2 B1 U, embL2 B1 V⟫ := by
+      laplaceBilin B1 U U = principalEigenvalue (laplaceBilin B1) ∧
+      0 < principalEigenvalue (laplaceBilin B1) ∧
+      ∀ V : H01 B1, laplaceBilin B1 U V
+        = principalEigenvalue (laplaceBilin B1) * ⟪embL2 B1 U, embL2 B1 V⟫ := by
   have hne := exists_embL2_ne_zero_ball hd
   obtain ⟨n, rfl⟩ : ∃ n, d = n + 1 := ⟨d - 1, by omega⟩
   exact dirichlet_principal_eigenpair_of_bounded _ measurableSet_ball isBounded_ball hne

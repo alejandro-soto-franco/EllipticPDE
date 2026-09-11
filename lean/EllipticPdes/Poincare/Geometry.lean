@@ -89,12 +89,12 @@ theorem poincare_testfn {Ω : Set (EuclideanSpace ℝ (Fin d))} (hd : 0 < d) (C 
 (Dirichlet) form is coercive *unconditionally* (no abstract Poincaré hypothesis), with
 constant `1 / (C/d + 1)`. The slice bound is the only geometric input, supplied by
 `poincare_box_dir`. -/
-theorem dirichletBilin_coercive_of_slices {Ω : Set (EuclideanSpace ℝ (Fin d))}
+theorem laplaceBilin_coercive_of_slices {Ω : Set (EuclideanSpace ℝ (Fin d))}
     (hd : 0 < d) (C : ℝ) (hC : 0 ≤ C)
     (hslice : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (_h : IsTestFn Ω φ) (i : Fin d),
       ∫ x in Ω, (φ x) ^ 2 ≤ C * ∫ x in Ω, (partialD i φ x) ^ 2) :
-    IsCoercive (EllipticPdes.dirichletBilin Ω) :=
-  EllipticPdes.dirichletBilin_coercive Ω (C / d)
+    IsCoercive (EllipticPdes.laplaceBilin Ω) :=
+  EllipticPdes.laplaceBilin_coercive Ω (C / d)
     (div_nonneg hC (Nat.cast_nonneg d))
     (fun {_φ} h => poincare_testfn hd C (fun {_ψ} h' i => hslice h' i) h)
 

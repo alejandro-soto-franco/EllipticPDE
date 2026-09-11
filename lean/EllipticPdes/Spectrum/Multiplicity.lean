@@ -63,15 +63,15 @@ coercivity. -/
 theorem dirichlet_eigenvalue_pos_of_bounded {n : ℕ} (Ω : Set (EuclideanSpace ℝ (Fin (n + 1))))
     (hΩb : Bornology.IsBounded Ω) (hne : ∃ V : H01 Ω, embL2 Ω V ≠ 0)
     {lam : ℝ} {U : H01 Ω} (hU : U ≠ 0)
-    (heig : ∀ V : H01 Ω, dirichletBilin Ω U V = lam * ⟪embL2 Ω U, embL2 Ω V⟫) : 0 < lam :=
-  weak_eigenvalue_pos (EllipticPdes.Poincare.dirichletBilin_coercive_of_bounded hΩb) hne hU heig
+    (heig : ∀ V : H01 Ω, laplaceBilin Ω U V = lam * ⟪embL2 Ω U, embL2 Ω V⟫) : 0 < lam :=
+  weak_eigenvalue_pos (EllipticPdes.Poincare.laplaceBilin_coercive_of_bounded hΩb) hne hU heig
 
 /-- **Finite multiplicity at `-Δ` on a bounded measurable domain.** -/
 theorem dirichlet_finiteDimensional_eigenspace_of_bounded {n : ℕ}
     (Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))) (hΩm : MeasurableSet Ω)
     (hΩb : Bornology.IsBounded Ω) {μ : ℝ} (hμ : μ ≠ 0) :
     FiniteDimensional ℝ (Module.End.eigenspace
-      (solOp (dirichletBilin Ω) (EllipticPdes.Poincare.dirichletBilin_coercive_of_bounded hΩb)
+      (solOp (laplaceBilin Ω) (EllipticPdes.Poincare.laplaceBilin_coercive_of_bounded hΩb)
         : Module.End ℝ (L2D Ω)) μ) :=
   solOp_finiteDimensional_eigenspace _ (embL2_isCompact hΩm hΩb) hμ
 

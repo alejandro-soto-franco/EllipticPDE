@@ -40,9 +40,9 @@ open EllipticPdes.Sobolev EllipticPdes.Poincare
 
 variable {d : ℕ}
 
-/-- The Dirichlet bilinear form as a bare bilinear map on `H₀¹(Ω)`:
+/-- The bilinear form of the Laplacian as a bare bilinear map on `H₀¹(Ω)`:
 `B[U, V] = ∑ᵢ ⟪∂ᵢu, ∂ᵢv⟫_{L²}`. -/
-def dirichletBilinₗ (Ω : Set (EuclideanSpace ℝ (Fin d))) :
+def laplaceBilinₗ (Ω : Set (EuclideanSpace ℝ (Fin d))) :
     (H01 Ω) →ₗ[ℝ] (H01 Ω) →ₗ[ℝ] ℝ :=
   LinearMap.mk₂ ℝ
     (fun U V => ∑ i : Fin d, ⟪(U : H1amb Ω) i.succ, (V : H1amb Ω) i.succ⟫)
@@ -55,13 +55,13 @@ def dirichletBilinₗ (Ω : Set (EuclideanSpace ℝ (Fin d))) :
     (by intro c U V; simp only [Submodule.coe_smul, PiLp.smul_apply, real_inner_smul_right,
           smul_eq_mul, Finset.mul_sum])
 
-/-- The Dirichlet bilinear form on `H₀¹(Ω)` as a bounded (continuous) bilinear form,
+/-- The bilinear form of the Laplacian on `H₀¹(Ω)` as a bounded (continuous) bilinear form,
 with operator-norm bound `d`. -/
-def dirichletBilin (Ω : Set (EuclideanSpace ℝ (Fin d))) :
+def laplaceBilin (Ω : Set (EuclideanSpace ℝ (Fin d))) :
     (H01 Ω) →L[ℝ] (H01 Ω) →L[ℝ] ℝ :=
-  (dirichletBilinₗ Ω).mkContinuous₂ (d : ℝ) (by
+  (laplaceBilinₗ Ω).mkContinuous₂ (d : ℝ) (by
     intro U V
-    simp only [dirichletBilinₗ, LinearMap.mk₂_apply]
+    simp only [laplaceBilinₗ, LinearMap.mk₂_apply]
     calc ‖∑ i : Fin d, ⟪(U : H1amb Ω) i.succ, (V : H1amb Ω) i.succ⟫‖
         ≤ ∑ i : Fin d, ‖⟪(U : H1amb Ω) i.succ, (V : H1amb Ω) i.succ⟫‖ := norm_sum_le _ _
       _ ≤ ∑ i : Fin d, ‖(U : H1amb Ω) i.succ‖ * ‖(V : H1amb Ω) i.succ‖ :=
@@ -74,33 +74,33 @@ def dirichletBilin (Ω : Set (EuclideanSpace ℝ (Fin d))) :
       _ = (d : ℝ) * ‖U‖ * ‖V‖ := by
           rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_assoc])
 
-/-- Simp lemma: `dirichletBilin Ω U V = ∑ i, ⟪(U : H1amb Ω) i.succ, (V : H1amb Ω) i.succ⟫`. -/
-@[simp] lemma dirichletBilin_apply (Ω : Set (EuclideanSpace ℝ (Fin d))) (U V : H01 Ω) :
-    dirichletBilin Ω U V = ∑ i : Fin d, ⟪(U : H1amb Ω) i.succ, (V : H1amb Ω) i.succ⟫ := by
-  simp only [dirichletBilin, LinearMap.mkContinuous₂_apply, dirichletBilinₗ, LinearMap.mk₂_apply]
+/-- Simp lemma: `laplaceBilin Ω U V = ∑ i, ⟪(U : H1amb Ω) i.succ, (V : H1amb Ω) i.succ⟫`. -/
+@[simp] lemma laplaceBilin_apply (Ω : Set (EuclideanSpace ℝ (Fin d))) (U V : H01 Ω) :
+    laplaceBilin Ω U V = ∑ i : Fin d, ⟪(U : H1amb Ω) i.succ, (V : H1amb Ω) i.succ⟫ := by
+  simp only [laplaceBilin, LinearMap.mkContinuous₂_apply, laplaceBilinₗ, LinearMap.mk₂_apply]
 
 /-- The Dirichlet energy identity: `B[U, U] = ∑ᵢ ‖∂ᵢu‖²`. -/
-lemma dirichletBilin_self (Ω : Set (EuclideanSpace ℝ (Fin d))) (U : H01 Ω) :
-    dirichletBilin Ω U U = ∑ i : Fin d, ‖(U : H1amb Ω) i.succ‖ ^ 2 := by
-  rw [dirichletBilin_apply]
+lemma laplaceBilin_self (Ω : Set (EuclideanSpace ℝ (Fin d))) (U : H01 Ω) :
+    laplaceBilin Ω U U = ∑ i : Fin d, ‖(U : H1amb Ω) i.succ‖ ^ 2 := by
+  rw [laplaceBilin_apply]
   exact Finset.sum_congr rfl (fun i _ => real_inner_self_eq_norm_sq _)
 
 /-- **Quantitative coercivity of the bilinear form of the Laplacian.** Given the
 test-function Poincaré bound with constant `C_P ≥ 0`, that form dominates the full
 `H¹` norm with the explicit constant `1 / (C_P + 1)`: the density Poincaré
 inequality controls the function part by the Dirichlet energy. This is the constant-level form of
-[`dirichletBilin_coercive`]; the explicit constant feeds the Lax-Milgram a-priori
+[`laplaceBilin_coercive`]; the explicit constant feeds the Lax-Milgram a-priori
 estimate [`norm_weak_solution_le`]. -/
-theorem dirichletBilin_coercive_const (Ω : Set (EuclideanSpace ℝ (Fin d)))
+theorem laplaceBilin_coercive_const (Ω : Set (EuclideanSpace ℝ (Fin d)))
     (CP : ℝ) (hCP : 0 ≤ CP)
     (hbase : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ),
       ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2)
     (U : H01 Ω) :
-    1 / (CP + 1) * ‖U‖ * ‖U‖ ≤ dirichletBilin Ω U U := by
+    1 / (CP + 1) * ‖U‖ * ‖U‖ ≤ laplaceBilin Ω U U := by
   have hpos : (0 : ℝ) < CP + 1 := by linarith
   set S : ℝ := ∑ i : Fin d, ‖(U : H1amb Ω) i.succ‖ ^ 2 with hS
   -- The Dirichlet energy is `S`.
-  have hBUU : dirichletBilin Ω U U = S := dirichletBilin_self Ω U
+  have hBUU : laplaceBilin Ω U U = S := laplaceBilin_self Ω U
   -- The full `H¹` norm splits into function part plus `S`.
   have hnorm : ‖U‖ ^ 2 = ‖(U : H1amb Ω) 0‖ ^ 2 + S := by
     rw [show ‖U‖ = ‖(U : H1amb Ω)‖ from rfl, PiLp.norm_sq_eq_of_L2, Fin.sum_univ_succ]
@@ -120,12 +120,12 @@ theorem dirichletBilin_coercive_const (Ω : Set (EuclideanSpace ℝ (Fin d)))
 Poincaré bound with constant `C_P ≥ 0`, that form is coercive on `H₀¹(Ω)` with constant
 `1 / (C_P + 1)`: the density Poincaré inequality controls the function part by the
 Dirichlet energy, so `B[U, U]` dominates the full `H¹` norm. -/
-theorem dirichletBilin_coercive (Ω : Set (EuclideanSpace ℝ (Fin d)))
+theorem laplaceBilin_coercive (Ω : Set (EuclideanSpace ℝ (Fin d)))
     (CP : ℝ) (hCP : 0 ≤ CP)
     (hbase : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ),
       ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2) :
-    IsCoercive (dirichletBilin Ω) :=
-  ⟨1 / (CP + 1), by positivity, dirichletBilin_coercive_const Ω CP hCP hbase⟩
+    IsCoercive (laplaceBilin Ω) :=
+  ⟨1 / (CP + 1), by positivity, laplaceBilin_coercive_const Ω CP hCP hbase⟩
 
 /-! ### Lax-Milgram -/
 

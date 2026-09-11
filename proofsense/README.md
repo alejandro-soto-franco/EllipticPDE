@@ -85,7 +85,7 @@ that run.
 Theorem, which states that there is `γ ≥ 0` such that for every `μ ≥ γ` and
 every `f ∈ L²(U)` the problem `Lu + μu = f` has a unique weak solution, for the
 general operator `L`. The declaration proves Lax-Milgram existence for
-`dirichletBilin`, the pure Dirichlet form `B[u,v] = ∑ᵢ ⟪∂ᵢu, ∂ᵢv⟫`, with no
+`laplaceBilin`, the pure Dirichlet form `B[u,v] = ∑ᵢ ⟪∂ᵢu, ∂ᵢv⟫`, with no
 drift, no zeroth-order term and no shift `μ`, taking the Poincaré bound as a
 hypothesis rather than deriving coercivity from Gårding. It is more general in
 the datum, admitting any continuous functional on `H₀¹` where Evans takes

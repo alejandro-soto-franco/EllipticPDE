@@ -34,7 +34,7 @@ The three bridges:
 * the left-face values vanish because `tsupport φ` sits inside the *open* box.
 
 The headline results are `slice_bound_euclBox` (the per-direction Poincaré bound on the box) and
-`dirichletBilin_coercive_euclBox` (Dirichlet coercivity on any open box, no abstract hypothesis).
+`laplaceBilin_coercive_euclBox` (Dirichlet coercivity on any open box, no abstract hypothesis).
 -/
 
 open MeasureTheory Set
@@ -169,11 +169,11 @@ of Evans §6.2.2, geometry supplied). With
 `C` an upper bound for every side contribution `(bᵢ - aᵢ)² / 2`, the Poisson (Dirichlet) form is
 coercive on `H₀¹` of the open box `∏ₖ (aₖ, bₖ)`, with no abstract Poincaré hypothesis: the slice
 bound is discharged from the box geometry by `slice_bound_euclBox`. -/
-theorem dirichletBilin_coercive_euclBox (a b : Fin (n + 1) → ℝ) (hab : ∀ k, a k ≤ b k)
+theorem laplaceBilin_coercive_euclBox (a b : Fin (n + 1) → ℝ) (hab : ∀ k, a k ≤ b k)
     (C : ℝ) (hC : ∀ i, (b i - a i) ^ 2 / 2 ≤ C) :
-    IsCoercive (EllipticPdes.dirichletBilin (euclBox a b)) := by
+    IsCoercive (EllipticPdes.laplaceBilin (euclBox a b)) := by
   have hCnonneg : 0 ≤ C := le_trans (by positivity) (hC 0)
-  refine dirichletBilin_coercive_of_slices (Ω := euclBox a b) (Nat.succ_pos n) C hCnonneg ?_
+  refine laplaceBilin_coercive_of_slices (Ω := euclBox a b) (Nat.succ_pos n) C hCnonneg ?_
   intro φ hφ i
   calc ∫ x in euclBox a b, (φ x) ^ 2
       ≤ (b i - a i) ^ 2 / 2 * ∫ x in euclBox a b, (partialD i φ x) ^ 2 :=

@@ -187,13 +187,13 @@ theorem dirichlet_eigen_family_of_bounded {m : ℕ} (Ω : Set (EuclideanSpace �
       (∀ i j, i ≠ j → ⟪embL2 Ω (w i), embL2 Ω (w j)⟫ = 0) ∧
       (∀ i, 0 < lam i) ∧
       (∀ i j, i ≤ j → lam i ≤ lam j) ∧
-      (∀ i, ∀ V : H01 Ω, dirichletBilin Ω (w i) V
+      (∀ i, ∀ V : H01 Ω, laplaceBilin Ω (w i) V
         = lam i * ⟪embL2 Ω (w i), embL2 Ω V⟫) := by
-  have hco := EllipticPdes.Poincare.dirichletBilin_coercive_of_bounded hΩb
+  have hco := EllipticPdes.Poincare.laplaceBilin_coercive_of_bounded hΩb
   obtain ⟨U0, -, hU0⟩ := hdim 0 Fin.elim0
   have hne : ∃ V : H01 Ω, embL2 Ω V ≠ 0 := ⟨U0, hU0⟩
   obtain ⟨w, lam, h1, h2, h3, h4, -⟩ :=
-    exists_eigen_family hco (dirichletBilin_symm Ω) (embL2_isCompact hΩm hΩb) hdim n
+    exists_eigen_family hco (laplaceBilin_symm Ω) (embL2_isCompact hΩm hΩb) hdim n
   exact ⟨w, lam, h1, h2, fun i => lt_of_lt_of_le (principalEigenvalue_pos hco hne)
     (principalEigenvalue_le_of_eigen_family hco h1 h3 i), h4, h3⟩
 

@@ -68,9 +68,9 @@ theorem exists_dirichlet_minimiser_of_lt
     (hp' : (p' : ℝ)⁻¹ = ((2 : ℝ≥0) : ℝ)⁻¹ - (d : ℝ)⁻¹) (hp'0 : p' ≠ 0) (hqlt : q < p') :
     ∃ U : H01 B1, ‖rellichEmbL measurableSet_ball hΩb hd hq U‖ = 1 ∧
       ∀ V : H01 B1, ‖rellichEmbL measurableSet_ball hΩb hd hq V‖ = 1 →
-        dirichletBilin B1 U U ≤ dirichletBilin B1 V V := by
+        laplaceBilin B1 U U ≤ laplaceBilin B1 V V := by
   obtain ⟨n, rfl⟩ : ∃ n, d = n + 1 := ⟨d - 1, by omega⟩
-  exact exists_bilin_minimiser (dirichletBilin_coercive_of_bounded hΩb) (dirichletBilin_symm _)
+  exact exists_bilin_minimiser (laplaceBilin_coercive_of_bounded hΩb) (laplaceBilin_symm _)
     (rellichEmbL measurableSet_ball hΩb hd hq)
     (rellichEmbL_isCompact_of_lt measurableSet_ball hΩb hd hq hq0 hp' hp'0 hqlt)
     (exists_norm_rellichEmbL_eq_one hΩb hd hq0 hq)
@@ -84,17 +84,17 @@ theorem exists_weakSolution_dirichlet_of_lt
     (hp' : (p' : ℝ)⁻¹ = ((2 : ℝ≥0) : ℝ)⁻¹ - (d : ℝ)⁻¹) (hp'0 : p' ≠ 0) (hqlt : q < p')
     (hq2 : (2 : ℝ≥0) ≤ q) :
     ∃ U : H01 B1, ‖rellichEmbL measurableSet_ball hΩb hd hq U‖ = 1 ∧
-      0 < dirichletBilin B1 U U ∧
-      ∀ V : H01 B1, dirichletBilin B1 U V
-        = dirichletBilin B1 U U
+      0 < laplaceBilin B1 U U ∧
+      ∀ V : H01 B1, laplaceBilin B1 U V
+        = laplaceBilin B1 U U
             * ∫ x, |(rellichEmbL measurableSet_ball hΩb hd hq U) x| ^ ((q : ℝ) - 2)
                 * (rellichEmbL measurableSet_ball hΩb hd hq U) x
                 * (rellichEmbL measurableSet_ball hΩb hd hq V) x ∂(volume.restrict B1) := by
   obtain ⟨U, hU, hmin⟩ :=
     exists_dirichlet_minimiser_of_lt hΩb hd hq hq0 hp' hp'0 hqlt
   obtain ⟨n, rfl⟩ : ∃ n, d = n + 1 := ⟨d - 1, by omega⟩
-  have hco : IsCoercive (dirichletBilin (ball (0 : EuclideanSpace ℝ (Fin (n + 1))) 1)) :=
-    dirichletBilin_coercive_of_bounded hΩb
+  have hco : IsCoercive (laplaceBilin (ball (0 : EuclideanSpace ℝ (Fin (n + 1))) 1)) :=
+    laplaceBilin_coercive_of_bounded hΩb
   have hq2R : (2 : ℝ) ≤ (q : ℝ) := by exact_mod_cast hq2
   have hp1 : 1 < ((q : ℝ≥0∞)).toReal := by
     rw [ENNReal.coe_toReal]
@@ -104,13 +104,13 @@ theorem exists_weakSolution_dirichlet_of_lt
     intro h0
     rw [h0] at hU
     simp at hU
-  have hpos : 0 < dirichletBilin (ball (0 : EuclideanSpace ℝ (Fin (n + 1))) 1) U U := by
+  have hpos : 0 < laplaceBilin (ball (0 : EuclideanSpace ℝ (Fin (n + 1))) 1) U U := by
     obtain ⟨C, hC, hcoer⟩ := id hco
     have hUpos : 0 < ‖U‖ := norm_pos_iff.mpr hUne
     nlinarith [hcoer U, mul_pos (mul_pos hC hUpos) hUpos]
   refine ⟨U, hU, hpos, fun V => ?_⟩
   have h := euler_lagrange_of_bilin_min (p := (q : ℝ≥0∞)) (by simpa using hq0) ENNReal.coe_ne_top
-    hp1 (rellichEmbL measurableSet_ball hΩb hd hq) _ (dirichletBilin_symm _)
+    hp1 (rellichEmbL measurableSet_ball hΩb hd hq) _ (laplaceBilin_symm _)
     (bilin_self_nonneg hco) hU hmin V
   simpa using h
 
@@ -130,8 +130,8 @@ theorem exists_weakSolution_dirichlet_of_lt'
             * (rellichEmbL measurableSet_ball hΩb hd hq V) x ∂(volume.restrict B1) := by
   obtain ⟨U, hU, hpos, heq⟩ :=
     exists_weakSolution_dirichlet_of_lt hΩb hd hq hq0 hp' hp'0 hqlt hq2
-  refine ⟨U, dirichletBilin B1 U U, hU, hpos, dirichletBilin_self _ U, fun V => ?_⟩
-  rw [← dirichletBilin_apply]
+  refine ⟨U, laplaceBilin B1 U U, hU, hpos, laplaceBilin_self _ U, fun V => ?_⟩
+  rw [← laplaceBilin_apply]
   exact heq V
 
 end

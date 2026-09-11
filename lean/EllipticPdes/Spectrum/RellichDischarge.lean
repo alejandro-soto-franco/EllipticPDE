@@ -260,7 +260,7 @@ theorem dirichlet_spectral_of_bounded (Ω : Set (EuclideanSpace ℝ (Fin d)))
     (hbase : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ),
       ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2) :
     (⨆ μ : ℝ, Module.End.eigenspace
-        (solOp (dirichletBilin Ω) (dirichletBilin_coercive Ω CP hCP hbase)
+        (solOp (laplaceBilin Ω) (laplaceBilin_coercive Ω CP hCP hbase)
           : Module.End ℝ (L2D Ω)) μ)ᗮ = ⊥ :=
   dirichlet_spectral Ω CP hCP hbase (embL2_isCompact hΩm hΩb)
 

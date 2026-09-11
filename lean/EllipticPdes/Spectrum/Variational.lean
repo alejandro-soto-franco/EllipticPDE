@@ -365,10 +365,10 @@ theorem dirichlet_principal_eigenpair (Ω : Set (EuclideanSpace ℝ (Fin d)))
       ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2)
     (hne : ∃ V : H01 Ω, embL2 Ω V ≠ 0) :
     ∃ U : H01 Ω, ‖embL2 Ω U‖ = 1 ∧
-      dirichletBilin Ω U U = principalEigenvalue (dirichletBilin Ω) ∧
-      ∀ V : H01 Ω, dirichletBilin Ω U V
-        = principalEigenvalue (dirichletBilin Ω) * ⟪embL2 Ω U, embL2 Ω V⟫ :=
-  exists_principal_eigenpair (dirichletBilin_coercive Ω CP hCP hbase) (dirichletBilin_symm Ω)
+      laplaceBilin Ω U U = principalEigenvalue (laplaceBilin Ω) ∧
+      ∀ V : H01 Ω, laplaceBilin Ω U V
+        = principalEigenvalue (laplaceBilin Ω) * ⟪embL2 Ω U, embL2 Ω V⟫ :=
+  exists_principal_eigenpair (laplaceBilin_coercive Ω CP hCP hbase) (laplaceBilin_symm Ω)
     (embL2_isCompact hΩm hΩb) hne
 
 /-- **Poincaré inequality with its optimal constant.** The principal Dirichlet eigenvalue is
@@ -378,10 +378,10 @@ theorem dirichlet_poincare_sharp (Ω : Set (EuclideanSpace ℝ (Fin d))) (CP : �
     (hbase : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ),
       ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2)
     (U : H01 Ω) :
-    principalEigenvalue (dirichletBilin Ω) * ‖(U : H1amb Ω) 0‖ ^ 2
+    principalEigenvalue (laplaceBilin Ω) * ‖(U : H1amb Ω) 0‖ ^ 2
       ≤ ∑ i : Fin d, ‖(U : H1amb Ω) i.succ‖ ^ 2 := by
-  simpa [dirichletBilin_self] using
-    principalEigenvalue_mul_norm_sq_le (dirichletBilin_coercive Ω CP hCP hbase) U
+  simpa [laplaceBilin_self] using
+    principalEigenvalue_mul_norm_sq_le (laplaceBilin_coercive Ω CP hCP hbase) U
 
 /-- The optimal Poincaré constant is attained: some `u` of unit `L²` norm has Dirichlet energy
 exactly `λ₁`. -/
@@ -391,10 +391,10 @@ theorem dirichlet_poincare_attained (Ω : Set (EuclideanSpace ℝ (Fin d)))
       ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2)
     (hne : ∃ V : H01 Ω, embL2 Ω V ≠ 0) :
     ∃ U : H01 Ω, ‖(U : H1amb Ω) 0‖ = 1 ∧
-      ∑ i : Fin d, ‖(U : H1amb Ω) i.succ‖ ^ 2 = principalEigenvalue (dirichletBilin Ω) := by
-  obtain ⟨U, hU, hmin⟩ := exists_rayleigh_minimiser (dirichletBilin_coercive Ω CP hCP hbase)
-    (dirichletBilin_symm Ω) (embL2_isCompact hΩm hΩb) hne
-  exact ⟨U, by simpa using hU, by simpa [dirichletBilin_self] using hmin⟩
+      ∑ i : Fin d, ‖(U : H1amb Ω) i.succ‖ ^ 2 = principalEigenvalue (laplaceBilin Ω) := by
+  obtain ⟨U, hU, hmin⟩ := exists_rayleigh_minimiser (laplaceBilin_coercive Ω CP hCP hbase)
+    (laplaceBilin_symm Ω) (embL2_isCompact hΩm hΩb) hne
+  exact ⟨U, by simpa using hU, by simpa [laplaceBilin_self] using hmin⟩
 
 /-- The principal Dirichlet eigenvalue is positive. -/
 theorem dirichlet_principalEigenvalue_pos (Ω : Set (EuclideanSpace ℝ (Fin d))) (CP : ℝ)
@@ -402,24 +402,24 @@ theorem dirichlet_principalEigenvalue_pos (Ω : Set (EuclideanSpace ℝ (Fin d))
     (hbase : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ),
       ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2)
     (hne : ∃ V : H01 Ω, embL2 Ω V ≠ 0) :
-    0 < principalEigenvalue (dirichletBilin Ω) :=
-  principalEigenvalue_pos (dirichletBilin_coercive Ω CP hCP hbase) hne
+    0 < principalEigenvalue (laplaceBilin Ω) :=
+  principalEigenvalue_pos (laplaceBilin_coercive Ω CP hCP hbase) hne
 
 /-- **Principal Dirichlet eigenpair on a bounded domain**, with no abstract Poincaré
-hypothesis: `EllipticPdes.Poincare.dirichletBilin_coercive_of_bounded` names the constant, so
+hypothesis: `EllipticPdes.Poincare.laplaceBilin_coercive_of_bounded` names the constant, so
 boundedness and measurability of `Ω` are the whole input. This is the statement Evans makes, and
 it includes the positivity of `λ₁`. -/
 theorem dirichlet_principal_eigenpair_of_bounded {n : ℕ}
     (Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))) (hΩm : MeasurableSet Ω)
     (hΩb : Bornology.IsBounded Ω) (hne : ∃ V : H01 Ω, embL2 Ω V ≠ 0) :
     ∃ U : H01 Ω, ‖embL2 Ω U‖ = 1 ∧
-      dirichletBilin Ω U U = principalEigenvalue (dirichletBilin Ω) ∧
-      0 < principalEigenvalue (dirichletBilin Ω) ∧
-      ∀ V : H01 Ω, dirichletBilin Ω U V
-        = principalEigenvalue (dirichletBilin Ω) * ⟪embL2 Ω U, embL2 Ω V⟫ := by
-  have hco := EllipticPdes.Poincare.dirichletBilin_coercive_of_bounded hΩb
+      laplaceBilin Ω U U = principalEigenvalue (laplaceBilin Ω) ∧
+      0 < principalEigenvalue (laplaceBilin Ω) ∧
+      ∀ V : H01 Ω, laplaceBilin Ω U V
+        = principalEigenvalue (laplaceBilin Ω) * ⟪embL2 Ω U, embL2 Ω V⟫ := by
+  have hco := EllipticPdes.Poincare.laplaceBilin_coercive_of_bounded hΩb
   obtain ⟨U, hU, hmin, heq⟩ :=
-    exists_principal_eigenpair hco (dirichletBilin_symm Ω) (embL2_isCompact hΩm hΩb) hne
+    exists_principal_eigenpair hco (laplaceBilin_symm Ω) (embL2_isCompact hΩm hΩb) hne
   exact ⟨U, hU, hmin, principalEigenvalue_pos hco hne, heq⟩
 
 end EllipticPdes.Sobolev
