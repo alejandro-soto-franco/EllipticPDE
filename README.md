@@ -42,7 +42,10 @@ prefix.
 |---|---|
 | Existence and uniqueness of the weak solution | `Sobolev.FullEllipticOp.weak_solution_L2_of_nonneg_zeroth_of_bounded` |
 | Gårding inequality | `Sobolev.FullEllipticOp.garding` |
-| Complete Fredholm alternative: kernel, index and solvability | `Sobolev.FullEllipticOp.fredholm_alternative` |
+| Fredholm alternative: a nontrivial kernel, or unique solvability for every datum | `Sobolev.FullEllipticOp.fredholm_alternative` |
+| Finite-dimensional kernel | `Sobolev.FullEllipticOp.finiteDimensional_solSpace` |
+| Kernel and adjoint kernel of equal dimension | `Sobolev.FullEllipticOp.finrank_solSpaceStar_eq_finrank_solSpace` |
+| Solvability exactly when the datum annihilates the adjoint kernel | `Sobolev.FullEllipticOp.solvable_iff_orthogonal_solSpaceStar` |
 | Resolvent bound | `Sobolev.FullEllipticOp.resolvent_bound` |
 | Spectral compactness | `Sobolev.spectrum_compact_operator` |
 | Interior $H^2$ regularity | `Regularity.interior_H2_estimate` |

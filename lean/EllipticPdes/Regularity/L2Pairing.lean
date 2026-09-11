@@ -11,7 +11,7 @@ import EllipticPdes.Regularity.MulIterated
 Evans's step 3 of §6.3.1, Theorem 2 assembles a datum out of a dozen products of a coefficient
 against a derivative of the solution, and every one of them reaches the statement as an integral
 against a test function. Moving between the sum of the integrals and the integral of the sum is
-all of the bookkeeping, and it is the same three facts each time: the pairing is additive, it
+all of the bookkeeping, the same three facts each time: the pairing is additive, it
 commutes with a finite sum, and a weighted class pairs as the weight times the class.
 
 Integrability is what makes the moves legal, and it is uniform: an `L²` class against a

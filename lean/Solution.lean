@@ -238,7 +238,7 @@ lemma datumPairing_eq {Ω : Set (EuclideanSpace ℝ (Fin d))} (f : L2D Ω) (V : 
 
 /-! ### Gårding inequality -/
 
-/-- **The Gårding inequality** (Evans, *Partial Differential Equations* (2nd ed.),
+/-- **Gårding inequality** (Evans, *Partial Differential Equations* (2nd ed.),
 §6.2.2, Theorem 2, p. 318). -/
 theorem garding (Op : EllipticOperator d) (Ω : Set (EuclideanSpace ℝ (Fin d)))
     (U : H01 Ω) :

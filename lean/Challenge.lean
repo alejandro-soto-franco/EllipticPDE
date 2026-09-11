@@ -199,7 +199,7 @@ def datumPairing {Ω : Set (EuclideanSpace ℝ (Fin d))} (f : L2D Ω) (V : H01 �
 
 /-! ### Gårding inequality -/
 
-/-- **The Gårding inequality** (Evans, *Partial Differential Equations* (2nd ed.),
+/-- **Gårding inequality** (Evans, *Partial Differential Equations* (2nd ed.),
 §6.2.2, Theorem 2, p. 318). The form is coercive on `H_0^1(Ω)` after a shift by a
 multiple of the `L²` norm,
 

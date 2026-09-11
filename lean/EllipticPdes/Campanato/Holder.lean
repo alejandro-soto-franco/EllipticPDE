@@ -15,7 +15,7 @@ import Mathlib.Topology.MetricSpace.Holder
 A function whose mean oscillation over balls decays at the rate `r^α` has a representative that is
 Hölder continuous with exponent `α`, and the Hölder constant is controlled by the Campanato
 constant. This is property (H3) of Fernández-Real and Ros-Oton, *Regularity Theory for Elliptic
-PDE*, and it is the analytic foundation the `C^{k,α}` scale of Schauder theory rests on.
+PDE*. The `C^{k,α}` scale of Schauder theory rests on it.
 
 Two facts finish the proof. The Lebesgue differentiation theorem identifies `campanatoLimit u`
 with `u` almost everywhere, so the limit is a representative. The two-centre comparison

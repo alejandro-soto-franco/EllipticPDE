@@ -11,8 +11,8 @@ import Mathlib.Analysis.InnerProductSpace.Projection.Basic
 
 A bounded sequence in a real Hilbert space has a subsequence along which every inner product
 converges, to the inner product against one fixed vector. This is the sequential form of
-Banach-Alaoglu on a reflexive space, and it is the compactness the direct method of the calculus
-of variations runs on, where `EllipticPdes.Embedding.rellichEmbL_isCompact_of_lt` supplies the
+Banach-Alaoglu on a reflexive space. The direct method of the calculus of variations runs on
+this compactness, with `EllipticPdes.Embedding.rellichEmbL_isCompact_of_lt` supplying the
 strong compactness at the lower exponent.
 
 Mathlib has Banach-Alaoglu as `WeakDual.isCompact_closedBall` and the weak topology as

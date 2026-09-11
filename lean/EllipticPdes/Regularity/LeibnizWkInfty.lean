@@ -20,8 +20,8 @@ replaces that route.
 For a weight that is already `C^∞`, no mollification is needed at all and no product rule for
 weak derivatives has to be proved: `b · φ` is itself a smooth compactly supported test function
 supported where `φ` is, so it may be fed straight to `HasWeakDerivOn`, and the classical
-Leibniz rule splits the result. That is `weakDerivOn_smul_test_contDiff` below, and it is the
-whole content of the mollified stage.
+Leibniz rule splits the result. That is `weakDerivOn_smul_test_contDiff` below, the whole
+content of the mollified stage.
 
 ## Entry point of the weak hypothesis
 

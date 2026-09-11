@@ -23,7 +23,7 @@ function supported in the region, and the fundamental lemma of the calculus of v
 that into vanishing almost everywhere on an open set. Reaching for it here would drag in local
 integrability of an `L²` class, which is a detour.
 
-A cutoff is shorter and is what the consumers want anyway. For a test function `χ` supported in
+A cutoff is shorter and is the form every consumer below takes anyway. For a test function `χ` supported in
 the region, `χ·ρ` is admissible for every whole-space test function `ρ`, so the whole-space
 class of `χ·w` annihilates every test class and
 `EllipticPdes.Regularity.annihilates_of_forall_testCls` kills it outright. Every term the

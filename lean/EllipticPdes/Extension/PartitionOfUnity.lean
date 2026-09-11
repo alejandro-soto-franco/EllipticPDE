@@ -20,8 +20,8 @@ a manifold.
 
 The index of the partition is an `Option`: the piece indexed `none` sits inside the domain, away
 from the boundary, and the piece indexed `some x` sits in the ball of the chart at the boundary
-point `x`. The pieces add to one on the closure of the domain, which is what the sum of the local
-extensions needs.
+point `x`. The pieces add to one on the closure of the domain, as the sum of the local
+extensions requires.
 
 ## Main declarations
 

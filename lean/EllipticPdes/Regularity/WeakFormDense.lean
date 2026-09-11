@@ -103,8 +103,8 @@ derivative and the function coordinate is the function, so no weak derivative su
 test side.
 
 `EllipticPdes.Regularity.localWeakForm_of_fullBilin` reads the same unfolding on a measurable
-`V ⊆ Ω` for a solution known to satisfy the weak formulation. Here nothing is assumed of `U`,
-which is what the converse direction needs: `weakForm_of_testFn` asks for the pairing against
+`V ⊆ Ω` for a solution known to satisfy the weak formulation. Here nothing is assumed of `U`.
+The converse direction needs exactly that: `weakForm_of_testFn` asks for the pairing against
 every test graph, and a differentiated equation produces plain integrals. -/
 theorem fullBilin_testGraph_eq (Op : FullEllipticOp d) (U : H01 Ω)
     {v : EuclideanSpace ℝ (Fin d) → ℝ} (hv : IsTestFn Ω v) :

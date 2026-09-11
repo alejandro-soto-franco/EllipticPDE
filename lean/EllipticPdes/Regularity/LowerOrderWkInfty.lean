@@ -81,8 +81,8 @@ def mono (hf : IsWkInfty f k) (hlk : l ≤ k) : IsWkInfty f l where
 
 /-- **Differentiating the hypothesis.** From `f ∈ W^{k+1,∞}`, the first derivative `D [m]` is in
 `W^{k,∞}`, with family `α ↦ D (α ++ [m])` and the bounds shifted by one order. Appending on the
-right makes the lengths line up, exactly as in `HasIteratedWeakDerivOn.deriv`, and this is the
-step that lets the induction of Guo's Theorem VIII.3.2 keep its coefficient hypothesis. -/
+right makes the lengths line up, exactly as in `HasIteratedWeakDerivOn.deriv`; this step lets
+the induction of Guo's Theorem VIII.3.2 keep its coefficient hypothesis. -/
 def deriv (hf : IsWkInfty f (k + 1)) (m : Fin d) : IsWkInfty (hf.D [m]) k where
   D α := hf.D (α ++ [m])
   D_nil := by simp

@@ -11,8 +11,8 @@ import EllipticPdes.Regularity.HigherWeakDeriv
 Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 3 (p. 331) is proved on
 balls: the Sobolev ladder runs inside a ball compactly contained in the region, and produces a
 smooth function agreeing almost everywhere with the solution there. The theorem is stated on the
-region. This file is the passage between the two, and it is the only part of that argument with
-no analysis.
+region. This file is the passage between the two, the only part of that argument with no
+analysis.
 
 Two observations do the work.
 
