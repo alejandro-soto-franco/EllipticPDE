@@ -183,6 +183,22 @@ status:
       file: "EllipticPdes/Regularity/InteriorSmooth.lean"
       sorry_count: 0
       axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "EllipticPdes.Regularity.interior_smooth_global"
+      file: "EllipticPdes/Regularity/InteriorSmoothGlobal.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "EllipticPdes.Regularity.exists_localOp"
+      file: "EllipticPdes/Regularity/Localise/LocalOp.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "EllipticPdes.Regularity.datum_hyp"
+      file: "EllipticPdes/Regularity/Localise/Datum.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "EllipticPdes.Regularity.localise"
+      file: "EllipticPdes/Regularity/Localise/Datum.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
     - declaration: "EllipticPdes.Embedding.interior_holder_estimate"
       file: "EllipticPdes/Embedding/InteriorHolder.lean"
       sorry_count: 0

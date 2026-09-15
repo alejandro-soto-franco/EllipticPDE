@@ -30,6 +30,11 @@ Two observations do the work.
 * `eqOn_of_ae_eq_of_continuousOn`: continuous functions agreeing almost everywhere on an open
   set agree on it.
 * `exists_contDiffOn_of_locally_ae`: local smooth representatives assemble into one.
+* `exists_contDiffOn_of_compact_ae`: the same, with the local hypothesis stated over compact
+  subsets rather than open balls, which is the shape a bootstrap run on a compact exhaustion
+  supplies.
+* `exists_contDiffOn_of_closedBall_ae`: the same, stated over closed balls, which is what a
+  bootstrap such as `interior_smooth` supplies directly.
 -/
 
 open MeasureTheory
@@ -129,5 +134,50 @@ theorem exists_contDiffOn_of_locally_ae {U : Set (EuclideanSpace ℝ (Fin d))} (
     refine contDiffOn_of_locally_contDiffOn fun x hx => ⟨B x hx, hBo x hx, hxB x hx, ?_⟩
     rw [Set.inter_eq_self_of_subset_right (hBU x hx)]
     exact (hvc x hx).congr fun y hy => key x hx hy
+
+/-- **Local smooth representatives on compact sets assemble into one.** A version of
+`exists_contDiffOn_of_locally_ae` whose local hypothesis is stated over compact subsets of `U`
+rather than open balls: if every compact `V ⊆ U` has a smooth representative agreeing with `u`
+almost everywhere on the interior of `V`, then a single smooth function does so on all of `U`.
+This is the shape a bootstrap run on a compact exhaustion, such as `interior_smooth`, supplies
+its conclusion in, one exhaustion piece at a time, with nothing relating two different pieces;
+`interior_smooth_global` glues them through this lemma into one representative on the whole
+region. -/
+theorem exists_contDiffOn_of_compact_ae {U : Set (EuclideanSpace ℝ (Fin d))} (hUo : IsOpen U)
+    (u : EuclideanSpace ℝ (Fin d) → ℝ)
+    (h : ∀ V : Set (EuclideanSpace ℝ (Fin d)), IsCompact V → V ⊆ U →
+      ∃ v : EuclideanSpace ℝ (Fin d) → ℝ,
+        v =ᵐ[volume.restrict (interior V)] u ∧ ContDiffOn ℝ (⊤ : ℕ∞) v (interior V)) :
+    ∃ u' : EuclideanSpace ℝ (Fin d) → ℝ,
+      u' =ᵐ[volume.restrict U] u ∧ ContDiffOn ℝ (⊤ : ℕ∞) u' U := by
+  refine exists_contDiffOn_of_locally_ae hUo u fun x hx => ?_
+  obtain ⟨r, hr, hrsub⟩ := Metric.isOpen_iff.1 hUo x hx
+  have hcl : Metric.closedBall x (r / 2) ⊆ U :=
+    (Metric.closedBall_subset_ball (by linarith)).trans hrsub
+  obtain ⟨v, hvae, hvc⟩ := h _ (isCompact_closedBall x (r / 2)) hcl
+  have hBint : Metric.ball x (r / 2) ⊆ interior (Metric.closedBall x (r / 2)) :=
+    interior_maximal Metric.ball_subset_closedBall Metric.isOpen_ball
+  refine ⟨Metric.ball x (r / 2), Metric.isOpen_ball, Metric.mem_ball_self (by linarith),
+    Metric.ball_subset_closedBall.trans hcl, v, hvc.mono hBint, ?_⟩
+  exact hvae.filter_mono (ae_mono (Measure.restrict_mono hBint le_rfl))
+
+/-- A version of `exists_contDiffOn_of_compact_ae` asking only for closed balls, which is what
+the local hypotheses of a difference-quotient bootstrap supply directly, with no compact set to
+name first. -/
+theorem exists_contDiffOn_of_closedBall_ae {U : Set (EuclideanSpace ℝ (Fin d))} (hUo : IsOpen U)
+    (u : EuclideanSpace ℝ (Fin d) → ℝ)
+    (h : ∀ x r, 0 < r → Metric.closedBall x r ⊆ U →
+      ∃ v : EuclideanSpace ℝ (Fin d) → ℝ,
+        v =ᵐ[volume.restrict (Metric.ball x r)] u ∧
+          ContDiffOn ℝ (⊤ : ℕ∞) v (Metric.ball x r)) :
+    ∃ u' : EuclideanSpace ℝ (Fin d) → ℝ,
+      u' =ᵐ[volume.restrict U] u ∧ ContDiffOn ℝ (⊤ : ℕ∞) u' U := by
+  refine exists_contDiffOn_of_locally_ae hUo u fun x hx => ?_
+  obtain ⟨r, hr, hrsub⟩ := Metric.isOpen_iff.1 hUo x hx
+  have hcl : Metric.closedBall x (r / 2) ⊆ U :=
+    (Metric.closedBall_subset_ball (by linarith)).trans hrsub
+  obtain ⟨v, hvae, hvc⟩ := h x (r / 2) (by linarith) hcl
+  exact ⟨Metric.ball x (r / 2), Metric.isOpen_ball, Metric.mem_ball_self (by linarith),
+    Metric.ball_subset_closedBall.trans hcl, v, hvc, hvae⟩
 
 end EllipticPdes.Regularity

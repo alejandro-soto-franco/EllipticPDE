@@ -55,6 +55,11 @@ import EllipticPdes.Regularity.SmoothGlue
 import EllipticPdes.Regularity.HigherInterior
 import EllipticPdes.Regularity.IteratedFamily
 import EllipticPdes.Regularity.InteriorSmooth
+import EllipticPdes.Regularity.InteriorSmoothGlobal
+import EllipticPdes.Regularity.Localise.CutoffProduct
+import EllipticPdes.Regularity.Localise.LocalOp
+import EllipticPdes.Regularity.Localise.CompactEllipticity
+import EllipticPdes.Regularity.Localise.Datum
 import EllipticPdes.Regularity.ClassicalSolvability
 import EllipticPdes.Regularity.PointwiseEquation
 import EllipticPdes.Regularity.InteriorHolderFinite

@@ -259,6 +259,31 @@ EXEMPT = {
         "carries D^alpha u as one symbol throughout and never faces the "
         "question"
     ),
+    "EllipticPdes.Regularity.exists_localOp": (
+        "builds a FullEllipticOp with global bounded-measurable coefficients out of one smooth "
+        "and uniformly elliptic on an open set alone, agreeing with it on a neighbourhood of a "
+        "given compact set. Evans passes from smooth coefficients on the region to the interior "
+        "estimate's bounded-measurable hypotheses without stating a lemma, treating the smooth "
+        "case as an instance of the bounded one throughout Theorem 3; no transcribed statement "
+        "matches the localisation itself"
+    ),
+    "EllipticPdes.Regularity.datum_hyp": (
+        "discharges the datum hypothesis of interior_smooth for a smooth compactly supported "
+        "function, whose classical iterated partials already are its weak derivatives at every "
+        "order, uniformly bounded because the family up to any order is finite. Evans reads a "
+        "smooth datum as meeting every weak-derivative hypothesis without comment, so no "
+        "transcribed statement matches this bridge on its own"
+    ),
+    "EllipticPdes.Regularity.localise": (
+        "the localisation step of Evans §6.3.1, Theorem 3: a local weak solution of the equation "
+        "with coefficients and datum smooth on an open set U, near a compact K subset of U, is a "
+        "local weak solution on a smaller open set of an equation with the global "
+        "bounded-measurable coefficients exists_localOp supplies and a smooth compactly "
+        "supported datum. Evans performs this passage inline, cutting the smooth data off with a "
+        "test function equal to one near the compact set of interest, and states no lemma for "
+        "it separately from the theorem it prepares; interior_smooth and interior_smooth_global "
+        "carry the numbered conclusion this step localises the hypotheses of"
+    ),
     "EllipticPdes.Embedding.not_isCompactOperator_critEmb": (
         "the sharpness of the range in 5.7 Theorem 1. Evans states compactness "
         "for q < p* and says nothing of the endpoint, and the scaling family "

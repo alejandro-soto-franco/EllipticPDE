@@ -241,6 +241,12 @@
       "claim": "formalises the theorem for a weak solution quantified over H_0^1(Omega) rather than Evans' H^1(U), and for coefficients in W^{k,infty} at every order rather than C^infty: the solution has a representative smooth on the interior of each compact V inside Omega. Evans states u in C^infty(U) for smooth coefficients and datum, which is an instance through IsCkCoeff.toIsWkInftyCoeff and IsWkInfty.ofContDiff. The conclusion names a representative, an L^2 class having no pointwise values, and it is smooth on the interior of V rather than on V, since smoothness is a statement about an open set"
     },
     {
+      "decl": "EllipticPdes.Regularity.interior_smooth_global",
+      "source_id": "evans-2010",
+      "locator": "§6.3.1 Thm 3",
+      "claim": "extends interior_smooth to a single representative smooth on the whole of Omega, gluing the per-compact representatives of the cited theorem through exists_contDiffOn_of_compact_ae rather than through a fresh construction: two representatives are continuous and agree almost everywhere on the interior of whichever compact set is the smaller of the two, hence agree there. The two divergences of interior_smooth remain unchanged here: the solution is quantified over H_0^1(Omega) rather than Evans' H^1(U), and the coefficient bundle is global and in W^{k,infty} at every order rather than C^infty(U), an instance through IsCkCoeff.toIsWkInftyCoeff and IsWkInfty.ofContDiff. Evans' own statement already concludes u in C^infty(U) on the whole region rather than on a compact exhaustion piece at a time, so this declaration is the one that reaches the shape of his stated conclusion"
+    },
+    {
       "decl": "EllipticPdes.Regularity.HasWeakDeriv.unique",
       "source_id": "evans-2010",
       "locator": "§6.3.1 Thm 2",

@@ -229,6 +229,26 @@ import EllipticPdes
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Regularity.interior_smooth
 
+/-! ### One smooth representative on all of the interior -/
+
+/-- info: 'EllipticPdes.Regularity.interior_smooth_global' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.interior_smooth_global
+
+/-! ### Localising coefficients smooth on an open set -/
+
+/-- info: 'EllipticPdes.Regularity.exists_localOp' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.exists_localOp
+
+/-- info: 'EllipticPdes.Regularity.datum_hyp' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.datum_hyp
+
+/-- info: 'EllipticPdes.Regularity.localise' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.localise
+
 /-- info: 'EllipticPdes.Embedding.memLp_of_gradClosed_fullStep' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Embedding.memLp_of_gradClosed_fullStep
