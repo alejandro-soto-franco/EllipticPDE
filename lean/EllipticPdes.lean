@@ -62,6 +62,7 @@ import EllipticPdes.Regularity.Localise.CompactEllipticity
 import EllipticPdes.Regularity.Localise.Datum
 import EllipticPdes.Regularity.Local.WeakSolution
 import EllipticPdes.Regularity.Local.Reduction
+import EllipticPdes.Regularity.Local.Caccioppoli
 import EllipticPdes.Regularity.Local.InteriorH2
 import EllipticPdes.Regularity.Local.Datum
 import EllipticPdes.Regularity.Local.HigherInterior

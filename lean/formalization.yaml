@@ -215,6 +215,10 @@ status:
       file: "EllipticPdes/Regularity/Local/Reduction.lean"
       sorry_count: 0
       axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "EllipticPdes.Regularity.caccioppoli_W12"
+      file: "EllipticPdes/Regularity/Local/Caccioppoli.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
     - declaration: "EllipticPdes.Regularity.interior_H2_estimate_W12"
       file: "EllipticPdes/Regularity/Local/InteriorH2.lean"
       sorry_count: 0

@@ -26,10 +26,11 @@ by induction on the order.
 * The hypothesis at order `k + 1` on a compact `W` is the conclusion at order `k` on
   `tsupport θ` for `θ = 1` near `W`: `U₀` has `k + 2` weak derivatives there, and on `W` the
   first of them are the gradient coordinates of `U` by uniqueness of the weak derivative after
-  the cutoff `θ` (`exists_collarFamily_of_weakDerivOn`). At order `0` the hypothesis asks
-  nothing.
+  the cutoff `θ` (`exists_collarFamily_of_weakDerivOn`). At order `0` the hypothesis asks for
+  the `L²` norms of the coordinates on `W`, which the Caccioppoli estimate
+  `exists_norm_mulTest_grad_le` bounds by `‖f‖ + ‖U₀‖`.
 
-The bound has `‖U‖_{H¹(Ω)}` where Evans has `‖u‖_{L²(U)}`, as in `interior_H2_estimate_W12`.
+The bound has `‖U₀‖_{L²(Ω)}` on the right, as in Evans.
 
 ## Main declarations
 
@@ -51,7 +52,7 @@ variable {n : ℕ}
 
 /-- **Order-`k` interior conclusion for local weak solutions.** For every compact `V ⊆ Ω` there
 is a constant, quantified before the solution and the datum, bounding every weak derivative of
-`U₀` of order at most `k + 2` on `V` by `M + ‖U‖`, for a datum with `k` weak derivatives
+`U₀` of order at most `k + 2` on `V` by `M + ‖U₀‖`, for a datum with `k` weak derivatives
 bounded by `M`. -/
 def LocalRegularityAt (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (k : ℕ) : Prop :=
@@ -60,11 +61,11 @@ def LocalRegularityAt (Op : FullEllipticOp (n + 1))
       (hfk : HasIteratedWeakDerivOn Ω k f), IteratedL2Bound hfk M →
       IsLocalWeakSolution Op Ω U f →
       ∃ hu : HasIteratedWeakDerivOn V (k + 2) (restrictL2 (Ω := V) (extendL2 hΩm (U 0))),
-        IteratedL2Bound hu (C * (M + ‖U‖))
+        IteratedL2Bound hu (C * (M + ‖U 0‖))
 
 /-- **Order-`k` hypothesis on the coordinates.** For every compact `W ⊆ Ω` every coordinate of
 a local weak solution, the function and its gradient alike, has `k` weak derivatives on `W`,
-bounded by `M + ‖U‖` with a constant quantified before the solution and the datum. -/
+bounded by `M + ‖U₀‖` with a constant quantified before the solution and the datum. -/
 def LocalFamiliesAt (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (k : ℕ) : Prop :=
   ∀ {W : Set (EuclideanSpace ℝ (Fin (n + 1)))}, IsCompact W → W ⊆ Ω →
@@ -73,23 +74,56 @@ def LocalFamiliesAt (Op : FullEllipticOp (n + 1))
       IsLocalWeakSolution Op Ω U f →
       ∀ j : Fin (n + 2),
         ∃ H : HasIteratedWeakDerivOn W k (restrictL2 (Ω := W) (extendL2 hΩm (U j))),
-          IteratedL2Bound H (C * (M + ‖U‖))
+          IteratedL2Bound H (C * (M + ‖U 0‖))
 
-/-- At order zero the hypothesis on the coordinates asks only for their `L²` norms, which
-`‖U‖` bounds. -/
+/-- **Invisibility of a cutoff on a set where it is one.** For `ζ = 1` on `W ⊆ Ω`, cutting
+`ζ g` down to `W` is cutting `g` down to `W`. -/
+theorem restrictL2_extendL2_mulTest_of_eqOn {Ω W : Set (EuclideanSpace ℝ (Fin (n + 1)))}
+    (hΩm : MeasurableSet Ω) (hWm : MeasurableSet W) (hWΩ : W ⊆ Ω)
+    {ζ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ} (hζ : IsTestFn Ω ζ) (hζW : Set.EqOn ζ 1 W)
+    (g : L2D Ω) :
+    restrictL2 (Ω := W) (extendL2 hΩm (mulTest hζ g))
+      = restrictL2 (Ω := W) (extendL2 hΩm g) := by
+  apply Lp.ext
+  filter_upwards [coeFn_restrictL2 (Ω := W) (extendL2 hΩm (mulTest hζ g)),
+    coeFn_restrictL2 (Ω := W) (extendL2 hΩm g),
+    ae_restrict_of_ae (coeFn_extendL2 hΩm (mulTest hζ g)),
+    ae_restrict_of_ae (coeFn_extendL2 hΩm g),
+    ae_restrict_of_ae_restrict_of_subset hWΩ (mulTest_coeFn hζ g), ae_restrict_mem hWm]
+    with x h1 h2 h3 h4 h5 h6
+  rw [h1, h2, h3, h4, Set.indicator_of_mem (hWΩ h6), Set.indicator_of_mem (hWΩ h6), h5,
+    hζW h6, Pi.one_apply, one_mul]
+
+/-- **Hypothesis at order zero.** At order zero the hypothesis on the coordinates asks only for
+their `L²` norms on `W`. `‖U₀‖` bounds the function, and the gradient, cut off by `ζ = 1` near
+`W`, is bounded by `‖f‖ + ‖U₀‖` through the Caccioppoli estimate. -/
 theorem localFamiliesAt_zero (Op : FullEllipticOp (n + 1))
-    {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) :
+    {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω) :
     LocalFamiliesAt Op hΩm 0 := by
-  intro W _ _
-  refine ⟨1, zero_le_one, fun U f M hfk hM _ j => ⟨HasIteratedWeakDerivOn.zero _, ?_⟩⟩
+  intro W hWc hWΩ
+  have hWm : MeasurableSet W := hWc.isClosed.measurableSet
+  obtain ⟨ζ, hζ, hζ1, -⟩ := exists_isTestFn_one_nhdsSet_of_isCompact hWc hΩo hWΩ
+  have hζW : Set.EqOn ζ 1 W := fun x hx => hζ1.self_of_nhdsSet x hx
+  obtain ⟨Cg, hCg0, hCg⟩ := exists_norm_mulTest_grad_le Op hΩo hζ
+  refine ⟨1 + Cg, by linarith, fun U f M hfk hM hsol j =>
+    ⟨HasIteratedWeakDerivOn.zero _, ?_⟩⟩
   intro α _
   have hM0 : 0 ≤ M := le_trans (norm_nonneg f) hM.norm_le
+  have hU0 := norm_nonneg (U 0)
+  have hfM : ‖f‖ ≤ M := hM.norm_le
   change ‖restrictL2 (Ω := W) (extendL2 hΩm (U j))‖ ≤ _
-  calc ‖restrictL2 (Ω := W) (extendL2 hΩm (U j))‖ ≤ ‖extendL2 hΩm (U j)‖ :=
-        norm_restrictL2_le _
-    _ = ‖U j‖ := norm_extendL2 hΩm _
-    _ ≤ ‖U‖ := PiLp.norm_apply_le U j
-    _ ≤ 1 * (M + ‖U‖) := by linarith
+  refine Fin.cases ?_ (fun i => ?_) j
+  · calc ‖restrictL2 (Ω := W) (extendL2 hΩm (U 0))‖ ≤ ‖extendL2 hΩm (U 0)‖ :=
+          norm_restrictL2_le _
+      _ = ‖U 0‖ := norm_extendL2 hΩm _
+      _ ≤ (1 + Cg) * (M + ‖U 0‖) := by nlinarith
+  · rw [← restrictL2_extendL2_mulTest_of_eqOn hΩm hWm hWΩ hζ hζW (U i.succ)]
+    have hg := hCg U f hsol i
+    calc ‖restrictL2 (Ω := W) (extendL2 hΩm (mulTest hζ (U i.succ)))‖
+        ≤ ‖extendL2 hΩm (mulTest hζ (U i.succ))‖ := norm_restrictL2_le _
+      _ = ‖mulTest hζ (U i.succ)‖ := norm_extendL2 hΩm _
+      _ ≤ Cg * (‖f‖ + ‖U 0‖) := hg
+      _ ≤ (1 + Cg) * (M + ‖U 0‖) := by nlinarith
 
 /-- **Hypothesis at `k + 1` from the conclusion at `k`.** For a compact `W`, the conclusion at
 order `k` on `tsupport θ`, with `θ = 1` near `W`, gives `U₀` its `k + 2` weak derivatives on
@@ -149,9 +183,9 @@ theorem localRegularityAt_of_localFamiliesAt (Op : FullEllipticOp (n + 1))
     mul_nonneg hCV0 (add_nonneg (mul_nonneg hK0 (by linarith)) hMη0),
     fun U f M hfk hM hsol => ?_⟩
   have hM0 : 0 ≤ M := le_trans (norm_nonneg f) hM.norm_le
-  have hU0 : 0 ≤ ‖U‖ := norm_nonneg U
-  have hMU : 0 ≤ M + ‖U‖ := add_nonneg hM0 hU0
-  set B : ℝ := (CW + 1) * (M + ‖U‖) with hB
+  have hU0 : 0 ≤ ‖U 0‖ := norm_nonneg (U 0)
+  have hMU : 0 ≤ M + ‖U 0‖ := add_nonneg hM0 hU0
+  set B : ℝ := (CW + 1) * (M + ‖U 0‖) with hB
   choose H hH using hW U f M hfk hM hsol
   obtain ⟨F, HF, hFbd, hFpair⟩ := hDat U f H hfk B
     (fun j => (hH j).mono_const (by rw [hB]; nlinarith))
@@ -165,13 +199,12 @@ theorem localRegularityAt_of_localFamiliesAt (Op : FullEllipticOp (n + 1))
     (K * B) HF hFbd hweak
   refine ⟨hu.congr (restrictL2_extendL2_cutoffMul hΩm hVm hVΩ hη hη1 U 0), ?_⟩
   refine hub.congr.mono_const ?_
-  have hη0 : ‖(cutoffMul hη U) 0‖ ≤ Mη * ‖U‖ := by
+  have hη0 : ‖(cutoffMul hη U) 0‖ ≤ Mη * ‖U 0‖ := by
     rw [cutoffMul_apply_zero]
-    exact le_trans (norm_le_of_ae_mul hη.continuous.measurable (Eventually.of_forall hMη)
-        (mulTest_coeFn hη (U 0)))
-      (mul_le_mul_of_nonneg_left (PiLp.norm_apply_le U 0) hMη0)
+    exact norm_le_of_ae_mul hη.continuous.measurable (Eventually.of_forall hMη)
+      (mulTest_coeFn hη (U 0))
   change CV * (K * B + ‖(cutoffMul hη U) 0‖) ≤ _
-  have h1 : K * B + ‖(cutoffMul hη U) 0‖ ≤ (K * (CW + 1) + Mη) * (M + ‖U‖) := by
+  have h1 : K * B + ‖(cutoffMul hη U) 0‖ ≤ (K * (CW + 1) + Mη) * (M + ‖U 0‖) := by
     rw [hB]
     nlinarith [mul_nonneg hMη0 hM0]
   rw [mul_assoc]
@@ -181,7 +214,7 @@ theorem localRegularityAt_of_localFamiliesAt (Op : FullEllipticOp (n + 1))
 Equations* (2nd ed.), §6.3.1, Theorem 2, p. 332).** A local weak solution `U ∈ W12 Ω` of
 `L U = f`, with no boundary condition, `W^{k+3,∞}` principal coefficients, `W^{k+2,∞}`
 lower-order coefficients and a datum with `k` weak derivatives bounded by `M`, has weak
-derivatives of every order up to `k + 2` on each compact `V ⊆ Ω`, bounded by `C (M + ‖U‖)`
+derivatives of every order up to `k + 2` on each compact `V ⊆ Ω`, bounded by `C (M + ‖U₀‖)`
 with `C` quantified before the solution and the datum. -/
 theorem higher_interior_regularity_W12 (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
@@ -192,7 +225,7 @@ theorem higher_interior_regularity_W12 (Op : FullEllipticOp (n + 1))
   induction k with
   | zero =>
     exact localRegularityAt_of_localFamiliesAt Op hΩm hΩo hA1 hA hbc
-      (localFamiliesAt_zero Op hΩm)
+      (localFamiliesAt_zero Op hΩm hΩo)
   | succ j ih =>
     exact localRegularityAt_of_localFamiliesAt Op hΩm hΩo hA1 hA hbc
       (localFamiliesAt_succ Op hΩm hΩo (ih (hA.mono (by omega)) (hbc.mono (by omega))))

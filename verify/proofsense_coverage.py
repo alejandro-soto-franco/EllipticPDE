@@ -327,6 +327,12 @@ EXEMPT = {
         "identification of u in H^1(U) with the pair (u, Du) that Evans makes by definition "
         "in 5.2.2, and no transcribed statement matches it"
     ),
+    "EllipticPdes.Regularity.caccioppoli_W12": (
+        "the first-derivative Caccioppoli estimate of caccioppoli for a weak solution in "
+        "H^1(Omega) with no boundary condition. Evans proves it inside 6.3.1 Theorem 1, in "
+        "the display before (8), without stating it as a numbered result, and Gilbarg and "
+        "Trudinger Theorem 8.8 is the match and is not transcribed"
+    ),
     "EllipticPdes.Embedding.not_isCompactOperator_critEmb": (
         "the sharpness of the range in 5.7 Theorem 1. Evans states compactness "
         "for q < p* and says nothing of the endpoint, and the scaling family "

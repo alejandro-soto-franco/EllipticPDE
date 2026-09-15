@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
 import EllipticPdes.Regularity.Local.Reduction
+import EllipticPdes.Regularity.Local.Caccioppoli
 import EllipticPdes.Regularity.TestFnCut
 
 /-!
@@ -15,17 +16,16 @@ Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 1 (p. 327): 
 
 The statement here asks nothing of `u` at the boundary. It is read off the `H₀¹` estimate
 `interior_H2_estimate` through the cutoff reduction: for `η` equal to `1` near `V` and supported
-in `Ω`, the element `η U ∈ H₀¹(Ω)` solves an equation whose datum `redDatum` is bounded by
-`K (‖f‖ + ‖U‖)` (`exists_norm_redDatum_le`), and the cutoff is invisible on `V`.
-
-The right-hand side has the full `H¹(Ω)` norm `‖U‖` where Evans has `‖u‖_{L²(U)}`. Evans
-removes the gradient with the Caccioppoli inequality (the display before (8) in the proof), which
-is not ported to `W12` solutions here.
+in `Ω`, the element `η U ∈ H₀¹(Ω)` solves an equation whose datum `redDatum` pairs `f`, `U₀` and
+the gradient of `U` against weights supported in `tsupport η`, and the cutoff is invisible on
+`V`. The gradient enters the datum only through `ζ ∇U` for a cutoff `ζ` equal to `1` on
+`tsupport η` (`exists_norm_redDatum_le`), and `exists_norm_mulTest_grad_le`, the Caccioppoli
+estimate, bounds that by `‖f‖ + ‖U₀‖`. The right-hand side is then Evans's.
 
 ## Main declarations
 
 * `exists_norm_redDatum_le`: the bound on the reduction datum.
-* `interior_H2_estimate_W12`: Theorem 1 with `‖U‖_{H¹(Ω)}` on the right.
+* `interior_H2_estimate_W12`: Theorem 1.
 -/
 
 open MeasureTheory Filter Topology
@@ -64,12 +64,39 @@ theorem norm_six_le (a b c e g h : L2D Ω) :
   have h5 := norm_sub_le a b
   linarith
 
-/-- **Bound on the reduction datum.** `‖F‖ ≤ K (‖f‖ + ‖U‖)`, with `K` depending on the
-coefficients and the cutoff alone. -/
+/-- The weight of `weightL`, read almost everywhere. -/
+theorem weightL_coeFn {c ψ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hcm : Measurable c) {M : ℝ}
+    (hc : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |c x| ≤ M)
+    (hψ : Continuous ψ) (hψcs : HasCompactSupport ψ) (g : L2D Ω) :
+    weightL Ω hcm hc hψ hψcs g =ᵐ[volume.restrict Ω] fun x => c x * ψ x * (g x : ℝ) := by
+  rw [weightL]; exact mulCoeffL_coeFn _ _ g
+
+/-- **Invisibility of a cutoff under a weight it is one on.** For `ζ = 1` on `tsupport ψ`,
+multiplying by `ζ` before `weightL` changes nothing. -/
+theorem weightL_mulTest_eq {c ψ ζ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hcm : Measurable c) {M : ℝ}
+    (hc : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |c x| ≤ M)
+    (hψ : Continuous ψ) (hψcs : HasCompactSupport ψ) (hζ : IsTestFn Ω ζ)
+    (hζψ : Set.EqOn ζ 1 (tsupport ψ)) (g : L2D Ω) :
+    weightL Ω hcm hc hψ hψcs (mulTest hζ g) = weightL Ω hcm hc hψ hψcs g := by
+  apply Lp.ext
+  filter_upwards [weightL_coeFn hcm hc hψ hψcs (mulTest hζ g), weightL_coeFn hcm hc hψ hψcs g,
+    mulTest_coeFn hζ g] with x h1 h2 h3
+  rw [h1, h2, h3]
+  by_cases hx : x ∈ tsupport ψ
+  · rw [hζψ hx, Pi.one_apply, one_mul]
+  · rw [image_eq_zero_of_notMem_tsupport hx]; ring
+
+/-- **Bound on the reduction datum.** For a cutoff `ζ` equal to `1` on `tsupport η`,
+`‖F‖ ≤ K (‖f‖ + ‖U₀‖ + Σ ‖ζ ∂_i U‖)`, with `K` depending on the coefficients and `η` alone. The
+gradient of `U` enters only where `η` lives, which is what lets the Caccioppoli estimate remove
+it. -/
 theorem exists_norm_redDatum_le (Op : FullEllipticOp d) (D : CoeffWeakGrad Op.toEllipticCoeff)
     {η : EuclideanSpace ℝ (Fin d) → ℝ} (hη : IsTestFn Ω η) :
-    ∃ K : ℝ, 0 ≤ K ∧ ∀ (U : H1amb Ω) (f : L2D Ω),
-      ‖redDatum Op D hη U f‖ ≤ K * (‖f‖ + ‖U‖) := by
+    ∃ K : ℝ, 0 ≤ K ∧ ∀ {ζ : EuclideanSpace ℝ (Fin d) → ℝ} (hζ : IsTestFn Ω ζ),
+      Set.EqOn ζ 1 (tsupport η) → ∀ (U : H1amb Ω) (f : L2D Ω),
+      ‖redDatum Op D hη U f‖ ≤ K * (‖f‖ + (‖U 0‖ + ∑ i : Fin d, ‖mulTest hζ (U i.succ)‖)) := by
   classical
   set Mη : ℝ := (exists_abs_bound hη).choose
   have hMη : 0 ≤ Mη := le_trans (abs_nonneg _) ((exists_abs_bound hη).choose_spec 0)
@@ -102,35 +129,49 @@ theorem exists_norm_redDatum_le (Op : FullEllipticOp d) (D : CoeffWeakGrad Op.to
   have hS2 : 0 ≤ S2 := Finset.sum_nonneg fun i _ => Finset.sum_nonneg fun j _ => hK2 i j
   have hS4 : 0 ≤ S4 := Finset.sum_nonneg fun i _ => Finset.sum_nonneg fun j _ => hK4 i j
   have hS5 : 0 ≤ S5 := Finset.sum_nonneg fun i _ => hK5 i
-  refine ⟨Mη + S1 + S2 + S1 + S4 + S5, by positivity, fun U f => ?_⟩
-  have hUc : ∀ j, ‖U j‖ ≤ ‖U‖ := fun j => PiLp.norm_apply_le U j
+  refine ⟨Mη + S1 + S2 + S1 + S4 + S5, by positivity, fun {ζ} hζ hζη U f => ?_⟩
+  set N : ℝ := ‖U 0‖ + ∑ i : Fin d, ‖mulTest hζ (U i.succ)‖ with hN
+  have hGi : ∀ i : Fin d, ‖mulTest hζ (U i.succ)‖ ≤ ∑ i : Fin d, ‖mulTest hζ (U i.succ)‖ :=
+    fun i => Finset.single_le_sum (f := fun i : Fin d => ‖mulTest hζ (U i.succ)‖)
+      (fun i _ => norm_nonneg _) (Finset.mem_univ i)
+  have hG0 : 0 ≤ ∑ i : Fin d, ‖mulTest hζ (U i.succ)‖ :=
+    Finset.sum_nonneg fun i _ => norm_nonneg _
+  have hN0 : ‖U 0‖ ≤ N := by rw [hN]; linarith
+  have hNi : ∀ i : Fin d, ‖mulTest hζ (U i.succ)‖ ≤ N := fun i => by
+    rw [hN]; linarith [hGi i, norm_nonneg (U 0)]
+  have hEq : ∀ j : Fin d, Set.EqOn ζ 1 (tsupport (partialD j η)) := fun j =>
+    hζη.mono (tsupport_partialD_subset j η)
   have t0 : ‖mulTest hη f‖ ≤ Mη * ‖f‖ := norm_mulTest_le hη f
   have t1 := norm_double_sum_le (fun i j => weightL Ω (Op.measurable i j) (Op.bdd i j)
-      (hη.continuous_partialD j) (hη.hasCompactSupport_partialD j) (U i.succ)) K1 ‖U‖
-    (fun i j => (norm_weightL_le _ _ _ _ _).trans
-      (mul_le_mul_of_nonneg_left (hUc _) (hK1 i j)))
+      (hη.continuous_partialD j) (hη.hasCompactSupport_partialD j) (U i.succ)) K1 N
+    (fun i j => by
+      rw [← weightL_mulTest_eq (Op.measurable i j) (Op.bdd i j) (hη.continuous_partialD j)
+        (hη.hasCompactSupport_partialD j) hζ (hEq j) (U i.succ)]
+      exact (norm_weightL_le _ _ _ _ _).trans (mul_le_mul_of_nonneg_left (hNi i) (hK1 i j)))
   have t2 := norm_double_sum_le (fun i j => weightL Ω (D.measurable j i j) (D.ae_abs_le j i j)
-      (hη.continuous_partialD i) (hη.hasCompactSupport_partialD i) (U 0)) K2 ‖U‖
+      (hη.continuous_partialD i) (hη.hasCompactSupport_partialD i) (U 0)) K2 N
     (fun i j => (norm_weightL_le _ _ _ _ _).trans
-      (mul_le_mul_of_nonneg_left (hUc _) (hK2 i j)))
+      (mul_le_mul_of_nonneg_left hN0 (hK2 i j)))
   have t3 := norm_double_sum_le (fun i j => weightL Ω (Op.measurable i j) (Op.bdd i j)
       (hη.continuous_partialD i) (hη.hasCompactSupport_partialD i) (U j.succ))
-      (fun i j => K1 j i) ‖U‖
-    (fun i j => (norm_weightL_le _ _ _ _ _).trans
-      (mul_le_mul_of_nonneg_left (hUc _) (hK1 j i)))
+      (fun i j => K1 j i) N
+    (fun i j => by
+      rw [← weightL_mulTest_eq (Op.measurable i j) (Op.bdd i j) (hη.continuous_partialD i)
+        (hη.hasCompactSupport_partialD i) hζ (hEq i) (U j.succ)]
+      exact (norm_weightL_le _ _ _ _ _).trans (mul_le_mul_of_nonneg_left (hNi j) (hK1 j i)))
   have hS3 : (∑ i : Fin d, ∑ j : Fin d, K1 j i) = S1 := Finset.sum_comm
   have t4 := norm_double_sum_le (fun i j => weightL Ω (Op.measurable i j) (Op.bdd i j)
       ((isTestFn_partialD hη i).continuous_partialD j)
-      ((isTestFn_partialD hη i).hasCompactSupport_partialD j) (U 0)) K4 ‖U‖
+      ((isTestFn_partialD hη i).hasCompactSupport_partialD j) (U 0)) K4 N
     (fun i j => (norm_weightL_le _ _ _ _ _).trans
-      (mul_le_mul_of_nonneg_left (hUc _) (hK4 i j)))
+      (mul_le_mul_of_nonneg_left hN0 (hK4 i j)))
   have t5 := norm_single_sum_le (fun i => weightL Ω (Op.b_meas i) (Op.b_bdd i)
-      (hη.continuous_partialD i) (hη.hasCompactSupport_partialD i) (U 0)) K5 ‖U‖
+      (hη.continuous_partialD i) (hη.hasCompactSupport_partialD i) (U 0)) K5 N
     (fun i => (norm_weightL_le _ _ _ _ _).trans
-      (mul_le_mul_of_nonneg_left (hUc _) (hK5 i)))
+      (mul_le_mul_of_nonneg_left hN0 (hK5 i)))
   rw [hS3] at t3
   have hf0 := norm_nonneg f
-  have hU0 := norm_nonneg U
+  have hU0 : 0 ≤ N := le_trans (norm_nonneg _) hN0
   rw [redDatum]
   refine (norm_six_le _ _ _ _ _ _).trans ?_
   simp only at t1 t2 t3 t4 t5
@@ -180,11 +221,10 @@ theorem restrictL2_extendL2_cutoffMul {V : Set (EuclideanSpace ℝ (Fin d))} (h�
   rw [h1, h2, h3, h4, Set.indicator_of_mem (hVΩ h6), Set.indicator_of_mem (hVΩ h6), h5]
 
 /-- **Interior `H²` estimate for a weak solution in `H¹(Ω)` (Evans, *Partial Differential
-Equations* (2nd ed.), §6.3.1, Theorem 1, p. 327), with `‖U‖_{H¹(Ω)}` on the right.** For `C¹`
-principal coefficients with a bounded derivative and a local weak solution `U ∈ W12 Ω` of
-`L U = f`, with no boundary condition, each gradient coordinate of `U` has every weak first
-derivative on a compact `V ⊆ Ω`, bounded by `C (‖f‖ + ‖U‖)` with `C` quantified before `U` and
-`f`. -/
+Equations* (2nd ed.), §6.3.1, Theorem 1, p. 327).** For `C¹` principal coefficients with a
+bounded derivative and a local weak solution `U ∈ W12 Ω` of `L U = f` on an open `Ω`, with no
+boundary condition, each gradient coordinate of `U` has every weak first derivative on a compact
+`V ⊆ Ω`, bounded by `C (‖f‖ + ‖U₀‖)` with `C` quantified before `U` and `f`. -/
 theorem interior_H2_estimate_W12 {n : ℕ} (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩo : IsOpen Ω)
     (hA : IsC1Coeff Op.toEllipticCoeff)
@@ -193,36 +233,51 @@ theorem interior_H2_estimate_W12 {n : ℕ} (Op : FullEllipticOp (n + 1))
       ∀ k i : Fin (n + 1), ∃ wki : Lp ℝ 2 (volume.restrict V),
         HasWeakDerivOn V k
             (restrictL2 (Ω := V) (extendL2 hΩo.measurableSet (U i.succ))) wki ∧
-          ‖wki‖ ≤ C * (‖f‖ + ‖U‖) := by
+          ‖wki‖ ≤ C * (‖f‖ + ‖U 0‖) := by
   classical
   have hΩm : MeasurableSet Ω := hΩo.measurableSet
   have hVm : MeasurableSet V := hVc.isClosed.measurableSet
   obtain ⟨η, hη, hη1, -⟩ := exists_isTestFn_one_nhdsSet_of_isCompact hVc hΩo hVΩ
+  obtain ⟨ζ, hζ, hζ1, -⟩ := exists_isTestFn_one_nhdsSet_of_isCompact hη.2.1 hΩo hη.2.2
+  have hζη : Set.EqOn ζ 1 (tsupport η) := fun x hx => hζ1.self_of_nhdsSet x hx
   obtain ⟨C, hC0, hC⟩ := interior_H2_estimate Op hΩm hΩo hA hVc hVΩ
   obtain ⟨K, hK0, hK⟩ := exists_norm_redDatum_le Op hA.coeffWeakGrad hη
+  obtain ⟨Cg, hCg0, hCg⟩ := exists_norm_mulTest_grad_le Op hΩo hζ
   set Mη : ℝ := (exists_abs_bound hη).choose
   have hMη : 0 ≤ Mη := le_trans (abs_nonneg _) ((exists_abs_bound hη).choose_spec 0)
-  refine ⟨C * (K + Mη), mul_nonneg hC0 (add_nonneg hK0 hMη), fun U f hsol k i => ?_⟩
+  refine ⟨C * (K * (1 + (n + 1) * Cg) + Mη),
+    mul_nonneg hC0 (add_nonneg (mul_nonneg hK0 (by positivity)) hMη),
+    fun U f hsol k i => ?_⟩
   set W : H01 Ω := ⟨cutoffMul hη U, cutoffMul_mem_H01_of_mem_W12 hΩo hη hsol.1⟩ with hWdef
   obtain ⟨wki, hwd, hbd⟩ := hC W (redDatum Op hA.coeffWeakGrad hη U f)
     (reduction_weakForm Op hA.coeffWeakGrad hη hΩo hsol) k i
   have hid := restrictL2_extendL2_cutoffMul hΩm hVm hVΩ hη hη1 U i.succ
   refine ⟨wki, hid ▸ hwd, ?_⟩
-  have hW0 : ‖(W : H1amb Ω) 0‖ ≤ Mη * ‖U‖ := by
+  have hW0 : ‖(W : H1amb Ω) 0‖ ≤ Mη * ‖U 0‖ := by
     change ‖(cutoffMul hη U) 0‖ ≤ _
     rw [cutoffMul_apply_zero]
-    exact (norm_mulTest_le hη _).trans
-      (mul_le_mul_of_nonneg_left (PiLp.norm_apply_le U 0) hMη)
-  have hF := hK U f
+    exact norm_mulTest_le hη _
+  have hf0 := norm_nonneg f
+  have hU0 := norm_nonneg (U 0)
+  have hG : ∑ j : Fin (n + 1), ‖mulTest hζ (U j.succ)‖ ≤ (n + 1) * Cg * (‖f‖ + ‖U 0‖) := by
+    calc ∑ j : Fin (n + 1), ‖mulTest hζ (U j.succ)‖
+        ≤ ∑ _j : Fin (n + 1), Cg * (‖f‖ + ‖U 0‖) :=
+          Finset.sum_le_sum fun j _ => hCg U f hsol j
+      _ = (n + 1) * Cg * (‖f‖ + ‖U 0‖) := by
+          rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+          push_cast; ring
+  have hF : ‖redDatum Op hA.coeffWeakGrad hη U f‖
+      ≤ K * (1 + (n + 1) * Cg) * (‖f‖ + ‖U 0‖) := by
+    refine (hK hζ hζη U f).trans ?_
+    have h := mul_le_mul_of_nonneg_left hG hK0
+    nlinarith [h, mul_nonneg hK0 hU0]
   have h1 := norm_nonneg (restrictL2 (Ω := V) (extendL2 hΩm ((W : H1amb Ω) i.succ)))
   have h2 := norm_nonneg (restrictL2 (Ω := V) (extendL2 hΩm ((W : H1amb Ω) 0)))
-  have hf0 := norm_nonneg f
-  have hU0 := norm_nonneg U
   calc ‖wki‖ ≤ C * (‖redDatum Op hA.coeffWeakGrad hη U f‖ + ‖(W : H1amb Ω) 0‖) := by linarith
-    _ ≤ C * (K * (‖f‖ + ‖U‖) + Mη * ‖U‖) :=
+    _ ≤ C * (K * (1 + (n + 1) * Cg) * (‖f‖ + ‖U 0‖) + Mη * ‖U 0‖) :=
         mul_le_mul_of_nonneg_left (add_le_add hF hW0) hC0
-    _ ≤ C * (K + Mη) * (‖f‖ + ‖U‖) := by
-        rw [mul_assoc]
-        exact mul_le_mul_of_nonneg_left (by nlinarith) hC0
+    _ ≤ C * ((K * (1 + (n + 1) * Cg) + Mη) * (‖f‖ + ‖U 0‖)) :=
+        mul_le_mul_of_nonneg_left (by nlinarith [mul_nonneg hMη hf0]) hC0
+    _ = C * (K * (1 + (n + 1) * Cg) + Mη) * (‖f‖ + ‖U 0‖) := by ring
 
 end EllipticPdes.Regularity

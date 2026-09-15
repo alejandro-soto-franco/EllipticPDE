@@ -267,6 +267,10 @@ import EllipticPdes
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Regularity.reduction_weakForm
 
+/-- info: 'EllipticPdes.Regularity.caccioppoli_W12' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.caccioppoli_W12
+
 /-- info: 'EllipticPdes.Regularity.interior_H2_estimate_W12' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Regularity.interior_H2_estimate_W12
