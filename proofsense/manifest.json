@@ -52,7 +52,7 @@
       "decl": "EllipticPdes.Sobolev.FullEllipticOp.weak_solution_L2_of_nonneg_zeroth_of_bounded",
       "source_id": "evans-2010",
       "locator": "§6.2.2 Thm 3",
-      "claim": "formalises the theorem at the shift mu = 0, for the operator with b = 0 and c >= 0 almost everywhere on an arbitrary bounded Omega, over the solution space H_0^1(Omega) that Evans also takes: every f in L^2(Omega) admits a unique weak solution, with the a-priori bound ‖u‖_{H_0^1} <= (C_P + 1)/lambda · ‖f‖_{L^2}. Evans reaches gamma = 0 for exactly these coefficients in the Examples following the theorem, and states no bound. The Poincare constant is quantified before the datum, so it depends on Omega alone. dirichlet_weak_solution carries the same locator for the pure Dirichlet form"
+      "claim": "formalises the theorem at the shift mu = 0, for the operator with b = 0 and c >= 0 almost everywhere on an arbitrary bounded Omega, over the solution space H_0^1(Omega) that Evans also takes: every f in L^2(Omega) admits a unique weak solution, with the a-priori bound ‖u‖_{H_0^1} <= (C_P + 1)/lambda · ‖f‖_{L^2}. Evans reaches gamma = 0 for exactly these coefficients in the Examples following the theorem, and states no bound. The Poincare constant is quantified before the datum, so it depends on Omega alone. poisson_weak_solution carries the same locator for the pure Dirichlet form"
     },
     {
       "decl": "EllipticPdes.Sobolev.FullEllipticOp.fredholm_alternative",

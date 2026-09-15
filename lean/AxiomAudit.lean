@@ -23,9 +23,9 @@ import EllipticPdes
 
 /-! ### Existence and uniqueness -/
 
-/-- info: 'EllipticPdes.dirichlet_weak_solution' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'EllipticPdes.poisson_weak_solution' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
-#print axioms EllipticPdes.dirichlet_weak_solution
+#print axioms EllipticPdes.poisson_weak_solution
 
 /-- info: 'EllipticPdes.Sobolev.FullEllipticOp.existence_three_of_bounded' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in

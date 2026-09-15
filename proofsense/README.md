@@ -81,7 +81,7 @@ that run.
 
 ## Known divergence
 
-`dirichlet_weak_solution` cites Evans §6.2.2 Theorem 3, the First Existence
+`poisson_weak_solution` cites Evans §6.2.2 Theorem 3, the First Existence
 Theorem, which states that there is `γ ≥ 0` such that for every `μ ≥ γ` and
 every `f ∈ L²(U)` the problem `Lu + μu = f` has a unique weak solution, for the
 general operator `L`. The declaration proves Lax-Milgram existence for

@@ -39,7 +39,7 @@ MANIFEST = ROOT / "proofsense" / "manifest.json"
 # that no transcribed statement matches it, which the README under
 # proofsense/ has to justify in prose.
 EXEMPT = {
-    "EllipticPdes.dirichlet_weak_solution": (
+    "EllipticPdes.poisson_weak_solution": (
         "the Lax-Milgram theorem at the form of the Laplacian. Evans applies it to that form "
         "in the example opening 6.2.2 and numbers nothing there, and his 6.2.2 Theorem 3 is the "
         "shifted statement rather than this one; the general theorem is warranted at lax_milgram"

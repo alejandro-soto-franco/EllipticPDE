@@ -147,7 +147,7 @@ status:
       axioms: ["propext", "Classical.choice", "Quot.sound"]
       comparator_config: "comparator.json"
       literature_dependencies: []
-    - declaration: "EllipticPdes.dirichlet_weak_solution"
+    - declaration: "EllipticPdes.poisson_weak_solution"
       file: "EllipticPdes/Existence/Existence.lean"
       sorry_count: 0
       axioms: ["propext", "Classical.choice", "Quot.sound"]
