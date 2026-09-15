@@ -26,9 +26,9 @@ against test functions compactly supported in the region rather than against eve
   coefficients `localOp` supplies and a smooth compactly supported datum, cut off from the
   original by the same cutoff.
 
-Neither bridge touches the global weak formulation against every member of `H01 Ω`: that is the
-remaining interface between a local weak solution and `interior_smooth`, left to a later module
-that connects `LocalWeakSol` to a predicate `IsLocalWeakSolution` on the ambient space.
+Neither bridge touches the global weak formulation against every member of `H01 Ω`.
+`Regularity/Local/WeakSolution.lean` connects `LocalWeakSol` to the predicate
+`IsLocalWeakSolution` on the ambient space, through which `interior_smooth_W12` applies.
 
 ## Main declarations
 
@@ -138,8 +138,8 @@ theorem datum_cutoff {U : Set (EuclideanSpace ℝ (Fin d))} (hU : IsOpen U)
 /-- **Local weak solution on `W`, on plain function representatives.** `u` with gradient `G`,
 tested against smooth functions compactly supported in `W`. This is the plain-integral shape
 Evans §6.3.1 states the equation in, ahead of the `H01`-and-`fullBilin` formulation
-`interior_smooth` asks for; a later module connects it to a predicate `IsLocalWeakSolution` on
-the ambient space. -/
+`interior_smooth` asks for; `isLocalWeakSolution_iff_localWeakSol` connects it to the predicate
+`IsLocalWeakSolution` on the ambient space. -/
 def LocalWeakSol (W : Set (EuclideanSpace ℝ (Fin d)))
     (a : EuclideanSpace ℝ (Fin d) → Fin d → Fin d → ℝ) (b : EuclideanSpace ℝ (Fin d) → Fin d → ℝ)
     (c f u : EuclideanSpace ℝ (Fin d) → ℝ) (G : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) : Prop :=
