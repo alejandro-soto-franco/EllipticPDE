@@ -1402,13 +1402,13 @@
       "decl": "EllipticPdes.Regularity.interior_H2_estimate_W12",
       "source_id": "evans-2010",
       "locator": "§6.3.1 Thm 1",
-      "claim": "formalises the cited theorem in per-pair form for a weak solution in H^1(Omega) with no boundary condition: the solution is an element U of W12 Omega, the ambient encoding of H^1(Omega), with B[U, phi] = (f, phi) for every test function phi of the open set Omega, which by density is Evans's identity against every v in H_0^1(Omega). For each pair of directions the weak derivative of the first partial of U exists on a compact subset V of Omega and is bounded by C(‖f‖_{L^2(Omega)} + ‖U_0‖_{L^2(Omega)}), with the constant quantified before the solution and the datum; summing over the pairs gives Evans's estimate. One difference from the cited statement remains: the coefficient bundle is global on R^n with a^{ij} of class C^1 with bounded derivatives and b, c bounded, where the cited hypothesis is a^{ij} in C^1(U) and b, c in L^infinity(U). The proof reduces to interior_H2_estimate through the cutoff eta U, which lies in H_0^1(Omega) and solves an equation with an L^2 datum, and caccioppoli_W12 removes the gradient of U from the bound on that datum"
+      "claim": "formalises the cited theorem in per-pair form for a weak solution in H^1(Omega) with no boundary condition: the solution is an element U of W12 Omega, the ambient encoding of H^1(Omega), with B[U, phi] = (f, phi) for every test function phi of the open set Omega, which by density is Evans's identity against every v in H_0^1(Omega). For each pair of directions the weak derivative of the first partial of U exists on a compact subset V of Omega and is bounded by C(‖f‖_{L^2(Omega)} + ‖U_0‖_{L^2(Omega)}), with the constant quantified before the solution and the datum; summing over the pairs gives Evans's estimate. The coefficient bundle is global on R^n with a^{ij} of class C^1 with bounded derivatives and b, c bounded, where the cited hypothesis is a^{ij} in C^1(U) and b, c in L^infinity(U); interior_H2_regularity_evans states the cited theorem with those hypotheses and the H^2(V) norm. The proof reduces to interior_H2_estimate through the cutoff eta U, which lies in H_0^1(Omega) and solves an equation with an L^2 datum, and caccioppoli_W12 removes the gradient of U from the bound on that datum"
     },
     {
       "decl": "EllipticPdes.Regularity.higher_interior_regularity_W12",
       "source_id": "evans-2010",
       "locator": "§6.3.1 Thm 2",
-      "claim": "formalises the cited theorem for a weak solution in H^1(Omega) with no boundary condition: an element U of W12 Omega, the ambient encoding of H^1(Omega), with B[U, phi] = (f, phi) for every test function phi of the open set Omega. For a datum with k weak derivatives in L^2(Omega) bounded by M, the function coordinate of U has weak derivatives of every order up to k + 2 on each compact subset V of Omega, each bounded by C(M + ‖U_0‖_{L^2(Omega)}), with C quantified before the solution and the datum, which is Evans's estimate. The coefficients are a global bundle on R^n with a^{ij} in W^{k+1,infinity} and of class C^1 with bounded derivatives, and b, c in W^{k,infinity}; Evans asks C^{m+1}(U) for all three, so the order asked of a^{ij} is his at m = k and the order asked of b and c is one less. The conclusion is stated as weak derivatives with a bound on each compact subset, the encoding of H^{k+2}_loc here. The proof applies higher_interior_regularity to the cutoff eta U in H_0^1(Omega) by induction on k, the datum of eta U having k weak derivatives once the coordinates of U have them on the support of eta"
+      "claim": "formalises the cited theorem for a weak solution in H^1(Omega) with no boundary condition: an element U of W12 Omega, the ambient encoding of H^1(Omega), with B[U, phi] = (f, phi) for every test function phi of the open set Omega. For a datum with k weak derivatives in L^2(Omega) bounded by M, the function coordinate of U has weak derivatives of every order up to k + 2 on each compact subset V of Omega, each bounded by C(M + ‖U_0‖_{L^2(Omega)}), with C quantified before the solution and the datum, which is Evans's estimate. The coefficients are a global bundle on R^n with a^{ij} in W^{k+1,infinity} and of class C^1 with bounded derivatives, and b, c in W^{k,infinity}; Evans asks C^{m+1}(U) for all three, so the order asked of a^{ij} is his at m = k and the order asked of b and c is one less. The conclusion is stated as weak derivatives with a bound on each compact subset, the encoding of H^{k+2}_loc here; higher_interior_regularity_evans states the cited theorem with the coefficients on U and the H^{m+2}(V) norm. The proof applies higher_interior_regularity to the cutoff eta U in H_0^1(Omega) by induction on k, the datum of eta U having k weak derivatives once the coordinates of U have them on the support of eta"
     },
     {
       "decl": "EllipticPdes.Regularity.interior_smooth_W12",
@@ -1439,6 +1439,18 @@
       "source_id": "guo-2026",
       "locator": "§VIII.3 Thm VIII.3.2",
       "claim": "formalises the cited theorem for a solution with zero boundary values, with the coefficient orders of the source, a^{i,j} in W^{k+1,infinity} and b^i, c in W^{k,infinity}, the principal coefficients also of class C^1 with bounded derivatives, and the coefficient bundle global on R^n: a weak solution in H_0^1(Omega) of L u = f with f having k weak derivatives in L^2(Omega) bounded by M has weak derivatives to order k + 2 on every compact subset V of Omega, each bounded by C(M + ‖u‖_{L^2(Omega)}), with C quantified before the solution and the datum. The proof is by induction on k, differentiating the equation once per step as the cited proof differentiates it by a multi-index of length k + 1"
+    },
+    {
+      "decl": "EllipticPdes.Regularity.interior_H2_regularity_evans",
+      "source_id": "evans-2010",
+      "locator": "§6.3.1 Thm 1",
+      "claim": "formalises the cited theorem with its hypotheses as stated: U is a bounded open subset of R^n for any n >= 0, a^{ij} is C^1 on U with no bound, b^i and c lie in L^infinity(U), the operator is uniformly elliptic with a constant theta > 0 for almost every x in U as in §6.1.1 (4), a^{ij} = a^{ji} on U, f lies in L^2(U), and u in H^1(U) is given as a function u with a weak gradient G on U, both in L^2(U). For every open V with compact closure inside U there is a constant C, fixed before f and u, such that every weak solution u of L u = f in U has weak derivatives up to order two in L^2(V) with ‖u‖_{H^2(V)} <= C(‖f‖_{L^2(U)} + ‖u‖_{L^2(U)}); since V is arbitrary this is also u in H^2_loc(U). Three differences of form remain. The H^2(V) norm is iteratedNorm, the square root of the sum of the squared L^2(V) norms of the derivatives indexed by lists of directions of length at most two, which counts a mixed derivative once per ordering and is equivalent to Evans's multi-index norm with constants depending on n alone. The weak formulation is B[u, v] = (f, v) for every v in C_c^infinity(U), the form of Remark (ii) after the theorem; Evans's §6.1.2 definition tests against H_0^1(U) for coefficients in L^infinity(U), which a^{ij} in C^1(U) need not be, and a solution in that sense is one here. The boundedness of U and the symmetry of a^{ij} enter only because Evans assumes them and are not used. The proof localises the coefficients to an open W between the closure of V and U (exists_localOp_C1), applies the local chain at order zero there (localRegularityAt_zero_of_isC1Coeff) and transfers the family to V (exists_family_of_localWeakSol)"
+    },
+    {
+      "decl": "EllipticPdes.Regularity.higher_interior_regularity_evans",
+      "source_id": "evans-2010",
+      "locator": "§6.3.1 Thm 2",
+      "claim": "formalises the cited theorem with its hypotheses as stated: m is a nonnegative integer, U is a bounded open subset of R^n for any n >= 0, a^{ij}, b^i and c are C^{m+1} on U with no bound, the operator is uniformly elliptic with a constant theta > 0 for almost every x in U as in §6.1.1 (4), a^{ij} = a^{ji} on U, f lies in H^m(U), given as f in L^2(U) with a family of weak derivatives up to order m in L^2(U), and u in H^1(U) is given as a function u with a weak gradient G on U, both in L^2(U). For every open V with compact closure inside U there is a constant C, fixed before f and u, such that every weak solution u of L u = f in U has weak derivatives up to order m + 2 in L^2(V) with ‖u‖_{H^{m+2}(V)} <= C(‖f‖_{H^m(U)} + ‖u‖_{L^2(U)}); since V is arbitrary this is also u in H^{m+2}_loc(U). Both Sobolev norms are iteratedNorm, the sum over lists of directions, equivalent to Evans's multi-index norm with constants depending on n and the order alone. The weak formulation is tested against C_c^infinity(U), which a solution tested against H_0^1(U) satisfies. The boundedness of U and the symmetry of a^{ij} enter only because Evans assumes them and are not used. The proof localises the coefficients to an open W between the closure of V and U (exists_localOp_Ck), applies higher_interior_regularity_W12 at order m there, which asks a^{ij} in W^{m+1,infinity} and C^1 and b, c in W^{m,infinity}, and transfers the family to V"
     }
   ],
   "source_divergences": [
@@ -1449,7 +1461,7 @@
         "H^1 (not H_0^1)",
         "L^infinity"
       ],
-      "note": "Evans supposes u in H^1(U) and his Remark (i) says no boundary condition is needed; every declaration of the interior chain takes the solution in H_0^1(Omega). His b^i, c in L^infinity(U) are local where the coefficient bundle is global on R^n."
+      "note": "Evans supposes u in H^1(U) and his Remark (i) says no boundary condition is needed; the H_0^1 chain (interior_H2_estimate) takes the solution in H_0^1(Omega), and the W12 chain (interior_H2_estimate_W12) removes that. His a^{ij} in C^1(U) and b^i, c in L^infinity(U) are local where the coefficient bundle of both chains is global on R^n; interior_H2_regularity_evans takes them on U."
     },
     {
       "source_id": "evans-2010",
@@ -1458,7 +1470,7 @@
         "H^1 (not H_0^1)",
         "L^infinity"
       ],
-      "note": "As at §6.3.1 Theorem 1: the solution is taken in H_0^1(Omega) where Evans supposes u in H^1(U), and the coefficient bundle is global."
+      "note": "As at §6.3.1 Theorem 1: the H_0^1 chain takes the solution in H_0^1(Omega) and a global coefficient bundle; higher_interior_regularity_W12 takes u in H^1, and higher_interior_regularity_evans takes the coefficients in C^{m+1}(U)."
     },
     {
       "source_id": "evans-2010",
@@ -1467,7 +1479,7 @@
         "H^1 (not H_0^1)",
         "L^infinity"
       ],
-      "note": "As at §6.3.1 Theorem 1: the solution is taken in H_0^1(Omega) where Evans supposes u in H^1(U)."
+      "note": "As at §6.3.1 Theorem 1: the H_0^1 chain (interior_smooth) takes the solution in H_0^1(Omega) where Evans supposes u in H^1(U); interior_smooth_global_W12 takes u in H^1, and exists_contDiffOn_of_weakSolution_evans takes Evans's hypotheses on U."
     },
     {
       "source_id": "evans-2010",

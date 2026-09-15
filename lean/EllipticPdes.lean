@@ -68,6 +68,9 @@ import EllipticPdes.Regularity.Local.Datum
 import EllipticPdes.Regularity.Local.HigherInterior
 import EllipticPdes.Regularity.Local.InteriorSmooth
 import EllipticPdes.Regularity.Local.Evans
+import EllipticPdes.Regularity.Localise.FiniteOrder
+import EllipticPdes.Regularity.IteratedNorm
+import EllipticPdes.Regularity.Local.Classical
 import EllipticPdes.Regularity.ClassicalSolvability
 import EllipticPdes.Regularity.PointwiseEquation
 import EllipticPdes.Regularity.InteriorHolderFinite
