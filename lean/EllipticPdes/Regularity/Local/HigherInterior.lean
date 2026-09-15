@@ -37,7 +37,9 @@ The bound has `‖U₀‖_{L²(Ω)}` on the right, as in Evans.
 * `LocalRegularityAt`: the order-`k` conclusion for local weak solutions.
 * `LocalFamiliesAt`: the order-`k` hypothesis on the coordinates of the solution.
 * `localRegularityAt_of_localFamiliesAt`, `localFamiliesAt_zero`, `localFamiliesAt_succ`.
-* `higher_interior_regularity_W12`: the theorem.
+* `higher_interior_regularity_W12`: the theorem, with `a^{ij} ∈ W^{k+1,∞}` and `C¹`, and
+  `b^i, c ∈ W^{k,∞}`.
+* `localRegularityAt_zero_of_isC1Coeff`: order zero from `C¹` principal coefficients alone.
 -/
 
 open MeasureTheory Filter Topology
@@ -163,7 +165,7 @@ and the conclusion for `η U` on `V` is the conclusion for `U`. -/
 theorem localRegularityAt_of_localFamiliesAt (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
     (hA1 : IsC1Coeff Op.toEllipticCoeff) {k : ℕ}
-    (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 3)) (hbc : IsWkInftyLower Op (k + 2))
+    (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 1)) (hbc : IsWkInftyLower Op k)
     (hfam : LocalFamiliesAt Op hΩm k) :
     LocalRegularityAt Op hΩm k := by
   classical
@@ -172,10 +174,9 @@ theorem localRegularityAt_of_localFamiliesAt (Op : FullEllipticOp (n + 1))
   obtain ⟨η, hη, hη1, -⟩ := exists_isTestFn_one_nhdsSet_of_isCompact hVc hΩo hVΩ
   have hWm : MeasurableSet (tsupport η) := (isClosed_tsupport η).measurableSet
   have hηW : IsTestFn (tsupport η) η := ⟨hη.1, hη.2.1, subset_rfl⟩
-  have hA' : IsWkInftyCoeff Op.toEllipticCoeff (k + 1) := hA.mono (by omega)
   obtain ⟨CW, hCW0, hW⟩ := hfam hη.2.1 hη.2.2
   obtain ⟨K, hK0, hDat⟩ :=
-    exists_reductionDatum Op hΩm hWm hη.2.2 hA' (hbc.mono (by omega)) hηW
+    exists_reductionDatum Op hΩm hWm hη.2.2 hA hbc hηW
   obtain ⟨CV, hCV0, hH01⟩ := higher_interior_regularity Op hΩm hΩo hA1 k hA hbc hVc hVΩ
   obtain ⟨Mη, hMη⟩ := exists_abs_bound hη
   have hMη0 : 0 ≤ Mη := le_trans (abs_nonneg _) (hMη 0)
@@ -194,7 +195,7 @@ theorem localRegularityAt_of_localFamiliesAt (Op : FullEllipticOp (n + 1))
       Op.fullBilin Ω ⟨cutoffMul hη U, cutoffMul_mem_H01_of_mem_W12 hΩo hη hsol.1⟩ w
         = ∫ x in Ω, (F x : ℝ) * ((w : H1amb Ω) 0 x : ℝ) := by
     refine weakForm_of_testFn Op _ F (fun v hv => ?_)
-    rw [reduction_testFn Op hΩo hA'.coeffWeakGrad hsol hη hv, hFpair v hv.1 hv.2.1]
+    rw [reduction_testFn Op hΩo hA.coeffWeakGrad hsol hη hv, hFpair v hv.1 hv.2.1]
   obtain ⟨hu, hub⟩ := hH01 ⟨cutoffMul hη U, cutoffMul_mem_H01_of_mem_W12 hΩo hη hsol.1⟩ F
     (K * B) HF hFbd hweak
   refine ⟨hu.congr (restrictL2_extendL2_cutoffMul hΩm hVm hVΩ hη hη1 U 0), ?_⟩
@@ -210,17 +211,39 @@ theorem localRegularityAt_of_localFamiliesAt (Op : FullEllipticOp (n + 1))
   rw [mul_assoc]
   exact mul_le_mul_of_nonneg_left h1 hCV0
 
+/-- An essentially bounded measurable function is in `W^{0,∞}`: the family is constant and no
+weak derivative is asked. -/
+def isWkInftyZero {f : EuclideanSpace ℝ (Fin (n + 1)) → ℝ} (hf : Measurable f) {M : ℝ}
+    (hM0 : 0 ≤ M) (hM : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin (n + 1)))), |f x| ≤ M) :
+    IsWkInfty f 0 where
+  D _ := f
+  D_nil := rfl
+  D_meas _ _ := hf
+  D_step _ _ h := absurd h (Nat.not_lt_zero _)
+  bound _ := M
+  bound_nonneg _ := hM0
+  ess_bdd _ _ := hM
+
+/-- The lower-order coefficients of every `FullEllipticOp` are in `W^{0,∞}`. -/
+def isWkInftyLowerZero (Op : FullEllipticOp (n + 1)) : IsWkInftyLower Op 0 where
+  bReg i := isWkInftyZero (Op.b_meas i) Op.Bsup_nonneg (Op.b_bdd i)
+  cReg := isWkInftyZero Op.c_meas Op.Csup_nonneg Op.c_bdd
+  bound _ := max Op.Bsup Op.Csup
+  bound_nonneg _ := le_max_of_le_left Op.Bsup_nonneg
+  b_le _ _ := le_max_left _ _
+  c_le _ := le_max_right _ _
+
 /-- **Higher interior regularity for a weak solution in `H¹` (Evans, *Partial Differential
 Equations* (2nd ed.), §6.3.1, Theorem 2, p. 332).** A local weak solution `U ∈ W12 Ω` of
-`L U = f`, with no boundary condition, `W^{k+3,∞}` principal coefficients, `W^{k+2,∞}`
-lower-order coefficients and a datum with `k` weak derivatives bounded by `M`, has weak
+`L U = f`, with no boundary condition, `W^{k+1,∞}` principal coefficients of class `C¹`,
+`W^{k,∞}` lower-order coefficients and a datum with `k` weak derivatives bounded by `M`, has weak
 derivatives of every order up to `k + 2` on each compact `V ⊆ Ω`, bounded by `C (M + ‖U₀‖)`
 with `C` quantified before the solution and the datum. -/
 theorem higher_interior_regularity_W12 (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
     (hA1 : IsC1Coeff Op.toEllipticCoeff) (k : ℕ)
-    (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 3))
-    (hbc : IsWkInftyLower Op (k + 2)) :
+    (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 1))
+    (hbc : IsWkInftyLower Op k) :
     LocalRegularityAt Op hΩm k := by
   induction k with
   | zero =>
@@ -229,5 +252,16 @@ theorem higher_interior_regularity_W12 (Op : FullEllipticOp (n + 1))
   | succ j ih =>
     exact localRegularityAt_of_localFamiliesAt Op hΩm hΩo hA1 hA hbc
       (localFamiliesAt_succ Op hΩm hΩo (ih (hA.mono (by omega)) (hbc.mono (by omega))))
+
+/-- **Order zero with `C¹` principal coefficients alone.** The interior `H²` conclusion for a
+local weak solution asks nothing of the lower-order coefficients beyond `FullEllipticOp`, and
+nothing of the principal part beyond a bounded derivative (Evans, *Partial Differential
+Equations* (2nd ed.), §6.3.1, Theorem 1, p. 327). -/
+theorem localRegularityAt_zero_of_isC1Coeff (Op : FullEllipticOp (n + 1))
+    {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
+    (hA1 : IsC1Coeff Op.toEllipticCoeff) :
+    LocalRegularityAt Op hΩm 0 :=
+  higher_interior_regularity_W12 Op hΩm hΩo hA1 0 hA1.toIsCkCoeff.toIsWkInftyCoeff
+    (isWkInftyLowerZero Op)
 
 end EllipticPdes.Regularity

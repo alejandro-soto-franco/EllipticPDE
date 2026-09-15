@@ -161,7 +161,7 @@ theorem interior_smooth (Op : FullEllipticOp (n + 1))
     intro k
     obtain ⟨hfk, M, hM⟩ := hf k
     obtain ⟨C, _hC0, hC⟩ :=
-      higher_interior_regularity Op hΩm hΩo hA1 k (hA (k + 3)) (hbc (k + 2)) hVc hVΩ
+      higher_interior_regularity Op hΩm hΩo hA1 k (hA (k + 1)) (hbc k) hVc hVΩ
     obtain ⟨hu, _⟩ := hC u f M hfk hM hweak
     exact ⟨hu.mono (by omega)⟩
   obtain ⟨u', hu'ae, hu'smooth⟩ := contDiffOn_interior_of_hasIteratedWeakDerivOn _ hall

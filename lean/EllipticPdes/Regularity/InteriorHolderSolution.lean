@@ -76,7 +76,8 @@ theorem interior_holder_of_weakSolution (Op : FullEllipticOp (n + 1))
         ∃ Mh : ℝ≥0, HolderOnWith Mh (1 / 2 : ℝ≥0) w (Metric.ball c r) := by
   -- The equation supplies `k + 1 + ⌊d/2⌋ + 2` orders of weak derivative on `V`.
   obtain ⟨C, _hC0, hC⟩ :=
-    higher_interior_regularity Op hΩm hΩo hA1 (k + 1 + (n + 1) / 2) hA hbc hVc hVΩ
+    higher_interior_regularity Op hΩm hΩo hA1 (k + 1 + (n + 1) / 2) (hA.mono (by omega))
+      (hbc.mono (by omega)) hVc hVΩ
   obtain ⟨hu, _hbound⟩ := hC u f M hfk hM hweak
   -- Guo's embedding at the order the ladder needs.
   obtain ⟨w, hwae, hwcn, hwhol⟩ :=

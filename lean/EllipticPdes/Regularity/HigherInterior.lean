@@ -20,15 +20,16 @@ import EllipticPdes.Regularity.CutoffDatum
 
 Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem VIII.3.2
 (*Higher Interior Regularity*, p. 65). For a weak solution `u` of `L u = f` with
-`a_{ij} ∈ W^{k+2,∞}`, `b_i, c ∈ W^{k+1,∞}` and `f ∈ H^k`, the solution lies in `H^{k+2}_loc`
+`a_{ij} ∈ W^{k+1,∞}`, `b_i, c ∈ W^{k,∞}` and `f ∈ H^k`, the solution lies in `H^{k+2}_loc`
 with
 
 `‖u‖_{H^{k+2}(V)} ≤ C (‖f‖_{H^k(Ω)} + ‖u‖_{L²(Ω)})` for every `V ⋐ Ω`,
 
 the constant depending on the data and the pair `V ⋐ Ω` and on neither `u` nor `f`. Evans,
-*Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 2 (p. 327) is the same statement
+*Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 2 (p. 332) is the same statement
 with `C^{k+1}` coefficients, which `IsCkCoeff.toIsWkInftyCoeff` shows to be the stronger
-hypothesis.
+hypothesis. The theorem below asks Guo's orders, together with `a_{ij} ∈ C¹` with a bounded
+derivative for the base case.
 
 ## Shape of the induction
 
@@ -177,7 +178,7 @@ step an induction. -/
 theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
     (hA1 : IsC1Coeff Op.toEllipticCoeff) {k : ℕ}
-    (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 3)) (hbc : IsWkInftyLower Op (k + 2))
+    (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 2)) (hbc : IsWkInftyLower Op (k + 1))
     (hk : InteriorRegularityAt Op hΩm k)
     {V : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hVc : IsCompact V) (hVΩ : V ⊆ Ω) :
     ∃ C : ℝ, 0 ≤ C ∧ ∀ (u : H01 Ω) (f : L2D Ω) (M : ℝ)
@@ -326,10 +327,10 @@ theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
         (hbc.cReg.ae_abs_D_singleton_le ℓ) hbc.cReg.measurable_self hbc.cReg.ae_abs_le
         (HuN.D []) (HuN.D [ℓ]) hξNt.1 hξNt.2.1 hv.1,
       Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ =>
-        setIntegral_add_weight_mul_cutoff (hA.D_meas i j [j, ℓ] (Nat.le_add_left 2 (k + 1)))
-          (hA.ess_bdd i j [j, ℓ] (Nat.le_add_left 2 (k + 1)))
-          (hA.D_meas i j [ℓ] (Nat.le_add_left 1 (k + 2)))
-          (hA.ess_bdd i j [ℓ] (Nat.le_add_left 1 (k + 2))) (HuN.D [i]) (HuN.D [j, i])
+        setIntegral_add_weight_mul_cutoff (hA.D_meas i j [j, ℓ] (Nat.le_add_left 2 k))
+          (hA.ess_bdd i j [j, ℓ] (Nat.le_add_left 2 k))
+          (hA.D_meas i j [ℓ] (Nat.le_add_left 1 (k + 1)))
+          (hA.ess_bdd i j [ℓ] (Nat.le_add_left 1 (k + 1))) (HuN.D [i]) (HuN.D [j, i])
           hξNt.1 hξNt.2.1 hv.1))]
     simp only [HuN.D_nil, Finset.sum_add_distrib]
     ring
@@ -396,8 +397,8 @@ entry of the assembled family needs and which no derivative bound supplies. -/
 theorem interiorRegularityAt_succ (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
     (hA1 : IsC1Coeff Op.toEllipticCoeff) {k : ℕ}
-    (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 3))
-    (hbc : IsWkInftyLower Op (k + 2)) (hk : InteriorRegularityAt Op hΩm k) :
+    (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 2))
+    (hbc : IsWkInftyLower Op (k + 1)) (hk : InteriorRegularityAt Op hΩm k) :
     InteriorRegularityAt Op hΩm (k + 1) := by
   classical
   intro V hVc hVΩ
@@ -429,26 +430,27 @@ theorem interiorRegularityAt_succ (Op : FullEllipticOp (n + 1))
 §6.3.1, Theorem 2, p. 332; Guo, *Partial Differential Equations I and II* (Course Lecture
 Notes), Theorem VIII.3.2, p. 65).** Evans states the result for `C^{m+1}` coefficients; the
 `W^{k,∞}` hypotheses below are Guo's, and nothing in the differentiated equation asks a
-coefficient to be continuous. A weak solution with `W^{k+2,∞}` principal coefficients,
-`W^{k+1,∞}` lower-order coefficients and an `H^k` datum has weak derivatives of every order up
-to `k + 2` on each compact `V ⋐ Ω`, bounded by the data with a constant quantified before the
-solution and the datum.
+coefficient to be continuous. A weak solution with `W^{k+1,∞}` principal coefficients of class
+`C¹`, `W^{k,∞}` lower-order coefficients and an `H^k` datum has weak derivatives of every order
+up to `k + 2` on each compact `V ⋐ Ω`, bounded by the data with a constant quantified before
+the solution and the datum.
 
-The coefficient hypotheses are asked at `k + 3` and `k + 2`, one order above the `k + 2` and
-`k + 1` the conclusion at a fixed `k` needs. The induction consumes one order per step and the
-statement is proved for every order at once; `IsWkInftyCoeff.mono` recovers the weaker form at
-any fixed `k`. -/
+The coefficient hypotheses are `W^{k+1,∞}` for `a_{ij}` and `W^{k,∞}` for `b_i, c`, with
+`a_{ij}` also `C¹` for the base case. The step to order `k + 1` differentiates the equation
+once: its datum pairs second derivatives of each `a_{ij}` and first derivatives of `b_i, c`
+against derivatives of `u` of order at most two, so an `H^k` datum asks `a_{ij} ∈ W^{k+2,∞}`
+and `b_i, c ∈ W^{k+1,∞}` (`exists_cutoffDatum`), and the induction hypothesis at order `k`
+asks no more. -/
 theorem higher_interior_regularity (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
     (hA1 : IsC1Coeff Op.toEllipticCoeff) (k : ℕ)
-    (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 3))
-    (hbc : IsWkInftyLower Op (k + 2)) :
+    (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 1))
+    (hbc : IsWkInftyLower Op k) :
     InteriorRegularityAt Op hΩm k := by
   induction k with
   | zero => exact interiorRegularityAt_zero Op hΩm hΩo hA1
   | succ j ih =>
-    refine interiorRegularityAt_succ (k := j) Op hΩm hΩo hA1 (hA.mono (by omega))
-      (hbc.mono (by omega)) ?_
-    exact ih (hA.mono (by omega)) (hbc.mono (by omega))
+    exact interiorRegularityAt_succ (k := j) Op hΩm hΩo hA1 hA hbc
+      (ih (hA.mono (by omega)) (hbc.mono (by omega)))
 
 end EllipticPdes.Regularity

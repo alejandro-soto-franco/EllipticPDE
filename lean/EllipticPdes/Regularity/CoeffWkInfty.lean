@@ -12,10 +12,9 @@ import EllipticPdes.Regularity.CoeffCk
 Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem VIII.3.2
 (*Higher Interior Regularity*, p. 65) runs the induction over `a_{ij} ∈ W^{k+1,∞}(Ω)` and
 `b_i, c ∈ W^{k,∞}(Ω)`, where Evans, *Partial Differential Equations* (2nd ed.), §6.3.1,
-Theorem 2 asks for `C^{m+1}`. The development here asks two derivatives more than Guo,
-`W^{k+3,∞}` and `W^{k+2,∞}`, which is the margin the induction consumes at each
-rung. This file states Guo's hypothesis: weak derivatives up to order `k`, each
-essentially bounded, with no continuity assumed anywhere.
+Theorem 2 asks for `C^{m+1}`. The development here asks `W^{k+1,∞}` for `a_{ij}` and
+`W^{k,∞}` for `b_i, c` (`higher_interior_regularity`). This file states the hypothesis: weak
+derivatives up to order `k`, each essentially bounded, with no continuity assumed anywhere.
 
 ## Choice of a new weak-derivative predicate
 

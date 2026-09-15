@@ -50,7 +50,7 @@ block the other, and only the symmetry of the mixed second derivatives identifie
 theorem exists_cutoffDatum (Op : FullEllipticOp (n + 1))
     {Ω N : Set (EuclideanSpace ℝ (Fin (n + 1)))}
     (hNm : MeasurableSet N) (hNΩ : N ⊆ Ω) {k : ℕ}
-    (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 3)) (hbc : IsWkInftyLower Op (k + 2))
+    (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 2)) (hbc : IsWkInftyLower Op (k + 1))
     {ξ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ} (hξ : IsTestFn N ξ) :
     ∃ K : ℝ, 0 ≤ K ∧ ∀ (ℓ : Fin (n + 1)) (uN Df : L2D N)
       (HuN : HasIteratedWeakDerivOn N (k + 2) uN)
