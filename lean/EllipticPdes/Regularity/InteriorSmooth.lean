@@ -12,7 +12,7 @@ import EllipticPdes.Embedding.SmoothOfGradClosed
 # Infinite differentiability in the interior
 
 Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 3 (*Infinite
-differentiability in the interior*, p. 331). Smooth coefficients and a smooth datum give a
+differentiability in the interior*, p. 334). Smooth coefficients and a smooth datum give a
 solution smooth in the interior, whatever the boundary does.
 
 The route is the one the chapter takes. Higher interior regularity, run at every order, puts
