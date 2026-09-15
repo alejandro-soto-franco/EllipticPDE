@@ -199,6 +199,26 @@ status:
       file: "EllipticPdes/Regularity/Localise/Datum.lean"
       sorry_count: 0
       axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "EllipticPdes.Regularity.cutoffMul_mem_H01_of_mem_W12"
+      file: "EllipticPdes/Regularity/Local/WeakSolution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "EllipticPdes.Regularity.IsLocalWeakSolution.weakForm"
+      file: "EllipticPdes/Regularity/Local/WeakSolution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "EllipticPdes.Regularity.isLocalWeakSolution_iff_localWeakSol"
+      file: "EllipticPdes/Regularity/Local/WeakSolution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "EllipticPdes.Regularity.reduction_weakForm"
+      file: "EllipticPdes/Regularity/Local/Reduction.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "EllipticPdes.Regularity.interior_H2_estimate_W12"
+      file: "EllipticPdes/Regularity/Local/InteriorH2.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
     - declaration: "EllipticPdes.Embedding.interior_holder_estimate"
       file: "EllipticPdes/Embedding/InteriorHolder.lean"
       sorry_count: 0

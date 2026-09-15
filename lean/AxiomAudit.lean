@@ -249,6 +249,28 @@ import EllipticPdes
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Regularity.localise
 
+/-! ### Weak solutions with no boundary condition -/
+
+/-- info: 'EllipticPdes.Regularity.cutoffMul_mem_H01_of_mem_W12' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.cutoffMul_mem_H01_of_mem_W12
+
+/-- info: 'EllipticPdes.Regularity.IsLocalWeakSolution.weakForm' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.IsLocalWeakSolution.weakForm
+
+/-- info: 'EllipticPdes.Regularity.isLocalWeakSolution_iff_localWeakSol' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.isLocalWeakSolution_iff_localWeakSol
+
+/-- info: 'EllipticPdes.Regularity.reduction_weakForm' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.reduction_weakForm
+
+/-- info: 'EllipticPdes.Regularity.interior_H2_estimate_W12' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.interior_H2_estimate_W12
+
 /-- info: 'EllipticPdes.Embedding.memLp_of_gradClosed_fullStep' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Embedding.memLp_of_gradClosed_fullStep

@@ -284,6 +284,29 @@ EXEMPT = {
         "it separately from the theorem it prepares; interior_smooth and interior_smooth_global "
         "carry the numbered conclusion this step localises the hypotheses of"
     ),
+    "EllipticPdes.Regularity.cutoffMul_mem_H01_of_mem_W12": (
+        "the admissibility of eta u in H_0^1(Omega) for u in H^1(Omega) and a smooth cutoff "
+        "eta compactly supported in the open set Omega. Evans uses it without comment "
+        "whenever a cutoff multiplies an H^1 function in the proof of 6.3.1 Theorem 1, and no "
+        "transcribed statement matches it as a lemma"
+    ),
+    "EllipticPdes.Regularity.IsLocalWeakSolution.weakForm": (
+        "extends the local weak formulation from test functions to every v in H_0^1(Omega) by "
+        "density of the test graphs. Evans states the weak formulation against H_0^1 "
+        "directly, so this is the identity between two readings of one definition and no "
+        "transcribed statement matches it"
+    ),
+    "EllipticPdes.Regularity.isLocalWeakSolution_iff_localWeakSol": (
+        "identifies the ambient local weak formulation with the plain-integral one on "
+        "representatives agreeing almost everywhere. It is bookkeeping between two encodings "
+        "of the definition of a weak solution in 6.1.2 and matches no transcribed statement"
+    ),
+    "EllipticPdes.Regularity.reduction_weakForm": (
+        "the equation solved by the cutoff eta u of a weak solution u in H^1(Omega), whose "
+        "datum is eta f together with the commutator terms of the cutoff against the "
+        "coefficients. Evans computes the same commutator inline in step 1 of the proof of "
+        "6.3.1 Theorem 1 and states no lemma for it"
+    ),
     "EllipticPdes.Embedding.not_isCompactOperator_critEmb": (
         "the sharpness of the range in 5.7 Theorem 1. Evans states compactness "
         "for q < p* and says nothing of the endpoint, and the scaling family "

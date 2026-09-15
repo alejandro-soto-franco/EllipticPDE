@@ -60,6 +60,9 @@ import EllipticPdes.Regularity.Localise.CutoffProduct
 import EllipticPdes.Regularity.Localise.LocalOp
 import EllipticPdes.Regularity.Localise.CompactEllipticity
 import EllipticPdes.Regularity.Localise.Datum
+import EllipticPdes.Regularity.Local.WeakSolution
+import EllipticPdes.Regularity.Local.Reduction
+import EllipticPdes.Regularity.Local.InteriorH2
 import EllipticPdes.Regularity.ClassicalSolvability
 import EllipticPdes.Regularity.PointwiseEquation
 import EllipticPdes.Regularity.InteriorHolderFinite
