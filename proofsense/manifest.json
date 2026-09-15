@@ -1420,7 +1420,13 @@
       "decl": "EllipticPdes.Regularity.interior_smooth_global_W12",
       "source_id": "evans-2010",
       "locator": "§6.3.1 Thm 3",
-      "claim": "formalises the cited theorem for a weak solution in H^1(Omega) with no boundary condition, an element U of W12 Omega with B[U, phi] = (f, phi) for every test function phi of the open set Omega: a single function smooth on all of Omega agrees almost everywhere on Omega with the function coordinate of U, which is Evans's u in C^infinity(U) for an L^2 class. The hypotheses differ from the cited ones in shape: the coefficients are a global bundle on R^n in W^{k,infinity} at every order with a^{ij} of class C^1 with bounded derivatives, and the datum has weak derivatives of every order in L^2(Omega), where Evans asks a^{ij}, b^i, c, f in C^infinity(U) with no bound."
+      "claim": "formalises the cited theorem for a weak solution in H^1(Omega) with no boundary condition, an element U of W12 Omega with B[U, phi] = (f, phi) for every test function phi of the open set Omega: a single function smooth on all of Omega agrees almost everywhere on Omega with the function coordinate of U, which is Evans's u in C^infinity(U) for an L^2 class. The hypotheses differ from the cited ones in shape: the coefficients are a global bundle on R^n in W^{k,infinity} at every order with a^{ij} of class C^1 with bounded derivatives, and the datum has weak derivatives of every order in L^2(Omega), where Evans asks a^{ij}, b^i, c, f in C^infinity(U) with no bound. exists_contDiffOn_of_localWeakSol removes that difference by localising coefficients and datum smooth on an open set"
+    },
+    {
+      "decl": "EllipticPdes.Regularity.exists_contDiffOn_of_localWeakSol",
+      "source_id": "evans-2010",
+      "locator": "§6.3.1 Thm 3",
+      "claim": "formalises the cited theorem on an open set U of R^n, n >= 1, with the classical hypotheses: the coefficients a^{ij}, b^i, c are C^infinity on U with no bound, and a^{ij} is uniformly elliptic almost everywhere on U with a constant lambda > 0 (SmoothOpOn), and f is C^infinity on U. The solution is a function u with a weak gradient G on U, both square-integrable on every compact subset of U, solving the weak formulation against every smooth test function compactly supported in U; this is u in H^1_loc(U), a weaker hypothesis than Evans's u in H^1(U). The conclusion is a function smooth on U agreeing with u almost everywhere on U, which is Evans's u in C^infinity(U) for a function defined up to a null set. The statement asks less than the cited one in two further places: U need not be bounded, where §6.3.1 assumes it, and a^{ij} need not be symmetric, where §6.1.1 assumes it. The dimension n = 0 is excluded. The proof localises coefficients and datum to a neighbourhood of each closed ball in U and applies interior_smooth_global_W12 there"
     }
   ],
   "source_divergences": [

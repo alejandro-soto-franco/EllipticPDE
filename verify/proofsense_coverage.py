@@ -321,6 +321,12 @@ EXEMPT = {
         "never separates two representatives of it, so no transcribed statement matches this "
         "identification"
     ),
+    "EllipticPdes.Regularity.isLocalWeakSolution_of_localWeakSol": (
+        "builds the ambient element of W12 Omega from square-integrable representatives of a "
+        "function and its weak gradient satisfying the plain weak formulation. It is the "
+        "identification of u in H^1(U) with the pair (u, Du) that Evans makes by definition "
+        "in 5.2.2, and no transcribed statement matches it"
+    ),
     "EllipticPdes.Embedding.not_isCompactOperator_critEmb": (
         "the sharpness of the range in 5.7 Theorem 1. Evans states compactness "
         "for q < p* and says nothing of the endpoint, and the scaling family "
