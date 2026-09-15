@@ -307,6 +307,20 @@ EXEMPT = {
         "coefficients. Evans computes the same commutator inline in step 1 of the proof of "
         "6.3.1 Theorem 1 and states no lemma for it"
     ),
+    "EllipticPdes.Regularity.exists_reductionDatum": (
+        "the datum of the cutoff equation for eta u at order k, with its k weak derivatives "
+        "and their bound, assembled from pieces each a cutoff against a W^{k,infinity} "
+        "coefficient against a coordinate of u. Evans reads the H^m bound of the "
+        "corresponding datum off the inductive hypothesis inline in step 2 of the proof of "
+        "6.3.1 Theorem 2 and states no lemma for it"
+    ),
+    "EllipticPdes.Regularity.exists_collarFamily_of_weakDerivOn": (
+        "identifies the first entries of an inductive family of weak derivatives on a compact "
+        "set with the gradient of the solution, where a cutoff is identically one, from a "
+        "weak derivative on the compact set alone. Evans writes D^alpha u as one symbol and "
+        "never separates two representatives of it, so no transcribed statement matches this "
+        "identification"
+    ),
     "EllipticPdes.Embedding.not_isCompactOperator_critEmb": (
         "the sharpness of the range in 5.7 Theorem 1. Evans states compactness "
         "for q < p* and says nothing of the endpoint, and the scaling family "

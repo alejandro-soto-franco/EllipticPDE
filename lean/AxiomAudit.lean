@@ -271,6 +271,26 @@ import EllipticPdes
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Regularity.interior_H2_estimate_W12
 
+/-- info: 'EllipticPdes.Regularity.exists_reductionDatum' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.exists_reductionDatum
+
+/-- info: 'EllipticPdes.Regularity.exists_collarFamily_of_weakDerivOn' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.exists_collarFamily_of_weakDerivOn
+
+/-- info: 'EllipticPdes.Regularity.higher_interior_regularity_W12' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.higher_interior_regularity_W12
+
+/-- info: 'EllipticPdes.Regularity.interior_smooth_W12' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.interior_smooth_W12
+
+/-- info: 'EllipticPdes.Regularity.interior_smooth_global_W12' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs (whitespace := lax) in
+#print axioms EllipticPdes.Regularity.interior_smooth_global_W12
+
 /-- info: 'EllipticPdes.Embedding.memLp_of_gradClosed_fullStep' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
 #print axioms EllipticPdes.Embedding.memLp_of_gradClosed_fullStep

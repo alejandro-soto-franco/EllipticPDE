@@ -219,6 +219,26 @@ status:
       file: "EllipticPdes/Regularity/Local/InteriorH2.lean"
       sorry_count: 0
       axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "EllipticPdes.Regularity.exists_reductionDatum"
+      file: "EllipticPdes/Regularity/Local/Datum.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "EllipticPdes.Regularity.exists_collarFamily_of_weakDerivOn"
+      file: "EllipticPdes/Regularity/Local/Datum.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "EllipticPdes.Regularity.higher_interior_regularity_W12"
+      file: "EllipticPdes/Regularity/Local/HigherInterior.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "EllipticPdes.Regularity.interior_smooth_W12"
+      file: "EllipticPdes/Regularity/Local/InteriorSmooth.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "EllipticPdes.Regularity.interior_smooth_global_W12"
+      file: "EllipticPdes/Regularity/Local/InteriorSmooth.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
     - declaration: "EllipticPdes.Embedding.interior_holder_estimate"
       file: "EllipticPdes/Embedding/InteriorHolder.lean"
       sorry_count: 0
