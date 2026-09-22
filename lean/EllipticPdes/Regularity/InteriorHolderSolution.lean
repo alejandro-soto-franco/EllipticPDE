@@ -59,7 +59,7 @@ two orders `higher_interior_regularity` supplies from the equation, so the dimen
 hypotheses and not the conclusion. -/
 theorem interior_holder_of_weakSolution (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
-    (hA1 : IsC1Coeff Op.toEllipticCoeff) (k : ℕ)
+    (hA1 : IsLipCoeff Op.toEllipticCoeff) (k : ℕ)
     (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 1 + (n + 1) / 2 + 3))
     (hbc : IsWkInftyLower Op (k + 1 + (n + 1) / 2 + 2))
     (u : H01 Ω) (f : L2D Ω) (M : ℝ)

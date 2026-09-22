@@ -240,7 +240,7 @@ theorem interior_H2_estimate_W12 {n : ℕ} (Op : FullEllipticOp (n + 1))
   obtain ⟨η, hη, hη1, -⟩ := exists_isTestFn_one_nhdsSet_of_isCompact hVc hΩo hVΩ
   obtain ⟨ζ, hζ, hζ1, -⟩ := exists_isTestFn_one_nhdsSet_of_isCompact hη.2.1 hΩo hη.2.2
   have hζη : Set.EqOn ζ 1 (tsupport η) := fun x hx => hζ1.self_of_nhdsSet x hx
-  obtain ⟨C, hC0, hC⟩ := interior_H2_estimate Op hΩm hΩo hA hVc hVΩ
+  obtain ⟨C, hC0, hC⟩ := interior_H2_estimate Op hΩm hΩo hA.toIsLipCoeff hVc hVΩ
   obtain ⟨K, hK0, hK⟩ := exists_norm_redDatum_le Op hA.coeffWeakGrad hη
   obtain ⟨Cg, hCg0, hCg⟩ := exists_norm_mulTest_grad_le Op hΩo hζ
   set Mη : ℝ := (exists_abs_bound hη).choose

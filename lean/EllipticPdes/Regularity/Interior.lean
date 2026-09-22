@@ -43,7 +43,7 @@ weak solution `u` of `L u = f` the whole-space extension of `ζ · ∂ᵢu` has 
 `interior_diffQuot_norm_bound`. Because `ζ ≡ 1` on `V`, the restriction of `w` to `V` is
 `∂ₖ∂ᵢu` there. -/
 theorem interior_secondWeakDeriv (Op : FullEllipticOp d) (hΩm : MeasurableSet Ω)
-    (hA : IsC1Coeff Op.toEllipticCoeff)
+    (hA : IsLipCoeff Op.toEllipticCoeff)
     {V : Set (EuclideanSpace ℝ (Fin d))} (T : CutoffTower Ω V) (k i : Fin d) :
     ∃ Cd : ℝ, 0 ≤ Cd ∧ ∀ (u : H01 Ω) (f : L2D Ω),
       (∀ w : H01 Ω, Op.fullBilin Ω u w
@@ -147,8 +147,8 @@ set_option maxHeartbeats 600000 in
 -- the tower definition and the difference-quotient bounds) exceeds the default `maxHeartbeats`.
 /-- **Interior H² estimate (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1;
 Gilbarg-Trudinger, *Elliptic Partial Differential Equations of Second Order*, Theorem 8.8).**
-For a weak solution `u ∈ H₀¹(Ω)` of `L u = f` with `C¹` principal coefficients
-and bounded transport and zeroth-order coefficients, and for any compact `V ⋐ Ω`,
+For a weak solution `u ∈ H₀¹(Ω)` of `L u = f` with `W^{1,∞}` principal coefficients,
+in the pointwise form of `IsLipCoeff`, and bounded transport and zeroth-order coefficients, and for any compact `V ⋐ Ω`,
 the second weak derivatives exist in `L²(V)` and are bounded by the data: for every direction
 pair `(k, i)` there is a weak `k`-derivative `wki` of `∂ᵢu` on `V` (that is, `∂ₖ∂ᵢu ∈ L²(V)`)
 with `‖∂ₖ∂ᵢu‖_{L²(V)} + ‖∂ᵢu‖_{L²(V)} + ‖u‖_{L²(V)} ≤ C (‖f‖ + ‖u‖)`. The constant is
@@ -157,7 +157,7 @@ quantified before the solution and the datum, so it depends only on the data
 the `L²`-level statement that `u ∈ H²_loc(Ω)` with the interior estimate. -/
 theorem interior_H2_estimate {n : ℕ} (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
-    (hA : IsC1Coeff Op.toEllipticCoeff)
+    (hA : IsLipCoeff Op.toEllipticCoeff)
     {V : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hVc : IsCompact V) (hVΩ : V ⊆ Ω) :
     ∃ C : ℝ, 0 ≤ C ∧ ∀ (u : H01 Ω) (f : L2D Ω),
       (∀ w : H01 Ω, Op.fullBilin Ω u w

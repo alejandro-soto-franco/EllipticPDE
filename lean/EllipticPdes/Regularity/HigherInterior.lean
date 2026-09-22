@@ -28,8 +28,7 @@ with
 the constant depending on the data and the pair `V ⋐ Ω` and on neither `u` nor `f`. Evans,
 *Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 2 (p. 332) is the same statement
 with `C^{k+1}` coefficients, which `IsCkCoeff.toIsWkInftyCoeff` shows to be the stronger
-hypothesis. The theorem below asks Guo's orders, together with `a_{ij} ∈ C¹` with a bounded
-derivative for the base case.
+hypothesis. The theorem below asks Guo's orders, together with `a_{ij} ∈ W^{1,∞}` for the base case.
 
 ## Shape of the induction
 
@@ -101,7 +100,7 @@ No constant is spent. The `H²` estimate bounds the sum of the three norms, so e
 bounded on its own, and `IteratedL2Bound.norm_le` supplies `‖f‖ ≤ M`. -/
 theorem interiorRegularityAt_zero (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
-    (hA : IsC1Coeff Op.toEllipticCoeff) :
+    (hA : IsLipCoeff Op.toEllipticCoeff) :
     InteriorRegularityAt Op hΩm 0 := by
   classical
   intro V hVc hVΩ
@@ -177,7 +176,7 @@ solution's membership of `H₀¹(Ω)`. Passing `hk` here rather than deriving it
 step an induction. -/
 theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
-    (hA1 : IsC1Coeff Op.toEllipticCoeff) {k : ℕ}
+    (hA1 : IsLipCoeff Op.toEllipticCoeff) {k : ℕ}
     (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 2)) (hbc : IsWkInftyLower Op (k + 1))
     (hk : InteriorRegularityAt Op hΩm k)
     {V : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hVc : IsCompact V) (hVΩ : V ⊆ Ω) :
@@ -396,7 +395,7 @@ is where the factor of two comes from, and the `+ 1` covers `‖u‖` itself, wh
 entry of the assembled family needs and which no derivative bound supplies. -/
 theorem interiorRegularityAt_succ (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
-    (hA1 : IsC1Coeff Op.toEllipticCoeff) {k : ℕ}
+    (hA1 : IsLipCoeff Op.toEllipticCoeff) {k : ℕ}
     (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 2))
     (hbc : IsWkInftyLower Op (k + 1)) (hk : InteriorRegularityAt Op hΩm k) :
     InteriorRegularityAt Op hΩm (k + 1) := by
@@ -430,20 +429,22 @@ theorem interiorRegularityAt_succ (Op : FullEllipticOp (n + 1))
 §6.3.1, Theorem 2, p. 332; Guo, *Partial Differential Equations I and II* (Course Lecture
 Notes), Theorem VIII.3.2, p. 65).** Evans states the result for `C^{m+1}` coefficients; the
 `W^{k,∞}` hypotheses below are Guo's, and nothing in the differentiated equation asks a
-coefficient to be continuous. A weak solution with `W^{k+1,∞}` principal coefficients of class
-`C¹`, `W^{k,∞}` lower-order coefficients and an `H^k` datum has weak derivatives of every order
+coefficient to be continuous. A weak solution with `W^{k+1,∞}` principal coefficients that are
+`W^{1,∞}`, `W^{k,∞}` lower-order coefficients and an `H^k` datum has weak derivatives of every order
 up to `k + 2` on each compact `V ⋐ Ω`, bounded by the data with a constant quantified before
 the solution and the datum.
 
 The coefficient hypotheses are `W^{k+1,∞}` for `a_{ij}` and `W^{k,∞}` for `b_i, c`, with
-`a_{ij}` also `C¹` for the base case. The step to order `k + 1` differentiates the equation
+`a_{ij}` also `W^{1,∞}` in the pointwise form of `IsLipCoeff` for the base case, which at
+`k = 0` is the whole of what the proof reads: `interiorRegularityAt_zero` takes `hA1` alone
+and the order-one bundle passed with it goes unused. The step to order `k + 1` differentiates the equation
 once: its datum pairs second derivatives of each `a_{ij}` and first derivatives of `b_i, c`
 against derivatives of `u` of order at most two, so an `H^k` datum asks `a_{ij} ∈ W^{k+2,∞}`
 and `b_i, c ∈ W^{k+1,∞}` (`exists_cutoffDatum`), and the induction hypothesis at order `k`
 asks no more. -/
 theorem higher_interior_regularity (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
-    (hA1 : IsC1Coeff Op.toEllipticCoeff) (k : ℕ)
+    (hA1 : IsLipCoeff Op.toEllipticCoeff) (k : ℕ)
     (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 1))
     (hbc : IsWkInftyLower Op k) :
     InteriorRegularityAt Op hΩm k := by

@@ -137,12 +137,17 @@ theorem contDiffOn_interior_of_hasIteratedWeakDerivOn
 in `W^{k,∞}` at every order and whose datum has weak derivatives of every order in `L²(Ω)`, the
 solution has a representative smooth on the interior of each compact `V ⋐ Ω`.
 
-Smooth coefficients meet the hypothesis through `IsCkCoeff.toIsWkInftyCoeff` and
-`IsWkInfty.ofContDiff`, so the classical statement with `a_{ij}, b_i, c, f ∈ C^∞(Ω)` follows as
-an instance. -/
+The principal part is asked for once more, as `W^{1,∞}` in the pointwise form of
+`IsLipCoeff`, which the base case of `higher_interior_regularity` reads and which no
+`W^{k,∞}` bundle supplies: the passage from an essential bound on a weak gradient to the
+pointwise Lipschitz estimate is the statement that a `W^{1,∞}` function has a Lipschitz
+representative, and Mathlib has Rademacher's theorem in the opposite direction alone. Smooth
+coefficients meet every hypothesis through `IsC1Coeff.toIsLipCoeff`,
+`IsCkCoeff.toIsWkInftyCoeff` and `IsWkInfty.ofContDiff`, so the classical statement with
+`a_{ij}, b_i, c, f ∈ C^∞(Ω)` follows as an instance. -/
 theorem interior_smooth (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
-    (hA1 : IsC1Coeff Op.toEllipticCoeff)
+    (hA1 : IsLipCoeff Op.toEllipticCoeff)
     (hA : ∀ k : ℕ, IsWkInftyCoeff Op.toEllipticCoeff k)
     (hbc : ∀ k : ℕ, IsWkInftyLower Op k)
     (u : H01 Ω) (f : L2D Ω)

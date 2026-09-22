@@ -22,6 +22,7 @@ import EllipticPdes.Existence.Garding
 import EllipticPdes.Regularity.Caccioppoli
 import EllipticPdes.Regularity.InteriorCompactSupport
 import EllipticPdes.Regularity.CoeffC1
+import EllipticPdes.Regularity.CoeffLip
 import EllipticPdes.Regularity.CoeffC2
 import EllipticPdes.Regularity.CoeffCk
 import EllipticPdes.Regularity.CoeffWkInfty

@@ -125,7 +125,7 @@ coordinate are handled by the first-order bound `‖Dₗ^h u‖ ≤ ‖∂ₗu�
 estimate are read off the tower margins (Evans, *Partial Differential Equations* (2nd ed.),
 §6.3.1). -/
 private lemma exists_cutoffMul_diffQuotG_norm_bound (Op : FullEllipticOp d)
-    (hΩm : MeasurableSet Ω) (hA : IsC1Coeff Op.toEllipticCoeff)
+    (hΩm : MeasurableSet Ω) (hA : IsLipCoeff Op.toEllipticCoeff)
     {V : Set (EuclideanSpace ℝ (Fin d))} (T : CutoffTower Ω V)
     (u : H01 Ω) (f : L2D Ω)
     (hu : ∀ w : H01 Ω, Op.fullBilin Ω u w
@@ -247,7 +247,7 @@ private lemma exists_cutoffMul_diffQuotG_norm_bound (Op : FullEllipticOp d)
 
 /-- **Cutoff of a directional derivative is admissible (Evans, *Partial Differential
 Equations* (2nd ed.), §6.3.1, Theorem 2, step 3).** For a weak solution `u ∈ H₀¹(Ω)` of
-`L u = f` with `C¹` principal coefficients and a cutoff tower `T` for `V ⋐ Ω`, the product
+`L u = f` with `W^{1,∞}` principal coefficients and a cutoff tower `T` for `V ⋐ Ω`, the product
 `ξ · ∂_ℓ u` of the middle tower cutoff with a directional derivative of `u` is again an element
 of `H₀¹(Ω)`: there is `W ∈ H₀¹(Ω)` whose function coordinate is `ξ · ∂_ℓ u`. Since `H₀¹(Ω)`
 sits inside the weak-gradient graph space, the gradient coordinates of `W` are then the weak
@@ -264,7 +264,7 @@ in `H₀¹(Ω)` by `cutoffMul_diffQuotG_mem_H01` and which is bounded in the gra
 of a Hilbert space equals its double orthogonal complement, and its function coordinate is
 pinned by the weak `L²` convergence `Dₗ^h u ⇀ ∂_ℓ u`. -/
 theorem exists_mem_H01_mulTest_gradient (Op : FullEllipticOp d)
-    (hΩm : MeasurableSet Ω) (hA : IsC1Coeff Op.toEllipticCoeff)
+    (hΩm : MeasurableSet Ω) (hA : IsLipCoeff Op.toEllipticCoeff)
     {V : Set (EuclideanSpace ℝ (Fin d))} (T : CutoffTower Ω V)
     (u : H01 Ω) (f : L2D Ω)
     (hu : ∀ w : H01 Ω, Op.fullBilin Ω u w
@@ -354,7 +354,7 @@ theorem exists_mem_H01_mulTest_gradient (Op : FullEllipticOp d)
 
 /-- **Cutoff derivative is an `H₀¹` function with its weak gradient (Evans, *Partial
 Differential Equations* (2nd ed.), §6.3.1, Theorem 2, step 3).** For a weak solution
-`u ∈ H₀¹(Ω)` of `L u = f` with `C¹` principal coefficients and a cutoff tower `T` for
+`u ∈ H₀¹(Ω)` of `L u = f` with `W^{1,∞}` principal coefficients and a cutoff tower `T` for
 `V ⋐ Ω`, the product `ξ · ∂_ℓ u` of the middle tower cutoff with a directional derivative of
 `u` is an element `W` of `H₀¹(Ω)`, and each gradient coordinate `W_{k+1}` of that element is
 the weak `k`-derivative of `ξ · ∂_ℓ u` on the whole space.
@@ -365,7 +365,7 @@ condition of its own. Because `ξ ≡ 1` on `tsupport ζ`, and `ζ ≡ 1` on `V`
 coordinate agrees with `∂_ℓ u` on a neighbourhood of `V`, so nothing is lost on the region of
 interest. -/
 theorem interior_cutoffGrad_mem_H01 (Op : FullEllipticOp d)
-    (hΩm : MeasurableSet Ω) (hA : IsC1Coeff Op.toEllipticCoeff)
+    (hΩm : MeasurableSet Ω) (hA : IsLipCoeff Op.toEllipticCoeff)
     {V : Set (EuclideanSpace ℝ (Fin d))} (T : CutoffTower Ω V)
     (u : H01 Ω) (f : L2D Ω)
     (hu : ∀ w : H01 Ω, Op.fullBilin Ω u w

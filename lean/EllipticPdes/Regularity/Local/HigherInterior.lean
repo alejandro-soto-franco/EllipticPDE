@@ -177,7 +177,7 @@ theorem localRegularityAt_of_localFamiliesAt (Op : FullEllipticOp (n + 1))
   obtain ⟨CW, hCW0, hW⟩ := hfam hη.2.1 hη.2.2
   obtain ⟨K, hK0, hDat⟩ :=
     exists_reductionDatum Op hΩm hWm hη.2.2 hA hbc hηW
-  obtain ⟨CV, hCV0, hH01⟩ := higher_interior_regularity Op hΩm hΩo hA1 k hA hbc hVc hVΩ
+  obtain ⟨CV, hCV0, hH01⟩ := higher_interior_regularity Op hΩm hΩo hA1.toIsLipCoeff k hA hbc hVc hVΩ
   obtain ⟨Mη, hMη⟩ := exists_abs_bound hη
   have hMη0 : 0 ≤ Mη := le_trans (abs_nonneg _) (hMη 0)
   refine ⟨CV * (K * (CW + 1) + Mη),

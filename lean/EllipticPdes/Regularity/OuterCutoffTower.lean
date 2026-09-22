@@ -56,7 +56,7 @@ square. The constant is quantified before the solution and the datum, so it depe
 operator and the tower. This is `interior_secondWeakDeriv` at `outerCutoffTower`, with the
 per-pair constants collected into one. -/
 theorem outer_secondWeakDeriv (Op : FullEllipticOp d) (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
-    (hA : IsC1Coeff Op.toEllipticCoeff) {V : Set (EuclideanSpace ℝ (Fin d))}
+    (hA : IsLipCoeff Op.toEllipticCoeff) {V : Set (EuclideanSpace ℝ (Fin d))}
     (T : CutoffTower Ω V) :
     ∃ C : ℝ, 0 ≤ C ∧ ∀ (u : H01 Ω) (f : L2D Ω),
       (∀ w : H01 Ω, Op.fullBilin Ω u w
@@ -88,7 +88,7 @@ regularity of `u` the differentiated equation consumes on the region where the c
 commutators live. -/
 theorem interior_H2_estimate_near_tsupport_xi {n : ℕ} (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
-    (hA : IsC1Coeff Op.toEllipticCoeff) {V : Set (EuclideanSpace ℝ (Fin (n + 1)))}
+    (hA : IsLipCoeff Op.toEllipticCoeff) {V : Set (EuclideanSpace ℝ (Fin (n + 1)))}
     (T : CutoffTower Ω V) :
     ∃ C : ℝ, 0 ≤ C ∧ ∀ (u : H01 Ω) (f : L2D Ω),
       (∀ w : H01 Ω, Op.fullBilin Ω u w

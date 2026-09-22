@@ -42,7 +42,7 @@ into a single function smooth on the whole open set `Ω`, rather than merely on 
 each compact subset in turn. -/
 theorem interior_smooth_global (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
-    (hA1 : IsC1Coeff Op.toEllipticCoeff)
+    (hA1 : IsLipCoeff Op.toEllipticCoeff)
     (hA : ∀ k : ℕ, IsWkInftyCoeff Op.toEllipticCoeff k)
     (hbc : ∀ k : ℕ, IsWkInftyLower Op k)
     (u : H01 Ω) (f : L2D Ω)

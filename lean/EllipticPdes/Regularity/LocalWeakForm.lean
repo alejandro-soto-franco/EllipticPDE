@@ -237,7 +237,7 @@ theorem differentiated_weakForm_of_weakSolution {n : ℕ} (Op : FullEllipticOp (
   classical
   have hVm : MeasurableSet V := hVc.isClosed.measurableSet
   obtain ⟨C, hC0, hest⟩ :=
-    interior_H2_estimate Op hΩm hΩo hA.toIsC1Coeff hVc hVΩ
+    interior_H2_estimate Op hΩm hΩo hA.toIsC1Coeff.toIsLipCoeff hVc hVΩ
   refine ⟨C, hC0, fun u f Df hf_Df hu => ?_⟩
   choose D2 hD2w hD2n using hest u f hu
   refine ⟨D2, hD2w, hD2n, fun φ hφc hφcs hφV => ?_⟩

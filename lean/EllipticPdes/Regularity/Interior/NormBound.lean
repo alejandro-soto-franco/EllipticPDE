@@ -86,7 +86,7 @@ Leibniz split localises the difference quotient onto the master energy bound
 operator bound `‖Dₖʰ g‖ ≤ 2‖g‖/|h|` closes it. This uniform bound is exactly the hypothesis of
 the weak-limit converse `weakDeriv_of_diffQuot_bounded`. -/
 theorem interior_diffQuot_norm_bound (Op : FullEllipticOp d) (hΩm : MeasurableSet Ω)
-    (hA : IsC1Coeff Op.toEllipticCoeff)
+    (hA : IsLipCoeff Op.toEllipticCoeff)
     {V : Set (EuclideanSpace ℝ (Fin d))} (T : CutoffTower Ω V) (k i : Fin d) :
     ∃ Cd : ℝ, 0 ≤ Cd ∧ ∀ (u : H01 Ω) (f : L2D Ω),
       (∀ w : H01 Ω, Op.fullBilin Ω u w

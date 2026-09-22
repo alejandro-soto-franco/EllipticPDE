@@ -40,7 +40,7 @@ open EllipticPdes.Sobolev
 
 /-- **Weak solution with a smooth interior representative.** On a bounded domain, for an
 operator with no transport term and a nonnegative zeroth-order coefficient, whose diffusion is
-`C¹` and whose coefficients lie in `W^{k,∞}` at every order, and for a datum with weak
+`W^{1,∞}` and whose coefficients lie in `W^{k,∞}` at every order, and for a datum with weak
 derivatives of every order bounded in `L²`, the Dirichlet problem has a weak solution whose
 class has a `C^∞` representative on the interior of every compact subset of the domain. -/
 theorem exists_weakSolution_interior_smooth {n : ℕ}
@@ -48,7 +48,7 @@ theorem exists_weakSolution_interior_smooth {n : ℕ}
     (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω) (hΩb : Bornology.IsBounded Ω)
     (hb : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
     (hc : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x)
-    (hA1 : IsC1Coeff Op.toEllipticCoeff)
+    (hA1 : IsLipCoeff Op.toEllipticCoeff)
     (hA : ∀ k : ℕ, IsWkInftyCoeff Op.toEllipticCoeff k)
     (hbc : ∀ k : ℕ, IsWkInftyLower Op k)
     (f : L2D Ω)

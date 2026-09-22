@@ -3,6 +3,7 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
+import EllipticPdes.Regularity.CoeffLip
 import EllipticPdes.Regularity.Interior.Support
 
 /-!
@@ -519,11 +520,11 @@ private lemma norm_mulTest_sq_le (hξ : IsTestFn Ω ξ) (g : L2D Ω) :
 /-- **`L²(Ω)` norm bound on the coefficient difference-quotient commutator.** The interior
 difference quotient of a coefficient-multiplied field splits into the translated coefficient
 acting on the field's difference quotient plus a commutator whose `L²(Ω)` norm is controlled
-by the `C¹` gradient bound `A₁`: `‖Dₖʰ(aᵢⱼ g) − (τ_{h eₖ}aᵢⱼ) Dₖʰ g‖ ≤ A₁ ‖g‖`. This is the
+by the Lipschitz constant `A₁`: `‖Dₖʰ(aᵢⱼ g) − (τ_{h eₖ}aᵢⱼ) Dₖʰ g‖ ≤ A₁ ‖g‖`. This is the
 discrete Leibniz split `coeFn_diffQuot_mul_coeff` measured at the restricted-domain level,
-its commutator coefficient bounded pointwise by `IsC1Coeff.abs_diffQuot_coeff_le` (Evans,
+its commutator coefficient bounded pointwise by `IsLipCoeff.abs_diffQuot_coeff_le` (Evans,
 *Partial Differential Equations* (2nd ed.), §6.3.1). -/
-private lemma norm_diffQuotD_actL_sub_le {A : EllipticCoeff d} (hA : IsC1Coeff A)
+private lemma norm_diffQuotD_actL_sub_le {A : EllipticCoeff d} (hA : IsLipCoeff A)
     (hΩm : MeasurableSet Ω) (i j k : Fin d) {h : ℝ} (hh : h ≠ 0) (g : L2D Ω) :
     ‖diffQuotD k h hΩm (A.actL i j g)
         - (A.translate (hshift k h)).actL i j (diffQuotD k h hΩm g)‖ ≤ hA.A1 * ‖g‖ := by
@@ -573,7 +574,7 @@ set_option maxHeartbeats 500000 in
 -- The final Young-absorption assembly chains the full toolkit (bilinear identity,
 -- ellipticity lower bound, five Cauchy-Schwarz/Peter-Paul term families) in one term, whose
 -- elaboration exceeds the default `maxHeartbeats`.
-/-- **Master interior difference-quotient energy estimate.** For a `C¹`-coefficient
+/-- **Master interior difference-quotient energy estimate.** For a `W^{1,∞}`-coefficient
 weak solution `u ∈ H₀¹(Ω)` of `L u = f`, an inner cutoff `ξ` and an
 outer cutoff `θ ≡ 1` on the shift-reachable part of `tsupport ξ²`, the cutoff-weighted energy
 of the interior difference quotient of the gradient is bounded by the data, uniformly in the
@@ -592,7 +593,7 @@ data
 (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1; Gilbarg-Trudinger, *Elliptic
 PDE of Second Order*, Theorem 8.8). -/
 theorem interior_diffQuot_energy_bound (Op : FullEllipticOp d) (hΩm : MeasurableSet Ω)
-    (hA : IsC1Coeff Op.toEllipticCoeff)
+    (hA : IsLipCoeff Op.toEllipticCoeff)
     (hξ : IsTestFn Ω ξ) (hθ : IsTestFn Ω θ) (k : Fin d) :
     ∃ C : ℝ, 0 ≤ C ∧ ∀ (u : H01 Ω) (f : L2D Ω),
       (∀ w : H01 Ω, Op.fullBilin Ω u w

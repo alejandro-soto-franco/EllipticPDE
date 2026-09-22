@@ -376,7 +376,7 @@ theorem exists_weakSolution_interior_classical {n : ℕ}
             -(∑ i, ∑ j, partialD j (fun y => Op.a y i j * partialD i u' y) x)
               + ∑ i, Op.b x i * partialD i u' x + Op.c x * u' x = f x := by
   obtain ⟨u, hu, u', hu', hsm⟩ :=
-    exists_weakSolution_interior_smooth Op hΩm hΩo hΩb hb hc hA1 hA hbc f hf hVc hVΩ
+    exists_weakSolution_interior_smooth Op hΩm hΩo hΩb hb hc hA1.toIsLipCoeff hA hbc f hf hVc hVΩ
   have hWΩ : interior V ⊆ Ω := interior_subset.trans hVΩ
   have hu'2 : u' =ᵐ[volume.restrict (interior V)] fun x => ((u : H1amb Ω) 0 : L2D Ω) x := by
     filter_upwards [hu', ae_restrict_of_ae (coeFn_extendL2 hΩm ((u : H1amb Ω) 0)),

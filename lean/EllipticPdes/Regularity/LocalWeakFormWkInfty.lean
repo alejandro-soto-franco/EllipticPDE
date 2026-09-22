@@ -15,9 +15,9 @@ principal and `C¹` lower-order coefficients. Guo, *Partial Differential Equatio
 (Course Lecture Notes), Theorem VIII.3.2 (p. 65) asks instead for `W^{k+2,∞}` and `W^{k+1,∞}`,
 and this file repeats the bridge under that hypothesis.
 
-One classical hypothesis remains, and it is not the one being removed. The interior `H²`
-estimate is proved by difference quotients against a `C¹` coefficient matrix, so `IsC1Coeff`
-is still asked for, exactly as `higher_interior_regularity` asks for it in its base case. What
+One hypothesis on the principal part remains beyond the bundles. The interior `H²`
+estimate is proved by difference quotients, which asks the Lipschitz estimate of
+`IsLipCoeff`, exactly as `higher_interior_regularity` asks for it in its base case. What
 the `W^{k,∞}` bundles remove is the second classical derivative of the principal part and the
 first of the lower-order coefficients.
 
@@ -48,7 +48,7 @@ localised weak identity. Only the
 weak derivative of `f` is left as a hypothesis, since Evans's datum (36) contains `D^α f`. -/
 theorem differentiated_weakForm_of_weakSolution_wkInfty {n : ℕ} (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
-    (hA1 : IsC1Coeff Op.toEllipticCoeff) {k m : ℕ}
+    (hA1 : IsLipCoeff Op.toEllipticCoeff) {k m : ℕ}
     (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 2)) (hbc : IsWkInftyLower Op (m + 1))
     (ℓ : Fin (n + 1))
     {V : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hVc : IsCompact V) (hVΩ : V ⊆ Ω) :
