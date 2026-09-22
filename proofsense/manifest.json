@@ -238,7 +238,7 @@
       "decl": "EllipticPdes.Regularity.interior_smooth",
       "source_id": "evans-2010",
       "locator": "§6.3.1 Thm 3",
-      "claim": "formalises the theorem for a weak solution quantified over H_0^1(Omega) rather than Evans' H^1(U), and for coefficients in W^{k,infty} at every order rather than C^infty: the solution has a representative smooth on the interior of each compact V inside Omega. Evans states u in C^infty(U) for smooth coefficients and datum, which is an instance through IsCkCoeff.toIsWkInftyCoeff and IsWkInfty.ofContDiff. The conclusion names a representative, an L^2 class having no pointwise values, and it is smooth on the interior of V rather than on V, since smoothness is a statement about an open set"
+      "claim": "formalises the theorem for a weak solution quantified over H_0^1(Omega) rather than Evans' H^1(U), and for coefficients in W^{k,infty} at every order rather than C^infty: the solution has a representative smooth on the interior of each compact V inside Omega. Evans states u in C^infty(U) for smooth coefficients and datum, which is an instance through IsC1Coeff.toIsLipCoeff, IsCkCoeff.toIsWkInftyCoeff and IsWkInfty.ofContDiff. Beside the bundles the declaration asks the principal coefficients Lipschitz, which the base case reads. The conclusion names a representative, an L^2 class having no pointwise values, and it is smooth on the interior of V rather than on V, since smoothness is a statement about an open set"
     },
     {
       "decl": "EllipticPdes.Regularity.interior_smooth_global",
@@ -280,7 +280,7 @@
       "decl": "EllipticPdes.Regularity.higher_interior_regularity",
       "source_id": "evans-2010",
       "locator": "§6.3.1 Thm 2",
-      "claim": "formalises the theorem for a weak solution quantified over H_0^1(Omega) rather than Evans' H^1(U), and for coefficients in W^{k,infty} rather than C^{k+1}: a^{ij} in W^{k+1,infinity} and of class C^1 with bounded derivatives, b and c in W^{k,infinity}. On every compact V inside Omega the solution has weak derivatives to order k + 2, with one constant bounding all of them by the L^2 norms of the solution and of the datum's derivatives. Evans states the conclusion as u in H^{k+2}(V) with the estimate; the family indexed by lists of directions records the same data, named so that the induction can hand a derivative on. The datum's derivatives are a hypothesis with a bound, where Evans takes f in H^k(U). The induction differentiates the equation once per step, and the datum of the step to order k + 1 asks a^{ij} in W^{k+2,infinity} and b, c in W^{k+1,infinity}"
+      "claim": "formalises the theorem for a weak solution quantified over H_0^1(Omega) rather than Evans' H^1(U), and for coefficients in W^{k,infty} rather than C^{k+1}: a^{ij} in W^{k+1,infinity} and Lipschitz, b and c in W^{k,infinity}. On every compact V inside Omega the solution has weak derivatives to order k + 2, with one constant bounding all of them by the L^2 norms of the solution and of the datum's derivatives. Evans states the conclusion as u in H^{k+2}(V) with the estimate; the family indexed by lists of directions records the same data, named so that the induction can hand a derivative on. The datum's derivatives are a hypothesis with a bound, where Evans takes f in H^k(U). The induction differentiates the equation once per step, and the datum of the step to order k + 1 asks a^{ij} in W^{k+2,infinity} and b, c in W^{k+1,infinity}"
     },
     {
       "decl": "EllipticPdes.Poincare.intervalIntegral_mul_sq_le",
@@ -1132,7 +1132,7 @@
       "decl": "EllipticPdes.Regularity.interior_H2_estimate",
       "source_id": "gilbarg-2001",
       "locator": "§8.3 Thm 8.8",
-      "claim": "formalises the cited theorem for the operators of this development, whose divergence-form part has no coefficient b^i inside the divergence, with the leading coefficients of class C^1 where the source asks Lipschitz continuity, the lower-order coefficients bounded, f in L^2 and the solution in W_0^{1,2}(Omega) with zero boundary values: on a compact subset of the open set the solution has second weak derivatives in L^2 with the estimate (8.17), the right side here being the L^2 norm of u in place of its W^{1,2} norm, and the constant quantified before the data. The proof is the cited one, difference quotients of the weak form with a cutoff and the bound on their L^2 norms, then Lemma 7.24"
+      "claim": "formalises the cited theorem for the operators of this development, whose divergence-form part has no coefficient b^i inside the divergence, with the leading coefficients Lipschitz, the hypothesis the source asks, the lower-order coefficients bounded, f in L^2 and the solution in W_0^{1,2}(Omega) with zero boundary values: on a compact subset of the open set the solution has second weak derivatives in L^2 with the estimate (8.17), the right side here being the L^2 norm of u in place of its W^{1,2} norm, and the constant quantified before the data. The proof is the cited one, difference quotients of the weak form with a cutoff and the bound on their L^2 norms, then Lemma 7.24"
     },
     {
       "decl": "EllipticPdes.Regularity.interior_smooth",
@@ -1366,7 +1366,7 @@
       "decl": "EllipticPdes.Regularity.interior_H2_estimate",
       "source_id": "guo-2026",
       "locator": "§VIII.2 Thm VIII.2.2",
-      "claim": "formalises the cited theorem for a solution with zero boundary values, with the leading coefficients of class C^1 with bounded derivatives, a case of the source's W^{1,infinity}, and the lower-order coefficients bounded: a weak solution in H_0^1(Omega) of L u = f with f in L^2(Omega) has second weak derivatives in L^2 on any compact subset, with the estimate ‖u‖_{H^2} on the subset at most C times ‖f‖_{L^2} + ‖u‖_{L^2}, the constant depending on Omega, the subset and L. The proof is the cited one, difference quotients of the weak form with a cutoff and Lemma VI.1.4"
+      "claim": "formalises the cited theorem for a solution with zero boundary values, with the leading coefficients Lipschitz, which is the source's W^{1,infinity} in pointwise form, and the lower-order coefficients bounded: a weak solution in H_0^1(Omega) of L u = f with f in L^2(Omega) has second weak derivatives in L^2 on any compact subset, with the estimate ‖u‖_{H^2} on the subset at most C times ‖f‖_{L^2} + ‖u‖_{L^2}, the constant depending on Omega, the subset and L. The proof is the cited one, difference quotients of the weak form with a cutoff and Lemma VI.1.4"
     },
     {
       "decl": "EllipticPdes.Regularity.interior_smooth",
@@ -1438,7 +1438,7 @@
       "decl": "EllipticPdes.Regularity.higher_interior_regularity",
       "source_id": "guo-2026",
       "locator": "§VIII.3 Thm VIII.3.2",
-      "claim": "formalises the cited theorem for a solution with zero boundary values, with the coefficient orders of the source, a^{i,j} in W^{k+1,infinity} and b^i, c in W^{k,infinity}, the principal coefficients also of class C^1 with bounded derivatives, and the coefficient bundle global on R^n: a weak solution in H_0^1(Omega) of L u = f with f having k weak derivatives in L^2(Omega) bounded by M has weak derivatives to order k + 2 on every compact subset V of Omega, each bounded by C(M + ‖u‖_{L^2(Omega)}), with C quantified before the solution and the datum. The proof is by induction on k, differentiating the equation once per step as the cited proof differentiates it by a multi-index of length k + 1"
+      "claim": "formalises the cited theorem for a solution with zero boundary values, with the coefficient orders of the source, a^{i,j} in W^{k+1,infinity} and b^i, c in W^{k,infinity}, the principal coefficients also Lipschitz, and the coefficient bundle global on R^n: a weak solution in H_0^1(Omega) of L u = f with f having k weak derivatives in L^2(Omega) bounded by M has weak derivatives to order k + 2 on every compact subset V of Omega, each bounded by C(M + ‖u‖_{L^2(Omega)}), with C quantified before the solution and the datum. The proof is by induction on k, differentiating the equation once per step as the cited proof differentiates it by a multi-index of length k + 1"
     },
     {
       "decl": "EllipticPdes.Regularity.interior_H2_regularity_evans",
