@@ -392,10 +392,11 @@ theorem hasWeakGradOn_comp (hΩ : IsOpen Ω) {u : EuclideanSpace ℝ (Fin d) →
 /-! ### The positive part -/
 
 /-- The `C¹` approximation of the positive part, `√((t⁺)² + ε²) - ε`. -/
-def posPartApprox (ε t : ℝ) : ℝ := Real.sqrt ((max t 0) ^ 2 + ε ^ 2) - ε
+private def posPartApprox (ε t : ℝ) : ℝ := Real.sqrt ((max t 0) ^ 2 + ε ^ 2) - ε
 
 /-- The square of the positive part is differentiable, with derivative `2 t⁺`. -/
-theorem hasDerivAt_max_sq (t : ℝ) : HasDerivAt (fun s : ℝ => (max s 0) ^ 2) (2 * max t 0) t := by
+private theorem hasDerivAt_max_sq (t : ℝ) :
+    HasDerivAt (fun s : ℝ => (max s 0) ^ 2) (2 * max t 0) t := by
   rcases lt_trichotomy t 0 with ht | rfl | ht
   · have h0 : (fun s : ℝ => (max s 0) ^ 2) =ᶠ[𝓝 t] fun _ => (0 : ℝ) :=
       (gt_mem_nhds ht).mono fun s hs => by simp [max_eq_right hs.le]
@@ -421,35 +422,35 @@ theorem hasDerivAt_max_sq (t : ℝ) : HasDerivAt (fun s : ℝ => (max s 0) ^ 2) 
     exact this.congr_of_eventuallyEq h0
 
 /-- The square of the positive part is `C¹`. -/
-theorem contDiff_max_sq : ContDiff ℝ 1 fun s : ℝ => (max s 0) ^ 2 := by
+private theorem contDiff_max_sq : ContDiff ℝ 1 fun s : ℝ => (max s 0) ^ 2 := by
   refine contDiff_one_iff_deriv.mpr ⟨fun t => (hasDerivAt_max_sq t).differentiableAt, ?_⟩
   rw [funext fun t => (hasDerivAt_max_sq t).deriv]
   exact continuous_const.mul (continuous_id.max continuous_const)
 
 /-- The argument of the square root in `posPartApprox` is positive. -/
-theorem posPartApprox_arg_pos {ε : ℝ} (hε : ε ≠ 0) (t : ℝ) : 0 < (max t 0) ^ 2 + ε ^ 2 := by
+private theorem posPartApprox_arg_pos {ε : ℝ} (hε : ε ≠ 0) (t : ℝ) : 0 < (max t 0) ^ 2 + ε ^ 2 := by
   have := pow_pos (abs_pos.mpr hε) 2
   rw [sq_abs] at this
   nlinarith [sq_nonneg (max t 0)]
 
 /-- The derivative of the approximation. -/
-theorem hasDerivAt_posPartApprox {ε : ℝ} (hε : ε ≠ 0) (t : ℝ) :
+private theorem hasDerivAt_posPartApprox {ε : ℝ} (hε : ε ≠ 0) (t : ℝ) :
     HasDerivAt (posPartApprox ε)
       (2 * max t 0 / (2 * Real.sqrt ((max t 0) ^ 2 + ε ^ 2))) t :=
   (((hasDerivAt_max_sq t).add_const (ε ^ 2)).sqrt (posPartApprox_arg_pos hε t).ne').sub_const ε
 
 /-- The approximation is `C¹`. -/
-theorem contDiff_posPartApprox {ε : ℝ} (hε : ε ≠ 0) : ContDiff ℝ 1 (posPartApprox ε) :=
+private theorem contDiff_posPartApprox {ε : ℝ} (hε : ε ≠ 0) : ContDiff ℝ 1 (posPartApprox ε) :=
   ((contDiff_max_sq.add contDiff_const).sqrt fun t => (posPartApprox_arg_pos hε t).ne').sub
     contDiff_const
 
 /-- The derivative of the approximation, in closed form. -/
-theorem deriv_posPartApprox {ε : ℝ} (hε : ε ≠ 0) (t : ℝ) :
+private theorem deriv_posPartApprox {ε : ℝ} (hε : ε ≠ 0) (t : ℝ) :
     deriv (posPartApprox ε) t = max t 0 / Real.sqrt ((max t 0) ^ 2 + ε ^ 2) := by
   rw [(hasDerivAt_posPartApprox hε t).deriv, mul_div_mul_left _ _ two_ne_zero]
 
 /-- The derivative of the approximation lies in `[0, 1]`. -/
-theorem deriv_posPartApprox_mem {ε : ℝ} (hε : ε ≠ 0) (t : ℝ) :
+private theorem deriv_posPartApprox_mem {ε : ℝ} (hε : ε ≠ 0) (t : ℝ) :
     0 ≤ deriv (posPartApprox ε) t ∧ deriv (posPartApprox ε) t ≤ 1 := by
   rw [deriv_posPartApprox hε]
   have hm : 0 ≤ max t 0 := le_max_right _ _
@@ -459,14 +460,14 @@ theorem deriv_posPartApprox_mem {ε : ℝ} (hε : ε ≠ 0) (t : ℝ) :
   exact (Real.le_sqrt hm (posPartApprox_arg_pos hε t).le).mpr (by nlinarith [sq_nonneg ε])
 
 /-- The derivative of the approximation has nonnegative norm at most one. -/
-theorem nnnorm_deriv_posPartApprox_le {ε : ℝ} (hε : ε ≠ 0) (t : ℝ) :
+private theorem nnnorm_deriv_posPartApprox_le {ε : ℝ} (hε : ε ≠ 0) (t : ℝ) :
     ‖deriv (posPartApprox ε) t‖₊ ≤ 1 := by
   obtain ⟨h0, h1⟩ := deriv_posPartApprox_mem hε t
   rw [← NNReal.coe_le_coe, coe_nnnorm, Real.norm_eq_abs, abs_of_nonneg h0, NNReal.coe_one]
   exact h1
 
 /-- The approximation lies between `0` and the positive part. -/
-theorem posPartApprox_mem {ε : ℝ} (hε : 0 ≤ ε) (t : ℝ) :
+private theorem posPartApprox_mem {ε : ℝ} (hε : 0 ≤ ε) (t : ℝ) :
     0 ≤ posPartApprox ε t ∧ posPartApprox ε t ≤ max t 0 := by
   have hm : 0 ≤ max t 0 := le_max_right _ _
   unfold posPartApprox
@@ -479,7 +480,7 @@ theorem posPartApprox_mem {ε : ℝ} (hε : 0 ≤ ε) (t : ℝ) :
     exact Real.sqrt_le_iff.mpr ⟨by positivity, by nlinarith⟩
 
 /-- The approximation tends to the positive part as `ε → 0`. -/
-theorem tendsto_posPartApprox (t : ℝ) :
+private theorem tendsto_posPartApprox (t : ℝ) :
     Tendsto (fun ε => posPartApprox ε t) (𝓝 0) (𝓝 (max t 0)) := by
   have hc : Continuous fun ε : ℝ => posPartApprox ε t := by
     unfold posPartApprox
@@ -491,7 +492,7 @@ theorem tendsto_posPartApprox (t : ℝ) :
 
 /-- The derivative of the approximation tends to the indicator of `{t > 0}` as `ε → 0`
 along positive values. -/
-theorem tendsto_deriv_posPartApprox (t : ℝ) :
+private theorem tendsto_deriv_posPartApprox (t : ℝ) :
     Tendsto (fun n : ℕ => deriv (posPartApprox (1 / (n + 1 : ℝ))) t) atTop
       (𝓝 (if 0 < t then 1 else 0)) := by
   have hεne : ∀ n : ℕ, (1 / (n + 1 : ℝ)) ≠ 0 := fun n => by positivity
