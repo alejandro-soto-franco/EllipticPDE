@@ -44,13 +44,11 @@ variable {d : ℕ}
 
 /-- The coordinate-`0` embedding `H₀¹(Ω) ↪ L²(Ω)`, `U ↦ U 0`, as a continuous linear map:
 the `PiLp` projection onto coordinate `0` precomposed with the submodule inclusion. -/
-def embL2 (Ω : Set (EuclideanSpace ℝ (Fin d))) : H01 Ω →L[ℝ] L2D Ω :=
-  (PiLp.proj (𝕜 := ℝ) 2 (fun _ : Fin (d + 1) => L2D Ω) (0 : Fin (d + 1))).comp (H01 Ω).subtypeL
+def embL2 (Ω : Set (EuclideanSpace ℝ (Fin d))) : H01 Ω →L[ℝ] L2D Ω := coordL Ω 0
 
 /-- Simp lemma: `embL2 Ω U = (U : H1amb Ω) 0`, the function coordinate of `U`. -/
 @[simp] lemma embL2_apply (Ω : Set (EuclideanSpace ℝ (Fin d))) (U : H01 Ω) :
-    embL2 Ω U = (U : H1amb Ω) 0 := by
-  simp only [embL2, ContinuousLinearMap.comp_apply, Submodule.subtypeL_apply, PiLp.proj_apply]
+    embL2 Ω U = (U : H1amb Ω) 0 := rfl
 
 /-- **Factorisation of the `L²` form through the embedding**: `opT = (embL2)† ∘ embL2`. Indeed
 `⟪opT U, V⟫ = ⟪U₀, V₀⟫_{L²} = ⟪embL2 U, embL2 V⟫ = ⟪(embL2)† (embL2 U), V⟫`. -/

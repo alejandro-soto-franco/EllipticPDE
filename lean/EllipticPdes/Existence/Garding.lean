@@ -56,6 +56,15 @@ lemma young_peterPaul {lam B x y : ℝ} (hlam : 0 < lam) :
   rw [key]
   exact div_nonneg (sq_nonneg _) h2l.le
 
+/-- The `i`-th coordinate `U ↦ Uᵢ` of an element of `H₀¹(Ω) ⊆ H1amb Ω`, as a continuous linear map
+into `L²(Ω)`: the `PiLp` projection precomposed with the submodule inclusion. -/
+def coordL (Ω : Set (EuclideanSpace ℝ (Fin d))) (i : Fin (d + 1)) : H01 Ω →L[ℝ] L2D Ω :=
+  (PiLp.proj (𝕜 := ℝ) 2 (fun _ : Fin (d + 1) => L2D Ω) i).comp (H01 Ω).subtypeL
+
+/-- Simp lemma: `coordL Ω i U` is the `i`-th coordinate of `U`. -/
+@[simp] lemma coordL_apply (Ω : Set (EuclideanSpace ℝ (Fin d))) (i : Fin (d + 1)) (U : H01 Ω) :
+    coordL Ω i U = (U : H1amb Ω) i := rfl
+
 /-- The test-function Poincaré bound on `Ω` with constant `CP`: for every test function `φ`
 of `Ω`, `‖φ‖²_{L²} ≤ CP ∑ᵢ ‖∂ᵢφ‖²_{L²}`. -/
 def HasTestPoincare (Ω : Set (EuclideanSpace ℝ (Fin d))) (CP : ℝ) : Prop :=
@@ -112,67 +121,18 @@ lemma norm_cAct_le {Ω : Set (EuclideanSpace ℝ (Fin d))} (g : L2D Ω) :
 
 /-! ### Lower-order (transport + zeroth) bilinear form -/
 
-/-- The lower-order part `∑ᵢ ⟪bᵢ ∂ᵢu, v₀⟫ + ⟪c u₀, v₀⟫` as a bare bilinear map. -/
-def lowerBilinₗ (Ω : Set (EuclideanSpace ℝ (Fin d))) :
-    (H01 Ω) →ₗ[ℝ] (H01 Ω) →ₗ[ℝ] ℝ :=
-  LinearMap.mk₂ ℝ
-    (fun U V => (∑ i : Fin d, ⟪Op.bAct i ((U : H1amb Ω) i.succ), ((V : H1amb Ω) 0)⟫)
-      + ⟪Op.cAct ((U : H1amb Ω) 0), ((V : H1amb Ω) 0)⟫)
-    (by intro U₁ U₂ V; simp only [Submodule.coe_add, PiLp.add_apply, map_add,
-          inner_add_left, Finset.sum_add_distrib]; ring)
-    (by intro c U V; simp only [Submodule.coe_smul, PiLp.smul_apply, map_smul,
-          real_inner_smul_left, smul_eq_mul, mul_add, Finset.mul_sum])
-    (by intro U V₁ V₂; simp only [Submodule.coe_add, PiLp.add_apply,
-          inner_add_right, Finset.sum_add_distrib]; ring)
-    (by intro c U V; simp only [Submodule.coe_smul, PiLp.smul_apply,
-          real_inner_smul_right, smul_eq_mul, mul_add, Finset.mul_sum])
-
-/-- The lower-order bilinear form as a bounded form, with norm bound `d·Bsup + Csup`. -/
+/-- The lower-order part `∑ᵢ ⟪bᵢ ∂ᵢu, v₀⟫ + ⟪c u₀, v₀⟫` as a bounded bilinear form. -/
 def lowerBilin (Ω : Set (EuclideanSpace ℝ (Fin d))) :
     (H01 Ω) →L[ℝ] (H01 Ω) →L[ℝ] ℝ :=
-  (Op.lowerBilinₗ Ω).mkContinuous₂ ((d : ℝ) * Op.Bsup + Op.Csup) (by
-    intro U V
-    simp only [FullEllipticOp.lowerBilinₗ, LinearMap.mk₂_apply]
-    have hb : ‖∑ i : Fin d, ⟪Op.bAct i ((U : H1amb Ω) i.succ), ((V : H1amb Ω) 0)⟫‖
-        ≤ (d : ℝ) * Op.Bsup * ‖U‖ * ‖V‖ := by
-      calc ‖∑ i : Fin d, ⟪Op.bAct i ((U : H1amb Ω) i.succ), ((V : H1amb Ω) 0)⟫‖
-          ≤ ∑ i : Fin d, ‖⟪Op.bAct i ((U : H1amb Ω) i.succ), ((V : H1amb Ω) 0)⟫‖ :=
-            norm_sum_le _ _
-        _ ≤ ∑ _i : Fin d, Op.Bsup * ‖U‖ * ‖V‖ := by
-            apply Finset.sum_le_sum; intro i _
-            calc ‖⟪Op.bAct i ((U : H1amb Ω) i.succ), ((V : H1amb Ω) 0)⟫‖
-                ≤ ‖Op.bAct i ((U : H1amb Ω) i.succ)‖ * ‖(V : H1amb Ω) 0‖ :=
-                  norm_inner_le_norm _ _
-              _ ≤ (Op.Bsup * ‖U‖) * ‖V‖ :=
-                  mul_le_mul (le_trans (Op.norm_bAct_le i _)
-                    (mul_le_mul_of_nonneg_left (PiLp.norm_apply_le _ _) Op.Bsup_nonneg))
-                    (PiLp.norm_apply_le _ _) (norm_nonneg _)
-                    (mul_nonneg Op.Bsup_nonneg (norm_nonneg _))
-        _ = (d : ℝ) * Op.Bsup * ‖U‖ * ‖V‖ := by
-            simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
-            ring
-    have hc : ‖⟪Op.cAct ((U : H1amb Ω) 0), ((V : H1amb Ω) 0)⟫‖ ≤ Op.Csup * ‖U‖ * ‖V‖ :=
-      calc ‖⟪Op.cAct ((U : H1amb Ω) 0), ((V : H1amb Ω) 0)⟫‖
-          ≤ ‖Op.cAct ((U : H1amb Ω) 0)‖ * ‖(V : H1amb Ω) 0‖ := norm_inner_le_norm _ _
-        _ ≤ (Op.Csup * ‖U‖) * ‖V‖ :=
-            mul_le_mul (le_trans (Op.norm_cAct_le _)
-              (mul_le_mul_of_nonneg_left (PiLp.norm_apply_le _ _) Op.Csup_nonneg))
-              (PiLp.norm_apply_le _ _) (norm_nonneg _)
-              (mul_nonneg Op.Csup_nonneg (norm_nonneg _))
-    calc ‖(∑ i : Fin d, ⟪Op.bAct i ((U : H1amb Ω) i.succ), ((V : H1amb Ω) 0)⟫)
-            + ⟪Op.cAct ((U : H1amb Ω) 0), ((V : H1amb Ω) 0)⟫‖
-        ≤ ‖∑ i : Fin d, ⟪Op.bAct i ((U : H1amb Ω) i.succ), ((V : H1amb Ω) 0)⟫‖
-            + ‖⟪Op.cAct ((U : H1amb Ω) 0), ((V : H1amb Ω) 0)⟫‖ := norm_add_le _ _
-      _ ≤ (d : ℝ) * Op.Bsup * ‖U‖ * ‖V‖ + Op.Csup * ‖U‖ * ‖V‖ := add_le_add hb hc
-      _ = ((d : ℝ) * Op.Bsup + Op.Csup) * ‖U‖ * ‖V‖ := by ring)
+  (∑ i : Fin d, (innerSL ℝ).bilinearComp ((Op.bAct i).comp (coordL Ω i.succ)) (coordL Ω 0))
+    + (innerSL ℝ).bilinearComp (Op.cAct.comp (coordL Ω 0)) (coordL Ω 0)
 
 /-- Simp lemma: unfolds `lowerBilin Ω U V` to the transport and zeroth-order inner products. -/
 @[simp] lemma lowerBilin_apply (Ω : Set (EuclideanSpace ℝ (Fin d))) (U V : H01 Ω) :
     Op.lowerBilin Ω U V
       = (∑ i : Fin d, ⟪Op.bAct i ((U : H1amb Ω) i.succ), ((V : H1amb Ω) 0)⟫)
         + ⟪Op.cAct ((U : H1amb Ω) 0), ((V : H1amb Ω) 0)⟫ := by
-  simp only [FullEllipticOp.lowerBilin, LinearMap.mkContinuous₂_apply,
-    FullEllipticOp.lowerBilinₗ, LinearMap.mk₂_apply]
+  simp [FullEllipticOp.lowerBilin, _root_.sum_apply]
 
 /-- The full divergence-form bilinear form `B = B_A + (transport + zeroth)`. -/
 def fullBilin (Ω : Set (EuclideanSpace ℝ (Fin d))) :
@@ -260,25 +220,12 @@ theorem garding (Ω : Set (EuclideanSpace ℝ (Fin d))) (U : H01 Ω) :
 /-- The zeroth `L²` form `⟪u₀, v₀⟫` on `H₀¹(Ω)`, used for the spectral shift. -/
 def zerothForm (Ω : Set (EuclideanSpace ℝ (Fin d))) :
     (H01 Ω) →L[ℝ] (H01 Ω) →L[ℝ] ℝ :=
-  (LinearMap.mk₂ ℝ (fun U V : H01 Ω => ⟪(U : H1amb Ω) 0, ((V : H1amb Ω) 0)⟫)
-    (by intro U₁ U₂ V; simp only [Submodule.coe_add, PiLp.add_apply, inner_add_left])
-    (by intro c U V; simp only [Submodule.coe_smul, PiLp.smul_apply, real_inner_smul_left,
-          smul_eq_mul])
-    (by intro U V₁ V₂; simp only [Submodule.coe_add, PiLp.add_apply, inner_add_right])
-    (by intro c U V; simp only [Submodule.coe_smul, PiLp.smul_apply, real_inner_smul_right,
-          smul_eq_mul])).mkContinuous₂ 1 (by
-    intro U V
-    simp only [LinearMap.mk₂_apply]
-    calc ‖⟪(U : H1amb Ω) 0, ((V : H1amb Ω) 0)⟫‖
-        ≤ ‖(U : H1amb Ω) 0‖ * ‖(V : H1amb Ω) 0‖ := norm_inner_le_norm _ _
-      _ ≤ ‖U‖ * ‖V‖ := mul_le_mul (PiLp.norm_apply_le _ _) (PiLp.norm_apply_le _ _)
-          (norm_nonneg _) (norm_nonneg _)
-      _ = 1 * ‖U‖ * ‖V‖ := by ring)
+  (innerSL ℝ).bilinearComp (coordL Ω 0) (coordL Ω 0)
 
 /-- Simp lemma: `zerothForm Ω U V = ⟪(U : H1amb Ω) 0, (V : H1amb Ω) 0⟫`. -/
 @[simp] lemma zerothForm_apply (Ω : Set (EuclideanSpace ℝ (Fin d))) (U V : H01 Ω) :
     zerothForm Ω U V = ⟪(U : H1amb Ω) 0, ((V : H1amb Ω) 0)⟫ := by
-  simp only [FullEllipticOp.zerothForm, LinearMap.mkContinuous₂_apply, LinearMap.mk₂_apply]
+  rfl
 
 /-- The shifted bilinear form `B_μ[U, V] = B[U, V] + μ ⟪u₀, v₀⟫` associated to `Lu + μu`. -/
 def shiftedBilin (Ω : Set (EuclideanSpace ℝ (Fin d))) (μ : ℝ) :
