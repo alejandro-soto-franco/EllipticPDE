@@ -59,6 +59,16 @@ theorem transL2_apply (h : EuclideanSpace ℝ (Fin n)) (g : EucL2 n) :
   rw [h1, h2]
   simp [add_comm]
 
+/-- Translation by `-h` inverts translation by `h`. -/
+theorem transL2_transL2_neg (h : EuclideanSpace ℝ (Fin n)) (g : EucL2 n) :
+    transL2 h (transL2 (-h) g) = g := by
+  refine Lp.ext ?_
+  filter_upwards [coeFn_transL2 h (transL2 (-h) g),
+    (measurePreserving_add_right volume h).quasiMeasurePreserving.ae_eq_comp
+      (coeFn_transL2 (-h) g)] with x h1 h2
+  rw [h1]
+  simpa using h2
+
 /-- The squared `L²` norm of a translation difference, as an integral. -/
 theorem norm_sq_transL2_sub (h : EuclideanSpace ℝ (Fin n)) (g : EucL2 n) :
     ‖transL2 h g - g‖ ^ 2 = ∫ x, (g (x + h) - g x) ^ 2 := by

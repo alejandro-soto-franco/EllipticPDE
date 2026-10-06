@@ -7,6 +7,8 @@ Authors: Alejandro Soto Franco
 module
 
 public import EllipticPdes.Embedding.Morrey
+public import EllipticPdes.Extension.C1Test
+public import Mathlib.Analysis.InnerProductSpace.Dual
 
 /-!
 # Continuous weak gradient as a classical gradient
@@ -41,7 +43,7 @@ to see it.
 @[expose] public section
 
 open MeasureTheory Set Metric Filter
-open scoped NNReal ENNReal Convolution Topology
+open scoped NNReal ENNReal Convolution Topology RealInnerProductSpace
 
 noncomputable section
 
@@ -53,18 +55,30 @@ variable {d : ℕ}
 
 /-! ### Gradient tuple as a functional -/
 
-/-- The continuous linear functional whose coordinate values are the entries of `g` at `y`. This
-is the shape `HasFDerivAt` asks for, assembled from the shape a weak gradient comes in. -/
+/-- The continuous linear functional whose coordinate values are the entries of `g` at `y`: the
+Riesz dual of the vector `(g k y)ₖ`. This is the shape `HasFDerivAt` asks for, assembled from the
+shape a weak gradient comes in. -/
 def gradCLM (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (y : EuclideanSpace ℝ (Fin d)) :
     EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ :=
-  ∑ k, g k y • (EuclideanSpace.proj k : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ)
+  InnerProductSpace.toDual ℝ (EuclideanSpace ℝ (Fin d)) (WithLp.toLp 2 fun k => g k y)
+
+/-- `gradCLM g y` evaluated on a vector is the inner product with `(g k y)ₖ`. -/
+theorem gradCLM_apply (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (y x : EuclideanSpace ℝ (Fin d)) :
+    gradCLM g y x = ⟪(WithLp.toLp 2 fun k => g k y : EuclideanSpace ℝ (Fin d)), x⟫ :=
+  InnerProductSpace.toDual_apply_apply
+
+/-- `gradCLM g y` is the sum of the coordinate functionals weighted by `g k y`. -/
+theorem gradCLM_eq_sum (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (y : EuclideanSpace ℝ (Fin d)) :
+    gradCLM g y = ∑ k, g k y • (EuclideanSpace.proj k : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ) := by
+  ext x
+  simp [gradCLM_apply, PiLp.inner_apply, mul_comm]
 
 /-- `gradCLM g y` evaluated on the `j`-th basis vector is `g j y`. -/
 @[simp]
 theorem gradCLM_apply_single (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ)
     (y : EuclideanSpace ℝ (Fin d)) (j : Fin d) :
     gradCLM g y (EuclideanSpace.single j (1 : ℝ)) = g j y := by
-  simp [gradCLM]
+  simp [gradCLM_apply, EuclideanSpace.inner_single_right]
 
 /-- **Control of a functional by its coordinate values.** On `EuclideanSpace ℝ (Fin d)` every
 vector is the sum of its coordinates against the standard directions, so the operator norm is at
@@ -178,21 +192,11 @@ theorem hasFDerivAt_of_continuousOn_hasWeakGradOn
     refine subset_trans (Metric.closedBall_subset_ball ?_) hRB
     rw [hρ_def]; linarith
   -- The shrinking mollifier family.
-  have hn2 : ∀ n : ℕ, (0 : ℝ) < (n + 2 : ℝ) := fun n => by positivity
   set φ : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := fun n =>
-    { rIn := ρ / (n + 2 : ℝ) / 2
-      rOut := ρ / (n + 2 : ℝ)
-      rIn_pos := div_pos (div_pos hρ0 (hn2 n)) two_pos
-      rIn_lt_rOut := half_lt_self (div_pos hρ0 (hn2 n)) } with hφ_def
-  have hrOut : ∀ n, (φ n).rOut = ρ / (n + 2 : ℝ) := fun _ => rfl
-  have hφρ : ∀ n, (φ n).rOut ≤ ρ := by
-    intro n
-    rw [hrOut n, div_le_iff₀ (hn2 n)]
-    nlinarith [hρ0, Nat.cast_nonneg (α := ℝ) n]
-  have hφ0 : Tendsto (fun n => (φ n).rOut) atTop (𝓝 0) := by
-    simp only [hrOut]
-    exact tendsto_const_nhds.div_atTop
-      (Filter.tendsto_atTop_add_const_right atTop 2 tendsto_natCast_atTop_atTop)
+    EllipticPdes.Extension.mollifier ρ hρ0 n with hφ_def
+  have hφρ : ∀ n, (φ n).rOut ≤ ρ := EllipticPdes.Extension.rOut_mollifier_le ρ hρ0
+  have hφ0 : Tendsto (fun n => (φ n).rOut) atTop (𝓝 0) :=
+    EllipticPdes.Extension.tendsto_rOut_mollifier ρ hρ0
   -- The mollifications, and their smoothness.
   have huB_li : LocallyIntegrable (B.indicator u) volume :=
     (hui.integrable_indicator hBm).locallyIntegrable
