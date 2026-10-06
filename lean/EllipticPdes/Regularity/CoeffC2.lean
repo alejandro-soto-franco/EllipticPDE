@@ -59,8 +59,7 @@ def IsC2Coeff.toIsC1Coeff {A : EllipticCoeff d} (hA : IsC2Coeff A) : IsC1Coeff A
   { contDiff := fun i j => (hA.contDiff i j).of_le (by norm_num)
     A1 := hA.A1, A1_nonneg := hA.A1_nonneg, grad_bdd := hA.grad_bdd }
 
-/-- The gradient entry `∂_ℓ a_{ij}` is `C¹` (needed to treat it as a differentiable weight in
-the strong-datum move, Task 7). -/
+/-- The gradient entry `∂_ℓ a_{ij}` is `C¹`. -/
 theorem IsC2Coeff.contDiff_partialD_coeff {A : EllipticCoeff d} (hA : IsC2Coeff A)
     (i j ℓ : Fin d) : ContDiff ℝ 1 (partialD ℓ (fun y => A.a y i j)) := by
   have hf : ContDiff ℝ 1 (fderiv ℝ (fun y => A.a y i j)) :=

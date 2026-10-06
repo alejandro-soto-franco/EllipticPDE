@@ -14,9 +14,8 @@ public import EllipticPdes.Embedding.Convolution
 /-!
 # Leibniz rule for a `W^{1,∞}` weight
 
-`EllipticPdes.Regularity.HasWeakDerivOn.mul_contDiff_left` proves the weak-derivative product
-rule for a `C¹` weight. Guo's hypothesis supplies no classical derivative, and this file
-replaces that route.
+This file proves the weak-derivative product rule for a weight in `W^{1,∞}`, which has no
+classical derivative. `HasWeakDerivOn.mul_contDiff_left` is the case of a `C¹` weight.
 
 ## Smooth case
 
@@ -390,9 +389,8 @@ theorem tendsto_setIntegral_mul_convolution_of_measurable
 `V`, and `a` is measurable and essentially bounded with an essentially bounded weak `ℓ`-derivative
 `a'`, then `a·g` has weak `ℓ`-derivative `a'·g + a·g'` on `V`.
 
-This is `HasWeakDerivOn.mul_contDiff_left` with the `C¹` hypothesis on the weight removed, which
-is what Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem VIII.3.2
-(p. 65) asks for. The weight is mollified, the smooth case
+This is the hypothesis of Guo, *Partial Differential Equations I and II* (Course Lecture
+Notes), Theorem VIII.3.2 (p. 65). The weight is mollified, the smooth case
 `weakDerivOn_smul_test_contDiff` gives the identity at every radius, and
 `tendsto_setIntegral_mul_convolution_of_measurable` sends each of the three terms to its
 limit. -/

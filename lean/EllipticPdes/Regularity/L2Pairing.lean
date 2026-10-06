@@ -44,15 +44,6 @@ open EllipticPdes.Sobolev
 
 variable {d : ℕ} {V : Set (EuclideanSpace ℝ (Fin d))}
 
-/-- **Integrability of an `L²` class against a test function.** Hölder with the two exponents `2`
-and the continuous compactly supported factor in `L²`. -/
-theorem integrable_mul_testFn (F : L2D V) {φ : EuclideanSpace ℝ (Fin d) → ℝ}
-    (hφc : ContDiff ℝ (⊤ : ℕ∞) φ) (hφcs : HasCompactSupport φ) :
-    Integrable (fun x => (F x : ℝ) * φ x) (volume.restrict V) := by
-  have : ENNReal.HolderTriple (2 : ENNReal) 2 1 := ⟨by rw [ENNReal.inv_two_add_inv_two, inv_one]⟩
-  exact (Lp.memLp F).integrable_mul
-    ((hφc.continuous.memLp_of_hasCompactSupport (p := 2) (μ := volume) hφcs).restrict V)
-
 /-- The pairing is additive in the class. -/
 theorem setIntegral_add_mul_testFn (F G : L2D V) {φ : EuclideanSpace ℝ (Fin d) → ℝ}
     (hφc : ContDiff ℝ (⊤ : ℕ∞) φ) (hφcs : HasCompactSupport φ) :

@@ -47,9 +47,8 @@ induction on `k` over that predicate.
   order-`k-1` conclusion is available for `u` itself. Applying the induction hypothesis to `∂_l
   u` on an intermediate `V ⋐ W ⋐ Ω` gives `∂_l u ∈ H^{k+1}(V)`, which is `u ∈ H^{k+2}(V)`.
 
-The differentiated equation is already available as
-`EllipticPdes.Regularity.differentiated_weakForm_div`, and the admissibility of the test
-function it needs as `interior_cutoffGrad_mem_H01`.
+The differentiated equation is `EllipticPdes.Regularity.differentiated_weakForm_wkInfty`, and
+the admissibility of the test function it needs is `interior_cutoffGrad_mem_H01`.
 
 ## Main declarations
 

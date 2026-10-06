@@ -17,20 +17,17 @@ public import Mathlib.MeasureTheory.Measure.Haar.Unique
 /-!
 # Mollifying a `W^{1,∞}` weight
 
-`EllipticPdes.Regularity.HasWeakDerivOn.mul_contDiff_left` proves the weak-derivative Leibniz
-rule for a `C¹` weight, by mollifying the weight and differentiating the mollification
-classically. Guo's hypothesis supplies no classical derivative, so that route is closed and the
-mollification has to take the weak derivative instead. This file rebuilds the two facts about
-mollification the Leibniz rule needs, with continuity of the weight dropped throughout.
+The weak-derivative Leibniz rule for a `W^{1,∞}` weight mollifies the weight and differentiates
+the mollification through the weak derivative of the weight. This file proves the two facts about
+mollification that the rule needs, for a measurable weight.
 
-* The sup bound survives with measurability alone. `EllipticPdes.Regularity` already had this
-  for a continuous weight; continuity entered only through the integrability of the convolution
-  integrand, which an essential bound supplies just as well.
+* The sup bound holds with measurability alone: an essential bound makes the convolution
+  integrand integrable.
 * The derivative of the mollification is the mollification of the *weak* derivative. This is
   where the weak hypothesis does the work: the classical proof moves the derivative from the
   kernel back onto the weight by integration by parts, and `HasWeakPartial` is that
   integration-by-parts identity, applied to the reflected kernel `t ↦ ρ (x - t)`, which is a
-  legitimate test function. The weak version is shorter than the `C¹` version it replaces.
+  legitimate test function.
 
 ## Main declarations
 

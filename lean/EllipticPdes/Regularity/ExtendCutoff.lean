@@ -74,15 +74,6 @@ theorem isTestFn_partialD {W : Set (EuclideanSpace ℝ (Fin d))}
     IsTestFn W (partialD ℓ χ) :=
   isTest_partialD hχ.1 hχ.2.1 hχ.2.2 ℓ
 
-/-- An integral over `Ω` of an integrand vanishing off `W ⊆ Ω` is an integral over `W`. -/
-private theorem setIntegral_shrink_of_forall_eq_zero
-    {W Ω : Set (EuclideanSpace ℝ (Fin d))} (hWΩ : W ⊆ Ω)
-    {F : EuclideanSpace ℝ (Fin d) → ℝ} (hF : ∀ x, x ∉ W → F x = 0) :
-    ∫ x in Ω, F x = ∫ x in W, F x := by
-  rw [setIntegral_eq_integral_of_forall_compl_eq_zero
-      (fun x hx => hF x (fun hc => hx (hWΩ hc))),
-    setIntegral_eq_integral_of_forall_compl_eq_zero hF]
-
 /-- The whole-space extension of an `L²(W)` class agrees with the class itself on `W`. -/
 private theorem coeFn_extendL2_restrict {W : Set (EuclideanSpace ℝ (Fin d))}
     (hWm : MeasurableSet W) (p : L2D W) :
