@@ -11,6 +11,8 @@ public import EllipticPdes.Regularity.WeakFormDense
 public import EllipticPdes.Regularity.PointwiseEquation
 public import EllipticPdes.Form.GeneralForm
 public import EllipticPdes.Existence.WeakMaximum
+public import EllipticPdes.Extension.C1Test
+public import EllipticPdes.Sobolev.GraphLimits
 
 /-!
 # Truncation in `H₀¹`
@@ -60,9 +62,47 @@ namespace EllipticPdes.Sobolev
 
 open EllipticPdes.Embedding EllipticPdes.Extension EllipticPdes.Regularity
 
+local notation "Lsm" => ContinuousLinearMap.lsmul ℝ ℝ (E := ℝ)
+
 variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))}
 
-/-! ### Compactly supported classes lie in `H₀¹` -/
+/-! ### Mollification -/
+
+/-- A square-integrable function of compact support is integrable. -/
+lemma integrable_of_memLp_hasCompactSupport {w : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hw : MemLp w 2 volume) (hwcs : HasCompactSupport w) : Integrable w volume := by
+  have : IsFiniteMeasure (volume.restrict (tsupport w)) :=
+    isFiniteMeasure_restrict.2 hwcs.measure_lt_top.ne
+  have : IntegrableOn w (tsupport w) volume :=
+    (hw.mono_measure Measure.restrict_le_self).integrable one_le_two
+  exact (integrableOn_iff_integrable_of_support_subset (subset_tsupport w)).mp this
+
+/-- **Mollifications are test functions.** The mollification of an integrable function of compact
+support by a bump whose outer radius thickens the support inside `Ω` is a test function of `Ω`. -/
+lemma isTestFn_convolution_normed {w : EuclideanSpace ℝ (Fin d) → ℝ} (hwint : Integrable w volume)
+    (hwcs : HasCompactSupport w) (ρ : ContDiffBump (0 : EuclideanSpace ℝ (Fin d)))
+    (hρ : cthickening ρ.rOut (tsupport w) ⊆ Ω) :
+    IsTestFn Ω (w ⋆[Lsm, volume] ρ.normed volume) := by
+  refine ⟨ρ.hasCompactSupport_normed.contDiff_convolution_right (L := Lsm)
+      hwint.locallyIntegrable ρ.contDiff_normed,
+    HasCompactSupport.convolution (L := Lsm) hwcs ρ.hasCompactSupport_normed,
+    (closure_minimal (fun x hx => ?_) isClosed_cthickening).trans hρ⟩
+  obtain ⟨a, ha, b, hb, rfl⟩ := Set.mem_add.mp (support_convolution_subset Lsm hx)
+  rw [ρ.support_normed_eq] at hb
+  refine mem_cthickening_of_dist_le (a + b) a ρ.rOut _ (subset_tsupport w ha) ?_
+  rw [dist_eq_norm, add_sub_cancel_left]
+  exact (mem_ball_zero_iff.mp hb).le
+
+/-- Mollifications of a square-integrable function by the bumps of `mollifier` converge to it in
+`L²`. -/
+lemma tendsto_eLpNorm_mollifier_sub {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : MemLp f 2 volume)
+    {r : ℝ} (hr : 0 < r) :
+    Tendsto (fun n => eLpNorm (f ⋆[Lsm, volume] (mollifier r hr n : ContDiffBump
+      (0 : EuclideanSpace ℝ (Fin d))).normed volume - f) 2 volume) atTop (𝓝 0) := by
+  have h2 : ENNReal.ofReal (2 : ℝ) = 2 := by norm_num
+  have := tendsto_eLpNorm_convolution_sub one_le_two (by rwa [h2]) (tendsto_rOut_mollifier r hr)
+    (K := 2) (Eventually.of_forall fun n => le_of_eq (by simp [mollifier]; ring))
+  rwa [h2] at this
 
 /-- **Compactly supported classes with `L²` weak gradient lie in `H₀¹`.** A class on the whole
 space with an `L²` weak gradient whose support is a compact subset of the open set `Ω` is, with
@@ -73,93 +113,33 @@ theorem mem_H01_of_hasCompactSupport (hΩ : IsOpen Ω) {w : EuclideanSpace ℝ (
     (hwΩ : tsupport w ⊆ Ω) :
     WithLp.toLp 2 (Fin.cons ((hw.mono_measure Measure.restrict_le_self).toLp w)
       fun k => ((hh k).mono_measure Measure.restrict_le_self).toLp (h k)) ∈ H01 Ω := by
-  classical
-  set L := ContinuousLinearMap.lsmul ℝ ℝ (E := ℝ) with hL
-  -- integrability of `w` on the whole space, from its compact support
-  have hwint : Integrable w volume := by
-    have : IsFiniteMeasure (volume.restrict (tsupport w)) :=
-      isFiniteMeasure_restrict.2 hwcs.measure_lt_top.ne
-    have : IntegrableOn w (tsupport w) volume :=
-      (hw.mono_measure Measure.restrict_le_self).integrable one_le_two
-    exact (integrableOn_iff_integrable_of_support_subset (subset_tsupport w)).mp this
   obtain ⟨δ, hδ, hK'⟩ := IsCompact.exists_cthickening_subset_open hwcs hΩ hwΩ
-  -- the mollifiers
-  let φb : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := fun n =>
-    { rIn := δ / (n + 1 : ℝ) / 2
-      rOut := δ / (n + 1 : ℝ)
-      rIn_pos := half_pos (by positivity)
-      rIn_lt_rOut := half_lt_self (by positivity) }
-  have hrOut : ∀ n : ℕ, (φb n).rOut = δ / (n + 1 : ℝ) := fun _ => rfl
-  have hrIn : ∀ n : ℕ, (φb n).rIn = δ / (n + 1 : ℝ) / 2 := fun _ => rfl
-  have hφrOut : Tendsto (fun n => (φb n).rOut) atTop (𝓝 0) := by
-    simp only [hrOut]
-    have := (tendsto_one_div_add_atTop_nhds_zero_nat (𝕜 := ℝ)).const_mul δ
-    rw [mul_zero] at this
-    refine this.congr fun n => ?_
-    ring
-  have hφratio : ∀ᶠ n in atTop, (φb n).rOut ≤ 2 * (φb n).rIn :=
-    Eventually.of_forall fun n => le_of_eq (by rw [hrOut, hrIn]; ring)
-  have hrOut_le : ∀ n : ℕ, (φb n).rOut ≤ δ := fun n => by
-    rw [hrOut]
-    exact div_le_self hδ.le (by linarith [(Nat.cast_nonneg n : (0 : ℝ) ≤ n)])
-  set v : ℕ → EuclideanSpace ℝ (Fin d) → ℝ :=
-    fun n => w ⋆[L, volume] (φb n).normed volume with hvdef
-  have hvsmooth : ∀ n, ContDiff ℝ (⊤ : ℕ∞) (v n) := fun n =>
-    (φb n).hasCompactSupport_normed.contDiff_convolution_right (L := L)
-      hwint.locallyIntegrable (φb n).contDiff_normed
-  have hvcs : ∀ n, HasCompactSupport (v n) := fun n =>
-    HasCompactSupport.convolution (L := L) hwcs (φb n).hasCompactSupport_normed
-  -- the mollifications are supported inside the domain
-  have hvsupp : ∀ n, tsupport (v n) ⊆ Ω := fun n => by
-    refine (closure_minimal ?_ isClosed_cthickening).trans hK'
-    intro x hx
-    obtain ⟨a, ha, b, hb, rfl⟩ := Set.mem_add.mp (support_convolution_subset L hx)
-    rw [(φb n).support_normed_eq] at hb
-    refine mem_cthickening_of_dist_le (a + b) a δ _ (subset_tsupport w ha) ?_
-    rw [dist_eq_norm, add_sub_cancel_left]
-    exact (mem_ball_zero_iff.mp hb).le.trans (hrOut_le n)
-  have hv : ∀ n, IsTestFn Ω (v n) := fun n => ⟨hvsmooth n, hvcs n, hvsupp n⟩
-  -- the partials of the mollifications are the mollified weak gradient
-  have hpartial : ∀ n k, partialD k (v n) = h k ⋆[L, volume] (φb n).normed volume := by
-    intro n k
-    funext x
-    have := partialD_convolution_eq_of_hasWeakGradOn MeasurableSet.univ hwint.integrableOn hwg
-      (φb n) k (x := x) (subset_univ _)
-    simpa only [indicator_univ] using this
-  -- `L²` convergence of the mollifications on the whole space
-  have h2 : ENNReal.ofReal (2 : ℝ) = 2 := by norm_num
-  have hw' : MemLp w (ENNReal.ofReal 2) volume := by rw [h2]; exact hw
-  have hh' : ∀ k, MemLp (h k) (ENNReal.ofReal 2) volume := fun k => by rw [h2]; exact hh k
-  have hconvw : Tendsto (fun n => eLpNorm (v n - w) 2 volume) atTop (𝓝 0) := by
-    have := tendsto_eLpNorm_convolution_sub one_le_two hw' hφrOut hφratio
-    rwa [h2] at this
-  have hconvh : ∀ k, Tendsto (fun n =>
-      eLpNorm ((h k ⋆[L, volume] (φb n).normed volume) - h k) 2 volume) atTop (𝓝 0) := by
-    intro k
-    have := tendsto_eLpNorm_convolution_sub one_le_two (hh' k) hφrOut hφratio
-    rwa [h2] at this
-  -- the graphs of the mollifications converge to the graph of `w`
-  have hclosed : IsClosed (H01 Ω : Set (H1amb Ω)) := Submodule.isClosed_topologicalClosure _
-  refine hclosed.mem_of_tendsto (b := atTop) ?_
-    (Eventually.of_forall fun n => testGraph_mem_H01 (hv n))
-  have hgraph : (fun n => (hv n).testGraph)
-      = fun n => WithLp.toLp 2 (Fin.cons (hv n).testCls fun i => (hv n).partialCls i) :=
-    rfl
-  rw [hgraph]
-  refine ((PiLp.continuous_toLp 2 fun _ : Fin (d + 1) => L2D Ω).tendsto _).comp
-    (tendsto_pi_nhds.mpr fun j => ?_)
-  induction j using Fin.cases with
-  | zero =>
-    simp only [Fin.cons_zero, IsTestFn.testCls]
-    refine (Lp.tendsto_Lp_iff_tendsto_eLpNorm'' _ _ _ _).mpr ?_
-    refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds hconvw
-      (fun _ => zero_le) fun n => eLpNorm_mono_measure _ Measure.restrict_le_self
-  | succ k =>
-    simp only [Fin.cons_succ, IsTestFn.partialCls]
-    refine (Lp.tendsto_Lp_iff_tendsto_eLpNorm'' _ _ _ _).mpr ?_
-    refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds (hconvh k)
-      (fun _ => zero_le) fun n => ?_
+  have hwint := integrable_of_memLp_hasCompactSupport hw hwcs
+  have hv : ∀ n, IsTestFn Ω (w ⋆[Lsm, volume] (mollifier δ hδ n :
+      ContDiffBump (0 : EuclideanSpace ℝ (Fin d))).normed volume) := fun n =>
+    isTestFn_convolution_normed hwint hwcs _
+      ((cthickening_mono (rOut_mollifier_le δ hδ n) _).trans hK')
+  have hpartial : ∀ n k, partialD k (w ⋆[Lsm, volume] (mollifier δ hδ n :
+      ContDiffBump (0 : EuclideanSpace ℝ (Fin d))).normed volume)
+        = h k ⋆[Lsm, volume] (mollifier δ hδ n : ContDiffBump
+          (0 : EuclideanSpace ℝ (Fin d))).normed volume := fun n k => funext fun x => by
+    simpa only [indicator_univ] using partialD_convolution_eq_of_hasWeakGradOn MeasurableSet.univ
+      hwint.integrableOn hwg _ k (x := x) (subset_univ _)
+  refine (Submodule.isClosed_topologicalClosure _).mem_of_tendsto (b := atTop)
+    (f := fun n => (hv n).testGraph) ?_ (Eventually.of_forall fun n => (hv n).testGraph_mem_H01)
+  change Tendsto _ _ (𝓝 (H1amb.mk _ _))
+  rw [tendsto_testGraph_iff hv]
+  refine ⟨?_, fun k => ?_⟩
+  · refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds
+      (tendsto_eLpNorm_mollifier_sub hw hδ) (fun _ => zero_le) fun n => ?_
+    refine le_of_eq_of_le (eLpNorm_congr_ae (EventuallyEq.rfl.sub (by
+      exact (hw.mono_measure Measure.restrict_le_self).coeFn_toLp))) ?_
+    exact eLpNorm_mono_measure _ Measure.restrict_le_self
+  · refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds
+      (tendsto_eLpNorm_mollifier_sub (hh k) hδ) (fun _ => zero_le) fun n => ?_
     rw [hpartial n k]
+    refine le_of_eq_of_le (eLpNorm_congr_ae (EventuallyEq.rfl.sub
+      ((hh k).mono_measure Measure.restrict_le_self).coeFn_toLp)) ?_
     exact eLpNorm_mono_measure _ Measure.restrict_le_self
 
 /-! ### Truncation -/
@@ -168,6 +148,97 @@ theorem mem_H01_of_hasCompactSupport (hΩ : IsOpen Ω) {w : EuclideanSpace ℝ (
 theorem abs_max_sub_le (a b k : ℝ) : |max (a - k) 0 - max (b - k) 0| ≤ |a - b| := by
   have := abs_max_sub_max_le_abs (a - k) (b - k) 0
   rwa [sub_sub_sub_cancel_right] at this
+
+/-- The truncation `max (φ - k) 0` of a test function of `Ω` has compact support in `Ω`. -/
+lemma IsTestFn.posPart_sub_const {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ) {k : ℝ}
+    (hk : 0 ≤ k) :
+    HasCompactSupport (fun x => max (φ x - k) 0) ∧ tsupport (fun x => max (φ x - k) 0) ⊆ Ω := by
+  have hsub : tsupport (fun x => max (φ x - k) 0) ⊆ tsupport φ :=
+    closure_minimal (fun x hx => subset_tsupport _ fun h0 => Function.mem_support.mp hx (by
+      simp only [h0, zero_sub]; exact max_eq_right (neg_nonpos.mpr hk))) (isClosed_tsupport _)
+  exact ⟨h.hasCompactSupport.of_isClosed_subset (isClosed_tsupport _) hsub, hsub.trans h.2.2⟩
+
+/-- At a point where `ψₙ → v` and `g = 0` on the level `v = k`, the truncated values
+`1_{ψₙ > k} g` eventually equal `1_{v > k} g`. -/
+lemma eventually_ite_lt_sub_eq_zero {ψ : ℕ → ℝ} {v g k : ℝ} (hψ : Tendsto ψ atTop (𝓝 v))
+    (hl : v = k → g = 0) :
+    ∀ᶠ n in atTop, (if k < ψ n then g else 0) - (if k < v then g else 0) = 0 := by
+  rcases lt_trichotomy v k with hlt | heq | hgt
+  · filter_upwards [hψ.eventually (gt_mem_nhds hlt)] with n hn
+    simp [not_lt.mpr hn.le, not_lt.mpr hlt.le]
+  · refine Eventually.of_forall fun n => ?_
+    simp only [hl heq]
+    split_ifs <;> simp
+  · filter_upwards [hψ.eventually (lt_mem_nhds hgt)] with n hn
+    simp [hn, hgt]
+
+/-- **Convergence of a level-set indicator.** Let `ψₙ → v` almost everywhere and let `g` be
+square integrable and vanish on `{v = k}`. Then `1_{ψₙ > k} g → 1_{v > k} g` in `L²`. -/
+lemma tendsto_eLpNorm_indicator_lt_sub {μ : Measure (EuclideanSpace ℝ (Fin d))}
+    {ψ : ℕ → EuclideanSpace ℝ (Fin d) → ℝ} {v g : EuclideanSpace ℝ (Fin d) → ℝ} {k : ℝ}
+    (hψm : ∀ n, AEStronglyMeasurable (ψ n) μ) (hvm : AEStronglyMeasurable v μ)
+    (hg : MemLp g 2 μ) (hae : ∀ᵐ x ∂μ, Tendsto (fun n => ψ n x) atTop (𝓝 (v x)))
+    (hlev : ∀ᵐ x ∂μ, v x = k → g x = 0) :
+    Tendsto (fun n => eLpNorm ((fun x => if k < ψ n x then g x else 0)
+      - fun x => if k < v x then g x else 0) 2 μ) atTop (𝓝 0) := by
+  have hBm : ∀ n, AEStronglyMeasurable ((fun x => if k < ψ n x then g x else 0)
+      - fun x => if k < v x then g x else 0) μ := fun n =>
+    (aestronglyMeasurable_ite_lt (hψm n) hg.aestronglyMeasurable k).sub
+      (aestronglyMeasurable_ite_lt hvm hg.aestronglyMeasurable k)
+  have hrepr : ∀ n, eLpNorm ((fun x => if k < ψ n x then g x else 0)
+      - fun x => if k < v x then g x else 0) 2 μ = (∫⁻ x, ‖(if k < ψ n x then g x else 0)
+        - (if k < v x then g x else 0)‖ₑ ^ (2 : ℝ) ∂μ) ^ (1 / (2 : ℝ)) := fun n => by
+    rw [eLpNorm_eq_lintegral_rpow_enorm_toReal two_ne_zero ENNReal.ofNat_ne_top (hBm n),
+      ENNReal.toReal_ofNat]
+    rfl
+  simp only [hrepr]
+  have hlim : Tendsto (fun n => ∫⁻ x, ‖(if k < ψ n x then g x else 0)
+      - (if k < v x then g x else 0)‖ₑ ^ (2 : ℝ) ∂μ) atTop (𝓝 (∫⁻ _, (0 : ℝ≥0∞) ∂μ)) := by
+    refine tendsto_lintegral_of_dominated_convergence' (fun x => ‖g x‖ₑ ^ (2 : ℝ))
+      (fun n => (hBm n).enorm.pow_const _) (fun n => Eventually.of_forall fun x => ?_) ?_ ?_
+    · refine ENNReal.rpow_le_rpow ?_ (by norm_num)
+      rw [enorm_eq_nnnorm, enorm_eq_nnnorm, ENNReal.coe_le_coe, ← NNReal.coe_le_coe,
+        coe_nnnorm, coe_nnnorm, Real.norm_eq_abs, Real.norm_eq_abs]
+      split_ifs <;> simp
+    · exact (lintegral_rpow_enorm_lt_top_of_eLpNorm_lt_top two_ne_zero ENNReal.ofNat_ne_top
+        hg.eLpNorm_lt_top).ne
+    · filter_upwards [hae, hlev] with x hx hxl
+      refine tendsto_const_nhds.congr' ?_
+      filter_upwards [eventually_ite_lt_sub_eq_zero hx hxl] with n hn
+      rw [hn, enorm_zero, ENNReal.zero_rpow_of_pos (by norm_num)]
+  rw [lintegral_zero] at hlim
+  have := (ENNReal.continuous_rpow_const (y := 1 / (2 : ℝ))).tendsto 0 |>.comp hlim
+  rwa [ENNReal.zero_rpow_of_pos (by norm_num)] at this
+
+/-- **Convergence of truncated gradients.** Let `ψₙ → v` almost everywhere, let `Dψₙ → g` in `L²`,
+and let `g` vanish on the level set `{v = k}`. Then `1_{ψₙ > k} Dψₙ → 1_{v > k} g` in `L²`. -/
+lemma tendsto_eLpNorm_ite_lt_sub {μ : Measure (EuclideanSpace ℝ (Fin d))}
+    {ψ Dψ : ℕ → EuclideanSpace ℝ (Fin d) → ℝ} {v g : EuclideanSpace ℝ (Fin d) → ℝ} {k : ℝ}
+    (hψm : ∀ n, AEStronglyMeasurable (ψ n) μ) (hDm : ∀ n, AEStronglyMeasurable (Dψ n) μ)
+    (hvm : AEStronglyMeasurable v μ) (hg : MemLp g 2 μ)
+    (hD : Tendsto (fun n => eLpNorm (Dψ n - g) 2 μ) atTop (𝓝 0))
+    (hae : ∀ᵐ x ∂μ, Tendsto (fun n => ψ n x) atTop (𝓝 (v x)))
+    (hlev : ∀ᵐ x ∂μ, v x = k → g x = 0) :
+    Tendsto (fun n => eLpNorm ((fun x => if k < ψ n x then Dψ n x else 0)
+      - fun x => if k < v x then g x else 0) 2 μ) atTop (𝓝 0) := by
+  have hA : Tendsto (fun n => eLpNorm (fun x => if k < ψ n x then Dψ n x - g x else 0) 2 μ)
+      atTop (𝓝 0) := by
+    refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds hD (fun _ => zero_le)
+      fun n => eLpNorm_mono (aestronglyMeasurable_ite_lt (hψm n)
+        ((hDm n).sub hg.aestronglyMeasurable) k) fun x => ?_
+    simp only [Pi.sub_apply]
+    split_ifs <;> simp
+  have hsum := hA.add (tendsto_eLpNorm_indicator_lt_sub hψm hvm hg hae hlev)
+  rw [add_zero] at hsum
+  refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds hsum (fun _ => zero_le)
+    fun n => ?_
+  have hsplit : ((fun x => if k < ψ n x then Dψ n x else 0) - fun x => if k < v x then g x else 0)
+      = (fun x => if k < ψ n x then Dψ n x - g x else 0) + ((fun x => if k < ψ n x then g x else 0)
+        - fun x => if k < v x then g x else 0) := funext fun x => by
+    simp only [Pi.sub_apply, Pi.add_apply]
+    split_ifs <;> ring
+  rw [hsplit]
+  exact eLpNorm_add_le one_le_two
 
 /-- **Truncation in `H₀¹`.** For `V ∈ H₀¹(Ω)` and `k ≥ 0` there is `W ∈ H₀¹(Ω)` whose function
 coordinate is `(v - k)⁺` and whose gradient coordinates are those of `V` on `{v > k}` and zero
@@ -180,57 +251,21 @@ theorem exists_mem_H01_posPart_sub_const (hΩ : IsOpen Ω) {V : H1amb Ω} (hV : 
       ∀ i : Fin d, ((W i.succ : L2D Ω) : EuclideanSpace ℝ (Fin d) → ℝ)
         =ᵐ[volume.restrict Ω] fun x => if k < (V 0 x : ℝ) then (V i.succ x : ℝ) else 0 := by
   classical
-  -- approximating test functions
-  have hVcl : V ∈ closure ((Submodule.span ℝ (testGraphSet Ω) : Submodule ℝ (H1amb Ω)) :
-      Set (H1amb Ω)) := by
-    rw [← Submodule.topologicalClosure_coe]
-    exact hV
-  obtain ⟨X, hXmem, hXt⟩ := mem_closure_iff_seq_limit.mp hVcl
-  have hXmem' : ∀ n, X n ∈ testGraphSet Ω := fun n => by
-    have := hXmem n
-    rw [span_testGraphSet] at this
-    exact this
-  choose φ hφ hXφ using hXmem'
-  -- the coordinates of `V`
+  obtain ⟨φ, hφ, hXt⟩ := exists_seq_isTestFn_tendsto hV
+  obtain ⟨hX0, hXi⟩ := (tendsto_testGraph_iff hφ).mp hXt
   set v : EuclideanSpace ℝ (Fin d) → ℝ := fun x => (V 0 x : ℝ) with hvdef
   set g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ := fun i x => (V i.succ x : ℝ) with hgdef
   have hvm : MemLp v 2 (volume.restrict Ω) := Lp.memLp _
   have hgm : ∀ i, MemLp (g i) 2 (volume.restrict Ω) := fun i => Lp.memLp _
-  -- coordinatewise convergence in `L²(Ω)`
-  have hXcoord : Tendsto (fun n => (X n).ofLp) atTop (𝓝 V.ofLp) :=
-    ((PiLp.continuous_ofLp 2 fun _ : Fin (d + 1) => L2D Ω).tendsto V).comp hXt
-  have hX0 : Tendsto (fun n => eLpNorm (φ n - v) 2 (volume.restrict Ω)) atTop (𝓝 0) := by
-    have h1 : Tendsto (fun n => X n 0) atTop (𝓝 (V 0)) := tendsto_pi_nhds.mp hXcoord 0
-    have h2 := (Lp.tendsto_Lp_iff_tendsto_eLpNorm' _ _).mp h1
-    refine h2.congr fun n => eLpNorm_congr_ae ?_
-    have e : X n 0 = (hφ n).testCls := by rw [hXφ n, IsTestFn.testGraph_zero]
-    rw [e]
-    filter_upwards [(hφ n).mem_lp.coeFn_toLp] with x hx
-    simp only [IsTestFn.testCls, Pi.sub_apply, hvdef, hx]
-  have hXi : ∀ i : Fin d, Tendsto (fun n => eLpNorm (partialD i (φ n) - g i) 2
-      (volume.restrict Ω)) atTop (𝓝 0) := by
-    intro i
-    have h1 : Tendsto (fun n => X n i.succ) atTop (𝓝 (V i.succ)) :=
-      tendsto_pi_nhds.mp hXcoord i.succ
-    have h2 := (Lp.tendsto_Lp_iff_tendsto_eLpNorm' _ _).mp h1
-    refine h2.congr fun n => eLpNorm_congr_ae ?_
-    have e : X n i.succ = (hφ n).partialCls i := by rw [hXφ n, IsTestFn.testGraph_succ]
-    rw [e]
-    filter_upwards [((hφ n).memLp_partialD i).coeFn_toLp] with x hx
-    simp only [IsTestFn.partialCls, Pi.sub_apply, hgdef, hx]
-  -- a subsequence converging almost everywhere
-  have hmeas : TendstoInMeasure (volume.restrict Ω) φ atTop v :=
-    tendstoInMeasure_of_tendsto_eLpNorm two_ne_zero hX0
-  obtain ⟨ns, hns, hae⟩ := hmeas.exists_seq_tendsto_ae
-  -- the weak gradient of `V` vanishes on the level set
-  have hvloc : LocallyIntegrableOn v Ω volume :=
-    locallyIntegrableOn_of_locallyIntegrable_restrict (hvm.locallyIntegrable one_le_two)
-  have hgloc : ∀ i, LocallyIntegrableOn (g i) Ω volume := fun i =>
-    locallyIntegrableOn_of_locallyIntegrable_restrict ((hgm i).locallyIntegrable one_le_two)
+  obtain ⟨ns, hns, hae⟩ :=
+    (tendstoInMeasure_of_tendsto_eLpNorm two_ne_zero hX0).exists_seq_tendsto_ae
   have hlevel : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), v x = k → g i x = 0 := fun i =>
-    ae_eq_zero_of_eq_const_of_hasWeakGradOn hΩ hvloc hgloc
+    ae_eq_zero_of_eq_const_of_hasWeakGradOn hΩ
+      (locallyIntegrableOn_of_locallyIntegrable_restrict (hvm.locallyIntegrable one_le_two))
+      (fun i => locallyIntegrableOn_of_locallyIntegrable_restrict
+        ((hgm i).locallyIntegrable one_le_two))
       (hasWeakGradOn_of_mem_W12 (H01_le_W12 Ω hV)) k i
-  -- the truncations of the approximants
+  -- the truncations of the approximants lie in `H₀¹`
   set ψ : ℕ → EuclideanSpace ℝ (Fin d) → ℝ := fun i => φ (ns i) with hψdef
   have hψ : ∀ i, IsTestFn Ω (ψ i) := fun i => hφ (ns i)
   have hψc : ∀ i, Continuous (ψ i) := fun i => (hψ i).continuous
@@ -241,18 +276,9 @@ theorem exists_mem_H01_posPart_sub_const (hΩ : IsOpen Ω) {V : H1amb Ω} (hV : 
       (fun j => ((hψ i).continuous_partialD j).locallyIntegrable.locallyIntegrableOn _)
       (hasWeakGradOn_of_contDiffOn isOpen_univ
         ((hψ i).1.of_le (WithTop.coe_le_coe.mpr le_top)).contDiffOn) k
-  have hsupp : ∀ i, Function.support (fun x => max (ψ i x - k) 0) ⊆ tsupport (ψ i) :=
-    fun i x hx => by
-    refine subset_tsupport _ fun h0 => Function.mem_support.mp hx ?_
-    simp only [h0, zero_sub]
-    exact max_eq_right (neg_nonpos.mpr hk)
-  have hcs : ∀ i, HasCompactSupport (fun x => max (ψ i x - k) 0) := fun i =>
-    (hψ i).2.1.of_isClosed_subset isClosed_closure
-      (closure_minimal (hsupp i) (isClosed_tsupport _))
-  have hsuppΩ : ∀ i, tsupport (fun x => max (ψ i x - k) 0) ⊆ Ω := fun i =>
-    (closure_minimal (hsupp i) (isClosed_tsupport _)).trans (hψ i).2.2
   have hwm : ∀ i, MemLp (fun x => max (ψ i x - k) 0) 2 volume := fun i =>
-    (((hψc i).sub continuous_const).max continuous_const).memLp_of_hasCompactSupport (hcs i)
+    (((hψc i).sub continuous_const).max continuous_const).memLp_of_hasCompactSupport
+      ((hψ i).posPart_sub_const hk).1
   have hhm : ∀ i j, MemLp (fun x => if k < ψ i x then partialD j (ψ i) x else 0) 2 volume :=
     fun i j =>
       (((hψ i).continuous_partialD j).memLp_of_hasCompactSupport
@@ -260,10 +286,10 @@ theorem exists_mem_H01_posPart_sub_const (hΩ : IsOpen Ω) {V : H1amb Ω} (hV : 
         (aestronglyMeasurable_ite_lt (hψc i).aestronglyMeasurable
           ((hψ i).continuous_partialD j).aestronglyMeasurable k)
         (Eventually.of_forall fun x => by split_ifs <;> simp)
-  have hWmem : ∀ i, WithLp.toLp 2
-      (Fin.cons (((hwm i).mono_measure Measure.restrict_le_self).toLp _)
-        fun j => ((hhm i j).mono_measure Measure.restrict_le_self).toLp _) ∈ H01 Ω :=
-    fun i => mem_H01_of_hasCompactSupport hΩ (hψwg i) (hwm i) (hhm i) (hcs i) (hsuppΩ i)
+  have hWmem : ∀ i, H1amb.mk (((hwm i).mono_measure Measure.restrict_le_self).toLp _)
+      (fun j => ((hhm i j).mono_measure Measure.restrict_le_self).toLp _) ∈ H01 Ω := fun i =>
+    mem_H01_of_hasCompactSupport hΩ (hψwg i) (hwm i) (hhm i) ((hψ i).posPart_sub_const hk).1
+      ((hψ i).posPart_sub_const hk).2
   -- the limit
   have hwlim : MemLp (fun x => max (v x - k) 0) 2 (volume.restrict Ω) := by
     refine hvm.of_le (((continuous_id.sub continuous_const).max
@@ -276,100 +302,26 @@ theorem exists_mem_H01_posPart_sub_const (hΩ : IsOpen Ω) {V : H1amb Ω} (hV : 
     fun i => (hgm i).of_le (aestronglyMeasurable_ite_lt hvm.aestronglyMeasurable
       (hgm i).aestronglyMeasurable k)
       (Eventually.of_forall fun x => by split_ifs <;> simp)
-  refine ⟨WithLp.toLp 2 (Fin.cons (hwlim.toLp _) fun i => (hhlim i).toLp _), ?_, ?_, ?_⟩
-  · -- membership: `H₀¹` is closed and the truncations converge to the limit
-    refine (Submodule.isClosed_topologicalClosure _).mem_of_tendsto (b := atTop) ?_
-      (Eventually.of_forall hWmem)
-    refine ((PiLp.continuous_toLp 2 fun _ : Fin (d + 1) => L2D Ω).tendsto _).comp
-      (tendsto_pi_nhds.mpr fun j => ?_)
-    induction j using Fin.cases with
-    | zero =>
-      simp only [Fin.cons_zero]
-      refine (Lp.tendsto_Lp_iff_tendsto_eLpNorm'' _ _ _ _).mpr ?_
-      refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds
-        (hX0.comp hns.tendsto_atTop) (fun _ => zero_le) fun i => ?_
-      refine eLpNorm_mono ?_ fun x => ?_
-      · exact ((((hψc i).sub continuous_const).max continuous_const).aestronglyMeasurable).sub
-          hwlim.aestronglyMeasurable
-      simp only [Pi.sub_apply, Real.norm_eq_abs]
-      exact abs_max_sub_le _ _ _
-    | succ j =>
-      simp only [Fin.cons_succ]
-      refine (Lp.tendsto_Lp_iff_tendsto_eLpNorm'' _ _ _ _).mpr ?_
-      -- split into the gradient difference on `{ψ > k}` and the indicator difference
-      set A : ℕ → EuclideanSpace ℝ (Fin d) → ℝ :=
-        fun i x => if k < ψ i x then partialD j (ψ i) x - g j x else 0 with hAdef
-      set B : ℕ → EuclideanSpace ℝ (Fin d) → ℝ :=
-        fun i x => (if k < ψ i x then g j x else 0) - (if k < v x then g j x else 0) with hBdef
-      have hsplit : ∀ i, ((fun x => if k < ψ i x then partialD j (ψ i) x else 0)
-          - fun x => if k < v x then g j x else 0) = A i + B i := by
-        intro i
-        funext x
-        simp only [Pi.sub_apply, Pi.add_apply, hAdef, hBdef]
-        split_ifs <;> ring
-      have hAm : ∀ i, AEStronglyMeasurable (A i) (volume.restrict Ω) := fun i =>
-        aestronglyMeasurable_ite_lt (hψc i).aestronglyMeasurable
-          (((hψ i).continuous_partialD j).aestronglyMeasurable.sub (hgm j).aestronglyMeasurable) k
-      have hBm : ∀ i, AEStronglyMeasurable (B i) (volume.restrict Ω) := fun i =>
-        (aestronglyMeasurable_ite_lt (hψc i).aestronglyMeasurable
-          (hgm j).aestronglyMeasurable k).sub
-          (aestronglyMeasurable_ite_lt hvm.aestronglyMeasurable (hgm j).aestronglyMeasurable k)
-      have hA : Tendsto (fun i => eLpNorm (A i) 2 (volume.restrict Ω)) atTop (𝓝 0) := by
-        refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds
-          ((hXi j).comp hns.tendsto_atTop) (fun _ => zero_le) fun i => ?_
-        refine eLpNorm_mono (hAm i) fun x => ?_
-        simp only [hAdef, Pi.sub_apply, hψdef]
-        split_ifs <;> simp
-      have hB : Tendsto (fun i => eLpNorm (B i) 2 (volume.restrict Ω)) atTop (𝓝 0) := by
-        have hrepr : ∀ i, eLpNorm (B i) 2 (volume.restrict Ω)
-            = (∫⁻ x, ‖B i x‖ₑ ^ (2 : ℝ) ∂(volume.restrict Ω)) ^ (1 / (2 : ℝ)) := fun i => by
-          rw [eLpNorm_eq_lintegral_rpow_enorm_toReal two_ne_zero ENNReal.ofNat_ne_top (hBm i),
-            ENNReal.toReal_ofNat]
-        simp only [hrepr]
-        have hlim : Tendsto (fun i => ∫⁻ x, ‖B i x‖ₑ ^ (2 : ℝ) ∂(volume.restrict Ω)) atTop
-            (𝓝 (∫⁻ _, (0 : ℝ≥0∞) ∂(volume.restrict Ω))) := by
-          refine tendsto_lintegral_of_dominated_convergence' (fun x => ‖g j x‖ₑ ^ (2 : ℝ))
-            (fun i => (hBm i).enorm.pow_const _)
-            (fun i => Eventually.of_forall fun x => ?_) ?_ ?_
-          · refine ENNReal.rpow_le_rpow ?_ (by norm_num)
-            rw [enorm_eq_nnnorm, enorm_eq_nnnorm, ENNReal.coe_le_coe, ← NNReal.coe_le_coe,
-              coe_nnnorm, coe_nnnorm, Real.norm_eq_abs, Real.norm_eq_abs]
-            simp only [hBdef]
-            split_ifs <;> simp
-          · exact (lintegral_rpow_enorm_lt_top_of_eLpNorm_lt_top two_ne_zero ENNReal.ofNat_ne_top
-              (hgm j).eLpNorm_lt_top).ne
-          · filter_upwards [hae, hlevel j] with x hx hxl
-            have hBzero : ∀ᶠ i in atTop, B i x = 0 := by
-              rcases lt_trichotomy (v x) k with hlt | heq | hgt
-              · filter_upwards [hx.eventually (gt_mem_nhds hlt)] with i hi
-                have hi' : φ (ns i) x < k := hi
-                simp only [hBdef, hψdef]
-                rw [ite_eq_right (not_lt.mpr hi'.le), ite_eq_right (not_lt.mpr hlt.le), sub_zero]
-              · refine Eventually.of_forall fun i => ?_
-                simp only [hBdef, hxl heq]
-                split_ifs <;> simp
-              · filter_upwards [hx.eventually (lt_mem_nhds hgt)] with i hi
-                have hi' : k < φ (ns i) x := hi
-                simp only [hBdef, hψdef]
-                rw [ite_eq_left hi', ite_eq_left hgt, sub_self]
-            refine tendsto_const_nhds.congr' ?_
-            filter_upwards [hBzero] with i hi
-            rw [hi, enorm_zero, ENNReal.zero_rpow_of_pos (by norm_num)]
-        rw [lintegral_zero] at hlim
-        have := (ENNReal.continuous_rpow_const (y := 1 / (2 : ℝ))).tendsto 0 |>.comp hlim
-        rw [ENNReal.zero_rpow_of_pos (by norm_num)] at this
-        exact this
-      have hsum := hA.add hB
-      rw [add_zero] at hsum
-      refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds hsum
-        (fun _ => zero_le) fun i => ?_
-      rw [hsplit i]
-      exact eLpNorm_add_le one_le_two
-  · simp only [Fin.cons_zero]
-    exact hwlim.coeFn_toLp
-  · intro i
-    simp only [Fin.cons_succ]
-    exact (hhlim i).coeFn_toLp
+  refine ⟨H1amb.mk (hwlim.toLp _) fun i => (hhlim i).toLp _, ?_, hwlim.coeFn_toLp,
+    fun i => (hhlim i).coeFn_toLp⟩
+  refine (Submodule.isClosed_topologicalClosure _).mem_of_tendsto (b := atTop) ?_
+    (Eventually.of_forall hWmem)
+  refine (H1amb.tendsto_iff_eLpNorm (f := fun i x => max (ψ i x - k) 0)
+    (G := fun i j x => if k < ψ i x then partialD j (ψ i) x else 0)
+    (fun i => ((hwm i).mono_measure Measure.restrict_le_self).coeFn_toLp)
+    (fun i j => ((hhm i j).mono_measure Measure.restrict_le_self).coeFn_toLp)).mpr ⟨?_, fun j => ?_⟩
+  · refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds
+      (hX0.comp hns.tendsto_atTop) (fun _ => zero_le) fun i => ?_
+    refine le_of_eq_of_le (eLpNorm_congr_ae (EventuallyEq.rfl.sub hwlim.coeFn_toLp)) ?_
+    refine eLpNorm_mono ((((hψc i).sub continuous_const).max
+      continuous_const).aestronglyMeasurable.sub hwlim.aestronglyMeasurable) fun x => ?_
+    simp only [Pi.sub_apply, Real.norm_eq_abs]
+    exact abs_max_sub_le _ _ _
+  · have hae' : ∀ᵐ x ∂(volume.restrict Ω), Tendsto (fun i => ψ i x) atTop (𝓝 (v x)) := hae
+    refine (tendsto_eLpNorm_ite_lt_sub (fun i => (hψc i).aestronglyMeasurable)
+      (fun i => ((hψ i).continuous_partialD j).aestronglyMeasurable) hvm.aestronglyMeasurable
+      (hgm j) ((hXi j).comp hns.tendsto_atTop) hae' (hlevel j)).congr fun i => ?_
+    exact (eLpNorm_congr_ae (EventuallyEq.rfl.sub (hhlim j).coeFn_toLp)).symm
 
 /-! ### The maximum principle in `H₀¹` -/
 

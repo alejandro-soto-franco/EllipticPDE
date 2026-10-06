@@ -96,8 +96,9 @@ lemma tendsto_testGraph_iff {φ : ℕ → EuclideanSpace ℝ (Fin d) → ℝ}
 lemma exists_seq_isTestFn_tendsto {V : H1amb Ω} (hV : V ∈ H01 Ω) :
     ∃ (φ : ℕ → EuclideanSpace ℝ (Fin d) → ℝ) (h : ∀ n, IsTestFn Ω (φ n)),
       Tendsto (fun n => (h n).testGraph) atTop (𝓝 V) := by
-  obtain ⟨X, hX, hXt⟩ := mem_closure_iff_seq_limit.mp ((coe_H01 Ω) ▸ hV : V ∈ closure _)
-  choose φ hφ hXφ using hX
+  have hV' : V ∈ closure (testGraphSet Ω) := by rw [← coe_H01]; exact hV
+  obtain ⟨X, hX, hXt⟩ := mem_closure_iff_seq_limit.mp hV'
+  choose φ hφ hXφ using fun n => (hX n : ∃ φ, ∃ h : IsTestFn Ω φ, X n = h.testGraph)
   exact ⟨φ, hφ, by simpa only [← hXφ] using hXt⟩
 
 /-- The graph of a test function lies in `H₀¹`. -/
