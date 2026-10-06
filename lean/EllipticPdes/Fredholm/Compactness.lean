@@ -6,7 +6,7 @@ Authors: Alejandro Soto Franco
 
 module
 
-public import EllipticPdes.Fredholm.Fredholm
+public import EllipticPdes.Fredholm.FredholmComplete
 public import Mathlib.Analysis.InnerProductSpace.Adjoint
 public import Mathlib.Analysis.Normed.Operator.Compact.Basic
 
