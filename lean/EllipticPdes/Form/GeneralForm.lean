@@ -175,23 +175,8 @@ theorem EllipticCoeff.bilin_coercive (A : EllipticCoeff d)
     (hbase : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ),
       ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2) :
     IsCoercive (A.bilin Ω) := by
-  have hpos : (0 : ℝ) < CP + 1 := by linarith
-  have hne : (CP : ℝ) + 1 ≠ 0 := hpos.ne'
-  refine ⟨A.lam / (CP + 1), div_pos A.lam_pos hpos, ?_⟩
-  intro U
-  set S : ℝ := ∑ i : Fin d, ‖(U : H1amb Ω) i.succ‖ ^ 2 with hS
-  have hBUU : A.lam * S ≤ A.bilin Ω U U := A.bilin_self_ge U
-  have hnorm : ‖U‖ ^ 2 = ‖(U : H1amb Ω) 0‖ ^ 2 + S := by
-    rw [show ‖U‖ = ‖(U : H1amb Ω)‖ from rfl, PiLp.norm_sq_eq_of_L2, Fin.sum_univ_succ]
-  have hpoin : ‖(U : H1amb Ω) 0‖ ^ 2 ≤ CP * S := poincare_H01 CP hbase U.2
-  have hkey : ‖U‖ * ‖U‖ ≤ (CP + 1) * S := by
-    have : ‖U‖ ^ 2 ≤ (CP + 1) * S := by rw [hnorm]; nlinarith [hpoin]
-    nlinarith [this]
-  rw [mul_assoc]
-  calc A.lam / (CP + 1) * (‖U‖ * ‖U‖)
-      ≤ A.lam / (CP + 1) * ((CP + 1) * S) :=
-        mul_le_mul_of_nonneg_left hkey (div_pos A.lam_pos hpos).le
-    _ = A.lam * S := by field_simp
-    _ ≤ A.bilin Ω U U := hBUU
+  refine ⟨A.lam / (CP + 1), div_pos A.lam_pos (by linarith), fun U => ?_⟩
+  exact isCoercive_of_energy_le (H01 Ω) A.lam_pos hCP (fun V => A.bilin_self_ge V)
+    (fun V => poincare_H01 CP hbase V.2) U
 
 end EllipticPdes.Sobolev

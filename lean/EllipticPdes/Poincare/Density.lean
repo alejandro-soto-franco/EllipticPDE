@@ -44,23 +44,28 @@ theorem poincare_H01 {Ω : Set (EuclideanSpace ℝ (Fin d))} (C : ℝ)
       ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ C * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2)
     {U : H1amb Ω} (hU : U ∈ H01 Ω) :
     ‖U 0‖ ^ 2 ≤ C * ∑ i : Fin d, ‖U i.succ‖ ^ 2 := by
-  -- `Φ V ≥ 0` is exactly the Poincaré estimate at `V`; `Φ` is continuous.
-  set Φ : H1amb Ω → ℝ := fun V => C * ∑ i : Fin d, ‖V i.succ‖ ^ 2 - ‖V 0‖ ^ 2 with hΦ
-  have hcont : Continuous Φ := by rw [hΦ]; fun_prop
-  have hclosed : IsClosed {V : H1amb Ω | 0 ≤ Φ V} := isClosed_le continuous_const hcont
-  -- The estimate holds on the span of the test graphs (which equals the test graphs).
-  have hspan : ((Submodule.span ℝ (testGraphSet Ω) : Submodule ℝ (H1amb Ω)) : Set (H1amb Ω))
-      ⊆ {V | 0 ≤ Φ V} := by
-    rw [span_testGraphSet]
-    rintro U ⟨φ, h, rfl⟩
-    simp only [Set.mem_ofPred_eq, hΦ, sub_nonneg]
-    exact hbase h
-  -- `H₀¹` is the closure of that span, so the closed estimate passes to all of it.
-  have hsub : (H01 Ω : Set (H1amb Ω)) ⊆ {V | 0 ≤ Φ V} := by
-    rw [H01, Submodule.topologicalClosure_coe]
-    exact closure_minimal hspan hclosed
-  have hUmem : 0 ≤ Φ U := hsub hU
-  simp only [hΦ, sub_nonneg] at hUmem
-  exact hUmem
+  have hclosed : IsClosed {V : H1amb Ω | ‖V 0‖ ^ 2 ≤ C * ∑ i : Fin d, ‖V i.succ‖ ^ 2} :=
+    isClosed_le (by fun_prop) (by fun_prop)
+  exact H01_subset_of_isClosed hclosed (fun φ h => by simpa using hbase h) hU
+
+/-- **Coercivity from an energy bound and a Poincaré bound.** If a bilinear form on a closed
+subspace `S` of `H¹` dominates `lam` times the Dirichlet energy and the function part is bounded
+by `CP` times the energy, then the form dominates the full `H¹` norm with constant
+`lam / (CP + 1)`. -/
+theorem isCoercive_of_energy_le {Ω : Set (EuclideanSpace ℝ (Fin d))} (S : Submodule ℝ (H1amb Ω))
+    {B : S →L[ℝ] S →L[ℝ] ℝ} {lam CP : ℝ} (hlam : 0 < lam) (hCP : 0 ≤ CP)
+    (hE : ∀ U : S, lam * ∑ i, ‖(U : H1amb Ω).grad i‖ ^ 2 ≤ B U U)
+    (hP : ∀ U : S, ‖(U : H1amb Ω).fn‖ ^ 2 ≤ CP * ∑ i, ‖(U : H1amb Ω).grad i‖ ^ 2)
+    (U : S) : lam / (CP + 1) * ‖U‖ * ‖U‖ ≤ B U U := by
+  have hpos : 0 < CP + 1 := by linarith
+  have hkey : ‖U‖ * ‖U‖ ≤ (CP + 1) * ∑ i, ‖(U : H1amb Ω).grad i‖ ^ 2 := by
+    have hn : ‖U‖ ^ 2 = ‖(U : H1amb Ω).fn‖ ^ 2 + ∑ i, ‖(U : H1amb Ω).grad i‖ ^ 2 :=
+      H1amb.norm_sq_eq (U : H1amb Ω)
+    linarith [hP U, sq ‖U‖]
+  calc lam / (CP + 1) * ‖U‖ * ‖U‖
+      = lam / (CP + 1) * (‖U‖ * ‖U‖) := by ring
+    _ ≤ lam / (CP + 1) * ((CP + 1) * ∑ i, ‖(U : H1amb Ω).grad i‖ ^ 2) := by gcongr
+    _ = lam * ∑ i, ‖(U : H1amb Ω).grad i‖ ^ 2 := by field_simp
+    _ ≤ B U U := hE U
 
 end EllipticPdes.Poincare

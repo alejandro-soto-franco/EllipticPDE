@@ -101,25 +101,9 @@ theorem laplaceBilin_coercive_const (Ω : Set (EuclideanSpace ℝ (Fin d)))
     (hbase : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ),
       ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2)
     (U : H01 Ω) :
-    1 / (CP + 1) * ‖U‖ * ‖U‖ ≤ laplaceBilin Ω U U := by
-  have hpos : (0 : ℝ) < CP + 1 := by linarith
-  set S : ℝ := ∑ i : Fin d, ‖(U : H1amb Ω) i.succ‖ ^ 2 with hS
-  -- The Dirichlet energy is `S`.
-  have hBUU : laplaceBilin Ω U U = S := laplaceBilin_self Ω U
-  -- The full `H¹` norm splits into function part plus `S`.
-  have hnorm : ‖U‖ ^ 2 = ‖(U : H1amb Ω) 0‖ ^ 2 + S := by
-    rw [show ‖U‖ = ‖(U : H1amb Ω)‖ from rfl, PiLp.norm_sq_eq_of_L2, Fin.sum_univ_succ]
-  -- Density Poincaré controls the function part by the energy.
-  have hpoin : ‖(U : H1amb Ω) 0‖ ^ 2 ≤ CP * S :=
-    poincare_H01 CP hbase U.2
-  -- Hence `‖U‖² ≤ (C_P + 1) · S`, i.e. `(1 / (C_P + 1)) ‖U‖² ≤ B[U, U]`.
-  have hkey : ‖U‖ * ‖U‖ ≤ (CP + 1) * S := by
-    have : ‖U‖ ^ 2 ≤ (CP + 1) * S := by rw [hnorm]; nlinarith [hpoin]
-    nlinarith [this]
-  rw [hBUU, mul_assoc]
-  calc 1 / (CP + 1) * (‖U‖ * ‖U‖)
-      ≤ 1 / (CP + 1) * ((CP + 1) * S) := mul_le_mul_of_nonneg_left hkey (by positivity)
-    _ = S := by rw [← mul_assoc, one_div_mul_cancel hpos.ne', one_mul]
+    1 / (CP + 1) * ‖U‖ * ‖U‖ ≤ laplaceBilin Ω U U :=
+  isCoercive_of_energy_le (H01 Ω) one_pos hCP
+    (fun V => by rw [laplaceBilin_self, one_mul]; rfl) (fun V => poincare_H01 CP hbase V.2) U
 
 /-- **Coercivity of the bilinear form of the Laplacian.** Given the test-function
 Poincaré bound with constant `C_P ≥ 0`, that form is coercive on `H₀¹(Ω)` with constant
@@ -134,6 +118,25 @@ theorem laplaceBilin_coercive (Ω : Set (EuclideanSpace ℝ (Fin d)))
 
 /-! ### Lax-Milgram -/
 
+/-- **Solvability for a coercive bilinear form.** If `B` is a bounded coercive bilinear form on a
+real Hilbert space `H` and `f` is a continuous linear functional on `H`, then there is a unique
+`u ∈ H` with `B u v = f v` for all `v ∈ H`.
+
+Mathlib's `IsCoercive.continuousLinearEquivOfBilin` supplies the equivalence `B♯` with
+`⟪B♯ u, v⟫ = B u v`; the step taken here is from that equivalence to solvability against a
+functional, by Riesz representation of `f`. -/
+theorem _root_.IsCoercive.existsUnique_apply_eq {H : Type*} [NormedAddCommGroup H]
+    [InnerProductSpace ℝ H] [CompleteSpace H] {B : H →L[ℝ] H →L[ℝ] ℝ} (hB : IsCoercive B)
+    (f : H →L[ℝ] ℝ) : ∃! u : H, ∀ v : H, B u v = f v := by
+  set g : H := (InnerProductSpace.toDual ℝ H).symm f with hg
+  have hgrep : ∀ w : H, ⟪g, w⟫ = f w := fun w => InnerProductSpace.toDual_symm_apply
+  refine ⟨hB.continuousLinearEquivOfBilin.symm g, fun v => ?_, fun u hu => ?_⟩
+  · rw [← hB.continuousLinearEquivOfBilin_apply, ContinuousLinearEquiv.apply_symm_apply, hgrep]
+  · apply hB.continuousLinearEquivOfBilin.injective
+    rw [ContinuousLinearEquiv.apply_symm_apply]
+    refine ext_inner_right (𝕜 := ℝ) (fun w => ?_)
+    rw [hB.continuousLinearEquivOfBilin_apply, hu w, ← hgrep w]
+
 /-- **Lax-Milgram Theorem.** If `(H, (·, ·))` is a Hilbert space and `B : H × H → ℝ` is a
 bounded coercive (i.e. `B(u, u) ≥ β‖u‖²_H`) bilinear form, and `f` is a continuous linear
 functional on `H`, then there is a unique `u ∈ H` such that `B(u, v) = ⟪f, v⟫` for all
@@ -141,27 +144,11 @@ functional on `H`, then there is a unique `u ∈ H` such that `B(u, v) = ⟪f, v
 
 Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem VII.3.1,
 p. 49. The two hypotheses are boundedness and coercivity, and `B` is otherwise
-arbitrary, which is Remark VII.3.2 there.
-
-Boundedness is the continuity the type `H →L[ℝ] H →L[ℝ] ℝ` states, and coercivity is
-`IsCoercive`. Mathlib's `IsCoercive.continuousLinearEquivOfBilin` supplies the equivalence
-`B♯` with `⟪B♯ u, v⟫ = B[u, v]`; the step taken here is from that equivalence to solvability
-against a functional, by Riesz representation of `f`. -/
+arbitrary, which is Remark VII.3.2 there. This is `IsCoercive.existsUnique_apply_eq`. -/
 theorem lax_milgram {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℝ H]
     [CompleteSpace H] {B : H →L[ℝ] H →L[ℝ] ℝ} (hB : IsCoercive B) (f : H →L[ℝ] ℝ) :
-    ∃! u : H, ∀ v : H, B u v = f v := by
-  set g : H := (InnerProductSpace.toDual ℝ H).symm f with hg
-  have hgrep : ∀ w : H, ⟪g, w⟫ = f w := fun w => InnerProductSpace.toDual_symm_apply
-  refine ⟨hB.continuousLinearEquivOfBilin.symm g, ?_, ?_⟩
-  · -- existence: `B[T⁻¹g, v] = ⟪T T⁻¹ g, v⟫ = ⟪g, v⟫ = f v`.
-    intro v
-    rw [← hB.continuousLinearEquivOfBilin_apply, ContinuousLinearEquiv.apply_symm_apply, hgrep]
-  · -- uniqueness: any solution `u` has `⟪T u, w⟫ = f w = ⟪g, w⟫`, so `T u = g`.
-    intro u hu
-    apply hB.continuousLinearEquivOfBilin.injective
-    rw [ContinuousLinearEquiv.apply_symm_apply]
-    refine ext_inner_right (𝕜 := ℝ) (fun w => ?_)
-    rw [hB.continuousLinearEquivOfBilin_apply, hu w, ← hgrep w]
+    ∃! u : H, ∀ v : H, B u v = f v :=
+  hB.existsUnique_apply_eq f
 
 /-! ### Lax-Milgram a-priori estimate -/
 
