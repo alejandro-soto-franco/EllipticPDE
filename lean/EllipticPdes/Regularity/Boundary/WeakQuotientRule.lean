@@ -20,7 +20,7 @@ At the point that step is invoked only the tangential second derivatives are kno
 `L²`, so (53) is available as a statement about the weak derivative of the *product*
 `a^{nn} u_{x_n}`, and the passage to `u_{x_n} ∈ H¹` needs a division. This file supplies
 that division: the inverse of the weighted product rule
-`EllipticPdes.Regularity.HasWeakDerivOn.mul_contDiff_left`.
+`EllipticPdes.Regularity.HasWeakDerivOn.mul_isWkInfty_left`.
 
 The mathematical content is one line, `v = a⁻¹ · (a · v)`, and the whole difficulty sits in the
 hypotheses on `a`. A bounded measurable `a` bounded away from zero falls short, since
@@ -127,14 +127,14 @@ private theorem partialD_inv {a : EuclideanSpace ℝ (Fin d) → ℝ} (ha : Cont
 `∂_ℓ a` bounded almost everywhere, then `v` itself has weak `ℓ`-derivative
 `(dav - (∂_ℓ a) · v) / a` on `V`.
 
-This is the inverse of `HasWeakDerivOn.mul_contDiff_left`, and is what step 5 of the proof
-of Evans, *Partial Differential Equations* (2nd ed.), §6.3.2, Theorem 4 (*Boundary `H²`
-regularity*) needs to pass from the rearranged equation (53), which controls the weak
+This is the inverse of the weak Leibniz rule `HasWeakDerivOn.mul_isWkInfty_left`, and is what
+step 5 of the proof of Evans, *Partial Differential Equations* (2nd ed.), §6.3.2, Theorem 4
+(*Boundary `H²` regularity*) needs to pass from the rearranged equation (53), which controls the weak
 derivative of the product `a^{nn} u_{x_n}`, to `u_{x_n} ∈ H¹` and hence to the pointwise
 bound (55). Proved by writing `v = a⁻¹ · (a · v)` and applying the product rule at the
 weight `a⁻¹`, whose `C¹` regularity is where the hypotheses on `a` are spent. -/
 theorem HasWeakDerivOn.of_mul_contDiff_left {V : Set (EuclideanSpace ℝ (Fin d))}
-    (hVm : MeasurableSet V) (ℓ : Fin d)
+    (ℓ : Fin d)
     {a : EuclideanSpace ℝ (Fin d) → ℝ} (ha : ContDiff ℝ 1 a)
     {θ M : ℝ} (hθ : 0 < θ)
     (haθ : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), θ ≤ a x)
@@ -173,7 +173,9 @@ theorem HasWeakDerivOn.of_mul_contDiff_left {V : Set (EuclideanSpace ℝ (Fin d)
     rw [hx, hax, partialD_inv ha hne ℓ x]
     field_simp
     ring
-  exact HasWeakDerivOn.mul_contDiff_left hVm ℓ hd hbC1 hbM hdbM v hvrep v' hv'rep
+  exact HasWeakDerivOn.mul_isWkInfty_left ℓ hd hbC1.continuous.measurable
+    ((hbC1.continuous_fderiv one_ne_zero).clm_apply continuous_const).measurable
+    (hasWeakPartial_partialD hbC1 ℓ) hbM hdbM v hvrep v' hv'rep
 
 /-- **Existence and estimate of the quotient class.** Under the hypotheses of
 `HasWeakDerivOn.of_mul_contDiff_left`, the weak `ℓ`-derivative of `v` is an `L²(V)` class
@@ -183,7 +185,7 @@ That estimate is the `L²` form of Evans, *Partial Differential Equations* (2nd 
 §6.3.2, Theorem 4 (*Boundary `H²` regularity*), proof step 5, equation (55), where the
 pointwise bound on `u_{x_n x_n}` is obtained by dividing (53) by `a^{nn} ≥ θ`. -/
 theorem exists_hasWeakDerivOn_of_mul_contDiff_left {V : Set (EuclideanSpace ℝ (Fin d))}
-    (hVm : MeasurableSet V) (ℓ : Fin d)
+    (ℓ : Fin d)
     {a : EuclideanSpace ℝ (Fin d) → ℝ} (ha : ContDiff ℝ 1 a)
     {θ M : ℝ} (hθ : 0 < θ)
     (haθ : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), θ ≤ a x)
@@ -225,7 +227,7 @@ theorem exists_hasWeakDerivOn_of_mul_contDiff_left {V : Set (EuclideanSpace ℝ 
     field_simp
     ring
   refine ⟨mulCoeffL hbmeas hbM dav + mulCoeffL hcmeas hcM v,
-    HasWeakDerivOn.of_mul_contDiff_left hVm ℓ ha hθ haθ hdaM hav hd hrep, hrep, ?_⟩
+    HasWeakDerivOn.of_mul_contDiff_left ℓ ha hθ haθ hdaM hav hd hrep, hrep, ?_⟩
   · refine le_trans (norm_add_le _ _) (add_le_add ?_ ?_)
     · exact norm_mulCoeffL_le hbmeas hbM dav
     · exact norm_mulCoeffL_le hcmeas hcM v
@@ -237,7 +239,7 @@ on the data the boundary programme already has. At `ℓ = k = n` this is exactly
 the rearranged equation (53) to `u_{x_n} ∈ H¹` in step 5 of the proof of Evans, *Partial
 Differential Equations* (2nd ed.), §6.3.2, Theorem 4 (*Boundary `H²` regularity*). -/
 theorem exists_hasWeakDerivOn_of_mul_diag {V : Set (EuclideanSpace ℝ (Fin d))}
-    (hVm : MeasurableSet V) (A : EllipticCoeff d) (hA : IsC1Coeff A) (ℓ k : Fin d)
+    (A : EllipticCoeff d) (hA : IsC1Coeff A) (ℓ k : Fin d)
     {v av dav : Lp ℝ 2 (volume.restrict V)}
     (hav : av =ᵐ[volume.restrict V] fun x => A.a x k k * (v x : ℝ))
     (hd : HasWeakDerivOn V ℓ av dav) :
@@ -247,7 +249,7 @@ theorem exists_hasWeakDerivOn_of_mul_diag {V : Set (EuclideanSpace ℝ (Fin d))}
             (fun x => ((dav x : ℝ) - partialD ℓ (fun y => A.a y k k) x * (v x : ℝ))
               / A.a x k k)
         ∧ ‖v'‖ ≤ A.lam⁻¹ * ‖dav‖ + hA.A1 / A.lam * ‖v‖ := by
-  refine exists_hasWeakDerivOn_of_mul_contDiff_left hVm ℓ (hA.contDiff k k) A.lam_pos
+  refine exists_hasWeakDerivOn_of_mul_contDiff_left ℓ (hA.contDiff k k) A.lam_pos
     (A.lam_le_diag k) (Filter.Eventually.of_forall fun x => ?_) hav hd
   calc |partialD ℓ (fun y => A.a y k k) x|
       = ‖(fderiv ℝ (fun y => A.a y k k) x) (EuclideanSpace.single ℓ (1 : ℝ))‖ := by

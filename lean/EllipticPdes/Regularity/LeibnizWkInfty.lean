@@ -14,7 +14,7 @@ public import EllipticPdes.Regularity.Caccioppoli
 # Leibniz rule for a `W^{1,∞}` weight
 
 This file proves the weak-derivative product rule for a weight in `W^{1,∞}`, which has no
-classical derivative. `HasWeakDerivOn.mul_contDiff_left` is the case of a `C¹` weight.
+classical derivative.
 
 For a `C^∞` weight `b`, the product `b · φ` is a test function supported where `φ` is, so
 `HasWeakDerivOn` applies to it directly and the classical Leibniz rule splits the result
