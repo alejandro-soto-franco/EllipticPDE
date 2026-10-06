@@ -129,16 +129,13 @@ theorem ae_const_on_ball_of_hasWeakGradOn_zero {Ω : Set (EuclideanSpace ℝ (Fi
     ∃ c : ℝ, u =ᵐ[volume.restrict (ball x r)] fun _ => c := by
   set L := ContinuousLinearMap.lsmul ℝ ℝ (E := ℝ) with hL
   set φb : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := stdBump r hr with hφb
-  have hφrOut : Tendsto (fun n => (φb n).rOut) atTop (𝓝 0) := tendsto_rOut_stdBump hr
-  have hφratio : ∀ n, (φb n).rOut ≤ 2 * (φb n).rIn := rOut_stdBump_le hr
   have hφle : ∀ n, (φb n).rOut ≤ r := rOut_stdBump_le_self hr
   set uΩ : EuclideanSpace ℝ (Fin d) → ℝ := Ω.indicator u with huΩ
   set v : ℕ → EuclideanSpace ℝ (Fin d) → ℝ :=
     fun n => uΩ ⋆[L, volume] (φb n).normed volume with hvdef
   have huΩint : Integrable uΩ volume := hu.integrable_indicator hΩm
   have hvsmooth : ∀ n, ContDiff ℝ (⊤ : ℕ∞) (v n) := fun n =>
-    (φb n).hasCompactSupport_normed.contDiff_convolution_right (L := L)
-      huΩint.locallyIntegrable (φb n).contDiff_normed
+    contDiff_convolution_normed (φb n) huΩint.locallyIntegrable
   -- each mollification is constant on the ball
   have hconst : ∀ n, ∀ y ∈ ball x r, v n y = v n x := fun n y hy =>
     isOpen_ball.is_const_of_fderiv_eq_zero (convex_ball x r).isPreconnected
@@ -149,10 +146,7 @@ theorem ae_const_on_ball_of_hasWeakGradOn_zero {Ω : Set (EuclideanSpace ℝ (Fi
           linarith [hφle n, mem_ball.mp hz, dist_triangle w z x]) hx))
       hy (mem_ball_self hr)
   -- the mollifications converge to the class in `L¹` on the ball
-  have hconv := tendsto_eLpNorm_convolution_sub le_rfl (h := uΩ)
-    (by rw [ENNReal.ofReal_one]; exact memLp_one_iff_integrable.mpr huΩint) hφrOut
-    (Eventually.of_forall hφratio)
-  rw [ENNReal.ofReal_one] at hconv
+  have hconv := tendsto_eLpNorm_one_stdBump_convolution_sub hr huΩint
   have hball : ball x r ⊆ Ω := fun z hz => hx (ball_subset_closedBall.trans
     (closedBall_subset_closedBall (by linarith)) hz)
   have hue : u =ᵐ[volume.restrict (ball x r)] uΩ :=

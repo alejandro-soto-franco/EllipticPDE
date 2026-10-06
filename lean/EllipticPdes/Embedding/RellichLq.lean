@@ -216,44 +216,7 @@ variable [Fact (1 ≤ (q : ℝ≥0∞))]
 map, with the operator norm the measure supplies. -/
 def lqOfL2 [IsFiniteMeasure (volume.restrict Ω)] (hq2 : (q : ℝ≥0∞) ≤ 2) :
     L2D Ω →L[ℝ] Lp ℝ (q : ℝ≥0∞) (volume.restrict Ω) :=
-  LinearMap.mkContinuous
-    { toFun := fun f => ((Lp.memLp f).mono_exponent hq2).toLp f
-      map_add' := fun f g => by
-        rw [MemLp.toLp_congr _ (((Lp.memLp f).mono_exponent hq2).add
-              ((Lp.memLp g).mono_exponent hq2)) (Lp.coeFn_add f g), MemLp.toLp_add]
-      map_smul' := fun c f => by
-        rw [MemLp.toLp_congr _ (((Lp.memLp f).mono_exponent hq2).const_smul c)
-          (Lp.coeFn_smul c f), MemLp.toLp_const_smul]
-        rfl }
-    (((volume.restrict Ω) Set.univ).toReal ^
-      (1 / (q : ℝ≥0∞).toReal - 1 / (2 : ℝ≥0∞).toReal))
-    (fun f => by
-      change ‖((Lp.memLp f).mono_exponent hq2).toLp f‖ ≤ _ * ‖f‖
-      rw [Lp.norm_toLp, Lp.norm_def]
-      have hq1 : (1 : ℝ) ≤ (q : ℝ≥0∞).toReal := by
-        have := ENNReal.toReal_mono ENNReal.coe_ne_top (Fact.out : (1 : ℝ≥0∞) ≤ (q : ℝ≥0∞))
-        simpa using this
-      have hq2' : (q : ℝ≥0∞).toReal ≤ (2 : ℝ≥0∞).toReal :=
-        ENNReal.toReal_mono (by simp) hq2
-      have he : (0 : ℝ) ≤ 1 / (q : ℝ≥0∞).toReal - 1 / (2 : ℝ≥0∞).toReal := by
-        rw [sub_nonneg]
-        exact one_div_le_one_div_of_le (by linarith) hq2'
-      have hb := eLpNorm_le_eLpNorm_mul_rpow_measure_univ (μ := volume.restrict Ω) hq2
-        (Lp.aestronglyMeasurable f)
-      have hfin : eLpNorm (f : EuclideanSpace ℝ (Fin d) → ℝ) 2 (volume.restrict Ω)
-          * (volume.restrict Ω) Set.univ ^ (1 / (q : ℝ≥0∞).toReal - 1 / (2 : ℝ≥0∞).toReal)
-          ≠ ⊤ :=
-        ENNReal.mul_ne_top (Lp.memLp f).eLpNorm_lt_top.ne
-          (ENNReal.rpow_ne_top_of_nonneg he (measure_ne_top _ _))
-      calc (eLpNorm (f : EuclideanSpace ℝ (Fin d) → ℝ) (q : ℝ≥0∞) (volume.restrict Ω)).toReal
-          ≤ (eLpNorm (f : EuclideanSpace ℝ (Fin d) → ℝ) 2 (volume.restrict Ω)
-              * (volume.restrict Ω) Set.univ
-                ^ (1 / (q : ℝ≥0∞).toReal - 1 / (2 : ℝ≥0∞).toReal)).toReal :=
-            ENNReal.toReal_mono hfin hb
-        _ = ((volume.restrict Ω) Set.univ).toReal
-              ^ (1 / (q : ℝ≥0∞).toReal - 1 / (2 : ℝ≥0∞).toReal)
-            * (eLpNorm (f : EuclideanSpace ℝ (Fin d) → ℝ) 2 (volume.restrict Ω)).toReal := by
-            rw [ENNReal.toReal_mul, ENNReal.toReal_rpow, mul_comm])
+  lpInclusion (volume.restrict Ω) hq2
 
 /-- **Compactness at every exponent up to `2`.** Below the `L²` exponent the embedding factors
 through `embL2`, the finite measure supplying the inclusion, so compactness is inherited rather

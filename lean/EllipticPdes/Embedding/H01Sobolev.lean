@@ -281,40 +281,24 @@ themselves. -/
 def sobolevEmbL (hbound : ∀ U : H1amb Ω, U ∈ H01 Ω →
       eLpNorm (U 0) q (volume.restrict Ω) ≤ C * ∑ i : Fin d, ‖U i.succ‖ₑ) :
     H01 Ω →L[ℝ] Lp ℝ q (volume.restrict Ω) :=
-  LinearMap.mkContinuous
-    { toFun := fun U => (memLp_of_mem_H01 (hbound (U : H1amb Ω) U.2)).toLp ((U : H1amb Ω) 0)
-      map_add' := fun U V => by
-        rw [MemLp.toLp_congr _ ((memLp_of_mem_H01 (hbound (U : H1amb Ω) U.2)).add
-              (memLp_of_mem_H01 (hbound (V : H1amb Ω) V.2)))
-            (show ⇑(((U + V : H01 Ω) : H1amb Ω) 0)
-              =ᵐ[volume.restrict Ω] ⇑((U : H1amb Ω) 0) + ⇑((V : H1amb Ω) 0) from
-              Lp.coeFn_add _ _),
-          MemLp.toLp_add]
-      map_smul' := fun c U => by
-        rw [MemLp.toLp_congr _ ((memLp_of_mem_H01 (hbound (U : H1amb Ω) U.2)).const_smul c)
-            (show ⇑(((c • U : H01 Ω) : H1amb Ω) 0)
-              =ᵐ[volume.restrict Ω] c • ⇑((U : H1amb Ω) 0) from Lp.coeFn_smul _ _),
-          MemLp.toLp_const_smul]
-        rfl }
-    (C * d) (fun U => by
-      change ‖(memLp_of_mem_H01 (hbound (U : H1amb Ω) U.2)).toLp ((U : H1amb Ω) 0)‖
-          ≤ (C * d) * ‖U‖
-      rw [Lp.norm_toLp]
-      refine ENNReal.toReal_le_of_le_ofReal (by positivity) ?_
-      calc eLpNorm ((U : H1amb Ω) 0) q (volume.restrict Ω)
-          ≤ C * ∑ i : Fin d, ‖(U : H1amb Ω) i.succ‖ₑ := hbound (U : H1amb Ω) U.2
-        _ ≤ (C : ℝ≥0∞) * ENNReal.ofReal (d * ‖U‖) := by
+  lpCLM (fun U => ⇑((U : H1amb Ω) 0)) (fun U => memLp_of_mem_H01 (hbound (U : H1amb Ω) U.2))
+    (fun _ _ => Lp.coeFn_add _ _) (fun _ _ => Lp.coeFn_smul _ _) (C * d) fun U =>
+    (hbound (U : H1amb Ω) U.2).trans (by
+      calc (C : ℝ≥0∞) * ∑ i : Fin d, ‖(U : H1amb Ω) i.succ‖ₑ
+          ≤ (C : ℝ≥0∞) * ENNReal.ofReal (d * ‖U‖) := by
             gcongr
             exact sum_enorm_succ_le U
-        _ = ENNReal.ofReal (C * d * ‖U‖) := by
-            rw [← ENNReal.ofReal_coe_nnreal, ← ENNReal.ofReal_mul (by positivity), mul_assoc])
+        _ = ((C * d : ℝ≥0) : ℝ≥0∞) * ‖U‖ₑ := by
+            rw [ENNReal.ofReal_mul (Nat.cast_nonneg d), ENNReal.ofReal_natCast, ofReal_norm]
+            push_cast
+            ring)
 
 /-- `sobolevEmbL hbound U` agrees almost everywhere on `Ω` with the function coordinate of `U`. -/
 @[simp] lemma coeFn_sobolevEmbL
     (hbound : ∀ U : H1amb Ω, U ∈ H01 Ω →
       eLpNorm (U 0) q (volume.restrict Ω) ≤ C * ∑ i : Fin d, ‖U i.succ‖ₑ) (U : H01 Ω) :
     ⇑(sobolevEmbL hbound U) =ᵐ[volume.restrict Ω] ⇑((U : H1amb Ω) 0) :=
-  MemLp.coeFn_toLp (memLp_of_mem_H01 (hbound (U : H1amb Ω) U.2))
+  coeFn_lpCLM U
 
 /-- The embedding is bounded by the gradient coordinates alone, with no Poincaré inequality and
 no bound on the domain. -/

@@ -434,4 +434,115 @@ theorem rOut_stdBump_le {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [
   simp only [rOut_stdBump, rIn_stdBump]
   exact le_of_eq (by ring)
 
+/-- The mollification of a locally integrable function is smooth. -/
+theorem contDiff_convolution_normed {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    [HasContDiffBump E] [MeasurableSpace E] [BorelSpace E] [FiniteDimensional ℝ E]
+    {μ : Measure E} [μ.IsAddHaarMeasure] (ρ : ContDiffBump (0 : E)) {h : E → ℝ}
+    (hh : LocallyIntegrable h μ) :
+    ContDiff ℝ (⊤ : ℕ∞) (h ⋆[ContinuousLinearMap.lsmul ℝ ℝ, μ] ρ.normed μ) :=
+  ρ.hasCompactSupport_normed.contDiff_convolution_right _ hh ρ.contDiff_normed
+
+/-- The mollification of a compactly supported function has compact support. -/
+theorem hasCompactSupport_convolution_normed {E : Type*} [NormedAddCommGroup E]
+    [NormedSpace ℝ E] [HasContDiffBump E] [MeasurableSpace E] [BorelSpace E]
+    [FiniteDimensional ℝ E] {μ : Measure E} [μ.IsAddHaarMeasure] (ρ : ContDiffBump (0 : E))
+    {h : E → ℝ} (hh : HasCompactSupport h) :
+    HasCompactSupport (h ⋆[ContinuousLinearMap.lsmul ℝ ℝ, μ] ρ.normed μ) :=
+  HasCompactSupport.convolution _ hh ρ.hasCompactSupport_normed
+
+/-- **Mollifications converge in `L¹`.** The standard mollifications of an integrable function
+converge to it in `L¹`. -/
+theorem tendsto_eLpNorm_one_stdBump_convolution_sub {δ : ℝ} (hδ : 0 < δ)
+    {h : EuclideanSpace ℝ (Fin d) → ℝ} (hh : Integrable h volume) :
+    Filter.Tendsto (fun n => eLpNorm (h ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume]
+      (stdBump δ hδ n : ContDiffBump (0 : EuclideanSpace ℝ (Fin d))).normed volume - h) 1 volume)
+      Filter.atTop (𝓝 0) := by
+  simpa using tendsto_eLpNorm_convolution_sub le_rfl
+    (by rw [ENNReal.ofReal_one]; exact memLp_one_iff_integrable.mpr hh) (tendsto_rOut_stdBump hδ)
+    (Filter.Eventually.of_forall (rOut_stdBump_le hδ))
+
+/-- **Lowering an exponent on a finite measure space costs a constant.** For `0 < p ≤ q` there
+is `A` with `‖f‖_{Lᵖ} ≤ A ‖f‖_{Lq}`, namely `μ(univ)^{1/p - 1/q}`. -/
+theorem exists_const_eLpNorm_le_of_le {α E : Type*} {m : MeasurableSpace α} {μ : Measure α}
+    [IsFiniteMeasure μ] [NormedAddCommGroup E] {p q : ℝ≥0∞} (hp : p ≠ 0) (hpq : p ≤ q) :
+    ∃ A : ℝ≥0, ∀ f : α → E, AEStronglyMeasurable f μ → eLpNorm f p μ ≤ A * eLpNorm f q μ := by
+  have he : 0 ≤ 1 / p.toReal - 1 / q.toReal := by
+    rcases eq_or_ne q ⊤ with rfl | hq
+    · simp
+    · rw [sub_nonneg]
+      exact one_div_le_one_div_of_le (ENNReal.toReal_pos hp (ne_top_of_le_ne_top hq hpq))
+        (ENNReal.toReal_mono hq hpq)
+  refine ⟨(μ univ ^ (1 / p.toReal - 1 / q.toReal)).toNNReal, fun f hf => ?_⟩
+  rw [ENNReal.coe_toNNReal (ENNReal.rpow_ne_top_of_nonneg he (measure_ne_top μ _)), mul_comm]
+  exact eLpNorm_le_eLpNorm_mul_rpow_measure_univ hpq hf
+
+/-- A function bounded by `B` together with its `d` partial derivatives, each bounded by `B`,
+has total `a + ∑ k, b k` at most `(d + 1) B`. -/
+theorem add_sum_le_of_le {d : ℕ} {a B : ℝ≥0∞} {b : Fin d → ℝ≥0∞} (ha : a ≤ B)
+    (hb : ∀ k, b k ≤ B) : a + ∑ k, b k ≤ (d + 1) * B := by
+  calc a + ∑ k, b k ≤ B + ∑ _k : Fin d, B := add_le_add ha (Finset.sum_le_sum fun k _ => hb k)
+    _ = (d + 1) * B := by simp [add_mul, add_comm]
+
+/-- The sum of `d` seminorms, each at most `B`, is at most `d * B`, read in `ℝ≥0`. -/
+theorem sum_toNNReal_eLpNorm_le {α : Type*} {m : MeasurableSpace α} {μ : Measure α}
+    {g : Fin d → α → ℝ} {p : ℝ≥0∞} {B : ℝ≥0} (h : ∀ k, eLpNorm (g k) p μ ≤ B) :
+    ∑ k, (eLpNorm (g k) p μ).toNNReal ≤ d * B := by
+  calc ∑ k, (eLpNorm (g k) p μ).toNNReal ≤ ∑ _k : Fin d, B :=
+        Finset.sum_le_sum fun k _ =>
+          (ENNReal.toNNReal_mono ENNReal.coe_ne_top (h k)).trans_eq (ENNReal.toNNReal_coe B)
+    _ = d * B := by simp
+
+/-- **A continuous linear map into `Lp` from an almost everywhere linear family of functions.**
+The family `T` sends a point of a normed space to a function in `Lp`, linearly up to null sets,
+with `‖T x‖_p ≤ C ‖x‖`. -/
+def lpCLM {X α : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X] {m : MeasurableSpace α}
+    {μ : Measure α} {p : ℝ≥0∞} [Fact (1 ≤ p)] (T : X → α → ℝ) (hT : ∀ x, MemLp (T x) p μ)
+    (hadd : ∀ x y, T (x + y) =ᵐ[μ] T x + T y) (hsmul : ∀ (c : ℝ) x, T (c • x) =ᵐ[μ] c • T x)
+    (C : ℝ≥0) (hC : ∀ x, eLpNorm (T x) p μ ≤ C * ‖x‖ₑ) : X →L[ℝ] Lp ℝ p μ :=
+  LinearMap.mkContinuous
+    { toFun := fun x => (hT x).toLp (T x)
+      map_add' := fun x y => by
+        rw [MemLp.toLp_congr _ ((hT x).add (hT y)) (hadd x y), MemLp.toLp_add]
+      map_smul' := fun c x => by
+        rw [MemLp.toLp_congr _ ((hT x).const_smul c) (hsmul c x), MemLp.toLp_const_smul]
+        rfl }
+    C (fun x => by
+      change ‖(hT x).toLp (T x)‖ ≤ C * ‖x‖
+      rw [Lp.norm_toLp]
+      refine ENNReal.toReal_le_of_le_ofReal (mul_nonneg C.coe_nonneg (norm_nonneg x))
+        ((hC x).trans_eq ?_)
+      rw [ENNReal.ofReal_mul C.coe_nonneg, ENNReal.ofReal_coe_nnreal, ofReal_norm])
+
+/-- `lpCLM T` agrees almost everywhere with the family it is built from. -/
+theorem coeFn_lpCLM {X α : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
+    {m : MeasurableSpace α} {μ : Measure α} {p : ℝ≥0∞} [Fact (1 ≤ p)] {T : X → α → ℝ}
+    {hT : ∀ x, MemLp (T x) p μ} {hadd : ∀ x y, T (x + y) =ᵐ[μ] T x + T y}
+    {hsmul : ∀ (c : ℝ) x, T (c • x) =ᵐ[μ] c • T x} {C : ℝ≥0}
+    {hC : ∀ x, eLpNorm (T x) p μ ≤ C * ‖x‖ₑ} (x : X) :
+    ⇑(lpCLM T hT hadd hsmul C hC x) =ᵐ[μ] T x :=
+  MemLp.coeFn_toLp (hT x)
+
+/-- **Inclusion of `Lq` into `Lp` on a finite measure space**, for `p ≤ q`. -/
+def lpInclusion {α : Type*} {m : MeasurableSpace α} (μ : Measure α) [IsFiniteMeasure μ]
+    {p q : ℝ≥0∞} [Fact (1 ≤ p)] [Fact (1 ≤ q)] (hpq : p ≤ q) : Lp ℝ q μ →L[ℝ] Lp ℝ p μ :=
+  have hp0 : p ≠ 0 := (lt_of_lt_of_le one_pos (Fact.out : 1 ≤ p)).ne'
+  lpCLM (fun f : Lp ℝ q μ => ⇑f) (fun f => (Lp.memLp f).mono_exponent hpq)
+    (fun f g => Lp.coeFn_add f g) (fun c f => Lp.coeFn_smul c f)
+    (exists_const_eLpNorm_le_of_le (μ := μ) (E := ℝ) hp0 hpq).choose fun f =>
+    ((exists_const_eLpNorm_le_of_le (μ := μ) (E := ℝ) hp0 hpq).choose_spec f
+      (Lp.aestronglyMeasurable f)).trans_eq (by rw [Lp.enorm_def])
+
+/-- The inclusion of `Lq` into `Lp` is the identity on representatives. -/
+theorem coeFn_lpInclusion {α : Type*} {m : MeasurableSpace α} (μ : Measure α) [IsFiniteMeasure μ]
+    {p q : ℝ≥0∞} [Fact (1 ≤ p)] [Fact (1 ≤ q)] (hpq : p ≤ q) (f : Lp ℝ q μ) :
+    ⇑(lpInclusion μ hpq f) =ᵐ[μ] ⇑f :=
+  MemLp.coeFn_toLp ((Lp.memLp f).mono_exponent hpq)
+
+/-- The inclusion of `Lq` into `Lp` is injective. -/
+theorem lpInclusion_injective {α : Type*} {m : MeasurableSpace α} (μ : Measure α)
+    [IsFiniteMeasure μ] {p q : ℝ≥0∞} [Fact (1 ≤ p)] [Fact (1 ≤ q)] (hpq : p ≤ q) :
+    Function.Injective (lpInclusion μ hpq) := fun f g h =>
+  Lp.ext ((coeFn_lpInclusion μ hpq f).symm.trans
+    ((Lp.ext_iff.mp h).trans (coeFn_lpInclusion μ hpq g)))
+
 end EllipticPdes.Embedding

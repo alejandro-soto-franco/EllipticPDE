@@ -374,24 +374,20 @@ theorem hasWeakGradOn_comp (hΩ : IsOpen Ω) {u : EuclideanSpace ℝ (Fin d) →
       (closure_minimal support_indicator_subset hK'c.isClosed)
   -- the mollifications of the extensions
   set ρ : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := stdBump δ hδ with hρ
-  have hρ0 : Tendsto (fun n => (ρ n).rOut) atTop (𝓝 0) := tendsto_rOut_stdBump hδ
-  have hρ1 : ∀ n, (ρ n).rOut ≤ 2 * (ρ n).rIn := rOut_stdBump_le hδ
   set v : ℕ → EuclideanSpace ℝ (Fin d) → ℝ :=
     fun n => K'.indicator u ⋆[L, volume] (ρ n).normed volume
   set w : ℕ → EuclideanSpace ℝ (Fin d) → ℝ :=
     fun n => K'.indicator (g k) ⋆[L, volume] (ρ n).normed volume
   have hvsmooth : ∀ n, ContDiff ℝ (⊤ : ℕ∞) (v n) := fun n =>
-    (ρ n).hasCompactSupport_normed.contDiff_convolution_right (L := L)
-      hUint.locallyIntegrable (ρ n).contDiff_normed
-  have hwc : ∀ n, Continuous (w n) := fun n =>
-    ((ρ n).hasCompactSupport_normed.contDiff_convolution_right (L := L)
-      hGint.locallyIntegrable (ρ n).contDiff_normed : ContDiff ℝ (⊤ : ℕ∞) _).continuous
+    contDiff_convolution_normed (ρ n) hUint.locallyIntegrable
+  have hwsmooth : ∀ n, ContDiff ℝ (⊤ : ℕ∞) (w n) := fun n =>
+    contDiff_convolution_normed (ρ n) hGint.locallyIntegrable
   have hwint : ∀ n, Integrable (w n) volume := fun n =>
-    (hwc n).integrable_of_hasCompactSupport
-      (HasCompactSupport.convolution (L := L) (hcs _) (ρ n).hasCompactSupport_normed)
+    (hwsmooth n).continuous.integrable_of_hasCompactSupport
+      (hasCompactSupport_convolution_normed (ρ n) (hcs _))
   have hvint : ∀ n, Integrable (v n) volume := fun n =>
     (hvsmooth n).continuous.integrable_of_hasCompactSupport
-      (HasCompactSupport.convolution (L := L) (hcs _) (ρ n).hasCompactSupport_normed)
+      (hasCompactSupport_convolution_normed (ρ n) (hcs _))
   -- on the support of `φ` the partial of the mollification is the mollified gradient
   have hpartial : ∀ n x, partialD k (v n) x * φ x = w n x * φ x := fun n x => by
     by_cases hx : x ∈ tsupport φ
@@ -400,14 +396,8 @@ theorem hasWeakGradOn_comp (hΩ : IsOpen Ω) {u : EuclideanSpace ℝ (Fin d) →
           (closedBall_subset_cthickening hx δ))]
     · rw [image_eq_zero_of_notMem_tsupport hx, mul_zero, mul_zero]
   -- `L¹` convergence of the mollifications, and an a.e. convergent subsequence
-  have hconv : ∀ h : EuclideanSpace ℝ (Fin d) → ℝ, Integrable h volume →
-      Tendsto (fun n => eLpNorm (h ⋆[L, volume] (ρ n).normed volume - h) 1 volume) atTop (𝓝 0) :=
-    fun h hh => by
-      simpa using tendsto_eLpNorm_convolution_sub le_rfl
-        (by rw [ENNReal.ofReal_one]; exact memLp_one_iff_integrable.mpr hh) hρ0
-        (Eventually.of_forall hρ1)
   obtain ⟨ns, hns, hae⟩ := (tendstoInMeasure_of_tendsto_eLpNorm one_ne_zero
-    (hconv _ hUint)).exists_seq_tendsto_ae
+    (tendsto_eLpNorm_one_stdBump_convolution_sub hδ hUint)).exists_seq_tendsto_ae
   -- the classical identity for every mollification
   have hclassical : ∀ n, ∫ x, f (v n x) * partialD k φ x = -∫ x, deriv f (v n x) * w n x * φ x :=
     fun n => by
@@ -418,12 +408,13 @@ theorem hasWeakGradOn_comp (hΩ : IsOpen Ω) {u : EuclideanSpace ℝ (Fin d) →
   -- the two limits agree
   have hintU : Integrable (fun x => f (K'.indicator u x) * partialD k φ x) volume :=
     integrable_comp_mul_of_lipschitz hUint hfl hpc hpcs
+  have hconvU := tendsto_eLpNorm_one_stdBump_convolution_sub hδ hUint
   have hlimL := (tendsto_integral_comp_mul hfl hCp hvint hUint (fun n =>
     ((hfl.continuous.comp (hvsmooth n).continuous).mul hpc).integrable_of_hasCompactSupport
-      hpcs.mul_left) hintU (hconv _ hUint)).comp hns.tendsto_atTop
+      hpcs.mul_left) hintU hconvU).comp hns.tendsto_atTop
   have hlimR := (tendsto_integral_deriv_comp_mul hf'c hMr hφc.continuous.aestronglyMeasurable hCφ
     (fun n => (hvsmooth (ns n)).continuous.aestronglyMeasurable) (fun n => hwint (ns n)) hGint
-    ((hconv _ hGint).comp hns.tendsto_atTop) hae).neg
+    ((tendsto_eLpNorm_one_stdBump_convolution_sub hδ hGint).comp hns.tendsto_atTop) hae).neg
   have hwhole := tendsto_nhds_unique hlimL (hlimR.congr fun i => (hclassical (ns i)).symm)
   -- back to the domain
   have hps : tsupport (partialD k φ) ⊆ Ω := (tsupport_partialD_subset k φ).trans hφΩ
