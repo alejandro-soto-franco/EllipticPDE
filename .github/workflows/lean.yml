@@ -60,7 +60,7 @@ jobs:
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
 
       # Builds `EllipticPdes` and `AxiomAudit`. That target pins every headline
-      # result to [propext, Classical.choice, Quot.sound] with `#guard_msgs`, so a
+      # result to [propext, Classical.choice, Quot.sound] with `assert_classical_axioms`, so a
       # change in the axiom set fails here instead of going unnoticed.
       - name: Build, including the axiom audit
         working-directory: lean
@@ -147,7 +147,7 @@ jobs:
         working-directory: lean
         run: |
           set -euo pipefail
-          names=$(grep '#print axioms' AxiomAudit.lean | sed 's/#print axioms //')
+          names=$(grep -E '^  EllipticPdes\.[^ ]+$' AxiomAudit.lean | sed 's/^  //')
           # Word splitting is the point: one argument per declaration.
           # shellcheck disable=SC2086
           # Absolute, because `lake env` runs the command from the package

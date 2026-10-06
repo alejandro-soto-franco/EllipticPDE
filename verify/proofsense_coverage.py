@@ -421,9 +421,9 @@ STATEMENT_LOCATOR = re.compile(
 
 
 def audited_declarations(path: Path) -> list[str]:
-    """Every declaration `#print axioms` pins in AxiomAudit.lean, in file order."""
+    """Every declaration `assert_classical_axioms` lists in AxiomAudit.lean, in file order."""
     text = path.read_text(encoding="utf-8")
-    return re.findall(r"^#print axioms\s+(\S+)\s*$", text, re.MULTILINE)
+    return re.findall(r"^  (EllipticPdes\.\S+)$", text, re.MULTILINE)
 
 
 def check(audited: list[str], warrants: list[dict], exempt: dict) -> list[str]:
@@ -466,7 +466,7 @@ def main() -> int:
 
     audited = audited_declarations(AUDIT)
     if not audited:
-        print(f"no `#print axioms` lines found in {AUDIT}", file=sys.stderr)
+        print(f"no audited declarations found in {AUDIT}", file=sys.stderr)
         return 2
 
     warrants = json.loads(MANIFEST.read_text(encoding="utf-8")).get("warrants", [])

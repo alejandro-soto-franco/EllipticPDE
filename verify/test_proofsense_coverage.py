@@ -5,16 +5,16 @@ def warrant(decl, locator="§6.3.1 Thm 1"):
     return {"decl": decl, "source_id": "evans-2010", "locator": locator}
 
 
-def test_the_audit_parses_the_printed_declarations(tmp_path):
+def test_the_audit_parses_the_listed_declarations(tmp_path):
     f = tmp_path / "AxiomAudit.lean"
     f.write_text(
         "import EllipticPdes\n"
-        "/-- info: 'A.b' depends on axioms: [propext] -/\n"
-        "#guard_msgs (whitespace := lax) in\n"
-        "#print axioms A.b\n"
-        "#print axioms C.d\n"
+        "assert_classical_axioms\n"
+        "  EllipticPdes.A.b\n"
+        "  EllipticPdes.C.d\n"
+        "  for id in stx do\n"
     )
-    assert pc.audited_declarations(f) == ["A.b", "C.d"]
+    assert pc.audited_declarations(f) == ["EllipticPdes.A.b", "EllipticPdes.C.d"]
 
 
 def test_a_warranted_audited_declaration_passes():
