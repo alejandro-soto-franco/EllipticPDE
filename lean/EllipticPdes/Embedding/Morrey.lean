@@ -817,9 +817,9 @@ theorem morrey_ball (hd : 0 < d) {p : ℝ} (hp : (d : ℝ) < p)
     Real.toNNReal_pos.mpr (sub_pos.mpr ((div_lt_one ((Nat.cast_nonneg d).trans_lt hp)).mpr hp))
   obtain ⟨C₀, hC₀⟩ := exists_holderOnWith_mollify hd hp
   refine ⟨C₀, fun u g hu hmemg hweak => ?_⟩
-  set φ : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := stdBump r hr with hφ
-  have hφ0 : Filter.Tendsto (fun n => (φ n).rOut) Filter.atTop (𝓝 0) := tendsto_rOut_stdBump hr
-  have hφ1 : ∀ n, (φ n).rOut ≤ 2 * (φ n).rIn := rOut_stdBump_le hr
+  set φ : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := mollifier hr with hφ
+  have hφ0 : Filter.Tendsto (fun n => (φ n).rOut) Filter.atTop (𝓝 0) := tendsto_rOut_mollifier hr
+  have hφ1 : ∀ n, (φ n).rOut ≤ 2 * (φ n).rIn := rOut_mollifier_le_two_mul_rIn hr
   have hHol : ∀ x ∈ Metric.ball c r, ∀ y ∈ Metric.ball c r, ∀ᶠ n in Filter.atTop,
       edist (((Metric.ball c r).indicator u ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume]
           (φ n).normed volume) x)

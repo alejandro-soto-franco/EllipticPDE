@@ -144,6 +144,7 @@ public import EllipticPdes.Analysis.WeakCompactness
 public import EllipticPdes.Analysis.DirectMethodForm
 public import EllipticPdes.Analysis.LpInterpolation
 public import EllipticPdes.Analysis.Dilation
+public import EllipticPdes.Analysis.Mollifier
 public import EllipticPdes.Embedding.H01Sobolev
 public import EllipticPdes.Embedding.SobolevSolution
 public import EllipticPdes.Embedding.RellichLq

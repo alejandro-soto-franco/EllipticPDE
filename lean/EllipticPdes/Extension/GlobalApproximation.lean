@@ -135,9 +135,9 @@ theorem exists_smooth_tendsto_of_hasWeakGradOn (hd : 0 < d) (hΩopen : IsOpen Ω
       (fun k => (hGint k).integrableOn) hwg hwgU hag k).symm
   -- the mollifiers
   set L := ContinuousLinearMap.lsmul ℝ ℝ (E := ℝ) with hL
-  let φb : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := mollifier 1 one_pos
+  let φb : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := mollifier one_pos
   have hφrOut : Tendsto (fun n => (φb n).rOut) atTop (𝓝 0) :=
-    tendsto_rOut_mollifier 1 one_pos
+    tendsto_rOut_mollifier one_pos
   have hφratio : ∀ᶠ n in atTop, (φb n).rOut ≤ 2 * (φb n).rIn :=
     Eventually.of_forall fun n => le_of_eq (by simp [φb, mollifier]; ring)
   set v : ℕ → EuclideanSpace ℝ (Fin d) → ℝ :=

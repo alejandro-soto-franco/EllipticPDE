@@ -297,11 +297,11 @@ theorem integral_comp_mul_partialD_eq_neg {f : ℝ → ℝ} (hf : ContDiff ℝ 1
     (hGcs : HasCompactSupport G) (hφc : ContDiff ℝ (⊤ : ℕ∞) φ) (hφcs : HasCompactSupport φ)
     {δ : ℝ} (hδ : 0 < δ)
     (hpartial : ∀ n x, partialD k (U ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume]
-        (stdBump δ hδ n : ContDiffBump (0 : EuclideanSpace ℝ (Fin d))).normed volume) x * φ x
+        (mollifier hδ n : ContDiffBump (0 : EuclideanSpace ℝ (Fin d))).normed volume) x * φ x
       = (G ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume]
-        (stdBump δ hδ n : ContDiffBump (0 : EuclideanSpace ℝ (Fin d))).normed volume) x * φ x) :
+        (mollifier hδ n : ContDiffBump (0 : EuclideanSpace ℝ (Fin d))).normed volume) x * φ x) :
     ∫ x, f (U x) * partialD k φ x = -∫ x, deriv f (U x) * G x * φ x := by
-  set ρ : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := stdBump δ hδ with hρ
+  set ρ : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := mollifier hδ with hρ
   set v : ℕ → EuclideanSpace ℝ (Fin d) → ℝ :=
     fun n => U ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] (ρ n).normed volume
   set w : ℕ → EuclideanSpace ℝ (Fin d) → ℝ :=
@@ -329,7 +329,7 @@ theorem integral_comp_mul_partialD_eq_neg {f : ℝ → ℝ} (hf : ContDiff ℝ 1
       (hasCompactSupport_convolution_normed (ρ n) hUcs)
   -- `L¹` convergence of the mollifications, and an a.e. convergent subsequence
   obtain ⟨ns, hns, hae⟩ := (tendstoInMeasure_of_tendsto_eLpNorm one_ne_zero
-    (tendsto_eLpNorm_one_stdBump_convolution_sub hδ hUint)).exists_seq_tendsto_ae
+    (tendsto_eLpNorm_one_mollifier_convolution_sub hδ hUint)).exists_seq_tendsto_ae
   -- the classical identity for every mollification
   have hclassical : ∀ n, ∫ x, f (v n x) * partialD k φ x = -∫ x, deriv f (v n x) * w n x * φ x :=
     fun n => by
@@ -342,11 +342,11 @@ theorem integral_comp_mul_partialD_eq_neg {f : ℝ → ℝ} (hf : ContDiff ℝ 1
     integrable_comp_mul_of_lipschitz hUint hfl hpc hpcs
   have hlimL := (tendsto_integral_comp_mul hfl hCp hvint hUint (fun n =>
     ((hfl.continuous.comp (hvsmooth n).continuous).mul hpc).integrable_of_hasCompactSupport
-      hpcs.mul_left) hintU (tendsto_eLpNorm_one_stdBump_convolution_sub hδ hUint)).comp
+      hpcs.mul_left) hintU (tendsto_eLpNorm_one_mollifier_convolution_sub hδ hUint)).comp
     hns.tendsto_atTop
   have hlimR := (tendsto_integral_deriv_comp_mul hf'c hMr hφc.continuous.aestronglyMeasurable hCφ
     (fun n => (hvsmooth (ns n)).continuous.aestronglyMeasurable) (fun n => hwint (ns n)) hGint
-    ((tendsto_eLpNorm_one_stdBump_convolution_sub hδ hGint).comp hns.tendsto_atTop) hae).neg
+    ((tendsto_eLpNorm_one_mollifier_convolution_sub hδ hGint).comp hns.tendsto_atTop) hae).neg
   exact tendsto_nhds_unique hlimL (hlimR.congr fun i => (hclassical (ns i)).symm)
 
 /-- **Chain rule for weak gradients** (Gilbarg and Trudinger Lemma 7.5, Evans §5.10 Problem
@@ -370,13 +370,13 @@ theorem hasWeakGradOn_comp (hΩ : IsOpen Ω) {u : EuclideanSpace ℝ (Fin d) →
       (closure_minimal support_indicator_subset hK'c.isClosed)
   -- on the support of `φ` the partial of the mollification is the mollified gradient
   have hpartial : ∀ n x, partialD k (K'.indicator u ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume]
-      (stdBump δ hδ n : ContDiffBump (0 : EuclideanSpace ℝ (Fin d))).normed volume) x * φ x
+      (mollifier hδ n : ContDiffBump (0 : EuclideanSpace ℝ (Fin d))).normed volume) x * φ x
       = (K'.indicator (g k) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume]
-        (stdBump δ hδ n : ContDiffBump (0 : EuclideanSpace ℝ (Fin d))).normed volume) x * φ x :=
+        (mollifier hδ n : ContDiffBump (0 : EuclideanSpace ℝ (Fin d))).normed volume) x * φ x :=
     fun n x => by
     by_cases hx : x ∈ tsupport φ
-    · rw [partialD_convolution_eq_of_hasWeakGradOn hK'm huK (hwg.mono hK') (stdBump δ hδ n) k
-        ((closedBall_subset_closedBall (rOut_stdBump_le_self hδ n)).trans
+    · rw [partialD_convolution_eq_of_hasWeakGradOn hK'm huK (hwg.mono hK') (mollifier hδ n) k
+        ((closedBall_subset_closedBall (rOut_mollifier_le hδ n)).trans
           (closedBall_subset_cthickening hx δ))]
     · rw [image_eq_zero_of_notMem_tsupport hx, mul_zero, mul_zero]
   have hwhole := integral_comp_mul_partialD_eq_neg hf hM k

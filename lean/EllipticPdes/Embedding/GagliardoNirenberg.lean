@@ -257,10 +257,10 @@ theorem exists_eLpNorm_sobolevConj_le_compactSupport (hd : 0 < d)
   have hGL2 : ∀ k, MemLp (G k) (ENNReal.ofReal (p : ℝ)) volume := by
     intro k; rw [hpofReal]; exact hGL k
   set L := ContinuousLinearMap.lsmul ℝ ℝ (E := ℝ) with hLdef
-  set φb : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := stdBump 1 one_pos with hφb
+  set φb : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := mollifier one_pos with hφb
   have hφrOut : Filter.Tendsto (fun n => (φb n).rOut) Filter.atTop (𝓝 0) :=
-    tendsto_rOut_stdBump one_pos
-  have hφratio : ∀ n, (φb n).rOut ≤ 2 * (φb n).rIn := rOut_stdBump_le one_pos
+    tendsto_rOut_mollifier one_pos
+  have hφratio : ∀ n, (φb n).rOut ≤ 2 * (φb n).rIn := rOut_mollifier_le_two_mul_rIn one_pos
   set W : ℕ → EuclideanSpace ℝ (Fin d) → ℝ :=
     fun n => w ⋆[L, volume] (φb n).normed volume with hWdef
   have hρ0 : ∀ n, (0 : EuclideanSpace ℝ (Fin d) → ℝ) ≤ (φb n).normed volume :=

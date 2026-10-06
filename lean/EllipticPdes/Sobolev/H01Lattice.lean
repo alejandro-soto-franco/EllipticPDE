@@ -97,10 +97,10 @@ lemma isTestFn_convolution_normed {w : EuclideanSpace ℝ (Fin d) → ℝ} (hwin
 `L²`. -/
 lemma tendsto_eLpNorm_mollifier_sub {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : MemLp f 2 volume)
     {r : ℝ} (hr : 0 < r) :
-    Tendsto (fun n => eLpNorm (f ⋆[Lsm, volume] (mollifier r hr n : ContDiffBump
+    Tendsto (fun n => eLpNorm (f ⋆[Lsm, volume] (mollifier hr n : ContDiffBump
       (0 : EuclideanSpace ℝ (Fin d))).normed volume - f) 2 volume) atTop (𝓝 0) := by
   have h2 : ENNReal.ofReal (2 : ℝ) = 2 := by norm_num
-  have := tendsto_eLpNorm_convolution_sub one_le_two (by rwa [h2]) (tendsto_rOut_mollifier r hr)
+  have := tendsto_eLpNorm_convolution_sub one_le_two (by rwa [h2]) (tendsto_rOut_mollifier hr)
     (K := 2) (Eventually.of_forall fun n => le_of_eq (by simp [mollifier]; ring))
   rwa [h2] at this
 
@@ -115,13 +115,13 @@ theorem mem_H01_of_hasCompactSupport (hΩ : IsOpen Ω) {w : EuclideanSpace ℝ (
       fun k => ((hh k).mono_measure Measure.restrict_le_self).toLp (h k)) ∈ H01 Ω := by
   obtain ⟨δ, hδ, hK'⟩ := IsCompact.exists_cthickening_subset_open hwcs hΩ hwΩ
   have hwint := integrable_of_memLp_hasCompactSupport hw hwcs
-  have hv : ∀ n, IsTestFn Ω (w ⋆[Lsm, volume] (mollifier δ hδ n :
+  have hv : ∀ n, IsTestFn Ω (w ⋆[Lsm, volume] (mollifier hδ n :
       ContDiffBump (0 : EuclideanSpace ℝ (Fin d))).normed volume) := fun n =>
     isTestFn_convolution_normed hwint hwcs _
-      ((cthickening_mono (rOut_mollifier_le δ hδ n) _).trans hK')
-  have hpartial : ∀ n k, partialD k (w ⋆[Lsm, volume] (mollifier δ hδ n :
+      ((cthickening_mono (rOut_mollifier_le hδ n) _).trans hK')
+  have hpartial : ∀ n k, partialD k (w ⋆[Lsm, volume] (mollifier hδ n :
       ContDiffBump (0 : EuclideanSpace ℝ (Fin d))).normed volume)
-        = h k ⋆[Lsm, volume] (mollifier δ hδ n : ContDiffBump
+        = h k ⋆[Lsm, volume] (mollifier hδ n : ContDiffBump
           (0 : EuclideanSpace ℝ (Fin d))).normed volume := fun n k => funext fun x => by
     simpa only [indicator_univ] using partialD_convolution_eq_of_hasWeakGradOn MeasurableSet.univ
       hwint.integrableOn hwg _ k (x := x) (subset_univ _)

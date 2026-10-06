@@ -108,12 +108,12 @@ theorem integral_mul_indepCoord {B : Set (EuclideanSpace ℝ (Fin d))} (hBopen :
   obtain ⟨P, hP⟩ := hψcs.exists_bound_of_continuous hψ.continuous
   obtain ⟨N, hN⟩ := (hψcs.partialD j).exists_bound_of_continuous
     (hψ.continuous_partialD one_ne_zero j)
-  set ρ : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := mollifier 1 one_pos
+  set ρ : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := mollifier one_pos
   set cn : ℕ → EuclideanSpace ℝ (Fin d) → ℝ := fun n => (ρ n).normed volume ⋆[Lsm, volume] c
   have hsm : ∀ n, ContDiff ℝ (⊤ : ℕ∞) (cn n) := fun n =>
     (ρ n).hasCompactSupport_normed.contDiff_convolution_left (L := Lsm) (ρ n).contDiff_normed
       hc.locallyIntegrable
-  have hrOut := tendsto_rOut_mollifier (E := EuclideanSpace ℝ (Fin d)) 1 one_pos
+  have hrOut := tendsto_rOut_mollifier (E := EuclideanSpace ℝ (Fin d)) one_pos
   refine integral_eq_neg_integral_of_tendsto hBopen.measurableSet hu (hgi j)
     (F := fun n x => cn n x * partialD j ψ x) (G := fun n x => cn n x * ψ x)
     (fun n => (hsm n).continuous.mul (hψ.continuous_partialD one_ne_zero j))

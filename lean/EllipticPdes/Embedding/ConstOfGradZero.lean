@@ -128,8 +128,8 @@ theorem ae_const_on_ball_of_hasWeakGradOn_zero {Ω : Set (EuclideanSpace ℝ (Fi
     (hr : 0 < r) (hx : closedBall x (2 * r) ⊆ Ω) :
     ∃ c : ℝ, u =ᵐ[volume.restrict (ball x r)] fun _ => c := by
   set L := ContinuousLinearMap.lsmul ℝ ℝ (E := ℝ) with hL
-  set φb : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := stdBump r hr with hφb
-  have hφle : ∀ n, (φb n).rOut ≤ r := rOut_stdBump_le_self hr
+  set φb : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := mollifier hr with hφb
+  have hφle : ∀ n, (φb n).rOut ≤ r := rOut_mollifier_le hr
   set uΩ : EuclideanSpace ℝ (Fin d) → ℝ := Ω.indicator u with huΩ
   set v : ℕ → EuclideanSpace ℝ (Fin d) → ℝ :=
     fun n => uΩ ⋆[L, volume] (φb n).normed volume with hvdef
@@ -146,7 +146,7 @@ theorem ae_const_on_ball_of_hasWeakGradOn_zero {Ω : Set (EuclideanSpace ℝ (Fi
           linarith [hφle n, mem_ball.mp hz, dist_triangle w z x]) hx))
       hy (mem_ball_self hr)
   -- the mollifications converge to the class in `L¹` on the ball
-  have hconv := tendsto_eLpNorm_one_stdBump_convolution_sub hr huΩint
+  have hconv := tendsto_eLpNorm_one_mollifier_convolution_sub hr huΩint
   have hball : ball x r ⊆ Ω := fun z hz => hx (ball_subset_closedBall.trans
     (closedBall_subset_closedBall (by linarith)) hz)
   have hue : u =ᵐ[volume.restrict (ball x r)] uΩ :=

@@ -6,6 +6,7 @@ Authors: Alejandro Soto Franco
 
 module
 
+public import EllipticPdes.Analysis.Mollifier
 public import EllipticPdes.Sobolev.WeakDeriv
 public import Mathlib.Analysis.Calculus.BumpFunction.Convolution
 public import Mathlib.Analysis.Calculus.BumpFunction.FiniteDimension
@@ -146,22 +147,6 @@ theorem HasWeakFDerivOn.hasFDerivAt_convolution (hw : HasWeakFDerivOn Ω u G μ)
     ((hρd 1).continuous_fderiv one_ne_zero), hR, (hw v).integral_eq hψ hψc (hψs.trans hKΩ),
     neg_neg]
 
-/-- Normed bumps of outer radius `r / (n + 1)`, a mollifying sequence of scale `r`. -/
-def bumpSeq (r : ℝ) (hr : 0 < r) (n : ℕ) : ContDiffBump (0 : E) :=
-  ⟨r / (n + 1) / 2, r / (n + 1), by positivity, half_lt_self (by positivity)⟩
-
-omit [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] in
-/-- The bumps of `bumpSeq r hr` have outer radius at most `r`. -/
-theorem rOut_bumpSeq_le {r : ℝ} (hr : 0 < r) (n : ℕ) : (bumpSeq (E := E) r hr n).rOut ≤ r :=
-  div_le_self hr.le (by linarith [(Nat.cast_nonneg n : (0 : ℝ) ≤ n)])
-
-omit [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] in
-/-- The outer radii of `bumpSeq r hr` tend to zero. -/
-theorem tendsto_rOut_bumpSeq {r : ℝ} (hr : 0 < r) :
-    Tendsto (fun n => (bumpSeq (E := E) r hr n).rOut) atTop (𝓝 0) := by
-  simpa [bumpSeq, div_eq_mul_inv, mul_comm] using
-    tendsto_one_div_add_atTop_nhds_zero_nat.const_mul r
-
 /-- **A continuous weak derivative is a Fréchet derivative.** If `u` is continuous on the open
 set `Ω` and has a weak Fréchet derivative `G` continuous on `Ω`, then `u` is differentiable at
 every point `x` of `Ω`, with derivative `G x`. -/
@@ -175,9 +160,9 @@ theorem HasWeakFDerivOn.hasFDerivAt (hw : HasWeakFDerivOn Ω u G μ) (hu : Conti
   have hthick : cthickening (R / 4) (ball x (R / 4)) ⊆ K :=
     (cthickening_subset_of_subset _ ball_subset_closedBall).trans
       (cthickening_closedBall hr.le hr.le x).le
-  have hsub : ∀ n, ∀ y ∈ ball x (R / 4), closedBall y (bumpSeq (E := E) _ hr n).rOut ⊆ K :=
+  have hsub : ∀ n, ∀ y ∈ ball x (R / 4), closedBall y (mollifier (E := E) hr n).rOut ⊆ K :=
     fun n y hy => closedBall_subset_closedBall' (by
-      linarith [rOut_bumpSeq_le (E := E) hr n, (mem_ball.1 hy).le])
+      linarith [rOut_mollifier_le (E := E) hr n, (mem_ball.1 hy).le])
   have hKm := hK.measurableSet
   have huK : IntegrableOn u K μ := (hu.mono hKΩ).integrableOn_compact hK
   have hGK : IntegrableOn G K μ := (hG.mono hKΩ).integrableOn_compact hK
@@ -185,13 +170,13 @@ theorem HasWeakFDerivOn.hasFDerivAt (hw : HasWeakFDerivOn Ω u G μ) (hu : Conti
     IntegrableOn.integrable_indicator (ε' := E →L[ℝ] F) hGK hKm
   have hvals := (tendstoUniformlyOn_normed_convolution (μ := μ) hK
     ((hu.mono hKΩ).congr fun y hy => indicator_of_mem hy u)
-    (huK.integrable_indicator hKm).aestronglyMeasurable hthick (rOut_bumpSeq_le hr)
-    (tendsto_rOut_bumpSeq hr)).congr_right fun y hy => indicator_of_mem (hthick
+    (huK.integrable_indicator hKm).aestronglyMeasurable hthick (rOut_mollifier_le hr)
+    (tendsto_rOut_mollifier hr)).congr_right fun y hy => indicator_of_mem (hthick
       (self_subset_cthickening _ hy)) u
   have hders := (tendstoUniformlyOn_normed_convolution (μ := μ) hK
     ((hG.mono hKΩ).congr fun y hy => indicator_of_mem hy G)
-    hGi.aestronglyMeasurable hthick (rOut_bumpSeq_le hr)
-    (tendsto_rOut_bumpSeq hr)).congr_right fun y hy => indicator_of_mem (hthick
+    hGi.aestronglyMeasurable hthick (rOut_mollifier_le hr)
+    (tendsto_rOut_mollifier hr)).congr_right fun y hy => indicator_of_mem (hthick
       (self_subset_cthickening _ hy)) G
   exact hasFDerivAt_of_tendstoUniformlyOn isOpen_ball hders
     (fun n y hy => hw.hasFDerivAt_convolution (hG.locallyIntegrableOn Ω.isOpen.measurableSet) hK
