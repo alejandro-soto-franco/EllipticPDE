@@ -319,6 +319,20 @@ private theorem enorm_mul_riesz_weight (hd : 0 < d) {D N w : ℝ} (hD : 0 < D) (
     ← ENNReal.ofReal_pow hw.le, ← ENNReal.ofReal_div_of_pos (pow_pos hw _),
     ← ENNReal.ofReal_mul (div_nonneg (pow_nonneg hD.le _) hdR.le)]
 
+/-- The contraction of a convex set `W ∋ x` towards `x` by a factor `t ∈ (0, 1]` stays in `W` and
+in the ball `ball x (D t)` when `W ⊆ ball x D`. -/
+private theorem image_affine_subset_inter {x : EuclideanSpace ℝ (Fin d)} {D t : ℝ}
+    {W : Set (EuclideanSpace ℝ (Fin d))} (hWconv : Convex ℝ W) (hxW : x ∈ W)
+    (hWsub : W ⊆ ball x D) (ht : t ∈ Ioc (0 : ℝ) 1) :
+    (fun y => x + t • (y - x)) '' W ⊆ W ∩ ball x (D * t) := by
+  rintro z ⟨y, hy, rfl⟩
+  refine ⟨?_, ?_⟩
+  · have hcombo := hWconv hxW hy (by linarith [ht.2] : (0 : ℝ) ≤ 1 - t) ht.1.le (by ring)
+    have : (1 - t) • x + t • y = x + t • (y - x) := by rw [sub_smul, one_smul, smul_sub]; abel
+    rwa [this] at hcombo
+  · rw [mem_ball, dist_eq_norm, add_sub_cancel_left]
+    exact norm_smul_sub_lt (hWsub hy) ht.1
+
 /-- **Morrey kernel bound (convex form).** The double gradient line integral over a bounded
 convex measurable set `W` containing the base point `x` is controlled by the Riesz potential of
 the gradient, with a dimensional factor `D^d/d`, where `D` is any radius with `W ⊆ ball x D`.
@@ -339,17 +353,6 @@ theorem kernel_bound_convex {φ : EuclideanSpace ℝ (Fin d) → ℝ}
   set h : EuclideanSpace ℝ (Fin d) → ℝ≥0∞ := fun z => ‖fderiv ℝ φ z‖ₑ * ‖z - x‖ₑ with hh_def
   have hhmeas : Measurable h :=
     (hfd.enorm.measurable).mul ((continuous_id.sub continuous_const).enorm.measurable)
-  -- The transformed region is contained in `W` intersected with a Euclidean ball at `x`.
-  have hregion : ∀ t ∈ Ioc (0 : ℝ) 1,
-      (fun y => x + t • (y - x)) '' W ⊆ W ∩ ball x (D * t) := by
-    intro t ht z hz
-    obtain ⟨y, hy, rfl⟩ := hz
-    refine ⟨?_, ?_⟩
-    · have hcombo := hWconv hxW hy (by linarith [ht.2] : (0 : ℝ) ≤ 1 - t) ht.1.le (by ring)
-      have : (1 - t) • x + t • y = x + t • (y - x) := by rw [sub_smul, one_smul, smul_sub]; abel
-      rwa [this] at hcombo
-    · rw [mem_ball, dist_eq_norm, add_sub_cancel_left]
-      exact norm_smul_sub_lt (hWsub hy) ht.1
   -- Step 1: Tonelli swap.
   rw [show (∫⁻ y in W, ∫⁻ t in Ioc (0 : ℝ) 1,
         ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂volume ∂volume)
@@ -371,7 +374,8 @@ theorem kernel_bound_convex {φ : EuclideanSpace ℝ (Fin d) → ℝ}
       lintegral_const_mul _ (hhmeas.indicator (measurableSet_ball))]
     refine mul_le_mul' le_rfl ?_
     calc ∫⁻ z in (fun y => x + t • (y - x)) '' W, h z ∂volume
-        ≤ ∫⁻ z in W ∩ ball x (D * t), h z ∂volume := lintegral_mono_set (hregion t ht)
+        ≤ ∫⁻ z in W ∩ ball x (D * t), h z ∂volume :=
+          lintegral_mono_set (image_affine_subset_inter hWconv hxW hWsub ht)
       _ = ∫⁻ z in W, (ball x (D * t)).indicator h z ∂volume := by
           rw [← lintegral_indicator (hWmeas.inter measurableSet_ball), ← lintegral_indicator hWmeas,
             Set.indicator_indicator]
