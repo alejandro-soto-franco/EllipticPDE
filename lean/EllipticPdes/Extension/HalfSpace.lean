@@ -17,7 +17,8 @@ public import EllipticPdes.Extension.Basic
 The extension of a Sobolev class across a flat boundary is by reflection, and what has to be
 proved is that the reflected class has a weak gradient across the interface. The identity of a
 weak gradient on the open half space applies only to test functions supported strictly inside
-it, so the test function is first multiplied by `slabCut j ε` and the slab is then let shrink.
+it, so the test function is first multiplied by `slabCut ℓ ε`, with `ℓ` the `j`-th coordinate,
+and the slab is then let shrink.
 
 Two terms survive the product rule. The one with the cutoff's own derivative vanishes
 identically in the directions along the interface, since the cutoff depends on the `j`-th
@@ -63,13 +64,19 @@ theorem isOpen_halfSpace (j : Fin d) : IsOpen (halfSpace j) :=
 theorem measurableSet_halfSpace (j : Fin d) : MeasurableSet (halfSpace j) :=
   (isOpen_halfSpace j).measurableSet
 
-/-- **Nullity of the interface**, being a proper linear subspace. -/
+/-- **A hyperplane is null.** The kernel of a nonzero linear functional is a proper subspace,
+and a proper subspace has measure zero for an additive Haar measure. -/
+theorem measure_ker_eq_zero {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] (μ : Measure E)
+    [μ.IsAddHaarMeasure] {ℓ : E →L[ℝ] ℝ} (hℓ : ℓ ≠ 0) : μ {x | ℓ x = 0} = 0 :=
+  Measure.addHaar_submodule μ (LinearMap.ker (ℓ : E →ₗ[ℝ] ℝ)) fun h =>
+    hℓ (ContinuousLinearMap.coe_injective (LinearMap.ker_eq_top.1 h))
+
+/-- **Nullity of the interface**, being a hyperplane. -/
 theorem volume_interface (j : Fin d) :
-    volume {x : EuclideanSpace ℝ (Fin d) | x j = 0} = 0 := by
-  have hne : LinearMap.ker (EuclideanSpace.proj j : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ).toLinearMap
-      ≠ ⊤ := fun h => by
-    simpa using DFunLike.congr_fun (LinearMap.ker_eq_top.1 h) (EuclideanSpace.single j (1 : ℝ))
-  exact Measure.addHaar_submodule volume _ hne
+    volume {x : EuclideanSpace ℝ (Fin d) | x j = 0} = 0 :=
+  measure_ker_eq_zero volume (ℓ := EuclideanSpace.proj j) fun h => by
+    simpa using DFunLike.congr_fun h (EuclideanSpace.single j (1 : ℝ))
 
 /-! ### No boundary term -/
 

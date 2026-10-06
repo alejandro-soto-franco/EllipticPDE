@@ -27,10 +27,16 @@ and the reflection returns through `T`.
 * `EllipticPdes.Extension.aboveGraph`: the region above the graph of a chart.
 * `EllipticPdes.Extension.preimage_shear_aboveGraph`: the shear pulls that region back to the
   half space.
+* `EllipticPdes.Extension.shearOp`, `EllipticPdes.Extension.evenOp` and
+  `EllipticPdes.Extension.chartOp`: the shear, the reflection and their composite, as linear
+  maps on pairs of a class and a gradient.
 * `EllipticPdes.Extension.chartExt` and `EllipticPdes.Extension.chartExtGrad`: the extension
   and its gradient.
 * `EllipticPdes.Extension.hasWeakGradOn_chartExt`: the extension has that weak gradient on the
   whole space.
+* `EllipticPdes.Extension.integrable_chartExt` and
+  `EllipticPdes.Extension.integrable_chartExtGrad`: the extension and its gradient are
+  integrable.
 * `EllipticPdes.Extension.chartExt_eq_of_mem`: the extension agrees with the class on the
   region it extends.
 * `EllipticPdes.Extension.eLpNorm_chartExt_le` and

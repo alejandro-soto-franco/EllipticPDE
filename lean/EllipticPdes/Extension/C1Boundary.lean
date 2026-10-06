@@ -32,6 +32,7 @@ the chart constrains nothing.
 * `EllipticPdes.Extension.tangential`: the projection killing the direction of the graph.
 * `EllipticPdes.Extension.exists_bound_on_cylinder`: a continuous function independent of a
   coordinate is bounded on a cylinder around that coordinate's axis.
+* `EllipticPdes.Extension.truncatedGraph`: a graph cut off in the tangential directions.
 * `EllipticPdes.Extension.exists_bounded_graph`: every graph agrees on a ball with one of
   bounded gradient.
 * `EllipticPdes.Extension.C1Chart`: a boundary chart.

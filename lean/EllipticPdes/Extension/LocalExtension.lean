@@ -192,6 +192,48 @@ theorem localConst_ne_top (d : ℕ) (B M : ℝ) : localConst d B M ≠ ⊤ := by
   unfold localConst
   finiteness
 
+/-- **A pair cut off and moved by an isometry.** Cutting by `ξ`, supported in `W` where the region
+`A'` lies in `Ω`, and moving by `e` gives integrable components over the preimage of `A'`, whose
+seminorms there are bounded by those of the pair over `Ω`: the function by `B` times the pair
+seminorm, and each gradient component by `d` times that. -/
+theorem eLpNorm_motionOp_cutOp_le {A' W Ω : Set (EuclideanSpace ℝ (Fin d))}
+    (e : EuclideanSpace ℝ (Fin d) ≃ₗᵢ[ℝ] EuclideanSpace ℝ (Fin d))
+    (hA'm : MeasurableSet A') (hW : MeasurableSet W) (hΩm : MeasurableSet Ω)
+    (hsub : A' ∩ W ⊆ Ω) {ξ : EuclideanSpace ℝ (Fin d) → ℝ} {B : ℝ}
+    (hξ : ContDiff ℝ (⊤ : ℕ∞) ξ) (hξcs : HasCompactSupport ξ) (hξs : tsupport ξ ⊆ W)
+    (hξb : ∀ y, ‖ξ y‖ ≤ B) (hξdb : ∀ (k : Fin d) y, ‖partialD k ξ y‖ ≤ B)
+    {p : ℝ≥0∞} (hp : 1 ≤ p) {u : EuclideanSpace ℝ (Fin d) → ℝ}
+    {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ} (hu : IntegrableOn u Ω volume)
+    (hgi : ∀ k, IntegrableOn (g k) Ω volume) :
+    IntegrableOn (motionOp e (cutOp ξ (u, g))).1
+        ((e : EuclideanSpace ℝ (Fin d) → EuclideanSpace ℝ (Fin d)) ⁻¹' A') volume ∧
+      (∀ k, IntegrableOn ((motionOp e (cutOp ξ (u, g))).2 k)
+        ((e : EuclideanSpace ℝ (Fin d) → EuclideanSpace ℝ (Fin d)) ⁻¹' A') volume) ∧
+      eLpNorm (motionOp e (cutOp ξ (u, g))).1 p
+        (volume.restrict ((e : EuclideanSpace ℝ (Fin d) → EuclideanSpace ℝ (Fin d)) ⁻¹' A'))
+          ≤ ENNReal.ofReal B * pairNorm p (volume.restrict Ω) u g ∧
+      ∀ k, eLpNorm ((motionOp e (cutOp ξ (u, g))).2 k) p
+        (volume.restrict ((e : EuclideanSpace ℝ (Fin d) → EuclideanSpace ℝ (Fin d)) ⁻¹' A'))
+          ≤ d * (ENNReal.ofReal B * pairNorm p (volume.restrict Ω) u g) := by
+  have hoff : ∀ y, y ∉ W → ξ y = 0 := fun y hy =>
+    image_eq_zero_of_notMem_tsupport fun hc => hy (hξs hc)
+  have h1u : eLpNorm (cutOp ξ (u, g)).1 p (volume.restrict A')
+      ≤ ENNReal.ofReal B * pairNorm p (volume.restrict Ω) u g :=
+    (eLpNorm_cutoff_mul_le hA'm hΩm hξb hξ.continuous.aestronglyMeasurable hu.1 hoff hsub).trans
+      (mul_le_mul_right eLpNorm_le_pairNorm _)
+  have h1g : ∀ i, eLpNorm ((cutOp ξ (u, g)).2 i) p (volume.restrict A')
+      ≤ ENNReal.ofReal B * pairNorm p (volume.restrict Ω) u g := fun i =>
+    (eLpNorm_cutOp_snd_le hA'm hΩm hξ hξs hξb i (hξdb i) hp hu.1 (hgi i).1 hsub).trans
+      (mul_le_mul_right (by rw [add_comm]; exact eLpNorm_add_grad_le_pairNorm i) _)
+  obtain ⟨hci, hcg⟩ := integrableOn_cutOp hA'm hW hξ hξcs hξs (hu.mono_set hsub)
+    fun k => (hgi k).mono_set hsub
+  obtain ⟨hmi, hmg⟩ := integrableOn_motionOp hci hcg e
+  refine ⟨hmi, hmg, (eLpNorm_comp_linearIsometry hci.1 e).le.trans h1u, fun k => ?_⟩
+  refine (eLpNorm_grad_comp_linearIsometry_le hp (fun i => (hcg i).1) e k).trans ?_
+  calc _ ≤ ∑ _i : Fin d, ENNReal.ofReal B * pairNorm p (volume.restrict Ω) u g :=
+        Finset.sum_le_sum fun i _ => h1g i
+    _ = d * (ENNReal.ofReal B * pairNorm p (volume.restrict Ω) u g) := by simp
+
 /-- **Bound on the local extension in every `Lᵖ` seminorm.** The cutoff multiplies the pair by a
 factor of at most `B`, the motion preserves the seminorm and mixes the `d` components of the
 gradient, the chart doubles and adds `4 M` times the normal component, and the motion back mixes
@@ -220,32 +262,11 @@ theorem localOp_bound {c : C1Chart d} {Ω : Set (EuclideanSpace ℝ (Fin d))}
   have hsub : A' ∩ ball x c.radius ⊆ Ω := hAW ▸ Set.inter_subset_left
   have hAeq : (c.motion.symm : EuclideanSpace ℝ (Fin d) → EuclideanSpace ℝ (Fin d)) ⁻¹' A'
       = aboveGraph c.dir γ := by ext y; simp [hA']
-  have hoff : ∀ y, y ∉ ball x c.radius → ξ y = 0 := fun y hy =>
-    image_eq_zero_of_notMem_tsupport fun hc => hy (hξs hc)
-  -- the cutoff pair over the region
-  have h1u : eLpNorm (cutOp ξ (u, g)).1 p (volume.restrict A')
-      ≤ ENNReal.ofReal B * N :=
-    (eLpNorm_cutoff_mul_le hA'm hΩm hξb hξ.continuous.aestronglyMeasurable hu.1 hoff hsub).trans
-      (mul_le_mul_right eLpNorm_le_pairNorm _)
-  have h1g : ∀ i, eLpNorm ((cutOp ξ (u, g)).2 i) p (volume.restrict A') ≤ ENNReal.ofReal B * N :=
-    fun i => (eLpNorm_cutOp_snd_le hA'm hΩm hξ hξs hξb i (hξdb i) hp hu.1 (hgi i).1 hsub).trans
-      (mul_le_mul_right (by rw [add_comm]; exact eLpNorm_add_grad_le_pairNorm i) _)
-  obtain ⟨hci, hcg⟩ := integrableOn_cutOp hA'm measurableSet_ball hξ hξcs hξs
-    (hu.mono_set hsub) fun k => (hgi k).mono_set hsub
-  obtain ⟨hmi, hmg⟩ := integrableOn_motionOp hci hcg c.motion.symm
-  rw [hAeq] at hmi hmg
-  have hγd : Differentiable ℝ γ := hγ.differentiable (by simp)
   -- the cutoff pair, moved into the chart's coordinates, over the region above the graph
-  have h2u : eLpNorm (motionOp c.motion.symm (cutOp ξ (u, g))).1 p
-      (volume.restrict (aboveGraph c.dir γ)) ≤ ENNReal.ofReal B * N := by
-    rw [← hAeq]
-    exact (eLpNorm_comp_linearIsometry hci.1 c.motion.symm).le.trans h1u
-  have h2g : ∀ k, eLpNorm ((motionOp c.motion.symm (cutOp ξ (u, g))).2 k) p
-      (volume.restrict (aboveGraph c.dir γ)) ≤ d * (ENNReal.ofReal B * N) := fun k => by
-    rw [← hAeq]
-    refine (eLpNorm_grad_comp_linearIsometry_le hp (fun i => (hcg i).1) c.motion.symm k).trans ?_
-    calc _ ≤ ∑ _i : Fin d, ENNReal.ofReal B * N := Finset.sum_le_sum fun i _ => h1g i
-      _ = d * (ENNReal.ofReal B * N) := by simp
+  obtain ⟨hmi, hmg, h2u, h2g⟩ := eLpNorm_motionOp_cutOp_le (B := B) c.motion.symm hA'm
+    measurableSet_ball hΩm hsub hξ hξcs hξs hξb hξdb hp hu hgi
+  rw [hAeq] at hmi hmg h2u h2g
+  have hγd : Differentiable ℝ γ := hγ.differentiable (by simp)
   -- the extension across the graph
   have h3u : eLpNorm (chartExt c.dir γ (motionOp c.motion.symm (cutOp ξ (u, g))).1) p volume
       ≤ 2 * (ENNReal.ofReal B * N) :=
