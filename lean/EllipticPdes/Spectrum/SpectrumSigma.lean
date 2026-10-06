@@ -351,7 +351,7 @@ lemma opAlam_bijective_of_notMem (hK : IsCompactOperator (Op.opK Ω)) {lam : ℝ
         (((Op.gardingγ + lam) / Op.gardingγ)⁻¹) := by
       rw [inv_div]
       exact fun h => hlam ⟨hcase, h⟩
-    have h1bij := bijective_one_sub_smul (E := H01 Ω) hK (div_ne_zero hcase hγ.ne') hnoteig
+    have h1bij := hK.bijective_one_sub_smul (div_ne_zero hcase hγ.ne') hnoteig
     have hEbij : Function.Bijective (Op.opE Ω : H01 Ω →L[ℝ] H01 Ω) := by
       simpa using (Op.opE Ω).bijective
     rw [Op.opAlam_factor Ω lam]
