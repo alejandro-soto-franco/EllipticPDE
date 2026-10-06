@@ -76,7 +76,7 @@ def reflectLI (j : Fin d) : EuclideanSpace ℝ (Fin d) ≃ₗᵢ[ℝ] EuclideanS
   split <;> simp
 
 /-- The reflection negates the `j`-th coordinate. -/
-@[simp] lemma reflectLI_apply_self (j : Fin d) (x : EuclideanSpace ℝ (Fin d)) :
+lemma reflectLI_apply_self (j : Fin d) (x : EuclideanSpace ℝ (Fin d)) :
     reflectLI j x j = -x j := by
   simp [reflectSign]
 

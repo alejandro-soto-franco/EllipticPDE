@@ -136,9 +136,11 @@ section signedExt
 
 variable {j : Fin d} {s : ℝ} {f : EuclideanSpace ℝ (Fin d) → ℝ}
 
+/-- On the closed upper half space the extension is the function. -/
 theorem signedExt_of_nonneg {x : EuclideanSpace ℝ (Fin d)} (hx : 0 ≤ x j) :
     signedExt j s f x = f x := by simp [signedExt, hx]
 
+/-- On the lower half space the extension is `s` times the function at the mirror image. -/
 theorem signedExt_of_neg {x : EuclideanSpace ℝ (Fin d)} (hx : x j < 0) :
     signedExt j s f x = s * f (reflectLI j x) := by simp [signedExt, hx.not_ge]
 

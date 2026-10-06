@@ -152,9 +152,11 @@ def cutOp (η : EuclideanSpace ℝ (Fin d) → ℝ) : SobolevPair d →ₗ[ℝ] 
       simp only [Prod.smul_fst, Prod.smul_snd, Pi.smul_apply, smul_eq_mul, RingHom.id_apply] <;>
       ring
 
+/-- The first component of `cutOp η w`. -/
 @[simp] theorem cutOp_fst (η : EuclideanSpace ℝ (Fin d) → ℝ) (w : SobolevPair d) :
     (cutOp η w).1 = fun x => η x * w.1 x := rfl
 
+/-- The second component of `cutOp η w`, the product rule. -/
 @[simp] theorem cutOp_snd (η : EuclideanSpace ℝ (Fin d) → ℝ) (w : SobolevPair d) :
     (cutOp η w).2 = fun k x => η x * w.2 k x + partialD k η x * w.1 x := rfl
 

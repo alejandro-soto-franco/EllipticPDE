@@ -174,9 +174,8 @@ theorem ballChart_fits (hd : 0 < d) {x : EuclideanSpace ℝ (Fin d)} (hx : ‖x�
     rw [map_sub, hp, tangential_neg_single, sub_zero]
   have htan_lt : ‖tangential j y‖ < 1 / 2 := by
     rw [htan]; exact lt_of_le_of_lt (norm_tangential_le j (y - p)) hy
-  have hs : ‖tangential j y‖ ^ 2 ≤ 1 / 4 := by
-    have h0 : 0 ≤ ‖tangential j y‖ := norm_nonneg _
-    nlinarith
+  have hs : ‖tangential j y‖ ^ 2 ≤ 1 / 4 :=
+    (pow_le_pow_left₀ (norm_nonneg _) htan_lt.le 2).trans_eq (by norm_num)
   have hyj : y j < -1 / 2 := by
     have h1 : |(y - p) j| ≤ ‖y - p‖ := by
       simpa [Real.norm_eq_abs] using PiLp.norm_apply_le (y - p) j

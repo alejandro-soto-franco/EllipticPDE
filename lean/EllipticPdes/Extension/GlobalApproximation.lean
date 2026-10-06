@@ -109,17 +109,11 @@ theorem exists_smooth_tendsto_of_hasWeakGradOn (hd : 0 < d) (hΩopen : IsOpen Ω
       (fun k => (hmg k).integrable hp1) (fun k => (hGint k).integrableOn) hwg hwuG k
   -- the mollifiers
   set L := ContinuousLinearMap.lsmul ℝ ℝ (E := ℝ) with hL
-  let φb : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := fun n =>
-    { rIn := 1 / (n + 1 : ℝ) / 2
-      rOut := 1 / (n + 1 : ℝ)
-      rIn_pos := half_pos (by positivity)
-      rIn_lt_rOut := half_lt_self (by positivity) }
-  have hrOut : ∀ n : ℕ, (φb n).rOut = 1 / (n + 1 : ℝ) := fun _ => rfl
-  have hrIn : ∀ n : ℕ, (φb n).rIn = 1 / (n + 1 : ℝ) / 2 := fun _ => rfl
-  have hφrOut : Tendsto (fun n => (φb n).rOut) atTop (𝓝 0) := by
-    simp only [hrOut]; exact tendsto_one_div_add_atTop_nhds_zero_nat
+  let φb : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := mollifier 1 one_pos
+  have hφrOut : Tendsto (fun n => (φb n).rOut) atTop (𝓝 0) :=
+    tendsto_rOut_mollifier 1 one_pos
   have hφratio : ∀ᶠ n in atTop, (φb n).rOut ≤ 2 * (φb n).rIn :=
-    Eventually.of_forall fun n => le_of_eq (by rw [hrOut, hrIn]; ring)
+    Eventually.of_forall fun n => le_of_eq (by simp [φb, mollifier]; ring)
   set v : ℕ → EuclideanSpace ℝ (Fin d) → ℝ :=
     fun n => U ⋆[L, volume] (φb n).normed volume with hvdef
   have hUli : LocallyIntegrable U volume := hUint.locallyIntegrable

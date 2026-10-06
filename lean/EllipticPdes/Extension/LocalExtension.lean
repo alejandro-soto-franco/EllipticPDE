@@ -187,6 +187,7 @@ graph with partials bounded by `M`. -/
 def localConst (d : ℕ) (B M : ℝ) : ℝ≥0∞ :=
   2 * ENNReal.ofReal B + d * ((2 + 4 * ENNReal.ofReal M) * (d * ENNReal.ofReal B))
 
+/-- The constant of the local extension is finite. -/
 theorem localConst_ne_top (d : ℕ) (B M : ℝ) : localConst d B M ≠ ⊤ := by
   unfold localConst
   finiteness
