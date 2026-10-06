@@ -164,6 +164,90 @@ theorem theta_eqOn_one (T : CutoffTower Ω V) : Set.EqOn T.θ 1 (tsupport T.ξ) 
 
 end CutoffTower
 
+/-- **One-neighbourhood margin.** If the cutoff `η` is `≡ 1` on a neighbourhood of a compact set
+`K`, then there is a positive margin `δ` such that `η` is locally constant `≡ 1` near every
+point within `δ` of `K`. -/
+theorem exists_one_margin {η : EuclideanSpace ℝ (Fin d) → ℝ}
+    {K : Set (EuclideanSpace ℝ (Fin d))} (hK : IsCompact K) (hη : ∀ᶠ x in 𝓝ˢ K, η x = 1) :
+    ∃ δ : ℝ, 0 < δ ∧ ∀ x : EuclideanSpace ℝ (Fin d),
+      (∃ p ∈ K, dist x p < δ) → η =ᶠ[𝓝 x] (fun _ => (1 : ℝ)) := by
+  obtain ⟨U, hUopen, hKU, hUsub⟩ := mem_nhdsSet_iff_exists.mp hη
+  obtain ⟨δ, hδpos, hδ⟩ := hK.exists_cthickening_subset_open hUopen hKU
+  refine ⟨δ, hδpos, fun x hx => ?_⟩
+  have hxU : x ∈ U :=
+    hδ (Metric.thickening_subset_cthickening δ K (Metric.mem_thickening_iff.mpr hx))
+  exact Filter.eventually_of_mem (hUopen.mem_nhds hxU) (fun y hy => hUsub hy)
+
+/-- **Admissible shift for a pair of cutoffs.** The conditions on the step `h` in the
+direction `k` under which the difference-quotient test element built from the inner cutoff `ξ`
+and the outer cutoff `θ` is admissible: shifting `tsupport ξ²` by `h eₖ` and `tsupport θ` by
+`-h eₖ` stays inside `Ω`, and `θ ≡ 1` (hence `∂ⱼθ = 0`) on the part of `Ω` reachable from
+`tsupport ξ²` by the shift. -/
+structure ShiftAdmissible (Ω : Set (EuclideanSpace ℝ (Fin d)))
+    (ξ θ : EuclideanSpace ℝ (Fin d) → ℝ) (k : Fin d) (h : ℝ) : Prop where
+  /-- Shifting the inner support by `h eₖ` stays inside `Ω`. -/
+  shift_in : ∀ x ∈ tsupport (fun y => ξ y * ξ y), x + hshift k h ∈ Ω
+  /-- Shifting the outer support by `-h eₖ` stays inside `Ω`. -/
+  shift_out : ∀ x ∈ tsupport θ, x + hshift k (-h) ∈ Ω
+  /-- `θ ≡ 1` on the part of `Ω` reachable from the inner support. -/
+  theta_one : ∀ x ∈ Ω,
+    x ∈ tsupport (fun y => ξ y * ξ y) ∨ x + hshift k (-h) ∈ tsupport (fun y => ξ y * ξ y) →
+      θ x = 1
+  /-- `∂ⱼθ = 0` on the part of `Ω` reachable from the inner support. -/
+  dtheta_zero : ∀ j : Fin d, ∀ x ∈ Ω,
+    x ∈ tsupport (fun y => ξ y * ξ y) ∨ x + hshift k (-h) ∈ tsupport (fun y => ξ y * ξ y) →
+      partialD j θ x = 0
+
+namespace CutoffTower
+
+variable {Ω V : Set (EuclideanSpace ℝ (Fin d))}
+
+/-- **Shift conditions from the tower.** Every sufficiently small step is admissible for the
+pair `(ξ, θ)` of a cutoff tower, in every direction. -/
+theorem exists_shiftAdmissible (T : CutoffTower Ω V) :
+    ∃ δ : ℝ, 0 < δ ∧ δ ≤ T.margin ∧ ∀ (k : Fin d) (h : ℝ), |h| < δ →
+      ShiftAdmissible Ω T.ξ T.θ k h := by
+  obtain ⟨δθ, hδθ, hθ1m⟩ := exists_one_margin T.hξ.2.1 T.hθ_one
+  have hξ2 : tsupport (fun y => T.ξ y * T.ξ y) ⊆ tsupport T.ξ := tsupport_mul_subset_left
+  have hξθ : tsupport T.ξ ⊆ tsupport T.θ := fun x hx =>
+    subset_tsupport T.θ (by rw [Function.mem_support, T.theta_eqOn_one hx]; exact one_ne_zero)
+  refine ⟨min T.margin δθ, lt_min T.hmargin_pos hδθ, min_le_left _ _, fun k h hh => ?_⟩
+  have hm : |h| < T.margin := hh.trans_le (min_le_left _ _)
+  have hθ : |h| < δθ := hh.trans_le (min_le_right _ _)
+  have hev : ∀ x, x ∈ tsupport (fun y => T.ξ y * T.ξ y)
+      ∨ x + hshift k (-h) ∈ tsupport (fun y => T.ξ y * T.ξ y) →
+      T.θ =ᶠ[𝓝 x] (fun _ => (1 : ℝ)) := by
+    rintro x (h1 | h2)
+    · exact hθ1m x ⟨x, hξ2 h1, by rw [dist_self]; exact hδθ⟩
+    · refine hθ1m x ⟨x + hshift k (-h), hξ2 h2, ?_⟩
+      have hn : ‖hshift k h‖ = |h| := by simp [hshift, norm_smul]
+      rwa [dist_eq_norm, show x - (x + hshift k (-h)) = hshift k h by rw [hshift_neg]; abel, hn]
+  exact
+    { shift_in := fun x hx => T.hmargin k h hm x (hξθ (hξ2 hx))
+      shift_out := fun x hx => T.hmargin k (-h) (by rwa [abs_neg]) x hx
+      theta_one := fun x _ hx => by simpa using (hev x hx).eq_of_nhds
+      dtheta_zero := fun j x _ hx => by
+        rw [partialD, (hev x hx).fderiv_eq]
+        simp }
+
+/-- **Localisation of the innermost cutoff.** For small steps, a shifted point of `tsupport ζ`
+lies where the middle cutoff is `1`: `ζ(x + h eₖ) = 0 ∨ ξ x = 1`. -/
+theorem exists_zeta_shift (T : CutoffTower Ω V) :
+    ∃ δ : ℝ, 0 < δ ∧ ∀ (k : Fin d) (h : ℝ), |h| < δ →
+      ∀ x, T.ζ (x + hshift k h) = 0 ∨ T.ξ x = 1 := by
+  obtain ⟨δ, hδ, hξ1⟩ := exists_one_margin T.hζ.2.1 T.hξ_one
+  refine ⟨δ, hδ, fun k h hh x => ?_⟩
+  by_cases hz : T.ζ (x + hshift k h) = 0
+  · exact Or.inl hz
+  · refine Or.inr ?_
+    have hn : ‖hshift k h‖ = |h| := by simp [hshift, norm_smul]
+    have hd : dist x (x + hshift k h) < δ := by
+      rwa [dist_eq_norm, show x - (x + hshift k h) = -hshift k h by abel, norm_neg, hn]
+    simpa using (hξ1 x ⟨x + hshift k h, subset_tsupport _ (Function.mem_support.mpr hz), hd⟩
+      ).eq_of_nhds
+
+end CutoffTower
+
 /-- **Existence of the cutoff tower.** For any compact `V` inside an open `Ω`, a cutoff tower
 based at `V` exists: three applications of `exists_isTestFn_one_nhdsSet_of_isCompact` build
 `ζ`, `ξ`, `θ` in turn (each new cutoff's compact set is the topological support of the

@@ -129,6 +129,46 @@ theorem coeFn_diffQuotD (k : Fin d) (h : ℝ) (hΩm : MeasurableSet Ω) (g : L2D
     with x hx1 hx2 hx3
   simp only [hx1, Pi.smul_apply, hx2, Pi.sub_apply, hx3, smul_eq_mul, div_eq_inv_mul]
 
+/-- **Interior difference quotient as a restriction of the whole-space one.** Both sides
+evaluate to `((extendL2 g)(x + h eₖ) - g x) / h` almost everywhere on `Ω`, because extension by
+zero agrees with the class there. -/
+theorem restrictL2_diffQuot_extendL2 (k : Fin d) (h : ℝ) (hΩm : MeasurableSet Ω) (g : L2D Ω) :
+    restrictL2 (diffQuot k h (extendL2 hΩm g)) = diffQuotD k h hΩm g := by
+  apply Lp.ext
+  filter_upwards [coeFn_restrictL2 (Ω := Ω) (diffQuot k h (extendL2 hΩm g)),
+      ae_restrict_of_ae (coeFn_diffQuot k h (extendL2 hΩm g)),
+      coeFn_diffQuotD k h hΩm g,
+      ae_restrict_of_ae (coeFn_extendL2 hΩm g), ae_restrict_mem hΩm]
+    with x h1 h2 h3 h4 h5
+  rw [h1, h2, h3, h4, Set.indicator_of_mem h5]
+
+/-- A whole-space weak derivative restricts to a weak derivative on any measurable `V`: test
+functions supported in `V` see only the restricted classes, and the whole-space
+integration-by-parts identity localises because both integrands vanish off `V`. -/
+theorem hasWeakDerivOn_of_hasWeakDeriv {V : Set (EuclideanSpace ℝ (Fin d))}
+    (k : Fin d) {g w : EucL2 d} (h : HasWeakDeriv k g w) :
+    HasWeakDerivOn V k (restrictL2 g) (restrictL2 w) := by
+  intro φ hφc hφcs hφV
+  have hzero_dk : ∀ x ∉ V, (g x : ℝ) * partialD k φ x = 0 := by
+    intro x hx
+    rw [show partialD k φ x = 0 from image_eq_zero_of_notMem_tsupport
+      (fun hc => hx (hφV (tsupport_partialD_subset k φ hc))), mul_zero]
+  have hzero_phi : ∀ x ∉ V, (w x : ℝ) * φ x = 0 := by
+    intro x hx
+    rw [show φ x = 0 from image_eq_zero_of_notMem_tsupport (fun hc => hx (hφV hc)), mul_zero]
+  calc ∫ x in V, (restrictL2 g x : ℝ) * partialD k φ x
+      = ∫ x in V, (g x : ℝ) * partialD k φ x := by
+        refine integral_congr_ae ?_
+        filter_upwards [coeFn_restrictL2 g] with x hx; rw [hx]
+    _ = ∫ x, (g x : ℝ) * partialD k φ x :=
+        setIntegral_eq_integral_of_forall_compl_eq_zero hzero_dk
+    _ = - ∫ x, (w x : ℝ) * φ x := h φ hφc hφcs
+    _ = - ∫ x in V, (w x : ℝ) * φ x := by
+        rw [setIntegral_eq_integral_of_forall_compl_eq_zero hzero_phi]
+    _ = - ∫ x in V, (restrictL2 w x : ℝ) * φ x := by
+        refine congrArg Neg.neg (integral_congr_ae ?_)
+        filter_upwards [coeFn_restrictL2 w] with x hx; rw [hx]
+
 /-! ### Graph-level interior difference quotient -/
 
 /-- **Graph-level interior difference quotient** `diffQuotG k h : H1amb Ω →L[ℝ] H1amb Ω`,

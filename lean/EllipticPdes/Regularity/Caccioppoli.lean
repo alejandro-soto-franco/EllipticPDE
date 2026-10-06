@@ -407,6 +407,25 @@ lemma absorb_energy {lam e N K₁ K₂ : ℝ} (hlam : 0 < lam)
   have hy := young_peterPaul (lam := lam) (B := K₁) (x := e) (y := N) hlam
   nlinarith only [h, hy]
 
+/-- Square-root form of a quadratic bound: `x² ≤ c P²` gives `x ≤ √c P`. -/
+lemma le_sqrt_mul_of_sq_le {x c P : ℝ} (hx : 0 ≤ x) (hP : 0 ≤ P) (h : x ^ 2 ≤ c * P ^ 2) :
+    x ≤ Real.sqrt c * P := by
+  calc x = Real.sqrt (x ^ 2) := (Real.sqrt_sq hx).symm
+    _ ≤ Real.sqrt (c * P ^ 2) := Real.sqrt_le_sqrt h
+    _ = Real.sqrt c * P := by rw [Real.sqrt_mul' c (sq_nonneg P), Real.sqrt_sq hP]
+
+/-- The sum of two coefficient actions on `L²(Ω)` is the pointwise sum of the products, almost
+everywhere. -/
+theorem mulCoeffL_add_coeFn {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    {f₁ f₂ : EuclideanSpace ℝ (Fin d) → ℝ} (hm₁ : Measurable f₁)
+    {M₁ : ℝ} (hb₁ : ∀ᵐ x ∂(volume.restrict Ω), |f₁ x| ≤ M₁) (hm₂ : Measurable f₂) {M₂ : ℝ}
+    (hb₂ : ∀ᵐ x ∂(volume.restrict Ω), |f₂ x| ≤ M₂) (g h : L2D Ω) :
+    mulCoeffL hm₁ hb₁ g + mulCoeffL hm₂ hb₂ h
+      =ᵐ[volume.restrict Ω] fun x => f₁ x * (g x : ℝ) + f₂ x * (h x : ℝ) := by
+  filter_upwards [Lp.coeFn_add (mulCoeffL hm₁ hb₁ g) (mulCoeffL hm₂ hb₂ h),
+    mulCoeffL_coeFn hm₁ hb₁ g, mulCoeffL_coeFn hm₂ hb₂ h] with x hadd h1 h2
+  simp only [hadd, h1, h2, Pi.add_apply]
+
 /-- The pairing of two vectors is bounded from below by minus the product of the norms. -/
 lemma neg_real_inner_le_mul_norm {G : Type*} [NormedAddCommGroup G] [InnerProductSpace ℝ G]
     (w v : G) : -⟪w, v⟫ ≤ ‖w‖ * ‖v‖ :=
@@ -425,6 +444,24 @@ lemma bAct_transport_regroup (Op : FullEllipticOp d)
     mulTest_coeFn hζ q] with x hq2 hp hq
   rw [hq2, hp, hq]
   ring
+
+/-- **Cross term bound.** `-∑ᵢⱼ 2 ⟪aᵢⱼ (ζ pᵢ), ∂ⱼζ q⟫ ≤ 2Λ ‖q‖ (∑ᵢ ‖ζ pᵢ‖) (∑ⱼ ‖∂ⱼζ‖∞)`. -/
+lemma neg_cross_sum_le (A : EllipticCoeff d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    {ζ : EuclideanSpace ℝ (Fin d) → ℝ} (hζ : IsTestFn Ω ζ) (p : Fin d → L2D Ω) (q : L2D Ω) :
+    -∑ i : Fin d, ∑ j : Fin d, 2 * ⟪A.actL i j (mulTest hζ (p i)), mulTestPartial hζ j q⟫
+      ≤ 2 * A.Λ * ‖q‖ * ((∑ i : Fin d, ‖mulTest hζ (p i)‖)
+        * ∑ j : Fin d, hζ.partialSupNorm j) := by
+  rw [← Finset.sum_neg_distrib, Finset.sum_mul_sum, Finset.mul_sum]
+  refine Finset.sum_le_sum fun i _ => ?_
+  rw [← Finset.sum_neg_distrib, Finset.mul_sum]
+  refine Finset.sum_le_sum fun j _ => ?_
+  have h1 := neg_real_inner_le_mul_norm (A.actL i j (mulTest hζ (p i)))
+    (mulTestPartial hζ j q)
+  have h2 : ‖A.actL i j (mulTest hζ (p i))‖ * ‖mulTestPartial hζ j q‖
+      ≤ (A.Λ * ‖mulTest hζ (p i)‖) * (hζ.partialSupNorm j * ‖q‖) :=
+    mul_le_mul (A.norm_actL_le i j _) (norm_mulTestPartial_le_supNorm hζ j q)
+      (norm_nonneg _) (mul_nonneg A.Λ_nonneg (norm_nonneg _))
+  nlinarith only [h1, h2]
 
 /-! ### Interior energy (Caccioppoli) estimate -/
 
@@ -545,22 +582,7 @@ theorem caccioppoli (Op : FullEllipticOp d) {Ω : Set (EuclideanSpace ℝ (Fin d
           mul_le_mul (Op.norm_cAct_le _) hζ2u0 (norm_nonneg _)
             (mul_nonneg Op.Csup_nonneg (norm_nonneg _))
       _ = _ := by ring
-  have hTx : -∑ i : Fin d, ∑ j : Fin d, 2 * ⟪A.actL i j (mulTest hζ ((u : H1amb Ω) i.succ)),
-        mulTestPartial hζ j ((u : H1amb Ω) 0)⟫
-      ≤ 2 * A.Λ * r * ((∑ i : Fin d, ‖mulTest hζ ((u : H1amb Ω) i.succ)‖)
-        * ∑ j : Fin d, hζ.partialSupNorm j) := by
-    rw [← Finset.sum_neg_distrib, Finset.sum_mul_sum, Finset.mul_sum]
-    refine Finset.sum_le_sum fun i _ => ?_
-    rw [← Finset.sum_neg_distrib, Finset.mul_sum]
-    refine Finset.sum_le_sum fun j _ => ?_
-    have h1 := neg_real_inner_le_mul_norm (A.actL i j (mulTest hζ ((u : H1amb Ω) i.succ)))
-      (mulTestPartial hζ j ((u : H1amb Ω) 0))
-    have h2 : ‖A.actL i j (mulTest hζ ((u : H1amb Ω) i.succ))‖
-        * ‖mulTestPartial hζ j ((u : H1amb Ω) 0)‖
-        ≤ (A.Λ * ‖mulTest hζ ((u : H1amb Ω) i.succ)‖) * (hζ.partialSupNorm j * r) :=
-      mul_le_mul (A.norm_actL_le i j _) (norm_mulTestPartial_le_supNorm hζ j _)
-        (norm_nonneg _) (mul_nonneg hΛ (norm_nonneg _))
-    nlinarith only [h1, h2]
+  have hTx := neg_cross_sum_le A hζ (fun i => (u : H1amb Ω) i.succ) ((u : H1amb Ω) 0)
   have hkey : A.lam * Real.sqrt E ^ 2 ≤ β * (‖f‖ + r) * Real.sqrt E + K₂ * (‖f‖ + r) ^ 2 := by
     rw [Real.sq_sqrt hE0]
     have he := Real.sqrt_nonneg E

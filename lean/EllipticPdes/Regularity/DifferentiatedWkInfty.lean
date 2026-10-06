@@ -172,17 +172,6 @@ theorem IsWkInftyCoeff.weakBddPair_D {A : EllipticCoeff d} {k : ℕ}
 
 variable {V : Set (EuclideanSpace ℝ (Fin d))}
 
-/-- The sum of two coefficient actions on `L²(V)` is the pointwise sum of the products, almost
-everywhere. -/
-theorem mulCoeffL_add_coeFn {f₁ f₂ : EuclideanSpace ℝ (Fin d) → ℝ} (hm₁ : Measurable f₁)
-    {M₁ : ℝ} (hb₁ : ∀ᵐ x ∂(volume.restrict V), |f₁ x| ≤ M₁) (hm₂ : Measurable f₂) {M₂ : ℝ}
-    (hb₂ : ∀ᵐ x ∂(volume.restrict V), |f₂ x| ≤ M₂) (g h : L2D V) :
-    mulCoeffL hm₁ hb₁ g + mulCoeffL hm₂ hb₂ h
-      =ᵐ[volume.restrict V] fun x => f₁ x * (g x : ℝ) + f₂ x * (h x : ℝ) := by
-  filter_upwards [Lp.coeFn_add (mulCoeffL hm₁ hb₁ g) (mulCoeffL hm₂ hb₂ h),
-    mulCoeffL_coeFn hm₁ hb₁ g, mulCoeffL_coeFn hm₂ hb₂ h] with x hadd h1 h2
-  simp only [hadd, h1, h2, Pi.add_apply]
-
 /-- A bounded measurable weight times an `L²(V)` class times a test function is integrable. -/
 theorem integrable_coeff_mul_testFn {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : Measurable f)
     (hM : ∃ M, ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |f x| ≤ M) (g : L2D V)

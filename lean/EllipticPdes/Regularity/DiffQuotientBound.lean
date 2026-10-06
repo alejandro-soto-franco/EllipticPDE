@@ -52,6 +52,16 @@ def HasWeakDeriv (k : Fin d) (g g' : EucL2 d) : Prop :=
   ∀ φ : EuclideanSpace ℝ (Fin d) → ℝ, ContDiff ℝ (⊤ : ℕ∞) φ → HasCompactSupport φ →
     ∫ x, (g x) * (partialD k φ x) = - ∫ x, (g' x) * (φ x)
 
+/-- **Weak derivative on a region.** `g'` is the weak `k`-derivative of `g` on `V` if the
+integration by parts identity holds against every test function supported in `V`. This is the
+`V`-restricted analogue of `HasWeakDeriv`, and is the `L²`-level statement of `∂ₖ g = g'` on
+`V`. -/
+def HasWeakDerivOn (V : Set (EuclideanSpace ℝ (Fin d))) (k : Fin d)
+    (g g' : Lp ℝ 2 (volume.restrict V)) : Prop :=
+  ∀ φ : EuclideanSpace ℝ (Fin d) → ℝ, ContDiff ℝ (⊤ : ℕ∞) φ → HasCompactSupport φ →
+    tsupport φ ⊆ V →
+    ∫ x in V, (g x : ℝ) * partialD k φ x = - ∫ x in V, (g' x : ℝ) * φ x
+
 /-! ### Smooth compactly supported case -/
 
 /-- The segment path `t ↦ φ (x + t • v)` has derivative `(fderiv ℝ φ (x + t • v)) v`
