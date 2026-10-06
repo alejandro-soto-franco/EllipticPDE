@@ -71,22 +71,23 @@ theorem exists_datum_piece {Ω N : Set (EuclideanSpace ℝ (Fin d))}
   refine ⟨K2 * K1, mul_nonneg hK2 hK1, ?_⟩
   intro p hp M hM
   -- The coefficient, then the cutoff.
+  set ap : L2D N := mulL2 ha.measurable_self ha.ae_abs_le p with hap
   obtain ⟨Hap, hApbd⟩ :=
     hP1 hp (mulL2_coeFn ha.measurable_self ha.ae_abs_le p) hM
   have hmt : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), x ∈ N →
-      ((mulTest hχ (mulL2 ha.measurable_self ha.ae_abs_le p)) x : ℝ)
-        = χ x * ((mulL2 ha.measurable_self ha.ae_abs_le p) x : ℝ) :=
-    (ae_restrict_iff' hNm).mp (mulTest_coeFn hχ (mulL2 ha.measurable_self ha.ae_abs_le p))
+      ((mulTest hχ ap) x : ℝ)
+        = χ x * (ap x : ℝ) :=
+    (ae_restrict_iff' hNm).mp (mulTest_coeFn hχ ap)
   have hqae : (restrictL2 (Ω := Ω)
-        (extendL2 hNm (mulTest hχ (mulL2 ha.measurable_self ha.ae_abs_le p)))
+        (extendL2 hNm (mulTest hχ ap))
         : EuclideanSpace ℝ (Fin d) → ℝ)
       =ᵐ[volume.restrict Ω] fun x =>
-        χ x * (extendL2 hNm (mulL2 ha.measurable_self ha.ae_abs_le p) x : ℝ) := by
+        χ x * (extendL2 hNm ap x : ℝ) := by
     filter_upwards [coeFn_restrictL2 (Ω := Ω)
-        (extendL2 hNm (mulTest hχ (mulL2 ha.measurable_self ha.ae_abs_le p))),
+        (extendL2 hNm (mulTest hχ ap)),
       ae_restrict_of_ae (coeFn_extendL2 hNm
-        (mulTest hχ (mulL2 ha.measurable_self ha.ae_abs_le p))),
-      ae_restrict_of_ae (coeFn_extendL2 hNm (mulL2 ha.measurable_self ha.ae_abs_le p)),
+        (mulTest hχ ap)),
+      ae_restrict_of_ae (coeFn_extendL2 hNm ap),
       ae_restrict_of_ae hmt] with x h1 h2 h3 h4
     rw [h1, h2, h3]
     by_cases hxN : x ∈ N
@@ -96,15 +97,15 @@ theorem exists_datum_piece {Ω N : Set (EuclideanSpace ℝ (Fin d))}
   refine ⟨_, H, by rw [mul_assoc]; exact hHbd, fun v => ?_⟩
   -- The pairing, read off the same description.
   have e1 : (∫ x in Ω, (restrictL2 (Ω := Ω)
-        (extendL2 hNm (mulTest hχ (mulL2 ha.measurable_self ha.ae_abs_le p))) x : ℝ) * v x)
+        (extendL2 hNm (mulTest hχ ap)) x : ℝ) * v x)
       = ∫ x in Ω, χ x
-          * (extendL2 hNm (mulL2 ha.measurable_self ha.ae_abs_le p) x : ℝ) * v x := by
+          * (extendL2 hNm ap x : ℝ) * v x := by
     refine integral_congr_ae ?_
     filter_upwards [hqae] with x hx
     rw [hx]
   have e2 : (∫ x in Ω, χ x
-        * (extendL2 hNm (mulL2 ha.measurable_self ha.ae_abs_le p) x : ℝ) * v x)
-      = ∫ x, χ x * (extendL2 hNm (mulL2 ha.measurable_self ha.ae_abs_le p) x : ℝ) * v x :=
+        * (extendL2 hNm ap x : ℝ) * v x)
+      = ∫ x, χ x * (extendL2 hNm ap x : ℝ) * v x :=
     setIntegral_eq_integral_of_forall_compl_eq_zero (fun x hx => by
       rw [show χ x = 0 from image_eq_zero_of_notMem_tsupport
         (fun hc => hx (hNΩ (hχ.2.2 hc)))]
