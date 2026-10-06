@@ -86,6 +86,57 @@ theorem truncSupport_subset (u : EuclideanSpace ℝ (Fin d) → ℝ)
 
 /-! ### The tail of the argument -/
 
+/-- On a finite measure space the superlevel sets `{u > N}` of a real function have arbitrarily
+small measure for large `N`. -/
+theorem exists_nat_measure_superlevel_lt {α : Type*} [MeasurableSpace α] {μ : Measure α}
+    [IsFiniteMeasure μ] {u : α → ℝ} (hu : Measurable u) {ε : ℝ≥0∞} (hε : 0 < ε) :
+    ∃ N : ℕ, μ {x | (N : ℝ) < u x} < ε := by
+  have hshrink : Tendsto (fun n : ℕ => μ {x | (n : ℝ) < u x}) atTop
+      (𝓝 (μ (⋂ n : ℕ, {x | (n : ℝ) < u x}))) :=
+    tendsto_measure_iInter_atTop (fun n => (measurableSet_lt measurable_const hu).nullMeasurableSet)
+      (fun m n hmn x (hx : (n : ℝ) < u x) => lt_of_le_of_lt (Nat.cast_le.mpr hmn) hx)
+      ⟨0, measure_ne_top _ _⟩
+  have hempty : (⋂ n : ℕ, {x | (n : ℝ) < u x}) = ∅ := by
+    ext x
+    simp only [mem_iInter, mem_ofPred_eq, mem_empty_iff_false, iff_false, not_forall, not_lt]
+    obtain ⟨n, hn⟩ := exists_nat_gt (u x)
+    exact ⟨n, hn.le⟩
+  rw [hempty, measure_empty] at hshrink
+  exact (hshrink.eventually (gt_mem_nhds hε)).exists
+
+/-- If every `Γ_t` with `k₀ ≤ t < T` has measure at least `c`, then so does the intersection of
+`{u ≥ T}` with the set where the gradient is nonzero: the sets `Γ_t` decrease to it as
+`t ↑ T`. -/
+theorem le_measure_superlevel_inter_of_levels {μ : Measure (EuclideanSpace ℝ (Fin d))}
+    [IsFiniteMeasure μ] {u : EuclideanSpace ℝ (Fin d) → ℝ}
+    {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ} (hu : Measurable u) (hg : ∀ i, Measurable (g i))
+    {c k₀ T : ℝ} (hTk : k₀ < T)
+    (hbelow : ∀ t, k₀ ≤ t → t < T → ENNReal.ofReal c ≤ μ (truncSupport u g t)) :
+    ENNReal.ofReal c ≤ μ ({x | T ≤ u x} ∩ {x | ∃ i, g i x ≠ 0}) := by
+  set t : ℕ → ℝ := fun n => max k₀ (T - 1 / (n + 1 : ℝ)) with htdef
+  have ht_lt : ∀ n, t n < T := fun n =>
+    max_lt hTk (by linarith [(by positivity : (0 : ℝ) < 1 / (n + 1 : ℝ))])
+  have ht_ge : ∀ n, k₀ ≤ t n := fun n => le_max_left _ _
+  have ht_mono : Monotone t := fun m n hmn => max_le_max le_rfl (by
+    have : (1 : ℝ) / (n + 1) ≤ 1 / (m + 1) :=
+      one_div_le_one_div_of_le (by positivity) (by exact_mod_cast Nat.succ_le_succ hmn)
+    linarith)
+  have ht_lim : Tendsto t atTop (𝓝 T) := by
+    have h1 : Tendsto (fun n : ℕ => T - 1 / (n + 1 : ℝ)) atTop (𝓝 (T - 0)) :=
+      tendsto_const_nhds.sub tendsto_one_div_add_atTop_nhds_zero_nat
+    rw [sub_zero] at h1
+    have h2 := ((continuous_const.max continuous_id : Continuous fun s : ℝ => max k₀ s).tendsto
+      T).comp h1
+    simpa only [Function.comp_def, max_eq_right hTk.le] using h2
+  have hlim := tendsto_measure_iInter_atTop (μ := μ)
+    (fun n => (measurableSet_truncSupport hu hg (t n)).nullMeasurableSet)
+    (fun m n hmn => truncSupport_antitone u g (ht_mono hmn)) ⟨0, measure_ne_top μ _⟩
+  have hge : ENNReal.ofReal c ≤ μ (⋂ n, truncSupport u g (t n)) :=
+    ge_of_tendsto' hlim fun n => hbelow (t n) (ht_ge n) (ht_lt n)
+  refine hge.trans (measure_mono fun x hx => ?_)
+  rw [mem_iInter] at hx
+  exact ⟨le_of_tendsto' ht_lim fun n => (hx n).1.le, (hx 0).2⟩
+
 /-- **Impossibility of a uniform lower bound on the measure of `Γ_k`.** If the measure of `Γ_k`
 is at least `c > 0` at every level `k ≥ k₀` whose superlevel set has positive measure, and the
 gradient vanishes almost everywhere on every level set, then the superlevel set of `k₀` is
@@ -103,19 +154,7 @@ theorem measure_superlevel_eq_zero {μ : Measure (EuclideanSpace ℝ (Fin d))} [
     measurableSet_lt measurable_const hu
   have hΓm : ∀ t, MeasurableSet (truncSupport u g t) := measurableSet_truncSupport hu hg
   -- the superlevel sets of `n` shrink to nothing, so some has measure below `c`
-  have hshrink : Tendsto (fun n : ℕ => μ {x | (n : ℝ) < u x}) atTop
-      (𝓝 (μ (⋂ n : ℕ, {x | (n : ℝ) < u x}))) :=
-    tendsto_measure_iInter_atTop (fun n => (hsup_meas n).nullMeasurableSet)
-      (fun m n hmn x hx => by
-        have hx' : (n : ℝ) < u x := hx
-        exact lt_of_le_of_lt (Nat.cast_le.mpr hmn) hx') ⟨0, measure_ne_top _ _⟩
-  have hempty : (⋂ n : ℕ, {x | (n : ℝ) < u x}) = ∅ := by
-    ext x
-    simp only [mem_iInter, mem_ofPred_eq, mem_empty_iff_false, iff_false, not_forall, not_lt]
-    obtain ⟨n, hn⟩ := exists_nat_gt (u x)
-    exact ⟨n, hn.le⟩
-  rw [hempty, measure_empty] at hshrink
-  obtain ⟨N, hN⟩ := (hshrink.eventually (gt_mem_nhds (ENNReal.ofReal_pos.mpr hc))).exists
+  obtain ⟨N, hN⟩ := exists_nat_measure_superlevel_lt (μ := μ) hu (ENNReal.ofReal_pos.mpr hc)
   -- the levels with a nonzero truncation
   set S : Set ℝ := {t | k₀ ≤ t ∧ 0 < μ {x | t < u x}} with hSdef
   have hk₀S : k₀ ∈ S := ⟨le_rfl, hpos⟩
@@ -174,33 +213,7 @@ theorem measure_superlevel_eq_zero {μ : Measure (EuclideanSpace ℝ (Fin d))} [
         (hest k₀ le_rfl hpos)) (measure_mono fun x hx => ⟨?_, hx.2⟩)
       rw [← hTk]
       exact hx.1.le
-    · -- levels increasing to the supremum
-      set t : ℕ → ℝ := fun n => max k₀ (T - 1 / (n + 1 : ℝ)) with htdef
-      have ht_lt : ∀ n, t n < T := fun n =>
-        max_lt hTk (by linarith [(by positivity : (0 : ℝ) < 1 / (n + 1 : ℝ))])
-      have ht_ge : ∀ n, k₀ ≤ t n := fun n => le_max_left _ _
-      have ht_mono : Monotone t := fun m n hmn => max_le_max le_rfl (by
-        have : (1 : ℝ) / (n + 1) ≤ 1 / (m + 1) :=
-          one_div_le_one_div_of_le (by positivity) (by exact_mod_cast Nat.succ_le_succ hmn)
-        linarith)
-      have ht_lim : Tendsto t atTop (𝓝 T) := by
-        have h1 : Tendsto (fun n : ℕ => T - 1 / (n + 1 : ℝ)) atTop (𝓝 (T - 0)) :=
-          tendsto_const_nhds.sub tendsto_one_div_add_atTop_nhds_zero_nat
-        rw [sub_zero] at h1
-        have hcm : Continuous fun s : ℝ => max k₀ s := continuous_const.max continuous_id
-        have h2 := (hcm.tendsto T).comp h1
-        simp only [Function.comp_def, max_eq_right hk₀T] at h2
-        exact h2
-      have hanti : Antitone fun n => truncSupport u g (t n) :=
-        fun m n hmn => truncSupport_antitone u g (ht_mono hmn)
-      have hlim := tendsto_measure_iInter_atTop (μ := μ)
-        (fun n => (hΓm (t n)).nullMeasurableSet) hanti ⟨0, measure_ne_top μ _⟩
-      have hge : ENNReal.ofReal c ≤ μ (⋂ n, truncSupport u g (t n)) :=
-        ge_of_tendsto' hlim fun n => hbelow (t n) (ht_ge n) (ht_lt n)
-      refine hge.trans (measure_mono fun x hx => ?_)
-      rw [mem_iInter] at hx
-      refine ⟨?_, (hx 0).2⟩
-      exact le_of_tendsto' ht_lim fun n => (hx n).1.le
+    · exact le_measure_superlevel_inter_of_levels hu hg hTk hbelow
   -- the two null sets cover the intersection
   have hcover : {x | T ≤ u x} ∩ {x | ∃ i, g i x ≠ 0}
       ⊆ {x | T < u x} ∪ ({x | u x = T} ∩ {x | ∃ i, g i x ≠ 0}) := by
