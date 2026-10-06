@@ -102,7 +102,7 @@ theorem cutoffMul_mem_H01_of_mem_W12 (hΩo : IsOpen Ω) {η : EuclideanSpace ℝ
     cutoffMul hη U ∈ H01 Ω := by
   classical
   have hΩm : MeasurableSet Ω := hΩo.measurableSet
-  obtain ⟨M, hM⟩ := exists_abs_bound hη
+  have hM := hη.abs_le_supNorm
   set g0 : EucL2 d := extendL2 hΩm (U 0) with hg0
   set gk : Fin d → EucL2 d := fun k => extendL2 hΩm (U k.succ) with hgk
   set w : EuclideanSpace ℝ (Fin d) → ℝ := fun x => η x * (g0 x : ℝ) with hw
@@ -110,9 +110,8 @@ theorem cutoffMul_mem_H01_of_mem_W12 (hΩo : IsOpen Ω) {η : EuclideanSpace ℝ
     fun k x => η x * (gk k x : ℝ) + partialD k η x * (g0 x : ℝ) with hh
   have hwL : MemLp w 2 volume := memLp_weight_mul hη.continuous hM
   have hhL : ∀ k, MemLp (h k) 2 volume := fun k => by
-    obtain ⟨Mk, hMk⟩ := exists_abs_bound_partialD hη k
     exact (memLp_weight_mul hη.continuous hM).add
-      (memLp_weight_mul (hη.continuous_partialD k) hMk)
+      (memLp_weight_mul (hη.continuous_partialD k) (hη.abs_partialD_le k))
   have hηoff : ∀ x, x ∉ Ω → η x = 0 := fun x hx =>
     image_eq_zero_of_notMem_tsupport (fun hc => hx (hη.2.2 hc))
   have hdηoff : ∀ k x, x ∉ Ω → partialD k η x = 0 := fun k x hx =>
@@ -173,20 +172,20 @@ theorem cutoffMul_mem_H01_of_mem_W12 (hΩo : IsOpen Ω) {η : EuclideanSpace ℝ
   apply PiLp.ext
   intro j
   refine Fin.cases ?_ (fun i => ?_) j
-  · rw [cutoffMul_apply_zero]
+  · rw [cutoffMulOn_apply_zero]
     simp only [Fin.cons_zero]
     apply Lp.ext
-    filter_upwards [mulTest_coeFn hη (U 0),
+    filter_upwards [mulCutoff_coeFn hη (U 0),
       MemLp.coeFn_toLp (hwL.mono_measure Measure.restrict_le_self),
       ae_restrict_of_ae (coeFn_extendL2 hΩm (U 0)), ae_restrict_mem hΩm] with x h1 h2 h3 h4
     rw [h1, h2]
     simp only [hw, hg0]
     rw [h3, Set.indicator_of_mem h4]
-  · rw [cutoffMul_apply_succ]
+  · rw [cutoffMulOn_apply_succ]
     simp only [Fin.cons_succ]
     apply Lp.ext
     filter_upwards [Lp.coeFn_add (mulTest hη (U i.succ)) (mulTestPartial hη i (U 0)),
-      mulTest_coeFn hη (U i.succ), mulTestPartial_coeFn hη i (U 0),
+      mulCutoff_coeFn hη (U i.succ), mulCutoffPartial_coeFn hη i (U 0),
       MemLp.coeFn_toLp ((hhL i).mono_measure Measure.restrict_le_self),
       ae_restrict_of_ae (coeFn_extendL2 hΩm (U 0)),
       ae_restrict_of_ae (coeFn_extendL2 hΩm (U i.succ)), ae_restrict_mem hΩm]

@@ -127,7 +127,7 @@ theorem setIntegral_principal_entry {Ω W : Set (EuclideanSpace ℝ (Fin d))}
       =ᵐ[volume.restrict W] fun x => (Aip x : ℝ) * (partialD i ξ x * partialD j v x)
         + (Aig x : ℝ) * (ξ x * partialD j v x) := by
     filter_upwards [Lp.coeFn_add (mulTest (isTestFn_partialD hξW i) p) (mulTest hξW Dgi),
-      mulTest_coeFn (isTestFn_partialD hξW i) p, mulTest_coeFn hξW Dgi, hAip, hAig]
+      mulCutoff_coeFn (isTestFn_partialD hξW i) p, mulCutoff_coeFn hξW Dgi, hAip, hAig]
       with x h1 h2 h3 h4 h5
     rw [h1, Pi.add_apply, h2, h3, h4, h5]
     ring
@@ -321,7 +321,7 @@ theorem setIntegral_blocks_eq (Op : FullEllipticOp d)
     rw [← integral_add hi1 hi2]
     refine integral_congr_ae ?_
     filter_upwards [Lp.coeFn_add (mulTest (isTestFn_partialD hξN i) p) (mulTest hξN (D2 i)),
-      mulTest_coeFn (isTestFn_partialD hξN i) p, mulTest_coeFn hξN (D2 i)] with x h1 h2 h3
+      mulCutoff_coeFn (isTestFn_partialD hξN i) p, mulCutoff_coeFn hξN (D2 i)] with x h1 h2 h3
     rw [h1, Pi.add_apply, h2, h3]
     ring
   -- The zeroth-order block.
@@ -329,7 +329,7 @@ theorem setIntegral_blocks_eq (Op : FullEllipticOp d)
       = ∫ x in N, ξ x * (Op.c x * (p x : ℝ)) * v x := by
     rw [setIntegral_lower_entry hΩm hNm (Uamb 0) _ hU0N Op.c v]
     refine integral_congr_ae ?_
-    filter_upwards [mulTest_coeFn hξN p] with x hx
+    filter_upwards [mulCutoff_coeFn hξN p] with x hx
     rw [hx]
     ring
   rw [Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ =>

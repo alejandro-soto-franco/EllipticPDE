@@ -48,29 +48,19 @@ open scoped RealInnerProductSpace
 
 noncomputable section
 
-namespace EllipticPdes.Regularity
+/-- A continuous function with compact support is bounded in absolute value by the supremum of
+its absolute value. -/
+lemma HasCompactSupport.abs_le_iSup_abs {X : Type*} [TopologicalSpace X] {f : X → ℝ}
+    (hc : Continuous f) (hs : HasCompactSupport f) (x : X) : |f x| ≤ ⨆ y, |f y| := by
+  obtain ⟨C, hC⟩ := hc.bounded_above_of_compact_support hs
+  exact le_ciSup (f := fun y => |f y|)
+    ⟨C, by rintro _ ⟨y, rfl⟩; simpa only [Real.norm_eq_abs] using hC y⟩ x
 
-open EllipticPdes.Sobolev
-
-variable {d : ℕ}
-
-/-! ### Global sup bounds for a test function and its partials -/
-
-/-- A smooth compactly supported function is globally bounded in absolute value. -/
-lemma exists_abs_bound {Ω : Set (EuclideanSpace ℝ (Fin d))}
-    {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ) : ∃ M : ℝ, ∀ x, |φ x| ≤ M := by
-  obtain ⟨C, hC⟩ := h.continuous.bounded_above_of_compact_support h.2.1
-  exact ⟨C, fun x => by have := hC x; rwa [Real.norm_eq_abs] at this⟩
-
-/-- Each partial derivative of a test function is globally bounded in absolute value. -/
-lemma exists_abs_bound_partialD {Ω : Set (EuclideanSpace ℝ (Fin d))}
-    {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ) (i : Fin d) :
-    ∃ M : ℝ, ∀ x, |partialD i φ x| ≤ M := by
-  obtain ⟨C, hC⟩ := (h.continuous_partialD i).bounded_above_of_compact_support
-    (h.hasCompactSupport_partialD i)
-  exact ⟨C, fun x => by have := hC x; rwa [Real.norm_eq_abs] at this⟩
-
-end EllipticPdes.Regularity
+/-- The supremum of the absolute value of a continuous function with compact support is
+nonnegative. -/
+lemma HasCompactSupport.iSup_abs_nonneg {X : Type*} [TopologicalSpace X] [Nonempty X]
+    {f : X → ℝ} (hc : Continuous f) (hs : HasCompactSupport f) : 0 ≤ ⨆ y, |f y| :=
+  (abs_nonneg _).trans (hs.abs_le_iSup_abs hc (Classical.arbitrary X))
 
 namespace EllipticPdes.Sobolev
 
@@ -89,30 +79,26 @@ def IsTestFn.partialSupNorm {Ω : Set (EuclideanSpace ℝ (Fin d))}
 /-- A test function is bounded in absolute value by its supremum norm. -/
 lemma IsTestFn.abs_le_supNorm {Ω : Set (EuclideanSpace ℝ (Fin d))}
     {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ) (x : EuclideanSpace ℝ (Fin d)) :
-    |φ x| ≤ h.supNorm := by
-  obtain ⟨C, hC⟩ := h.continuous.bounded_above_of_compact_support h.2.1
-  exact le_ciSup ⟨C, by rintro _ ⟨y, rfl⟩; simpa only [Real.norm_eq_abs] using hC y⟩ x
+    |φ x| ≤ h.supNorm :=
+  h.2.1.abs_le_iSup_abs h.continuous x
 
 /-- The supremum norm of a test function is nonnegative. -/
 lemma IsTestFn.supNorm_nonneg {Ω : Set (EuclideanSpace ℝ (Fin d))}
     {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ) : 0 ≤ h.supNorm :=
-  (abs_nonneg _).trans (h.abs_le_supNorm 0)
+  h.2.1.iSup_abs_nonneg h.continuous
 
 /-- A partial derivative of a test function is bounded in absolute value by its supremum
 norm. -/
 lemma IsTestFn.abs_partialD_le {Ω : Set (EuclideanSpace ℝ (Fin d))}
     {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ) (i : Fin d)
-    (x : EuclideanSpace ℝ (Fin d)) : |partialD i φ x| ≤ h.partialSupNorm i := by
-  obtain ⟨C, hC⟩ := (h.continuous_partialD i).bounded_above_of_compact_support
-    (h.hasCompactSupport_partialD i)
-  exact le_ciSup (f := fun x => |partialD i φ x|)
-    ⟨C, by rintro _ ⟨y, rfl⟩; simpa only [Real.norm_eq_abs] using hC y⟩ x
+    (x : EuclideanSpace ℝ (Fin d)) : |partialD i φ x| ≤ h.partialSupNorm i :=
+  (h.hasCompactSupport_partialD i).abs_le_iSup_abs (h.continuous_partialD i) x
 
 /-- The supremum norm of a partial derivative of a test function is nonnegative. -/
 lemma IsTestFn.partialSupNorm_nonneg {Ω : Set (EuclideanSpace ℝ (Fin d))}
     {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ) (i : Fin d) :
     0 ≤ h.partialSupNorm i :=
-  (abs_nonneg _).trans (h.abs_partialD_le i 0)
+  (h.hasCompactSupport_partialD i).iSup_abs_nonneg (h.continuous_partialD i)
 
 end EllipticPdes.Sobolev
 
@@ -124,57 +110,79 @@ variable {d : ℕ}
 
 /-! ### Multiplier actions of a cutoff on `L²(Ω)` -/
 
-/-- Multiplication by the cutoff `η` on `L²(Ω)`, as a continuous linear map. -/
-def mulTest {Ω : Set (EuclideanSpace ℝ (Fin d))} {η : EuclideanSpace ℝ (Fin d) → ℝ}
+/-- **Multiplication by a cutoff** on `L²(Ω)`, as a continuous linear map. The cutoff `η` is a
+test function on some set `Ω'` unrelated to `Ω`, so its support may meet `∂Ω`; only smoothness
+and compact support of `η` are used. -/
+def mulCutoff (Ω : Set (EuclideanSpace ℝ (Fin d))) {Ω' : Set (EuclideanSpace ℝ (Fin d))}
+    {η : EuclideanSpace ℝ (Fin d) → ℝ} (hη : IsTestFn Ω' η) : L2D Ω →L[ℝ] L2D Ω :=
+  mulCoeffL hη.continuous.measurable (ae_of_all (volume.restrict Ω) hη.abs_le_supNorm)
+
+/-- Multiplication by the partial `∂ᵢη` of a cutoff on `L²(Ω)`, the companion of `mulCutoff`
+that carries the Leibniz correction term. -/
+def mulCutoffPartial (Ω : Set (EuclideanSpace ℝ (Fin d)))
+    {Ω' : Set (EuclideanSpace ℝ (Fin d))} {η : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hη : IsTestFn Ω' η) (i : Fin d) : L2D Ω →L[ℝ] L2D Ω :=
+  mulCoeffL (hη.continuous_partialD i).measurable
+    (ae_of_all (volume.restrict Ω) (hη.abs_partialD_le i))
+
+/-- Multiplication by a cutoff that is a test function of the domain itself. -/
+abbrev mulTest {Ω : Set (EuclideanSpace ℝ (Fin d))} {η : EuclideanSpace ℝ (Fin d) → ℝ}
     (h : IsTestFn Ω η) : L2D Ω →L[ℝ] L2D Ω :=
-  mulCoeffL h.continuous.measurable (ae_of_all (volume.restrict Ω) h.abs_le_supNorm)
+  mulCutoff Ω h
 
-/-- Multiplication by the partial `∂ᵢη` of the cutoff on `L²(Ω)`, continuous linear map. -/
-def mulTestPartial {Ω : Set (EuclideanSpace ℝ (Fin d))} {η : EuclideanSpace ℝ (Fin d) → ℝ}
+/-- Multiplication by `∂ᵢη` for a cutoff that is a test function of the domain itself. -/
+abbrev mulTestPartial {Ω : Set (EuclideanSpace ℝ (Fin d))} {η : EuclideanSpace ℝ (Fin d) → ℝ}
     (h : IsTestFn Ω η) (i : Fin d) : L2D Ω →L[ℝ] L2D Ω :=
-  mulCoeffL (h.continuous_partialD i).measurable
-    (ae_of_all (volume.restrict Ω) (h.abs_partialD_le i))
+  mulCutoffPartial Ω h i
 
-/-- The a.e. representative of `mulTest`: `mulTest h g =ᵐ x ↦ η x · g x`. -/
-lemma mulTest_coeFn {Ω : Set (EuclideanSpace ℝ (Fin d))} {η : EuclideanSpace ℝ (Fin d) → ℝ}
-    (h : IsTestFn Ω η) (g : L2D Ω) :
-    mulTest h g =ᵐ[volume.restrict Ω] fun x => η x * (g x : ℝ) :=
+/-- The a.e. representative of `mulCutoff`: `mulCutoff Ω hη g =ᵐ x ↦ η x · g x`. -/
+lemma mulCutoff_coeFn {Ω Ω' : Set (EuclideanSpace ℝ (Fin d))}
+    {η : EuclideanSpace ℝ (Fin d) → ℝ} (hη : IsTestFn Ω' η) (g : L2D Ω) :
+    mulCutoff Ω hη g =ᵐ[volume.restrict Ω] fun x => η x * (g x : ℝ) :=
   mulCoeffL_coeFn _ _ g
 
-/-- The a.e. representative of `mulTestPartial`: `mulTestPartial h i g =ᵐ x ↦ ∂ᵢη x · g x`. -/
-lemma mulTestPartial_coeFn {Ω : Set (EuclideanSpace ℝ (Fin d))}
-    {η : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω η) (i : Fin d) (g : L2D Ω) :
-    mulTestPartial h i g =ᵐ[volume.restrict Ω] fun x => partialD i η x * (g x : ℝ) :=
+/-- The a.e. representative of `mulCutoffPartial`:
+`mulCutoffPartial Ω hη i g =ᵐ x ↦ ∂ᵢη x · g x`. -/
+lemma mulCutoffPartial_coeFn {Ω Ω' : Set (EuclideanSpace ℝ (Fin d))}
+    {η : EuclideanSpace ℝ (Fin d) → ℝ} (hη : IsTestFn Ω' η) (i : Fin d) (g : L2D Ω) :
+    mulCutoffPartial Ω hη i g =ᵐ[volume.restrict Ω] fun x => partialD i η x * (g x : ℝ) :=
   mulCoeffL_coeFn _ _ g
 
 /-! ### Cutoff-multiplication operator on the graph space -/
 
-/-- The **cutoff-multiplication operator** `cutoffMul η : H1amb Ω →L H1amb Ω`, encoding the
-Leibniz rule `∇(η u) = η ∇u + (∇η) u`: coordinate `0` multiplies by `η`, coordinate `i+1`
+/-- The **cutoff-multiplication operator** `cutoffMulOn Ω η : H1amb Ω →L H1amb Ω`, encoding
+the Leibniz rule `∇(η u) = η ∇u + (∇η) u`: coordinate `0` multiplies by `η`, coordinate `i+1`
 sends `U` to `η · U_{i+1} + (∂ᵢη) · U₀`. -/
-def cutoffMul {Ω : Set (EuclideanSpace ℝ (Fin d))} {η : EuclideanSpace ℝ (Fin d) → ℝ}
-    (h : IsTestFn Ω η) : H1amb Ω →L[ℝ] H1amb Ω :=
+def cutoffMulOn (Ω : Set (EuclideanSpace ℝ (Fin d))) {Ω' : Set (EuclideanSpace ℝ (Fin d))}
+    {η : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω' η) : H1amb Ω →L[ℝ] H1amb Ω :=
   (PiLp.continuousLinearEquiv 2 ℝ (fun _ : Fin (d + 1) => L2D Ω)).symm.toContinuousLinearMap.comp
     ((ContinuousLinearMap.pi
-        (Fin.cons ((mulTest h).comp (ContinuousLinearMap.proj 0))
-          (fun i => (mulTest h).comp (ContinuousLinearMap.proj i.succ)
-            + (mulTestPartial h i).comp (ContinuousLinearMap.proj 0)))).comp
+        (Fin.cons ((mulCutoff Ω h).comp (ContinuousLinearMap.proj 0))
+          (fun i => (mulCutoff Ω h).comp (ContinuousLinearMap.proj i.succ)
+            + (mulCutoffPartial Ω h i).comp (ContinuousLinearMap.proj 0)))).comp
       (PiLp.continuousLinearEquiv 2 ℝ (fun _ : Fin (d + 1) => L2D Ω)).toContinuousLinearMap)
 
-/-- Coordinate `0` of `cutoffMul`: `(cutoffMul η U)₀ = η · U₀`. -/
-lemma cutoffMul_apply_zero {Ω : Set (EuclideanSpace ℝ (Fin d))}
-    {η : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω η) (U : H1amb Ω) :
-    (cutoffMul h U) 0 = mulTest h (U 0) := by
-  simp only [cutoffMul, ContinuousLinearMap.comp_apply,
+/-- The cutoff-multiplication operator for a cutoff that is a test function of the domain
+itself. -/
+abbrev cutoffMul {Ω : Set (EuclideanSpace ℝ (Fin d))} {η : EuclideanSpace ℝ (Fin d) → ℝ}
+    (h : IsTestFn Ω η) : H1amb Ω →L[ℝ] H1amb Ω :=
+  cutoffMulOn Ω h
+
+/-- Coordinate `0` of `cutoffMulOn`: `(cutoffMulOn Ω η U)₀ = η · U₀`. -/
+lemma cutoffMulOn_apply_zero {Ω Ω' : Set (EuclideanSpace ℝ (Fin d))}
+    {η : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω' η) (U : H1amb Ω) :
+    (cutoffMulOn Ω h U) 0 = mulCutoff Ω h (U 0) := by
+  simp only [cutoffMulOn, ContinuousLinearMap.comp_apply,
     ContinuousLinearEquiv.coe_coe, PiLp.coe_symm_continuousLinearEquiv,
     PiLp.coe_continuousLinearEquiv, PiLp.toLp_apply, ContinuousLinearMap.pi_apply,
     Fin.cons_zero, ContinuousLinearMap.proj_apply]
 
-/-- Coordinate `i+1` of `cutoffMul`: `(cutoffMul η U)_{i+1} = η · U_{i+1} + (∂ᵢη) · U₀`. -/
-lemma cutoffMul_apply_succ {Ω : Set (EuclideanSpace ℝ (Fin d))}
-    {η : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω η) (U : H1amb Ω) (i : Fin d) :
-    (cutoffMul h U) i.succ = mulTest h (U i.succ) + mulTestPartial h i (U 0) := by
-  simp only [cutoffMul, ContinuousLinearMap.comp_apply,
+/-- Coordinate `i+1` of `cutoffMulOn`:
+`(cutoffMulOn Ω η U)_{i+1} = η · U_{i+1} + (∂ᵢη) · U₀`. -/
+lemma cutoffMulOn_apply_succ {Ω Ω' : Set (EuclideanSpace ℝ (Fin d))}
+    {η : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω' η) (U : H1amb Ω) (i : Fin d) :
+    (cutoffMulOn Ω h U) i.succ = mulCutoff Ω h (U i.succ) + mulCutoffPartial Ω h i (U 0) := by
+  simp only [cutoffMulOn, ContinuousLinearMap.comp_apply,
     ContinuousLinearEquiv.coe_coe, PiLp.coe_symm_continuousLinearEquiv,
     PiLp.coe_continuousLinearEquiv, PiLp.toLp_apply, ContinuousLinearMap.pi_apply,
     Fin.cons_succ, _root_.add_apply, ContinuousLinearMap.proj_apply]
@@ -240,19 +248,19 @@ lemma cutoffMul_testGraph {Ω : Set (EuclideanSpace ℝ (Fin d))}
   intro j
   refine Fin.cases ?_ (fun i => ?_) j
   · -- coordinate 0: `η · [φ] = [η φ]`
-    rw [cutoffMul_apply_zero, IsTestFn.testGraph_zero, IsTestFn.testGraph_zero]
+    rw [cutoffMulOn_apply_zero, IsTestFn.testGraph_zero, IsTestFn.testGraph_zero]
     apply Lp.ext
-    filter_upwards [mulTest_coeFn hη hφ.testCls, hφ.mem_lp.coeFn_toLp,
+    filter_upwards [mulCutoff_coeFn hη hφ.testCls, hφ.mem_lp.coeFn_toLp,
       (isTestFn_mul hη hφ).mem_lp.coeFn_toLp] with x hx hφx hprod
     rw [hx, show (hφ.testCls x : ℝ) = φ x from hφx]
     exact hprod.symm
   · -- coordinate `i+1`: `η · [∂ᵢφ] + (∂ᵢη) · [φ] = [∂ᵢ(η φ)]`
-    rw [cutoffMul_apply_succ, IsTestFn.testGraph_succ, IsTestFn.testGraph_zero,
+    rw [cutoffMulOn_apply_succ, IsTestFn.testGraph_succ, IsTestFn.testGraph_zero,
       IsTestFn.testGraph_succ]
     apply Lp.ext
     filter_upwards [Lp.coeFn_add (mulTest hη (hφ.partialCls i))
         (mulTestPartial hη i hφ.testCls),
-      mulTest_coeFn hη (hφ.partialCls i), mulTestPartial_coeFn hη i hφ.testCls,
+      mulCutoff_coeFn hη (hφ.partialCls i), mulCutoffPartial_coeFn hη i hφ.testCls,
       (hφ.memLp_partialD i).coeFn_toLp, hφ.mem_lp.coeFn_toLp,
       ((isTestFn_mul hη hφ).memLp_partialD i).coeFn_toLp] with
       x hadd hmt hmtp hpφ hφx hprodp
@@ -341,26 +349,6 @@ lemma norm_mulTestPartial_le_supNorm {Ω : Set (EuclideanSpace ℝ (Fin d))}
     ‖mulTestPartial h i g‖ ≤ h.partialSupNorm i * ‖g‖ :=
   norm_mulCoeffL_le _ _ g
 
-/-- Operator-norm bound for the cutoff multiplier against any global bound `M` of `η`. -/
-lemma norm_mulTest_le {Ω : Set (EuclideanSpace ℝ (Fin d))}
-    {η : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω η) (g : L2D Ω) :
-    ‖mulTest h g‖ ≤ (exists_abs_bound h).choose * ‖g‖ := by
-  refine Lp.norm_le_mul_norm_of_ae_le_mul ?_
-  filter_upwards [mulTest_coeFn h g] with x hx
-  rw [hx, Real.norm_eq_abs, Real.norm_eq_abs, abs_mul]
-  exact mul_le_mul_of_nonneg_right ((exists_abs_bound h).choose_spec x) (abs_nonneg _)
-
-/-- Operator-norm bound for the partial-cutoff multiplier against any global bound of
-`∂ᵢη`. -/
-lemma norm_mulTestPartial_le {Ω : Set (EuclideanSpace ℝ (Fin d))}
-    {η : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω η) (i : Fin d) (g : L2D Ω) :
-    ‖mulTestPartial h i g‖ ≤ (exists_abs_bound_partialD h i).choose * ‖g‖ := by
-  refine Lp.norm_le_mul_norm_of_ae_le_mul ?_
-  filter_upwards [mulTestPartial_coeFn h i g] with x hx
-  rw [hx, Real.norm_eq_abs, Real.norm_eq_abs, abs_mul]
-  exact mul_le_mul_of_nonneg_right ((exists_abs_bound_partialD h i).choose_spec x)
-    (abs_nonneg _)
-
 /-- Regrouping one `ζ` factor across the coefficient action, principal part:
 `⟪aᵢⱼ (ζ p), ζ q⟫ = ⟪aᵢⱼ p, ζ² q⟫`. -/
 lemma actL_mulTest_regroup (A : EllipticCoeff d)
@@ -370,8 +358,8 @@ lemma actL_mulTest_regroup (A : EllipticCoeff d)
       = ⟪A.actL i j p, mulTest (isTestFn_mul hζ hζ) q⟫ := by
   rw [A.inner_actL_eq, A.inner_actL_eq]
   refine integral_congr_ae ?_
-  filter_upwards [mulTest_coeFn hζ p, mulTest_coeFn hζ q,
-    mulTest_coeFn (isTestFn_mul hζ hζ) q] with x hp hq hpq
+  filter_upwards [mulCutoff_coeFn hζ p, mulCutoff_coeFn hζ q,
+    mulCutoff_coeFn (isTestFn_mul hζ hζ) q] with x hp hq hpq
   rw [hp, hq, hpq]
   ring
 
@@ -384,8 +372,8 @@ lemma actL_cross_regroup (A : EllipticCoeff d)
       = 2 * ⟪A.actL i j (mulTest hζ p), mulTestPartial hζ j q⟫ := by
   rw [A.inner_actL_eq, A.inner_actL_eq, ← integral_const_mul]
   refine integral_congr_ae ?_
-  filter_upwards [mulTestPartial_coeFn (isTestFn_mul hζ hζ) j q,
-    mulTest_coeFn hζ p, mulTestPartial_coeFn hζ j q] with x hpart hp hq
+  filter_upwards [mulCutoffPartial_coeFn (isTestFn_mul hζ hζ) j q,
+    mulCutoff_coeFn hζ p, mulCutoffPartial_coeFn hζ j q] with x hpart hp hq
   rw [hpart, hp, hq,
     congrFun (partialD_mul (hζ.1.differentiable (by simp))
       (hζ.1.differentiable (by simp)) j) x]
@@ -447,8 +435,8 @@ lemma bAct_transport_regroup (Op : FullEllipticOp d)
   simp only [FullEllipticOp.bAct]
   rw [inner_mulCoeffL_eq, inner_mulCoeffL_eq]
   refine integral_congr_ae ?_
-  filter_upwards [mulTest_coeFn (isTestFn_mul hζ hζ) q, mulTest_coeFn hζ p,
-    mulTest_coeFn hζ q] with x hq2 hp hq
+  filter_upwards [mulCutoff_coeFn (isTestFn_mul hζ hζ) q, mulCutoff_coeFn hζ p,
+    mulCutoff_coeFn hζ q] with x hq2 hp hq
   rw [hq2, hp, hq]
   ring
 
@@ -519,17 +507,17 @@ lemma caccioppoli_lower_bound (Op : FullEllipticOp d) {Ω : Set (EuclideanSpace 
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun j _ => ?_
-    rw [cutoffMul_apply_succ, inner_add_right, ← actL_mulTest_regroup A hζ,
+    rw [cutoffMulOn_apply_succ, inner_add_right, ← actL_mulTest_regroup A hζ,
       ← actL_cross_regroup A hζ]
   have hlow : (∑ i, ⟪Op.bAct i (U i.succ), cutoffMul (isTestFn_mul hζ hζ) U 0⟫)
         + ⟪Op.cAct (U 0), cutoffMul (isTestFn_mul hζ hζ) U 0⟫
       = (∑ i, ⟪Op.bAct i (mulTest hζ (U i.succ)), mulTest hζ (U 0)⟫)
         + ⟪Op.cAct (U 0), mulTest (isTestFn_mul hζ hζ) (U 0)⟫ := by
-    rw [cutoffMul_apply_zero]
+    rw [cutoffMulOn_apply_zero]
     simp only [bAct_transport_regroup Op hζ]
   unfold TestedIdentity at hid
-  rw [cutoffMul_apply_zero, ← inner_eq_setIntegral] at hid
-  rw [cutoffMul_apply_zero] at hlow
+  rw [cutoffMulOn_apply_zero, ← inner_eq_setIntegral] at hid
+  rw [cutoffMulOn_apply_zero] at hlow
   linarith only [hen, hid, hbil, hlow]
 
 /-- **Interior energy estimate for a tested identity.** If `U ∈ H¹` satisfies the weak identity

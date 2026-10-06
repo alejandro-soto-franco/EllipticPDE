@@ -101,14 +101,14 @@ private lemma exists_cutoffMul_diffQuotG_norm_bound (Op : FullEllipticOp d)
     linarith only [hmaster]
   have hD0 : ‖diffQuotD ℓ h hΩm ((u : H1amb Ω) 0)‖ ≤ Dl := norm_diffQuotD_le_grad hΩm ℓ u h
   have hnorm0 : ‖(cutoffMul T.hξ (diffQuotG ℓ h hΩm (u : H1amb Ω))) 0‖ ≤ T.hξ.supNorm * Dl := by
-    rw [cutoffMul_apply_zero, diffQuotG_apply]
+    rw [cutoffMulOn_apply_zero, diffQuotG_apply]
     exact (norm_mulTest_le_supNorm _ _).trans (mul_le_mul_of_nonneg_left hD0 T.hξ.supNorm_nonneg)
   have hstep : ∀ i : Fin d,
       ‖(cutoffMul T.hξ (diffQuotG ℓ h hΩm (u : H1amb Ω))) i.succ‖ ^ 2
         ≤ 2 * ‖mulTest T.hξ (diffQuotD ℓ h hΩm ((u : H1amb Ω) i.succ))‖ ^ 2
           + 2 * (T.hξ.partialSupNorm i * Dl) ^ 2 := by
     intro i
-    rw [cutoffMul_apply_succ, diffQuotG_apply, diffQuotG_apply]
+    rw [cutoffMulOn_apply_succ, diffQuotG_apply, diffQuotG_apply]
     have h2 : ‖mulTestPartial T.hξ i (diffQuotD ℓ h hΩm ((u : H1amb Ω) 0))‖
         ≤ T.hξ.partialSupNorm i * Dl :=
       (norm_mulTestPartial_le_supNorm _ _ _).trans
@@ -218,7 +218,7 @@ theorem exists_mem_H01_mulTest_gradient (Op : FullEllipticOp d)
       intro m
       have h0 : (Wn m) 0 = mulTest T.hξ (diffQuotD ℓ (hs m) hΩm ((u : H1amb Ω) 0)) := by
         simp only [hWndef]
-        rw [cutoffMul_apply_zero, diffQuotG_apply]
+        rw [cutoffMulOn_apply_zero, diffQuotG_apply]
       rw [h0, ← inner_mulTest_comm T.hξ z _, ← restrictL2_diffQuot_extendL2,
         ← extendL2_inner_restrictL2]
       exact real_inner_comm _ _

@@ -28,7 +28,7 @@ Two things separate this from the interior layer (`Regularity/RestrictedDiffQuot
   the flat part `{xₙ = 0}`. It is therefore a test function on the *ball* `B(0, r)` rather
   than on the half-ball, and `mulTest` / `cutoffMul`
   (`EllipticPdes.Regularity.Caccioppoli`), whose cutoff is a test function on the domain
-  itself, do not accept it. `mulCutoff`, `mulCutoffPartial` and `cutoffMulOn` below decouple
+  itself, do not accept it. `mulCutoff`, `mulCutoffPartial` and `cutoffMulOn` decouple
   the two: the cutoff is a test function on an ambient set `Ω'`, the operators act on
   `L²(Ω)` for an unrelated `Ω`.
 * **Only tangential directions are admissible.** A translation in the normal direction can
@@ -43,8 +43,6 @@ Coordinate `0` is Evans' normal direction `xₙ` and tangential directions are `
 
 ## Main declarations
 
-* `mulCutoff`, `mulCutoffPartial`, `cutoffMulOn`: the cutoff multipliers for a cutoff
-  supported in an ambient set, generalising `mulTest`, `mulTestPartial` and `cutoffMul`.
 * `tangDiffQuotD`, `tangDiffQuotG`: the tangential difference quotient on `L²` of the
   half-ball and on its graph space.
 * `exists_tangentialCutoff`: Evans' cutoff, a test function on `B(0, r)` valued in `[0, 1]`
@@ -64,75 +62,6 @@ noncomputable section
 namespace EllipticPdes.Regularity
 
 open EllipticPdes.Sobolev
-
-/-! ### Cutoff multipliers for a cutoff supported in an ambient set -/
-
-section Multipliers
-
-variable {n : ℕ} {Ω Ω' : Set (EuclideanSpace ℝ (Fin n))} {η : EuclideanSpace ℝ (Fin n) → ℝ}
-
-/-- **Multiplication by an ambiently supported cutoff** on `L²(Ω)`. The cutoff `η` is a test
-function on some set `Ω'` unrelated to `Ω`, so its support may meet `∂Ω`; only smoothness and
-compact support of `η` are used, exactly as in `mulTest`
-(`EllipticPdes.Regularity.mulTest`), which is the case `Ω' = Ω`. The boundary `H²` estimate
-needs this because Evans' cutoff vanishes near the curved part of `∂U` alone (Evans, *Partial
-Differential Equations* (2nd ed.), §6.3.2, Theorem 4, proof step 1). -/
-def mulCutoff (Ω : Set (EuclideanSpace ℝ (Fin n))) (hη : IsTestFn Ω' η) :
-    L2D Ω →L[ℝ] L2D Ω :=
-  mulCoeffL hη.continuous.measurable
-    (ae_of_all (volume.restrict Ω) (exists_abs_bound hη).choose_spec)
-
-/-- **Multiplication by the partial `∂ᵢη` of an ambiently supported cutoff** on `L²(Ω)`, the
-companion of `mulCutoff` with the Leibniz correction term. -/
-def mulCutoffPartial (Ω : Set (EuclideanSpace ℝ (Fin n))) (hη : IsTestFn Ω' η) (i : Fin n) :
-    L2D Ω →L[ℝ] L2D Ω :=
-  mulCoeffL (hη.continuous_partialD i).measurable
-    (ae_of_all (volume.restrict Ω) (exists_abs_bound_partialD hη i).choose_spec)
-
-/-- The a.e. representative of `mulCutoff`: `mulCutoff Ω hη g =ᵐ x ↦ η x · g x`. -/
-theorem mulCutoff_coeFn (hη : IsTestFn Ω' η) (g : L2D Ω) :
-    mulCutoff Ω hη g =ᵐ[volume.restrict Ω] fun x => η x * (g x : ℝ) :=
-  mulCoeffL_coeFn _ _ g
-
-/-- The a.e. representative of `mulCutoffPartial`:
-`mulCutoffPartial Ω hη i g =ᵐ x ↦ ∂ᵢη x · g x`. -/
-theorem mulCutoffPartial_coeFn (hη : IsTestFn Ω' η) (i : Fin n) (g : L2D Ω) :
-    mulCutoffPartial Ω hη i g =ᵐ[volume.restrict Ω] fun x => partialD i η x * (g x : ℝ) :=
-  mulCoeffL_coeFn _ _ g
-
-/-- **Cutoff multiplication on the graph space for an ambiently supported cutoff**,
-`cutoffMulOn Ω η : H1amb Ω →L H1amb Ω`, encoding the Leibniz rule `∇(η u) = η ∇u + (∇η) u`:
-coordinate `0` multiplies by `η`, coordinate `i+1` sends `U` to `η · U_{i+1} + (∂ᵢη) · U₀`.
-This is `cutoffMul` (`EllipticPdes.Regularity.cutoffMul`) with the cutoff's support released
-from `Ω`. -/
-def cutoffMulOn (Ω : Set (EuclideanSpace ℝ (Fin n))) (hη : IsTestFn Ω' η) :
-    H1amb Ω →L[ℝ] H1amb Ω :=
-  (PiLp.continuousLinearEquiv 2 ℝ (fun _ : Fin (n + 1) => L2D Ω)).symm.toContinuousLinearMap.comp
-    ((ContinuousLinearMap.pi
-        (Fin.cons ((mulCutoff Ω hη).comp (ContinuousLinearMap.proj 0))
-          (fun i => (mulCutoff Ω hη).comp (ContinuousLinearMap.proj i.succ)
-            + (mulCutoffPartial Ω hη i).comp (ContinuousLinearMap.proj 0)))).comp
-      (PiLp.continuousLinearEquiv 2 ℝ (fun _ : Fin (n + 1) => L2D Ω)).toContinuousLinearMap)
-
-/-- Coordinate `0` of `cutoffMulOn`: `(cutoffMulOn Ω η U)₀ = η · U₀`. -/
-theorem cutoffMulOn_apply_zero (hη : IsTestFn Ω' η) (U : H1amb Ω) :
-    (cutoffMulOn Ω hη U) 0 = mulCutoff Ω hη (U 0) := by
-  simp only [cutoffMulOn, ContinuousLinearMap.comp_apply,
-    ContinuousLinearEquiv.coe_coe, PiLp.coe_symm_continuousLinearEquiv,
-    PiLp.coe_continuousLinearEquiv, PiLp.toLp_apply, ContinuousLinearMap.pi_apply,
-    Fin.cons_zero, ContinuousLinearMap.proj_apply]
-
-/-- Coordinate `i+1` of `cutoffMulOn`:
-`(cutoffMulOn Ω η U)_{i+1} = η · U_{i+1} + (∂ᵢη) · U₀`. -/
-theorem cutoffMulOn_apply_succ (hη : IsTestFn Ω' η) (U : H1amb Ω) (i : Fin n) :
-    (cutoffMulOn Ω hη U) i.succ
-      = mulCutoff Ω hη (U i.succ) + mulCutoffPartial Ω hη i (U 0) := by
-  simp only [cutoffMulOn, ContinuousLinearMap.comp_apply,
-    ContinuousLinearEquiv.coe_coe, PiLp.coe_symm_continuousLinearEquiv,
-    PiLp.coe_continuousLinearEquiv, PiLp.toLp_apply, ContinuousLinearMap.pi_apply,
-    Fin.cons_succ, _root_.add_apply, ContinuousLinearMap.proj_apply]
-
-end Multipliers
 
 /-! ### Support calculus for a difference quotient of a test function -/
 

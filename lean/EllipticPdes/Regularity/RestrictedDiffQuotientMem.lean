@@ -62,8 +62,8 @@ theorem mulTest_diffQuotD_eq_of_small (hζ : IsTestFn Ω ζ) (k : Fin d) {h : �
     mulTest hζ (diffQuotD k h hΩm g)
       = mulTest hζ (restrictL2 (diffQuot k h (extendL2 hΩm g))) := by
   apply Lp.ext
-  filter_upwards [mulTest_coeFn hζ (diffQuotD k h hΩm g),
-      mulTest_coeFn hζ (restrictL2 (diffQuot k h (extendL2 hΩm g))),
+  filter_upwards [mulCutoff_coeFn hζ (diffQuotD k h hΩm g),
+      mulCutoff_coeFn hζ (restrictL2 (diffQuot k h (extendL2 hΩm g))),
       coeFn_diffQuotD k h hΩm g,
       coeFn_restrictL2 (diffQuot k h (extendL2 hΩm g)),
       ae_restrict_of_ae (coeFn_diffQuot k h (extendL2 hΩm g)),
@@ -151,10 +151,10 @@ private lemma cutoffMul_diffQuotG_testGraph (hζ : IsTestFn Ω ζ) (hφ : IsTest
   intro j
   refine Fin.cases ?_ (fun i => ?_) j
   · -- coordinate `0`: `ζ · Dₖ^h φ`
-    rw [cutoffMul_apply_zero]
+    rw [cutoffMulOn_apply_zero]
     simp only [diffQuotG_apply, IsTestFn.testGraph_zero]
     apply Lp.ext
-    filter_upwards [mulTest_coeFn hζ (diffQuotD k h hΩm hφ.testCls),
+    filter_upwards [mulCutoff_coeFn hζ (diffQuotD k h hΩm hφ.testCls),
         coeFn_diffQuotD k h hΩm hφ.testCls, ae_restrict_of_ae hsh_test,
         (show (⇑hφ.testCls : EuclideanSpace ℝ (Fin d) → ℝ)
           =ᵐ[volume.restrict Ω] φ from hφ.mem_lp.coeFn_toLp),
@@ -178,13 +178,13 @@ private lemma cutoffMul_diffQuotG_testGraph (hζ : IsTestFn Ω ζ) (hφ : IsTest
       rw [partialD_mul (hζ.1.differentiable (by simp))
           ((contDiff_diffQuotFn hφ.1 k h).differentiable (by simp)) i,
         partialD_diffQuotFn (hφ.1.differentiable (by simp)) i k h]
-    rw [cutoffMul_apply_succ]
+    rw [cutoffMulOn_apply_succ]
     simp only [diffQuotG_apply, IsTestFn.testGraph_zero, IsTestFn.testGraph_succ]
     apply Lp.ext
     filter_upwards [Lp.coeFn_add (mulTest hζ (diffQuotD k h hΩm (hφ.partialCls i)))
           (mulTestPartial hζ i (diffQuotD k h hΩm hφ.testCls)),
-        mulTest_coeFn hζ (diffQuotD k h hΩm (hφ.partialCls i)),
-        mulTestPartial_coeFn hζ i (diffQuotD k h hΩm hφ.testCls),
+        mulCutoff_coeFn hζ (diffQuotD k h hΩm (hφ.partialCls i)),
+        mulCutoffPartial_coeFn hζ i (diffQuotD k h hΩm hφ.testCls),
         coeFn_diffQuotD k h hΩm (hφ.partialCls i),
         coeFn_diffQuotD k h hΩm hφ.testCls,
         ae_restrict_of_ae hsh_part, ae_restrict_of_ae hsh_test,

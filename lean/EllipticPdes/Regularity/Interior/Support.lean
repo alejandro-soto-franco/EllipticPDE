@@ -40,7 +40,7 @@ lemma mulTest_ae_eq_zero_off_tsupport {η : EuclideanSpace ℝ (Fin d) → ℝ}
     (hη : IsTestFn Ω η) (g : L2D Ω) :
     ∀ᵐ x ∂(volume.restrict Ω),
       x ∉ tsupport η → (mulTest hη g x : ℝ) = 0 := by
-  filter_upwards [mulTest_coeFn hη g] with x hx hxns
+  filter_upwards [mulCutoff_coeFn hη g] with x hx hxns
   rw [hx, image_eq_zero_of_notMem_tsupport hxns, zero_mul]
 
 /-- If a class `g` vanishes a.e. (on `Ω`) off a set `S`, then its extension by zero to the
@@ -86,7 +86,7 @@ theorem restrictL2_extendL2_mulTest_eq_of_eqOn (hΩm : MeasurableSet Ω)
     restrictL2 (Ω := V) (extendL2 hΩm (mulTest hη g)) = restrictL2 (Ω := V) (extendL2 hΩm g) := by
   have hmt : (mulTest hη g : EuclideanSpace ℝ (Fin d) → ℝ)
       =ᵐ[volume.restrict V] fun x => η x * (g x : ℝ) :=
-    (mulTest_coeFn hη g).filter_mono (ae_mono (Measure.restrict_mono hVΩ le_rfl))
+    (mulCutoff_coeFn hη g).filter_mono (ae_mono (Measure.restrict_mono hVΩ le_rfl))
   apply Lp.ext
   filter_upwards [coeFn_restrictL2 (Ω := V) (extendL2 hΩm (mulTest hη g)),
     coeFn_restrictL2 (Ω := V) (extendL2 hΩm g),

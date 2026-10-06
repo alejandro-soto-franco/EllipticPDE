@@ -198,15 +198,15 @@ theorem reduction_testFn (Op : FullEllipticOp d) (hΩo : IsOpen Ω)
   have hW0 : ((W : H1amb Ω) 0 : EuclideanSpace ℝ (Fin d) → ℝ)
       =ᵐ[volume.restrict Ω] fun x => η x * (U 0 x : ℝ) := by
     change ((cutoffMul hη U) 0 : EuclideanSpace ℝ (Fin d) → ℝ) =ᵐ[_] _
-    rw [cutoffMul_apply_zero]; exact mulTest_coeFn hη (U 0)
+    rw [cutoffMulOn_apply_zero]; exact mulCutoff_coeFn hη (U 0)
   have hWs : ∀ i : Fin d, ((W : H1amb Ω) i.succ : EuclideanSpace ℝ (Fin d) → ℝ)
       =ᵐ[volume.restrict Ω]
         fun x => η x * (U i.succ x : ℝ) + partialD i η x * (U 0 x : ℝ) := by
     intro i
     change ((cutoffMul hη U) i.succ : EuclideanSpace ℝ (Fin d) → ℝ) =ᵐ[_] _
-    rw [cutoffMul_apply_succ]
+    rw [cutoffMulOn_apply_succ]
     filter_upwards [Lp.coeFn_add (mulTest hη (U i.succ)) (mulTestPartial hη i (U 0)),
-      mulTest_coeFn hη (U i.succ), mulTestPartial_coeFn hη i (U 0)] with x h1 h2 h3
+      mulCutoff_coeFn hη (U i.succ), mulCutoffPartial_coeFn hη i (U 0)] with x h1 h2 h3
     rw [h1, Pi.add_apply, h2, h3]
   have hηv : IsTestFn Ω (fun x => η x * v x) := isTestFn_mul hη hv
   have hloc := hsol.2 _ hηv
@@ -282,28 +282,25 @@ def weightL (Ω : Set (EuclideanSpace ℝ (Fin d))) {c ψ : EuclideanSpace ℝ (
     (hc : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |c x| ≤ M)
     (hψ : Continuous ψ) (hψcs : HasCompactSupport ψ) : L2D Ω →L[ℝ] L2D Ω :=
   mulCoeffL (f := fun x => c x * ψ x) (hcm.mul hψ.measurable)
-    (M := max M 0 * (hψcs.exists_bound_of_continuous hψ).choose)
+    (M := max M 0 * ⨆ y, |ψ y|)
     (ae_restrict_of_ae (hc.mono fun x hx => by
-      have hK := (hψcs.exists_bound_of_continuous hψ).choose_spec
       rw [abs_mul]
-      exact mul_le_mul (le_max_of_le_left hx) (by simpa [Real.norm_eq_abs] using hK x)
+      exact mul_le_mul (le_max_of_le_left hx) (hψcs.abs_le_iSup_abs hψ x)
         (abs_nonneg _) (le_max_right _ _)))
 
-/-- The operator-norm bound `max M 0 * (hψcs.exists_bound_of_continuous hψ).choose` for `weightL` is
-nonnegative. -/
+/-- The operator-norm bound `max M 0 * sup |ψ|` for `weightL` is nonnegative. -/
 theorem weightL_bound_nonneg {ψ : EuclideanSpace ℝ (Fin d) → ℝ} (hψ : Continuous ψ)
     (hψcs : HasCompactSupport ψ) {M : ℝ} :
-    0 ≤ max M 0 * (hψcs.exists_bound_of_continuous hψ).choose :=
-  mul_nonneg (le_max_right _ _)
-    (le_trans (norm_nonneg _) ((hψcs.exists_bound_of_continuous hψ).choose_spec 0))
+    0 ≤ max M 0 * ⨆ y, |ψ y| :=
+  mul_nonneg (le_max_right _ _) (hψcs.iSup_abs_nonneg hψ)
 
-/-- `weightL` has operator norm at most `max M 0 * (hψcs.exists_bound_of_continuous hψ).choose`. -/
+/-- `weightL` has operator norm at most `max M 0 * sup |ψ|`. -/
 theorem norm_weightL_le {c ψ : EuclideanSpace ℝ (Fin d) → ℝ}
     (hcm : Measurable c) {M : ℝ}
     (hc : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |c x| ≤ M)
     (hψ : Continuous ψ) (hψcs : HasCompactSupport ψ) (g : L2D Ω) :
     ‖weightL Ω hcm hc hψ hψcs g‖
-      ≤ (max M 0 * (hψcs.exists_bound_of_continuous hψ).choose) * ‖g‖ :=
+      ≤ (max M 0 * ⨆ y, |ψ y|) * ‖g‖ :=
   norm_mulCoeffL_le _ _ g
 
 /-- The inner product of `weightL Ω hcm hc hψ hψcs g` with `hv.testCls` is `∫ x in Ω, c x * g x * (ψ
@@ -360,7 +357,7 @@ theorem reduction_weakForm (hΩo : IsOpen Ω) {U : H1amb Ω} {f : L2D Ω}
   rw [inner_testCls_eq hv]
   have h0 : ∫ x in Ω, ((mulTest hη f) x : ℝ) * v x = ∫ x in Ω, (f x : ℝ) * (η x * v x) := by
     refine integral_congr_ae ?_
-    filter_upwards [mulTest_coeFn hη f] with x hx
+    filter_upwards [mulCutoff_coeFn hη f] with x hx
     rw [hx]; ring
   rw [h0]
 

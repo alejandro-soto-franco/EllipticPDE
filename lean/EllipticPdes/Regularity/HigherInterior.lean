@@ -190,7 +190,7 @@ private lemma cutoffDeriv_pairing_eq (Op : FullEllipticOp (n + 1))
       (HuN.D_step i [] (Nat.succ_pos _)) (HuN.D_step ℓ [] (Nat.succ_pos _))
       (HuN.D_step ℓ [i] (Nat.succ_lt_succ (Nat.succ_pos k)))
       (HuN.D_step i [ℓ] (Nat.succ_lt_succ (Nat.succ_pos k)))
-    filter_upwards [mulTest_coeFn hϑ (HuN.D [ℓ, i]), mulTest_coeFn hϑ (HuN.D [i, ℓ])]
+    filter_upwards [mulCutoff_coeFn hϑ (HuN.D [ℓ, i]), mulCutoff_coeFn hϑ (HuN.D [i, ℓ])]
       with x h1 h2
     rw [← h2, ← h, h1]
   have hψ : ∀ j : Fin (n + 1), ∀ x, ϑ x * partialD j (fun y => ξ y * v y) x

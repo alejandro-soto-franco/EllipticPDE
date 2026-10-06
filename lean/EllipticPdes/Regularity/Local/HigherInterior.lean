@@ -96,7 +96,7 @@ theorem restrictL2_extendL2_mulTest_of_eqOn {Ω W : Set (EuclideanSpace ℝ (Fin
     coeFn_restrictL2 (Ω := W) (extendL2 hΩm g),
     ae_restrict_of_ae (coeFn_extendL2 hΩm (mulTest hζ g)),
     ae_restrict_of_ae (coeFn_extendL2 hΩm g),
-    ae_restrict_of_ae_restrict_of_subset hWΩ (mulTest_coeFn hζ g), ae_restrict_mem hWm]
+    ae_restrict_of_ae_restrict_of_subset hWΩ (mulCutoff_coeFn hζ g), ae_restrict_mem hWm]
     with x h1 h2 h3 h4 h5 h6
   rw [h1, h2, h3, h4, Set.indicator_of_mem (hWΩ h6), Set.indicator_of_mem (hWΩ h6), h5,
     hζW h6, Pi.one_apply, one_mul]
@@ -183,8 +183,9 @@ theorem localRegularityAt_of_localFamiliesAt (Op : FullEllipticOp (n + 1))
   obtain ⟨K, hK0, hDat⟩ :=
     exists_reductionDatum Op hΩm hWm hη.2.2 hA hbc hηW
   obtain ⟨CV, hCV0, hH01⟩ := higher_interior_regularity Op hΩm hΩo hA1.toIsLipCoeff k hA hbc hVc hVΩ
-  obtain ⟨Mη, hMη⟩ := exists_abs_bound hη
-  have hMη0 : 0 ≤ Mη := le_trans (abs_nonneg _) (hMη 0)
+  set Mη : ℝ := hη.supNorm with hMηdef
+  have hMη := hη.abs_le_supNorm
+  have hMη0 : 0 ≤ Mη := hη.supNorm_nonneg
   refine ⟨CV * (K * (CW + 1) + Mη),
     mul_nonneg hCV0 (add_nonneg (mul_nonneg hK0 (by linarith)) hMη0),
     fun U f M hfk hM hsol => ?_⟩
@@ -206,9 +207,9 @@ theorem localRegularityAt_of_localFamiliesAt (Op : FullEllipticOp (n + 1))
   refine ⟨hu.congr (restrictL2_extendL2_cutoffMul hΩm hVm hVΩ hη hη1 U 0), ?_⟩
   refine hub.congr.mono_const ?_
   have hη0 : ‖(cutoffMul hη U) 0‖ ≤ Mη * ‖U 0‖ := by
-    rw [cutoffMul_apply_zero]
+    rw [cutoffMulOn_apply_zero]
     exact norm_le_of_ae_mul hη.continuous.measurable (Eventually.of_forall hMη)
-      (mulTest_coeFn hη (U 0))
+      (mulCutoff_coeFn hη (U 0))
   change CV * (K * B + ‖(cutoffMul hη U) 0‖) ≤ _
   have h1 : K * B + ‖(cutoffMul hη U) 0‖ ≤ (K * (CW + 1) + Mη) * (M + ‖U 0‖) := by
     rw [hB]

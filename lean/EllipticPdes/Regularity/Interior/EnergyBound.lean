@@ -110,7 +110,7 @@ private lemma mulTest_theta_diffQuotD (hΩm : MeasurableSet Ω) (hθ : IsTestFn 
     (hθ1 : ∀ x ∈ Ω, x ∈ S ∨ x + hshift k h ∈ S → θ x = 1) :
     mulTest hθ (diffQuotD k h hΩm g) = diffQuotD k h hΩm g := by
   apply Lp.ext
-  filter_upwards [mulTest_coeFn hθ (diffQuotD k h hΩm g),
+  filter_upwards [mulCutoff_coeFn hθ (diffQuotD k h hΩm g),
     diffQuotD_ae_eq_zero_off hΩm k g hgS, ae_restrict_mem hΩm] with x hmt hzero hmem
   rw [hmt]
   by_cases hd : (diffQuotD k h hΩm g x : ℝ) = 0
@@ -131,7 +131,7 @@ private lemma mulTestPartial_theta_diffQuotD (hΩm : MeasurableSet Ω) (hθ : Is
     (hθ0 : ∀ x ∈ Ω, x ∈ S ∨ x + hshift k h ∈ S → partialD j θ x = 0) :
     mulTestPartial hθ j (diffQuotD k h hΩm g) = 0 := by
   apply Lp.ext
-  filter_upwards [mulTestPartial_coeFn hθ j (diffQuotD k h hΩm g),
+  filter_upwards [mulCutoffPartial_coeFn hθ j (diffQuotD k h hΩm g),
     Lp.coeFn_zero (E := ℝ) (p := 2) (μ := volume.restrict Ω),
     diffQuotD_ae_eq_zero_off hΩm k g hgS, ae_restrict_mem hΩm] with x hmtp hz hzero hmem
   rw [hmtp, hz, Pi.zero_apply]
@@ -176,14 +176,14 @@ private lemma diffQuotG_cutoffSq_supp (hξ : IsTestFn Ω ξ) (hΩm : MeasurableS
         → x ∈ tsupport (fun y => ξ y * ξ y) := by
   apply extendL2_supp_of_ae_restrict
   refine Fin.cases ?_ (fun i => ?_) j
-  · rw [cutoffMul_apply_zero, diffQuotG_apply]
+  · rw [cutoffMulOn_apply_zero, diffQuotG_apply]
     exact mulTest_ae_eq_zero_off_tsupport (isTestFn_mul hξ hξ) _
-  · rw [cutoffMul_apply_succ, diffQuotG_apply, diffQuotG_apply]
+  · rw [cutoffMulOn_apply_succ, diffQuotG_apply, diffQuotG_apply]
     filter_upwards [Lp.coeFn_add
         (mulTest (isTestFn_mul hξ hξ) (diffQuotD k h hΩm (u i.succ)))
         (mulTestPartial (isTestFn_mul hξ hξ) i (diffQuotD k h hΩm (u 0))),
-      mulTest_coeFn (isTestFn_mul hξ hξ) (diffQuotD k h hΩm (u i.succ)),
-      mulTestPartial_coeFn (isTestFn_mul hξ hξ) i (diffQuotD k h hΩm (u 0))]
+      mulCutoff_coeFn (isTestFn_mul hξ hξ) (diffQuotD k h hΩm (u i.succ)),
+      mulCutoffPartial_coeFn (isTestFn_mul hξ hξ) i (diffQuotD k h hΩm (u 0))]
       with x hadd hmt hmtp hxS
     have hsq : ξ x * ξ x = 0 :=
       image_eq_zero_of_notMem_tsupport (f := fun y => ξ y * ξ y) hxS
@@ -205,7 +205,7 @@ private lemma evansTest_succ_eq (hΩm : MeasurableSet Ω) (hξ : IsTestFn Ω ξ)
   have hcoe : (evansTest hΩm hξ hθ hS u : H1amb Ω) j.succ
       = -(cutoffMul hθ (diffQuotG k (-h) hΩm Z)) j.succ := by
     rw [evansTest_coe]; rfl
-  rw [hcoe, cutoffMul_apply_succ, diffQuotG_apply, diffQuotG_apply,
+  rw [hcoe, cutoffMulOn_apply_succ, diffQuotG_apply, diffQuotG_apply,
     mulTest_theta_diffQuotD hΩm hθ k (Z j.succ)
       (diffQuotG_cutoffSq_supp hξ hΩm k h (u : H1amb Ω) j.succ) hS.theta_one,
     mulTestPartial_theta_diffQuotD hΩm hθ j k (Z 0)
@@ -222,7 +222,7 @@ private lemma evansTest_zero_eq (hΩm : MeasurableSet Ω) (hξ : IsTestFn Ω ξ)
   set Z : H1amb Ω := cutoffMul (isTestFn_mul hξ hξ) (diffQuotG k h hΩm (u : H1amb Ω)) with hZ
   have hcoe : (evansTest hΩm hξ hθ hS u : H1amb Ω) 0
       = -(cutoffMul hθ (diffQuotG k (-h) hΩm Z)) 0 := by rw [evansTest_coe]; rfl
-  rw [hcoe, cutoffMul_apply_zero, diffQuotG_apply,
+  rw [hcoe, cutoffMulOn_apply_zero, diffQuotG_apply,
     mulTest_theta_diffQuotD hΩm hθ k (Z 0)
       (diffQuotG_cutoffSq_supp hξ hΩm k h (u : H1amb Ω) 0) hS.theta_one]
 
@@ -393,8 +393,8 @@ private lemma norm_diffQuotD_actL_sub_le {A : EllipticCoeff d} (hA : IsLipCoeff 
 private lemma mulTest_mul_eq (hξ : IsTestFn Ω ξ) (g : L2D Ω) :
     mulTest (isTestFn_mul hξ hξ) g = mulTest hξ (mulTest hξ g) := by
   apply Lp.ext
-  filter_upwards [mulTest_coeFn (isTestFn_mul hξ hξ) g,
-    mulTest_coeFn hξ (mulTest hξ g), mulTest_coeFn hξ g] with x h1 h2 h3
+  filter_upwards [mulCutoff_coeFn (isTestFn_mul hξ hξ) g,
+    mulCutoff_coeFn hξ (mulTest hξ g), mulCutoff_coeFn hξ g] with x h1 h2 h3
   rw [h1, h2, h3]; ring
 
 /-- **Norm of a coordinate of the inner block.** The `j`-th gradient coordinate `ξ² g + ∂ⱼ(ξ²) p`
@@ -419,7 +419,7 @@ private lemma norm_evansTest_zero_le (hΩm : MeasurableSet Ω) (hξ : IsTestFn �
   refine (norm_diffQuotD_le_grad hΩm k
     ⟨_, cutoffMul_diffQuotG_mem_H01 (isTestFn_mul hξ hξ) k hΩm hS.shift_in u.2⟩ (-h)).trans ?_
   change ‖(cutoffMul (isTestFn_mul hξ hξ) (diffQuotG k h hΩm (u : H1amb Ω))) k.succ‖ ≤ _
-  rw [cutoffMul_apply_succ, diffQuotG_apply, diffQuotG_apply]
+  rw [cutoffMulOn_apply_succ, diffQuotG_apply, diffQuotG_apply]
   exact norm_cutoffSq_block_le hξ k _ _
 
 /-! ### The commutator term and the energy identity -/
@@ -527,7 +527,7 @@ private lemma evans_lower_bound (Op : FullEllipticOp d) (hΩm : MeasurableSet Ω
         = 2 * ⟪A'.actL i j (mulTest hξ p), mulTestPartial hξ j q⟫ := fun p q => by
       rw [real_inner_comm, actL_cross_regroup A' hξ i j p q]
     conv_lhs =>
-      rw [cutoffMul_apply_succ, diffQuotG_apply, diffQuotG_apply, hsplit, inner_add_right,
+      rw [cutoffMulOn_apply_succ, diffQuotG_apply, diffQuotG_apply, hsplit, inner_add_right,
         inner_add_left, hlead, hcross]
   have hweak : A.bilin Ω u v = ⟪f, (v : H1amb Ω) 0⟫
       - (∑ i : Fin d, ⟪Op.bAct i ((u : H1amb Ω) i.succ), (v : H1amb Ω) 0⟫)

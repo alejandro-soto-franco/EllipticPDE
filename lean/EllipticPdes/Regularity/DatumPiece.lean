@@ -77,7 +77,7 @@ theorem exists_datum_piece {Ω N : Set (EuclideanSpace ℝ (Fin d))}
   have hmt : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), x ∈ N →
       ((mulTest hχ ap) x : ℝ)
         = χ x * (ap x : ℝ) :=
-    (ae_restrict_iff' hNm).mp (mulTest_coeFn hχ ap)
+    (ae_restrict_iff' hNm).mp (mulCutoff_coeFn hχ ap)
   have hqae : (restrictL2 (Ω := Ω)
         (extendL2 hNm (mulTest hχ ap))
         : EuclideanSpace ℝ (Fin d) → ℝ)
