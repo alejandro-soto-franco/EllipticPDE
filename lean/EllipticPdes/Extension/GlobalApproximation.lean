@@ -59,6 +59,34 @@ open EllipticPdes.Sobolev
 
 variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))}
 
+/-- **The gradient of an extension is the gradient of the class on the domain.** If `(U, G)` has a
+weak gradient on the whole space and `U` agrees with `u` on the open set `Ω`, then `G` agrees
+with the weak gradient `g` of `u` there. -/
+theorem ae_grad_eq_of_extension (hΩopen : IsOpen Ω) {u U : EuclideanSpace ℝ (Fin d) → ℝ}
+    {g G : Fin d → EuclideanSpace ℝ (Fin d) → ℝ} (hgi : ∀ k, IntegrableOn (g k) Ω volume)
+    (hGi : ∀ k, IntegrableOn (G k) Ω volume) (hwg : HasWeakGradOn Ω u g)
+    (hU : HasWeakGradOn Set.univ U G) (hag : ∀ y ∈ Ω, U y = u y) (k : Fin d) :
+    G k =ᵐ[volume.restrict Ω] g k := by
+  have hue : u =ᵐ[volume.restrict Ω] U :=
+    (ae_restrict_iff' hΩopen.measurableSet).mpr (Eventually.of_forall fun y hy => (hag y hy).symm)
+  exact hasWeakGradOn_unique_ae hΩopen hΩopen.measurableSet hGi hgi
+    ((hU.mono (subset_univ _)).congr_ae hue.symm fun _ => EventuallyEq.rfl) hwg k
+
+/-- **Mollifications converge in `Lᵖ(Ω)` to anything that agrees with the class on `Ω`.** -/
+theorem tendsto_eLpNorm_convolution_sub_restrict {p : ℝ} (hp : 1 ≤ p)
+    {F f : EuclideanSpace ℝ (Fin d) → ℝ} (hF : MemLp F (ENNReal.ofReal p) volume)
+    (hfF : f =ᵐ[volume.restrict Ω] F) {φ : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d))}
+    (hrOut : Tendsto (fun n => (φ n).rOut) atTop (𝓝 0))
+    (hratio : ∀ᶠ n in atTop, (φ n).rOut ≤ 2 * (φ n).rIn) :
+    Tendsto (fun n => eLpNorm ((F ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] (φ n).normed volume) - f)
+      (ENNReal.ofReal p) (volume.restrict Ω)) atTop (𝓝 0) := by
+  refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds
+    (tendsto_eLpNorm_convolution_sub hp hF hrOut hratio) (fun _ => zero_le) fun n => ?_
+  calc _ = eLpNorm ((F ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] (φ n).normed volume) - F)
+        (ENNReal.ofReal p) (volume.restrict Ω) :=
+        eLpNorm_congr_ae (by filter_upwards [hfF] with x hx; simp [hx])
+    _ ≤ _ := eLpNorm_mono_measure _ Measure.restrict_le_self
+
 /-- **Global approximation by functions smooth up to the boundary** (Evans §5.3.3 Theorem 3 at
 order one, Guo Theorem III.1.3). On a bounded open domain with `C¹` boundary, a class with an
 `Lᵖ` weak gradient on the domain, `1 ≤ p < ∞`, is the limit in `W^{1,p}(Ω)` of smooth
@@ -102,11 +130,9 @@ theorem exists_smooth_tendsto_of_hasWeakGradOn (hd : 0 < d) (hΩopen : IsOpen Ω
   have hue : u =ᵐ[volume.restrict Ω] U :=
     (ae_restrict_iff' hΩopen.measurableSet).mpr
       (Eventually.of_forall fun y hy => (hag y hy).symm)
-  have hwuG : HasWeakGradOn Ω u G :=
-    (hwgU.mono (subset_univ _)).congr_ae hue.symm fun _ => EventuallyEq.rfl
   have hge : ∀ k, g k =ᵐ[volume.restrict Ω] G k := fun k =>
-    hasWeakGradOn_unique_ae hΩopen hΩopen.measurableSet
-      (fun k => (hmg k).integrable hp1) (fun k => (hGint k).integrableOn) hwg hwuG k
+    (ae_grad_eq_of_extension hΩopen (fun k => (hmg k).integrable hp1)
+      (fun k => (hGint k).integrableOn) hwg hwgU hag k).symm
   -- the mollifiers
   set L := ContinuousLinearMap.lsmul ℝ ℝ (E := ℝ) with hL
   let φb : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := mollifier 1 one_pos
@@ -130,31 +156,10 @@ theorem exists_smooth_tendsto_of_hasWeakGradOn (hd : 0 < d) (hΩopen : IsOpen Ω
     have h := partialD_convolution_eq_of_hasWeakGradOn MeasurableSet.univ
       hUint.integrableOn hwgU (φb n) k (x := x) (subset_univ _)
     simpa only [indicator_univ] using h
-  refine ⟨v, hvsmooth, hvcs, ?_, ?_⟩
-  · have hconv := tendsto_eLpNorm_convolution_sub hp hMU hφrOut hφratio
-    refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds hconv
-      (fun _ => zero_le) fun n => ?_
-    calc eLpNorm (v n - u) (ENNReal.ofReal p) (volume.restrict Ω)
-        = eLpNorm (v n - U) (ENNReal.ofReal p) (volume.restrict Ω) := by
-          refine eLpNorm_congr_ae ?_
-          filter_upwards [hue] with x hx
-          simp only [Pi.sub_apply, hx]
-      _ ≤ eLpNorm (v n - U) (ENNReal.ofReal p) volume :=
-          eLpNorm_mono_measure _ Measure.restrict_le_self
-  · intro k
-    have hconv := tendsto_eLpNorm_convolution_sub hp (hMG k) hφrOut hφratio
-    refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds hconv
-      (fun _ => zero_le) fun n => ?_
-    calc eLpNorm (partialD k (v n) - g k) (ENNReal.ofReal p) (volume.restrict Ω)
-        = eLpNorm ((G k ⋆[L, volume] (φb n).normed volume) - G k) (ENNReal.ofReal p)
-            (volume.restrict Ω) := by
-          rw [hpartial n k]
-          refine eLpNorm_congr_ae ?_
-          filter_upwards [hge k] with x hx
-          simp only [Pi.sub_apply, hx]
-      _ ≤ eLpNorm ((G k ⋆[L, volume] (φb n).normed volume) - G k) (ENNReal.ofReal p)
-            volume :=
-          eLpNorm_mono_measure _ Measure.restrict_le_self
+  refine ⟨v, hvsmooth, hvcs, tendsto_eLpNorm_convolution_sub_restrict hp hMU hue hφrOut hφratio,
+    fun k => ?_⟩
+  simp only [hpartial]
+  exact tendsto_eLpNorm_convolution_sub_restrict hp (hMG k) (hge k) hφrOut hφratio
 
 /-! ### The graph space -/
 

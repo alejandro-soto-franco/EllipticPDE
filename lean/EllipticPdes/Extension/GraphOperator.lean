@@ -19,16 +19,20 @@ gradient, given as functions. Guo's Theorem III.2.2 states it as a bounded linea
 `E : W^{1,p}(Ω) → W^{1,p}(ℝⁿ)` between the Sobolev spaces. This file states it that way at
 `p = 2`, between the graph spaces `W12 Ω` and `W12 ℝᵈ` of this development.
 
-The passage from functions to classes needs nothing beyond the bound. A linear map on
-representatives whose image is bounded in `L²(ℝᵈ)` by the `L²(Ω)` seminorms of the input
-descends to classes: two representatives of one class differ by a pair of seminorm zero, so
-their images differ by a function of seminorm zero, which vanishes almost everywhere. The map
-is then linear on the classes, bounded by the same constant, its image lies in the graph space
-of the whole space because the image pair has a weak gradient there, and the three clauses of
-the theorem are read off `exists_extLinear` through the representatives.
+The passage from functions to classes is `EllipticPdes.Extension.exists_clm_of_ae_compat`: a
+linear map on representatives that respects almost-everywhere equality on the good pairs, and
+bounds its image in `L²`, descends to a continuous linear map on classes. A bounded operator
+on good pairs respects almost-everywhere equality (`ae_eq_of_bound`), because two good pairs
+that agree almost everywhere differ by a pair of seminorm zero. The image lies in the graph
+space of the whole space because the image pair has a weak gradient there, and the three clauses
+of the theorem are read off `exists_extLinear` through the representatives.
 
 ## Main declarations
 
+* `EllipticPdes.Extension.goodPairs`: the pairs with integrable components and a weak gradient
+  on the domain, as a submodule.
+* `EllipticPdes.Extension.ae_eq_of_bound`: a bounded operator on good pairs respects
+  almost-everywhere equality.
 * `EllipticPdes.Extension.mem_W12_of_hasWeakGradOn`: a class with an `L²` weak gradient,
   paired with it, lies in the graph space.
 * `EllipticPdes.Extension.exists_extW12`: the extension operator as a bounded linear map
@@ -133,6 +137,27 @@ theorem eq_toLp_cons {F : EuclideanSpace ℝ (Fin d) → ℝ}
   · exact Lp.ext (h0.trans hF.coeFn_toLp.symm)
   · exact Lp.ext ((hk k).trans (hG k).coeFn_toLp.symm)
 
+/-- The pair of a class and a gradient that an element of the graph space presents. -/
+@[irreducible] def pairOf (U : W12 Ω) : SobolevPair d :=
+  (rep (U : H1amb Ω) 0, fun k => rep (U : H1amb Ω) k.succ)
+
+/-- The function component of the pair an element presents. -/
+theorem pairOf_fst (U : W12 Ω) : (pairOf U).1 = rep (U : H1amb Ω) 0 := by
+  unfold pairOf; rfl
+
+/-- The gradient components of the pair an element presents. -/
+theorem pairOf_snd (U : W12 Ω) (k : Fin d) : (pairOf U).2 k = rep (U : H1amb Ω) k.succ := by
+  unfold pairOf; rfl
+
+/-- An element of the graph space presents a good pair. -/
+theorem pairOf_mem_goodPairs [IsFiniteMeasure (volume.restrict Ω)] (U : W12 Ω) :
+    pairOf U ∈ goodPairs Ω := by
+  refine ⟨?_, fun k => ?_, ?_⟩
+  · rw [pairOf_fst]; exact (Lp.memLp _).integrable one_le_two
+  · rw [pairOf_snd]; exact (Lp.memLp _).integrable one_le_two
+  · rw [show (pairOf U).2 = _ from funext (pairOf_snd U), pairOf_fst]
+    exact hasWeakGradOn_of_mem_W12 U.2
+
 /-- The pair seminorm of the representatives of an element of the graph space is at most `d + 1`
 times its norm. -/
 theorem pairNorm_rep_le (U : H1amb Ω) :
@@ -149,6 +174,87 @@ theorem pairNorm_rep_le (U : H1amb Ω) :
         add_le_add (PiLp.norm_apply_le U 0) (Finset.sum_le_sum fun k _ => PiLp.norm_apply_le U _)
     _ = (d + 1) * ‖U‖ := by
         rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]; ring
+
+/-- **A bounded operator on good pairs descends to the graph spaces.** If `T` is linear on pairs
+and the image of a good pair is bounded in `L²` by `K` times the pair seminorm over `Ω`, there is a
+bounded linear map `E` from `W12 Ω` to the ambient space of the whole domain whose coordinates are
+the classes of `T` applied to the pair an element presents. -/
+theorem exists_clm_of_bounded_goodPairs [IsFiniteMeasure (volume.restrict Ω)]
+    (T : SobolevPair d →ₗ[ℝ] SobolevPair d) {K : ℝ≥0}
+    (hbd : ∀ w ∈ goodPairs Ω, eLpNorm (T w).1 2 volume
+        ≤ K * pairNorm 2 (volume.restrict Ω) w.1 w.2 ∧
+      ∀ k, eLpNorm ((T w).2 k) 2 volume ≤ K * pairNorm 2 (volume.restrict Ω) w.1 w.2) :
+    ∃ (E : W12 Ω →L[ℝ] H1amb (Set.univ : Set (EuclideanSpace ℝ (Fin d)))) (C : ℝ),
+      (∀ U : W12 Ω, MemLp (T (pairOf U)).1 2 volume) ∧
+      (∀ (U : W12 Ω) k, MemLp ((T (pairOf U)).2 k) 2 volume) ∧
+      (∀ U : W12 Ω, ⇑(E U 0) =ᵐ[volume] (T (pairOf U)).1) ∧
+      (∀ (U : W12 Ω) k, ⇑(E U k.succ) =ᵐ[volume] (T (pairOf U)).2 k) ∧
+      ∀ U : W12 Ω, ‖E U‖ ≤ C * ‖U‖ := by
+  classical
+  -- vectors of representatives against pairs, and the operator on them
+  obtain ⟨ce, hce0, hces⟩ : ∃ ce : SobolevPair d ≃ₗ[ℝ]
+      (Fin (d + 1) → EuclideanSpace ℝ (Fin d) → ℝ),
+      (∀ p : SobolevPair d, ce p 0 = p.1) ∧ ∀ (p : SobolevPair d) k, ce p k.succ = p.2 k :=
+    ⟨Fin.consLinearEquiv ℝ fun _ : Fin (d + 1) => EuclideanSpace ℝ (Fin d) → ℝ,
+      fun p => by simp, fun p k => by simp⟩
+  obtain ⟨T', hT'⟩ : ∃ T' : (Fin (d + 1) → EuclideanSpace ℝ (Fin d) → ℝ) →ₗ[ℝ]
+      (Fin (d + 1) → EuclideanSpace ℝ (Fin d) → ℝ), ∀ f, T' f = ce (T (ce.symm f)) :=
+    ⟨ce.toLinearMap ∘ₗ T ∘ₗ ce.symm.toLinearMap, fun f => rfl⟩
+  have hrep : ∀ U : W12 Ω, ce (pairOf U) = rep (U : H1amb Ω) := fun U => by
+    funext i
+    refine Fin.cases ?_ (fun k => ?_) i
+    · rw [hce0, pairOf_fst]
+    · rw [hces, pairOf_snd]
+  have hT'0 : ∀ U : W12 Ω, T' (rep (U : H1amb Ω)) 0 = (T (pairOf U)).1 := fun U => by
+    rw [hT', ← hrep U, ce.symm_apply_apply, hce0]
+  have hT's : ∀ (U : W12 Ω) k, T' (rep (U : H1amb Ω)) k.succ = (T (pairOf U)).2 k :=
+    fun U k => by rw [hT', ← hrep U, ce.symm_apply_apply, hces]
+  -- the image is in `L²`, with the bound the norm gives
+  have hpair : ∀ U : W12 Ω, pairNorm 2 (volume.restrict Ω) (pairOf U).1 (pairOf U).2
+      ≤ ENNReal.ofReal ((d + 1) * ‖U‖) := fun U => by
+    rw [pairOf_fst, show (pairOf U).2 = _ from funext (pairOf_snd U)]
+    exact pairNorm_rep_le _
+  have hfin : ∀ U : W12 Ω,
+      (K : ℝ≥0∞) * pairNorm 2 (volume.restrict Ω) (pairOf U).1 (pairOf U).2 < ⊤ := fun U =>
+    ENNReal.mul_lt_top ENNReal.coe_lt_top ((hpair U).trans_lt ENNReal.ofReal_lt_top)
+  have hMF : ∀ U : W12 Ω, MemLp (T (pairOf U)).1 2 volume := fun U =>
+    lt_of_le_of_lt (hbd _ (pairOf_mem_goodPairs U)).1 (hfin U)
+  have hMG : ∀ U : W12 Ω, ∀ k, MemLp ((T (pairOf U)).2 k) 2 volume := fun U k =>
+    lt_of_le_of_lt ((hbd _ (pairOf_mem_goodPairs U)).2 k) (hfin U)
+  have hbound : ∀ U : W12 Ω, ∀ k, eLpNorm (T' (rep (U : H1amb Ω)) k) 2 volume
+      ≤ ENNReal.ofReal (K * (d + 1) * ‖U‖) := fun U k => by
+    have h : (K : ℝ≥0∞) * pairNorm 2 (volume.restrict Ω) (pairOf U).1 (pairOf U).2
+        ≤ ENNReal.ofReal (K * (d + 1) * ‖U‖) := by
+      rw [mul_assoc, ENNReal.ofReal_mul (NNReal.coe_nonneg K), ENNReal.ofReal_coe_nnreal]
+      exact mul_le_mul_right (hpair U) _
+    refine Fin.cases ?_ (fun k => ?_) k
+    · rw [hT'0]; exact (hbd _ (pairOf_mem_goodPairs U)).1.trans h
+    · rw [hT's]; exact ((hbd _ (pairOf_mem_goodPairs U)).2 k).trans h
+  -- the operator respects almost-everywhere equality on good pairs
+  have hcompat : ∀ f ∈ (goodPairs Ω).map (ce : SobolevPair d →ₗ[ℝ] _),
+      ∀ g ∈ (goodPairs Ω).map (ce : SobolevPair d →ₗ[ℝ] _),
+      (∀ i, f i =ᵐ[volume.restrict Ω] g i) → ∀ k, T' f k =ᵐ[volume.restrict Set.univ] T' g k := by
+    rintro _ ⟨p, hp, rfl⟩ _ ⟨q, hq, rfl⟩ hfg k
+    have h := ae_eq_of_bound hbd hp hq (by simpa only [LinearEquiv.coe_coe, hce0] using hfg 0)
+      (fun k => by simpa only [LinearEquiv.coe_coe, hces] using hfg k.succ)
+    rw [Measure.restrict_univ]
+    refine Fin.cases ?_ (fun k => ?_) k
+    · simpa only [hT', LinearEquiv.coe_coe, ce.symm_apply_apply, hce0] using h.1
+    · simpa only [hT', LinearEquiv.coe_coe, ce.symm_apply_apply, hces] using h.2 k
+  obtain ⟨E, hE, hEn⟩ := exists_clm_of_ae_compat (W12 Ω)
+    ((goodPairs Ω).map (ce : SobolevPair d →ₗ[ℝ] _))
+    (fun U hU => ⟨pairOf ⟨U, hU⟩, pairOf_mem_goodPairs ⟨U, hU⟩, hrep ⟨U, hU⟩⟩) T' hcompat
+    (fun U hU k => by
+      rw [Measure.restrict_univ]
+      refine Fin.cases ?_ (fun k => ?_) k
+      · rw [hT'0 ⟨U, hU⟩]; exact hMF ⟨U, hU⟩
+      · rw [hT's ⟨U, hU⟩]; exact hMG ⟨U, hU⟩ k) (C := (K : ℝ) * (d + 1)) (by positivity)
+    (fun U hU k => by rw [Measure.restrict_univ]; exact hbound ⟨U, hU⟩ k)
+  refine ⟨E, Real.sqrt (d + 1) * (K * (d + 1)), hMF, hMG, fun U => ?_, fun U k => ?_,
+    fun U => ?_⟩
+  · simpa only [hT'0, Measure.restrict_univ] using hE U 0
+  · simpa only [hT's, Measure.restrict_univ] using hE U k.succ
+  · simpa [mul_assoc] using hEn U
 
 /-- **Extension operator between the graph spaces** (Guo Theorem III.2.2 at `p = 2`,
 Evans §5.4 Theorem 1). On a bounded open domain with `C¹` boundary, and for any open set
@@ -176,113 +282,37 @@ theorem exists_extW12 (hd : 0 < d) (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBou
   classical
   have : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
   obtain ⟨T, K, hT⟩ := exists_extLinear hd hΩopen hΩb hC1 hΩ'open hsub (p := 2) one_le_two
-  have hbd : ∀ w ∈ goodPairs Ω, eLpNorm (T w).1 2 volume
-        ≤ K * pairNorm 2 (volume.restrict Ω) w.1 w.2 ∧
-      ∀ k, eLpNorm ((T w).2 k) 2 volume ≤ K * pairNorm 2 (volume.restrict Ω) w.1 w.2 :=
+  have hspec := fun U : W12 Ω => hT (pairOf U) (pairOf_mem_goodPairs U).1
+    (pairOf_mem_goodPairs U).2.1 (pairOf_mem_goodPairs U).2.2
+  obtain ⟨E, C, hMF, hMG, hE0, hEs, hEn⟩ := exists_clm_of_bounded_goodPairs (K := K) T
     fun w hw => by
       obtain ⟨-, -, -, -, -, -, h1, h2⟩ := hT w hw.1 hw.2.1 hw.2.2
       exact ⟨h1, h2⟩
-  obtain ⟨ce, hce0, hces⟩ : ∃ ce : SobolevPair d ≃ₗ[ℝ]
-      (Fin (d + 1) → EuclideanSpace ℝ (Fin d) → ℝ),
-      (∀ p : SobolevPair d, ce p 0 = p.1) ∧ ∀ (p : SobolevPair d) k, ce p k.succ = p.2 k :=
-    ⟨Fin.consLinearEquiv ℝ fun _ : Fin (d + 1) => EuclideanSpace ℝ (Fin d) → ℝ,
-      fun p => by simp, fun p k => by simp⟩
-  -- the operator on vectors of representatives, and the pair a vector of classes presents
-  obtain ⟨T', hT'⟩ : ∃ T' : (Fin (d + 1) → EuclideanSpace ℝ (Fin d) → ℝ) →ₗ[ℝ]
-      (Fin (d + 1) → EuclideanSpace ℝ (Fin d) → ℝ), ∀ f, T' f = ce (T (ce.symm f)) :=
-    ⟨ce.toLinearMap ∘ₗ T ∘ₗ ce.symm.toLinearMap, fun f => rfl⟩
-  obtain ⟨w, hwdef⟩ : ∃ w : H1amb Ω → SobolevPair d, ∀ U, w U = ce.symm (rep U) := ⟨_, fun U => rfl⟩
-  have hrep : ∀ U : H1amb Ω, ce (w U) = rep U := fun U => by rw [hwdef, ce.apply_symm_apply]
-  have hw1 : ∀ U, (w U).1 = rep U 0 := fun U => by rw [← hce0, hrep U]
-  have hw2 : ∀ U k, (w U).2 k = rep U k.succ := fun U k => by rw [← hces, hrep U]
-  have hw : ∀ U : W12 Ω, w U ∈ goodPairs Ω := fun U => by
-    refine ⟨?_, fun k => ?_, ?_⟩
-    · rw [hw1]; exact (Lp.memLp _).integrable one_le_two
-    · rw [hw2]; exact (Lp.memLp _).integrable one_le_two
-    · rw [show (w U).1 = _ from hw1 U, show (w U).2 = _ from funext (hw2 U)]
-      exact hasWeakGradOn_of_mem_W12 U.2
-  have hT'0 : ∀ U : H1amb Ω, T' (rep U) 0 = (T (w U)).1 := fun U => by
-    rw [hT', ← hrep U, ce.symm_apply_apply, hce0]
-  have hT's : ∀ (U : H1amb Ω) k, T' (rep U) k.succ = (T (w U)).2 k := fun U k => by
-    rw [hT', ← hrep U, ce.symm_apply_apply, hces]
-  -- measure and bound
-  have hpair : ∀ U : H1amb Ω, pairNorm 2 (volume.restrict Ω) (w U).1 (w U).2
-      ≤ ENNReal.ofReal ((d + 1) * ‖U‖) := fun U => by
-    rw [show (w U).1 = rep U 0 from hw1 U, show (w U).2 = fun k => rep U k.succ from funext (hw2 U)]
-    exact pairNorm_rep_le U
-  have hfin : ∀ U : W12 Ω, (K : ℝ≥0∞) * pairNorm 2 (volume.restrict Ω) (w U).1 (w U).2 < ⊤ :=
-    fun U => ENNReal.mul_lt_top ENNReal.coe_lt_top
-      (lt_of_le_of_lt (hpair U) ENNReal.ofReal_lt_top)
-  have hMF : ∀ U : W12 Ω, MemLp (T (w U)).1 2 volume := fun U =>
-    lt_of_le_of_lt (hbd _ (hw U)).1 (hfin U)
-  have hMG : ∀ U : W12 Ω, ∀ k, MemLp ((T (w U)).2 k) 2 volume := fun U k =>
-    lt_of_le_of_lt ((hbd _ (hw U)).2 k) (hfin U)
-  have hmem : ∀ U ∈ W12 Ω, ∀ k, MemLp (T' (rep U) k) 2 (volume.restrict Set.univ) :=
-    fun U hU k => by
-      rw [Measure.restrict_univ]
-      refine Fin.cases ?_ (fun k => ?_) k
-      · rw [hT'0]; exact hMF ⟨U, hU⟩
-      · rw [hT's]; exact hMG ⟨U, hU⟩ k
-  have hbound : ∀ U ∈ W12 Ω, ∀ k, eLpNorm (T' (rep U) k) 2 (volume.restrict Set.univ)
-      ≤ ENNReal.ofReal (K * (d + 1) * ‖U‖) := fun U hU k => by
-    rw [Measure.restrict_univ]
-    have h : (K : ℝ≥0∞) * pairNorm 2 (volume.restrict Ω) (w U).1 (w U).2
-        ≤ ENNReal.ofReal (K * (d + 1) * ‖U‖) := by
-      rw [mul_assoc, ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_coe_nnreal]
-      exact mul_le_mul_right (hpair U) _
-    refine Fin.cases ?_ (fun k => ?_) k
-    · rw [hT'0]; exact (hbd _ (hw ⟨U, hU⟩)).1.trans h
-    · rw [hT's]; exact ((hbd _ (hw ⟨U, hU⟩)).2 k).trans h
-  have hcompat : ∀ f ∈ (goodPairs Ω).map (ce : SobolevPair d →ₗ[ℝ] _),
-      ∀ g ∈ (goodPairs Ω).map (ce : SobolevPair d →ₗ[ℝ] _),
-      (∀ i, f i =ᵐ[volume.restrict Ω] g i) → ∀ k, T' f k =ᵐ[volume.restrict Set.univ] T' g k := by
-    rintro _ ⟨p, hp, rfl⟩ _ ⟨q, hq, rfl⟩ hfg k
-    have h := ae_eq_of_bound hbd hp hq (by simpa only [LinearEquiv.coe_coe, hce0] using hfg 0)
-      (fun k => by simpa only [LinearEquiv.coe_coe, hces] using hfg k.succ)
-    rw [Measure.restrict_univ]
-    refine Fin.cases ?_ (fun k => ?_) k
-    · simpa only [hT', LinearEquiv.coe_coe, ce.symm_apply_apply, hce0] using h.1
-    · simpa only [hT', LinearEquiv.coe_coe, ce.symm_apply_apply, hces] using h.2 k
-  obtain ⟨E, hE, hEn⟩ := exists_clm_of_ae_compat (W12 Ω)
-    ((goodPairs Ω).map (ce : SobolevPair d →ₗ[ℝ] _)) (fun U hU => ⟨w U, hw ⟨U, hU⟩, hrep U⟩) T'
-    hcompat hmem (by positivity) hbound
-  have hE0 : ∀ U : W12 Ω, ⇑(E U 0) =ᵐ[volume] (T (w U)).1 := fun U => by
-    simpa only [hT'0, Measure.restrict_univ] using hE U 0
-  have hEs : ∀ (U : W12 Ω) k, ⇑(E U k.succ) =ᵐ[volume] (T (w U)).2 k := fun U k => by
-    simpa only [hT's, Measure.restrict_univ] using hE U k.succ
   have hmemE : ∀ U : W12 Ω, (E U : H1amb Set.univ) ∈ W12 Set.univ := fun U => by
-    have hF : MemLp (T (w U)).1 2 (volume.restrict Set.univ) := by
+    have hF : MemLp (T (pairOf U)).1 2 (volume.restrict Set.univ) := by
       rw [Measure.restrict_univ]; exact hMF U
-    have hG : ∀ k, MemLp ((T (w U)).2 k) 2 (volume.restrict Set.univ) := fun k => by
+    have hG : ∀ k, MemLp ((T (pairOf U)).2 k) 2 (volume.restrict Set.univ) := fun k => by
       rw [Measure.restrict_univ]; exact hMG U k
     rw [eq_toLp_cons hF hG (E U) (by simpa only [Measure.restrict_univ] using hE0 U)
       (fun k => by simpa only [Measure.restrict_univ] using hEs U k)]
-    exact mem_W12_of_hasWeakGradOn hF hG (hT _ (hw U).1 (hw U).2.1 (hw U).2.2).1
-  refine ⟨E.codRestrict (W12 Set.univ) hmemE, Real.sqrt (d + 1) * (K * (d + 1)),
-    fun U => ⟨?_, fun k => ?_⟩, fun U => ?_, fun U => ?_⟩
+    exact mem_W12_of_hasWeakGradOn hF hG (hspec U).1
+  refine ⟨E.codRestrict (W12 Set.univ) hmemE, C, fun U => ⟨?_, fun k => ?_⟩, fun U => ?_,
+    fun U => hEn U⟩
   · -- agreement of the function coordinate on the domain
-    obtain ⟨-, -, -, -, -, hag, -, -⟩ := hT _ (hw U).1 (hw U).2.1 (hw U).2.2
-    have h2 : (T (w U)).1 =ᵐ[volume.restrict Ω] (w U).1 :=
-      (ae_restrict_iff' hΩopen.measurableSet).mpr (Eventually.of_forall hag)
-    rw [hw1] at h2
+    have h2 : (T (pairOf U)).1 =ᵐ[volume.restrict Ω] (pairOf U).1 :=
+      (ae_restrict_iff' hΩopen.measurableSet).mpr (Eventually.of_forall (hspec U).2.2.2.2.2.1)
+    rw [pairOf_fst] at h2
     exact Filter.EventuallyEq.trans (ae_restrict_of_ae (hE0 U)) h2
   · -- agreement of the gradient coordinates, by uniqueness of the weak gradient
-    obtain ⟨hwgU, -, -, -, hgint, hag, -, -⟩ := hT _ (hw U).1 (hw U).2.1 (hw U).2.2
-    have hue : (w U).1 =ᵐ[volume.restrict Ω] (T (w U)).1 :=
-      (ae_restrict_iff' hΩopen.measurableSet).mpr
-        (Eventually.of_forall fun y hy => (hag y hy).symm)
-    have hge : (T (w U)).2 k =ᵐ[volume.restrict Ω] (w U).2 k :=
-      hasWeakGradOn_unique_ae hΩopen hΩopen.measurableSet (fun k => (hgint k).integrableOn)
-        (hw U).2.1 (((hwgU.mono (subset_univ _)).congr_ae hue.symm fun _ => EventuallyEq.rfl))
-        (hw U).2.2 k
-    rw [hw2] at hge
+    have hge := ae_grad_eq_of_extension hΩopen (fun k => (pairOf_mem_goodPairs U).2.1 k)
+      (fun k => ((hspec U).2.2.2.2.1 k).integrableOn) (pairOf_mem_goodPairs U).2.2 (hspec U).1
+      (hspec U).2.2.2.2.2.1 k
+    rw [pairOf_snd] at hge
     exact Filter.EventuallyEq.trans (ae_restrict_of_ae (hEs U k)) hge
   · -- vanishing outside the given open set
-    obtain ⟨-, -, hsupp, -⟩ := hT _ (hw U).1 (hw U).2.1 (hw U).2.2
     filter_upwards [hE0 U] with y hy hyΩ'
     rw [show (((E.codRestrict (W12 Set.univ) hmemE U : W12 Set.univ) : H1amb Set.univ) 0 :
       EuclideanSpace ℝ (Fin d) → ℝ) y = E U 0 y from rfl, hy]
-    exact image_eq_zero_of_notMem_tsupport fun hc => hyΩ' (hsupp hc)
-  · simpa [mul_assoc] using hEn U
+    exact image_eq_zero_of_notMem_tsupport fun hc => hyΩ' ((hspec U).2.2.1 hc)
 
 end EllipticPdes.Extension

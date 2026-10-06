@@ -135,6 +135,22 @@ theorem integral_mul_indepCoord {B : Set (EuclideanSpace ℝ (Fin d))} (hBopen :
 
 /-! ### The weak gradient of a composition with a shear -/
 
+/-- **A test function pulled back through the inverse shear.** A smooth test function supported in
+the preimage of `B` under the shear is the composite of the shear with a `C¹` function of compact
+support in `B`. -/
+theorem exists_shear_pullback {B : Set (EuclideanSpace ℝ (Fin d))} {j : Fin d}
+    {γ : EuclideanSpace ℝ (Fin d) → ℝ} (hγ : ContDiff ℝ 1 γ) (hind : IndepCoord j γ)
+    {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (hφcs : HasCompactSupport φ)
+    (hφs : tsupport φ ⊆ shear j γ ⁻¹' B) :
+    ∃ Ψ : EuclideanSpace ℝ (Fin d) → ℝ, ContDiff ℝ 1 Ψ ∧ HasCompactSupport Ψ ∧
+      tsupport Ψ ⊆ B ∧ ∀ y, Ψ (shear j γ y) = φ y := by
+  have hnegcont : Continuous fun z => -γ z := hγ.continuous.neg
+  refine ⟨φ ∘ shearHomeomorph hnegcont hind.neg,
+    (hφ.of_le (by exact_mod_cast le_top)).comp (contDiff_shear hγ.neg),
+    hφcs.comp_homeomorph _, fun x hx => ?_, fun y => congrArg φ (shear_shear_neg hind y)⟩
+  rw [tsupport_comp_homeomorph] at hx
+  simpa [shearHomeomorph, shear_neg_shear hind x] using hφs hx
+
 /-- **Weak gradient through a shear.** If `u` has weak gradient `g` on `B`, then `u ∘ S` has
 weak gradient `k ↦ gₖ ∘ S + (g_j ∘ S) ∂ₖγ` on the preimage of `B`, which is the transpose of the
 shear's derivative applied to the gradient.
@@ -153,7 +169,6 @@ theorem hasWeakGradOn_comp_shear {B : Set (EuclideanSpace ℝ (Fin d))} (hBopen 
       (fun k y => g k (shear j γ y) + g j (shear j γ y) * partialD k γ y) := by
   intro φ hφ hφcs hφs k
   have hγd : Differentiable ℝ γ := hγ.differentiable (by simp)
-  have hnegcont : Continuous fun z => -γ z := hγ.continuous.neg
   have hckc : Continuous (partialD k γ) := hγ.continuous_partialD one_ne_zero k
   have hckind : IndepCoord j (partialD k γ) := indepCoord_partialD hγd hind
   -- the chart's partial derivative sees no change along the shear
@@ -161,16 +176,7 @@ theorem hasWeakGradOn_comp_shear {B : Set (EuclideanSpace ℝ (Fin d))} (hBopen 
       partialD m γ (shear j γ y) = partialD m γ y := fun m y =>
     indepCoord_partialD (k := m) hγd hind y (γ y)
   -- the test function, pulled back through the inverse shear
-  set Ψ : EuclideanSpace ℝ (Fin d) → ℝ := φ ∘ shearHomeomorph hnegcont hind.neg with hΨ
-  have hΨC1 : ContDiff ℝ 1 Ψ :=
-    (hφ.of_le (by exact_mod_cast le_top)).comp (contDiff_shear hγ.neg)
-  have hΨcs : HasCompactSupport Ψ := hφcs.comp_homeomorph _
-  have hΨS : ∀ y, Ψ (shear j γ y) = φ y := fun y => by
-    simp only [hΨ, Function.comp_apply]
-    exact congrArg φ (shear_shear_neg hind y)
-  have hΨs : tsupport Ψ ⊆ B := fun x hx => by
-    rw [hΨ, tsupport_comp_homeomorph] at hx
-    simpa [shearHomeomorph, shear_neg_shear hind x] using hφs hx
+  obtain ⟨Ψ, hΨC1, hΨcs, hΨs, hΨS⟩ := exists_shear_pullback hγ hind hφ hφcs hφs
   -- the chain rule for the smooth test function
   have hchain : ∀ y, partialD k φ y
       = partialD k Ψ (shear j γ y) + partialD j Ψ (shear j γ y) * partialD k γ y := fun y => by
