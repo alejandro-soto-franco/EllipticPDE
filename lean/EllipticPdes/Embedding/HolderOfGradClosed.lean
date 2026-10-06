@@ -59,17 +59,6 @@ namespace EllipticPdes.Embedding
 
 variable {d : ℕ}
 
-/-- At the exponent `2d` the Morrey exponent is `1/2`, whatever the dimension. -/
-theorem morreyExponent_two_mul (hd : 0 < d) : morreyExponent d (2 * (d : ℝ)) = (1 / 2 : ℝ≥0) := by
-  have hdR : (0 : ℝ) < (d : ℝ) := by exact_mod_cast hd
-  have hnn : 0 ≤ 1 - (d : ℝ) / (2 * (d : ℝ)) := by
-    rw [sub_nonneg, div_le_one (by linarith)]; linarith
-  refine NNReal.coe_injective ?_
-  rw [morreyExponent, Real.coe_toNNReal _ hnn]
-  push_cast
-  field_simp
-  norm_num
-
 /-- **Classical derivatives of finite order from a bounded supply of weak ones.** Let `F` assign a
 function to each index of `ι`, let `nxt i k` name a weak `k`-derivative of `F i` on
 `Metric.ball c R`, and let `dep` record how far an index sits above the root. If every index of

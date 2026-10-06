@@ -629,6 +629,15 @@ theorem add_sum_le_of_le {d : ℕ} {a B : ℝ≥0∞} {b : Fin d → ℝ≥0∞}
   calc a + ∑ k, b k ≤ B + ∑ _k : Fin d, B := add_le_add ha (Finset.sum_le_sum fun k _ => hb k)
     _ = (d + 1) * B := by simp [add_mul, add_comm]
 
+/-- The sum of `d` seminorms, each at most `B`, is at most `d * B`, read in `ℝ≥0`. -/
+theorem sum_toNNReal_eLpNorm_le {α : Type*} {m : MeasurableSpace α} {μ : Measure α}
+    {g : Fin d → α → ℝ} {p : ℝ≥0∞} {B : ℝ≥0} (h : ∀ k, eLpNorm (g k) p μ ≤ B) :
+    ∑ k, (eLpNorm (g k) p μ).toNNReal ≤ d * B := by
+  calc ∑ k, (eLpNorm (g k) p μ).toNNReal ≤ ∑ _k : Fin d, B :=
+        Finset.sum_le_sum fun k _ =>
+          (ENNReal.toNNReal_mono ENNReal.coe_ne_top (h k)).trans_eq (ENNReal.toNNReal_coe B)
+    _ = d * B := by simp
+
 end Bootstrap
 
 end EllipticPdes.Embedding

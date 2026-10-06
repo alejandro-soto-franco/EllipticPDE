@@ -936,4 +936,15 @@ theorem morrey_ball (hd : 0 < d) {p : ℝ} (hp : (d : ℝ) < p)
     exists_holderOnWith_of_ae_tendsto Metric.isOpen_ball hγpos hHol hae
   exact ⟨u', hu'ae, hu'H⟩
 
+/-- At the exponent `2d` the Morrey exponent is `1/2`, whatever the dimension. -/
+theorem morreyExponent_two_mul (hd : 0 < d) : morreyExponent d (2 * (d : ℝ)) = (1 / 2 : ℝ≥0) := by
+  have hdR : (0 : ℝ) < (d : ℝ) := by exact_mod_cast hd
+  have hnn : 0 ≤ 1 - (d : ℝ) / (2 * (d : ℝ)) := by
+    rw [sub_nonneg, div_le_one (by linarith)]; linarith
+  refine NNReal.coe_injective ?_
+  rw [morreyExponent, Real.coe_toNNReal _ hnn]
+  push_cast
+  field_simp
+  norm_num
+
 end EllipticPdes.Embedding
