@@ -25,6 +25,7 @@ Consumers should use `interior_H2_estimate` and its siblings from
 @[expose] public section
 
 open MeasureTheory
+open scoped RealInnerProductSpace
 
 noncomputable section
 
@@ -55,6 +56,76 @@ lemma extendL2_supp_of_ae_restrict (hΩm : MeasurableSet Ω) (g : L2D Ω)
     rw [Set.indicator_of_mem hxΩ] at hne
     exact hne (himp hxΩ hxS)
   · rw [Set.indicator_of_notMem hxΩ] at hne; exact absurd rfl hne
+
+/-- If a class `g` agrees a.e. on `Ω` with a function `F` that vanishes off `Ω`, then its
+extension by zero agrees a.e. with `F` on the whole space. -/
+lemma coeFn_extendL2_of_ae_restrict (hΩm : MeasurableSet Ω) (g : L2D Ω)
+    {F : EuclideanSpace ℝ (Fin d) → ℝ} (hg : g =ᵐ[volume.restrict Ω] F)
+    (hF : ∀ x, x ∉ Ω → F x = 0) :
+    (extendL2 hΩm g : EuclideanSpace ℝ (Fin d) → ℝ) =ᵐ[volume] F := by
+  filter_upwards [coeFn_extendL2 hΩm g, ae_imp_of_ae_restrict hg] with x hx himp
+  rw [hx]
+  by_cases hxΩ : x ∈ Ω
+  · rw [Set.indicator_of_mem hxΩ]; exact himp hxΩ
+  · rw [Set.indicator_of_notMem hxΩ, hF x hxΩ]
+
+/-- The inner product of two `L²` classes is the integral of the product of any representatives. -/
+lemma inner_Lp_eq_integral_of_ae {α : Type*} [MeasurableSpace α] {μ : Measure α}
+    {f g : Lp ℝ 2 μ} {F G : α → ℝ} (hf : f =ᵐ[μ] F) (hg : g =ᵐ[μ] G) :
+    ⟪f, g⟫ = ∫ x, F x * G x ∂μ := by
+  rw [L2.inner_def]
+  refine integral_congr_ae ?_
+  filter_upwards [hf, hg] with x h1 h2
+  rw [Real.inner_apply, h1, h2]
+
+/-- **Invisibility of a cutoff on the set where it is `1`.** If `η ≡ 1` on `V ⊆ Ω`, the
+`V`-restriction of the whole-space extension of `η · g` agrees with that of `g`. -/
+theorem restrictL2_extendL2_mulTest_eq_of_eqOn (hΩm : MeasurableSet Ω)
+    {V : Set (EuclideanSpace ℝ (Fin d))} (hVm : MeasurableSet V) (hVΩ : V ⊆ Ω)
+    {η : EuclideanSpace ℝ (Fin d) → ℝ} (hη : IsTestFn Ω η) (h1 : Set.EqOn η 1 V) (g : L2D Ω) :
+    restrictL2 (Ω := V) (extendL2 hΩm (mulTest hη g)) = restrictL2 (Ω := V) (extendL2 hΩm g) := by
+  have hmt : (mulTest hη g : EuclideanSpace ℝ (Fin d) → ℝ)
+      =ᵐ[volume.restrict V] fun x => η x * (g x : ℝ) :=
+    (mulTest_coeFn hη g).filter_mono (ae_mono (Measure.restrict_mono hVΩ le_rfl))
+  apply Lp.ext
+  filter_upwards [coeFn_restrictL2 (Ω := V) (extendL2 hΩm (mulTest hη g)),
+    coeFn_restrictL2 (Ω := V) (extendL2 hΩm g),
+    ae_restrict_of_ae (coeFn_extendL2 hΩm (mulTest hη g)),
+    ae_restrict_of_ae (coeFn_extendL2 hΩm g), hmt, ae_restrict_mem hVm]
+    with x h1' h2' h3 h4 hmtx hxV
+  rw [h1', h2', h3, h4, Set.indicator_of_mem (hVΩ hxV), Set.indicator_of_mem (hVΩ hxV), hmtx,
+    h1 hxV, Pi.one_apply, one_mul]
+
+/-- An integral over `Ω` of an integrand vanishing off `W ⊆ Ω` is an integral over `W`. -/
+theorem setIntegral_shrink_of_forall_eq_zero
+    {W Ω : Set (EuclideanSpace ℝ (Fin d))} (hWΩ : W ⊆ Ω)
+    {F : EuclideanSpace ℝ (Fin d) → ℝ} (hF : ∀ x, x ∉ W → F x = 0) :
+    ∫ x in Ω, F x = ∫ x in W, F x := by
+  rw [setIntegral_eq_integral_of_forall_compl_eq_zero
+      (fun x hx => hF x (fun hc => hx (hWΩ hc))),
+    setIntegral_eq_integral_of_forall_compl_eq_zero hF]
+
+/-- The restriction to `V ⊆ Ω` of the whole-space extension of an `L²(Ω)` class agrees with the
+class itself on `V`. -/
+theorem coeFn_restrictL2_extendL2_of_subset {Ω V : Set (EuclideanSpace ℝ (Fin d))}
+    (hΩm : MeasurableSet Ω) (hVm : MeasurableSet V) (hVΩ : V ⊆ Ω) (g : L2D Ω) :
+    (restrictL2 (Ω := V) (extendL2 hΩm g) : EuclideanSpace ℝ (Fin d) → ℝ)
+      =ᵐ[volume.restrict V] (g : EuclideanSpace ℝ (Fin d) → ℝ) := by
+  filter_upwards [coeFn_restrictL2 (Ω := V) (extendL2 hΩm g),
+    ae_restrict_of_ae (coeFn_extendL2 hΩm g), ae_restrict_mem hVm] with x h1 h2 h3
+  rw [h1, h2, Set.indicator_of_mem (hVΩ h3)]
+
+/-- An integral over `Ω` of a weight times an `L²(Ω)` class times a function vanishing off
+`V ⊆ Ω` is the integral over `V` against the restricted extension of the class. -/
+theorem setIntegral_mul_restrictL2_extendL2 {Ω V : Set (EuclideanSpace ℝ (Fin d))}
+    (hΩm : MeasurableSet Ω) (hVm : MeasurableSet V) (hVΩ : V ⊆ Ω) (g : L2D Ω)
+    (c w : EuclideanSpace ℝ (Fin d) → ℝ) (hw : ∀ x, x ∉ V → w x = 0) :
+    ∫ x in Ω, c x * (g x : ℝ) * w x
+      = ∫ x in V, c x * (restrictL2 (Ω := V) (extendL2 hΩm g) x : ℝ) * w x := by
+  rw [setIntegral_shrink_of_forall_eq_zero hVΩ (fun x hx => by rw [hw x hx, mul_zero])]
+  refine integral_congr_ae ?_
+  filter_upwards [coeFn_restrictL2_extendL2_of_subset hΩm hVm hVΩ g] with x hx
+  rw [hx]
 
 /-- Restriction to `Ω` is non-expansive on `L²`: `‖restrictL2 w‖ ≤ ‖w‖`. -/
 lemma norm_restrictL2_le (w : EucL2 d) :

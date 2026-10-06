@@ -164,38 +164,58 @@ theorem abs_iterPartial_le {f : EuclideanSpace ℝ (Fin d) → ℝ} (α : List (
 
 /-! ### Classical derivative as a weak derivative -/
 
-/-- **Integration by parts for a `C¹` function against a test function.** The classical
-partial derivative of a continuously differentiable function is its weak partial derivative.
-No decay is asked of `f`, because the test function has compact support and puts every
-integrand into `L¹`. -/
+/-- A function continuous on an open set and vanishing off a compact subset of it is
+integrable on the whole space. -/
+theorem integrable_of_continuousOn_of_eq_zero_off_compact {W K : Set (EuclideanSpace ℝ (Fin d))}
+    (hK : IsCompact K) (hKW : K ⊆ W) {F : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hF : ContinuousOn F W) (hFK : ∀ x, x ∉ K → F x = 0) : Integrable F volume :=
+  ((hF.mono hKW).integrableOn_compact hK).integrable_of_forall_notMem_eq_zero hFK
+
+/-- **Integration by parts for a `C¹` function on an open set.** For `f` of class `C¹` on an
+open set `W` and a test function `φ` supported in `W`, `∫_W f ∂ⱼφ = -∫_W (∂ⱼf) φ`. The compact
+support of `φ` leaves no boundary term, and `f` need only be differentiable on that support. -/
+theorem setIntegral_mul_partialD_eq_neg {W : Set (EuclideanSpace ℝ (Fin d))} (hW : IsOpen W)
+    {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : ContDiffOn ℝ 1 f W)
+    {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφc : ContDiff ℝ (⊤ : ℕ∞) φ)
+    (hφcs : HasCompactSupport φ) (hφW : tsupport φ ⊆ W) (j : Fin d) :
+    ∫ x in W, f x * partialD j φ x = -∫ x in W, partialD j f x * φ x := by
+  have hφcont : Continuous φ := hφc.continuous
+  have hdφ : Continuous (partialD j φ) :=
+    (hφc.continuous_fderiv (by simp)).clm_apply continuous_const
+  have hdf : ContinuousOn (partialD j f) W :=
+    (hf.continuousOn_fderiv_of_isOpen hW le_rfl).clm_apply continuousOn_const
+  have hz1 : ∀ x, x ∉ tsupport φ → f x * partialD j φ x = 0 := fun x hx => by
+    rw [show partialD j φ x = 0 from image_eq_zero_of_notMem_tsupport
+      (fun hc => hx (tsupport_partialD_subset j φ hc)), mul_zero]
+  have hz2 : ∀ x, x ∉ tsupport φ → partialD j f x * φ x = 0 := fun x hx => by
+    rw [image_eq_zero_of_notMem_tsupport hx, mul_zero]
+  have hz3 : ∀ x, x ∉ tsupport φ → f x * φ x = 0 := fun x hx => by
+    rw [image_eq_zero_of_notMem_tsupport hx, mul_zero]
+  rw [setIntegral_eq_integral_of_forall_compl_eq_zero (fun x hx => hz1 x fun hc => hx (hφW hc)),
+    setIntegral_eq_integral_of_forall_compl_eq_zero (fun x hx => hz2 x fun hc => hx (hφW hc))]
+  simp only [partialD]
+  refine integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable ?_ ?_ ?_ ?_ ?_
+  · exact integrable_of_continuousOn_of_eq_zero_off_compact hφcs.isCompact hφW
+      (hdf.mul hφcont.continuousOn) hz2
+  · exact integrable_of_continuousOn_of_eq_zero_off_compact hφcs.isCompact hφW
+      (hf.continuousOn.mul hdφ.continuousOn) hz1
+  · exact integrable_of_continuousOn_of_eq_zero_off_compact hφcs.isCompact hφW
+      (hf.continuousOn.mul hφcont.continuousOn) hz3
+  · intro x hx
+    exact (hf.differentiableOn one_ne_zero).differentiableAt (hW.mem_nhds (hφW hx))
+  · intro x _
+    exact (hφc.differentiable (by simp)).differentiableAt
+
+/-- **Integration by parts for a `C¹` function.** The classical partial derivative of a
+continuously differentiable function is its weak partial derivative. No decay is asked of `f`,
+because the test function has compact support. -/
 theorem hasWeakPartial_partialD {f : EuclideanSpace ℝ (Fin d) → ℝ}
     (hf : ContDiff ℝ ((1 : ℕ) : ℕ∞) f) (l : Fin d) :
     HasWeakPartial l f (partialD l f) := by
   intro φ hφ hφc
-  have hfd : Differentiable ℝ f := hf.differentiable (by simp)
-  have hφd : Differentiable ℝ φ := hφ.differentiable (by simp)
-  have hcf : Continuous f := hfd.continuous
-  have hcφ : Continuous φ := hφd.continuous
-  have hcdf : Continuous (partialD l f) :=
-    (hf.continuous_fderiv (by simp)).clm_apply continuous_const
-  have hcdφ : Continuous (partialD l φ) :=
-    (hφ.continuous_fderiv (by simp)).clm_apply continuous_const
-  -- Every integrand is continuous and inherits the compact support of `φ`.
-  have hsuppDφ : HasCompactSupport (partialD l φ) :=
-    hφc.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single l 1)
-  have h1 : Integrable (fun x => partialD l f x * φ x)
-      (volume : Measure (EuclideanSpace ℝ (Fin d))) :=
-    (hcdf.mul hcφ).integrable_of_hasCompactSupport hφc.mul_left
-  have h2 : Integrable (fun x => f x * partialD l φ x)
-      (volume : Measure (EuclideanSpace ℝ (Fin d))) :=
-    (hcf.mul hcdφ).integrable_of_hasCompactSupport hsuppDφ.mul_left
-  have h3 : Integrable (fun x => f x * φ x)
-      (volume : Measure (EuclideanSpace ℝ (Fin d))) :=
-    (hcf.mul hcφ).integrable_of_hasCompactSupport hφc.mul_left
-  exact integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable
-    (μ := (volume : Measure (EuclideanSpace ℝ (Fin d)))) (f := f) (g := φ)
-    (v := EuclideanSpace.single l 1) h1 h2 h3
-    (fun x _ => hfd.differentiableAt) (fun x _ => hφd.differentiableAt)
+  have := setIntegral_mul_partialD_eq_neg isOpen_univ hf.contDiffOn hφ hφc
+    (Set.subset_univ _) l
+  simpa only [Measure.restrict_univ] using this
 
 /-! ### Bridge -/
 

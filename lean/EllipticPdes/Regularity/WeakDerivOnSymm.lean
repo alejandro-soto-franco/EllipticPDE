@@ -36,7 +36,6 @@ identity is all that is ever asked for.
 
 ## Main declarations
 
-* `partialD_comm`: classical partial derivatives of a smooth function commute.
 * `mulTest_eq_zero_of_forall_testFn`: a class annihilating every test function is killed by any
   cutoff supported in the region.
 * `mulTest_weakDerivOn_unique`: two weak derivatives of one class agree after a cutoff.
@@ -54,34 +53,6 @@ namespace EllipticPdes.Regularity
 open EllipticPdes.Sobolev
 
 variable {d : ℕ}
-
-/-! ### Classical partial derivatives commute -/
-
-/-- **Schwarz for `partialD`.** The `i`-th partial of the `ℓ`-th partial of a smooth function is
-the `ℓ`-th partial of its `i`-th partial.
-
-`partialD ℓ φ` is `fun y => fderiv ℝ φ y (eℓ)`, an application of a differentiable
-map into continuous linear maps against a constant, so `fderiv_clm_apply` reads its derivative
-off `fderiv ℝ (fderiv ℝ φ)` with the two arguments flipped. Symmetry of the second Fréchet
-derivative then swaps them back. -/
-theorem partialD_comm {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφ : ContDiff ℝ (⊤ : ℕ∞) φ)
-    (i ℓ : Fin d) : partialD i (partialD ℓ φ) = partialD ℓ (partialD i φ) := by
-  have hF : ContDiff ℝ (⊤ : ℕ∞) (fderiv ℝ φ) := (contDiff_infty_iff_fderiv.mp hφ).2
-  have hFd : Differentiable ℝ (fderiv ℝ φ) := hF.differentiable (by simp)
-  -- Both partials are entries of the second Fréchet derivative.
-  have hentry : ∀ (a b : Fin d) (x : EuclideanSpace ℝ (Fin d)),
-      partialD a (partialD b φ) x
-        = fderiv ℝ (fderiv ℝ φ) x (EuclideanSpace.single a 1) (EuclideanSpace.single b 1) := by
-    intro a b x
-    have hrw : partialD b φ = fun y => (fderiv ℝ φ y) (EuclideanSpace.single b 1) := rfl
-    simp only [partialD, hrw]
-    rw [fderiv_clm_apply (hFd x) (differentiableAt_const _)]
-    simp [ContinuousLinearMap.flip_apply]
-  funext x
-  rw [hentry i ℓ x, hentry ℓ i x]
-  refine (hφ.contDiffAt.isSymmSndFDerivAt ?_) _ _
-  simp only [minSmoothness_of_isRCLikeNormedField]
-  exact WithTop.coe_le_coe.mpr le_top
 
 /-! ### Vanishing of a class orthogonal to every test function -/
 
@@ -130,7 +101,6 @@ private theorem setIntegral_sub_mul_testFn_symm {V : Set (EuclideanSpace ℝ (Fi
     (hφcs : HasCompactSupport φ) :
     (∫ x in V, ((w₁ - w₂) x : ℝ) * φ x)
       = (∫ x in V, (w₁ x : ℝ) * φ x) - ∫ x in V, (w₂ x : ℝ) * φ x := by
-  have : ENNReal.HolderTriple (2 : ENNReal) 2 1 := ⟨by rw [ENNReal.inv_two_add_inv_two, inv_one]⟩
   have hφL : MemLp φ 2 (volume.restrict V) :=
     (hφc.continuous.memLp_of_hasCompactSupport (p := 2) (μ := volume) hφcs).restrict V
   have hi1 : Integrable (fun x => (w₁ x : ℝ) * φ x) (volume.restrict V) :=
@@ -173,7 +143,7 @@ in `V`.
 
 Two integrations by parts move each of them onto `u`: `∫ u_{ℓi} φ = ∫ u ∂ᵢ∂_ℓφ` and
 `∫ u_{iℓ} φ = ∫ u ∂_ℓ∂ᵢφ`, admissibly, since a partial derivative of a test function supported
-in `V` is again one. `partialD_comm` identifies the two right-hand sides, so the difference
+in `V` is again one. `partialD_partialD_swap` identifies the two right-hand sides, so the difference
 annihilates every test function supported in `V`. -/
 theorem mulTest_mixed_weakDeriv_comm {V : Set (EuclideanSpace ℝ (Fin d))}
     (hVm : MeasurableSet V) {χ : EuclideanSpace ℝ (Fin d) → ℝ} (hχ : IsTestFn V χ) {i ℓ : Fin d}
@@ -181,7 +151,6 @@ theorem mulTest_mixed_weakDeriv_comm {V : Set (EuclideanSpace ℝ (Fin d))}
     (hui : HasWeakDerivOn V i u ui) (hul : HasWeakDerivOn V ℓ u ul)
     (huli : HasWeakDerivOn V ℓ ui uli) (huil : HasWeakDerivOn V i ul uil) :
     mulTest hχ uli = mulTest hχ uil := by
-  have : ENNReal.HolderTriple (2 : ENNReal) 2 1 := ⟨by rw [ENNReal.inv_two_add_inv_two, inv_one]⟩
   have hkey : ∀ φ : EuclideanSpace ℝ (Fin d) → ℝ, ContDiff ℝ (⊤ : ℕ∞) φ → HasCompactSupport φ →
       tsupport φ ⊆ V → ∫ x in V, ((uli - uil) x : ℝ) * φ x = 0 := by
     intro φ hφc hφcs hφV
@@ -197,7 +166,7 @@ theorem mulTest_mixed_weakDeriv_comm {V : Set (EuclideanSpace ℝ (Fin d))}
       rw [hul (partialD i φ) hdic hdics hdiV]
       linarith [huil φ hφc hφcs hφV]
     -- The two right-hand sides agree, so the difference annihilates `φ`.
-    rw [setIntegral_sub_mul_testFn_symm hφc hφcs, h1, h2, partialD_comm hφc i ℓ, sub_self]
+    rw [setIntegral_sub_mul_testFn_symm hφc hφcs, h1, h2, partialD_partialD_swap hφc ℓ i, sub_self]
   have hzero := mulTest_eq_zero_of_forall_testFn hVm hχ hkey
   rw [map_sub] at hzero
   exact sub_eq_zero.mp hzero

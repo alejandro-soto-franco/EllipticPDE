@@ -15,13 +15,12 @@ The capstone of the interior regularity chain. This file passes to the limit in 
 difference-quotient bound of `EllipticPdes.Regularity.Interior.NormBound` to produce the
 second weak derivative, then assembles the coordinates into the interior H² estimate.
 
-This module keeps the import path `EllipticPdes.Regularity.Interior` and re-exports the whole
-chain, so dependents see the same API as before the file was split.
+The module imports the whole chain (`Interior.Support`, `Interior.EnergyBound`,
+`Interior.NormBound`).
 
 ## Main declarations
 
 * `interior_secondWeakDeriv`: existence of the interior second weak derivative.
-* `HasWeakDerivOn`: the region-restricted weak derivative.
 * `interior_H2_estimate`: the interior H² estimate.
 -/
 
@@ -65,91 +64,39 @@ theorem interior_secondWeakDeriv (Op : FullEllipticOp d) (hΩm : MeasurableSet �
 
 /-! ### Assembly of the interior H² estimate -/
 
-/-- **Weak derivative on an open region.** `g'` is the weak `k`-derivative of `g` on `V` if
-the integration by parts identity is satisfied against every test function in `V`. This is the
-`V`-restricted analogue of `HasWeakDeriv`, and is the `L²`-level statement of `∂ₖ g = g'` on
-`V`. -/
-def HasWeakDerivOn (V : Set (EuclideanSpace ℝ (Fin d))) (k : Fin d)
-    (g g' : Lp ℝ 2 (volume.restrict V)) : Prop :=
-  ∀ φ : EuclideanSpace ℝ (Fin d) → ℝ, ContDiff ℝ (⊤ : ℕ∞) φ → HasCompactSupport φ →
-    tsupport φ ⊆ V →
-    ∫ x in V, (g x : ℝ) * partialD k φ x = - ∫ x in V, (g' x : ℝ) * φ x
+/-- **Localised second derivative for one pair `(k, i)`.** There is a constant `G`, fixed before
+the solution and the datum, such that the `V`-restriction of `∂ᵢu` has a weak `k`-derivative on
+`V` whose norm, together with the norms of `∂ᵢu` and `u₀` on `V`, is at most `G (‖f‖ + ‖u₀‖)`.
+The `V`-restriction of `ζ · ∂ᵢu` coincides with that of `∂ᵢu`, because `ζ ≡ 1` on `V`. -/
+private lemma interior_secondDeriv_step (Op : FullEllipticOp d) (hΩm : MeasurableSet Ω)
+    (hA : IsLipCoeff Op.toEllipticCoeff) {V : Set (EuclideanSpace ℝ (Fin d))}
+    (hVm : MeasurableSet V) (hVΩ : V ⊆ Ω) (T : CutoffTower Ω V) (k i : Fin d) :
+    ∃ G : ℝ, ∀ (u : H01 Ω) (f : L2D Ω),
+      (∀ w : H01 Ω, Op.fullBilin Ω u w
+        = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) →
+      ∃ wki : Lp ℝ 2 (volume.restrict V),
+        HasWeakDerivOn V k (restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ))) wki ∧
+        ‖wki‖ + ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ))‖
+            + ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) 0))‖
+          ≤ G * (‖f‖ + ‖(u : H1amb Ω) 0‖) := by
+  obtain ⟨Cd, _, hCd⟩ := interior_secondWeakDeriv Op hΩm hA T k i
+  set dcoef : ℝ := Real.sqrt ((1 + 4 * Op.gardingγ) / (2 * Op.lam)) with hdcoef
+  refine ⟨Cd + dcoef + 1, fun u f hu => ?_⟩
+  obtain ⟨w, hw, hwCd⟩ := hCd u f hu
+  set P : ℝ := ‖f‖ + ‖(u : H1amb Ω) 0‖ with hP
+  have hDiuEq := restrictL2_extendL2_mulTest_eq_of_eqOn hΩm hVm hVΩ T.hζ T.zeta_eqOn_one
+    ((u : H1amb Ω) i.succ)
+  refine ⟨restrictL2 w, ?_, ?_⟩
+  · rw [← hDiuEq]; exact hasWeakDerivOn_of_hasWeakDeriv k hw
+  · have h1 : ‖restrictL2 (Ω := V) w‖ ≤ Cd * P := (norm_restrictL2_le w).trans hwCd
+    have h2 : ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ))‖ ≤ dcoef * P :=
+      (norm_restrictL2_le _).trans (by
+        rw [norm_extendL2]; exact firstOrder_gradNorm_le Op u f hu i)
+    have h3 : ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) 0))‖ ≤ 1 * P :=
+      (norm_restrictL2_le _).trans (by rw [norm_extendL2, one_mul, hP]; linarith [norm_nonneg f])
+    calc _ ≤ Cd * P + dcoef * P + 1 * P := add_le_add (add_le_add h1 h2) h3
+      _ = (Cd + dcoef + 1) * P := by ring
 
-/-- A whole-space weak derivative restricts to a weak derivative on any measurable `V`: test
-functions supported in `V` see only the restricted classes, and the whole-space
-integration-by-parts identity localises because both integrands vanish off `V`. -/
-theorem hasWeakDerivOn_of_hasWeakDeriv {V : Set (EuclideanSpace ℝ (Fin d))}
-    (k : Fin d) {g w : EucL2 d} (h : HasWeakDeriv k g w) :
-    HasWeakDerivOn V k (restrictL2 g) (restrictL2 w) := by
-  intro φ hφc hφcs hφV
-  have hzero_dk : ∀ x ∉ V, (g x : ℝ) * partialD k φ x = 0 := by
-    intro x hx
-    rw [show partialD k φ x = 0 from image_eq_zero_of_notMem_tsupport
-      (fun hc => hx (hφV (tsupport_partialD_subset k φ hc))), mul_zero]
-  have hzero_phi : ∀ x ∉ V, (w x : ℝ) * φ x = 0 := by
-    intro x hx
-    rw [show φ x = 0 from image_eq_zero_of_notMem_tsupport (fun hc => hx (hφV hc)), mul_zero]
-  calc ∫ x in V, (restrictL2 g x : ℝ) * partialD k φ x
-      = ∫ x in V, (g x : ℝ) * partialD k φ x := by
-        refine integral_congr_ae ?_
-        filter_upwards [coeFn_restrictL2 g] with x hx; rw [hx]
-    _ = ∫ x, (g x : ℝ) * partialD k φ x :=
-        setIntegral_eq_integral_of_forall_compl_eq_zero hzero_dk
-    _ = - ∫ x, (w x : ℝ) * φ x := h φ hφc hφcs
-    _ = - ∫ x in V, (w x : ℝ) * φ x := by
-        rw [setIntegral_eq_integral_of_forall_compl_eq_zero hzero_phi]
-    _ = - ∫ x in V, (restrictL2 w x : ℝ) * φ x := by
-        refine congrArg Neg.neg (integral_congr_ae ?_)
-        filter_upwards [coeFn_restrictL2 w] with x hx; rw [hx]
-
-/-- **First-order gradient bound.** Each gradient component of a weak solution is bounded in
-`L²` by the data: `‖∂ᵢu‖ ≤ √((1 + 4γ) / (2λ)) (‖f‖ + ‖u₀‖)`, where `γ` is the Gårding shift
-constant, through which the transport and zeroth-order coefficients enter. This is the
-first-order energy estimate `firstOrder_energy_le` combined with the arithmetic-geometric
-mean inequality. -/
-lemma firstOrder_gradNorm_le (Op : FullEllipticOp d) (u : H01 Ω) (f : L2D Ω)
-    (hu : ∀ w : H01 Ω, Op.fullBilin Ω u w
-      = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) (i : Fin d) :
-    ‖(u : H1amb Ω) i.succ‖
-      ≤ Real.sqrt ((1 + 4 * Op.gardingγ) / (2 * Op.lam)) * (‖f‖ + ‖(u : H1amb Ω) 0‖) := by
-  have hlam : (0 : ℝ) < Op.lam := Op.toEllipticCoeff.lam_pos
-  have hγnn : (0 : ℝ) ≤ Op.gardingγ := Op.gardingγ_nonneg
-  set P : ℝ := ‖f‖ + ‖(u : H1amb Ω) 0‖ with hPdef
-  have hP0 : (0 : ℝ) ≤ P := by rw [hPdef]; positivity
-  have hfo : Op.lam / 2 * ∑ j : Fin d, ‖(u : H1amb Ω) j.succ‖ ^ 2
-      ≤ ‖f‖ * ‖(u : H1amb Ω) 0‖ + Op.gardingγ * ‖(u : H1amb Ω) 0‖ ^ 2 :=
-    firstOrder_energy_le Op u f hu
-  have hdisqm : ‖(u : H1amb Ω) i.succ‖ ^ 2 * (Op.lam / 2)
-      ≤ ‖f‖ * ‖(u : H1amb Ω) 0‖ + Op.gardingγ * ‖(u : H1amb Ω) 0‖ ^ 2 := by
-    have hle : ‖(u : H1amb Ω) i.succ‖ ^ 2 ≤ ∑ j : Fin d, ‖(u : H1amb Ω) j.succ‖ ^ 2 :=
-      single_le_sum_fin (fun j => ‖(u : H1amb Ω) j.succ‖ ^ 2) (fun j => sq_nonneg _) i
-    nlinarith only [mul_le_mul_of_nonneg_left hle (by linarith only [hlam] :
-      (0 : ℝ) ≤ Op.lam / 2), hfo]
-  have hamgm : ‖f‖ * ‖(u : H1amb Ω) 0‖ ≤ P ^ 2 / 4 := by
-    rw [hPdef]; nlinarith only [sq_nonneg (‖f‖ - ‖(u : H1amb Ω) 0‖)]
-  have hu0P : ‖(u : H1amb Ω) 0‖ ^ 2 ≤ P ^ 2 := by
-    rw [hPdef]; nlinarith only [norm_nonneg f, norm_nonneg ((u : H1amb Ω) 0)]
-  have hrad : (0 : ℝ) ≤ (1 + 4 * Op.gardingγ) / (2 * Op.lam) := by positivity
-  have hdiP : ‖(u : H1amb Ω) i.succ‖ ^ 2
-      ≤ (1 + 4 * Op.gardingγ) / (2 * Op.lam) * P ^ 2 := by
-    rw [div_mul_eq_mul_div, le_div_iff₀ (by positivity : (0 : ℝ) < 2 * Op.lam)]
-    have hprod : Op.gardingγ * ‖(u : H1amb Ω) 0‖ ^ 2 ≤ Op.gardingγ * P ^ 2 :=
-      mul_le_mul_of_nonneg_left hu0P hγnn
-    linarith only [hdisqm, hamgm, hprod]
-  have hsq : (Real.sqrt ((1 + 4 * Op.gardingγ) / (2 * Op.lam)) * P) ^ 2
-      = (1 + 4 * Op.gardingγ) / (2 * Op.lam) * P ^ 2 := by
-    rw [mul_pow, Real.sq_sqrt hrad]
-  have hval : Real.sqrt ((1 + 4 * Op.gardingγ) / (2 * Op.lam) * P ^ 2)
-      = Real.sqrt ((1 + 4 * Op.gardingγ) / (2 * Op.lam)) * P := by
-    rw [← hsq]; exact Real.sqrt_sq (mul_nonneg (Real.sqrt_nonneg _) hP0)
-  rw [show ‖(u : H1amb Ω) i.succ‖ = Real.sqrt (‖(u : H1amb Ω) i.succ‖ ^ 2) from
-    (Real.sqrt_sq (norm_nonneg _)).symm, ← hval]
-  exact Real.sqrt_le_sqrt hdiP
-
-set_option maxHeartbeats 600000 in
--- The final assembly loops the per-`(k, i)` localised second-derivative statement over the
--- finite index square and threads the cutoff-tower construction, whose elaboration (unfolding
--- the tower definition and the difference-quotient bounds) exceeds the default `maxHeartbeats`.
 /-- **Interior H² estimate (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1;
 Gilbarg-Trudinger, *Elliptic Partial Differential Equations of Second Order*, Theorem 8.8).**
 For a weak solution `u ∈ H₀¹(Ω)` of `L u = f` with `W^{1,∞}` principal coefficients,
@@ -176,78 +123,13 @@ theorem interior_H2_estimate {n : ℕ} (Op : FullEllipticOp (n + 1))
             + ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ))‖
             + ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) 0))‖
           ≤ C * (‖f‖ + ‖(u : H1amb Ω) 0‖) := by
-  classical
   have hVm : MeasurableSet V := hVc.isClosed.measurableSet
-  set T := cutoffTowerOfIsCompactSubsetIsOpen hVc hΩo hVΩ with hT
-  set dcoef : ℝ := Real.sqrt ((1 + 4 * Op.gardingγ) / (2 * Op.lam)) with hdcoefdef
-  have hdcoef0 : (0 : ℝ) ≤ dcoef := Real.sqrt_nonneg _
-  -- Per-`(k, i)` localised statement with a data-only growth constant. The `V`-restriction of
-  -- the cutoff class `ζ · ∂ᵢu` coincides with that of `∂ᵢu`, because `ζ ≡ 1` on `V`.
-  have hstep : ∀ k i : Fin (n + 1), ∃ G : ℝ, ∀ (u : H01 Ω) (f : L2D Ω),
-      (∀ w : H01 Ω, Op.fullBilin Ω u w
-        = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) →
-      ∃ wki : Lp ℝ 2 (volume.restrict V),
-      HasWeakDerivOn V k (restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ))) wki ∧
-      ‖wki‖ + ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ))‖
-          + ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) 0))‖
-        ≤ G * (‖f‖ + ‖(u : H1amb Ω) 0‖) := by
-    intro k i
-    obtain ⟨Cd, _hCd0, hCd⟩ := interior_secondWeakDeriv Op hΩm hA T k i
-    refine ⟨Cd + dcoef + 1, fun u f hu => ?_⟩
-    obtain ⟨w, hw, hwCd⟩ := hCd u f hu
-    set P : ℝ := ‖f‖ + ‖(u : H1amb Ω) 0‖ with hPdef
-    have hP0 : (0 : ℝ) ≤ P := by rw [hPdef]; positivity
-    have hdiu : ∀ j : Fin (n + 1), ‖(u : H1amb Ω) j.succ‖ ≤ dcoef * P := fun j =>
-      firstOrder_gradNorm_le Op u f hu j
-    have hAB : (extendL2 hΩm (mulTest T.hζ ((u : H1amb Ω) i.succ))
-          : EuclideanSpace ℝ (Fin (n + 1)) → ℝ)
-        =ᵐ[volume.restrict V]
-        (extendL2 hΩm ((u : H1amb Ω) i.succ) : EuclideanSpace ℝ (Fin (n + 1)) → ℝ) := by
-      have hmt : (mulTest T.hζ ((u : H1amb Ω) i.succ)
-            : EuclideanSpace ℝ (Fin (n + 1)) → ℝ)
-          =ᵐ[volume.restrict V] fun x => T.ζ x * ((u : H1amb Ω) i.succ x : ℝ) :=
-        (mulTest_coeFn T.hζ ((u : H1amb Ω) i.succ)).filter_mono
-          (ae_mono (Measure.restrict_mono hVΩ le_rfl))
-      filter_upwards [ae_restrict_of_ae
-          (coeFn_extendL2 hΩm (mulTest T.hζ ((u : H1amb Ω) i.succ))),
-        ae_restrict_of_ae (coeFn_extendL2 hΩm ((u : H1amb Ω) i.succ)), hmt,
-        ae_restrict_mem hVm] with x he1 he2 hmtx hxV
-      rw [he1, he2, Set.indicator_of_mem (hVΩ hxV), Set.indicator_of_mem (hVΩ hxV), hmtx]
-      simp [T.zeta_eqOn_one hxV]
-    have hDiuEq : restrictL2 (Ω := V) (extendL2 hΩm (mulTest T.hζ ((u : H1amb Ω) i.succ)))
-        = restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ)) := by
-      apply Lp.ext
-      filter_upwards [coeFn_restrictL2 (Ω := V)
-          (extendL2 hΩm (mulTest T.hζ ((u : H1amb Ω) i.succ))),
-        coeFn_restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ)), hAB] with x h1 h2 h3
-      rw [h1, h2, h3]
-    refine ⟨restrictL2 w, ?_, ?_⟩
-    · rw [← hDiuEq]; exact hasWeakDerivOn_of_hasWeakDeriv k hw
-    · have h1 : ‖restrictL2 (Ω := V) w‖ ≤ Cd * P := le_trans (norm_restrictL2_le w) hwCd
-      have h2 : ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ))‖ ≤ dcoef * P := by
-        refine le_trans (norm_restrictL2_le _) ?_
-        rw [norm_extendL2]; exact hdiu i
-      have h3 : ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) 0))‖ ≤ 1 * P := by
-        refine le_trans (norm_restrictL2_le _) ?_
-        rw [norm_extendL2, one_mul, hPdef]
-        linarith only [norm_nonneg f]
-      calc ‖restrictL2 (Ω := V) w‖ + ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) i.succ))‖
-              + ‖restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) 0))‖
-          ≤ Cd * P + dcoef * P + 1 * P := add_le_add (add_le_add h1 h2) h3
-        _ = (Cd + dcoef + 1) * P := by ring
-  choose G hG using hstep
-  refine ⟨∑ k : Fin (n + 1), ∑ i : Fin (n + 1), |G k i|,
-    Finset.sum_nonneg (fun _ _ => Finset.sum_nonneg (fun _ _ => abs_nonneg _)), ?_⟩
-  intro u f hu k i
+  choose G hG using fun k i =>
+    interior_secondDeriv_step Op hΩm hA hVm hVΩ (cutoffTowerOfIsCompactSubsetIsOpen hVc hΩo hVΩ) k i
+  obtain ⟨C, hC⟩ := Finite.exists_le (fun p : Fin (n + 1) × Fin (n + 1) => G p.1 p.2)
+  refine ⟨max C 0, le_max_right _ _, fun u f hu k i => ?_⟩
   obtain ⟨wki, hHWD, hbound⟩ := hG k i u f hu
-  refine ⟨wki, hHWD, le_trans hbound ?_⟩
-  refine mul_le_mul_of_nonneg_right ?_ (by positivity)
-  calc G k i ≤ |G k i| := le_abs_self _
-    _ ≤ ∑ i' : Fin (n + 1), |G k i'| :=
-        Finset.single_le_sum (f := fun i' => |G k i'|)
-          (fun i' _ => abs_nonneg _) (Finset.mem_univ i)
-    _ ≤ ∑ k' : Fin (n + 1), ∑ i' : Fin (n + 1), |G k' i'| :=
-        Finset.single_le_sum (f := fun k' => ∑ i' : Fin (n + 1), |G k' i'|)
-          (fun k' _ => Finset.sum_nonneg (fun i' _ => abs_nonneg _)) (Finset.mem_univ k)
+  exact ⟨wki, hHWD, hbound.trans (mul_le_mul_of_nonneg_right
+    ((hC (k, i)).trans (le_max_left _ _)) (by positivity))⟩
 
 end EllipticPdes.Regularity

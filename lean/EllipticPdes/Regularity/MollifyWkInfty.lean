@@ -17,20 +17,17 @@ public import Mathlib.MeasureTheory.Measure.Haar.Unique
 /-!
 # Mollifying a `W^{1,∞}` weight
 
-`EllipticPdes.Regularity.HasWeakDerivOn.mul_contDiff_left` proves the weak-derivative Leibniz
-rule for a `C¹` weight, by mollifying the weight and differentiating the mollification
-classically. Guo's hypothesis supplies no classical derivative, so that route is closed and the
-mollification has to take the weak derivative instead. This file rebuilds the two facts about
-mollification the Leibniz rule needs, with continuity of the weight dropped throughout.
+The weak-derivative Leibniz rule for a `W^{1,∞}` weight mollifies the weight and differentiates
+the mollification through the weak derivative of the weight. This file proves the two facts about
+mollification that the rule needs, for a measurable weight.
 
-* The sup bound survives with measurability alone. `EllipticPdes.Regularity` already had this
-  for a continuous weight; continuity entered only through the integrability of the convolution
-  integrand, which an essential bound supplies just as well.
+* The sup bound holds with measurability alone: an essential bound makes the convolution
+  integrand integrable.
 * The derivative of the mollification is the mollification of the *weak* derivative. This is
   where the weak hypothesis does the work: the classical proof moves the derivative from the
   kernel back onto the weight by integration by parts, and `HasWeakPartial` is that
   integration-by-parts identity, applied to the reflected kernel `t ↦ ρ (x - t)`, which is a
-  legitimate test function. The weak version is shorter than the `C¹` version it replaces.
+  legitimate test function.
 
 ## Main declarations
 
@@ -114,23 +111,6 @@ theorem abs_convolution_le_of_measurable
     _ = M * ∫ t, ρ (x - t) ∂volume := integral_const_mul M _
     _ = M * 1 := by rw [integral_sub_left_eq_self ρ volume x, hρ1]
     _ = M := mul_one M
-
-/-- **Locality of a mollification.** If the kernel vanishes outside the ball of radius `r` and two
-weights agree on the ball of radius `r` about `x`, their mollifications agree at `x`. This is
-what lets a globally bounded weight, which lies in no `Lᵖ` on the whole space, be replaced near
-a compact set by a truncation that does, without changing the mollification there. -/
-theorem convolution_congr_of_eqOn {a b ρ : EuclideanSpace ℝ (Fin d) → ℝ}
-    {x : EuclideanSpace ℝ (Fin d)} {r : ℝ}
-    (hρsupp : ∀ y : EuclideanSpace ℝ (Fin d), r ≤ ‖y‖ → ρ y = 0)
-    (heq : ∀ t : EuclideanSpace ℝ (Fin d), ‖x - t‖ < r → a t = b t) :
-    (a ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ρ) x
-      = (b ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ρ) x := by
-  rw [convolution_lsmul_apply, convolution_lsmul_apply]
-  refine integral_congr_ae (Filter.Eventually.of_forall fun t => ?_)
-  change a t * ρ (x - t) = b t * ρ (x - t)
-  rcases lt_or_ge ‖x - t‖ r with hlt | hge
-  · rw [heq t hlt]
-  · rw [hρsupp (x - t) hge, mul_zero, mul_zero]
 
 /-! ### Derivative of a mollification from the weak derivative -/
 

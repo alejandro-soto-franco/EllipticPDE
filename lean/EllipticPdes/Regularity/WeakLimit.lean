@@ -14,15 +14,11 @@ public import EllipticPdes.Regularity.DiffQuotientBound
 The `H^k` bootstrap of Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 2
 runs the interior `H²` estimate on a directional derivative `∂_ℓ u`. In the graph encoding of
 `EllipticPdes.Sobolev.Basic` that derivative has to be produced as a limit of the discrete
-family `Dₖ^h u`, and the limit is taken weakly, so this file supplies the two weak-limit
-facts the bootstrap needs.
-
-The first is weak sequential compactness of a bounded sequence in a separable real Hilbert
-space, which is the abstract form of `EllipticPdes.Regularity.exists_weak_limit_of_bounded`:
-the difference-quotient engine needs it on the ambient graph space `H1amb Ω`, not only on the
-whole-space `EucL2 d` where that theorem states it.
-
-The second is weak `L²` convergence of the difference quotients themselves. The bound
+family `Dₖ^h u`, and the limit is taken weakly, so this file supplies the weak-limit facts the
+bootstrap needs. Weak sequential compactness of a bounded sequence in a separable real Hilbert
+space is `exists_weak_limit_of_bounded_hilbert`, in `DiffQuotientBound`. The facts here are the
+density upgrade for weak convergence and weak `L²` convergence of the difference quotients
+themselves. The bound
 `norm_diffQuot_le_of_hasWeakDeriv` makes the family uniformly bounded, and against a smooth
 compactly supported test the discrete integration-by-parts identity together with the strong
 convergence `Dₖ^{-h} φ → ∂ₖφ` identifies the limit as the weak derivative; density of the
@@ -30,8 +26,6 @@ smooth compactly supported classes then upgrades the test class to an arbitrary 
 
 ## Main declarations
 
-* `exists_weak_limit_of_bounded_hilbert`: weak sequential compactness in a separable real
-  Hilbert space.
 * `tendsto_inner_of_dense_of_bounded`: a uniformly bounded sequence converging weakly against a
   dense set converges weakly against every vector.
 * `tendsto_inner_diffQuot_of_hasWeakDeriv`: `Dₖ^{hₘ} g ⇀ g'` whenever `g'` is the weak
@@ -50,50 +44,6 @@ namespace EllipticPdes.Regularity
 open EllipticPdes.Sobolev
 
 variable {d : ℕ}
-
-/-! ### Weak sequential compactness in a separable real Hilbert space -/
-
-/-- **Weak sequential compactness of bounded sequences.** A sequence bounded by `M` in a
-separable real Hilbert space has a subsequence converging weakly to a limit `g'` with
-`‖g'‖ ≤ M`. This is `EllipticPdes.Regularity.exists_weak_limit_of_bounded` with the whole-space
-`L²` substrate replaced by an abstract space, so that it also applies to the ambient graph
-space `H1amb Ω`. Assembled from the sequential Banach-Alaoglu theorem on the weak dual
-(`WeakDual.isSeqCompact_closedBall`), the Riesz self-duality of the Hilbert space
-(`InnerProductSpace.toDual`), and the closed-ball membership of the weak-\* limit. -/
-theorem exists_weak_limit_of_bounded_hilbert {E : Type*} [NormedAddCommGroup E]
-    [InnerProductSpace ℝ E] [CompleteSpace E] [TopologicalSpace.SeparableSpace E]
-    {x : ℕ → E} {M : ℝ} (hx : ∀ m, ‖x m‖ ≤ M) :
-    ∃ (g' : E) (σ : ℕ → ℕ), StrictMono σ ∧ ‖g'‖ ≤ M ∧
-      ∀ y : E, Filter.Tendsto (fun m => ⟪x (σ m), y⟫) Filter.atTop (nhds ⟪g', y⟫) := by
-  set F : ℕ → WeakDual ℝ E :=
-    fun m => WeakDual.toStrongDual.symm (InnerProductSpace.toDual ℝ E (x m)) with hFdef
-  have hFtoS : ∀ m, WeakDual.toStrongDual (F m) = InnerProductSpace.toDual ℝ E (x m) :=
-    fun m => WeakDual.toStrongDual.apply_symm_apply _
-  have hFmem : ∀ m, F m ∈ WeakDual.toStrongDual ⁻¹' Metric.closedBall
-      (0 : StrongDual ℝ E) M := by
-    intro m
-    simp only [Set.mem_preimage, hFtoS m, Metric.mem_closedBall, dist_zero_right]
-    rw [(InnerProductSpace.toDual ℝ E).norm_map]
-    exact hx m
-  obtain ⟨L, hLmem, σ, hσmono, hLtend⟩ :=
-    WeakDual.isSeqCompact_closedBall ℝ E 0 M hFmem
-  refine ⟨(InnerProductSpace.toDual ℝ E).symm (WeakDual.toStrongDual L), σ, hσmono, ?_, ?_⟩
-  · rw [(InnerProductSpace.toDual ℝ E).symm.norm_map]
-    simpa only [Set.mem_preimage, Metric.mem_closedBall, dist_zero_right] using hLmem
-  · intro y
-    have heval := (tendsto_iff_forall_eval_tendsto_topDualPairing.mp hLtend) y
-    have hL1 : ∀ m, topDualPairing ℝ E (F (σ m)) y = ⟪x (σ m), y⟫ := by
-      intro m
-      change (F (σ m)) y = ⟪x (σ m), y⟫
-      rw [show (F (σ m)) y = (InnerProductSpace.toDual ℝ E (x (σ m))) y from rfl,
-        InnerProductSpace.toDual_apply_apply]
-    have hL2 : topDualPairing ℝ E L y
-        = ⟪(InnerProductSpace.toDual ℝ E).symm (WeakDual.toStrongDual L), y⟫ := by
-      change L y = ⟪(InnerProductSpace.toDual ℝ E).symm (WeakDual.toStrongDual L), y⟫
-      rw [InnerProductSpace.toDual_symm_apply]
-      exact (WeakDual.toStrongDual_apply L y).symm
-    rw [hL2] at heval
-    exact heval.congr (fun m => hL1 m)
 
 /-! ### Upgrading weak convergence from a dense set -/
 

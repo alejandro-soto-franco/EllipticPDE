@@ -43,6 +43,31 @@ open EllipticPdes.Sobolev
 
 variable {n : ℕ}
 
+/-- **Pairing of the datum of the induction step with a test function.** The twelve shapes of
+Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 2 step 3, each the cutoff `ξ`
+or one of its first two partial derivatives against a coefficient of the operator or one of its
+derivatives, against a derivative of the solution `uN` of order at most two on the collar `N`,
+integrated against the test function `v`. `Df` is the derivative of the datum in the direction
+`ℓ`. -/
+def cutoffDatumPairing (Op : FullEllipticOp (n + 1))
+    {N : Set (EuclideanSpace ℝ (Fin (n + 1)))} {k : ℕ}
+    (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 2)) (hbc : IsWkInftyLower Op (k + 1))
+    (ξ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ) (ℓ : Fin (n + 1)) {uN : L2D N} (Df : L2D N)
+    (HuN : HasIteratedWeakDerivOn N (k + 2) uN) (v : EuclideanSpace ℝ (Fin (n + 1)) → ℝ) : ℝ :=
+  (∫ x in N, ξ x * ((1 : ℝ) * (Df x : ℝ)) * v x)
+    - (∑ i, ∫ x in N, ξ x * ((hbc.bReg i).D [ℓ] x * (HuN.D [i] x : ℝ)) * v x)
+    - (∑ i, ∫ x in N, ξ x * (Op.b x i * (HuN.D [ℓ, i] x : ℝ)) * v x)
+    - (∫ x in N, ξ x * (hbc.cReg.D [ℓ] x * (uN x : ℝ)) * v x)
+    + (∑ i, ∑ j, ∫ x in N, ξ x * (hA.D [j, ℓ] i j x * (HuN.D [i] x : ℝ)) * v x)
+    + (∑ i, ∑ j, ∫ x in N, ξ x * (hA.D [ℓ] i j x * (HuN.D [j, i] x : ℝ)) * v x)
+    - (∑ i, ∑ j, ∫ x in N, partialD j ξ x * (Op.a x i j * (HuN.D [i, ℓ] x : ℝ)) * v x)
+    - (∑ i, ∑ j, ∫ x in N,
+        partialD j (partialD i ξ) x * (Op.a x i j * (HuN.D [ℓ] x : ℝ)) * v x)
+    - (∑ i, ∑ j, ∫ x in N, partialD i ξ x * (hA.D [j] i j x * (HuN.D [ℓ] x : ℝ)) * v x)
+    - (∑ i, ∑ j, ∫ x in N, partialD i ξ x * (Op.a x i j * (HuN.D [j, ℓ] x : ℝ)) * v x)
+    + (∑ i, ∫ x in N, partialD i ξ x * (Op.b x i * (HuN.D [ℓ] x : ℝ)) * v x)
+    + ∑ i, ∫ x in N, ξ x * (Op.b x i * (HuN.D [i, ℓ] x : ℝ)) * v x
+
 /-- **Datum of the induction step.** For a cutoff `ξ` supported in the collar `N ⊆ Ω`, there
 is a constant such that every family of derivatives of the solution on `N` bounded by `B`, and
 every derivative of the datum bounded by `B`, produce an `L²(Ω)` class with `k` weak derivatives
@@ -65,84 +90,43 @@ theorem exists_cutoffDatum (Op : FullEllipticOp (n + 1))
         IteratedL2Bound HF (K * B) ∧
         ∀ v : EuclideanSpace ℝ (Fin (n + 1)) → ℝ, ContDiff ℝ (⊤ : ℕ∞) v →
           HasCompactSupport v →
-          (∫ x in Ω, (F x : ℝ) * v x)
-            = (∫ x in N, ξ x * ((1 : ℝ) * (Df x : ℝ)) * v x)
-              - (∑ i, ∫ x in N, ξ x * ((hbc.bReg i).D [ℓ] x * (HuN.D [i] x : ℝ)) * v x)
-              - (∑ i, ∫ x in N, ξ x * (Op.b x i * (HuN.D [ℓ, i] x : ℝ)) * v x)
-              - (∫ x in N, ξ x * (hbc.cReg.D [ℓ] x * (uN x : ℝ)) * v x)
-              + (∑ i, ∑ j, ∫ x in N,
-                  ξ x * (hA.D [j, ℓ] i j x * (HuN.D [i] x : ℝ)) * v x)
-              + (∑ i, ∑ j, ∫ x in N,
-                  ξ x * (hA.D [ℓ] i j x * (HuN.D [j, i] x : ℝ)) * v x)
-              - (∑ i, ∑ j, ∫ x in N,
-                  partialD j ξ x * (Op.a x i j * (HuN.D [i, ℓ] x : ℝ)) * v x)
-              - (∑ i, ∑ j, ∫ x in N,
-                  partialD j (partialD i ξ) x * (Op.a x i j * (HuN.D [ℓ] x : ℝ)) * v x)
-              - (∑ i, ∑ j, ∫ x in N,
-                  partialD i ξ x * (hA.D [j] i j x * (HuN.D [ℓ] x : ℝ)) * v x)
-              - (∑ i, ∑ j, ∫ x in N,
-                  partialD i ξ x * (Op.a x i j * (HuN.D [j, ℓ] x : ℝ)) * v x)
-              + (∑ i, ∫ x in N, partialD i ξ x * (Op.b x i * (HuN.D [ℓ] x : ℝ)) * v x)
-              + ∑ i, ∫ x in N, ξ x * (Op.b x i * (HuN.D [i, ℓ] x : ℝ)) * v x := by
+          (∫ x in Ω, (F x : ℝ) * v x) = cutoffDatumPairing Op hA hbc ξ ℓ Df HuN v := by
   classical
   -- The coefficients, each read off its bundle at order `k`.
-  have haE : ∀ i j : Fin (n + 1), IsWkInfty (fun x => Op.a x i j) k :=
-    fun i j => (hA.entry i j).mono (by omega)
-  have haD : ∀ i j m : Fin (n + 1), IsWkInfty ((hA.entry i j).D [m]) k :=
-    fun i j m => ((hA.entry i j).deriv m).mono (by omega)
-  have haDD : ∀ i j m r : Fin (n + 1), IsWkInfty (((hA.entry i j).deriv m).D [r]) k :=
-    fun i j m r => (((hA.entry i j).deriv m).deriv r).mono (by omega)
-  have hbE : ∀ i : Fin (n + 1), IsWkInfty (fun x => Op.b x i) k :=
-    fun i => (hbc.bReg i).mono (by omega)
-  have hbD : ∀ i m : Fin (n + 1), IsWkInfty ((hbc.bReg i).D [m]) k :=
-    fun i m => ((hbc.bReg i).deriv m).mono (by omega)
-  have hcD : ∀ m : Fin (n + 1), IsWkInfty (hbc.cReg.D [m]) k :=
-    fun m => (hbc.cReg.deriv m).mono (by omega)
   have hξD : ∀ i : Fin (n + 1), IsTestFn N (partialD i ξ) := fun i => isTestFn_partialD hξ i
   have hξDD : ∀ i j : Fin (n + 1), IsTestFn N (partialD j (partialD i ξ)) :=
     fun i j => isTestFn_partialD (hξD i) j
+  have P := fun {ι : Type} [Fintype ι] {χ a : ι → EuclideanSpace ℝ (Fin (n + 1)) → ℝ}
+    (hχ : ∀ t, IsTestFn N (χ t)) (ha : ∀ t, IsWkInfty (a t) k) =>
+    exists_datum_of_pieces (Ω := Ω) hNm hNΩ k hχ ha
+  have hb : ∀ i : Fin (n + 1), IsWkInfty (fun x => Op.b x i) k :=
+    fun i => (hbc.bReg i).mono (by omega)
+  have ha : ∀ t : Fin (n + 1) × Fin (n + 1), IsWkInfty (fun x => Op.a x t.1 t.2) k :=
+    fun t => (hA.entry t.1 t.2).mono (by omega)
   -- The shapes whose coefficient does not depend on the direction of differentiation.
-  obtain ⟨K1, hK1, hP1⟩ := exists_datum_of_pieces (Ω := Ω) hNm hNΩ k (ι := Unit)
-    (χ := fun _ => ξ) (fun _ => hξ)
-    (a := fun _ => fun _ => (1 : ℝ)) (fun _ => IsWkInfty.const 1 k)
-  obtain ⟨K3, hK3, hP3⟩ := exists_datum_of_pieces (Ω := Ω) hNm hNΩ k (ι := Fin (n + 1))
-    (χ := fun _ => ξ) (fun _ => hξ) (a := fun i => fun x => Op.b x i) hbE
-  obtain ⟨K7, hK7, hP7⟩ := exists_datum_of_pieces (Ω := Ω) hNm hNΩ k
-    (ι := Fin (n + 1) × Fin (n + 1))
-    (χ := fun t => partialD t.2 ξ) (fun t => hξD t.2)
-    (a := fun t => fun x => Op.a x t.1 t.2) (fun t => haE t.1 t.2)
-  obtain ⟨K8, hK8, hP8⟩ := exists_datum_of_pieces (Ω := Ω) hNm hNΩ k
-    (ι := Fin (n + 1) × Fin (n + 1))
-    (χ := fun t => partialD t.2 (partialD t.1 ξ)) (fun t => hξDD t.1 t.2)
-    (a := fun t => fun x => Op.a x t.1 t.2) (fun t => haE t.1 t.2)
-  obtain ⟨K9, hK9, hP9⟩ := exists_datum_of_pieces (Ω := Ω) hNm hNΩ k
-    (ι := Fin (n + 1) × Fin (n + 1))
-    (χ := fun t => partialD t.1 ξ) (fun t => hξD t.1)
-    (a := fun t => hA.D [t.2] t.1 t.2) (fun t => haD t.1 t.2 t.2)
-  obtain ⟨K10, hK10, hP10⟩ := exists_datum_of_pieces (Ω := Ω) hNm hNΩ k
-    (ι := Fin (n + 1) × Fin (n + 1))
-    (χ := fun t => partialD t.1 ξ) (fun t => hξD t.1)
-    (a := fun t => fun x => Op.a x t.1 t.2) (fun t => haE t.1 t.2)
-  obtain ⟨K11, hK11, hP11⟩ := exists_datum_of_pieces (Ω := Ω) hNm hNΩ k (ι := Fin (n + 1))
-    (χ := fun i => partialD i ξ) hξD (a := fun i => fun x => Op.b x i) hbE
+  obtain ⟨K1, hK1, hP1⟩ := P (ι := Unit) (χ := fun _ => ξ) (a := fun _ _ => (1 : ℝ))
+    (fun _ => hξ) fun _ => IsWkInfty.const 1 k
+  obtain ⟨K3, hK3, hP3⟩ := P (χ := fun _ : Fin (n + 1) => ξ) (fun _ => hξ) hb
+  obtain ⟨K7, hK7, hP7⟩ := P (fun t : Fin (n + 1) × Fin (n + 1) => hξD t.2) ha
+  obtain ⟨K8, hK8, hP8⟩ := P (fun t : Fin (n + 1) × Fin (n + 1) => hξDD t.1 t.2) ha
+  obtain ⟨K9, hK9, hP9⟩ := P (a := fun t : Fin (n + 1) × Fin (n + 1) => hA.D [t.2] t.1 t.2)
+    (fun t => hξD t.1) (fun t => ((hA.entry t.1 t.2).deriv t.2).mono (by omega))
+  obtain ⟨K10, hK10, hP10⟩ := P (fun t : Fin (n + 1) × Fin (n + 1) => hξD t.1) ha
+  obtain ⟨K11, hK11, hP11⟩ := P hξD hb
   -- The shapes that differentiate a coefficient in the direction the equation is
   -- differentiated, collected over that direction.
   choose K2 hK2 hP2 using fun m : Fin (n + 1) =>
-    exists_datum_of_pieces (Ω := Ω) hNm hNΩ k (ι := Fin (n + 1))
-      (χ := fun _ => ξ) (fun _ => hξ)
-      (a := fun i => (hbc.bReg i).D [m]) (fun i => hbD i m)
+    P (χ := fun _ : Fin (n + 1) => ξ) (a := fun i => (hbc.bReg i).D [m]) (fun _ => hξ)
+      (fun i => ((hbc.bReg i).deriv m).mono (by omega))
   choose K4 hK4 hP4 using fun m : Fin (n + 1) =>
-    exists_datum_of_pieces (Ω := Ω) hNm hNΩ k (ι := Unit)
-      (χ := fun _ => ξ) (fun _ => hξ)
-      (a := fun _ => hbc.cReg.D [m]) (fun _ => hcD m)
+    P (χ := fun _ : Unit => ξ) (a := fun _ => hbc.cReg.D [m]) (fun _ => hξ)
+      (fun _ => (hbc.cReg.deriv m).mono (by omega))
   choose K5 hK5 hP5 using fun m : Fin (n + 1) =>
-    exists_datum_of_pieces (Ω := Ω) hNm hNΩ k (ι := Fin (n + 1) × Fin (n + 1))
-      (χ := fun _ => ξ) (fun _ => hξ)
-      (a := fun t => hA.D [t.2, m] t.1 t.2) (fun t => haDD t.1 t.2 m t.2)
+    P (χ := fun _ : Fin (n + 1) × Fin (n + 1) => ξ) (a := fun t => hA.D [t.2, m] t.1 t.2)
+      (fun _ => hξ) (fun t => (((hA.entry t.1 t.2).deriv m).deriv t.2).mono (by omega))
   choose K6 hK6 hP6 using fun m : Fin (n + 1) =>
-    exists_datum_of_pieces (Ω := Ω) hNm hNΩ k (ι := Fin (n + 1) × Fin (n + 1))
-      (χ := fun _ => ξ) (fun _ => hξ)
-      (a := fun t => hA.D [m] t.1 t.2) (fun t => haD t.1 t.2 m)
+    P (χ := fun _ : Fin (n + 1) × Fin (n + 1) => ξ) (a := fun t => hA.D [m] t.1 t.2)
+      (fun _ => hξ) (fun t => ((hA.entry t.1 t.2).deriv m).mono (by omega))
   refine ⟨K1 + (∑ m, K2 m) + 2 * K3 + (∑ m, K4 m) + (∑ m, K5 m) + (∑ m, K6 m)
       + K7 + K8 + K9 + K10 + K11, ?_, ?_⟩
   · have h2 : (0 : ℝ) ≤ ∑ m, K2 m := Finset.sum_nonneg fun m _ => hK2 m
@@ -192,15 +176,10 @@ theorem exists_cutoffDatum (Op : FullEllipticOp (n + 1))
           + K7 + K8 + K9 + K10 + K11 := by linarith only [h2, h4, h5, h6]
     linarith only [mul_le_mul_of_nonneg_right hK hB0]
   · intro v hvc hvcs
-    rw [setIntegral_add_mul_testFn _ _ hvc hvcs, setIntegral_add_mul_testFn _ _ hvc hvcs,
-      setIntegral_sub_mul_testFn _ _ hvc hvcs, setIntegral_sub_mul_testFn _ _ hvc hvcs,
-      setIntegral_sub_mul_testFn _ _ hvc hvcs, setIntegral_sub_mul_testFn _ _ hvc hvcs,
-      setIntegral_add_mul_testFn _ _ hvc hvcs, setIntegral_add_mul_testFn _ _ hvc hvcs,
-      setIntegral_sub_mul_testFn _ _ hvc hvcs, setIntegral_sub_mul_testFn _ _ hvc hvcs,
-      setIntegral_sub_mul_testFn _ _ hvc hvcs,
+    simp only [setIntegral_add_mul_testFn _ _ hvc hvcs, setIntegral_sub_mul_testFn _ _ hvc hvcs,
       hp1 v hvc hvcs, hp2 v hvc hvcs, hp3 v hvc hvcs, hp4 v hvc hvcs, hp5 v hvc hvcs,
       hp6 v hvc hvcs, hp7 v hvc hvcs, hp8 v hvc hvcs, hp9 v hvc hvcs, hp10 v hvc hvcs,
-      hp11 v hvc hvcs, hp12 v hvc hvcs]
-    simp only [Fintype.sum_prod_type, Finset.univ_unique, Finset.sum_singleton]
+      hp11 v hvc hvcs, hp12 v hvc hvcs, cutoffDatumPairing, Fintype.sum_prod_type,
+      Finset.univ_unique, Finset.sum_singleton]
 
 end EllipticPdes.Regularity

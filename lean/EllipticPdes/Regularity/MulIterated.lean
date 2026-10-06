@@ -58,7 +58,6 @@ theorem HasWeakDerivOn.add {V : Set (EuclideanSpace ℝ (Fin d))} {ℓ : Fin d}
     {g g' h h' : L2D V} (hg : HasWeakDerivOn V ℓ g g') (hh : HasWeakDerivOn V ℓ h h') :
     HasWeakDerivOn V ℓ (g + h) (g' + h') := by
   intro φ hφc hφcs hφV
-  have : ENNReal.HolderTriple (2 : ENNReal) 2 1 := ⟨by rw [ENNReal.inv_two_add_inv_two, inv_one]⟩
   have hdφ : MemLp (partialD ℓ φ) 2 (volume.restrict V) :=
     ((contDiff_partialD hφc ℓ).continuous.memLp_of_hasCompactSupport (p := 2) (μ := volume)
       (hasCompactSupport_partialD hφcs ℓ)).restrict V
