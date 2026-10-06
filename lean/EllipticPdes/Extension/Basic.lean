@@ -11,20 +11,24 @@ public import Mathlib.MeasureTheory.Integral.DominatedConvergence
 public import Mathlib.LinearAlgebra.Matrix.SchurComplement
 
 /-!
-# Weak derivatives along a direction
+# Common tools of the extension
 
-A weak gradient on `EuclideanSpace ℝ (Fin d)` is the family of its weak derivatives along the
-standard directions. This file defines the weak derivative along an arbitrary direction `v` of
-any normed space, and transports it through an affine automorphism that preserves the measure.
-Translations, reflections and linear isometries are then instances of one statement.
+The weak derivative along a direction `v` of any normed space, transported through an affine
+automorphism that preserves the measure: translations, reflections and linear isometries are
+instances of one statement. The pairs of a class and a gradient that the extension operators act
+on, with the seminorm that bounds them, and the small lemmas on supports, integrability and
+seminorms that the files of the extension share.
 
 ## Main declarations
 
 * `EllipticPdes.Extension.HasWeakDerivAlong`: the weak derivative of `u` along `v` on `B`.
 * `EllipticPdes.Extension.hasWeakGradOn_iff`: a weak gradient is a family of weak derivatives.
-* `EllipticPdes.Extension.HasWeakDerivAlong.comp_affine`: transport through
-  `x ↦ e x + c`.
+* `EllipticPdes.Extension.HasWeakDerivAlong.comp_affine`: transport through `x ↦ e x + c`.
 * `EllipticPdes.Extension.HasWeakDerivAlong.sum`: a weak derivative is linear in the direction.
+* `EllipticPdes.Extension.SobolevPair` and `EllipticPdes.Extension.pairNorm`: a class with its
+  gradient, and the seminorm of both.
+* `EllipticPdes.Extension.integral_eq_neg_integral_of_tendsto`: an integration by parts identity
+  passes to a limit of bounded test functions.
 * `EllipticPdes.Extension.tsupport_comp_homeomorph`: the topological support of a composite.
 -/
 

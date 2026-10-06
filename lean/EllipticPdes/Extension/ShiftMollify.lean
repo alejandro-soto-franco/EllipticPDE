@@ -79,61 +79,24 @@ theorem tendsto_eLpNorm_translate_convolution_sub {p : ℝ} (hp : 1 ≤ p)
         (ENNReal.ofReal p) volume) l (𝓝 0) := by
   have hp1 : (1 : ℝ≥0∞) ≤ ENNReal.ofReal p := by
     rw [← ENNReal.ofReal_one]; exact ENNReal.ofReal_le_ofReal hp
-  have hptop : ENNReal.ofReal p ≠ ∞ := ENNReal.ofReal_ne_top
-  -- The two limits the error splits into.
   have hconv := tendsto_eLpNorm_convolution_sub (h := f) hp hf hφ hK
-  have htrans := (tendsto_eLpNorm_translate_sub hp1 hptop hf).comp hh
-  rw [ENNReal.tendsto_nhds_zero]
-  intro ε hε
-  have hε2 : ε / 2 ≠ 0 := ENNReal.div_ne_zero.mpr ⟨hε.ne', by norm_num⟩
-  have hA := (ENNReal.tendsto_nhds_zero.mp hconv) (ε / 2) (pos_iff_ne_zero.mpr hε2)
-  have hB := (ENNReal.tendsto_nhds_zero.mp htrans) (ε / 2) (pos_iff_ne_zero.mpr hε2)
-  filter_upwards [hA, hB] with i h1 h2
-  set ρ := (φ i).normed volume with hρ
-  set g := f ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ρ with hg
-  -- The convolution is continuous, so both pieces are measurable.
-  have hloc : LocallyIntegrable f volume := hf.locallyIntegrable hp1
-  have hgc : Continuous g := by
-    rw [hg]
-    exact ((φ i).hasCompactSupport_normed).continuous_convolution_right
-      (ContinuousLinearMap.lsmul ℝ ℝ) hloc (φ i).continuous_normed
-  have hgf : AEStronglyMeasurable (fun y => g y - f y) volume :=
-    hgc.aestronglyMeasurable.sub hf.aestronglyMeasurable
-  -- The shifted mollification error is the shift of the mollification error.
-  have hshift : ((fun y => f (y + hv i)) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ρ)
-      = fun y => g (y + hv i) := by
+  have htrans := (tendsto_eLpNorm_translate_sub hp1 ENNReal.ofReal_ne_top hf).comp hh
+  refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds
+    (by simpa using hconv.add htrans) (fun _ => zero_le) fun i => ?_
+  set g := f ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] (φ i).normed volume with hg
+  have hgc : Continuous g :=
+    ((φ i).hasCompactSupport_normed).continuous_convolution_right
+      (ContinuousLinearMap.lsmul ℝ ℝ) (hf.locallyIntegrable hp1) (φ i).continuous_normed
+  -- the error is the shift of the mollification error, plus the shift error
+  have hsplit : ((fun y => f (y + hv i)) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume]
+        (φ i).normed volume - f)
+      = (fun z => g z - f z) ∘ (fun y => y + hv i) + fun y => f (y + hv i) - f y := by
     funext y
-    exact convolution_comp_translate f ρ (hv i) y
-  have hfirst : eLpNorm
-      (fun y => ((fun y => f (y + hv i)) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ρ) y
-        - f (y + hv i)) (ENNReal.ofReal p) volume
-      = eLpNorm (fun y => g y - f y) (ENNReal.ofReal p) volume := by
-    rw [show (fun y => ((fun y => f (y + hv i)) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ρ) y
-          - f (y + hv i)) = fun y => (fun z => g z - f z) (y + hv i) from by
-        funext y; rw [hshift]]
-    exact eLpNorm_comp_translate hgf (hv i) _
-  -- The triangle inequality on the split.
-  have hsplit : ((fun y => f (y + hv i)) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ρ - f)
-      = (fun y => ((fun y => f (y + hv i)) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ρ) y
-          - f (y + hv i))
-        + (fun y => f (y + hv i) - f y) := by
-    funext y
-    simp only [Pi.add_apply, Pi.sub_apply]
+    simp only [Pi.sub_apply, Pi.add_apply, Function.comp_apply, hg,
+      convolution_comp_translate f _ (hv i) y]
     ring
-  calc eLpNorm ((fun y => f (y + hv i)) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ρ - f)
-        (ENNReal.ofReal p) volume
-      ≤ eLpNorm (fun y => ((fun y => f (y + hv i))
-            ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ρ) y - f (y + hv i))
-          (ENNReal.ofReal p) volume
-        + eLpNorm (fun y => f (y + hv i) - f y) (ENNReal.ofReal p) volume := by
-        rw [hsplit]
-        exact eLpNorm_add_le hp1
-    _ = eLpNorm (fun y => g y - f y) (ENNReal.ofReal p) volume
-        + eLpNorm (fun y => f (y + hv i) - f y) (ENNReal.ofReal p) volume := by rw [hfirst]
-    _ ≤ ε / 2 + ε / 2 := by
-        refine add_le_add ?_ h2
-        refine le_trans (le_of_eq (eLpNorm_congr_ae ?_)) h1
-        exact Filter.EventuallyEq.of_eq (funext fun y => rfl)
-    _ = ε := ENNReal.add_halves ε
+  rw [hsplit]
+  refine (eLpNorm_add_le hp1).trans (add_le_add (le_of_eq ?_) le_rfl)
+  exact eLpNorm_comp_translate (hgc.aestronglyMeasurable.sub hf.aestronglyMeasurable) (hv i) _
 
 end EllipticPdes.Extension

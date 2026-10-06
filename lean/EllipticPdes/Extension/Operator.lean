@@ -55,7 +55,7 @@ Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theore
 @[expose] public section
 
 open MeasureTheory Metric Set
-open scoped Manifold NNReal ENNReal
+open scoped NNReal ENNReal
 
 noncomputable section
 
@@ -284,20 +284,13 @@ theorem exists_cutoff_one_on_compact {K U : Set (EuclideanSpace ℝ (Fin d))}
     ∃ χ : EuclideanSpace ℝ (Fin d) → ℝ, ContDiff ℝ (⊤ : ℕ∞) χ ∧
       HasCompactSupport χ ∧ tsupport χ ⊆ U ∧ ∀ y ∈ K, χ y = 1 := by
   obtain ⟨L, hLc, hKL, hLU⟩ := exists_compact_between hK hU hKU
-  obtain ⟨f, hf0, hf1, -⟩ :=
-    exists_contMDiffMap_zero_one_of_isClosed (I := 𝓘(ℝ, EuclideanSpace ℝ (Fin d)))
-      (isOpen_interior (s := L)).isClosed_compl hK.isClosed
-      (by
-        rw [Set.disjoint_compl_left_iff_subset]
-        exact hKL)
-  have hsupp : tsupport (fun y => f y) ⊆ L := by
-    refine closure_minimal ?_ hLc.isClosed
-    intro y hy
-    by_contra hc
-    exact hy (hf0 fun hcc => hc (interior_subset hcc))
-  exact ⟨fun y => f y, contMDiff_iff_contDiff.mp f.contMDiff,
-    hLc.of_isClosed_subset (isClosed_tsupport _) hsupp, hsupp.trans hLU,
-    fun y hy => hf1 hy⟩
+  obtain ⟨f, hf, -, hsupp, h1⟩ := exists_contDiff_support_eq_eq_one_iff (n := (⊤ : ℕ∞))
+    (isOpen_interior (s := L)) hK.isClosed hKL
+  have hts : tsupport f ⊆ L := by
+    rw [tsupport, hsupp]
+    exact closure_minimal interior_subset hLc.isClosed
+  exact ⟨f, hf, hLc.of_isClosed_subset (isClosed_tsupport _) hts, hts.trans hLU,
+    fun y hy => (h1 y).1 hy⟩
 
 /-- **Extension with its support cut into a given open set.** One more cutoff, equal to
 one on the closure of the domain, which leaves the agreement alone and moves the support. -/
