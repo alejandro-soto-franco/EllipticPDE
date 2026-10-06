@@ -111,23 +111,6 @@ private lemma partialD_diffQuotFn (hφ : Differentiable ℝ φ) (i k : Fin d) (h
   simp only [_root_.smul_apply, _root_.sub_apply, smul_eq_mul]
   ring
 
-/-! ### Extension by zero of a test-function class is the test function -/
-
-/-- Extension by zero of the `L²(Ω)` class of a function supported inside `Ω` recovers the
-function itself a.e. on the whole space: off `Ω` the function already vanishes (its
-`tsupport` is inside `Ω`), and on `Ω` extension agrees with the class. -/
-private lemma extendL2_toLp_ae_eq (hΩm : MeasurableSet Ω)
-    {ψ : EuclideanSpace ℝ (Fin d) → ℝ} (hmem : MemLp ψ 2 (volume.restrict Ω))
-    (hsupp : tsupport ψ ⊆ Ω) :
-    (extendL2 hΩm (hmem.toLp ψ) : EuclideanSpace ℝ (Fin d) → ℝ) =ᵐ[volume] ψ := by
-  filter_upwards [coeFn_extendL2 hΩm (hmem.toLp ψ),
-      ae_imp_of_ae_restrict hmem.coeFn_toLp] with x hx himp
-  rw [hx]
-  by_cases hxΩ : x ∈ Ω
-  · rw [Set.indicator_of_mem hxΩ, himp hxΩ]
-  · rw [Set.indicator_of_notMem hxΩ,
-      image_eq_zero_of_notMem_tsupport (fun hc => hxΩ (hsupp hc))]
-
 /-! ### Discrete graph identity -/
 
 /-- **Discrete graph identity.** On a test-function graph, the cutoff of the interior

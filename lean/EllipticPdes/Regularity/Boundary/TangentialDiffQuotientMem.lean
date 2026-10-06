@@ -45,23 +45,6 @@ namespace EllipticPdes.Regularity
 
 open EllipticPdes.Sobolev
 
-/-! ### Extension by zero of a test-function class is the test function -/
-
-/-- Extension by zero of the `L²(Ω)` class of a function supported inside `Ω` recovers the
-function itself a.e. on the whole space: off `Ω` the function already vanishes (its
-`tsupport` is inside `Ω`), and on `Ω` extension agrees with the class. -/
-private lemma extendL2_toLp_ae_eq_halfBall {n : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin n))}
-    (hΩm : MeasurableSet Ω) {ψ : EuclideanSpace ℝ (Fin n) → ℝ}
-    (hmem : MemLp ψ 2 (volume.restrict Ω)) (hsupp : tsupport ψ ⊆ Ω) :
-    (extendL2 hΩm (hmem.toLp ψ) : EuclideanSpace ℝ (Fin n) → ℝ) =ᵐ[volume] ψ := by
-  filter_upwards [coeFn_extendL2 hΩm (hmem.toLp ψ),
-      ae_imp_of_ae_restrict hmem.coeFn_toLp] with x hx himp
-  rw [hx]
-  by_cases hxΩ : x ∈ Ω
-  · rw [Set.indicator_of_mem hxΩ, himp hxΩ]
-  · rw [Set.indicator_of_notMem hxΩ,
-      image_eq_zero_of_notMem_tsupport (fun hc => hxΩ (hsupp hc))]
-
 /-! ### Commutation of the difference quotient with the partial derivative -/
 
 /-- **Commutation of the difference quotient along a fixed vector with the partial derivative.**
@@ -109,7 +92,7 @@ private lemma cutoffMulOn_tangDiffQuotG_testGraph (hζ : IsTestFn (Metric.ball 0
           (x + hshift k.succ h) = φ (x + hshift k.succ h) :=
     (measurePreserving_add_right volume
         (hshift k.succ h)).quasiMeasurePreserving.tendsto_ae.eventually
-      (extendL2_toLp_ae_eq_halfBall hΩm hφ.mem_lp hφ.2.2)
+      (extendL2_toLp_ae_eq hΩm hφ.mem_lp hφ.2.2)
   apply PiLp.ext
   intro j
   refine Fin.cases ?_ (fun i => ?_) j
@@ -134,7 +117,7 @@ private lemma cutoffMulOn_tangDiffQuotG_testGraph (hζ : IsTestFn (Metric.ball 0
             (x + hshift k.succ h) = partialD i φ (x + hshift k.succ h) :=
       (measurePreserving_add_right volume
           (hshift k.succ h)).quasiMeasurePreserving.tendsto_ae.eventually
-        (extendL2_toLp_ae_eq_halfBall hΩm (hφ.memLp_partialD i)
+        (extendL2_toLp_ae_eq hΩm (hφ.memLp_partialD i)
           ((tsupport_partialD_subset i φ).trans hφ.2.2))
     have hpsi_eq : partialD i (fun x => ζ x * ((φ (x + hshift k.succ h) - φ x) / h))
         = fun x => ζ x * ((partialD i φ (x + hshift k.succ h) - partialD i φ x) / h)
