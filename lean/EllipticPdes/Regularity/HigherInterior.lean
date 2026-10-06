@@ -147,9 +147,141 @@ theorem interiorRegularityAt_zero (Op : FullEllipticOp (n + 1))
         linarith
       · simp at hα
 
-set_option maxHeartbeats 1600000 in
--- The step has the tower, its collar, four cutoffs, the inductive family on two sets and the
--- datum, and the closed form of the gradient is checked against all of them.
+/-- **Weak formulation of the cut-off derivative against a test function.** Let `U` be the
+cut-off derivative `ξ · ∂_ℓ u`, with gradient given in closed form by `hgrad`, and let `HuN` be
+the family of derivatives of `u` on the collar `N`. Then `B[U, v]` is the datum
+`cutoffDatumPairing` for every test function `v`: expanding the bilinear form
+(`setIntegral_blocks_eq`) and the differentiated equation tested against `ξ v`
+(`differentiated_weakForm_wkInfty`) gives the same twelve shapes, once the mixed second
+derivatives are swapped under the cutoff `ϑ`. -/
+private lemma cutoffDeriv_pairing_eq (Op : FullEllipticOp (n + 1))
+    {Ω N : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω)
+    (hNm : MeasurableSet N) (hNΩ : N ⊆ Ω) {k : ℕ}
+    (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 2)) (hbc : IsWkInftyLower Op (k + 1))
+    {ξ ϑ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ} (hξNt : IsTestFn N ξ) (hϑ : IsTestFn N ϑ)
+    (hϑ_eqOn : Set.EqOn ϑ 1 (tsupport ξ)) (u : H01 Ω) (f : L2D Ω)
+    (hu : ∀ w : H01 Ω, Op.fullBilin Ω u w
+      = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ))
+    (hfk : HasIteratedWeakDerivOn Ω (k + 1) f)
+    (HuN : HasIteratedWeakDerivOn N (k + 2) (restrictL2 (Ω := N) (extendL2 hΩm ((u : H1amb Ω) 0))))
+    (hDu : ∀ i : Fin (n + 1),
+      HuN.D [i] = restrictL2 (Ω := N) (extendL2 hΩm ((u : H1amb Ω) i.succ)))
+    (ℓ : Fin (n + 1)) {Uamb : H1amb Ω} (hUmem : Uamb ∈ H01 Ω)
+    (hgrad : ∀ i : Fin (n + 1), extendL2 hΩm (Uamb i.succ)
+      = extendL2 hNm (mulTest (isTestFn_partialD hξNt i) (HuN.D [ℓ])
+        + mulTest hξNt (HuN.D [i, ℓ])))
+    (hU0N : extendL2 hΩm (Uamb 0) = extendL2 hNm (mulTest hξNt (HuN.D [ℓ])))
+    {v : EuclideanSpace ℝ (Fin (n + 1)) → ℝ} (hv : IsTestFn Ω v) :
+    Op.fullBilin Ω ⟨Uamb, hUmem⟩ ⟨hv.testGraph, testGraph_mem_H01 hv⟩
+      = cutoffDatumPairing Op hA hbc ξ ℓ (restrictL2 (Ω := N) (extendL2 hΩm (hfk.D [ℓ])))
+          HuN v := by
+  have hD2 : ∀ i : Fin (n + 1), HasWeakDerivOn N i (HuN.D [ℓ]) (HuN.D [i, ℓ]) :=
+    fun i => HuN.D_step i [ℓ] (Nat.succ_lt_succ (Nat.succ_pos k))
+  refine (fullBilin_testGraph_eq Op ⟨Uamb, hUmem⟩ hv).trans
+    ((setIntegral_blocks_eq Op hΩm hNm hξNt hA hbc (p := HuN.D [ℓ])
+      (D2 := fun i => HuN.D [i, ℓ]) hgrad hU0N hD2 hv.1).trans ?_)
+  unfold cutoffDatumPairing
+  -- The mixed second derivative, swapped into the order the equation names.
+  have hsymm : ∀ i : Fin (n + 1),
+      (fun x => ϑ x * (HuN.D [i, ℓ] x : ℝ))
+        =ᵐ[volume.restrict N] fun x => ϑ x * (HuN.D [ℓ, i] x : ℝ) := by
+    intro i
+    have h := mulTest_mixed_weakDeriv_comm hNm hϑ
+      (HuN.D_step i [] (Nat.succ_pos _)) (HuN.D_step ℓ [] (Nat.succ_pos _))
+      (HuN.D_step ℓ [i] (Nat.succ_lt_succ (Nat.succ_pos k)))
+      (HuN.D_step i [ℓ] (Nat.succ_lt_succ (Nat.succ_pos k)))
+    filter_upwards [mulTest_coeFn hϑ (HuN.D [ℓ, i]), mulTest_coeFn hϑ (HuN.D [i, ℓ])]
+      with x h1 h2
+    rw [← h2, ← h, h1]
+  have hψ : ∀ j : Fin (n + 1), ∀ x, ϑ x * partialD j (fun y => ξ y * v y) x
+      = partialD j (fun y => ξ y * v y) x := fun j =>
+    mul_eq_self_of_eqOn_one hϑ_eqOn
+      ((tsupport_partialD_subset j _).trans tsupport_mul_subset_left)
+  rw [Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ =>
+    setIntegral_weight_mul_congr_of_cutoff_ae (hsymm i) (fun x => Op.a x i j) (hψ j)))]
+  -- The differentiated equation on the collar, tested against the cut-off test function.
+  have hfDf : HasWeakDerivOn N ℓ (restrictL2 (Ω := N) (extendL2 hΩm f))
+      (restrictL2 (Ω := N) (extendL2 hΩm (hfk.D [ℓ]))) := by
+    have h := hfk.D_step ℓ [] (Nat.succ_pos k)
+    rw [hfk.D_nil] at h
+    exact h.restrict hΩm hNm hNΩ
+  have hLoc : ∀ v' : EuclideanSpace ℝ (Fin (n + 1)) → ℝ, ContDiff ℝ (⊤ : ℕ∞) v' →
+      HasCompactSupport v' → tsupport v' ⊆ N →
+      (∑ i, ∑ j, ∫ x in N, Op.a x i j * (HuN.D [i] x : ℝ) * partialD j v' x)
+        + (∑ i, ∫ x in N, Op.b x i * (HuN.D [i] x : ℝ) * v' x)
+        + (∫ x in N, Op.c x * (HuN.D [] x : ℝ) * v' x)
+        = ∫ x in N, (restrictL2 (Ω := N) (extendL2 hΩm f) x : ℝ) * v' x := by
+    intro v' h1 h2 h3
+    simp only [hDu, HuN.D_nil]
+    exact localWeakForm_of_fullBilin Op hΩm hNm hNΩ u f hu v' h1 h2 h3
+  have hdiffeq := differentiated_weakForm_wkInfty Op hA hbc ℓ (HuN.D [])
+    (fun i => HuN.D [i]) (fun m i => HuN.D [m, i])
+    (restrictL2 (Ω := N) (extendL2 hΩm f))
+    (restrictL2 (Ω := N) (extendL2 hΩm (hfk.D [ℓ])))
+    (fun i => HuN.D_step ℓ [i] (Nat.succ_lt_succ (Nat.succ_pos k)))
+    (fun i j => HuN.D_step j [i] (Nat.succ_lt_succ (Nat.succ_pos k)))
+    (HuN.D_step ℓ [] (Nat.succ_pos _)) hfDf hLoc
+    (hξNt.1.mul hv.1) hξNt.2.1.mul_right (tsupport_mul_subset_left.trans hξNt.2.2)
+  have hT : ∀ i : Fin (n + 1),
+      (∫ x in N, ((hbc.bReg i).D [ℓ] x * (HuN.D [i] x : ℝ)
+          + Op.b x i * (HuN.D [ℓ, i] x : ℝ)) * (ξ x * v x))
+        = (∫ x in N, ξ x * ((hbc.bReg i).D [ℓ] x * (HuN.D [i] x : ℝ)) * v x)
+          + ∫ x in N, ξ x * (Op.b x i * (HuN.D [ℓ, i] x : ℝ)) * v x := fun i =>
+    setIntegral_add_weight_mul_cutoff ((hbc.bReg i).measurable_D_singleton ℓ)
+      ((hbc.bReg i).ae_abs_D_singleton_le ℓ) (hbc.bReg i).measurable_self
+      (hbc.bReg i).ae_abs_le (HuN.D [i]) (HuN.D [ℓ, i]) hξNt.1 hξNt.2.1 hv.1
+  have hZ : (∫ x in N, (hbc.cReg.D [ℓ] x * (HuN.D [] x : ℝ) + Op.c x * (HuN.D [ℓ] x : ℝ))
+        * (ξ x * v x))
+      = (∫ x in N, ξ x * (hbc.cReg.D [ℓ] x * (HuN.D [] x : ℝ)) * v x)
+        + ∫ x in N, ξ x * (Op.c x * (HuN.D [ℓ] x : ℝ)) * v x :=
+    setIntegral_add_weight_mul_cutoff (hbc.cReg.measurable_D_singleton ℓ)
+      (hbc.cReg.ae_abs_D_singleton_le ℓ) hbc.cReg.measurable_self hbc.cReg.ae_abs_le
+      (HuN.D []) (HuN.D [ℓ]) hξNt.1 hξNt.2.1 hv.1
+  have hAA : ∀ i j : Fin (n + 1),
+      (∫ x in N, (hA.D [j, ℓ] i j x * (HuN.D [i] x : ℝ)
+          + hA.D [ℓ] i j x * (HuN.D [j, i] x : ℝ)) * (ξ x * v x))
+        = (∫ x in N, ξ x * (hA.D [j, ℓ] i j x * (HuN.D [i] x : ℝ)) * v x)
+          + ∫ x in N, ξ x * (hA.D [ℓ] i j x * (HuN.D [j, i] x : ℝ)) * v x := fun i j =>
+    setIntegral_add_weight_mul_cutoff (hA.D_meas i j [j, ℓ] (Nat.le_add_left 2 k))
+      (hA.ess_bdd i j [j, ℓ] (Nat.le_add_left 2 k))
+      (hA.D_meas i j [ℓ] (Nat.le_add_left 1 (k + 1)))
+      (hA.ess_bdd i j [ℓ] (Nat.le_add_left 1 (k + 1))) (HuN.D [i]) (HuN.D [j, i])
+      hξNt.1 hξNt.2.1 hv.1
+  have hDf : (∫ x in N, (restrictL2 (Ω := N) (extendL2 hΩm (hfk.D [ℓ])) x : ℝ)
+        * (ξ x * v x))
+      = ∫ x in N, ξ x * ((1 : ℝ)
+          * (restrictL2 (Ω := N) (extendL2 hΩm (hfk.D [ℓ])) x : ℝ)) * v x :=
+    integral_congr_ae (Filter.Eventually.of_forall fun x => by ring)
+  rw [hdiffeq]
+  simp only [hT, hZ, hAA, hDf]
+  simp only [HuN.D_nil, Finset.sum_add_distrib]
+  ring
+
+/-- **The cut-off derivative as a weak solution.** An element `U ∈ H₀¹(Ω)` agreeing with
+`∂_ℓ u` on `V`, a datum `F ∈ L²(Ω)` with `k` weak derivatives, and the weak formulation
+`B[U, w] = ⟪F, w⟫` for every `w ∈ H₀¹(Ω)`, with the norms of `U` and the `H^k` bound on `F`
+controlled by `B`. -/
+structure CutoffDerivWeakForm (Op : FullEllipticOp (n + 1))
+    {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω)
+    (V : Set (EuclideanSpace ℝ (Fin (n + 1)))) (u : H01 Ω) (ℓ : Fin (n + 1)) (k : ℕ)
+    (B : ℝ) where
+  /-- The cut-off derivative. -/
+  U : H01 Ω
+  /-- The datum of its equation. -/
+  F : L2D Ω
+  /-- The weak derivatives of the datum. -/
+  hFk : HasIteratedWeakDerivOn Ω k F
+  /-- `U` agrees with `∂_ℓ u` on `V`. -/
+  restrict_eq : restrictL2 (Ω := V) (extendL2 hΩm ((U : H1amb Ω) 0))
+    = restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) ℓ.succ))
+  /-- The weak formulation of the equation of `U`. -/
+  weakForm : ∀ w : H01 Ω, Op.fullBilin Ω U w
+    = ∫ x in Ω, (F x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)
+  /-- The `H^k` bound on the datum. -/
+  bound_F : IteratedL2Bound hFk B
+  /-- The bound on the function value of `U`. -/
+  bound_U : ‖(U : H1amb Ω) 0‖ ≤ B
+
 /-- **Differentiated equation as a weak formulation for a cutoff derivative.** For a weak
 solution `u` of `L u = f` and each direction `ℓ`, there is an element `U ∈ H₀¹(Ω)` agreeing with
 `∂_ℓ u` on `V`, a datum `F ∈ L²(Ω)` with `k` weak derivatives, and a weak formulation `B[U, w] =
@@ -188,14 +320,8 @@ theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
       (hfk : HasIteratedWeakDerivOn Ω (k + 1) f), IteratedL2Bound hfk M →
       (∀ w : H01 Ω, Op.fullBilin Ω u w
         = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) →
-      ∀ ℓ : Fin (n + 1), ∃ (U : H01 Ω) (F : L2D Ω) (hFk : HasIteratedWeakDerivOn Ω k F),
-        restrictL2 (Ω := V) (extendL2 hΩm ((U : H1amb Ω) 0))
-            = restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) ℓ.succ))
-          ∧ (∀ w : H01 Ω, Op.fullBilin Ω U w
-              = ∫ x in Ω, (F x : ℝ) * ((w : H1amb Ω) 0 x : ℝ))
-          ∧ IteratedL2Bound hFk (C * (M + ‖(u : H1amb Ω) 0‖))
-          ∧ ‖(U : H1amb Ω) 0‖ ≤ C * (M + ‖(u : H1amb Ω) 0‖) := by
-  classical
+      ∀ ℓ : Fin (n + 1),
+        Nonempty (CutoffDerivWeakForm Op hΩm V u ℓ k (C * (M + ‖(u : H1amb Ω) 0‖))) := by
   -- The cutoff tower for `V ⋐ Ω`, and an open collar around its middle cutoff.
   obtain ⟨T⟩ : Nonempty (CutoffTower Ω V) :=
     ⟨cutoffTowerOfIsCompactSubsetIsOpen hVc hΩo hVΩ⟩
@@ -215,9 +341,8 @@ theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
   -- The datum, and the inductive hypothesis at the outer support of the tower.
   obtain ⟨KD, hKD0, hDat⟩ := exists_cutoffDatum Op hNm hNΩ hA hbc hξNt
   obtain ⟨C₁, hC₁0, hIH⟩ := hk T.hθ.2.1 hWΩ
-  obtain ⟨Cξ, hCξ⟩ := exists_abs_bound hξNt
-  have hCξ0 : (0 : ℝ) ≤ Cξ := le_trans (abs_nonneg (T.ξ 0)) (hCξ 0)
-  refine ⟨KD * (C₁ + 1) + Cξ * C₁,
+  have hCξ0 : (0 : ℝ) ≤ hξNt.supNorm := hξNt.supNorm_nonneg
+  refine ⟨KD * (C₁ + 1) + hξNt.supNorm * C₁,
     add_nonneg (mul_nonneg hKD0 (add_nonneg hC₁0 zero_le_one)) (mul_nonneg hCξ0 hC₁0),
     fun u f M hfk hM hu ℓ => ?_⟩
   have hM0 : (0 : ℝ) ≤ M := le_trans (norm_nonneg f) hM.norm_le
@@ -253,7 +378,7 @@ theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
   have hVm : MeasurableSet V := hVc.isClosed.measurableSet
   have hDℓnorm : ‖HuN.D [ℓ]‖ ≤ C₁ * (M + ‖(u : H1amb Ω) 0‖) :=
     hHuNbd [ℓ] (Nat.succ_le_succ (Nat.zero_le _))
-  refine ⟨⟨Uamb, hUmem⟩, F, HF, ?_, ?_, ?_, ?_⟩
+  refine ⟨⟨⟨Uamb, hUmem⟩, F, HF, ?_, ?_, ?_, ?_⟩⟩
   · -- The cutoff is invisible on the base set, so nothing is lost there.
     change restrictL2 (Ω := V) (extendL2 hΩm (Uamb 0)) = _
     rw [hU0]
@@ -261,82 +386,10 @@ theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
   · -- The weak formulation, extended from test functions by density.
     intro w
     refine weakForm_of_testFn Op ⟨Uamb, hUmem⟩ F (fun v hv => ?_) w
-    have hgrad' : ∀ i : Fin (n + 1), extendL2 hΩm (Uamb i.succ)
-        = extendL2 hNm (mulTest (isTestFn_partialD hξNt i) (HuN.D [ℓ])
-          + mulTest hξNt (HuN.D [i, ℓ])) := by
-      intro i
-      rw [hDu ℓ]
-      exact hgrad i
-    have hU0N : extendL2 hΩm (Uamb 0) = extendL2 hNm (mulTest hξNt (HuN.D [ℓ])) := by
-      rw [hU0, hDu ℓ]
-      exact extendL2_mulTest_eq hΩm hNm hNΩ T.hξ hξNt ((u : H1amb Ω) ℓ.succ)
-    have hD2 : ∀ i : Fin (n + 1), HasWeakDerivOn N i (HuN.D [ℓ]) (HuN.D [i, ℓ]) :=
-      fun i => HuN.D_step i [ℓ] (Nat.succ_lt_succ (Nat.succ_pos k))
-    rw [fullBilin_testGraph_eq Op ⟨Uamb, hUmem⟩ hv,
-      setIntegral_blocks_eq Op hΩm hNm hξNt hA hbc (p := HuN.D [ℓ])
-        (D2 := fun i => HuN.D [i, ℓ]) hgrad' hU0N hD2 hv.1,
-      hFpair v hv.1 hv.2.1]
-    -- The mixed second derivative, swapped into the order the equation names.
-    have hsymm : ∀ i : Fin (n + 1),
-        (fun x => ϑ x * (HuN.D [i, ℓ] x : ℝ))
-          =ᵐ[volume.restrict N] fun x => ϑ x * (HuN.D [ℓ, i] x : ℝ) := by
-      intro i
-      have h := mulTest_mixed_weakDeriv_comm hNm hϑ
-        (HuN.D_step i [] (Nat.succ_pos _)) (HuN.D_step ℓ [] (Nat.succ_pos _))
-        (HuN.D_step ℓ [i] (Nat.succ_lt_succ (Nat.succ_pos k)))
-        (HuN.D_step i [ℓ] (Nat.succ_lt_succ (Nat.succ_pos k)))
-      filter_upwards [mulTest_coeFn hϑ (HuN.D [ℓ, i]), mulTest_coeFn hϑ (HuN.D [i, ℓ])]
-        with x h1 h2
-      rw [← h2, ← h, h1]
-    have hψ : ∀ j : Fin (n + 1), ∀ x, ϑ x * partialD j (fun y => T.ξ y * v y) x
-        = partialD j (fun y => T.ξ y * v y) x := fun j =>
-      mul_eq_self_of_eqOn_one hϑ_eqOn
-        ((tsupport_partialD_subset j _).trans tsupport_mul_subset_left)
-    rw [Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ =>
-      setIntegral_weight_mul_congr_of_cutoff_ae (hsymm i) (fun x => Op.a x i j) (hψ j)))]
-    -- The differentiated equation on the collar, tested against the cut-off test function.
-    have hfDf : HasWeakDerivOn N ℓ (restrictL2 (Ω := N) (extendL2 hΩm f))
-        (restrictL2 (Ω := N) (extendL2 hΩm (hfk.D [ℓ]))) := by
-      have h := hfk.D_step ℓ [] (Nat.succ_pos k)
-      rw [hfk.D_nil] at h
-      exact h.restrict hΩm hNm hNΩ
-    have hLoc : ∀ v' : EuclideanSpace ℝ (Fin (n + 1)) → ℝ, ContDiff ℝ (⊤ : ℕ∞) v' →
-        HasCompactSupport v' → tsupport v' ⊆ N →
-        (∑ i, ∑ j, ∫ x in N, Op.a x i j * (HuN.D [i] x : ℝ) * partialD j v' x)
-          + (∑ i, ∫ x in N, Op.b x i * (HuN.D [i] x : ℝ) * v' x)
-          + (∫ x in N, Op.c x * (HuN.D [] x : ℝ) * v' x)
-          = ∫ x in N, (restrictL2 (Ω := N) (extendL2 hΩm f) x : ℝ) * v' x := by
-      intro v' h1 h2 h3
-      simp only [hDu, HuN.D_nil]
-      exact localWeakForm_of_fullBilin Op hΩm hNm hNΩ u f hu v' h1 h2 h3
-    have hdiffeq := differentiated_weakForm_wkInfty Op hA hbc ℓ (HuN.D [])
-      (fun i => HuN.D [i]) (fun m i => HuN.D [m, i])
-      (restrictL2 (Ω := N) (extendL2 hΩm f))
-      (restrictL2 (Ω := N) (extendL2 hΩm (hfk.D [ℓ])))
-      (fun i => HuN.D_step ℓ [i] (Nat.succ_lt_succ (Nat.succ_pos k)))
-      (fun i j => HuN.D_step j [i] (Nat.succ_lt_succ (Nat.succ_pos k)))
-      (HuN.D_step ℓ [] (Nat.succ_pos _)) hfDf hLoc
-      (hξNt.1.mul hv.1) hξNt.2.1.mul_right (tsupport_mul_subset_left.trans hξN)
-    rw [hdiffeq,
-      show (∫ x in N, (restrictL2 (Ω := N) (extendL2 hΩm (hfk.D [ℓ])) x : ℝ) * (T.ξ x * v x))
-          = ∫ x in N, T.ξ x * ((1 : ℝ)
-              * (restrictL2 (Ω := N) (extendL2 hΩm (hfk.D [ℓ])) x : ℝ)) * v x from
-        integral_congr_ae (Filter.Eventually.of_forall fun x => by ring),
-      Finset.sum_congr rfl (fun i _ =>
-        setIntegral_add_weight_mul_cutoff ((hbc.bReg i).measurable_D_singleton ℓ)
-          ((hbc.bReg i).ae_abs_D_singleton_le ℓ) (hbc.bReg i).measurable_self
-          (hbc.bReg i).ae_abs_le (HuN.D [i]) (HuN.D [ℓ, i]) hξNt.1 hξNt.2.1 hv.1),
-      setIntegral_add_weight_mul_cutoff (hbc.cReg.measurable_D_singleton ℓ)
-        (hbc.cReg.ae_abs_D_singleton_le ℓ) hbc.cReg.measurable_self hbc.cReg.ae_abs_le
-        (HuN.D []) (HuN.D [ℓ]) hξNt.1 hξNt.2.1 hv.1,
-      Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ =>
-        setIntegral_add_weight_mul_cutoff (hA.D_meas i j [j, ℓ] (Nat.le_add_left 2 k))
-          (hA.ess_bdd i j [j, ℓ] (Nat.le_add_left 2 k))
-          (hA.D_meas i j [ℓ] (Nat.le_add_left 1 (k + 1)))
-          (hA.ess_bdd i j [ℓ] (Nat.le_add_left 1 (k + 1))) (HuN.D [i]) (HuN.D [j, i])
-          hξNt.1 hξNt.2.1 hv.1))]
-    simp only [HuN.D_nil, Finset.sum_add_distrib]
-    ring
+    refine (cutoffDeriv_pairing_eq Op hΩm hNm hNΩ hA hbc hξNt hϑ hϑ_eqOn u f hu hfk HuN hDu ℓ
+      hUmem (fun i => by rw [hDu ℓ]; exact hgrad i) ?_ hv).trans (hFpair v hv.1 hv.2.1).symm
+    rw [hU0, hDu ℓ]
+    exact extendL2_mulTest_eq hΩm hNm hNΩ T.hξ hξNt ((u : H1amb Ω) ℓ.succ)
   · -- The datum's bound, in the data.
     refine hFbd.mono_const ?_
     have h1 : C₁ * (M + ‖(u : H1amb Ω) 0‖) + M ≤ (C₁ + 1) * (M + ‖(u : H1amb Ω) 0‖) := by
@@ -344,39 +397,20 @@ theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
     calc KD * (C₁ * (M + ‖(u : H1amb Ω) 0‖) + M)
         ≤ KD * ((C₁ + 1) * (M + ‖(u : H1amb Ω) 0‖)) := mul_le_mul_of_nonneg_left h1 hKD0
       _ = KD * (C₁ + 1) * (M + ‖(u : H1amb Ω) 0‖) := by ring
-      _ ≤ (KD * (C₁ + 1) + Cξ * C₁) * (M + ‖(u : H1amb Ω) 0‖) :=
+      _ ≤ (KD * (C₁ + 1) + hξNt.supNorm * C₁) * (M + ‖(u : H1amb Ω) 0‖) :=
           mul_le_mul_of_nonneg_right (le_add_of_nonneg_right (mul_nonneg hCξ0 hC₁0)) hMu
   · -- The cut-off derivative's norm, read on the collar where the cutoff lives.
     change ‖Uamb 0‖ ≤ _
     rw [hU0]
-    have hag : (mulTest T.hξ ((u : H1amb Ω) ℓ.succ) : EuclideanSpace ℝ (Fin (n + 1)) → ℝ)
-        =ᵐ[volume.restrict Ω] fun x => T.ξ x
-          * ((restrictL2 (Ω := Ω) (extendL2 hNm (HuN.D [ℓ]))) x : ℝ) := by
-      have hres : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin (n + 1)))), x ∈ N →
-          (HuN.D [ℓ] x : ℝ) = (extendL2 hΩm ((u : H1amb Ω) ℓ.succ) x : ℝ) := by
-        rw [hDu ℓ]
-        exact (ae_restrict_iff' hNm).mp
-          (coeFn_restrictL2 (Ω := N) (extendL2 hΩm ((u : H1amb Ω) ℓ.succ)))
-      filter_upwards [mulTest_coeFn T.hξ ((u : H1amb Ω) ℓ.succ),
-        coeFn_restrictL2 (Ω := Ω) (extendL2 hNm (HuN.D [ℓ])),
-        ae_restrict_of_ae (coeFn_extendL2 hNm (HuN.D [ℓ])),
-        ae_restrict_of_ae (coeFn_extendL2 hΩm ((u : H1amb Ω) ℓ.succ)),
-        ae_restrict_of_ae hres, ae_restrict_mem hΩm] with x h1 h2 h3 h4 h5 h6
-      rw [h1, h2, h3]
-      by_cases hxN : x ∈ N
-      · rw [Set.indicator_of_mem hxN, h5 hxN, h4, Set.indicator_of_mem h6]
-      · rw [Set.indicator_of_notMem hxN, mul_zero,
-          show T.ξ x = 0 from image_eq_zero_of_notMem_tsupport (fun hc => hxN (hξN hc)),
-          zero_mul]
-    have hstep : ‖restrictL2 (Ω := Ω) (extendL2 hNm (HuN.D [ℓ]))‖ ≤ ‖HuN.D [ℓ]‖ :=
-      le_trans (norm_restrictL2_le _) (le_of_eq (norm_extendL2 hNm (HuN.D [ℓ])))
     calc ‖mulTest T.hξ ((u : H1amb Ω) ℓ.succ)‖
-        ≤ Cξ * ‖restrictL2 (Ω := Ω) (extendL2 hNm (HuN.D [ℓ]))‖ :=
-          norm_le_of_ae_mul T.hξ.continuous.measurable (Filter.Eventually.of_forall hCξ) hag
-      _ ≤ Cξ * ‖HuN.D [ℓ]‖ := mul_le_mul_of_nonneg_left hstep hCξ0
-      _ ≤ Cξ * (C₁ * (M + ‖(u : H1amb Ω) 0‖)) := mul_le_mul_of_nonneg_left hDℓnorm hCξ0
-      _ = Cξ * C₁ * (M + ‖(u : H1amb Ω) 0‖) := by ring
-      _ ≤ (KD * (C₁ + 1) + Cξ * C₁) * (M + ‖(u : H1amb Ω) 0‖) :=
+        = ‖mulTest hξNt (HuN.D [ℓ])‖ := by
+          rw [← norm_extendL2 hΩm, extendL2_mulTest_eq hΩm hNm hNΩ T.hξ hξNt, norm_extendL2,
+            hDu ℓ]
+      _ ≤ hξNt.supNorm * ‖HuN.D [ℓ]‖ := norm_mulTest_le_supNorm hξNt _
+      _ ≤ hξNt.supNorm * (C₁ * (M + ‖(u : H1amb Ω) 0‖)) :=
+          mul_le_mul_of_nonneg_left hDℓnorm hCξ0
+      _ = hξNt.supNorm * C₁ * (M + ‖(u : H1amb Ω) 0‖) := by ring
+      _ ≤ (KD * (C₁ + 1) + hξNt.supNorm * C₁) * (M + ‖(u : H1amb Ω) 0‖) :=
           mul_le_mul_of_nonneg_right
             (le_add_of_nonneg_left (mul_nonneg hKD0 (add_nonneg hC₁0 zero_le_one))) hMu
 
@@ -416,9 +450,9 @@ theorem interiorRegularityAt_succ (Op : FullEllipticOp (n + 1))
       (restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) ℓ.succ))),
       IteratedL2Bound H ((2 * C₁ * C₀ + 1) * (M + ‖(u : H1amb Ω) 0‖)) := by
     intro ℓ
-    obtain ⟨U, F, hFk, hres, hUweak, hFbd, hU0⟩ := hdat u f M hfk hM hu ℓ
-    obtain ⟨HU, hHU⟩ := hIH U F (C₀ * (M + ‖(u : H1amb Ω) 0‖)) hFk hFbd hUweak
-    exact ⟨HU.congr hres, hHU.congr.mono_const (by nlinarith)⟩
+    obtain ⟨S⟩ := hdat u f M hfk hM hu ℓ
+    obtain ⟨HU, hHU⟩ := hIH S.U S.F (C₀ * (M + ‖(u : H1amb Ω) 0‖)) S.hFk S.bound_F S.weakForm
+    exact ⟨HU.congr S.restrict_eq, hHU.congr.mono_const (by nlinarith [S.bound_U])⟩
   choose H hH using hstep
   refine ⟨HasIteratedWeakDerivOn.ofDeriv
     (fun ℓ => hasWeakDerivOn_of_hasWeakDeriv ℓ

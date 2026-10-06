@@ -43,6 +43,31 @@ open EllipticPdes.Sobolev
 
 variable {n : ℕ}
 
+/-- **Pairing of the datum of the induction step with a test function.** The twelve shapes of
+Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 2 step 3, each the cutoff `ξ`
+or one of its first two partial derivatives against a coefficient of the operator or one of its
+derivatives, against a derivative of the solution `uN` of order at most two on the collar `N`,
+integrated against the test function `v`. `Df` is the derivative of the datum in the direction
+`ℓ`. -/
+def cutoffDatumPairing (Op : FullEllipticOp (n + 1))
+    {N : Set (EuclideanSpace ℝ (Fin (n + 1)))} {k : ℕ}
+    (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 2)) (hbc : IsWkInftyLower Op (k + 1))
+    (ξ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ) (ℓ : Fin (n + 1)) {uN : L2D N} (Df : L2D N)
+    (HuN : HasIteratedWeakDerivOn N (k + 2) uN) (v : EuclideanSpace ℝ (Fin (n + 1)) → ℝ) : ℝ :=
+  (∫ x in N, ξ x * ((1 : ℝ) * (Df x : ℝ)) * v x)
+    - (∑ i, ∫ x in N, ξ x * ((hbc.bReg i).D [ℓ] x * (HuN.D [i] x : ℝ)) * v x)
+    - (∑ i, ∫ x in N, ξ x * (Op.b x i * (HuN.D [ℓ, i] x : ℝ)) * v x)
+    - (∫ x in N, ξ x * (hbc.cReg.D [ℓ] x * (uN x : ℝ)) * v x)
+    + (∑ i, ∑ j, ∫ x in N, ξ x * (hA.D [j, ℓ] i j x * (HuN.D [i] x : ℝ)) * v x)
+    + (∑ i, ∑ j, ∫ x in N, ξ x * (hA.D [ℓ] i j x * (HuN.D [j, i] x : ℝ)) * v x)
+    - (∑ i, ∑ j, ∫ x in N, partialD j ξ x * (Op.a x i j * (HuN.D [i, ℓ] x : ℝ)) * v x)
+    - (∑ i, ∑ j, ∫ x in N,
+        partialD j (partialD i ξ) x * (Op.a x i j * (HuN.D [ℓ] x : ℝ)) * v x)
+    - (∑ i, ∑ j, ∫ x in N, partialD i ξ x * (hA.D [j] i j x * (HuN.D [ℓ] x : ℝ)) * v x)
+    - (∑ i, ∑ j, ∫ x in N, partialD i ξ x * (Op.a x i j * (HuN.D [j, ℓ] x : ℝ)) * v x)
+    + (∑ i, ∫ x in N, partialD i ξ x * (Op.b x i * (HuN.D [ℓ] x : ℝ)) * v x)
+    + ∑ i, ∫ x in N, ξ x * (Op.b x i * (HuN.D [i, ℓ] x : ℝ)) * v x
+
 /-- **Datum of the induction step.** For a cutoff `ξ` supported in the collar `N ⊆ Ω`, there
 is a constant such that every family of derivatives of the solution on `N` bounded by `B`, and
 every derivative of the datum bounded by `B`, produce an `L²(Ω)` class with `k` weak derivatives
@@ -65,25 +90,7 @@ theorem exists_cutoffDatum (Op : FullEllipticOp (n + 1))
         IteratedL2Bound HF (K * B) ∧
         ∀ v : EuclideanSpace ℝ (Fin (n + 1)) → ℝ, ContDiff ℝ (⊤ : ℕ∞) v →
           HasCompactSupport v →
-          (∫ x in Ω, (F x : ℝ) * v x)
-            = (∫ x in N, ξ x * ((1 : ℝ) * (Df x : ℝ)) * v x)
-              - (∑ i, ∫ x in N, ξ x * ((hbc.bReg i).D [ℓ] x * (HuN.D [i] x : ℝ)) * v x)
-              - (∑ i, ∫ x in N, ξ x * (Op.b x i * (HuN.D [ℓ, i] x : ℝ)) * v x)
-              - (∫ x in N, ξ x * (hbc.cReg.D [ℓ] x * (uN x : ℝ)) * v x)
-              + (∑ i, ∑ j, ∫ x in N,
-                  ξ x * (hA.D [j, ℓ] i j x * (HuN.D [i] x : ℝ)) * v x)
-              + (∑ i, ∑ j, ∫ x in N,
-                  ξ x * (hA.D [ℓ] i j x * (HuN.D [j, i] x : ℝ)) * v x)
-              - (∑ i, ∑ j, ∫ x in N,
-                  partialD j ξ x * (Op.a x i j * (HuN.D [i, ℓ] x : ℝ)) * v x)
-              - (∑ i, ∑ j, ∫ x in N,
-                  partialD j (partialD i ξ) x * (Op.a x i j * (HuN.D [ℓ] x : ℝ)) * v x)
-              - (∑ i, ∑ j, ∫ x in N,
-                  partialD i ξ x * (hA.D [j] i j x * (HuN.D [ℓ] x : ℝ)) * v x)
-              - (∑ i, ∑ j, ∫ x in N,
-                  partialD i ξ x * (Op.a x i j * (HuN.D [j, ℓ] x : ℝ)) * v x)
-              + (∑ i, ∫ x in N, partialD i ξ x * (Op.b x i * (HuN.D [ℓ] x : ℝ)) * v x)
-              + ∑ i, ∫ x in N, ξ x * (Op.b x i * (HuN.D [i, ℓ] x : ℝ)) * v x := by
+          (∫ x in Ω, (F x : ℝ) * v x) = cutoffDatumPairing Op hA hbc ξ ℓ Df HuN v := by
   classical
   -- The coefficients, each read off its bundle at order `k`.
   have haE : ∀ i j : Fin (n + 1), IsWkInfty (fun x => Op.a x i j) k :=
@@ -201,6 +208,6 @@ theorem exists_cutoffDatum (Op : FullEllipticOp (n + 1))
       hp1 v hvc hvcs, hp2 v hvc hvcs, hp3 v hvc hvcs, hp4 v hvc hvcs, hp5 v hvc hvcs,
       hp6 v hvc hvcs, hp7 v hvc hvcs, hp8 v hvc hvcs, hp9 v hvc hvcs, hp10 v hvc hvcs,
       hp11 v hvc hvcs, hp12 v hvc hvcs]
-    simp only [Fintype.sum_prod_type, Finset.univ_unique, Finset.sum_singleton]
+    simp only [cutoffDatumPairing, Fintype.sum_prod_type, Finset.univ_unique, Finset.sum_singleton]
 
 end EllipticPdes.Regularity
