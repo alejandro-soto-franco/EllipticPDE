@@ -76,10 +76,10 @@ theorem integrable_mul_of_locallyIntegrableOn {u : EuclideanSpace ℝ (Fin d) �
     ((Function.support_mul_subset_right u h).trans (subset_tsupport h))).mp hprod
 
 /-- **Product of two bounded factors and an integrable one.** -/
-theorem integrable_bdd_mul_mul_bdd {a b c : EuclideanSpace ℝ (Fin d) → ℝ}
-    (ha : AEStronglyMeasurable a volume) {A : ℝ} (hA : ∀ x, ‖a x‖ ≤ A)
-    (hb : Integrable b volume) (hc : AEStronglyMeasurable c volume) {C : ℝ}
-    (hC : ∀ x, ‖c x‖ ≤ C) : Integrable (fun x => a x * b x * c x) volume := by
+theorem integrable_bdd_mul_mul_bdd {α : Type*} {m : MeasurableSpace α} {μ : Measure α}
+    {a b c : α → ℝ} (ha : AEStronglyMeasurable a μ) {A : ℝ} (hA : ∀ x, ‖a x‖ ≤ A)
+    (hb : Integrable b μ) (hc : AEStronglyMeasurable c μ) {C : ℝ}
+    (hC : ∀ x, ‖c x‖ ≤ C) : Integrable (fun x => a x * b x * c x) μ := by
   refine Integrable.mono' (hb.norm.const_mul (A * C)) ((ha.mul hb.1).mul hc) ?_
   filter_upwards with x
   have hA0 : 0 ≤ A := (norm_nonneg _).trans (hA x)
@@ -228,6 +228,115 @@ theorem hasWeakGradOn_unique_ae_of_locallyIntegrableOn (hΩ : IsOpen Ω)
 
 /-! ### The chain rule -/
 
+/-! ### Convergence lemmas for the chain rule -/
+
+/-- **The classical chain rule against a test function.** For `f` and `v` of class `C¹` and a
+smooth compactly supported `φ`, integration by parts gives
+`∫ f(v) ∂ₖφ = -∫ f'(v) ∂ₖv φ`. -/
+theorem integral_comp_mul_partialD_eq {f : ℝ → ℝ} (hf : ContDiff ℝ 1 f)
+    {v φ : EuclideanSpace ℝ (Fin d) → ℝ} (hv : ContDiff ℝ 1 v) (hφ : ContDiff ℝ (⊤ : ℕ∞) φ)
+    (hφcs : HasCompactSupport φ) (k : Fin d) :
+    ∫ x, f (v x) * partialD k φ x = -∫ x, deriv f (v x) * partialD k v x * φ x := by
+  have hfv : ContDiff ℝ 1 (f ∘ v) := hf.comp hv
+  have hpc : Continuous (partialD k φ) :=
+    (hφ.continuous_fderiv (by simp)).clm_apply continuous_const
+  have hpcs : HasCompactSupport (partialD k φ) :=
+    hφcs.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single k (1 : ℝ))
+  have hfderiv : ∀ x, fderiv ℝ (f ∘ v) x (EuclideanSpace.single k (1 : ℝ))
+      = deriv f (v x) * partialD k v x := fun x => by
+    have h := ((hf.differentiable one_ne_zero) (v x)).hasDerivAt.comp_hasFDerivAt x
+      (hv.differentiable one_ne_zero x).hasFDerivAt
+    rw [h.fderiv, _root_.smul_apply, smul_eq_mul]
+    rfl
+  have key := integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable (μ := volume)
+    (f := f ∘ v) (g := φ) (v := EuclideanSpace.single k (1 : ℝ))
+    (((hfv.continuous_fderiv one_ne_zero).clm_apply continuous_const).mul
+      hφ.continuous |>.integrable_of_hasCompactSupport hφcs.mul_left)
+    ((hfv.continuous.mul hpc).integrable_of_hasCompactSupport hpcs.mul_left)
+    ((hfv.continuous.mul hφ.continuous).integrable_of_hasCompactSupport hφcs.mul_left)
+    (fun x _ => (hfv.differentiable one_ne_zero) x) (fun x _ => (hφ.differentiable (by simp)) x)
+  refine key.trans (congrArg Neg.neg (integral_congr_ae (Eventually.of_forall fun x => ?_)))
+  simp only [hfderiv x]
+
+/-- **The function side of the chain rule.** If `f` is `M`-Lipschitz, `ψ` is bounded and
+`vₙ → U` in `L¹`, then `∫ f(vₙ) ψ → ∫ f(U) ψ`. -/
+theorem tendsto_integral_comp_mul {α : Type*} {m : MeasurableSpace α} {μ : Measure α}
+    {f : ℝ → ℝ} {M : ℝ≥0} (hf : LipschitzWith M f) {ψ : α → ℝ} {C : ℝ} (hψ : ∀ x, ‖ψ x‖ ≤ C)
+    {v : ℕ → α → ℝ} {U : α → ℝ} (hv : ∀ n, Integrable (v n) μ) (hU : Integrable U μ)
+    (hint : ∀ n, Integrable (fun x => f (v n x) * ψ x) μ)
+    (hintU : Integrable (fun x => f (U x) * ψ x) μ)
+    (hconv : Tendsto (fun n => eLpNorm (v n - U) 1 μ) atTop (𝓝 0)) :
+    Tendsto (fun n => ∫ x, f (v n x) * ψ x ∂μ) atTop (𝓝 (∫ x, f (U x) * ψ x ∂μ)) := by
+  rw [← tendsto_sub_nhds_zero_iff]
+  have hto : Tendsto (fun n => (M : ℝ) * C * (eLpNorm (v n - U) 1 μ).toReal) atTop (𝓝 0) := by
+    simpa using ((ENNReal.tendsto_toReal ENNReal.zero_ne_top).comp hconv).const_mul
+      ((M : ℝ) * C)
+  refine squeeze_zero_norm (fun n => ?_) hto
+  rw [← integral_sub (hint n) hintU]
+  have hbd : Integrable (fun x => (M : ℝ) * C * ‖(v n - U) x‖) μ :=
+    ((hv n).sub hU).norm.const_mul _
+  refine (norm_integral_le_of_norm_le hbd (Eventually.of_forall fun x => ?_)).trans_eq ?_
+  · rw [Pi.sub_apply, ← sub_mul, norm_mul]
+    have h1 : ‖f (v n x) - f (U x)‖ ≤ (M : ℝ) * ‖v n x - U x‖ := by
+      simpa [dist_eq_norm] using hf.dist_le_mul (v n x) (U x)
+    calc ‖f (v n x) - f (U x)‖ * ‖ψ x‖ ≤ ((M : ℝ) * ‖v n x - U x‖) * C := by gcongr; exact hψ x
+      _ = (M : ℝ) * C * ‖v n x - U x‖ := by ring
+  · have hm : AEStronglyMeasurable (v n - U) μ := ((hv n).sub hU).aestronglyMeasurable
+    rw [integral_const_mul, integral_norm_eq_lintegral_enorm hm, eLpNorm_one_eq_lintegral_enorm hm]
+
+/-- **The gradient side of the chain rule.** If `f'` is continuous and bounded by `M`, `ψ` is
+bounded, `vₙ → U` almost everywhere and `wₙ → G` in `L¹`, then
+`∫ f'(vₙ) wₙ ψ → ∫ f'(U) G ψ`. -/
+theorem tendsto_integral_deriv_comp_mul {α : Type*} {m : MeasurableSpace α} {μ : Measure α}
+    {f : ℝ → ℝ} {M : ℝ≥0} (hfc : Continuous (deriv f)) (hM : ∀ t, ‖deriv f t‖ ≤ M)
+    {ψ : α → ℝ} {C : ℝ} (hψm : AEStronglyMeasurable ψ μ) (hψ : ∀ x, ‖ψ x‖ ≤ C)
+    {v : ℕ → α → ℝ} {U : α → ℝ} (hvm : ∀ n, AEStronglyMeasurable (v n) μ)
+    {w : ℕ → α → ℝ} {G : α → ℝ} (hw : ∀ n, Integrable (w n) μ) (hG : Integrable G μ)
+    (hconv : Tendsto (fun n => eLpNorm (w n - G) 1 μ) atTop (𝓝 0))
+    (hae : ∀ᵐ x ∂μ, Tendsto (fun n => v n x) atTop (𝓝 (U x))) :
+    Tendsto (fun n => ∫ x, deriv f (v n x) * w n x * ψ x ∂μ) atTop
+      (𝓝 (∫ x, deriv f (U x) * G x * ψ x ∂μ)) := by
+  have hA : ∀ n, Integrable (fun x => deriv f (v n x) * (w n x - G x) * ψ x) μ := fun n =>
+    integrable_bdd_mul_mul_bdd (hfc.comp_aestronglyMeasurable (hvm n)) (fun x => hM _)
+      ((hw n).sub hG) hψm hψ
+  have hB : ∀ n, Integrable (fun x => deriv f (v n x) * G x * ψ x) μ := fun n =>
+    integrable_bdd_mul_mul_bdd (hfc.comp_aestronglyMeasurable (hvm n)) (fun x => hM _) hG hψm hψ
+  have hsplit : ∀ n, ∫ x, deriv f (v n x) * w n x * ψ x ∂μ
+      = (∫ x, deriv f (v n x) * (w n x - G x) * ψ x ∂μ)
+        + ∫ x, deriv f (v n x) * G x * ψ x ∂μ := fun n => by
+    rw [← integral_add (hA n) (hB n)]
+    exact integral_congr_ae (Eventually.of_forall fun x => by ring)
+  have hpiece1 : Tendsto (fun n => ∫ x, deriv f (v n x) * (w n x - G x) * ψ x ∂μ) atTop (𝓝 0) := by
+    have hto : Tendsto (fun n => (M : ℝ) * C * (eLpNorm (w n - G) 1 μ).toReal) atTop (𝓝 0) := by
+      simpa using ((ENNReal.tendsto_toReal ENNReal.zero_ne_top).comp hconv).const_mul
+        ((M : ℝ) * C)
+    refine squeeze_zero_norm (fun n => ?_) hto
+    have hbd : Integrable (fun x => (M : ℝ) * C * ‖(w n - G) x‖) μ :=
+      ((hw n).sub hG).norm.const_mul _
+    refine (norm_integral_le_of_norm_le hbd (Eventually.of_forall fun x => ?_)).trans_eq ?_
+    · rw [Pi.sub_apply, norm_mul, norm_mul]
+      calc ‖deriv f (v n x)‖ * ‖w n x - G x‖ * ‖ψ x‖ ≤ (M : ℝ) * ‖w n x - G x‖ * C := by
+            gcongr
+            · exact hM _
+            · exact hψ x
+        _ = (M : ℝ) * C * ‖w n x - G x‖ := by ring
+    · have hm : AEStronglyMeasurable (w n - G) μ := ((hw n).sub hG).aestronglyMeasurable
+      rw [integral_const_mul, integral_norm_eq_lintegral_enorm hm,
+        eLpNorm_one_eq_lintegral_enorm hm]
+  have hpiece2 : Tendsto (fun n => ∫ x, deriv f (v n x) * G x * ψ x ∂μ) atTop
+      (𝓝 (∫ x, deriv f (U x) * G x * ψ x ∂μ)) := by
+    refine tendsto_integral_of_dominated_convergence (fun x => (M : ℝ) * C * ‖G x‖)
+      (fun n => (hB n).1) (hG.norm.const_mul _) (fun n => Eventually.of_forall fun x => ?_) ?_
+    · rw [norm_mul, norm_mul]
+      calc ‖deriv f (v n x)‖ * ‖G x‖ * ‖ψ x‖ ≤ (M : ℝ) * ‖G x‖ * C := by
+            gcongr
+            · exact hM _
+            · exact hψ x
+        _ = (M : ℝ) * C * ‖G x‖ := by ring
+    · filter_upwards [hae] with x hx
+      exact (((hfc.tendsto (U x)).comp hx).mul_const (G x)).mul_const (ψ x)
+  simpa [hsplit] using hpiece1.add hpiece2
+
 /-- **Chain rule for weak gradients** (Gilbarg and Trudinger Lemma 7.5, Evans §5.10 Problem
 17). A `C¹` function with bounded derivative, composed with a class with a locally integrable
 weak gradient on an open set, has the weak gradient `f'(u) ∇u` there. -/
@@ -239,253 +348,103 @@ theorem hasWeakGradOn_comp (hΩ : IsOpen Ω) {u : EuclideanSpace ℝ (Fin d) →
   classical
   intro φ hφc hφcs hφΩ k
   set L := ContinuousLinearMap.lsmul ℝ ℝ (E := ℝ) with hL
-  have hfd : Differentiable ℝ f := hf.differentiable one_ne_zero
-  have hfl : LipschitzWith M f := lipschitzWith_of_nnnorm_deriv_le hfd hM
+  have hfl : LipschitzWith M f :=
+    lipschitzWith_of_nnnorm_deriv_le (hf.differentiable one_ne_zero) hM
   have hf'c : Continuous (deriv f) := hf.continuous_deriv_one
   have hMr : ∀ t, ‖deriv f t‖ ≤ (M : ℝ) := fun t => by
     have := hM t
     rwa [← NNReal.coe_le_coe, coe_nnnorm] at this
-  -- the test function and its partial
-  have hφcont : Continuous φ := hφc.continuous
   have hpc : Continuous (partialD k φ) :=
     (hφc.continuous_fderiv (by simp)).clm_apply continuous_const
   have hpcs : HasCompactSupport (partialD k φ) :=
     hφcs.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single k (1 : ℝ))
-  obtain ⟨Cφ, hCφ⟩ := hφcs.exists_bound_of_continuous hφcont
+  obtain ⟨Cφ, hCφ⟩ := hφcs.exists_bound_of_continuous hφc.continuous
   obtain ⟨Cp, hCp⟩ := hpcs.exists_bound_of_continuous hpc
-  have hCφ0 : 0 ≤ Cφ := (norm_nonneg _).trans (hCφ 0)
-  have hCp0 : 0 ≤ Cp := (norm_nonneg _).trans (hCp 0)
-  -- a compact neighbourhood of the support inside the domain
+  -- a compact neighbourhood of the support inside the domain, and the extensions by zero
   obtain ⟨δ, hδ, hK'⟩ := IsCompact.exists_cthickening_subset_open hφcs hΩ hφΩ
   set K' := cthickening δ (tsupport φ) with hK'def
   have hK'c : IsCompact K' := IsCompact.cthickening hφcs
   have hK'm : MeasurableSet K' := hK'c.isClosed.measurableSet
-  have hKK' : tsupport φ ⊆ K' := self_subset_cthickening _
   have huK : IntegrableOn u K' volume := hu.integrableOn_compact_subset hK' hK'c
-  have hgK : ∀ j, IntegrableOn (g j) K' volume := fun j =>
-    (hg j).integrableOn_compact_subset hK' hK'c
-  have hwgK : HasWeakGradOn K' u g := hwg.mono hK'
-  -- extensions by zero off `K'`, integrable on the whole space
-  set U : EuclideanSpace ℝ (Fin d) → ℝ := K'.indicator u with hUdef
-  set G : EuclideanSpace ℝ (Fin d) → ℝ := K'.indicator (g k) with hGdef
-  have hUint : Integrable U volume := (integrable_indicator_iff hK'm).mpr huK
-  have hGint : Integrable G volume := (integrable_indicator_iff hK'm).mpr (hgK k)
-  have hUK : ∀ x ∈ K', U x = u x := fun x hx => indicator_of_mem hx u
-  have hGK : ∀ x ∈ K', G x = g k x := fun x hx => indicator_of_mem hx (g k)
-  have hUcs : HasCompactSupport U :=
+  have hgK : IntegrableOn (g k) K' volume := (hg k).integrableOn_compact_subset hK' hK'c
+  have hUint : Integrable (K'.indicator u) volume := (integrable_indicator_iff hK'm).mpr huK
+  have hGint : Integrable (K'.indicator (g k)) volume := (integrable_indicator_iff hK'm).mpr hgK
+  have hcs : ∀ h : EuclideanSpace ℝ (Fin d) → ℝ, HasCompactSupport (K'.indicator h) := fun h =>
     hK'c.of_isClosed_subset isClosed_closure
       (closure_minimal support_indicator_subset hK'c.isClosed)
-  have hGcs : HasCompactSupport G :=
-    hK'c.of_isClosed_subset isClosed_closure
-      (closure_minimal support_indicator_subset hK'c.isClosed)
-  -- the mollifiers
-  let φb : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := fun n =>
-    { rIn := δ / (n + 1 : ℝ) / 2
-      rOut := δ / (n + 1 : ℝ)
-      rIn_pos := half_pos (by positivity)
-      rIn_lt_rOut := half_lt_self (by positivity) }
-  have hrOut : ∀ n : ℕ, (φb n).rOut = δ / (n + 1 : ℝ) := fun _ => rfl
-  have hrIn : ∀ n : ℕ, (φb n).rIn = δ / (n + 1 : ℝ) / 2 := fun _ => rfl
-  have hφrOut : Tendsto (fun n => (φb n).rOut) atTop (𝓝 0) := by
-    simp only [hrOut]
-    have := (tendsto_one_div_add_atTop_nhds_zero_nat (𝕜 := ℝ)).const_mul δ
-    rw [mul_zero] at this
-    refine this.congr fun n => ?_
-    ring
-  have hφratio : ∀ᶠ n in atTop, (φb n).rOut ≤ 2 * (φb n).rIn :=
-    Eventually.of_forall fun n => le_of_eq (by rw [hrOut, hrIn]; ring)
-  have hrOut_le : ∀ n : ℕ, (φb n).rOut ≤ δ := fun n => by
-    rw [hrOut]
-    exact div_le_self hδ.le (by linarith [(Nat.cast_nonneg n : (0 : ℝ) ≤ n)])
+  -- the mollifications of the extensions
+  set ρ : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := stdBump δ hδ with hρ
+  have hρ0 : Tendsto (fun n => (ρ n).rOut) atTop (𝓝 0) := tendsto_rOut_stdBump hδ
+  have hρ1 : ∀ n, (ρ n).rOut ≤ 2 * (ρ n).rIn := rOut_stdBump_le hδ
   set v : ℕ → EuclideanSpace ℝ (Fin d) → ℝ :=
-    fun n => U ⋆[L, volume] (φb n).normed volume with hvdef
+    fun n => K'.indicator u ⋆[L, volume] (ρ n).normed volume
   set w : ℕ → EuclideanSpace ℝ (Fin d) → ℝ :=
-    fun n => G ⋆[L, volume] (φb n).normed volume with hwdef
+    fun n => K'.indicator (g k) ⋆[L, volume] (ρ n).normed volume
   have hvsmooth : ∀ n, ContDiff ℝ (⊤ : ℕ∞) (v n) := fun n =>
-    (φb n).hasCompactSupport_normed.contDiff_convolution_right (L := L)
-      hUint.locallyIntegrable (φb n).contDiff_normed
-  have hwsmooth : ∀ n, ContDiff ℝ (⊤ : ℕ∞) (w n) := fun n =>
-    (φb n).hasCompactSupport_normed.contDiff_convolution_right (L := L)
-      hGint.locallyIntegrable (φb n).contDiff_normed
-  have hvc : ∀ n, Continuous (v n) := fun n => (hvsmooth n).continuous
-  have hwc : ∀ n, Continuous (w n) := fun n => (hwsmooth n).continuous
-  have hvcs : ∀ n, HasCompactSupport (v n) := fun n =>
-    HasCompactSupport.convolution (L := L) hUcs (φb n).hasCompactSupport_normed
-  have hwcs : ∀ n, HasCompactSupport (w n) := fun n =>
-    HasCompactSupport.convolution (L := L) hGcs (φb n).hasCompactSupport_normed
-  have hvint : ∀ n, Integrable (v n) volume := fun n =>
-    (hvc n).integrable_of_hasCompactSupport (hvcs n)
+    (ρ n).hasCompactSupport_normed.contDiff_convolution_right (L := L)
+      hUint.locallyIntegrable (ρ n).contDiff_normed
+  have hwc : ∀ n, Continuous (w n) := fun n =>
+    ((ρ n).hasCompactSupport_normed.contDiff_convolution_right (L := L)
+      hGint.locallyIntegrable (ρ n).contDiff_normed : ContDiff ℝ (⊤ : ℕ∞) _).continuous
   have hwint : ∀ n, Integrable (w n) volume := fun n =>
-    (hwc n).integrable_of_hasCompactSupport (hwcs n)
+    (hwc n).integrable_of_hasCompactSupport
+      (HasCompactSupport.convolution (L := L) (hcs _) (ρ n).hasCompactSupport_normed)
+  have hvint : ∀ n, Integrable (v n) volume := fun n =>
+    (hvsmooth n).continuous.integrable_of_hasCompactSupport
+      (HasCompactSupport.convolution (L := L) (hcs _) (ρ n).hasCompactSupport_normed)
   -- on the support of `φ` the partial of the mollification is the mollified gradient
-  have hpartial : ∀ n, ∀ x ∈ tsupport φ, partialD k (v n) x = w n x := by
-    intro n x hx
-    exact partialD_convolution_eq_of_hasWeakGradOn hK'm huK hwgK (φb n) k
-      ((closedBall_subset_closedBall (hrOut_le n)).trans (closedBall_subset_cthickening hx δ))
-  -- `L¹` convergence of the mollifications
-  have h1 : ENNReal.ofReal (1 : ℝ) = 1 := ENNReal.ofReal_one
-  have hMU : MemLp U (ENNReal.ofReal 1) volume := by
-    rw [h1]; exact memLp_one_iff_integrable.mpr hUint
-  have hMG : MemLp G (ENNReal.ofReal 1) volume := by
-    rw [h1]; exact memLp_one_iff_integrable.mpr hGint
-  have hconvU : Tendsto (fun n => eLpNorm (v n - U) 1 volume) atTop (𝓝 0) := by
-    have := tendsto_eLpNorm_convolution_sub le_rfl hMU hφrOut hφratio
-    rwa [h1] at this
-  have hconvG : Tendsto (fun n => eLpNorm (w n - G) 1 volume) atTop (𝓝 0) := by
-    have := tendsto_eLpNorm_convolution_sub le_rfl hMG hφrOut hφratio
-    rwa [h1] at this
-  have htoRealU : Tendsto (fun n => (M : ℝ) * Cp * (eLpNorm (v n - U) 1 volume).toReal)
-      atTop (𝓝 0) := by
-    have := ((ENNReal.tendsto_toReal ENNReal.zero_ne_top).comp hconvU).const_mul
-      ((M : ℝ) * Cp)
-    simpa using this
-  have htoRealG : Tendsto (fun n => (M : ℝ) * Cφ * (eLpNorm (w n - G) 1 volume).toReal)
-      atTop (𝓝 0) := by
-    have := ((ENNReal.tendsto_toReal ENNReal.zero_ne_top).comp hconvG).const_mul
-      ((M : ℝ) * Cφ)
-    simpa using this
-  -- a subsequence converging almost everywhere
-  have hmeas : TendstoInMeasure volume v atTop U :=
-    tendstoInMeasure_of_tendsto_eLpNorm one_ne_zero hconvU
-  obtain ⟨ns, hns, hae⟩ := hmeas.exists_seq_tendsto_ae
-  -- the classical identity for every mollification
-  have hclassical : ∀ n, ∫ x, f (v n x) * partialD k φ x
-      = -∫ x, deriv f (v n x) * w n x * φ x := by
-    intro n
-    have hv1 : ContDiff ℝ 1 (v n) := (hvsmooth n).of_le (WithTop.coe_le_coe.mpr le_top)
-    have hfv : ContDiff ℝ 1 (f ∘ v n) := hf.comp hv1
-    have hfvd : Differentiable ℝ (f ∘ v n) := hfv.differentiable one_ne_zero
-    have hfderiv : ∀ x, fderiv ℝ (f ∘ v n) x (EuclideanSpace.single k (1 : ℝ))
-        = deriv f (v n x) * partialD k (v n) x := by
-      intro x
-      have h := (hfd (v n x)).hasDerivAt.comp_hasFDerivAt x
-        (hv1.differentiable one_ne_zero x).hasFDerivAt
-      rw [h.fderiv, _root_.smul_apply, smul_eq_mul]
-      rfl
-    have hcont1 : Continuous fun x =>
-        fderiv ℝ (f ∘ v n) x (EuclideanSpace.single k (1 : ℝ)) :=
-      (hfv.continuous_fderiv one_ne_zero).clm_apply continuous_const
-    have key := integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable (μ := volume)
-      (f := f ∘ v n) (g := φ) (v := EuclideanSpace.single k (1 : ℝ))
-      ((hcont1.mul hφcont).integrable_of_hasCompactSupport hφcs.mul_left)
-      ((hfv.continuous.mul hpc).integrable_of_hasCompactSupport hpcs.mul_left)
-      ((hfv.continuous.mul hφcont).integrable_of_hasCompactSupport hφcs.mul_left)
-      (fun x _ => hfvd x) (fun x _ => (hφc.differentiable (by simp)) x)
-    have hL' : (fun x => (f ∘ v n) x * fderiv ℝ φ x (EuclideanSpace.single k (1 : ℝ)))
-        = fun x => f (v n x) * partialD k φ x := rfl
-    rw [hL'] at key
-    rw [key]
-    congr 1
-    refine integral_congr_ae (Eventually.of_forall fun x => ?_)
-    simp only [hfderiv x]
+  have hpartial : ∀ n x, partialD k (v n) x * φ x = w n x * φ x := fun n x => by
     by_cases hx : x ∈ tsupport φ
-    · rw [hpartial n x hx]
+    · rw [partialD_convolution_eq_of_hasWeakGradOn hK'm huK (hwg.mono hK') (ρ n) k
+        ((closedBall_subset_closedBall (rOut_stdBump_le_self hδ n)).trans
+          (closedBall_subset_cthickening hx δ))]
     · rw [image_eq_zero_of_notMem_tsupport hx, mul_zero, mul_zero]
-  -- limit of the function side
-  have hintU : Integrable (fun x => f (U x) * partialD k φ x) volume :=
-    integrable_comp_mul_of_lipschitz hUint hfl hpc hpcs
-  have hlimL : Tendsto (fun n => ∫ x, f (v n x) * partialD k φ x) atTop
-      (𝓝 (∫ x, f (U x) * partialD k φ x)) := by
-    rw [← tendsto_sub_nhds_zero_iff]
-    refine squeeze_zero_norm (fun n => ?_) htoRealU
-    have hint : Integrable (fun x => f (v n x) * partialD k φ x) volume :=
-      ((hfl.continuous.comp (hvc n)).mul hpc).integrable_of_hasCompactSupport hpcs.mul_left
-    rw [← integral_sub hint hintU]
-    have hbd : Integrable (fun x => (M : ℝ) * Cp * ‖(v n - U) x‖) volume :=
-      ((hvint n).sub hUint).norm.const_mul _
-    refine (norm_integral_le_of_norm_le hbd (Eventually.of_forall fun x => ?_)).trans ?_
-    · rw [Pi.sub_apply, ← sub_mul, norm_mul]
-      have h1 : ‖f (v n x) - f (U x)‖ ≤ (M : ℝ) * ‖v n x - U x‖ := by
-        have := hfl.dist_le_mul (v n x) (U x)
-        rwa [dist_eq_norm, dist_eq_norm] at this
-      calc ‖f (v n x) - f (U x)‖ * ‖partialD k φ x‖
-          ≤ ((M : ℝ) * ‖v n x - U x‖) * Cp := by gcongr; exact hCp x
-        _ = (M : ℝ) * Cp * ‖v n x - U x‖ := by ring
-    · rw [integral_const_mul, integral_norm_eq_lintegral_enorm ((hvc n).aestronglyMeasurable.sub
-        hUint.1),
-      eLpNorm_one_eq_lintegral_enorm
-        (show AEStronglyMeasurable (v n - U) volume from
-          (hvc n).aestronglyMeasurable.sub hUint.1)]
-  -- limit of the gradient side along the subsequence
-  have hintG : Integrable (fun x => deriv f (U x) * G x * φ x) volume :=
-    integrable_bdd_mul_mul_bdd (hf'c.comp_aestronglyMeasurable hUint.1) (fun x => hMr _)
-      hGint hφcont.aestronglyMeasurable hCφ
-  have hlimR : Tendsto (fun i => ∫ x, deriv f (v (ns i) x) * w (ns i) x * φ x) atTop
-      (𝓝 (∫ x, deriv f (U x) * G x * φ x)) := by
-    have hA : ∀ n, Integrable (fun x => deriv f (v n x) * (w n x - G x) * φ x) volume :=
-      fun n => integrable_bdd_mul_mul_bdd (hf'c.comp (hvc n)).aestronglyMeasurable
-        (fun x => hMr _) ((hwint n).sub hGint) hφcont.aestronglyMeasurable hCφ
-    have hB : ∀ n, Integrable (fun x => deriv f (v n x) * G x * φ x) volume :=
-      fun n => integrable_bdd_mul_mul_bdd (hf'c.comp (hvc n)).aestronglyMeasurable
-        (fun x => hMr _) hGint hφcont.aestronglyMeasurable hCφ
-    have hsplit : ∀ i, ∫ x, deriv f (v (ns i) x) * w (ns i) x * φ x
-        = (∫ x, deriv f (v (ns i) x) * (w (ns i) x - G x) * φ x)
-          + ∫ x, deriv f (v (ns i) x) * G x * φ x := by
-      intro i
-      rw [← integral_add (hA _) (hB _)]
-      exact integral_congr_ae (Eventually.of_forall fun x => by ring)
-    have hpiece1 : Tendsto (fun i => ∫ x, deriv f (v (ns i) x) * (w (ns i) x - G x) * φ x)
-        atTop (𝓝 0) := by
-      refine squeeze_zero_norm
-        (a := fun i => (M : ℝ) * Cφ * (eLpNorm (w (ns i) - G) 1 volume).toReal)
-        (fun i => ?_) (htoRealG.comp hns.tendsto_atTop)
-      have hbd : Integrable (fun x => (M : ℝ) * Cφ * ‖(w (ns i) - G) x‖) volume :=
-        ((hwint _).sub hGint).norm.const_mul _
-      refine (norm_integral_le_of_norm_le hbd (Eventually.of_forall fun x => ?_)).trans ?_
-      · rw [Pi.sub_apply, norm_mul, norm_mul]
-        calc ‖deriv f (v (ns i) x)‖ * ‖w (ns i) x - G x‖ * ‖φ x‖
-            ≤ (M : ℝ) * ‖w (ns i) x - G x‖ * Cφ := by
-              gcongr
-              · exact hMr _
-              · exact hCφ x
-          _ = (M : ℝ) * Cφ * ‖w (ns i) x - G x‖ := by ring
-      · rw [integral_const_mul, integral_norm_eq_lintegral_enorm
-          ((hwc _).aestronglyMeasurable.sub hGint.1),
-        eLpNorm_one_eq_lintegral_enorm
-          (show AEStronglyMeasurable (w (ns i) - G) volume from
-            (hwc _).aestronglyMeasurable.sub hGint.1)]
-    have hpiece2 : Tendsto (fun i => ∫ x, deriv f (v (ns i) x) * G x * φ x) atTop
-        (𝓝 (∫ x, deriv f (U x) * G x * φ x)) := by
-      refine tendsto_integral_of_dominated_convergence (fun x => (M : ℝ) * Cφ * ‖G x‖)
-        (fun i => (hB (ns i)).1) (hGint.norm.const_mul _)
-        (fun i => Eventually.of_forall fun x => ?_) ?_
-      · rw [norm_mul, norm_mul]
-        calc ‖deriv f (v (ns i) x)‖ * ‖G x‖ * ‖φ x‖ ≤ (M : ℝ) * ‖G x‖ * Cφ := by
-              gcongr
-              · exact hMr _
-              · exact hCφ x
-          _ = (M : ℝ) * Cφ * ‖G x‖ := by ring
-      · filter_upwards [hae] with x hx
-        exact (((hf'c.tendsto (U x)).comp hx).mul_const (G x)).mul_const (φ x)
-    have := hpiece1.add hpiece2
-    rw [zero_add] at this
-    exact this.congr fun i => (hsplit i).symm
+  -- `L¹` convergence of the mollifications, and an a.e. convergent subsequence
+  have hconv : ∀ h : EuclideanSpace ℝ (Fin d) → ℝ, Integrable h volume →
+      Tendsto (fun n => eLpNorm (h ⋆[L, volume] (ρ n).normed volume - h) 1 volume) atTop (𝓝 0) :=
+    fun h hh => by
+      simpa using tendsto_eLpNorm_convolution_sub le_rfl
+        (by rw [ENNReal.ofReal_one]; exact memLp_one_iff_integrable.mpr hh) hρ0
+        (Eventually.of_forall hρ1)
+  obtain ⟨ns, hns, hae⟩ := (tendstoInMeasure_of_tendsto_eLpNorm one_ne_zero
+    (hconv _ hUint)).exists_seq_tendsto_ae
+  -- the classical identity for every mollification
+  have hclassical : ∀ n, ∫ x, f (v n x) * partialD k φ x = -∫ x, deriv f (v n x) * w n x * φ x :=
+    fun n => by
+      rw [integral_comp_mul_partialD_eq hf ((hvsmooth n).of_le (WithTop.coe_le_coe.mpr le_top))
+        hφc hφcs k]
+      exact congrArg Neg.neg (integral_congr_ae (Eventually.of_forall fun x => by
+        dsimp only; rw [mul_assoc, hpartial n x, ← mul_assoc]))
   -- the two limits agree
-  have hlimL' : Tendsto (fun i => ∫ x, f (v (ns i) x) * partialD k φ x) atTop
-      (𝓝 (∫ x, f (U x) * partialD k φ x)) := hlimL.comp hns.tendsto_atTop
-  have hlimR' : Tendsto (fun i => ∫ x, f (v (ns i) x) * partialD k φ x) atTop
-      (𝓝 (-∫ x, deriv f (U x) * G x * φ x)) := by
-    simp only [hclassical]
-    exact hlimR.neg
-  have hwhole : ∫ x, f (U x) * partialD k φ x = -∫ x, deriv f (U x) * G x * φ x :=
-    tendsto_nhds_unique hlimL' hlimR'
+  have hintU : Integrable (fun x => f (K'.indicator u x) * partialD k φ x) volume :=
+    integrable_comp_mul_of_lipschitz hUint hfl hpc hpcs
+  have hlimL := (tendsto_integral_comp_mul hfl hCp hvint hUint (fun n =>
+    ((hfl.continuous.comp (hvsmooth n).continuous).mul hpc).integrable_of_hasCompactSupport
+      hpcs.mul_left) hintU (hconv _ hUint)).comp hns.tendsto_atTop
+  have hlimR := (tendsto_integral_deriv_comp_mul hf'c hMr hφc.continuous.aestronglyMeasurable hCφ
+    (fun n => (hvsmooth (ns n)).continuous.aestronglyMeasurable) (fun n => hwint (ns n)) hGint
+    ((hconv _ hGint).comp hns.tendsto_atTop) hae).neg
+  have hwhole := tendsto_nhds_unique hlimL (hlimR.congr fun i => (hclassical (ns i)).symm)
   -- back to the domain
   have hps : tsupport (partialD k φ) ⊆ Ω := (tsupport_partialD_subset k φ).trans hφΩ
   rw [setIntegral_eq_integral_of_forall_compl_eq_zero fun x hx => by
         rw [image_eq_zero_of_notMem_tsupport fun hc => hx (hps hc), mul_zero],
       setIntegral_eq_integral_of_forall_compl_eq_zero fun x hx => by
         rw [image_eq_zero_of_notMem_tsupport fun hc => hx (hφΩ hc), mul_zero]]
-  have e1 : (fun x => f (u x) * partialD k φ x) = fun x => f (U x) * partialD k φ x := by
+  have e1 : (fun x => f (u x) * partialD k φ x)
+      = fun x => f (K'.indicator u x) * partialD k φ x := by
     funext x
     by_cases hx : x ∈ K'
-    · rw [hUK x hx]
-    · rw [image_eq_zero_of_notMem_tsupport fun hc => hx (hKK' (tsupport_partialD_subset k φ hc)),
-        mul_zero, mul_zero]
-  have e2 : (fun x => deriv f (u x) * g k x * φ x) = fun x => deriv f (U x) * G x * φ x := by
+    · rw [indicator_of_mem hx]
+    · rw [image_eq_zero_of_notMem_tsupport fun hc =>
+        hx (self_subset_cthickening _ (tsupport_partialD_subset k φ hc)), mul_zero, mul_zero]
+  have e2 : (fun x => deriv f (u x) * g k x * φ x)
+      = fun x => deriv f (K'.indicator u x) * K'.indicator (g k) x * φ x := by
     funext x
     by_cases hx : x ∈ K'
-    · rw [hUK x hx, hGK x hx]
-    · rw [image_eq_zero_of_notMem_tsupport fun hc => hx (hKK' hc), mul_zero, mul_zero]
+    · rw [indicator_of_mem hx, indicator_of_mem hx]
+    · rw [image_eq_zero_of_notMem_tsupport fun hc => hx (self_subset_cthickening _ hc), mul_zero,
+        mul_zero]
   rw [e1, e2]
   exact hwhole
 

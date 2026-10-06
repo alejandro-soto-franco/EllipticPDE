@@ -420,6 +420,13 @@ theorem tendsto_rOut_stdBump {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ
   simp only [rOut_stdBump]
   exact tendsto_const_nhds.div_atTop (tendsto_natCast_atTop_atTop.atTop_add tendsto_const_nhds)
 
+/-- The outer radii of the standard mollifiers are at most `δ`. -/
+theorem rOut_stdBump_le_self {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    [HasContDiffBump E] {δ : ℝ} (hδ : 0 < δ) (n : ℕ) :
+    (stdBump (E := E) δ hδ n).rOut ≤ δ := by
+  rw [rOut_stdBump]
+  exact div_le_self hδ.le (by linarith [(n.cast_nonneg : (0 : ℝ) ≤ n)])
+
 /-- The standard mollifiers have bounded ratio of radii. -/
 theorem rOut_stdBump_le {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [HasContDiffBump E]
     {δ : ℝ} (hδ : 0 < δ) (n : ℕ) :

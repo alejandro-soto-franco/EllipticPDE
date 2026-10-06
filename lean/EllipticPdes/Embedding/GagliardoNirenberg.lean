@@ -130,6 +130,14 @@ theorem partialD_mul {η φ : EuclideanSpace ℝ (Fin d) → ℝ} (k : Fin d)
     smul_eq_mul, partialD]
   ring
 
+/-- A function integrable on a set stays integrable after multiplication by a continuous
+function of compact support. -/
+theorem integrableOn_mul_of_hasCompactSupport {B : Set (EuclideanSpace ℝ (Fin d))}
+    {f ψ : EuclideanSpace ℝ (Fin d) → ℝ} (hf : IntegrableOn f B volume) (hψ : Continuous ψ)
+    (hψs : HasCompactSupport ψ) : IntegrableOn (fun x => f x * ψ x) B volume := by
+  obtain ⟨C, hC⟩ := hψs.exists_bound_of_continuous hψ
+  exact hf.mul_bdd hψ.aestronglyMeasurable (Filter.Eventually.of_forall hC)
+
 /-- **Cutting a weak gradient off.** If `g` is the weak gradient of `u` on `B` and `η` is a
 smooth compactly supported function with `tsupport η ⊆ B`, then the extension by zero of `η u`
 has a weak gradient on the whole space, namely `η gₖ + u ∂ₖη`. Testing against `φ` reduces to
@@ -154,11 +162,6 @@ theorem hasWeakGradOn_univ_mul_cutoff {B : Set (EuclideanSpace ℝ (Fin d))}
     hηcs.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single k (1 : ℝ))
   have hφpc : Continuous (partialD k φ) :=
     (hφc.continuous_fderiv (by simp)).clm_apply continuous_const
-  obtain ⟨Cη, hCη⟩ := hηcs.exists_bound_of_continuous hηc.continuous
-  obtain ⟨Cηp, hCηp⟩ := hηpcs.exists_bound_of_continuous hηpc
-  obtain ⟨Cφ, hCφ⟩ := hφcs.exists_bound_of_continuous hφc.continuous
-  obtain ⟨Cφp, hCφp⟩ :=
-    (hφcs.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single k (1 : ℝ))).exists_bound_of_continuous hφpc
   -- The hypothesis applied to the test function `η φ`.
   have hψs : tsupport (fun x => η x * φ x) ⊆ B :=
     (closure_mono (Function.support_mul_subset_left η φ)).trans hηs
@@ -166,26 +169,14 @@ theorem hasWeakGradOn_univ_mul_cutoff {B : Set (EuclideanSpace ℝ (Fin d))}
   have hprod : ∀ x, partialD k (fun z => η z * φ z) x
       = partialD k η x * φ x + η x * partialD k φ x :=
     fun x => partialD_mul k (hηd x) (hφd x)
-  -- Integrability of the four products against the bounded smooth multipliers.
+  -- Integrability of the four products against the compactly supported smooth multipliers.
   have hi1 : IntegrableOn (fun x => u x * (partialD k η x * φ x)) B volume :=
-    hu.mul_bdd ((hηpc.mul hφc.continuous).aestronglyMeasurable)
-      (Filter.Eventually.of_forall fun x => by
-        calc ‖partialD k η x * φ x‖ = ‖partialD k η x‖ * ‖φ x‖ := norm_mul _ _
-          _ ≤ Cηp * Cφ := mul_le_mul (hCηp x) (hCφ x) (norm_nonneg _)
-              ((norm_nonneg _).trans (hCηp x)))
+    integrableOn_mul_of_hasCompactSupport hu (hηpc.mul hφc.continuous) hηpcs.mul_right
   have hi2 : IntegrableOn (fun x => u x * (η x * partialD k φ x)) B volume :=
-    hu.mul_bdd ((hηc.continuous.mul hφpc).aestronglyMeasurable)
-      (Filter.Eventually.of_forall fun x => by
-        calc ‖η x * partialD k φ x‖ = ‖η x‖ * ‖partialD k φ x‖ := norm_mul _ _
-          _ ≤ Cη * Cφp := mul_le_mul (hCη x) (hCφp x) (norm_nonneg _)
-              ((norm_nonneg _).trans (hCη x)))
-  have hi3 : IntegrableOn (fun x => (η x * g k x) * φ x) B volume := by
-    have := (hgi k).mul_bdd ((hηc.continuous.mul hφc.continuous).aestronglyMeasurable)
-      (Filter.Eventually.of_forall fun x => by
-        calc ‖η x * φ x‖ = ‖η x‖ * ‖φ x‖ := norm_mul _ _
-          _ ≤ Cη * Cφ := mul_le_mul (hCη x) (hCφ x) (norm_nonneg _)
-              ((norm_nonneg _).trans (hCη x)))
-    exact this.congr (Filter.Eventually.of_forall fun x => by simp only [Pi.mul_apply]; ring)
+    integrableOn_mul_of_hasCompactSupport hu (hηc.continuous.mul hφpc) hηcs.mul_right
+  have hi3 : IntegrableOn (fun x => (η x * g k x) * φ x) B volume :=
+    (integrableOn_mul_of_hasCompactSupport (hgi k) (hηc.continuous.mul hφc.continuous)
+      hηcs.mul_right).congr (Filter.Eventually.of_forall fun x => by simp only [Pi.mul_apply]; ring)
   have hi4 : IntegrableOn (fun x => (partialD k η x * u x) * φ x) B volume :=
     hi1.congr (Filter.Eventually.of_forall fun x => by ring)
   -- Split the hypothesis by the product rule.
@@ -265,22 +256,10 @@ theorem exists_eLpNorm_sobolevConj_le_compactSupport (hd : 0 < d)
   have hGL2 : ∀ k, MemLp (G k) (ENNReal.ofReal (p : ℝ)) volume := by
     intro k; rw [hpofReal]; exact hGL k
   set L := ContinuousLinearMap.lsmul ℝ ℝ (E := ℝ) with hLdef
-  have hLflip : L.flip = L := by
-    refine ContinuousLinearMap.ext fun a => ContinuousLinearMap.ext fun b => ?_
-    simp only [hLdef, ContinuousLinearMap.flip_apply, ContinuousLinearMap.lsmul_apply,
-      smul_eq_mul]
-    exact mul_comm b a
-  let φb : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := fun n =>
-    { rIn := 1 / (n + 1 : ℝ) / 2
-      rOut := 1 / (n + 1 : ℝ)
-      rIn_pos := half_pos (by positivity)
-      rIn_lt_rOut := half_lt_self (by positivity) }
-  have hrOut : ∀ n : ℕ, (φb n).rOut = 1 / (n + 1 : ℝ) := fun _ => rfl
-  have hrIn : ∀ n : ℕ, (φb n).rIn = 1 / (n + 1 : ℝ) / 2 := fun _ => rfl
-  have hφrOut : Filter.Tendsto (fun n => (φb n).rOut) Filter.atTop (𝓝 0) := by
-    simp only [hrOut]; exact tendsto_one_div_add_atTop_nhds_zero_nat
-  have hφratio : ∀ᶠ n in Filter.atTop, (φb n).rOut ≤ 2 * (φb n).rIn :=
-    Filter.Eventually.of_forall fun n => le_of_eq (by rw [hrOut, hrIn]; ring)
+  set φb : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := stdBump 1 one_pos with hφb
+  have hφrOut : Filter.Tendsto (fun n => (φb n).rOut) Filter.atTop (𝓝 0) :=
+    tendsto_rOut_stdBump one_pos
+  have hφratio : ∀ n, (φb n).rOut ≤ 2 * (φb n).rIn := rOut_stdBump_le one_pos
   set W : ℕ → EuclideanSpace ℝ (Fin d) → ℝ :=
     fun n => w ⋆[L, volume] (φb n).normed volume with hWdef
   have hρ0 : ∀ n, (0 : EuclideanSpace ℝ (Fin d) → ℝ) ≤ (φb n).normed volume :=
@@ -330,16 +309,9 @@ theorem exists_eLpNorm_sobolevConj_le_compactSupport (hd : 0 < d)
       (hfd.trans (Finset.sum_le_sum fun k _ => hyoung k)))
   -- The mollifications converge to `w` almost everywhere, so Fatou passes the bound to `w`.
   have hae : ∀ᵐ x ∂volume, Filter.Tendsto (fun n => W n x) Filter.atTop (𝓝 (w x)) := by
-    have hflip : ∀ n : ℕ,
-        ((φb n).normed volume ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] w) = W n := by
-      intro n
-      change ((φb n).normed volume ⋆[L, volume] w) = w ⋆[L, volume] (φb n).normed volume
-      conv_lhs => rw [← hLflip]
-      exact convolution_flip (L := L)
-    have h0 := ContDiffBump.ae_convolution_tendsto_right_of_locallyIntegrable
-      (μ := volume) (g := w) hφrOut hφratio hwli
-    filter_upwards [h0] with x hx
-    exact hx.congr fun n => congrFun (hflip n) x
+    filter_upwards [ContDiffBump.ae_convolution_tendsto_right_of_locallyIntegrable
+      (μ := volume) (g := w) hφrOut (Filter.Eventually.of_forall hφratio) hwli] with x hx
+    exact hx.congr fun n => congrFun (convolution_lsmul_comm _ _) x
   have hwsix : eLpNorm w p' volume ≤ (Kg : ℝ≥0∞) * ∑ k, eLpNorm (G k) p volume :=
     MeasureTheory.Lp.eLpNorm_le_of_ae_tendsto (Filter.Eventually.of_forall hbound)
       (fun n => (hWsmooth n).continuous.aestronglyMeasurable) hwL.aestronglyMeasurable hae
