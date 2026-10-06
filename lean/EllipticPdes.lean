@@ -172,6 +172,18 @@ public import EllipticPdes.Existence.StrongMaximum
 public import EllipticPdes.Existence.StrongMaximumCorollaries
 public import EllipticPdes.Existence.AprioriBound
 public import EllipticPdes.Existence.Harmonic
+public import EllipticPdes.Analysis.EuclideanFunctionalNorm
+public import EllipticPdes.Analysis.FrechetKolmogorov
+public import EllipticPdes.Analysis.LpExtendByZero
+public import EllipticPdes.Analysis.LpTranslation
+public import EllipticPdes.Analysis.PoincareInequality
+public import EllipticPdes.Analysis.Translation
+public import EllipticPdes.Extension.Basic
+public import EllipticPdes.Extension.Descent
+public import EllipticPdes.Poincare.Slab
+public import EllipticPdes.Sobolev.GraphLimits
+public import EllipticPdes.Sobolev.WeakDeriv
+public import EllipticPdes.Sobolev.WeakDerivClassical
 
 /-!
 # EllipticPdes
