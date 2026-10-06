@@ -7,6 +7,8 @@ Authors: Alejandro Soto Franco
 module
 
 public import EllipticPdes.Sobolev.Basic
+public import EllipticPdes.Sobolev.WeakDeriv
+public import Mathlib.Analysis.InnerProductSpace.Dual
 public import Mathlib.MeasureTheory.Integral.Bochner.Basic
 public import Mathlib.MeasureTheory.Function.LpSpace.Basic
 public import Mathlib.MeasureTheory.Integral.Average
@@ -33,7 +35,7 @@ general exponent `p > d` is expressible, which the `L²`-only `HasWeakDerivOn` c
 @[expose] public section
 
 open MeasureTheory Set Metric
-open scoped NNReal
+open scoped NNReal RealInnerProductSpace
 
 noncomputable section
 
@@ -61,6 +63,47 @@ def HasWeakGradOn (B : Set (EuclideanSpace ℝ (Fin d)))
   ∀ φ : EuclideanSpace ℝ (Fin d) → ℝ, ContDiff ℝ (⊤ : ℕ∞) φ → HasCompactSupport φ →
     tsupport φ ⊆ B → ∀ k : Fin d,
       ∫ x in B, u x * partialD k φ x = - ∫ x in B, g k x * φ x
+
+/-! ### Gradient tuple as a functional -/
+
+/-- The continuous linear functional whose coordinate values are the entries of `g` at `y`. It is
+the Riesz dual of the vector `(g k y)ₖ` (`gradCLM_eq_toDual`), the coordinate form of the weak
+Fréchet derivative of `EllipticPdes.HasWeakFDerivOn` (`hasWeakGradOn_iff_hasWeakFDerivOn`). -/
+def gradCLM (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (y : EuclideanSpace ℝ (Fin d)) :
+    EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ :=
+  ∑ k, g k y • (EuclideanSpace.proj k : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ)
+
+/-- `gradCLM g y` is the Riesz dual of the vector `(g k y)ₖ`. -/
+theorem gradCLM_eq_toDual (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ)
+    (y : EuclideanSpace ℝ (Fin d)) :
+    gradCLM g y = InnerProductSpace.toDual ℝ (EuclideanSpace ℝ (Fin d))
+      (WithLp.toLp 2 fun k => g k y) := by
+  ext x
+  simp [gradCLM, InnerProductSpace.toDual_apply_apply, PiLp.inner_apply, mul_comm]
+
+/-- `gradCLM g y` evaluated on a vector is the inner product with `(g k y)ₖ`. -/
+theorem gradCLM_apply (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (y x : EuclideanSpace ℝ (Fin d)) :
+    gradCLM g y x = ⟪(WithLp.toLp 2 fun k => g k y : EuclideanSpace ℝ (Fin d)), x⟫ := by
+  rw [gradCLM_eq_toDual, InnerProductSpace.toDual_apply_apply]
+
+/-- `gradCLM g y` evaluated on the `j`-th basis vector is `g j y`. -/
+@[simp]
+theorem gradCLM_apply_single (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ)
+    (y : EuclideanSpace ℝ (Fin d)) (j : Fin d) :
+    gradCLM g y (EuclideanSpace.single j (1 : ℝ)) = g j y := by
+  simp [gradCLM]
+
+/-- `gradCLM g` is continuous on a set where every component of `g` is. -/
+theorem continuousOn_gradCLM {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
+    {B : Set (EuclideanSpace ℝ (Fin d))} (hg : ∀ k, ContinuousOn (g k) B) :
+    ContinuousOn (gradCLM g) B :=
+  continuousOn_finsetSum _ fun k _ => (hg k).smul continuousOn_const
+
+/-- `gradCLM g` is `Cⁿ` on a set where every component of `g` is. -/
+theorem contDiffOn_gradCLM {n : WithTop ℕ∞} {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
+    {B : Set (EuclideanSpace ℝ (Fin d))} (hg : ∀ k, ContDiffOn ℝ n (g k) B) :
+    ContDiffOn ℝ n (gradCLM g) B :=
+  ContDiffOn.sum fun k _ => (hg k).smul contDiffOn_const
 
 /-- **Scalar multiple of a weak gradient.** A constant multiple of a class with a weak gradient
 has the same multiple of the gradient. -/
@@ -262,7 +305,58 @@ theorem HasWeakDerivAlong.comp_linear [BorelSpace E] (e : E ≃L[ℝ] E)
     HasWeakDerivAlong μ v (e ⁻¹' B) (fun x => u (e x)) (fun x => g (e x)) := by
   simpa using h.comp_affine e 0 (by simpa using hmp)
 
+omit [NormedSpace ℝ E] in
+/-- Against a function with support in `B`, a set integral over `B` is an integral over the
+whole space. -/
+theorem setIntegral_mul_eq_integral_smul {B : Set E} {φ : E → ℝ} (hs : tsupport φ ⊆ B)
+    (f : E → ℝ) : ∫ x in B, f x * φ x ∂μ = ∫ x, φ x • f x ∂μ := by
+  rw [setIntegral_eq_integral_of_forall_compl_eq_zero fun x hx => by
+    rw [image_eq_zero_of_notMem_tsupport (fun h => hx (hs h)), mul_zero]]
+  simp_rw [smul_eq_mul, mul_comm]
+
+/-- `HasWeakDerivAlong` in the integral form of `EllipticPdes.hasWeakLineDerivOn_iff`. -/
+theorem hasWeakDerivAlong_iff_integral {v : E} {B : Set E} {u g : E → ℝ} :
+    HasWeakDerivAlong μ v B u g ↔
+      ∀ φ : E → ℝ, ContDiff ℝ (⊤ : ℕ∞) φ → HasCompactSupport φ → tsupport φ ⊆ B →
+        ∫ x, fderiv ℝ φ x v • u x ∂μ = -∫ x, φ x • g x ∂μ := by
+  refine forall₄_congr fun φ hφ hc hs => ?_
+  rw [setIntegral_mul_eq_integral_smul ((tsupport_fderiv_apply_subset ℝ v).trans hs),
+    setIntegral_mul_eq_integral_smul hs]
+
+/-- **`HasWeakDerivAlong` is `HasWeakLineDerivOn`.** On an open set, for locally integrable `u`
+and `g`, the weak derivative along `v` of this file is the weak derivative of
+`EllipticPdes.HasWeakLineDerivOn`. -/
+theorem hasWeakDerivAlong_iff_hasWeakLineDerivOn [OpensMeasurableSpace E] {B : Set E}
+    (hB : IsOpen B) {v : E} {u g : E → ℝ} (hu : LocallyIntegrableOn u B μ)
+    (hg : LocallyIntegrableOn g B μ) :
+    HasWeakDerivAlong μ v B u g ↔ HasWeakLineDerivOn ⟨B, hB⟩ v u g μ := by
+  rw [hasWeakLineDerivOn_iff, hasWeakDerivAlong_iff_integral]
+  exact ⟨fun h => ⟨hu, hg, h⟩, fun h => h.2.2⟩
+
+/-- **Uniqueness of the weak derivative along a direction.** On an open set, two locally
+integrable weak derivatives of one function along one direction agree almost everywhere. -/
+theorem HasWeakDerivAlong.ae_eq [BorelSpace E] [FiniteDimensional ℝ E] {B : Set E}
+    (hB : IsOpen B) {v : E} {u g g' : E → ℝ} (hg : LocallyIntegrableOn g B μ)
+    (hg' : LocallyIntegrableOn g' B μ) (h : HasWeakDerivAlong μ v B u g)
+    (h' : HasWeakDerivAlong μ v B u g') : g =ᵐ[μ.restrict B] g' :=
+  ae_eq_of_forall_integral_smul_eq (Ω := ⟨B, hB⟩) hg hg' fun φ hφ hc hs => neg_inj.1 <|
+    (hasWeakDerivAlong_iff_integral.1 h φ hφ hc hs).symm.trans
+      (hasWeakDerivAlong_iff_integral.1 h' φ hφ hc hs)
+
 end WeakDeriv
+
+/-- **`HasWeakGradOn` is `HasWeakFDerivOn`.** On an open set, for `u` and the components of
+`g` locally integrable, `g` is a weak gradient of `u` exactly when the functional `gradCLM g`
+(the Riesz dual of `(g k ·)ₖ`, `gradCLM_eq_toDual`) is the weak Fréchet derivative of `u`. -/
+theorem hasWeakGradOn_iff_hasWeakFDerivOn {B : Set (EuclideanSpace ℝ (Fin d))} (hB : IsOpen B)
+    {u : EuclideanSpace ℝ (Fin d) → ℝ} {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
+    (hu : LocallyIntegrableOn u B volume) (hg : ∀ k, LocallyIntegrableOn (g k) B volume) :
+    HasWeakGradOn B u g ↔ HasWeakFDerivOn ⟨B, hB⟩ u (gradCLM g) := by
+  classical
+  rw [hasWeakGradOn_iff, hasWeakFDerivOn_iff_basis (EuclideanSpace.basisFun (Fin d) ℝ).toBasis hu]
+  refine forall_congr' fun k => ?_
+  simp only [OrthonormalBasis.coe_toBasis, EuclideanSpace.basisFun_apply, gradCLM_apply_single]
+  exact hasWeakDerivAlong_iff_hasWeakLineDerivOn hB hu (hg k)
 
 /-- The Morrey/Hölder exponent `γ = 1 - d/p`, as a `ℝ≥0` (faithful when `p > d`). -/
 def morreyExponent (d : ℕ) (p : ℝ) : ℝ≥0 := Real.toNNReal (1 - (d : ℝ) / p)

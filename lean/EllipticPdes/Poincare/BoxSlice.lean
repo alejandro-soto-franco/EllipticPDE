@@ -7,34 +7,21 @@ Authors: Alejandro Soto Franco
 module
 
 public import EllipticPdes.Poincare.Geometry
+public import EllipticPdes.Poincare.Slab
 public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
-public import Mathlib.Analysis.Normed.Lp.MeasurableSpace
 
 /-!
-# Discharging the box Poincaré slice bound from the Euclidean geometry
+# Poincaré inequality on a coordinate box
 
 `Poincare/Geometry.lean` reduces coercivity of the bilinear form of the Laplacian on a domain `Ω`
-to the
-**slice bound**
+to the **slice bound**
 
   `∫_Ω φ² ≤ C · ∫_Ω (∂ᵢφ)²`   (`hslice`, every test function, every direction `i`),
 
-phrased on `EuclideanSpace ℝ (Fin (n+1))`. The one-dimensional/Fubini machinery of
-`Poincare/Fubini.lean` proves exactly this bound, but on the **plain product** `Fin (n+1) → ℝ`
-with the pi-Lebesgue measure (`poincare_box_dir`). This file is the missing transport: it moves
-`poincare_box_dir` across the measure-preserving identification `WithLp.toLp` between
-`Fin (n+1) → ℝ` and `EuclideanSpace ℝ (Fin (n+1))`, turning it into the slice bound on a
-coordinate box, and hence into **unconditional** coercivity of the bilinear form of the Laplacian
-on that box.
-
-The three bridges:
-
-* `toLp_insertNth_eq`: a coordinate slice of the box, reconstructed through `toLp`, is the affine
-  line `c + s • eᵢ` in `EuclideanSpace`. This identifies the 1-D slice derivative used by
-  `poincare_box_dir` with the Fréchet partial `partialD i φ` (`hasDerivAt_slice`).
-* the measure-preserving equivalence `MeasurableEquiv.toLp` (`EuclideanSpace.volume_preserving …`)
-  transports the box integrals and the integrability hypotheses between the two spaces.
-* the left-face values vanish because `tsupport φ` sits inside the *open* box.
+phrased on `EuclideanSpace ℝ (Fin (n+1))`. On an open coordinate box `∏ₖ (aₖ, bₖ)` the slice
+bound with `C = (bᵢ - aᵢ)² / 2` is the slab Poincaré inequality
+`EllipticPdes.Poincare.integral_sq_le_of_tsupport_subset_slab` for the coordinate functional
+`xᵢ`, since the box lies in the slab `aᵢ < xᵢ < bᵢ`.
 
 The headline results are `slice_bound_euclBox` (the per-direction Poincaré bound on the box) and
 `poincare_H01_of_subset_euclBox` (the Poincaré inequality on `H₀¹` of any subset of a box).
@@ -68,106 +55,21 @@ lemma isOpen_euclBox (a b : Fin (n + 1) → ℝ) : IsOpen (euclBox a b) := by
   exact isOpen_iInter_of_finite fun k =>
     isOpen_Ioo.preimage ((EuclideanSpace.proj (𝕜 := ℝ) k).continuous)
 
-/-- A coordinate slice `s ↦ i.insertNth s y`, transported into `EuclideanSpace` by `toLp`, is the
-affine line `toLp (i.insertNth 0 y) + s • eᵢ`. -/
-lemma toLp_insertNth_eq (i : Fin (n + 1)) (y : Fin n → ℝ) (s : ℝ) :
-    (WithLp.toLp 2 (i.insertNth s y) : EuclideanSpace ℝ (Fin (n + 1)))
-      = WithLp.toLp 2 (i.insertNth (0 : ℝ) y) + s • EuclideanSpace.single i (1 : ℝ) := by
-  apply PiLp.ext
-  intro k
-  simp only [PiLp.add_apply, PiLp.smul_apply, PiLp.single_apply, smul_eq_mul]
-  by_cases hk : k = i
-  · subst hk
-    rw [Fin.insertNth_apply_same, Fin.insertNth_apply_same]; simp
-  · obtain ⟨j, rfl⟩ := Fin.exists_succAbove_eq hk
-    rw [Fin.insertNth_apply_succAbove, Fin.insertNth_apply_succAbove,
-      ite_eq_right (Fin.succAbove_ne i j)]; ring
-
-/-- The slice of a test function along coordinate `i`, reconstructed through `toLp`, is
-differentiable with derivative the `i`-th classical partial `partialD i φ`. -/
-lemma hasDerivAt_slice {φ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ} (hφ : Differentiable ℝ φ)
-    (i : Fin (n + 1)) (y : Fin n → ℝ) (t : ℝ) :
-    HasDerivAt (fun s => φ (WithLp.toLp 2 (i.insertNth s y)))
-      (partialD i φ (WithLp.toLp 2 (i.insertNth t y))) t := by
-  set v : EuclideanSpace ℝ (Fin (n + 1)) := EuclideanSpace.single i (1 : ℝ) with hv
-  set c : EuclideanSpace ℝ (Fin (n + 1)) := WithLp.toLp 2 (i.insertNth (0 : ℝ) y) with hc
-  have h1 : HasDerivAt (fun s : ℝ => s • v) v t := by
-    simpa using (hasDerivAt_id t).smul_const v
-  have hl : HasDerivAt (fun s : ℝ => c + s • v) v t := h1.const_add c
-  have hcomp := ((hφ (c + t • v)).hasFDerivAt).comp_hasDerivAt t hl
-  simp only [toLp_insertNth_eq, ← hc, ← hv]
-  rw [partialD, ← hv]
-  exact hcomp
-
 /-- **Per-direction Poincaré bound on an open box** (the slice bound `hslice`). For a test
 function `φ` supported in the open box `∏ₖ (aₖ, bₖ)` of `EuclideanSpace ℝ (Fin (n+1))`,
-`∫ φ² ≤ (bᵢ - aᵢ)² / 2 · ∫ (∂ᵢφ)²`. This is `poincare_box_dir` (the 1-D/Fubini bound on the plain
-product) transported across the measure-preserving `toLp`. -/
-theorem slice_bound_euclBox (a b : Fin (n + 1) → ℝ) (hab : ∀ k, a k ≤ b k)
+`∫ φ² ≤ (bᵢ - aᵢ)² / 2 · ∫ (∂ᵢφ)²`. The box lies in the slab `aᵢ < xᵢ < bᵢ`, so this is
+`integral_sq_le_of_tsupport_subset_slab` for the coordinate functional `xᵢ`. -/
+theorem slice_bound_euclBox (a b : Fin (n + 1) → ℝ) (_hab : ∀ k, a k ≤ b k)
     {φ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ} (h : IsTestFn (euclBox a b) φ) (i : Fin (n + 1)) :
     ∫ x in euclBox a b, (φ x) ^ 2
       ≤ (b i - a i) ^ 2 / 2 * ∫ x in euclBox a b, (partialD i φ x) ^ 2 := by
-  classical
-  have hφd : Differentiable ℝ φ := h.1.differentiable (by simp)
-  set P : Set (Fin (n + 1) → ℝ) := Set.univ.pi fun k => Set.Ioo (a k) (b k) with hP
-  set e : (Fin (n + 1) → ℝ) ≃ᵐ EuclideanSpace ℝ (Fin (n + 1)) :=
-    MeasurableEquiv.toLp 2 (Fin (n + 1) → ℝ) with he
-  have hmp : MeasurePreserving (⇑e) (volume) (volume) := PiLp.volume_preserving_toLp (Fin (n + 1))
-  have hme : MeasurableEmbedding (⇑e) := e.measurableEmbedding
-  -- The image of the pi-box under `toLp` is the Euclidean box.
-  have hbox : (⇑e) '' P = euclBox a b := by
-    rw [e.image_eq_preimage_symm]
-    ext x
-    simp only [hP, Set.mem_preimage, Set.mem_pi, Set.mem_univ,
-      true_implies, euclBox, Set.mem_ofPred_eq]
-    rfl
-  -- Transport any box integral from `EuclideanSpace` to the pi-box.
-  have htr : ∀ g : EuclideanSpace ℝ (Fin (n + 1)) → ℝ,
-      ∫ z in euclBox a b, g z = ∫ x in P, g (WithLp.toLp 2 x) := by
-    intro g
-    rw [← hbox]
-    exact hmp.setIntegral_image_emb hme g P
-  -- Whole-space integrability of the relevant squares (continuous, compact support).
-  have hφ2 : Integrable (fun z => (φ z) ^ 2) (volume : Measure (EuclideanSpace ℝ (Fin (n + 1)))) :=
-    (h.continuous.fun_pow 2).integrable_of_hasCompactSupport
-      (h.2.1.comp_left (g := fun y : ℝ => y ^ 2) (by norm_num))
-  have hpd2 : Integrable (fun z => (partialD i φ z) ^ 2)
-      (volume : Measure (EuclideanSpace ℝ (Fin (n + 1)))) :=
-    ((h.continuous_partialD i).fun_pow 2).integrable_of_hasCompactSupport
-      ((h.hasCompactSupport_partialD i).comp_left (g := fun y : ℝ => y ^ 2) (by norm_num))
-  -- Integrability of the pulled-back squares on the pi-box.
-  have hu2 : IntegrableOn (fun x => (φ (WithLp.toLp 2 x)) ^ 2) P volume := by
-    have hi := (hmp.integrableOn_image hme (f := fun z => (φ z) ^ 2) (s := P)).mp
-    rw [hbox] at hi
-    exact hi hφ2.integrableOn
-  have hu'2 : IntegrableOn (fun x => (partialD i φ (WithLp.toLp 2 x)) ^ 2) P volume := by
-    have hi := (hmp.integrableOn_image hme (f := fun z => (partialD i φ z) ^ 2) (s := P)).mp
-    rw [hbox] at hi
-    exact hi hpd2.integrableOn
-  -- Slice continuity and left-face vanishing.
-  have hcont : ∀ y : Fin n → ℝ,
-      ContinuousOn (fun s => partialD i φ (WithLp.toLp 2 (i.insertNth s y)))
-        (uIcc (a i) (b i)) := by
-    intro y
-    apply Continuous.continuousOn
-    have heq : (fun s => partialD i φ (WithLp.toLp 2 (i.insertNth s y)))
-        = fun s => partialD i φ
-            (WithLp.toLp 2 (i.insertNth (0 : ℝ) y) + s • EuclideanSpace.single i (1 : ℝ)) :=
-      funext fun s => by rw [toLp_insertNth_eq]
-    rw [heq]
-    exact (h.continuous_partialD i).comp (by fun_prop)
-  have hzero : ∀ y : Fin n → ℝ, φ (WithLp.toLp 2 (i.insertNth (a i) y)) = 0 := by
-    intro y
-    apply image_eq_zero_of_notMem_tsupport
-    intro hmem
-    have hkey := (h.2.2 hmem i).1
-    rw [PiLp.toLp_apply, Fin.insertNth_apply_same] at hkey
-    exact lt_irrefl (a i) hkey
-  -- Transport both integrals, then apply the 1-D/Fubini box bound.
-  rw [htr (fun z => (φ z) ^ 2), htr (fun z => (partialD i φ z) ^ 2)]
-  exact poincare_box_dir (u := fun x => φ (WithLp.toLp 2 x))
-    (u' := fun x => partialD i φ (WithLp.toLp 2 x)) i (hab i)
-    (fun y t _ => hasDerivAt_slice hφd i y t) hcont hzero hu2 hu'2
+  have hz : ∀ {g : EuclideanSpace ℝ (Fin (n + 1)) → ℝ}, tsupport g ⊆ euclBox a b →
+      ∫ x in euclBox a b, g x ^ 2 = ∫ x, g x ^ 2 := fun hg =>
+    setIntegral_eq_integral_of_forall_compl_eq_zero fun x hx => by
+      rw [image_eq_zero_of_notMem_tsupport fun hm => hx (hg hm)]; ring
+  rw [hz h.tsupport_subset, hz ((tsupport_partialD_subset i φ).trans h.tsupport_subset)]
+  exact integral_sq_le_of_tsupport_subset_slab (h.contDiff.of_le (by simp)) h.hasCompactSupport
+    (EuclideanSpace.proj i) (by simp) (h.tsupport_subset.trans fun x hx => hx i)
 
 /-- **Per-direction Poincaré bound for a subset of a box.** A test function of any
 `Ω` inside the open box obeys the box slice bound with the integrals taken over `Ω`. -/

@@ -7,6 +7,7 @@ Authors: Alejandro Soto Franco
 module
 
 public import EllipticPdes.Regularity.DiffQuotientBound
+public import EllipticPdes.Sobolev.WeakDeriv
 
 /-!
 # Uniqueness of the whole-space weak derivative
@@ -26,7 +27,8 @@ class. This file supplies that step.
 
 * `annihilates_of_forall_testCls`: an `L²` class orthogonal to every smooth compactly
   supported class is zero.
-* `HasWeakDeriv.unique`: the weak `k`-derivative is unique as an `L²` class.
+* `HasWeakDeriv.unique`: the weak `k`-derivative is unique as an `L²` class, an instance of
+  `EllipticPdes.ae_eq_of_forall_integral_smul_eq`.
 -/
 
 @[expose] public section
@@ -72,31 +74,13 @@ theorem annihilates_of_forall_testCls {w : EucL2 d}
   exact inner_self_eq_zero.mp (hall w)
 
 /-- **Uniqueness of the whole-space weak derivative.** Two `L²` weak `k`-derivatives of the
-same class coincide: their difference is orthogonal to every smooth compactly supported test
-class, hence zero by `annihilates_of_forall_testCls`. -/
+same class coincide, by `EllipticPdes.ae_eq_of_forall_integral_smul_eq` on the whole space. -/
 theorem HasWeakDeriv.unique {k : Fin d} {g w₁ w₂ : EucL2 d}
     (h₁ : HasWeakDeriv k g w₁) (h₂ : HasWeakDeriv k g w₂) : w₁ = w₂ := by
-  have hzero : w₁ - w₂ = 0 := by
-    refine annihilates_of_forall_testCls (fun ρ hρcd hρcs => ?_)
-    have hsplit : ∫ x, ((w₁ - w₂) x : ℝ) * ρ x
-        = (∫ x, (w₁ x : ℝ) * ρ x) - ∫ x, (w₂ x : ℝ) * ρ x := by
-      have hρL2 : MemLp ρ 2 (volume : Measure (EuclideanSpace ℝ (Fin d))) :=
-        hρcd.continuous.memLp_of_hasCompactSupport hρcs
-      have hi₁ : Integrable (fun x => (w₁ x : ℝ) * ρ x) volume :=
-        (Lp.memLp w₁).integrable_mul hρL2
-      have hi₂ : Integrable (fun x => (w₂ x : ℝ) * ρ x) volume :=
-        (Lp.memLp w₂).integrable_mul hρL2
-      rw [← integral_sub hi₁ hi₂]
-      refine integral_congr_ae ?_
-      filter_upwards [Lp.coeFn_sub w₁ w₂] with x hx
-      rw [hx, Pi.sub_apply, sub_mul]
-    have hw₁ := h₁ ρ hρcd hρcs
-    have hw₂ := h₂ ρ hρcd hρcs
-    rw [hsplit]
-    have : (∫ x, (w₁ x : ℝ) * ρ x) = ∫ x, (w₂ x : ℝ) * ρ x := by
-      have := hw₁.symm.trans hw₂
-      linarith [this]
-    rw [this, sub_self]
-  exact sub_eq_zero.mp hzero
+  have hli : ∀ w : EucL2 d, LocallyIntegrableOn w Set.univ volume := fun w =>
+    ((Lp.memLp w).locallyIntegrable one_le_two).locallyIntegrableOn _
+  have h := ae_eq_of_forall_integral_smul_eq (Ω := ⟨Set.univ, isOpen_univ⟩) (hli w₁) (hli w₂)
+    fun φ hφ hc _ => by simpa [mul_comm] using (h₁ φ hφ hc).symm.trans (h₂ φ hφ hc)
+  exact Lp.ext (by simpa using h)
 
 end EllipticPdes.Regularity

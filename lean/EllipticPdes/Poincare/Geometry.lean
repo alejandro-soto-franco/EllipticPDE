@@ -26,13 +26,13 @@ level of box integrals `∫_Ω φ²` and `∫_Ω (∂ᵢφ)²`. Two bridges do t
   coordinate **is** the box integral of the corresponding classical quantity
   (`‖tg 0‖² = ∫_Ω φ²`, `‖tg i.succ‖² = ∫_Ω (∂ᵢφ)²`), via the `L²` self-inner product.
 * `poincare_testfn`: feeding the per-direction slice bounds `∫_Ω φ² ≤ C ∫_Ω (∂ᵢφ)²` (the
-  geometric content of `poincare_box_dir`) into `poincare_domain`'s averaging yields `hbase`
-  with `C_P = C / d`. For a box of maximal side `L` the slice bound holds with `C = L²/2`
-  (the 1-D step), giving the diameter constant `C_P = L²/(2d)` of `notes/constants.md`.
+  slab Poincaré inequality `integral_sq_le_of_tsupport_subset_slab`) into `poincare_domain`'s
+  averaging yields `hbase` with `C_P = C / d`. For a box of maximal side `L` the slice bound
+  holds with `C = L²/2`, giving the diameter constant `C_P = L²/(2d)`.
 
-The remaining input, the per-direction integral slice bound on a coordinate box, is exactly the
-conclusion of `poincare_box_dir` (`Poincare/Fubini.lean`); this file is the bridge that turns
-it into the abstract-norm `hbase` the Hilbert-space layer wants.
+The per-direction slice bound on a coordinate box is `slice_bound_euclBox`
+(`Poincare/BoxSlice.lean`); this file turns it into the abstract-norm `hbase` the Hilbert-space
+layer wants.
 -/
 
 @[expose] public section
@@ -65,10 +65,10 @@ lemma norm_testGraph_succ_sq_eq {Ω : Set (EuclideanSpace ℝ (Fin d))}
   exact integral_congr_ae (by filter_upwards [h.coeFn_partialCls i] with x hx using by rw [hx])
 
 /-- **Test-function Poincaré bound from box geometry.** If on the box `Ω` every test
-function obeys the per-direction slice bound `∫_Ω φ² ≤ C ∫_Ω (∂ᵢφ)²` (the geometric content
-of `poincare_box_dir`), then it obeys the graph-coordinate bound `hbase` with Poincaré
-constant `C_P = C / d`. This is `poincare_domain` (averaging the `d` directions) re-expressed
-through the `L²` self-inner products. -/
+function obeys the per-direction slice bound `∫_Ω φ² ≤ C ∫_Ω (∂ᵢφ)²` (the slab Poincaré
+inequality `integral_sq_le_of_tsupport_subset_slab`), then it obeys the graph-coordinate bound
+`hbase` with Poincaré constant `C_P = C / d`. This is `poincare_domain` (averaging the `d`
+directions) re-expressed through the `L²` self-inner products. -/
 theorem poincare_testfn {Ω : Set (EuclideanSpace ℝ (Fin d))} (hd : 0 < d) (C : ℝ)
     (hslice : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (_h : IsTestFn Ω φ) (i : Fin d),
       ∫ x in Ω, (φ x) ^ 2 ≤ C * ∫ x in Ω, (partialD i φ x) ^ 2)

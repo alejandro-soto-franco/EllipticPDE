@@ -11,7 +11,6 @@ public import EllipticPdes.Sobolev.Coefficients
 public import EllipticPdes.Regularity.DifferenceQuotient
 public import EllipticPdes.Regularity.DiffQuotientBound
 public import EllipticPdes.Poincare.OneDim
-public import EllipticPdes.Poincare.Fubini
 public import EllipticPdes.Poincare.Domain
 public import EllipticPdes.Poincare.Density
 public import EllipticPdes.Poincare.Geometry
