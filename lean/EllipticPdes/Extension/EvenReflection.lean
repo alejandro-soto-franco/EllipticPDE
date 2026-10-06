@@ -25,16 +25,15 @@ disappears.
 
 ## Main declarations
 
-* `EllipticPdes.Extension.evenExt`: the reflected extension of a function.
-* `EllipticPdes.Extension.evenExtGrad`: the reflected extension of its gradient.
-* `EllipticPdes.Extension.integral_split_interface`: an integral splits at the interface.
+* `EllipticPdes.Extension.signedExt`: the extension of a function by its signed reflection, as
+  a linear map.
+* `EllipticPdes.Extension.evenExt`, `EllipticPdes.Extension.evenExtGrad`: the extensions of a
+  function and of its gradient.
+* `EllipticPdes.Extension.integral_signedExt_mul`: an integral of a signed extension is an
+  integral over the half space.
 * `EllipticPdes.Extension.hasWeakGradOn_evenExt`: the weak gradient of the extension.
-* `EllipticPdes.Extension.eLpNorm_evenExt_le`: its bound in every `Lᵖ` seminorm.
-* `EllipticPdes.Extension.aestronglyMeasurable_evenExt`: the extension is measurable.
-* `EllipticPdes.Extension.eLpNorm_evenExtGrad_le`: the gradient's bound in every `Lᵖ` seminorm.
-* `EllipticPdes.Extension.integrable_evenExt` and
-  `EllipticPdes.Extension.integrable_evenExtGrad`: the extension and its gradient are
-  integrable on the whole space whenever the class is integrable on the half space.
+* `EllipticPdes.Extension.eLpNorm_signedExt_le`: the bound in every `Lᵖ` seminorm.
+* `EllipticPdes.Extension.integrable_signedExt`: integrability on the whole space.
 
 ## References
 
@@ -63,31 +62,20 @@ theorem measurableSet_halfSpaceNeg (j : Fin d) : MeasurableSet (halfSpaceNeg j) 
   (isOpen_lt (EuclideanSpace.proj j).continuous continuous_const).measurableSet
 
 /-- `halfSpace j` and `halfSpaceNeg j` are disjoint. -/
-theorem disjoint_halfSpace (j : Fin d) : Disjoint (halfSpace j) (halfSpaceNeg j) := by
-  rw [Set.disjoint_left]
-  intro x hx hx'
-  have h1 : 0 < x j := hx
-  have h2 : x j < 0 := hx'
-  linarith
+theorem disjoint_halfSpace (j : Fin d) : Disjoint (halfSpace j) (halfSpaceNeg j) :=
+  Set.disjoint_left.2 fun x hx hx' => by
+    simp only [halfSpace, halfSpaceNeg, Set.mem_ofPred_eq] at hx hx'
+    linarith
 
 /-- Up to the null interface, the whole space is the union of the two open half spaces. -/
 theorem univ_ae_eq_union (j : Fin d) :
     (Set.univ : Set (EuclideanSpace ℝ (Fin d)))
       =ᵐ[volume] ((halfSpace j ∪ halfSpaceNeg j : Set (EuclideanSpace ℝ (Fin d)))) := by
-  have hdiff : (Set.univ : Set (EuclideanSpace ℝ (Fin d))) \ (halfSpace j ∪ halfSpaceNeg j)
-      = {x : EuclideanSpace ℝ (Fin d) | x j = 0} := by
-    ext x
-    simp only [Set.mem_sdiff, Set.mem_univ, true_and, Set.mem_union, halfSpace, halfSpaceNeg,
-      Set.mem_ofPred_eq, not_or, not_lt]
-    constructor
-    · rintro ⟨h1, h2⟩; linarith
-    · rintro h; exact ⟨by linarith, by linarith⟩
-  refine (MeasureTheory.ae_eq_set).mpr ⟨?_, ?_⟩
-  · rw [hdiff]; exact volume_interface j
-  · have : (halfSpace j ∪ halfSpaceNeg j) \ (Set.univ : Set (EuclideanSpace ℝ (Fin d))) = ∅ := by
-      simp
-    rw [this]
-    simp
+  refine (MeasureTheory.ae_eq_set).mpr ⟨measure_mono_null (fun x hx => ?_) (volume_interface j),
+    by simp⟩
+  simp only [Set.mem_sdiff, Set.mem_univ, true_and, Set.mem_union, halfSpace, halfSpaceNeg,
+    Set.mem_ofPred_eq, not_or, not_lt] at hx
+  exact le_antisymm hx.1 hx.2
 
 /-- **Splitting of an integral over the whole space at the interface.** -/
 theorem integral_split_interface {j : Fin d} {f : EuclideanSpace ℝ (Fin d) → ℝ}
@@ -96,25 +84,12 @@ theorem integral_split_interface {j : Fin d} {f : EuclideanSpace ℝ (Fin d) →
   rw [← setIntegral_univ, setIntegral_congr_set (univ_ae_eq_union j),
     setIntegral_union (disjoint_halfSpace j) (measurableSet_halfSpaceNeg j) h1 h2]
 
-/-! ### The reflected extension -/
-
-/-- **Reflected extension of a function**: below the interface it takes the value at the
-mirror image. -/
-def evenExt (j : Fin d) (u : EuclideanSpace ℝ (Fin d) → ℝ) : EuclideanSpace ℝ (Fin d) → ℝ :=
-  fun x => if 0 ≤ x j then u x else u (reflectLI j x)
-
-/-- **Reflected extension of a gradient**, with a sign in the normal direction. -/
-def evenExtGrad (j : Fin d) (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (k : Fin d) :
-    EuclideanSpace ℝ (Fin d) → ℝ :=
-  fun x => if 0 ≤ x j then g k x else reflectSign j k * g k (reflectLI j x)
-
-/-- Reflection in the `j`-th coordinate maps `halfSpace j` onto `halfSpaceNeg j` under preimage. -/
+/-- Reflection in the `j`-th coordinate maps `halfSpaceNeg j` onto `halfSpace j` under preimage. -/
 theorem preimage_reflectLI_halfSpaceNeg (j : Fin d) :
     reflectLI j ⁻¹' halfSpaceNeg j = halfSpace j := by
   ext x
-  have h : reflectLI j x j = -(x j) := by
-    rw [reflectLI_apply, reflectSign, ite_eq_left rfl]; ring
-  simp only [Set.mem_preimage, halfSpaceNeg, halfSpace, Set.mem_ofPred_eq, h, neg_lt_zero]
+  simp only [Set.mem_preimage, halfSpaceNeg, halfSpace, Set.mem_ofPred_eq, reflectLI_apply_self,
+    neg_lt_zero]
 
 /-- **Integral over the lower half space as the reflected integral over the upper one.** -/
 theorem setIntegral_halfSpaceNeg (j : Fin d) (f : EuclideanSpace ℝ (Fin d) → ℝ) :
@@ -124,23 +99,14 @@ theorem setIntegral_halfSpaceNeg (j : Fin d) (f : EuclideanSpace ℝ (Fin d) →
   rw [preimage_reflectLI_halfSpaceNeg] at h
   exact h.symm
 
-/-- The partial derivative is additive. -/
-theorem partialD_add {f h : EuclideanSpace ℝ (Fin d) → ℝ} (k : Fin d)
-    {x : EuclideanSpace ℝ (Fin d)} (hf : DifferentiableAt ℝ f x) (hh : DifferentiableAt ℝ h x) :
-    partialD k (fun y => f y + h y) x = partialD k f x + partialD k h x := by
-  have hfd : HasFDerivAt (fun y => f y + h y) (fderiv ℝ f x + fderiv ℝ h x) x :=
-    hf.hasFDerivAt.add hh.hasFDerivAt
-  rw [partialD, hfd.fderiv]
-  simp [partialD]
-
-/-- The partial derivative commutes with a constant multiple. -/
-theorem partialD_const_mul {f : EuclideanSpace ℝ (Fin d) → ℝ} (k : Fin d) (c : ℝ)
-    {x : EuclideanSpace ℝ (Fin d)} (hf : DifferentiableAt ℝ f x) :
-    partialD k (fun y => c * f y) x = c * partialD k f x := by
-  have hfd : HasFDerivAt (fun y => c * f y) (c • fderiv ℝ f x) x :=
-    hf.hasFDerivAt.const_mul c
-  rw [partialD, hfd.fderiv]
-  simp [partialD]
+/-- **Reflection of the lower half space onto the upper one**, preserving measure. -/
+theorem measurePreserving_reflectLI_halfSpaceNeg (j : Fin d) :
+    MeasurePreserving (reflectLI j) (volume.restrict (halfSpaceNeg j))
+      (volume.restrict (halfSpace j)) := by
+  have h := (measurePreserving_reflectLI j).restrict_preimage_emb
+    (measurableEmbedding_reflectLI j) (halfSpace j)
+  rwa [show reflectLI j ⁻¹' halfSpace j = halfSpaceNeg j from by
+    rw [← preimage_reflectLI_halfSpaceNeg j, reflectLI_preimage_preimage]] at h
 
 /-- The reflection fixes the interface. -/
 theorem reflectLI_eq_self_of_interface {j : Fin d} {x : EuclideanSpace ℝ (Fin d)}
@@ -148,8 +114,140 @@ theorem reflectLI_eq_self_of_interface {j : Fin d} {x : EuclideanSpace ℝ (Fin 
   ext m
   rw [reflectLI_apply, reflectSign]
   by_cases hm : m = j
-  · subst hm; rw [ite_eq_left rfl, hx]; ring
-  · rw [ite_eq_right hm]; ring
+  · subst hm; simp [hx]
+  · simp [hm]
+
+/-- The sign a reflection attaches to a direction has absolute value `1`. -/
+theorem abs_reflectSign (j k : Fin d) : |reflectSign j k| = 1 := by
+  rw [reflectSign]
+  split_ifs <;> norm_num
+
+/-! ### The extension by a signed reflection -/
+
+/-- **Extension by a signed reflection**: below the interface it takes `s` times the value at the
+mirror image. It is linear in the function. -/
+def signedExt (j : Fin d) (s : ℝ) :
+    (EuclideanSpace ℝ (Fin d) → ℝ) →ₗ[ℝ] (EuclideanSpace ℝ (Fin d) → ℝ) where
+  toFun f x := if 0 ≤ x j then f x else s * f (reflectLI j x)
+  map_add' f g := by funext x; by_cases h : 0 ≤ x j <;> simp [h, mul_add]
+  map_smul' c f := by funext x; by_cases h : 0 ≤ x j <;> simp [h, mul_left_comm]
+
+section signedExt
+
+variable {j : Fin d} {s : ℝ} {f : EuclideanSpace ℝ (Fin d) → ℝ}
+
+theorem signedExt_of_nonneg {x : EuclideanSpace ℝ (Fin d)} (hx : 0 ≤ x j) :
+    signedExt j s f x = f x := by simp [signedExt, hx]
+
+theorem signedExt_of_neg {x : EuclideanSpace ℝ (Fin d)} (hx : x j < 0) :
+    signedExt j s f x = s * f (reflectLI j x) := by simp [signedExt, hx.not_ge]
+
+/-- At the mirror image of a point of the upper half space, the extension is `s` times the
+value at the point. -/
+theorem signedExt_reflectLI {y : EuclideanSpace ℝ (Fin d)} (hy : y ∈ halfSpace j) :
+    signedExt j s f (reflectLI j y) = s * f y := by
+  rw [signedExt_of_neg (by rw [reflectLI_apply_self]; exact neg_lt_zero.2 hy),
+    reflectLI_involutive]
+
+/-- The extension is, almost everywhere, the sum of the function and its signed reflection, each
+on its own side of the interface. -/
+theorem signedExt_ae_eq : signedExt j s f =ᵐ[volume] fun x => (halfSpace j).indicator f x
+    + (halfSpaceNeg j).indicator (fun y => s * f (reflectLI j y)) x := by
+  refine measure_mono_null (fun x hx => ?_) (volume_interface j)
+  by_contra hne
+  refine hx ?_
+  rcases lt_or_gt_of_ne hne with h | h
+  · have h' : x ∈ halfSpaceNeg j := h
+    simp [signedExt_of_neg h, h', show x ∉ halfSpace j from fun hh => (hh.trans h).false]
+  · have h' : x ∈ halfSpace j := h
+    simp [signedExt_of_nonneg h.le, h', show x ∉ halfSpaceNeg j from fun hh => (h.trans hh).false]
+
+/-- **Measurability of the extension.** -/
+theorem aestronglyMeasurable_signedExt
+    (hf : AEStronglyMeasurable f (volume.restrict (halfSpace j))) :
+    AEStronglyMeasurable (signedExt j s f) volume := by
+  have hf' : AEStronglyMeasurable (fun y => s * f (reflectLI j y))
+      (volume.restrict (halfSpaceNeg j)) :=
+    (hf.comp_measurePreserving (measurePreserving_reflectLI_halfSpaceNeg j)).const_mul s
+  exact (((aestronglyMeasurable_indicator_iff (measurableSet_halfSpace j)).mpr hf).add
+    ((aestronglyMeasurable_indicator_iff (measurableSet_halfSpaceNeg j)).mpr hf')).congr
+    signedExt_ae_eq.symm
+
+/-- **Integrability of the extension.** Each side of the interface contributes the integral over
+the half space, the reflection preserving measure. -/
+theorem integrable_signedExt (hf : IntegrableOn f (halfSpace j) volume) :
+    Integrable (signedExt j s f) volume := by
+  have hmp := measurePreserving_reflectLI_halfSpaceNeg j
+  have hr : IntegrableOn (fun y => s * f (reflectLI j y)) (halfSpaceNeg j) volume :=
+    ((hmp.integrable_comp_emb (measurableEmbedding_reflectLI j)).mpr hf).const_mul s
+  exact ((hf.integrable_indicator (measurableSet_halfSpace j)).add
+    (hr.integrable_indicator (measurableSet_halfSpaceNeg j))).congr signedExt_ae_eq.symm
+
+/-- **Bound for the extension in every `Lᵖ` seminorm.** The reflection preserves measure and `s`
+has absolute value `1`, so each side contributes the seminorm on the half space. -/
+theorem eLpNorm_signedExt_le {p : ℝ≥0∞} (hp : 1 ≤ p) (hs : |s| = 1)
+    (hf : AEStronglyMeasurable f (volume.restrict (halfSpace j))) :
+    eLpNorm (signedExt j s f) p volume ≤ 2 * eLpNorm f p (volume.restrict (halfSpace j)) := by
+  have hmp := measurePreserving_reflectLI_halfSpaceNeg j
+  have hf' : AEStronglyMeasurable (fun y => f (reflectLI j y))
+      (volume.restrict (halfSpaceNeg j)) := hf.comp_measurePreserving hmp
+  have hsign : eLpNorm (fun y => s * f (reflectLI j y)) p (volume.restrict (halfSpaceNeg j))
+      ≤ eLpNorm f p (volume.restrict (halfSpace j)) := by
+    rw [← eLpNorm_comp_measurePreserving hf hmp]
+    refine eLpNorm_mono_ae (hf'.const_mul s) (Filter.Eventually.of_forall fun y => ?_)
+    rw [norm_mul, Real.norm_eq_abs, hs, one_mul]
+    exact le_rfl
+  calc eLpNorm (signedExt j s f) p volume
+      = eLpNorm (fun x => (halfSpace j).indicator f x + (halfSpaceNeg j).indicator
+          (fun y => s * f (reflectLI j y)) x) p volume := eLpNorm_congr_ae signedExt_ae_eq
+    _ ≤ eLpNorm ((halfSpace j).indicator f) p volume
+        + eLpNorm ((halfSpaceNeg j).indicator fun y => s * f (reflectLI j y)) p volume :=
+        eLpNorm_add_le hp
+    _ ≤ eLpNorm f p (volume.restrict (halfSpace j))
+        + eLpNorm f p (volume.restrict (halfSpace j)) := by
+        rw [eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_halfSpace j),
+          eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_halfSpaceNeg j)]
+        exact add_le_add le_rfl hsign
+    _ = 2 * eLpNorm f p (volume.restrict (halfSpace j)) := (two_mul _).symm
+
+/-- **An integral against a test function, over the extension.** Splitting at the interface and
+reflecting the lower half puts the integral on the upper half space, against `h + s (h ∘ R)`. -/
+theorem integral_signedExt_mul {h : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hf : IntegrableOn f (halfSpace j) volume) (hh : Continuous h) (hhcs : HasCompactSupport h) :
+    ∫ x, signedExt j s f x * h x
+      = ∫ x in halfSpace j, f x * (h x + s * h (reflectLI j x)) := by
+  have hI : IntegrableOn (fun x => signedExt j s f x * h x) Set.univ volume :=
+    (integrable_signedExt hf).integrableOn.mul_of_hasCompactSupport hh hhcs
+  have hR : Continuous fun x => s * h (reflectLI j x) :=
+    continuous_const.mul (hh.comp (reflectLI j).continuous)
+  have hRcs : HasCompactSupport fun x => s * h (reflectLI j x) :=
+    (hhcs.comp_homeomorph (reflectLI j).toHomeomorph).mul_left
+  have hsplit := integral_split_interface (j := j) (f := fun x => signedExt j s f x * h x)
+    (hI.mono_set (Set.subset_univ _)) (hI.mono_set (Set.subset_univ _))
+  have e1 : ∫ x in halfSpace j, signedExt j s f x * h x = ∫ x in halfSpace j, f x * h x :=
+    setIntegral_congr_fun (measurableSet_halfSpace j) fun y hy => by
+      rw [signedExt_of_nonneg (le_of_lt hy)]
+  have e2 : ∫ y in halfSpace j, signedExt j s f (reflectLI j y) * h (reflectLI j y)
+      = ∫ y in halfSpace j, f y * (s * h (reflectLI j y)) :=
+    setIntegral_congr_fun (measurableSet_halfSpace j) fun y hy => by
+      rw [signedExt_reflectLI hy]; ring
+  rw [hsplit, setIntegral_halfSpaceNeg, e1, e2, ← integral_add
+    (hf.mul_of_hasCompactSupport hh hhcs) (hf.mul_of_hasCompactSupport hR hRcs)]
+  exact setIntegral_congr_fun (measurableSet_halfSpace j) fun y _ => by ring
+
+end signedExt
+
+/-! ### The reflected extension -/
+
+/-- **Reflected extension of a function**: below the interface it takes the value at the
+mirror image. -/
+def evenExt (j : Fin d) : (EuclideanSpace ℝ (Fin d) → ℝ) →ₗ[ℝ] (EuclideanSpace ℝ (Fin d) → ℝ) :=
+  signedExt j 1
+
+/-- **Reflected extension of a gradient**, with a sign in the normal direction. -/
+def evenExtGrad (j : Fin d) (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (k : Fin d) :
+    EuclideanSpace ℝ (Fin d) → ℝ :=
+  signedExt j (reflectSign j k) (g k)
 
 /-- **Weak gradient of the reflected extension on the whole space.** Splitting the integral
 at the interface and reflecting the lower half tests the class against `φ + s (φ ∘ R)`, which in
@@ -161,342 +259,35 @@ theorem hasWeakGradOn_evenExt {j : Fin d} {u : EuclideanSpace ℝ (Fin d) → �
     (hg : ∀ k, IntegrableOn (g k) (halfSpace j) volume)
     (hwg : HasWeakGradOn (halfSpace j) u g) :
     HasWeakGradOn Set.univ (evenExt j u) (evenExtGrad j g) := by
-  intro φ hφ hφcs _hsupp k
+  intro φ hφ hφcs _ k
   have hφd : Differentiable ℝ φ := hφ.differentiable (by simp)
-  set s : ℝ := reflectSign j k with hs
-  set ψ : EuclideanSpace ℝ (Fin d) → ℝ := fun x => φ x + s * φ (reflectLI j x) with hψdef
   have hφR : ContDiff ℝ (⊤ : ℕ∞) (fun y => φ (reflectLI j y)) := contDiff_comp_reflect hφ j
-  have hφRd : Differentiable ℝ (fun y => φ (reflectLI j y)) := hφR.differentiable (by simp)
-  have hψsmooth : ContDiff ℝ (⊤ : ℕ∞) ψ := hφ.add (contDiff_const.mul hφR)
-  have hψcs : HasCompactSupport ψ :=
-    hφcs.add ((hasCompactSupport_comp_reflect hφcs j).mul_left)
-  -- The derivative of the combination, and the reflected derivative.
-  have hpartial : ∀ x, partialD k ψ x
-      = partialD k φ x + s * partialD k (fun z => φ (reflectLI j z)) x := by
-    intro x
-    rw [hψdef, partialD_add k (hφd x) ((hφRd x).const_mul s),
-      partialD_const_mul k s (hφRd x)]
-  have hrefl : ∀ y, partialD k φ (reflectLI j y)
-      = s * partialD k (fun z => φ (reflectLI j z)) y := by
-    intro y
-    rw [partialD_comp_reflect hφd j k y, ← mul_assoc, hs, reflectSign_mul_self, one_mul]
-  -- The two halves of the extension.
-  have hExtPos : ∀ x ∈ halfSpace j, evenExt j u x = u x := by
-    intro x hx
-    have hx0 : (0 : ℝ) ≤ x j := le_of_lt hx
-    change (if 0 ≤ x j then u x else u (reflectLI j x)) = u x
-    rw [ite_eq_left hx0]
-  have hExtNeg : ∀ y ∈ halfSpace j, evenExt j u (reflectLI j y) = u y := by
-    intro y hy
-    have hyj : 0 < y j := hy
-    have hRy : reflectLI j y j = -(y j) := by
-      rw [reflectLI_apply, reflectSign, ite_eq_left rfl]; ring
-    have hneg : ¬ (0 : ℝ) ≤ reflectLI j y j := by rw [hRy]; linarith
-    change (if 0 ≤ reflectLI j y j then u (reflectLI j y)
-      else u (reflectLI j (reflectLI j y))) = u y
-    rw [ite_eq_right hneg, reflectLI_involutive]
-  have hGradPos : ∀ x ∈ halfSpace j, evenExtGrad j g k x = g k x := by
-    intro x hx
-    have hx0 : (0 : ℝ) ≤ x j := le_of_lt hx
-    change (if 0 ≤ x j then g k x else reflectSign j k * g k (reflectLI j x)) = g k x
-    rw [ite_eq_left hx0]
-  have hGradNeg : ∀ y ∈ halfSpace j, evenExtGrad j g k (reflectLI j y) = s * g k y := by
-    intro y hy
-    have hyj : 0 < y j := hy
-    have hRy : reflectLI j y j = -(y j) := by
-      rw [reflectLI_apply, reflectSign, ite_eq_left rfl]; ring
-    have hneg : ¬ (0 : ℝ) ≤ reflectLI j y j := by rw [hRy]; linarith
-    change (if 0 ≤ reflectLI j y j then g k (reflectLI j y)
-      else reflectSign j k * g k (reflectLI j (reflectLI j y))) = s * g k y
-    rw [ite_eq_right hneg, reflectLI_involutive, hs]
-  -- Bounds, for the integrability side conditions.
-  obtain ⟨N, hN⟩ := (hφcs.fderiv ℝ).comp_left
-    (g := fun T : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ => T (EuclideanSpace.single k (1 : ℝ)))
-    (by simp) |>.exists_bound_of_continuous
-      ((hφ.continuous_fderiv (by simp)).clm_apply continuous_const)
-  obtain ⟨P, hP⟩ := hφcs.exists_bound_of_continuous hφ.continuous
-  have hdφc : Continuous (partialD k φ) :=
-    (hφ.continuous_fderiv (by simp)).clm_apply continuous_const
-  have hdφRc : Continuous (partialD k (fun z => φ (reflectLI j z))) :=
-    (hφR.continuous_fderiv (by simp)).clm_apply continuous_const
-  have habs : |s| = 1 := by
-    rw [hs, reflectSign]
-    split <;> norm_num
-  -- Integrability of the four pieces on the half space.
-  have hi1 : IntegrableOn (fun x => u x * partialD k φ x) (halfSpace j) volume :=
-    hu.mul_bdd hdφc.aestronglyMeasurable (Filter.Eventually.of_forall hN)
-  have hi2 : IntegrableOn (fun y => u y * (s * partialD k (fun z => φ (reflectLI j z)) y))
-      (halfSpace j) volume := by
-    refine hu.mul_bdd (c := N) ((continuous_const.mul hdφRc)).aestronglyMeasurable
-      (Filter.Eventually.of_forall fun y => ?_)
-    rw [norm_mul, Real.norm_eq_abs, habs, one_mul]
-    have : partialD k (fun z => φ (reflectLI j z)) y = s * partialD k φ (reflectLI j y) := by
-      rw [partialD_comp_reflect hφd j k y, hs]
-    rw [this, norm_mul, Real.norm_eq_abs, habs, one_mul]
-    exact hN _
-  have hi3 : IntegrableOn (fun x => g k x * φ x) (halfSpace j) volume :=
-    (hg k).mul_bdd hφ.continuous.aestronglyMeasurable (Filter.Eventually.of_forall hP)
-  have hi4 : IntegrableOn (fun y => g k y * (s * φ (reflectLI j y))) (halfSpace j) volume := by
-    refine (hg k).mul_bdd (c := P) ((continuous_const.mul (hφ.continuous.comp
-      (reflectLI j).continuous))).aestronglyMeasurable (Filter.Eventually.of_forall fun y => ?_)
-    rw [norm_mul, Real.norm_eq_abs, habs, one_mul]
-    exact hP _
-  -- The left-hand side, moved onto the half space.
+  set s : ℝ := reflectSign j k with hs
+  set ψ : EuclideanSpace ℝ (Fin d) → ℝ := fun x => φ x + s * φ (reflectLI j x) with hψ
+  have hψsm : ContDiff ℝ (⊤ : ℕ∞) ψ := hφ.add (contDiff_const.mul hφR)
+  have hψcs : HasCompactSupport ψ := hφcs.add (hasCompactSupport_comp_reflect hφcs j).mul_left
+  -- the derivative of the combination
+  have hpsi : ∀ x, partialD k ψ x = partialD k φ x + partialD k φ (reflectLI j x) := fun x => by
+    have h1 : partialD k ψ x
+        = partialD k φ x + s * partialD k (fun z => φ (reflectLI j z)) x := by
+      rw [hψ, partialD, fderiv_fun_add (hφd x) ((hφR.differentiable (by simp) x).const_mul s),
+        fderiv_const_mul (hφR.differentiable (by simp) x)]
+      simp [partialD]
+    rw [h1, partialD_comp_reflect hφd j k x, ← mul_assoc, hs, reflectSign_mul_self, one_mul]
   have hLHS : ∫ x in Set.univ, evenExt j u x * partialD k φ x
       = ∫ y in halfSpace j, u y * partialD k ψ y := by
-    have hj1 : IntegrableOn (fun x => evenExt j u x * partialD k φ x) (halfSpace j) volume :=
-      hi1.congr_fun (fun x hx => by rw [hExtPos x hx]) (measurableSet_halfSpace j)
-    have hj2 : IntegrableOn (fun x => evenExt j u x * partialD k φ x)
-        (halfSpaceNeg j) volume := by
-      rw [← (measurePreserving_reflectLI j).integrableOn_comp_preimage
-        (measurableEmbedding_reflectLI j), preimage_reflectLI_halfSpaceNeg]
-      refine hi2.congr_fun (fun y hy => ?_) (measurableSet_halfSpace j)
-      change u y * (s * partialD k (fun z => φ (reflectLI j z)) y)
-        = evenExt j u (reflectLI j y) * partialD k φ (reflectLI j y)
-      rw [hExtNeg y hy, hrefl y]
-    rw [setIntegral_univ, integral_split_interface hj1 hj2, setIntegral_halfSpaceNeg]
-    have hsecond : ∫ y in halfSpace j,
-        evenExt j u (reflectLI j y) * partialD k φ (reflectLI j y)
-        = ∫ y in halfSpace j, u y * (s * partialD k (fun z => φ (reflectLI j z)) y) := by
-      refine setIntegral_congr_fun (measurableSet_halfSpace j) fun y hy => ?_
-      rw [hExtNeg y hy, hrefl y]
-    rw [hsecond, ← integral_add hj1 hi2]
-    refine setIntegral_congr_fun (measurableSet_halfSpace j) fun y hy => ?_
-    change evenExt j u y * partialD k φ y
-        + u y * (s * partialD k (fun z => φ (reflectLI j z)) y)
-      = u y * partialD k ψ y
-    rw [hExtPos y hy, hpartial y]
-    ring
-  -- The right-hand side, the same way.
+    rw [setIntegral_univ, evenExt, integral_signedExt_mul hu (hφ.continuous_partialD (by simp) k)
+      (hφcs.partialD k)]
+    exact setIntegral_congr_fun (measurableSet_halfSpace j) fun y _ => by
+      rw [hpsi, one_mul]
   have hRHS : ∫ x in Set.univ, evenExtGrad j g k x * φ x
       = ∫ y in halfSpace j, g k y * ψ y := by
-    have hj3 : IntegrableOn (fun x => evenExtGrad j g k x * φ x) (halfSpace j) volume :=
-      hi3.congr_fun (fun x hx => by rw [hGradPos x hx]) (measurableSet_halfSpace j)
-    have hj4 : IntegrableOn (fun x => evenExtGrad j g k x * φ x) (halfSpaceNeg j) volume := by
-      rw [← (measurePreserving_reflectLI j).integrableOn_comp_preimage
-        (measurableEmbedding_reflectLI j), preimage_reflectLI_halfSpaceNeg]
-      refine hi4.congr_fun (fun y hy => ?_) (measurableSet_halfSpace j)
-      change g k y * (s * φ (reflectLI j y))
-        = evenExtGrad j g k (reflectLI j y) * φ (reflectLI j y)
-      rw [hGradNeg y hy]
-      ring
-    rw [setIntegral_univ, integral_split_interface hj3 hj4, setIntegral_halfSpaceNeg]
-    have hsecond : ∫ y in halfSpace j, evenExtGrad j g k (reflectLI j y) * φ (reflectLI j y)
-        = ∫ y in halfSpace j, g k y * (s * φ (reflectLI j y)) := by
-      refine setIntegral_congr_fun (measurableSet_halfSpace j) fun y hy => ?_
-      rw [hGradNeg y hy]
-      ring
-    rw [hsecond, ← integral_add hj3 hi4]
-    refine setIntegral_congr_fun (measurableSet_halfSpace j) fun y hy => ?_
-    change evenExtGrad j g k y * φ y + g k y * (s * φ (reflectLI j y)) = g k y * ψ y
-    rw [hGradPos y hy, hψdef]
-    ring
+    rw [setIntegral_univ, evenExtGrad, integral_signedExt_mul (hg k) hφ.continuous hφcs]
   rw [hLHS, hRHS]
   by_cases hk : k = j
   · subst hk
-    refine integral_partialD_of_eq hu (hg k) hwg hψsmooth hψcs (fun z hz => ?_)
-    rw [hψdef]
-    simp only
-    rw [reflectLI_eq_self_of_interface hz, hs, reflectSign, ite_eq_left rfl]
-    ring
-  · exact integral_partialD_of_ne hk hu (hg k) hwg hψsmooth hψcs
-
-/-! ### The bound -/
-
-/-- The extension is, almost everywhere, the sum of the class and its reflection, each on its
-own side of the interface. -/
-theorem evenExt_ae_eq (j : Fin d) (u : EuclideanSpace ℝ (Fin d) → ℝ) :
-    evenExt j u =ᵐ[volume] fun x => (halfSpace j).indicator u x
-      + (halfSpaceNeg j).indicator (fun y => u (reflectLI j y)) x := by
-  have hnull : volume {x : EuclideanSpace ℝ (Fin d) | x j = 0} = 0 := volume_interface j
-  refine (MeasureTheory.ae_iff).mpr (measure_mono_null ?_ hnull)
-  intro x hx
-  simp only [Set.mem_ofPred_eq]
-  by_contra hne
-  refine hx ?_
-  rcases lt_trichotomy (x j) 0 with h | h | h
-  · have h1 : ¬ (0 : ℝ) ≤ x j := by linarith
-    have h2 : x ∉ halfSpace j := by
-      intro hmem
-      exact absurd (lt_trans hmem h) (lt_irrefl 0)
-    change (if 0 ≤ x j then u x else u (reflectLI j x))
-      = (halfSpace j).indicator u x + (halfSpaceNeg j).indicator (fun y => u (reflectLI j y)) x
-    have hmemNeg : x ∈ halfSpaceNeg j := h
-    rw [ite_eq_right h1, Set.indicator_of_notMem h2, Set.indicator_of_mem hmemNeg, zero_add]
-  · exact absurd h hne
-  · have h2 : x ∉ halfSpaceNeg j := by
-      intro hmem
-      exact absurd (lt_trans h hmem) (lt_irrefl 0)
-    change (if 0 ≤ x j then u x else u (reflectLI j x))
-      = (halfSpace j).indicator u x + (halfSpaceNeg j).indicator (fun y => u (reflectLI j y)) x
-    have hmemPos : x ∈ halfSpace j := h
-    rw [ite_eq_left h.le, Set.indicator_of_notMem h2, Set.indicator_of_mem hmemPos, add_zero]
-
-/-- **Reflection of the lower half space onto the upper one**, preserving measure. -/
-theorem measurePreserving_reflectLI_halfSpaceNeg (j : Fin d) :
-    MeasurePreserving (reflectLI j) (volume.restrict (halfSpaceNeg j))
-      (volume.restrict (halfSpace j)) := by
-  have h := (measurePreserving_reflectLI j).restrict_preimage_emb
-    (measurableEmbedding_reflectLI j) (halfSpace j)
-  rwa [show reflectLI j ⁻¹' halfSpace j = halfSpaceNeg j from by
-    rw [← preimage_reflectLI_halfSpaceNeg j, reflectLI_preimage_preimage]] at h
-
-/-- **Bound for the extension in every `Lᵖ` seminorm.** The reflection preserves
-measure, so each side contributes the seminorm on the half space. -/
-theorem eLpNorm_evenExt_le {j : Fin d} {u : EuclideanSpace ℝ (Fin d) → ℝ} {p : ℝ≥0∞}
-    (hp : 1 ≤ p) (hu : AEStronglyMeasurable u (volume.restrict (halfSpace j))) :
-    eLpNorm (evenExt j u) p volume ≤ 2 * eLpNorm u p (volume.restrict (halfSpace j)) := by
-  have hmp : MeasurePreserving (reflectLI j) (volume.restrict (halfSpaceNeg j))
-      (volume.restrict (halfSpace j)) := measurePreserving_reflectLI_halfSpaceNeg j
-  have hu' : AEStronglyMeasurable (fun y => u (reflectLI j y))
-      (volume.restrict (halfSpaceNeg j)) := hu.comp_measurePreserving hmp
-  calc eLpNorm (evenExt j u) p volume
-      = eLpNorm (fun x => (halfSpace j).indicator u x
-          + (halfSpaceNeg j).indicator (fun y => u (reflectLI j y)) x) p volume :=
-        eLpNorm_congr_ae (evenExt_ae_eq j u)
-    _ ≤ eLpNorm ((halfSpace j).indicator u) p volume
-        + eLpNorm ((halfSpaceNeg j).indicator (fun y => u (reflectLI j y))) p volume :=
-        eLpNorm_add_le hp
-    _ = eLpNorm u p (volume.restrict (halfSpace j))
-        + eLpNorm u p (volume.restrict (halfSpace j)) := by
-        have hcomp : eLpNorm (fun y => u (reflectLI j y)) p (volume.restrict (halfSpaceNeg j))
-            = eLpNorm u p (volume.restrict (halfSpace j)) :=
-          eLpNorm_comp_measurePreserving hu hmp
-        rw [eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_halfSpace j),
-          eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_halfSpaceNeg j), hcomp]
-    _ = 2 * eLpNorm u p (volume.restrict (halfSpace j)) := by
-        rw [two_mul]
-
-/-! ### Integrability of the extension -/
-
-/-- The extended gradient is, almost everywhere, the sum of the component and its signed
-reflection, each on its own side of the interface. -/
-theorem evenExtGrad_ae_eq (j : Fin d) (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (k : Fin d) :
-    evenExtGrad j g k =ᵐ[volume] fun x => (halfSpace j).indicator (g k) x
-      + (halfSpaceNeg j).indicator (fun y => reflectSign j k * g k (reflectLI j y)) x := by
-  have hnull : volume {x : EuclideanSpace ℝ (Fin d) | x j = 0} = 0 := volume_interface j
-  refine (MeasureTheory.ae_iff).mpr (measure_mono_null ?_ hnull)
-  intro x hx
-  simp only [Set.mem_ofPred_eq]
-  by_contra hne
-  refine hx ?_
-  rcases lt_trichotomy (x j) 0 with h | h | h
-  · have h1 : ¬ (0 : ℝ) ≤ x j := by linarith
-    have h2 : x ∉ halfSpace j := by
-      intro hmem
-      exact absurd (lt_trans hmem h) (lt_irrefl 0)
-    have hmemNeg : x ∈ halfSpaceNeg j := h
-    change (if 0 ≤ x j then g k x else reflectSign j k * g k (reflectLI j x))
-      = (halfSpace j).indicator (g k) x
-        + (halfSpaceNeg j).indicator (fun y => reflectSign j k * g k (reflectLI j y)) x
-    rw [ite_eq_right h1, Set.indicator_of_notMem h2, Set.indicator_of_mem hmemNeg, zero_add]
-  · exact absurd h hne
-  · have h2 : x ∉ halfSpaceNeg j := by
-      intro hmem
-      exact absurd (lt_trans h hmem) (lt_irrefl 0)
-    have hmemPos : x ∈ halfSpace j := h
-    change (if 0 ≤ x j then g k x else reflectSign j k * g k (reflectLI j x))
-      = (halfSpace j).indicator (g k) x
-        + (halfSpaceNeg j).indicator (fun y => reflectSign j k * g k (reflectLI j y)) x
-    rw [ite_eq_left h.le, Set.indicator_of_notMem h2, Set.indicator_of_mem hmemPos, add_zero]
-
-/-- **Measurability of the reflected extension**, from the description of it as a sum of two
-indicators. -/
-theorem aestronglyMeasurable_evenExt {j : Fin d} {u : EuclideanSpace ℝ (Fin d) → ℝ}
-    (hu : AEStronglyMeasurable u (volume.restrict (halfSpace j))) :
-    AEStronglyMeasurable (evenExt j u) volume := by
-  have hmp := measurePreserving_reflectLI_halfSpaceNeg j
-  have hu' : AEStronglyMeasurable (fun y => u (reflectLI j y))
-      (volume.restrict (halfSpaceNeg j)) := hu.comp_measurePreserving hmp
-  have h1 : AEStronglyMeasurable ((halfSpace j).indicator u) volume :=
-    (aestronglyMeasurable_indicator_iff (measurableSet_halfSpace j)).mpr hu
-  have h2 : AEStronglyMeasurable ((halfSpaceNeg j).indicator fun y => u (reflectLI j y)) volume :=
-    (aestronglyMeasurable_indicator_iff (measurableSet_halfSpaceNeg j)).mpr hu'
-  exact (h1.add h2).congr (evenExt_ae_eq j u).symm
-
-/-- **Integrability of the reflected extension.** Each side of the interface contributes the
-integral over the half space, the reflection preserving measure. -/
-theorem integrable_evenExt {j : Fin d} {u : EuclideanSpace ℝ (Fin d) → ℝ}
-    (hu : IntegrableOn u (halfSpace j) volume) : Integrable (evenExt j u) volume := by
-  have hmp := measurePreserving_reflectLI_halfSpaceNeg j
-  have h1 : Integrable ((halfSpace j).indicator u) volume :=
-    hu.integrable_indicator (measurableSet_halfSpace j)
-  have hrefl : IntegrableOn (fun y => u (reflectLI j y)) (halfSpaceNeg j) volume :=
-    (hmp.integrable_comp_emb (measurableEmbedding_reflectLI j)).mpr hu
-  have h2 : Integrable ((halfSpaceNeg j).indicator fun y => u (reflectLI j y)) volume :=
-    hrefl.integrable_indicator (measurableSet_halfSpaceNeg j)
-  exact (h1.add h2).congr (evenExt_ae_eq j u).symm
-
-/-- **Integrability of the extended gradient**, componentwise. -/
-theorem integrable_evenExtGrad {j : Fin d} {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
-    (k : Fin d) (hg : IntegrableOn (g k) (halfSpace j) volume) :
-    Integrable (evenExtGrad j g k) volume := by
-  have hmp := measurePreserving_reflectLI_halfSpaceNeg j
-  have h1 : Integrable ((halfSpace j).indicator (g k)) volume :=
-    hg.integrable_indicator (measurableSet_halfSpace j)
-  have hr0 : IntegrableOn (fun y => g k (reflectLI j y)) (halfSpaceNeg j) volume :=
-    (hmp.integrable_comp_emb (measurableEmbedding_reflectLI j)).mpr hg
-  have hr1 : IntegrableOn (fun y => reflectSign j k * g k (reflectLI j y))
-      (halfSpaceNeg j) volume := Integrable.const_mul hr0 _
-  have h2 : Integrable ((halfSpaceNeg j).indicator
-      fun y => reflectSign j k * g k (reflectLI j y)) volume :=
-    hr1.integrable_indicator (measurableSet_halfSpaceNeg j)
-  exact (h1.add h2).congr (evenExtGrad_ae_eq j g k).symm
-
-/-! ### The gradient's bound -/
-
-/-- The sign a reflection attaches to a direction has absolute value `1`. -/
-theorem abs_reflectSign (j k : Fin d) : |reflectSign j k| = 1 := by
-  rw [reflectSign]
-  split_ifs <;> norm_num
-
-/-- **Measurability of the extended gradient**, componentwise. -/
-theorem aestronglyMeasurable_evenExtGrad {j : Fin d} {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
-    (k : Fin d) (hg : AEStronglyMeasurable (g k) (volume.restrict (halfSpace j))) :
-    AEStronglyMeasurable (evenExtGrad j g k) volume := by
-  have hmp := measurePreserving_reflectLI_halfSpaceNeg j
-  have hg' : AEStronglyMeasurable (fun y => g k (reflectLI j y))
-      (volume.restrict (halfSpaceNeg j)) := hg.comp_measurePreserving hmp
-  have h1 : AEStronglyMeasurable ((halfSpace j).indicator (g k)) volume :=
-    (aestronglyMeasurable_indicator_iff (measurableSet_halfSpace j)).mpr hg
-  have h2 : AEStronglyMeasurable ((halfSpaceNeg j).indicator
-      fun y => reflectSign j k * g k (reflectLI j y)) volume :=
-    (aestronglyMeasurable_indicator_iff (measurableSet_halfSpaceNeg j)).mpr
-      (hg'.const_mul (reflectSign j k))
-  exact (h1.add h2).congr (evenExtGrad_ae_eq j g k).symm
-
-/-- **Bound on the extended gradient in every `Lᵖ` seminorm.** The reflection preserves measure
-and the sign has absolute value `1`, so each side contributes the seminorm on the half space. -/
-theorem eLpNorm_evenExtGrad_le {j : Fin d} {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
-    (k : Fin d) {p : ℝ≥0∞} (hp : 1 ≤ p)
-    (hg : AEStronglyMeasurable (g k) (volume.restrict (halfSpace j))) :
-    eLpNorm (evenExtGrad j g k) p volume
-      ≤ 2 * eLpNorm (g k) p (volume.restrict (halfSpace j)) := by
-  have hmp := measurePreserving_reflectLI_halfSpaceNeg j
-  have hg' : AEStronglyMeasurable (fun y => g k (reflectLI j y))
-      (volume.restrict (halfSpaceNeg j)) := hg.comp_measurePreserving hmp
-  have hsign : eLpNorm (fun y => reflectSign j k * g k (reflectLI j y)) p
-      (volume.restrict (halfSpaceNeg j))
-      ≤ eLpNorm (fun y => g k (reflectLI j y)) p (volume.restrict (halfSpaceNeg j)) := by
-    refine eLpNorm_mono_ae (hg'.const_mul (reflectSign j k))
-      (Filter.Eventually.of_forall fun y => ?_)
-    rw [norm_mul, Real.norm_eq_abs (reflectSign j k), abs_reflectSign, one_mul]
-  calc eLpNorm (evenExtGrad j g k) p volume
-      = eLpNorm (fun x => (halfSpace j).indicator (g k) x
-          + (halfSpaceNeg j).indicator (fun y => reflectSign j k * g k (reflectLI j y)) x)
-          p volume := eLpNorm_congr_ae (evenExtGrad_ae_eq j g k)
-    _ ≤ eLpNorm ((halfSpace j).indicator (g k)) p volume
-        + eLpNorm ((halfSpaceNeg j).indicator
-            fun y => reflectSign j k * g k (reflectLI j y)) p volume := eLpNorm_add_le hp
-    _ ≤ eLpNorm (g k) p (volume.restrict (halfSpace j))
-        + eLpNorm (g k) p (volume.restrict (halfSpace j)) := by
-        rw [eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_halfSpace j),
-          eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_halfSpaceNeg j)]
-        have hstep : eLpNorm (fun y => reflectSign j k * g k (reflectLI j y)) p
-            (volume.restrict (halfSpaceNeg j))
-            ≤ eLpNorm (g k) p (volume.restrict (halfSpace j)) :=
-          hsign.trans (le_of_eq (eLpNorm_comp_measurePreserving hg hmp))
-        exact add_le_add le_rfl hstep
-    _ = 2 * eLpNorm (g k) p (volume.restrict (halfSpace j)) := by rw [two_mul]
+    exact integral_partialD_of_eq hu (hg k) hwg hψsm hψcs fun z hz => by
+      simp [hψ, reflectLI_eq_self_of_interface hz, hs, reflectSign]
+  · exact integral_partialD_of_ne hk hu (hg k) hwg hψsm hψcs
 
 end EllipticPdes.Extension

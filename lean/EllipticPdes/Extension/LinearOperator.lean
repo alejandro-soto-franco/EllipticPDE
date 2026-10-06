@@ -12,10 +12,11 @@ public import EllipticPdes.Extension.Operator
 # Extension operator as a linear map
 
 Guo's proof produces an extension of each class. Evans states the same theorem as a bounded
-linear operator, and this file packages it that way: the partition, the charts, the bounded
-graphs, the radii and the two cutoffs are all chosen from the domain alone, before any class
-appears, so the assembled extension is a formula in the class, and every step of that formula
-is either multiplication by a fixed function, precomposition with a fixed map, or a finite sum.
+linear operator, and this file packages it that way: the partition, the charts, the truncated
+graphs, the radii and the cutoffs are all chosen from the domain alone, before any class appears,
+so the assembled extension is a formula in the class, and every step of that formula is
+multiplication by a fixed function, precomposition with a fixed map, or a finite sum. The map
+`extOp` is built from those linear steps, so its linearity needs no proof.
 
 The domain of the operator is the pair of a class and its gradient, which is what the weak
 gradient of this development relates; the bound of clause (iii) is stated on that pair, so the
@@ -23,7 +24,6 @@ operator is bounded in the sense the theorem asserts at every exponent, and not 
 
 ## Main declarations
 
-* `EllipticPdes.Extension.SobolevPair`: a class together with a candidate gradient.
 * `EllipticPdes.Extension.extLinear`: the extension operator, as an `ℝ`-linear map.
 * `EllipticPdes.Extension.extLinear_spec`: the three clauses of the theorem, stated for that
   map with a constant quantified before the class.
@@ -49,199 +49,28 @@ namespace EllipticPdes.Extension
 open EllipticPdes.Embedding (HasWeakGradOn)
 open EllipticPdes.Sobolev (partialD)
 
-variable {d : ℕ}
-
-/-- A class together with a candidate for its gradient. This is the module the extension
-operator acts on. -/
-abbrev SobolevPair (d : ℕ) : Type :=
-  (EuclideanSpace ℝ (Fin d) → ℝ) × (Fin d → EuclideanSpace ℝ (Fin d) → ℝ)
-
-variable {Ω Ω' : Set (EuclideanSpace ℝ (Fin d))}
-
-/-! ### Linearity of the pieces -/
-
-/-- The indicator of a set is additive in the function. -/
-theorem indicator_add_apply {α : Type*} (s : Set α) (f g : α → ℝ) (y : α) :
-    s.indicator (f + g) y = s.indicator f y + s.indicator g y := by
-  by_cases h : y ∈ s <;> simp [h]
-
-/-- The indicator of a set commutes with a scalar. -/
-theorem indicator_smul_apply {α : Type*} (s : Set α) (a : ℝ) (f : α → ℝ) (y : α) :
-    s.indicator (a • f) y = a * s.indicator f y := by
-  by_cases h : y ∈ s <;> simp [h]
-
-
-/-- A piece of the glued extension is additive in the class. -/
-theorem extPiece_add (P : BoundaryPartition d Ω) (i : Option {x // x ∈ P.centres})
-    (u v : EuclideanSpace ℝ (Fin d) → ℝ) :
-    extPiece P i (u + v) = extPiece P i u + extPiece P i v := by
-  funext y
-  cases i with
-  | none => simp only [extPiece, Pi.add_apply, indicator_add_apply]; ring
-  | some x =>
-      have h : localExt (P.chart x) x (pieceRadius_lt P x) (u + v)
-          = localExt (P.chart x) x (pieceRadius_lt P x) u
-            + localExt (P.chart x) x (pieceRadius_lt P x) v := by
-        funext z
-        exact congrFun (localExt_add (P.chart x) x (pieceRadius_lt P x) u v) z
-      simp only [extPiece, h, Pi.add_apply, indicator_add_apply]
-      ring
-
-/-- A piece of the glued extension commutes with a scalar. -/
-theorem extPiece_smul (P : BoundaryPartition d Ω) (i : Option {x // x ∈ P.centres}) (a : ℝ)
-    (u : EuclideanSpace ℝ (Fin d) → ℝ) :
-    extPiece P i (a • u) = a • extPiece P i u := by
-  funext y
-  cases i with
-  | none =>
-      simp only [extPiece, Pi.smul_apply, smul_eq_mul, indicator_smul_apply]
-      ring
-  | some x =>
-      have h : localExt (P.chart x) x (pieceRadius_lt P x) (a • u)
-          = a • localExt (P.chart x) x (pieceRadius_lt P x) u := by
-        funext z
-        exact congrFun (localExt_smul (P.chart x) x (pieceRadius_lt P x) a u) z
-      simp only [extPiece, h, Pi.smul_apply, smul_eq_mul, indicator_smul_apply]
-      ring
-
-/-- The gradient of a piece is additive in the class and its gradient together. -/
-theorem extPieceGrad_add (P : BoundaryPartition d Ω) (i : Option {x // x ∈ P.centres})
-    (u v : EuclideanSpace ℝ (Fin d) → ℝ) (g h : Fin d → EuclideanSpace ℝ (Fin d) → ℝ)
-    (k : Fin d) :
-    extPieceGrad P i (u + v) (g + h) k = extPieceGrad P i u g k + extPieceGrad P i v h k := by
-  funext y
-  cases i with
-  | none =>
-      simp only [extPieceGrad, Pi.add_apply, indicator_add_apply]
-      ring
-  | some x =>
-      have hu : localExt (P.chart x) x (pieceRadius_lt P x) (u + v)
-          = localExt (P.chart x) x (pieceRadius_lt P x) u
-            + localExt (P.chart x) x (pieceRadius_lt P x) v := by
-        funext z
-        exact congrFun (localExt_add (P.chart x) x (pieceRadius_lt P x) u v) z
-      have hg : localExtGrad (P.chart x) x (pieceRadius_lt P x) (u + v) (g + h) k
-          = localExtGrad (P.chart x) x (pieceRadius_lt P x) u g k
-            + localExtGrad (P.chart x) x (pieceRadius_lt P x) v h k := by
-        funext z
-        exact congrFun (localExtGrad_add (P.chart x) x (pieceRadius_lt P x) u v g h k) z
-      simp only [extPieceGrad, hu, hg, Pi.add_apply, indicator_add_apply]
-      ring
-
-/-- The gradient of a piece commutes with a scalar. -/
-theorem extPieceGrad_smul (P : BoundaryPartition d Ω) (i : Option {x // x ∈ P.centres})
-    (a : ℝ) (u : EuclideanSpace ℝ (Fin d) → ℝ) (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ)
-    (k : Fin d) :
-    extPieceGrad P i (a • u) (a • g) k = a • extPieceGrad P i u g k := by
-  funext y
-  cases i with
-  | none =>
-      simp only [extPieceGrad, Pi.smul_apply, smul_eq_mul, indicator_smul_apply]
-      ring
-  | some x =>
-      have hu : localExt (P.chart x) x (pieceRadius_lt P x) (a • u)
-          = a • localExt (P.chart x) x (pieceRadius_lt P x) u := by
-        funext z
-        exact congrFun (localExt_smul (P.chart x) x (pieceRadius_lt P x) a u) z
-      have hg : localExtGrad (P.chart x) x (pieceRadius_lt P x) (a • u) (a • g) k
-          = a • localExtGrad (P.chart x) x (pieceRadius_lt P x) u g k := by
-        funext z
-        exact congrFun (localExtGrad_smul (P.chart x) x (pieceRadius_lt P x) a u g k) z
-      simp only [extPieceGrad, hu, hg, Pi.smul_apply, smul_eq_mul, indicator_smul_apply]
-      ring
-
-/-! ### Linearity of the glued extension -/
-
-/-- The glued extension is additive in the class. -/
-theorem extFun_add (P : BoundaryPartition d Ω) (u v : EuclideanSpace ℝ (Fin d) → ℝ) :
-    extFun P (u + v) = extFun P u + extFun P v := by
-  funext y
-  simp only [extFun, Pi.add_apply, extPiece_add, ← Finset.sum_add_distrib]
-
-/-- The glued extension commutes with a scalar. -/
-theorem extFun_smul (P : BoundaryPartition d Ω) (a : ℝ) (u : EuclideanSpace ℝ (Fin d) → ℝ) :
-    extFun P (a • u) = a • extFun P u := by
-  funext y
-  simp only [extFun, Pi.smul_apply, smul_eq_mul, extPiece_smul, Finset.mul_sum]
-
-/-- The gradient of the glued extension is additive. -/
-theorem extFunGrad_add (P : BoundaryPartition d Ω) (u v : EuclideanSpace ℝ (Fin d) → ℝ)
-    (g h : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (k : Fin d) :
-    extFunGrad P (u + v) (g + h) k = extFunGrad P u g k + extFunGrad P v h k := by
-  funext y
-  simp only [extFunGrad, Pi.add_apply, extPieceGrad_add, ← Finset.sum_add_distrib]
-
-/-- The gradient of the glued extension commutes with a scalar. -/
-theorem extFunGrad_smul (P : BoundaryPartition d Ω) (a : ℝ)
-    (u : EuclideanSpace ℝ (Fin d) → ℝ) (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ)
-    (k : Fin d) :
-    extFunGrad P (a • u) (a • g) k = a • extFunGrad P u g k := by
-  funext y
-  simp only [extFunGrad, Pi.smul_apply, smul_eq_mul, extPieceGrad_smul, Finset.mul_sum]
-
-/-! ### Linearity of the extension with its support cut down -/
-
-/-- The cut-down extension is additive in the class. -/
-theorem extSubsetFun_add (P : BoundaryPartition d Ω) (χ u v : EuclideanSpace ℝ (Fin d) → ℝ) :
-    extSubsetFun P χ (u + v) = extSubsetFun P χ u + extSubsetFun P χ v := by
-  funext y
-  simp only [extSubsetFun, extFun_add, Pi.add_apply]
-  ring
-
-/-- The cut-down extension commutes with a scalar. -/
-theorem extSubsetFun_smul (P : BoundaryPartition d Ω) (a : ℝ)
-    (χ u : EuclideanSpace ℝ (Fin d) → ℝ) :
-    extSubsetFun P χ (a • u) = a • extSubsetFun P χ u := by
-  funext y
-  simp only [extSubsetFun, extFun_smul, Pi.smul_apply, smul_eq_mul]
-  ring
-
-/-- The gradient of the cut-down extension is additive. -/
-theorem extSubsetGrad_add (P : BoundaryPartition d Ω) (χ u v : EuclideanSpace ℝ (Fin d) → ℝ)
-    (g h : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (k : Fin d) :
-    extSubsetGrad P χ (u + v) (g + h) k
-      = extSubsetGrad P χ u g k + extSubsetGrad P χ v h k := by
-  funext y
-  simp only [extSubsetGrad, extFun_add, extFunGrad_add, Pi.add_apply]
-  ring
-
-/-- The gradient of the cut-down extension commutes with a scalar. -/
-theorem extSubsetGrad_smul (P : BoundaryPartition d Ω) (a : ℝ)
-    (χ u : EuclideanSpace ℝ (Fin d) → ℝ) (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ)
-    (k : Fin d) :
-    extSubsetGrad P χ (a • u) (a • g) k = a • extSubsetGrad P χ u g k := by
-  funext y
-  simp only [extSubsetGrad, extFun_smul, extFunGrad_smul, Pi.smul_apply, smul_eq_mul]
-  ring
-
-/-! ### The operator -/
+variable {d : ℕ} {Ω Ω' : Set (EuclideanSpace ℝ (Fin d))}
 
 /-- **Extension operator.** A class and its gradient go to the extension and its gradient.
 The partition, the charts, the graphs, the radii and the cutoff are fixed before the class, so
 the map is linear. -/
 def extLinear (P : BoundaryPartition d Ω) (χ : EuclideanSpace ℝ (Fin d) → ℝ) :
-    SobolevPair d →ₗ[ℝ] SobolevPair d where
-  toFun w := (extSubsetFun P χ w.1, fun k => extSubsetGrad P χ w.1 w.2 k)
-  map_add' w w' := by
-    refine Prod.ext ?_ ?_
-    · exact extSubsetFun_add P χ w.1 w'.1
-    · funext k
-      exact extSubsetGrad_add P χ w.1 w'.1 w.2 w'.2 k
-  map_smul' a w := by
-    refine Prod.ext ?_ ?_
-    · exact extSubsetFun_smul P a χ w.1
-    · funext k
-      exact extSubsetGrad_smul P a χ w.1 w.2 k
+    SobolevPair d →ₗ[ℝ] SobolevPair d :=
+  cutOp χ ∘ₗ extOp P
 
 /-- The first component of `extLinear P χ w` is `extSubsetFun P χ w.1`. -/
 @[simp] theorem extLinear_fst (P : BoundaryPartition d Ω)
     (χ : EuclideanSpace ℝ (Fin d) → ℝ) (w : SobolevPair d) :
-    (extLinear P χ w).1 = extSubsetFun P χ w.1 := rfl
+    (extLinear P χ w).1 = extSubsetFun P χ w.1 := by
+  simp only [extLinear, LinearMap.comp_apply, extOp_apply]
+  rfl
 
-/-- The `k`-th gradient component of `extLinear P χ w` is `extSubsetGrad P χ w.1 w.2 k`. -/
+/-- The gradient component of `extLinear P χ w` is `extSubsetGrad P χ w.1 w.2`. -/
 @[simp] theorem extLinear_snd (P : BoundaryPartition d Ω)
-    (χ : EuclideanSpace ℝ (Fin d) → ℝ) (w : SobolevPair d) (k : Fin d) :
-    (extLinear P χ w).2 k = extSubsetGrad P χ w.1 w.2 k := rfl
+    (χ : EuclideanSpace ℝ (Fin d) → ℝ) (w : SobolevPair d) :
+    (extLinear P χ w).2 = extSubsetGrad P χ w.1 w.2 := by
+  simp only [extLinear, LinearMap.comp_apply, extOp_apply]
+  rfl
 
 /-- **Three clauses of the theorem for the operator.** The constant is quantified before
 the class, so the map is bounded in the sense clause (iii) asserts. -/

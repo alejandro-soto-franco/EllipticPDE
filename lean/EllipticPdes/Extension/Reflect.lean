@@ -75,6 +75,11 @@ def reflectLI (j : Fin d) : EuclideanSpace ℝ (Fin d) ≃ₗᵢ[ℝ] EuclideanS
   rw [reflectLI, LinearIsometryEquiv.piLpCongrRight_apply, PiLp.toLp_apply, reflectSign]
   split <;> simp
 
+/-- The reflection negates the `j`-th coordinate. -/
+@[simp] lemma reflectLI_apply_self (j : Fin d) (x : EuclideanSpace ℝ (Fin d)) :
+    reflectLI j x j = -x j := by
+  simp [reflectSign]
+
 /-- `reflectLI j` is involutive. -/
 @[simp] lemma reflectLI_involutive (j : Fin d) (x : EuclideanSpace ℝ (Fin d)) :
     reflectLI j (reflectLI j x) = x := by

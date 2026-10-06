@@ -30,7 +30,6 @@ extensions requires.
 
 * `EllipticPdes.Extension.exists_smooth_partition`: a smooth partition of unity subordinate to a
   finite open cover, stated with `ContDiff`.
-* `EllipticPdes.Extension.exists_cutoff_one_on_ball`: a smooth cutoff between two balls.
 * `EllipticPdes.Extension.BoundaryPartition`: the cover and the partition together.
 * `EllipticPdes.Extension.nonempty_boundaryPartition`: every bounded domain with `C¹` boundary
   admits one.
@@ -74,28 +73,6 @@ theorem exists_smooth_partition {ι : Type} [Fintype ι]
     exact f.sum_eq_one hx
 
 
-/-- **Smooth cutoff equal to one on a closed ball and supported in a larger one.** Guo's third
-step asks the support of each piece of the partition to sit compactly inside its neighbourhood,
-and the local extension of step 2 reads the class on a neighbourhood of that support, so a
-cutoff between two balls is what mediates the two. -/
-theorem exists_cutoff_one_on_ball (x : EuclideanSpace ℝ (Fin d)) {r R : ℝ} (hrR : r < R) :
-    ∃ ξ : EuclideanSpace ℝ (Fin d) → ℝ, ContDiff ℝ (⊤ : ℕ∞) ξ ∧
-      (∀ y ∈ closedBall x r, ξ y = 1) ∧ tsupport ξ ⊆ ball x R := by
-  obtain ⟨t, hrt, htR⟩ := exists_between hrR
-  obtain ⟨f, hf0, hf1, -⟩ :=
-    exists_contMDiffMap_zero_one_of_isClosed (I := 𝓘(ℝ, EuclideanSpace ℝ (Fin d)))
-      (isOpen_ball (x := x) (ε := t)).isClosed_compl
-      (isClosed_closedBall (x := x) (ε := r))
-      (by
-        rw [Set.disjoint_compl_left_iff_subset]
-        exact closedBall_subset_ball hrt)
-  refine ⟨fun y => f y, contMDiff_iff_contDiff.mp f.contMDiff, fun y hy => hf1 hy, ?_⟩
-  refine (closure_minimal ?_ (isClosed_closedBall (x := x) (ε := t))).trans
-    (closedBall_subset_ball htR)
-  intro y hy
-  by_contra hc
-  exact hy (hf0 fun hcc => hc (ball_subset_closedBall hcc))
-
 /-- **Data Guo's third step glues with.** A finite family of boundary charts whose balls
 cover the boundary, and a smooth partition of unity subordinate to those balls together with the
 domain itself. The index `none` is the piece supported inside the domain, away from the
@@ -105,30 +82,38 @@ structure BoundaryPartition (d : ℕ) (Ω : Set (EuclideanSpace ℝ (Fin d))) wh
   centres : Finset (EuclideanSpace ℝ (Fin d))
   /-- The chart at each of them. -/
   chart : EuclideanSpace ℝ (Fin d) → C1Chart d
+  /-- The radius of the ball the local extension at each centre is taken on, strictly inside
+  the chart's. -/
+  radius : {x // x ∈ centres} → ℝ
   /-- The pieces of the partition. -/
   part : Option {x // x ∈ centres} → EuclideanSpace ℝ (Fin d) → ℝ
-  /-- Every centre is a boundary point. -/
-  centres_mem : ∀ x ∈ centres, x ∈ frontier Ω
   /-- The chart at a centre describes the domain there. -/
   chart_fits : ∀ x ∈ centres, (chart x).Fits Ω x
+  /-- The ball of the local extension sits strictly inside the chart's. -/
+  radius_lt : ∀ x : {x // x ∈ centres}, radius x < (chart x).radius
   /-- Every piece is smooth. -/
   part_contDiff : ∀ i, ContDiff ℝ (⊤ : ℕ∞) (part i)
-  /-- Every piece is nonnegative. -/
-  part_nonneg : ∀ i x, 0 ≤ part i x
   /-- The interior piece is supported inside the domain. -/
   part_interior : tsupport (part none) ⊆ Ω
-  /-- Each boundary piece is supported in its chart's ball. -/
+  /-- Each boundary piece is supported in the ball of its local extension. -/
   part_boundary : ∀ x : {x // x ∈ centres},
-    tsupport (part (some x)) ⊆ Metric.ball (x : EuclideanSpace ℝ (Fin d)) (chart x).radius
+    tsupport (part (some x)) ⊆ Metric.ball (x : EuclideanSpace ℝ (Fin d)) (radius x)
   /-- The pieces add to one on the closure of the domain. -/
   part_sum : ∀ x ∈ closure Ω, ∑ i, part i x = 1
+
+/-- A boundary piece of the partition has compact support. -/
+theorem BoundaryPartition.hasCompactSupport_part_some {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    (P : BoundaryPartition d Ω) (x : {x // x ∈ P.centres}) :
+    HasCompactSupport (P.part (some x)) :=
+  (isCompact_closedBall (x : EuclideanSpace ℝ (Fin d)) (P.radius x)).of_isClosed_subset
+    (isClosed_tsupport _) ((P.part_boundary x).trans ball_subset_closedBall)
 
 /-- **Every bounded domain with `C¹` boundary admits such a partition.** -/
 theorem nonempty_boundaryPartition (hd : 0 < d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
     (hΩopen : IsOpen Ω) (hΩ : Bornology.IsBounded Ω) (hC1 : HasC1Boundary Ω) :
     Nonempty (BoundaryPartition d Ω) := by
   classical
-  obtain ⟨F, c, hmem, hfits, hcover⟩ := exists_finite_chart_cover hd hΩ hC1
+  obtain ⟨F, c, -, hfits, hcover⟩ := exists_finite_chart_cover hd hΩ hC1
   set U : Option {x // x ∈ F} → Set (EuclideanSpace ℝ (Fin d)) :=
     fun i => i.elim Ω (fun x => Metric.ball (x : EuclideanSpace ℝ (Fin d)) (c x).radius)
     with hUdef
@@ -145,11 +130,11 @@ theorem nonempty_boundaryPartition (hd : 0 < d) {Ω : Set (EuclideanSpace ℝ (F
       exact Set.mem_iUnion.mpr ⟨some ⟨x, hxF⟩, hyx⟩
   obtain ⟨ζ, hζc, hζ0, hζs, hζ1⟩ :=
     exists_smooth_partition (isClosed_closure (s := Ω)) U ho hU
-  exact ⟨{ centres := F, chart := c, part := ζ
-           centres_mem := hmem, chart_fits := hfits
-           part_contDiff := hζc, part_nonneg := hζ0
-           part_interior := hζs none
-           part_boundary := fun x => hζs (some x)
-           part_sum := hζ1 }⟩
+  choose r hr hsub using fun x : {x // x ∈ F} =>
+    exists_pos_lt_subset_ball (c x).radius_pos (isClosed_tsupport (ζ (some x))) (hζs (some x))
+  exact ⟨{ centres := F, chart := c, radius := r, part := ζ, chart_fits := hfits
+           radius_lt := fun x => (hr x).2
+           part_contDiff := hζc, part_interior := hζs none
+           part_boundary := hsub, part_sum := hζ1 }⟩
 
 end EllipticPdes.Extension

@@ -91,13 +91,91 @@ theorem preimage_shear_aboveGraph {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) �
   simp only [Set.mem_preimage, aboveGraph, halfSpace, Set.mem_ofPred_eq, shear_coord, hγS]
   constructor <;> intro h <;> linarith
 
-/-! ### The extension -/
+/-! ### Transport through the shear -/
 
 /-- **Gradient of a class pulled back through the shear**, the transpose of the shear's
 derivative applied to the gradient. -/
 def shearGrad (j : Fin d) (γ : EuclideanSpace ℝ (Fin d) → ℝ)
     (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (k : Fin d) : EuclideanSpace ℝ (Fin d) → ℝ :=
   fun x => g k (shear j γ x) + g j (shear j γ x) * partialD k γ x
+
+/-- **Pull-back through the shear, as a linear map on pairs.** -/
+def shearOp (j : Fin d) (γ : EuclideanSpace ℝ (Fin d) → ℝ) : SobolevPair d →ₗ[ℝ] SobolevPair d where
+  toFun w := (fun x => w.1 (shear j γ x), shearGrad j γ w.2)
+  map_add' w w' := by
+    refine Prod.ext rfl (funext fun k => funext fun x => ?_)
+    simp only [shearGrad, Prod.snd_add, Pi.add_apply]
+    ring
+  map_smul' a w := by
+    refine Prod.ext rfl (funext fun k => funext fun x => ?_)
+    simp only [shearGrad, Prod.smul_snd, Pi.smul_apply, smul_eq_mul, RingHom.id_apply]
+    ring
+
+/-- The partial derivative of a negated chart. -/
+theorem partialD_neg {γ : EuclideanSpace ℝ (Fin d) → ℝ} (k : Fin d)
+    (y : EuclideanSpace ℝ (Fin d)) : partialD k (fun z => -γ z) y = -partialD k γ y := by
+  simp only [partialD, fderiv_fun_neg, _root_.neg_apply]
+
+/-- **Restriction of the shear to the half space**, preserving measure onto the region above
+the graph. -/
+theorem measurePreserving_shear_halfSpace {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hγ : Differentiable ℝ γ) (hind : IndepCoord j γ) :
+    MeasurePreserving (shear j γ) (volume.restrict (halfSpace j))
+      (volume.restrict (aboveGraph j γ)) := by
+  have h := (measurePreserving_shear hγ hind).restrict_preimage_emb
+    (measurableEmbedding_shear hγ.continuous hind) (aboveGraph j γ)
+  rwa [preimage_shear_aboveGraph hind] at h
+
+/-- Integrability on the region above the graph is integrability of the pull-back on the half
+space. -/
+theorem integrableOn_comp_shear_halfSpace {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hγ : Differentiable ℝ γ) (hind : IndepCoord j γ) {w : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hw : IntegrableOn w (aboveGraph j γ) volume) :
+    IntegrableOn (fun x => w (shear j γ x)) (halfSpace j) volume :=
+  ((measurePreserving_shear_halfSpace hγ hind).integrable_comp hw.1).mpr hw
+
+/-- **Normal component of the gradient through the shear**, untouched, the chart having no
+partial derivative in the direction it is a graph in. -/
+theorem shearGrad_normal {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hγ : Differentiable ℝ γ) (hind : IndepCoord j γ)
+    (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) :
+    shearGrad j γ g j = fun x => g j (shear j γ x) := by
+  funext x
+  simp [shearGrad, partialD_eq_zero_of_indepCoord hγ hind x]
+
+/-- The pulled-back gradient is integrable on the half space. -/
+theorem integrableOn_shearGrad {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ} {M : ℝ}
+    (hγ : ContDiff ℝ 1 γ) (hind : IndepCoord j γ)
+    (hγb : ∀ (k : Fin d) (y : EuclideanSpace ℝ (Fin d)), ‖partialD k γ y‖ ≤ M)
+    {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
+    (hgi : ∀ k, IntegrableOn (g k) (aboveGraph j γ) volume) (k : Fin d) :
+    IntegrableOn (shearGrad j γ g k) (halfSpace j) volume :=
+  (integrableOn_comp_shear_halfSpace (hγ.differentiable (by simp)) hind (hgi k)).add
+    (integrableOn_mul_bounded
+      (integrableOn_comp_shear_halfSpace (hγ.differentiable (by simp)) hind (hgi j))
+      (hγ.continuous_partialD one_ne_zero k) (hγb k))
+
+/-- **Bound on the transported gradient**, componentwise. The shear contributes the chart's
+bound against the normal component. -/
+theorem eLpNorm_shearGrad_le {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hγ : ContDiff ℝ 1 γ) (hind : IndepCoord j γ) {M : ℝ}
+    (hγb : ∀ (k : Fin d) (y : EuclideanSpace ℝ (Fin d)), ‖partialD k γ y‖ ≤ M)
+    {p : ℝ≥0∞} (hp : 1 ≤ p) {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
+    (hgm : ∀ k, AEStronglyMeasurable (g k) (volume.restrict (aboveGraph j γ))) (k : Fin d) :
+    eLpNorm (shearGrad j γ g k) p (volume.restrict (halfSpace j))
+      ≤ eLpNorm (g k) p (volume.restrict (aboveGraph j γ))
+        + ENNReal.ofReal M * eLpNorm (g j) p (volume.restrict (aboveGraph j γ)) := by
+  have hres := measurePreserving_shear_halfSpace (hγ.differentiable (by simp)) hind
+  have heq : ∀ i, eLpNorm (fun x => g i (shear j γ x)) p (volume.restrict (halfSpace j))
+      = eLpNorm (g i) p (volume.restrict (aboveGraph j γ)) := fun i =>
+    eLpNorm_comp_measurePreserving (hgm i) hres
+  refine (eLpNorm_add_le hp).trans ?_
+  rw [heq k, ← heq j]
+  exact add_le_add le_rfl (eLpNorm_mul_le_of_bound
+    (((hgm j).comp_measurePreserving hres).mul
+      (hγ.continuous_partialD one_ne_zero k).aestronglyMeasurable) (hγb k))
+
+/-! ### The extension -/
 
 /-- **Extension across a `C¹` boundary chart.** The chart is flattened by the shear, the
 flattened class is reflected across the interface, and the reflection returns through the
@@ -110,13 +188,21 @@ def chartExt (j : Fin d) (γ u : EuclideanSpace ℝ (Fin d) → ℝ) :
 own contribution, with the sign of the inverse chart. -/
 def chartExtGrad (j : Fin d) (γ : EuclideanSpace ℝ (Fin d) → ℝ)
     (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (k : Fin d) : EuclideanSpace ℝ (Fin d) → ℝ :=
-  fun y => evenExtGrad j (shearGrad j γ g) k (shear j (fun z => -γ z) y)
-    - evenExtGrad j (shearGrad j γ g) j (shear j (fun z => -γ z) y) * partialD k γ y
+  shearGrad j (fun z => -γ z) (evenExtGrad j (shearGrad j γ g)) k
 
-/-- The partial derivative of a negated chart. -/
-theorem partialD_neg {γ : EuclideanSpace ℝ (Fin d) → ℝ} (k : Fin d)
-    (y : EuclideanSpace ℝ (Fin d)) : partialD k (fun z => -γ z) y = -partialD k γ y := by
-  simp only [partialD, fderiv_fun_neg, _root_.neg_apply]
+/-- **Reflection across the interface, as a linear map on pairs.** -/
+def evenOp (j : Fin d) : SobolevPair d →ₗ[ℝ] SobolevPair d where
+  toFun w := (evenExt j w.1, evenExtGrad j w.2)
+  map_add' _ _ := Prod.ext (map_add _ _ _) (funext fun _ => (signedExt j _).map_add _ _)
+  map_smul' _ _ := Prod.ext (map_smul _ _ _) (funext fun _ => (signedExt j _).map_smul _ _)
+
+/-- **Extension across a chart, as a linear map on pairs**: flatten, reflect, return. -/
+def chartOp (j : Fin d) (γ : EuclideanSpace ℝ (Fin d) → ℝ) : SobolevPair d →ₗ[ℝ] SobolevPair d :=
+  shearOp j (fun z => -γ z) ∘ₗ evenOp j ∘ₗ shearOp j γ
+
+/-- `chartOp` is the pair of `chartExt` and `chartExtGrad`. -/
+theorem chartOp_apply (j : Fin d) (γ : EuclideanSpace ℝ (Fin d) → ℝ) (w : SobolevPair d) :
+    chartOp j γ w = (chartExt j γ w.1, fun k => chartExtGrad j γ w.2 k) := rfl
 
 /-- **Weak gradient of the extension across a `C¹` boundary chart**, on the whole space. The
 class travels through the shear onto the half space, the reflection extends it across the
@@ -131,60 +217,51 @@ theorem hasWeakGradOn_chartExt {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → 
     (hwg : HasWeakGradOn (aboveGraph j γ) u g) :
     HasWeakGradOn Set.univ (chartExt j γ u) (chartExtGrad j γ g) := by
   have hγd : Differentiable ℝ γ := hγ.differentiable (by simp)
-  have hnegC1 : ContDiff ℝ 1 fun z => -γ z := hγ.neg
-  have hnegd : Differentiable ℝ fun z => -γ z := hγd.neg
-  have hckc : ∀ k : Fin d, Continuous (partialD k γ) := fun _ =>
-    (hγ.continuous_fderiv one_ne_zero).clm_apply continuous_const
   have hnegb : ∀ (k : Fin d) (y : EuclideanSpace ℝ (Fin d)),
-      ‖partialD k (fun z => -γ z) y‖ ≤ M := by
-    intro k y
+      ‖partialD k (fun z => -γ z) y‖ ≤ M := fun k y => by
     rw [partialD_neg, norm_neg]
     exact hγb k y
-  -- the class and its gradient, moved onto the half space
-  have hmpS : MeasurePreserving (shear j γ) volume volume := measurePreserving_shear hγd hind
-  have hmeS : MeasurableEmbedding (shear j γ) := measurableEmbedding_shear hγd.continuous hind
-  have htrans : ∀ w : EuclideanSpace ℝ (Fin d) → ℝ, IntegrableOn w (aboveGraph j γ) volume →
-      IntegrableOn (fun x => w (shear j γ x)) (halfSpace j) volume := by
-    intro w hw
-    have h := (hmpS.integrableOn_comp_preimage hmeS (f := w) (s := aboveGraph j γ)).mpr hw
-    rwa [preimage_shear_aboveGraph hind] at h
-  have hgS : ∀ k, IntegrableOn (shearGrad j γ g k) (halfSpace j) volume := by
-    intro k
-    exact (htrans (g k) (hgi k)).add
-      (integrableOn_mul_bounded (htrans (g j) (hgi j)) (hckc k) (hγb k))
   have hS : HasWeakGradOn (halfSpace j) (fun x => u (shear j γ x)) (shearGrad j γ g) := by
     have h := hasWeakGradOn_comp_shear (isOpen_aboveGraph hγd.continuous) hu hgi hwg hγ hind hγb
     rwa [preimage_shear_aboveGraph hind] at h
-  -- reflected across the interface
-  have hEven : HasWeakGradOn Set.univ (evenExt j fun x => u (shear j γ x))
-      (evenExtGrad j (shearGrad j γ g)) :=
-    hasWeakGradOn_evenExt (htrans u hu) hgS hS
-  -- returned through the inverse shear
   have hFinal := hasWeakGradOn_comp_shear (B := Set.univ) isOpen_univ
-    (integrable_evenExt (htrans u hu)).integrableOn
-    (fun k => (integrable_evenExtGrad k (hgS k)).integrableOn)
-    hEven hnegC1 hind.neg hnegb
-  rw [Set.preimage_univ] at hFinal
-  have hgrad : chartExtGrad j γ g
-      = fun k y => evenExtGrad j (shearGrad j γ g) k (shear j (fun z => -γ z) y)
-        + evenExtGrad j (shearGrad j γ g) j (shear j (fun z => -γ z) y)
-          * partialD k (fun z => -γ z) y := by
-    funext k y
-    simp only [chartExtGrad, partialD_neg]
-    ring
-  rw [hgrad]
-  exact hFinal
+    (integrable_signedExt (integrableOn_comp_shear_halfSpace hγd hind hu)).integrableOn
+    (fun k => (integrable_signedExt (integrableOn_shearGrad hγ hind hγb hgi k)).integrableOn)
+    (hasWeakGradOn_evenExt (integrableOn_comp_shear_halfSpace hγd hind hu)
+      (integrableOn_shearGrad hγ hind hγb hgi) hS) hγ.neg hind.neg hnegb
+  rwa [Set.preimage_univ] at hFinal
 
 /-- **Agreement of the extension with the class on the region it extends.** -/
 theorem chartExt_eq_of_mem {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ}
     (hind : IndepCoord j γ) {u : EuclideanSpace ℝ (Fin d) → ℝ}
     {y : EuclideanSpace ℝ (Fin d)} (hy : y ∈ aboveGraph j γ) : chartExt j γ u y = u y := by
-  have hmem : shear j (fun z => -γ z) y ∈ halfSpace j := by
-    rw [aboveGraph_eq_preimage] at hy
-    exact hy
-  have h0 : (0 : ℝ) ≤ (shear j (fun z => -γ z) y) j := le_of_lt hmem
-  simp only [chartExt, evenExt]
-  rw [ite_eq_left h0, shear_neg_shear hind y]
+  rw [aboveGraph_eq_preimage] at hy
+  simp only [chartExt, evenExt, signedExt_of_nonneg (le_of_lt hy), shear_neg_shear hind y]
+
+/-- **Integrability of the extension across a chart.** -/
+theorem integrable_chartExt {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hγ : Differentiable ℝ γ) (hind : IndepCoord j γ) {u : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hu : IntegrableOn u (aboveGraph j γ) volume) : Integrable (chartExt j γ u) volume :=
+  ((measurePreserving_shear hγ.neg hind.neg).integrable_comp_emb
+    (measurableEmbedding_shear hγ.neg.continuous hind.neg)).mpr
+    (integrable_signedExt (integrableOn_comp_shear_halfSpace hγ hind hu))
+
+/-- **Integrability of the gradient of the extension across a chart.** -/
+theorem integrable_chartExtGrad {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ} {M : ℝ}
+    (hγ : ContDiff ℝ 1 γ) (hind : IndepCoord j γ)
+    (hγb : ∀ (k : Fin d) (y : EuclideanSpace ℝ (Fin d)), ‖partialD k γ y‖ ≤ M)
+    {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
+    (hgi : ∀ k, IntegrableOn (g k) (aboveGraph j γ) volume) (k : Fin d) :
+    Integrable (chartExtGrad j γ g k) volume := by
+  have hγd : Differentiable ℝ γ := hγ.differentiable (by simp)
+  have hback : ∀ i, Integrable (evenExtGrad j (shearGrad j γ g) i ∘ shear j fun z => -γ z)
+      volume := fun i =>
+    ((measurePreserving_shear hγd.neg hind.neg).integrable_comp_emb
+      (measurableEmbedding_shear hγd.neg.continuous hind.neg)).mpr
+      (integrable_signedExt (integrableOn_shearGrad hγ hind hγb hgi i))
+  exact (hback k).add (integrableOn_univ.mp (integrableOn_mul_bounded
+    (integrableOn_univ.mpr (hback j)) (hγ.neg.continuous_partialD one_ne_zero k)
+    (fun y => by rw [partialD_neg, norm_neg]; exact hγb k y)))
 
 /-- **Bound on the extension in every `Lᵖ` seminorm.** Both shears preserve measure and the
 reflection doubles, so the extension over the whole space is bounded by twice the seminorm over
@@ -195,114 +272,23 @@ theorem eLpNorm_chartExt_le {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ
     (hu : AEStronglyMeasurable u (volume.restrict (aboveGraph j γ))) :
     eLpNorm (chartExt j γ u) p volume
       ≤ 2 * eLpNorm u p (volume.restrict (aboveGraph j γ)) := by
-  have hnegd : Differentiable ℝ fun z => -γ z := hγ.neg
-  have hmpS : MeasurePreserving (shear j γ) volume volume := measurePreserving_shear hγ hind
-  have hmeS : MeasurableEmbedding (shear j γ) := measurableEmbedding_shear hγ.continuous hind
-  -- the flattened class, on the half space
-  have hres : MeasurePreserving (shear j γ) (volume.restrict (halfSpace j))
-      (volume.restrict (aboveGraph j γ)) := by
-    have h := hmpS.restrict_preimage_emb hmeS (aboveGraph j γ)
-    rwa [preimage_shear_aboveGraph hind] at h
-  have hvm : AEStronglyMeasurable (fun x => u (shear j γ x))
-      (volume.restrict (halfSpace j)) := hu.comp_measurePreserving hres
-  have hveq : eLpNorm (fun x => u (shear j γ x)) p (volume.restrict (halfSpace j))
-      = eLpNorm u p (volume.restrict (aboveGraph j γ)) :=
-    eLpNorm_comp_measurePreserving hu hres
-  -- the reflection, returned through the inverse shear
-  have hem : AEStronglyMeasurable (evenExt j fun x => u (shear j γ x)) volume :=
-    aestronglyMeasurable_evenExt hvm
-  have hback : eLpNorm (chartExt j γ u) p volume
-      = eLpNorm (evenExt j fun x => u (shear j γ x)) p volume :=
-    eLpNorm_comp_measurePreserving hem (measurePreserving_shear hnegd hind.neg)
+  have hres := measurePreserving_shear_halfSpace hγ hind
+  have hvm := hu.comp_measurePreserving hres
   calc eLpNorm (chartExt j γ u) p volume
-      = eLpNorm (evenExt j fun x => u (shear j γ x)) p volume := hback
+      = eLpNorm (evenExt j fun x => u (shear j γ x)) p volume :=
+        eLpNorm_comp_measurePreserving (aestronglyMeasurable_signedExt hvm)
+          (measurePreserving_shear hγ.neg hind.neg)
     _ ≤ 2 * eLpNorm (fun x => u (shear j γ x)) p (volume.restrict (halfSpace j)) :=
-        eLpNorm_evenExt_le hp hvm
-    _ = 2 * eLpNorm u p (volume.restrict (aboveGraph j γ)) := by rw [hveq]
-
-/-! ### The gradient's bound -/
-
-/-- **Restriction of the shear to the half space**, preserving measure onto the region above
-the graph. -/
-theorem measurePreserving_shear_halfSpace {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ}
-    (hγ : Differentiable ℝ γ) (hind : IndepCoord j γ) :
-    MeasurePreserving (shear j γ) (volume.restrict (halfSpace j))
-      (volume.restrict (aboveGraph j γ)) := by
-  have h := (measurePreserving_shear hγ hind).restrict_preimage_emb
-    (measurableEmbedding_shear hγ.continuous hind) (aboveGraph j γ)
-  rwa [preimage_shear_aboveGraph hind] at h
-
-/-- **Normal component of the gradient through the shear**, untouched, the chart having no
-partial derivative in the direction it is a graph in. -/
-theorem shearGrad_normal {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ}
-    (hγ : Differentiable ℝ γ) (hind : IndepCoord j γ)
-    (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) :
-    shearGrad j γ g j = fun x => g j (shear j γ x) := by
-  funext x
-  have hz : partialD j γ x = 0 := partialD_eq_zero_of_indepCoord hγ hind x
-  simp only [shearGrad, hz, mul_zero, add_zero]
-
-/-- **Scaling of an `Lᵖ` seminorm by a bounded factor.** -/
-theorem eLpNorm_mul_bounded_le {μ : Measure (EuclideanSpace ℝ (Fin d))}
-    {f h : EuclideanSpace ℝ (Fin d) → ℝ} {C : ℝ} (hC0 : 0 ≤ C) (hC : ∀ x, ‖h x‖ ≤ C)
-    (hh : AEStronglyMeasurable h μ)
-    {p : ℝ≥0∞} : eLpNorm (fun x => f x * h x) p μ ≤ ENNReal.ofReal C * eLpNorm f p μ := by
-  have hnorm : ‖C‖ₑ = ENNReal.ofReal C := by
-    rw [← ofReal_norm, Real.norm_eq_abs, abs_of_nonneg hC0]
-  have h1 : eLpNorm (fun x => f x * h x) p μ ≤ eLpNorm (C • f) p μ := by
-    have hpt : ∀ x, ‖f x * h x‖ ≤ ‖(C • f) x‖ := fun x => by
-      have hs : ‖(C • f) x‖ = C * ‖f x‖ := by
-        simp [Pi.smul_apply, smul_eq_mul, Real.norm_eq_abs, abs_of_nonneg hC0]
-      rw [norm_mul, hs, mul_comm]
-      exact mul_le_mul_of_nonneg_right (hC x) (norm_nonneg _)
-    by_cases hf : AEStronglyMeasurable f μ
-    · exact eLpNorm_mono_ae (hf.mul hh) (Filter.Eventually.of_forall hpt)
-    · rcases hC0.eq_or_lt with hC0' | hCpos
-      · have hzero : (fun x => f x * h x) = 0 := by
-          funext x
-          have hhx : h x = 0 := norm_le_zero_iff.mp (hC x |>.trans hC0'.symm.le)
-          simp [hhx]
-        rw [hzero, eLpNorm_zero]
-        exact zero_le
-      · have hnm : ¬ AEStronglyMeasurable (C • f) μ := fun hm => hf (by
-          simpa [smul_smul, hCpos.ne'] using hm.const_smul C⁻¹)
-        rw [eLpNorm_of_not_aestronglyMeasurable hnm]
-        exact le_top
-  refine h1.trans (le_of_eq ?_)
-  rw [eLpNorm_const_smul, hnorm]
-
-/-- **Bound on the transported gradient**, componentwise. The shear contributes the chart's
-bound against the normal component. -/
-theorem eLpNorm_shearGrad_le {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ}
-    (hγ : ContDiff ℝ 1 γ) (hind : IndepCoord j γ) {M : ℝ} (hM0 : 0 ≤ M)
-    (hγb : ∀ (k : Fin d) (y : EuclideanSpace ℝ (Fin d)), ‖partialD k γ y‖ ≤ M)
-    {p : ℝ≥0∞} (hp : 1 ≤ p) {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
-    (hgm : ∀ k, AEStronglyMeasurable (g k) (volume.restrict (aboveGraph j γ))) (k : Fin d) :
-    eLpNorm (shearGrad j γ g k) p (volume.restrict (halfSpace j))
-      ≤ eLpNorm (g k) p (volume.restrict (aboveGraph j γ))
-        + ENNReal.ofReal M * eLpNorm (g j) p (volume.restrict (aboveGraph j γ)) := by
-  have hγd : Differentiable ℝ γ := hγ.differentiable (by simp)
-  have hres := measurePreserving_shear_halfSpace hγd hind
-  have hckc : Continuous (partialD k γ) :=
-    (hγ.continuous_fderiv one_ne_zero).clm_apply continuous_const
-  have heq : ∀ i, eLpNorm (fun x => g i (shear j γ x)) p (volume.restrict (halfSpace j))
-      = eLpNorm (g i) p (volume.restrict (aboveGraph j γ)) := fun i =>
-    eLpNorm_comp_measurePreserving (hgm i) hres
-  calc eLpNorm (shearGrad j γ g k) p (volume.restrict (halfSpace j))
-      ≤ eLpNorm (fun x => g k (shear j γ x)) p (volume.restrict (halfSpace j))
-        + eLpNorm (fun x => g j (shear j γ x) * partialD k γ x) p
-            (volume.restrict (halfSpace j)) :=
-        eLpNorm_add_le hp
-    _ ≤ eLpNorm (g k) p (volume.restrict (aboveGraph j γ))
-        + ENNReal.ofReal M * eLpNorm (g j) p (volume.restrict (aboveGraph j γ)) := by
-        rw [heq k, ← heq j]
-        exact add_le_add le_rfl (eLpNorm_mul_bounded_le hM0 (hγb k) hckc.aestronglyMeasurable)
+        eLpNorm_signedExt_le hp (by simp) hvm
+    _ = 2 * eLpNorm u p (volume.restrict (aboveGraph j γ)) := by
+        rw [← eLpNorm_comp_measurePreserving hu hres]
+        rfl
 
 /-- **Bound on the gradient of the extension across a `C¹` boundary chart.** Each of the three
 maps plays its part: the shear contributes the chart's bound against the normal component, the
 reflection doubles, and the inverse shear contributes the bound again. -/
 theorem eLpNorm_chartExtGrad_le {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ}
-    (hγ : ContDiff ℝ 1 γ) (hind : IndepCoord j γ) {M : ℝ} (hM0 : 0 ≤ M)
+    (hγ : ContDiff ℝ 1 γ) (hind : IndepCoord j γ) {M : ℝ} (_hM0 : 0 ≤ M)
     (hγb : ∀ (k : Fin d) (y : EuclideanSpace ℝ (Fin d)), ‖partialD k γ y‖ ≤ M)
     {p : ℝ≥0∞} (hp : 1 ≤ p) {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
     (hgm : ∀ k, AEStronglyMeasurable (g k) (volume.restrict (aboveGraph j γ))) (k : Fin d) :
@@ -310,58 +296,32 @@ theorem eLpNorm_chartExtGrad_le {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) →
       ≤ 2 * eLpNorm (g k) p (volume.restrict (aboveGraph j γ))
         + 4 * ENNReal.ofReal M * eLpNorm (g j) p (volume.restrict (aboveGraph j γ)) := by
   have hγd : Differentiable ℝ γ := hγ.differentiable (by simp)
-  have hnegd : Differentiable ℝ fun z => -γ z := hγd.neg
   have hres := measurePreserving_shear_halfSpace hγd hind
-  have hckc : Continuous (partialD k γ) :=
-    (hγ.continuous_fderiv one_ne_zero).clm_apply continuous_const
-  have hcomp : ∀ i, AEStronglyMeasurable (fun x => g i (shear j γ x))
-      (volume.restrict (halfSpace j)) := fun i => (hgm i).comp_measurePreserving hres
-  have hsgm : ∀ i, AEStronglyMeasurable (shearGrad j γ g i)
-      (volume.restrict (halfSpace j)) := by
-    intro i
-    have hci : Continuous (partialD i γ) :=
-      (hγ.continuous_fderiv one_ne_zero).clm_apply continuous_const
-    exact (hcomp i).add ((hcomp j).mul hci.aestronglyMeasurable)
-  -- the extended gradient, and its bound on the half space
-  have hHm : ∀ i, AEStronglyMeasurable (evenExtGrad j (shearGrad j γ g) i) volume := fun i =>
-    aestronglyMeasurable_evenExtGrad i (hsgm i)
-  have hH : ∀ i, eLpNorm (evenExtGrad j (shearGrad j γ g) i) p volume
+  have hmpT := measurePreserving_shear hγd.neg hind.neg
+  have hsgm : ∀ i, AEStronglyMeasurable (shearGrad j γ g i) (volume.restrict (halfSpace j)) :=
+    fun i => ((hgm i).comp_measurePreserving hres).add (((hgm j).comp_measurePreserving hres).mul
+      (hγ.continuous_partialD one_ne_zero i).aestronglyMeasurable)
+  -- the reflected gradient, returned through the inverse shear, and its bound on the half space
+  have hH : ∀ i, eLpNorm (evenExtGrad j (shearGrad j γ g) i ∘ shear j fun z => -γ z) p volume
       ≤ 2 * eLpNorm (shearGrad j γ g i) p (volume.restrict (halfSpace j)) := fun i =>
-    eLpNorm_evenExtGrad_le i hp (hsgm i)
-  -- the inverse shear preserves the seminorm
-  have hmpT : MeasurePreserving (shear j fun z => -γ z) volume volume :=
-    measurePreserving_shear hnegd hind.neg
-  have hback : ∀ i, eLpNorm (evenExtGrad j (shearGrad j γ g) i ∘ shear j fun z => -γ z)
-      p volume = eLpNorm (evenExtGrad j (shearGrad j γ g) i) p volume := fun i =>
-    eLpNorm_comp_measurePreserving (hHm i) hmpT
-  -- the normal component travels untouched, so its bound has no chart factor
+    (eLpNorm_comp_measurePreserving (aestronglyMeasurable_signedExt (hsgm i)) hmpT).le.trans
+      (eLpNorm_signedExt_le hp (abs_reflectSign j i) (hsgm i))
   have hjbound : eLpNorm (shearGrad j γ g j) p (volume.restrict (halfSpace j))
       = eLpNorm (g j) p (volume.restrict (aboveGraph j γ)) := by
     rw [shearGrad_normal hγd hind g]
     exact eLpNorm_comp_measurePreserving (hgm j) hres
-  have hsplit : chartExtGrad j γ g k
-      = (evenExtGrad j (shearGrad j γ g) k ∘ shear j fun z => -γ z)
-        - fun y => (evenExtGrad j (shearGrad j γ g) j ∘ shear j fun z => -γ z) y
-            * partialD k γ y := rfl
-  rw [hsplit]
-  calc eLpNorm ((evenExtGrad j (shearGrad j γ g) k ∘ shear j fun z => -γ z)
-        - fun y => (evenExtGrad j (shearGrad j γ g) j ∘ shear j fun z => -γ z) y
-            * partialD k γ y) p volume
-      ≤ eLpNorm (evenExtGrad j (shearGrad j γ g) k ∘ shear j fun z => -γ z) p volume
-        + eLpNorm (fun y => (evenExtGrad j (shearGrad j γ g) j ∘ shear j fun z => -γ z) y
-            * partialD k γ y) p volume :=
-        eLpNorm_sub_le hp
-    _ ≤ 2 * (eLpNorm (g k) p (volume.restrict (aboveGraph j γ))
+  have hHm : AEStronglyMeasurable (evenExtGrad j (shearGrad j γ g) j ∘ shear j fun z => -γ z)
+      volume := (aestronglyMeasurable_signedExt (hsgm j)).comp_measurePreserving hmpT
+  refine (eLpNorm_add_le hp).trans ?_
+  calc _ ≤ 2 * (eLpNorm (g k) p (volume.restrict (aboveGraph j γ))
           + ENNReal.ofReal M * eLpNorm (g j) p (volume.restrict (aboveGraph j γ)))
         + ENNReal.ofReal M * (2 * eLpNorm (g j) p (volume.restrict (aboveGraph j γ))) := by
-        refine add_le_add ?_ ?_
-        · refine ((hback k).le.trans (hH k)).trans ?_
-          exact mul_le_mul_right (eLpNorm_shearGrad_le hγ hind hM0 hγb hp hgm k) 2
-        · refine (eLpNorm_mul_bounded_le hM0 (hγb k) hckc.aestronglyMeasurable).trans ?_
-          refine mul_le_mul_right (((hback j).le.trans (hH j)).trans ?_) _
-          exact le_of_eq (by rw [hjbound])
-    _ = 2 * eLpNorm (g k) p (volume.restrict (aboveGraph j γ))
-        + 4 * ENNReal.ofReal M * eLpNorm (g j) p (volume.restrict (aboveGraph j γ)) := by
-        ring
+        refine add_le_add ((hH k).trans ?_) ?_
+        · exact mul_le_mul_right (eLpNorm_shearGrad_le hγ hind hγb hp hgm k) 2
+        · refine (eLpNorm_mul_le_of_bound (hHm.mul
+            (hγ.neg.continuous_partialD one_ne_zero k).aestronglyMeasurable)
+            (fun y => by rw [partialD_neg, norm_neg]; exact hγb k y)).trans ?_
+          exact mul_le_mul_right ((hH j).trans (by rw [hjbound])) _
+    _ = _ := by ring
 
 end EllipticPdes.Extension

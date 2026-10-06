@@ -133,46 +133,85 @@ theorem norm_partialD_le_fderiv {f : EuclideanSpace ℝ (Fin d) → ℝ} (k : Fi
 
 /-! ### Cutting a graph off outside the ball it describes -/
 
-/-- **Every graph agrees on a ball with one of bounded gradient.** A chart constrains its graph
-only on the ball it describes, so cutting the graph off in the tangential directions leaves the
-description alone and bounds the gradient. This is what lets the chart ask for no bound while
-every statement about the shear has one. -/
-theorem exists_bounded_graph {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ}
-    (hγ : ContDiff ℝ 1 γ) (hind : IndepCoord j γ) (z : EuclideanSpace ℝ (Fin d)) {r : ℝ}
-    (hr : 0 < r) :
-    ∃ (γ' : EuclideanSpace ℝ (Fin d) → ℝ) (M : ℝ), ContDiff ℝ 1 γ' ∧ IndepCoord j γ' ∧
-      (∀ (k : Fin d) (y : EuclideanSpace ℝ (Fin d)), ‖partialD k γ' y‖ ≤ M) ∧
-      aboveGraph j γ' ∩ ball z r = aboveGraph j γ ∩ ball z r := by
-  classical
+/-- The bump of radii `r` and `2 r` about the tangential part of `z`. -/
+def tangentialBump (j : Fin d) (z : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr : 0 < r) :
+    ContDiffBump (tangential j z) :=
+  ⟨r, 2 * r, hr, by linarith⟩
+
+/-- The bump in the tangential directions, equal to one on the cylinder of radius `r` about the
+axis through `z` and supported in the cylinder of radius `2 r`. -/
+def cylinderBump (j : Fin d) (z : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr : 0 < r)
+    (y : EuclideanSpace ℝ (Fin d)) : ℝ :=
+  tangentialBump j z hr (tangential j y)
+
+/-- **Truncation of a graph.** The graph is read as itself on the cylinder about the axis through
+`z` and as the constant `γ z` far from it. A chart constrains its graph only on the ball it
+describes, so the truncation leaves the description alone and bounds the gradient. -/
+def truncatedGraph (j : Fin d) (γ : EuclideanSpace ℝ (Fin d) → ℝ) (z : EuclideanSpace ℝ (Fin d))
+    {r : ℝ} (hr : 0 < r) (y : EuclideanSpace ℝ (Fin d)) : ℝ :=
+  cylinderBump j z hr y * (γ y - γ z) + γ z
+
+section truncatedGraph
+
+variable {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ} {z : EuclideanSpace ℝ (Fin d)} {r : ℝ}
+  (hr : 0 < r)
+
+include hr in
+/-- The bump is smooth. -/
+theorem contDiff_cylinderBump : ContDiff ℝ (⊤ : ℕ∞) (cylinderBump j z hr) :=
+  ContDiffBump.contDiff _ |>.comp (tangential j).contDiff
+
+include hr in
+/-- The bump does not depend on the `j`-th coordinate. -/
+theorem indepCoord_cylinderBump : IndepCoord j (cylinderBump j z hr) := fun y t => by
+  simp only [cylinderBump, tangential_add_smul]
+
+include hr in
+/-- The bump is one on the ball. -/
+theorem cylinderBump_eq_one {y : EuclideanSpace ℝ (Fin d)} (hy : y ∈ ball z r) :
+    cylinderBump j z hr y = 1 := by
+  refine ContDiffBump.one_of_mem_closedBall _ ?_
+  rw [mem_closedBall, dist_eq_norm, ← map_sub]
+  exact (norm_tangential_le j (y - z)).trans (by rw [← dist_eq_norm]; exact (mem_ball.1 hy).le)
+
+/-- The truncation is of class `C¹`. -/
+theorem contDiff_truncatedGraph (hγ : ContDiff ℝ 1 γ) : ContDiff ℝ 1 (truncatedGraph j γ z hr) :=
+  (((contDiff_cylinderBump hr).of_le (by exact_mod_cast le_top)).mul
+    (hγ.sub contDiff_const)).add contDiff_const
+
+/-- The truncation does not depend on the `j`-th coordinate. -/
+theorem indepCoord_truncatedGraph (hind : IndepCoord j γ) :
+    IndepCoord j (truncatedGraph j γ z hr) := fun y t => by
+  simp only [truncatedGraph, indepCoord_cylinderBump hr y t, hind y t]
+
+/-- The truncation describes the same region as the graph on the ball. -/
+theorem aboveGraph_truncatedGraph_inter :
+    aboveGraph j (truncatedGraph j γ z hr) ∩ ball z r = aboveGraph j γ ∩ ball z r := by
+  ext y
+  simp only [Set.mem_inter_iff, aboveGraph, Set.mem_ofPred_eq, and_congr_left_iff]
+  intro hy
+  simp [truncatedGraph, cylinderBump_eq_one hr hy]
+
+/-- **The truncation has a bounded gradient.** Outside the cylinder of radius `2 r` the bump and
+its derivative vanish, and inside it the continuous functions independent of the `j`-th
+coordinate are bounded. -/
+theorem exists_bound_partialD_truncatedGraph (hγ : ContDiff ℝ 1 γ) (hind : IndepCoord j γ) :
+    ∃ M : ℝ, ∀ (k : Fin d) (y : EuclideanSpace ℝ (Fin d)),
+      ‖partialD k (truncatedGraph j γ z hr) y‖ ≤ M := by
   have hγd : Differentiable ℝ γ := hγ.differentiable (by simp)
-  set ρ : ContDiffBump (tangential j z) :=
-    { rIn := r, rOut := 2 * r, rIn_pos := hr, rIn_lt_rOut := by linarith } with hρdef
-  set ζ : EuclideanSpace ℝ (Fin d) → ℝ := fun y => ρ (tangential j y) with hζdef
-  have hζsmooth : ContDiff ℝ (⊤ : ℕ∞) ζ := ρ.contDiff.comp (tangential j).contDiff
+  set ζ := cylinderBump j z hr with hζdef
+  have hζsmooth : ContDiff ℝ (⊤ : ℕ∞) ζ := contDiff_cylinderBump hr
   have hζd : Differentiable ℝ ζ := hζsmooth.differentiable (by simp)
-  have hζind : IndepCoord j ζ := fun y t => by
-    simp only [hζdef, tangential_add_smul]
-  have hζ01 : ∀ y, ζ y ≤ 1 ∧ 0 ≤ ζ y := fun y => ⟨ρ.le_one, ρ.nonneg⟩
-  -- inside the ball the cutoff is one
-  have hζone : ∀ y ∈ ball z r, ζ y = 1 := by
-    intro y hy
-    refine ρ.one_of_mem_closedBall ?_
-    rw [mem_closedBall, dist_eq_norm, ← map_sub]
-    exact le_of_lt (lt_of_le_of_lt (norm_tangential_le j (y - z))
-      (by rwa [← dist_eq_norm, ← mem_ball]))
+  have hζind : IndepCoord j ζ := indepCoord_cylinderBump hr
   -- outside the wider cylinder both the cutoff and its derivative vanish
   have hζzero : ∀ y, 2 * r < ‖tangential j y - tangential j z‖ →
-      ζ y = 0 ∧ fderiv ℝ ζ y = 0 := by
-    intro y hy
-    have hopen : IsOpen {w : EuclideanSpace ℝ (Fin d) |
-        2 * r < ‖tangential j w - tangential j z‖} :=
-      isOpen_lt continuous_const (by fun_prop)
+      ζ y = 0 ∧ fderiv ℝ ζ y = 0 := fun y hy => by
     have heq : ζ =ᶠ[nhds y] fun _ => (0 : ℝ) := by
-      filter_upwards [hopen.mem_nhds hy] with w hw
-      exact ρ.zero_of_le_dist (by rw [dist_eq_norm]; exact le_of_lt hw)
-    exact ⟨ρ.zero_of_le_dist (by rw [dist_eq_norm]; exact le_of_lt hy),
-      by rw [heq.fderiv_eq]; simp⟩
-  -- the three bounds on the wider cylinder
+      filter_upwards [(isOpen_lt continuous_const (by fun_prop :
+        Continuous fun w : EuclideanSpace ℝ (Fin d) =>
+          ‖tangential j w - tangential j z‖)).mem_nhds hy] with w hw
+      exact ContDiffBump.zero_of_le_dist _ (by rw [dist_eq_norm]; exact hw.le)
+    exact ⟨heq.eq_of_nhds, by rw [heq.fderiv_eq]; simp⟩
   obtain ⟨A, hA0, hA⟩ := exists_bound_on_cylinder (j := j)
     (f := fun y => ‖fderiv ℝ γ y‖) ((hγ.continuous_fderiv one_ne_zero).norm)
     (fun y t => by simp only; rw [fderiv_eq_of_indepCoord hγd hind y t]) z (2 * r)
@@ -183,55 +222,49 @@ theorem exists_bounded_graph {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → �
   obtain ⟨C, hC0, hC⟩ := exists_bound_on_cylinder (j := j)
     (f := fun y => γ y - γ z) (hγ.continuous.sub continuous_const)
     (fun y t => by simp only; rw [hind y t]) z (2 * r)
-  refine ⟨fun y => ζ y * (γ y - γ z) + γ z, A + C * B, ?_, ?_, ?_, ?_⟩
-  · exact (((hζsmooth.of_le (by exact_mod_cast le_top)).mul
-      (hγ.sub contDiff_const)).add contDiff_const)
-  · intro y t
-    simp only
-    rw [hζind y t, hind y t]
-  · intro k y
-    have hderiv : partialD k (fun w => ζ w * (γ w - γ z) + γ z) y
-        = ζ y * partialD k γ y + (γ y - γ z) * partialD k ζ y := by
-      have h1 : HasFDerivAt (fun w => ζ w * (γ w - γ z) + γ z)
-          (ζ y • fderiv ℝ γ y + (γ y - γ z) • fderiv ℝ ζ y) y := by
-        have hsub : HasFDerivAt (fun w => γ w - γ z) (fderiv ℝ γ y) y :=
-          ((hγd y).hasFDerivAt).sub_const _
-        exact ((hζd y).hasFDerivAt.mul hsub).add_const (γ z)
-      rw [partialD, h1.fderiv]
-      simp [partialD]
-    rw [hderiv]
-    by_cases hy : 2 * r < ‖tangential j y - tangential j z‖
-    · obtain ⟨hz1, hz2⟩ := hζzero y hy
-      have hpz : partialD k ζ y = 0 := by rw [partialD, hz2]; rfl
-      rw [hz1, hpz, zero_mul, mul_zero, add_zero, norm_zero]
-      positivity
-    · replace hy : ‖tangential j y - tangential j z‖ ≤ 2 * r := not_lt.mp hy
-      have h1 : ‖ζ y * partialD k γ y‖ ≤ A := by
-        rw [norm_mul]
-        calc ‖ζ y‖ * ‖partialD k γ y‖ ≤ 1 * ‖fderiv ℝ γ y‖ := by
-              refine mul_le_mul ?_ (norm_partialD_le_fderiv k y) (norm_nonneg _) zero_le_one
-              rw [Real.norm_eq_abs, abs_of_nonneg (hζ01 y).2]
-              exact (hζ01 y).1
-          _ = ‖fderiv ℝ γ y‖ := one_mul _
-          _ ≤ A := by simpa using hA y hy
-      have h2 : ‖(γ y - γ z) * partialD k ζ y‖ ≤ C * B := by
-        rw [norm_mul]
-        exact mul_le_mul (by simpa using hC y hy)
-          ((norm_partialD_le_fderiv k y).trans (by simpa using hB y hy)) (norm_nonneg _) hC0
-      exact (norm_add_le _ _).trans (add_le_add h1 h2)
-  · ext y
-    simp only [Set.mem_inter_iff, aboveGraph, Set.mem_ofPred_eq, and_congr_left_iff]
-    intro hy
-    rw [hζone y hy]
-    constructor <;> intro h <;> linarith [h]
+  refine ⟨A + C * B, fun k y => ?_⟩
+  have hderiv : partialD k (truncatedGraph j γ z hr) y
+      = ζ y * partialD k γ y + (γ y - γ z) * partialD k ζ y := by
+    have h1 : HasFDerivAt (truncatedGraph j γ z hr)
+        (ζ y • fderiv ℝ γ y + (γ y - γ z) • fderiv ℝ ζ y) y :=
+      ((hζd y).hasFDerivAt.mul ((hγd y).hasFDerivAt.sub_const _)).add_const (γ z)
+    rw [partialD, h1.fderiv]
+    simp [partialD]
+  rw [hderiv]
+  by_cases hy : 2 * r < ‖tangential j y - tangential j z‖
+  · obtain ⟨hz1, hz2⟩ := hζzero y hy
+    rw [hz1, show partialD k ζ y = 0 by rw [partialD, hz2]; rfl]
+    simp only [zero_mul, mul_zero, add_zero, norm_zero]
+    positivity
+  · replace hy := not_lt.mp hy
+    have h1 : ‖ζ y * partialD k γ y‖ ≤ A := by
+      have hζ0 : 0 ≤ ζ y := (tangentialBump j z hr).nonneg
+      have hζ1 : ζ y ≤ 1 := (tangentialBump j z hr).le_one
+      rw [norm_mul, Real.norm_eq_abs, abs_of_nonneg hζ0]
+      calc ζ y * ‖partialD k γ y‖ ≤ 1 * ‖fderiv ℝ γ y‖ :=
+            mul_le_mul hζ1 (norm_partialD_le_fderiv k y) (norm_nonneg _) zero_le_one
+        _ ≤ A := by simpa using hA y hy
+    have h2 : ‖(γ y - γ z) * partialD k ζ y‖ ≤ C * B := by
+      rw [norm_mul]
+      exact mul_le_mul (by simpa using hC y hy)
+        ((norm_partialD_le_fderiv k y).trans (by simpa using hB y hy)) (norm_nonneg _) hC0
+    exact (norm_add_le _ _).trans (add_le_add h1 h2)
 
-/-- An isometry pulls a ball about an image point back to the ball about the point. -/
-theorem preimage_motion_ball
-    (e : EuclideanSpace ℝ (Fin d) ≃ₗᵢ[ℝ] EuclideanSpace ℝ (Fin d))
-    (x : EuclideanSpace ℝ (Fin d)) (r : ℝ) :
-    (e : EuclideanSpace ℝ (Fin d) → EuclideanSpace ℝ (Fin d)) ⁻¹' ball (e x) r = ball x r := by
-  ext y
-  simp only [Set.mem_preimage, mem_ball, e.dist_map]
+end truncatedGraph
+
+/-- **Every graph agrees on a ball with one of bounded gradient.** A chart constrains its graph
+only on the ball it describes, so cutting the graph off in the tangential directions leaves the
+description alone and bounds the gradient. This is what lets the chart ask for no bound while
+every statement about the shear has one. -/
+theorem exists_bounded_graph {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hγ : ContDiff ℝ 1 γ) (hind : IndepCoord j γ) (z : EuclideanSpace ℝ (Fin d)) {r : ℝ}
+    (hr : 0 < r) :
+    ∃ (γ' : EuclideanSpace ℝ (Fin d) → ℝ) (M : ℝ), ContDiff ℝ 1 γ' ∧ IndepCoord j γ' ∧
+      (∀ (k : Fin d) (y : EuclideanSpace ℝ (Fin d)), ‖partialD k γ' y‖ ≤ M) ∧
+      aboveGraph j γ' ∩ ball z r = aboveGraph j γ ∩ ball z r := by
+  obtain ⟨M, hM⟩ := exists_bound_partialD_truncatedGraph (z := z) hr hγ hind
+  exact ⟨truncatedGraph j γ z hr, M, contDiff_truncatedGraph hr hγ,
+    indepCoord_truncatedGraph hr hind, hM, aboveGraph_truncatedGraph_inter hr⟩
 
 /-! ### The boundary chart -/
 
@@ -276,7 +309,7 @@ theorem fits_ball {Ω : Set (EuclideanSpace ℝ (Fin d))} {x : EuclideanSpace �
   have himg := congrArg (fun s =>
     (c.motion : EuclideanSpace ℝ (Fin d) → EuclideanSpace ℝ (Fin d)) ⁻¹' s) h
   simpa [Set.preimage_inter, Set.preimage_image_eq _ c.motion.injective,
-    preimage_motion_ball] using himg
+    c.motion.isometry.preimage_ball] using himg
 
 /-- The graph is differentiable, being of class `C¹`. -/
 theorem graph_differentiable : Differentiable ℝ c.graph :=

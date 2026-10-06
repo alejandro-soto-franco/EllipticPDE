@@ -114,7 +114,6 @@ public import EllipticPdes.Extension.EvenReflection
 public import EllipticPdes.Extension.Shear
 public import EllipticPdes.Extension.ShearWeakGrad
 public import EllipticPdes.Extension.BoundaryChart
-public import EllipticPdes.Extension.Linearity
 public import EllipticPdes.Extension.C1Boundary
 public import EllipticPdes.Extension.BallChart
 public import EllipticPdes.Extension.Motion

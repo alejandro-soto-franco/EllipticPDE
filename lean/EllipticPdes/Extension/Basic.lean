@@ -53,6 +53,48 @@ theorem eLpNorm_sum_mul_le {α ι : Type*} [MeasurableSpace α] [Fintype ι] {μ
   rw [norm_mul, Real.norm_eq_abs (a i)]
   exact mul_le_of_le_one_left (norm_nonneg _) (ha i)
 
+/-! ### Pairs of a class and a gradient -/
+
+/-- A class together with a candidate for its gradient. This is the module the extension
+operator acts on. -/
+abbrev SobolevPair (d : ℕ) : Type :=
+  (EuclideanSpace ℝ (Fin d) → ℝ) × (Fin d → EuclideanSpace ℝ (Fin d) → ℝ)
+
+/-- The `Lᵖ` seminorm of a class plus those of the components of its gradient. -/
+def pairNorm {d : ℕ} (p : ENNReal) (μ : Measure (EuclideanSpace ℝ (Fin d)))
+    (u : EuclideanSpace ℝ (Fin d) → ℝ) (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) : ENNReal :=
+  eLpNorm u p μ + ∑ i, eLpNorm (g i) p μ
+
+section PairNorm
+
+variable {d : ℕ} {p : ENNReal} {μ : Measure (EuclideanSpace ℝ (Fin d))}
+  {u : EuclideanSpace ℝ (Fin d) → ℝ} {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
+
+/-- The seminorm of the class is at most the pair seminorm. -/
+theorem eLpNorm_le_pairNorm : eLpNorm u p μ ≤ pairNorm p μ u g := le_self_add
+
+/-- The seminorm of one component of the gradient is at most the pair seminorm. -/
+theorem eLpNorm_grad_le_pairNorm (k : Fin d) : eLpNorm (g k) p μ ≤ pairNorm p μ u g :=
+  (Finset.single_le_sum (f := fun i => eLpNorm (g i) p μ) (fun _ _ => zero_le)
+    (Finset.mem_univ k)).trans le_add_self
+
+/-- The seminorm of the class and of one component of the gradient together is at most the pair
+seminorm. -/
+theorem eLpNorm_add_grad_le_pairNorm (k : Fin d) :
+    eLpNorm u p μ + eLpNorm (g k) p μ ≤ pairNorm p μ u g :=
+  add_le_add_right (Finset.single_le_sum (f := fun i => eLpNorm (g i) p μ)
+    (fun _ _ => zero_le) (Finset.mem_univ k)) _
+
+end PairNorm
+
+/-- **Seminorm of a product with a bounded factor.** -/
+theorem eLpNorm_mul_le_of_bound {α : Type*} [MeasurableSpace α] {μ : Measure α}
+    {f h : α → ℝ} {C : ℝ} {p : ENNReal} (hfh : AEStronglyMeasurable (fun x => f x * h x) μ)
+    (hC : ∀ x, ‖h x‖ ≤ C) : eLpNorm (fun x => f x * h x) p μ ≤ ENNReal.ofReal C * eLpNorm f p μ :=
+  eLpNorm_le_mul_eLpNorm_of_ae_le_mul hfh (Filter.Eventually.of_forall fun x => by
+    rw [norm_mul, mul_comm]
+    exact mul_le_mul_of_nonneg_right (hC x) (norm_nonneg _)) p
+
 /-! ### Supports and integrability -/
 
 /-- The topological support of `f ∘ e` for a homeomorphism `e` is the preimage of that
@@ -136,6 +178,29 @@ theorem _root_.LinearMap.det_id_add_smulRight {E : Type*} [AddCommGroup E] [Modu
   have h := congrArg f (b.sum_repr v)
   rw [map_sum] at h
   simpa [dotProduct, mul_comm] using h
+
+/-- The product of a continuous function of compact support with an integrable function,
+the continuous factor written first. -/
+theorem _root_.MeasureTheory.IntegrableOn.hasCompactSupport_mul {X : Type*}
+    [MeasurableSpace X] [TopologicalSpace X] [OpensMeasurableSpace X] {μ : Measure X}
+    {B : Set X} {u h : X → ℝ} (hu : IntegrableOn u B μ) (hh : Continuous h)
+    (hcs : HasCompactSupport h) : IntegrableOn (fun x => h x * u x) B μ :=
+  (hu.mul_of_hasCompactSupport hh hcs).congr (Filter.Eventually.of_forall fun _ => mul_comm _ _)
+
+/-- **One bound for a smooth compactly supported function and for each of its partials.** -/
+theorem exists_bound_with_partials {d : ℕ} {h : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hc : ContDiff ℝ (⊤ : ℕ∞) h) (hcs : HasCompactSupport h) :
+    ∃ C : ℝ, 0 ≤ C ∧ (∀ y, ‖h y‖ ≤ C) ∧ ∀ (k : Fin d) (y : EuclideanSpace ℝ (Fin d)),
+      ‖partialD k h y‖ ≤ C := by
+  obtain ⟨C₀, hC₀⟩ := hcs.exists_bound_of_continuous hc.continuous
+  choose Ck hCk using fun k => (hcs.partialD k).exists_bound_of_continuous
+    (hc.continuous_partialD (by simp) k)
+  have hsum0 : (0 : ℝ) ≤ ∑ k, Ck k := Finset.sum_nonneg fun k _ => (norm_nonneg _).trans (hCk k 0)
+  have hC00 : 0 ≤ C₀ := (norm_nonneg _).trans (hC₀ 0)
+  refine ⟨C₀ + ∑ k, Ck k, by linarith, fun y => (hC₀ y).trans (by linarith),
+    fun k y => (hCk k y).trans ?_⟩
+  linarith [Finset.single_le_sum (f := fun j => Ck j)
+    (fun j _ => (norm_nonneg _).trans (hCk j 0)) (Finset.mem_univ k)]
 
 section WeakDeriv
 

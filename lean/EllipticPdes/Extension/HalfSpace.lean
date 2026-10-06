@@ -9,6 +9,7 @@ module
 public import EllipticPdes.Extension.Cutoff
 public import EllipticPdes.Extension.Reflect
 public import EllipticPdes.Embedding.GagliardoNirenberg
+public import EllipticPdes.Extension.Basic
 
 /-!
 # Half space and its interface
@@ -65,68 +66,58 @@ theorem measurableSet_halfSpace (j : Fin d) : MeasurableSet (halfSpace j) :=
 /-- **Nullity of the interface**, being a proper linear subspace. -/
 theorem volume_interface (j : Fin d) :
     volume {x : EuclideanSpace ℝ (Fin d) | x j = 0} = 0 := by
-  set K : Submodule ℝ (EuclideanSpace ℝ (Fin d)) :=
-    LinearMap.ker ((EuclideanSpace.proj j : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ) :
-      EuclideanSpace ℝ (Fin d) →ₗ[ℝ] ℝ) with hK
-  have hset : {x : EuclideanSpace ℝ (Fin d) | x j = 0} = (K : Set (EuclideanSpace ℝ (Fin d))) := by
-    ext x
-    simp [hK, LinearMap.mem_ker]
-  have hne : K ≠ ⊤ := by
-    intro h
-    have hmem : EuclideanSpace.single j (1 : ℝ) ∈ K := by rw [h]; exact Submodule.mem_top
-    rw [hK, LinearMap.mem_ker] at hmem
-    simp at hmem
-  rw [hset]
-  exact Measure.addHaar_submodule volume K hne
-
-/-- The reflection sends the half space onto the other side. -/
-theorem preimage_reflectLI_halfSpace (j : Fin d) :
-    reflectLI j ⁻¹' halfSpace j = {x : EuclideanSpace ℝ (Fin d) | x j < 0} := by
-  ext x
-  have h : reflectLI j x j = -(x j) := by
-    rw [reflectLI_apply, reflectSign, ite_eq_left rfl]; ring
-  simp only [Set.mem_preimage, halfSpace, Set.mem_ofPred_eq, h, neg_pos]
+  have hne : LinearMap.ker (EuclideanSpace.proj j : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ).toLinearMap
+      ≠ ⊤ := fun h => by
+    simpa using DFunLike.congr_fun (LinearMap.ker_eq_top.1 h) (EuclideanSpace.single j (1 : ℝ))
+  exact Measure.addHaar_submodule volume _ hne
 
 /-! ### No boundary term -/
 
 variable {j : Fin d} {u : EuclideanSpace ℝ (Fin d) → ℝ}
   {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ} {ψ : EuclideanSpace ℝ (Fin d) → ℝ}
 
-/-- **`C¹` class vanishing on the interface is bounded by its gradient and the distance to
+/-- **A `C¹` function vanishing on a hyperplane is bounded by its gradient and the distance to
 it.** This is what makes the boundary term vanish in the limit. -/
-theorem abs_le_of_vanishes_on_interface (hψ : Differentiable ℝ ψ) {M : ℝ}
-    (hM : ∀ z, ‖fderiv ℝ ψ z‖ ≤ M) (hzero : ∀ z : EuclideanSpace ℝ (Fin d), z j = 0 → ψ z = 0)
-    (x : EuclideanSpace ℝ (Fin d)) (hx : 0 ≤ x j) : |ψ x| ≤ M * x j := by
-  set x0 : EuclideanSpace ℝ (Fin d) := x - (x j) • EuclideanSpace.single j (1 : ℝ) with hx0
-  have hx0j : x0 j = 0 := by
-    rw [hx0]
-    simp [PiLp.sub_apply, PiLp.smul_apply]
-  have hdiff : x - x0 = (x j) • EuclideanSpace.single j (1 : ℝ) := by
-    rw [hx0]; abel
-  have hnorm : ‖x - x0‖ = x j := by
-    rw [hdiff, norm_smul, PiLp.norm_single]
-    simp [abs_of_nonneg hx]
-  have hconv : Convex ℝ (Set.univ : Set (EuclideanSpace ℝ (Fin d))) := convex_univ
-  have hmv := hconv.norm_image_sub_le_of_norm_fderiv_le
-    (f := ψ) (fun z _ => hψ z) (fun z _ => hM z) (Set.mem_univ x0) (Set.mem_univ x)
-  rw [hzero x0 hx0j, sub_zero, hnorm] at hmv
-  simpa [Real.norm_eq_abs] using hmv
+theorem abs_le_of_vanishes_on_hyperplane {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    {ψ : E → ℝ} (hψ : Differentiable ℝ ψ) {M : ℝ} (hM : ∀ z, ‖fderiv ℝ ψ z‖ ≤ M)
+    {ℓ : E →L[ℝ] ℝ} {v : E} (hv : ℓ v = 1) (hzero : ∀ z, ℓ z = 0 → ψ z = 0) (x : E) :
+    |ψ x| ≤ M * ‖v‖ * |ℓ x| := by
+  have h := (convex_univ (𝕜 := ℝ) (E := E)).norm_image_sub_le_of_norm_fderiv_le (f := ψ)
+    (fun z _ => hψ z) (fun z _ => hM z) (mem_univ (x - ℓ x • v)) (mem_univ x)
+  rw [hzero (x - ℓ x • v) (by simp [hv]), sub_zero, sub_sub_cancel, norm_smul,
+    Real.norm_eq_abs] at h
+  calc |ψ x| ≤ M * (|ℓ x| * ‖v‖) := by simpa using h
+    _ = M * ‖v‖ * |ℓ x| := by ring
 
 /-- The identity at each `ε`: multiplied by the cutoff, the test function is supported strictly
 inside the half space, where the weak gradient applies. -/
 private theorem cutoff_identity (hwg : HasWeakGradOn (halfSpace j) u g)
     (hψ : ContDiff ℝ (⊤ : ℕ∞) ψ) (hψcs : HasCompactSupport ψ) {ε : ℝ} (hε : 0 < ε) (k : Fin d) :
-    ∫ x in halfSpace j, u x * (partialD k (slabCut j ε) x * ψ x
-        + slabCut j ε x * partialD k ψ x)
-      = - ∫ x in halfSpace j, g k x * (slabCut j ε x * ψ x) := by
-  have h := hwg (fun x => slabCut j ε x * ψ x) ((contDiff_slabCut j ε).mul hψ)
-    (hψcs.mul_left) (tsupport_mul_slabCut_subset hε ψ) k
+    ∫ x in halfSpace j, u x * (partialD k (slabCut (EuclideanSpace.proj j) ε) x * ψ x
+        + slabCut (EuclideanSpace.proj j) ε x * partialD k ψ x)
+      = - ∫ x in halfSpace j, g k x * (slabCut (EuclideanSpace.proj j) ε x * ψ x) := by
+  have h := hwg (fun x => slabCut (EuclideanSpace.proj j) ε x * ψ x)
+    ((contDiff_slabCut _ ε).mul hψ) hψcs.mul_left (tsupport_mul_slabCut_subset hε ψ) k
   rw [← h]
   refine integral_congr_ae (Filter.Eventually.of_forall fun x => ?_)
-  change u x * (partialD k (slabCut j ε) x * ψ x + slabCut j ε x * partialD k ψ x)
-      = u x * partialD k (fun y => slabCut j ε y * ψ y) x
-  rw [partialD_mul k ((contDiff_slabCut j ε).differentiable (by simp) x)
+  change _ = u x * partialD k (fun y => slabCut (EuclideanSpace.proj j) ε y * ψ y) x
+  rw [partialD_mul k ((contDiff_slabCut _ ε).differentiable (by simp) x)
     (hψ.differentiable (by simp) x)]
+
+/-- The cutoffs of width `1 / (n + 1)` converge to `1` on the open half space. -/
+private theorem tendsto_slabCut {x : EuclideanSpace ℝ (Fin d)} (hx : x ∈ halfSpace j) :
+    Tendsto (fun n : ℕ => slabCut (EuclideanSpace.proj j) ((n + 1 : ℝ)⁻¹) x) atTop (𝓝 1) := by
+  obtain ⟨m, hm⟩ := exists_nat_gt (2 / x j)
+  refine tendsto_const_nhds.congr' ?_
+  filter_upwards [eventually_ge_atTop m] with n hn
+  refine (slabCut_eq_one (by positivity) ?_).symm
+  have hmn : (2 : ℝ) / x j < (n : ℝ) + 1 := by
+    have : (m : ℝ) ≤ (n : ℝ) := by exact_mod_cast hn
+    linarith
+  rw [div_lt_iff₀ hx] at hmn
+  change 2 * ((n : ℝ) + 1)⁻¹ ≤ x j
+  rw [inv_eq_one_div, mul_one_div, div_le_iff₀ (by positivity)]
+  linarith
 
 /-- **Weak-gradient identity against a test function that need not vanish near the
 interface**, given that the boundary term it leaves goes to zero. -/
@@ -134,111 +125,39 @@ private theorem integral_partialD_aux {k : Fin d} (hu : IntegrableOn u (halfSpac
     (hg : IntegrableOn (g k) (halfSpace j) volume) (hwg : HasWeakGradOn (halfSpace j) u g)
     (hψ : ContDiff ℝ (⊤ : ℕ∞) ψ) (hψcs : HasCompactSupport ψ)
     (hbdry : Tendsto (fun n : ℕ => ∫ x in halfSpace j,
-        u x * (partialD k (slabCut j (((n : ℝ) + 1)⁻¹)) x * ψ x)) atTop (𝓝 0)) :
+        u x * (partialD k (slabCut (EuclideanSpace.proj j) ((n + 1 : ℝ)⁻¹)) x * ψ x)) atTop
+        (𝓝 0)) :
     ∫ x in halfSpace j, u x * partialD k ψ x = - ∫ x in halfSpace j, g k x * ψ x := by
-  classical
-  set ε : ℕ → ℝ := fun n => ((n : ℝ) + 1)⁻¹ with hεdef
-  have hε : ∀ n, 0 < ε n := fun n => by positivity
-  have hψc : Continuous ψ := hψ.continuous
-  have hdψc : Continuous (partialD k ψ) :=
-    (hψ.continuous_fderiv (by simp)).clm_apply continuous_const
-  obtain ⟨M, hM⟩ := hψcs.exists_bound_of_continuous hψc
-  obtain ⟨N, hN⟩ :=
-    (hψcs.fderiv ℝ).comp_left (g := fun T : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ =>
-      T (EuclideanSpace.single k (1 : ℝ))) (by simp) |>.exists_bound_of_continuous hdψc
-  -- The cutoff is eventually `1` at each interior point.
-  have hone : ∀ x ∈ halfSpace j, ∀ᶠ n : ℕ in atTop, slabCut j (ε n) x = 1 := by
-    intro x hx
-    have hxj : 0 < x j := hx
-    obtain ⟨m, hm⟩ := exists_nat_gt (2 / x j)
-    filter_upwards [eventually_ge_atTop m] with n hn
-    refine slabCut_eq_one (hε n) ?_
-    have hmn : (2 : ℝ) / x j < (n : ℝ) + 1 := by
-      have : (m : ℝ) ≤ (n : ℝ) := by exact_mod_cast hn
-      linarith
-    have hn1 : (0 : ℝ) < (n : ℝ) + 1 := by positivity
-    rw [div_lt_iff₀ hxj] at hmn
-    change 2 * ((n : ℝ) + 1)⁻¹ ≤ x j
-    rw [inv_eq_one_div, mul_one_div, div_le_iff₀ hn1]
-    linarith
-  -- The two dominated limits.
-  have hlim1 : Tendsto (fun n : ℕ => ∫ x in halfSpace j,
-      u x * (slabCut j (ε n) x * partialD k ψ x)) atTop
-      (𝓝 (∫ x in halfSpace j, u x * partialD k ψ x)) := by
-    refine tendsto_integral_of_dominated_convergence (fun x => N * ‖u x‖) ?_ ?_ ?_ ?_
-    · exact fun n =>
-        hu.1.mul (((contDiff_slabCut j (ε n)).continuous.mul hdψc)).aestronglyMeasurable
-    · exact hu.norm.const_mul N
-    · intro n
-      filter_upwards with x
-      rw [norm_mul, norm_mul, mul_comm]
-      refine mul_le_mul ?_ le_rfl (norm_nonneg _) (le_trans (norm_nonneg _) (hN 0))
-      calc ‖slabCut j (ε n) x‖ * ‖partialD k ψ x‖
-          ≤ 1 * N := by
-            refine mul_le_mul ?_ (hN x) (norm_nonneg _) zero_le_one
-            rw [Real.norm_eq_abs, abs_of_nonneg (slabCut_nonneg j (ε n) x)]
-            exact slabCut_le_one j (ε n) x
-        _ = N := one_mul N
-    · rw [ae_restrict_iff' (measurableSet_halfSpace j)]
-      filter_upwards with x hx
-      have : Tendsto (fun n : ℕ => slabCut j (ε n) x) atTop (𝓝 1) :=
-        Tendsto.congr' (by filter_upwards [hone x hx] with n hn using hn.symm) tendsto_const_nhds
-      simpa using ((this.mul tendsto_const_nhds).const_mul (u x))
-  have hlim2 : Tendsto (fun n : ℕ => ∫ x in halfSpace j,
-      g k x * (slabCut j (ε n) x * ψ x)) atTop (𝓝 (∫ x in halfSpace j, g k x * ψ x)) := by
-    refine tendsto_integral_of_dominated_convergence (fun x => M * ‖g k x‖) ?_ ?_ ?_ ?_
-    · exact fun n =>
-        hg.1.mul (((contDiff_slabCut j (ε n)).continuous.mul hψc)).aestronglyMeasurable
-    · exact hg.norm.const_mul M
-    · intro n
-      filter_upwards with x
-      rw [norm_mul, norm_mul, mul_comm]
-      refine mul_le_mul ?_ le_rfl (norm_nonneg _) (le_trans (norm_nonneg _) (hM 0))
-      calc ‖slabCut j (ε n) x‖ * ‖ψ x‖
-          ≤ 1 * M := by
-            refine mul_le_mul ?_ (hM x) (norm_nonneg _) zero_le_one
-            rw [Real.norm_eq_abs, abs_of_nonneg (slabCut_nonneg j (ε n) x)]
-            exact slabCut_le_one j (ε n) x
-        _ = M := one_mul M
-    · rw [ae_restrict_iff' (measurableSet_halfSpace j)]
-      filter_upwards with x hx
-      have : Tendsto (fun n : ℕ => slabCut j (ε n) x) atTop (𝓝 1) :=
-        Tendsto.congr' (by filter_upwards [hone x hx] with n hn using hn.symm) tendsto_const_nhds
-      simpa using ((this.mul tendsto_const_nhds).const_mul (g k x))
+  set cut : ℕ → EuclideanSpace ℝ (Fin d) → ℝ :=
+    fun n => slabCut (EuclideanSpace.proj j) ((n + 1 : ℝ)⁻¹) with hcut
+  have hcc : ∀ n, ContDiff ℝ (⊤ : ℕ∞) (cut n) := fun n => contDiff_slabCut _ _
+  have hdψ : Continuous (partialD k ψ) := hψ.continuous_partialD (by simp) k
+  have hdψcs : HasCompactSupport (partialD k ψ) := hψcs.partialD k
+  obtain ⟨M, hM⟩ := hψcs.exists_bound_of_continuous hψ.continuous
+  obtain ⟨N, hN⟩ := hdψcs.exists_bound_of_continuous hdψ
+  have hlim1 := tendsto_setIntegral_mul (measurableSet_halfSpace j) hu
+    (f := fun n x => cut n x * partialD k ψ x) (f' := partialD k ψ)
+    (fun n => (hcc n).continuous.mul hdψ) (C := N)
+    (fun n x => by simpa using norm_mul_le_of_le (norm_slabCut_le_one _ _ x) (hN x))
+    (fun x hx => by simpa using (tendsto_slabCut hx).mul_const (partialD k ψ x))
+  have hlim2 := tendsto_setIntegral_mul (measurableSet_halfSpace j) hg
+    (f := fun n x => cut n x * ψ x) (f' := ψ)
+    (fun n => (hcc n).continuous.mul hψ.continuous) (C := M)
+    (fun n x => by simpa using norm_mul_le_of_le (norm_slabCut_le_one _ _ x) (hM x))
+    (fun x hx => by simpa using (tendsto_slabCut hx).mul_const (ψ x))
   -- Each `ε` gives the identity, and the limit gives the statement.
-  obtain ⟨C, hC0, hC⟩ := exists_bound_deriv_stepProfile
-  have hsplit : ∀ n : ℕ, (∫ x in halfSpace j, u x * (partialD k (slabCut j (ε n)) x * ψ x))
-      + (∫ x in halfSpace j, u x * (slabCut j (ε n) x * partialD k ψ x))
-      = - ∫ x in halfSpace j, g k x * (slabCut j (ε n) x * ψ x) := by
-    intro n
-    have hb1 : Integrable (fun x => u x * (partialD k (slabCut j (ε n)) x * ψ x))
-        (volume.restrict (halfSpace j)) := by
-      refine hu.mul_bdd (c := (C / ε n) * M) ?_ ?_
-      · exact ((((contDiff_slabCut j (ε n)).continuous_fderiv
-          (by simp)).clm_apply continuous_const).mul hψc).aestronglyMeasurable
-      · filter_upwards with x
-        rw [norm_mul]
-        refine mul_le_mul ?_ (hM x) (norm_nonneg _) (by positivity)
-        rw [Real.norm_eq_abs]
-        exact norm_partialD_slabCut_le (hε n) hC k x
-    have hb2 : Integrable (fun x => u x * (slabCut j (ε n) x * partialD k ψ x))
-        (volume.restrict (halfSpace j)) := by
-      refine hu.mul_bdd (c := 1 * N) ?_ ?_
-      · exact ((contDiff_slabCut j (ε n)).continuous.mul hdψc).aestronglyMeasurable
-      · filter_upwards with x
-        rw [norm_mul]
-        refine mul_le_mul ?_ (hN x) (norm_nonneg _) zero_le_one
-        rw [Real.norm_eq_abs, abs_of_nonneg (slabCut_nonneg j (ε n) x)]
-        exact slabCut_le_one j (ε n) x
-    rw [← integral_add hb1 hb2, ← cutoff_identity hwg hψ hψcs (hε n) k]
-    refine integral_congr_ae (Filter.Eventually.of_forall fun x => ?_)
-    ring
-  have hL : Tendsto (fun n : ℕ =>
-      (∫ x in halfSpace j, u x * (partialD k (slabCut j (ε n)) x * ψ x))
-        + (∫ x in halfSpace j, u x * (slabCut j (ε n) x * partialD k ψ x))) atTop
-      (𝓝 (∫ x in halfSpace j, u x * partialD k ψ x)) := by
-    simpa using hbdry.add hlim1
-  exact tendsto_nhds_unique (hL.congr fun n => hsplit n) hlim2.neg
+  have hsplit : ∀ n : ℕ, (∫ x in halfSpace j, u x * (partialD k (cut n) x * ψ x))
+      + (∫ x in halfSpace j, u x * (cut n x * partialD k ψ x))
+      = - ∫ x in halfSpace j, g k x * (cut n x * ψ x) := fun n => by
+    have hb1 : IntegrableOn (fun x => u x * (partialD k (cut n) x * ψ x)) (halfSpace j) volume :=
+      hu.mul_of_hasCompactSupport (((hcc n).continuous_partialD (by simp) k).mul hψ.continuous)
+        hψcs.mul_left
+    have hb2 : IntegrableOn (fun x => u x * (cut n x * partialD k ψ x)) (halfSpace j) volume :=
+      hu.mul_of_hasCompactSupport ((hcc n).continuous.mul hdψ) hdψcs.mul_left
+    rw [← integral_add hb1 hb2, ← cutoff_identity hwg hψ hψcs (by positivity) k]
+    exact integral_congr_ae (Filter.Eventually.of_forall fun x => by ring)
+  exact tendsto_nhds_unique
+    ((by simpa using hbdry.add hlim1 : Tendsto _ atTop _).congr hsplit) hlim2.neg
 
 /-- **No boundary term along the interface.** The cutoff depends on the `j`-th coordinate
 alone, so in every other direction its derivative vanishes and the identity passes to a test
@@ -249,16 +168,11 @@ theorem integral_partialD_of_ne {k : Fin d} (hk : k ≠ j)
     (hψcs : HasCompactSupport ψ) :
     ∫ x in halfSpace j, u x * partialD k ψ x = - ∫ x in halfSpace j, g k x * ψ x := by
   refine integral_partialD_aux hu hg hwg hψ hψcs ?_
-  have hzero : ∀ n : ℕ,
-      (∫ x in halfSpace j, u x * (partialD k (slabCut j (((n : ℝ) + 1)⁻¹)) x * ψ x)) = 0 := by
-    intro n
-    have hpt : ∀ x : EuclideanSpace ℝ (Fin d),
-        u x * (partialD k (slabCut j (((n : ℝ) + 1)⁻¹)) x * ψ x) = 0 := by
-      intro x
-      rw [partialD_slabCut_of_ne (by positivity) hk x, zero_mul, mul_zero]
-    simp only [hpt, integral_zero]
-  simp only [hzero]
-  exact tendsto_const_nhds
+  have hpd : ∀ (ε : ℝ) (x : EuclideanSpace ℝ (Fin d)),
+      partialD k (slabCut (EuclideanSpace.proj j) ε) x = 0 := fun ε x => by
+    rw [partialD, fderiv_slabCut]
+    simp [hk.symm]
+  simp [hpd]
 
 /-- **No boundary term in the remaining direction either**, for a test function vanishing on the
 interface. Where the cutoff's derivative is `C/ε` the test function is at most `2ε` times its
@@ -269,54 +183,50 @@ theorem integral_partialD_of_eq (hu : IntegrableOn u (halfSpace j) volume)
     (hzero : ∀ z : EuclideanSpace ℝ (Fin d), z j = 0 → ψ z = 0) :
     ∫ x in halfSpace j, u x * partialD j ψ x = - ∫ x in halfSpace j, g j x * ψ x := by
   refine integral_partialD_aux hu hg hwg hψ hψcs ?_
-  obtain ⟨C, hC0, hC⟩ := exists_bound_deriv_stepProfile
-  obtain ⟨M, hM⟩ := (hψcs.fderiv ℝ).exists_bound_of_continuous (hψ.continuous_fderiv (by simp))
-  have hM0 : (0 : ℝ) ≤ M := le_trans (norm_nonneg _) (hM 0)
-  have hε : ∀ n : ℕ, (0 : ℝ) < ((n : ℝ) + 1)⁻¹ := fun n => by positivity
-  rw [show (0 : ℝ) = ∫ _x in halfSpace j, (0 : ℝ) by simp]
-  refine tendsto_integral_of_dominated_convergence (fun x => 2 * C * M * ‖u x‖) ?_ ?_ ?_ ?_
-  · intro n
-    exact hu.1.mul (((((contDiff_slabCut j (((n : ℝ) + 1)⁻¹)).continuous_fderiv
-      (by simp)).clm_apply continuous_const).mul hψ.continuous).aestronglyMeasurable)
-  · exact hu.norm.const_mul (2 * C * M)
-  · intro n
-    rw [ae_restrict_iff' (measurableSet_halfSpace j)]
-    filter_upwards with x hx
-    have hxj : 0 < x j := hx
-    rw [norm_mul, norm_mul, mul_comm (2 * C * M) ‖u x‖]
-    refine mul_le_mul le_rfl ?_ (by positivity) (norm_nonneg _)
-    by_cases hcase : 2 * ((n : ℝ) + 1)⁻¹ < x j
-    · rw [partialD_slabCut_eq_zero_of_gt (hε n) j hcase]
-      simp only [norm_zero, zero_mul]
-      exact mul_nonneg (mul_nonneg (by norm_num) hC0) hM0
-    · have hcase' : x j ≤ 2 * ((n : ℝ) + 1)⁻¹ := not_lt.mp hcase
-      have hψx : |ψ x| ≤ M * x j :=
-        abs_le_of_vanishes_on_interface (hψ.differentiable (by simp)) hM hzero x hxj.le
-      have h1 : ‖partialD j (slabCut j (((n : ℝ) + 1)⁻¹)) x‖ ≤ C / ((n : ℝ) + 1)⁻¹ := by
-        rw [Real.norm_eq_abs]
-        exact norm_partialD_slabCut_le (hε n) hC j x
-      have h2 : ‖ψ x‖ ≤ M * (2 * ((n : ℝ) + 1)⁻¹) := by
-        rw [Real.norm_eq_abs]
-        exact le_trans hψx (by nlinarith [hM0, hcase'])
-      calc ‖partialD j (slabCut j (((n : ℝ) + 1)⁻¹)) x‖ * ‖ψ x‖
-          ≤ (C / ((n : ℝ) + 1)⁻¹) * (M * (2 * ((n : ℝ) + 1)⁻¹)) := by
-            refine mul_le_mul h1 h2 (norm_nonneg _) ?_
-            positivity
+  obtain ⟨C, hC0, hC⟩ := exists_bound_deriv_smoothTransition
+  obtain ⟨M, hM⟩ := (hψcs.fderiv ℝ).exists_bound_of_continuous
+    (hψ.continuous_fderiv (by simp))
+  have hM0 : (0 : ℝ) ≤ M := (norm_nonneg _).trans (hM 0)
+  have hcut : ∀ (n : ℕ) (x : EuclideanSpace ℝ (Fin d)),
+      ‖partialD j (slabCut (EuclideanSpace.proj j) ((n + 1 : ℝ)⁻¹)) x * ψ x‖ ≤ 2 * C * M := by
+    intro n x
+    have hε : (0 : ℝ) < ((n : ℝ) + 1)⁻¹ := by positivity
+    rw [norm_mul, partialD]
+    by_cases hcase : x j ∈ Icc ((n + 1 : ℝ)⁻¹) (2 * (n + 1 : ℝ)⁻¹)
+    · have hx : 0 < x j := hε.trans_le hcase.1
+      have h1 : |fderiv ℝ (slabCut (EuclideanSpace.proj j) ((n + 1 : ℝ)⁻¹)) x
+          (EuclideanSpace.single j (1 : ℝ))| ≤ C / ((n : ℝ) + 1)⁻¹ := by
+        simpa using abs_fderiv_slabCut_le (ℓ := EuclideanSpace.proj j) hε hC x
+          (EuclideanSpace.single j (1 : ℝ))
+      have h2 : |ψ x| ≤ M * (2 * ((n : ℝ) + 1)⁻¹) := by
+        have := abs_le_of_vanishes_on_hyperplane (hψ.differentiable (by simp)) hM
+          (ℓ := EuclideanSpace.proj j) (v := EuclideanSpace.single j (1 : ℝ)) (by simp) hzero x
+        simp only [PiLp.norm_single, norm_one, mul_one, PiLp.proj_apply, abs_of_pos hx] at this
+        exact this.trans (by gcongr; exact hcase.2)
+      rw [Real.norm_eq_abs, Real.norm_eq_abs]
+      calc _ ≤ C / ((n : ℝ) + 1)⁻¹ * (M * (2 * ((n : ℝ) + 1)⁻¹)) :=
+            mul_le_mul h1 h2 (abs_nonneg _) (by positivity)
         _ = 2 * C * M := by field_simp
-  · rw [ae_restrict_iff' (measurableSet_halfSpace j)]
-    filter_upwards with x hx
-    have hxj : 0 < x j := hx
-    obtain ⟨m, hm⟩ := exists_nat_gt (2 / x j)
+    · rw [fderiv_slabCut_eq_zero_of_notMem hε hcase]
+      simp only [norm_zero, zero_mul]
+      positivity
+  have h := tendsto_setIntegral_mul (measurableSet_halfSpace j) hu
+    (f := fun (n : ℕ) x => partialD j (slabCut (EuclideanSpace.proj j) ((n + 1 : ℝ)⁻¹)) x * ψ x)
+    (f' := fun _ => 0)
+    (fun n => (((contDiff_slabCut _ _).continuous_partialD (by simp) j)).mul hψ.continuous)
+    (C := 2 * C * M) hcut fun x hx => ?_
+  · simpa using h
+  · obtain ⟨m, hm⟩ := exists_nat_gt (2 / x j)
     refine tendsto_const_nhds.congr' ?_
     filter_upwards [eventually_ge_atTop m] with n hn
-    have hn1 : (0 : ℝ) < (n : ℝ) + 1 := by positivity
     have hmn : (2 : ℝ) / x j < (n : ℝ) + 1 := by
       have : (m : ℝ) ≤ (n : ℝ) := by exact_mod_cast hn
       linarith
-    rw [div_lt_iff₀ hxj] at hmn
+    rw [div_lt_iff₀ hx] at hmn
     have hgt : 2 * ((n : ℝ) + 1)⁻¹ < x j := by
-      rw [inv_eq_one_div, mul_one_div, div_lt_iff₀ hn1]
+      rw [inv_eq_one_div, mul_one_div, div_lt_iff₀ (by positivity)]
       linarith
-    rw [partialD_slabCut_eq_zero_of_gt (hε n) j hgt, zero_mul, mul_zero]
+    rw [partialD, fderiv_slabCut_eq_zero_of_notMem (by positivity) (fun h => h.2.not_gt hgt),
+      zero_mul]
 
 end EllipticPdes.Extension
