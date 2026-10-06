@@ -166,22 +166,7 @@ theorem exists_eLpNorm_sobolevConj_le_domain_of_le (hd : 0 < d)
         eLpNorm u p' (volume.restrict Ω) ≤ (K : ℝ≥0∞) * (eLpNorm u q (volume.restrict Ω)
           + ∑ k, eLpNorm (g k) q (volume.restrict Ω)) := by
   have := isFiniteMeasure_restrict_of_isBounded hΩb
-  have hpqE : (p : ℝ≥0∞) ≤ (q : ℝ≥0∞) := by exact_mod_cast hpq
-  obtain ⟨K₀, hK₀⟩ := exists_eLpNorm_sobolevConj_le_domain hd hΩopen hΩb hC1 hp hpp'
-  obtain ⟨A, hA⟩ := exists_const_eLpNorm_le_of_le (μ := volume.restrict Ω) (E := ℝ)
-    (by exact_mod_cast (hp.trans_lt' one_pos).ne') hpqE
-  refine ⟨K₀ * A, fun u g hu hg hwg => ?_⟩
-  obtain ⟨hmem, hbd⟩ :=
-    hK₀ u g (hu.mono_exponent hpqE) (fun k => (hg k).mono_exponent hpqE) hwg
-  refine ⟨hmem, hbd.trans ?_⟩
-  calc (K₀ : ℝ≥0∞) * (eLpNorm u (p : ℝ≥0∞) (volume.restrict Ω)
-          + ∑ k, eLpNorm (g k) (p : ℝ≥0∞) (volume.restrict Ω))
-      ≤ (K₀ : ℝ≥0∞) * (A * eLpNorm u (q : ℝ≥0∞) (volume.restrict Ω)
-          + ∑ k, A * eLpNorm (g k) (q : ℝ≥0∞) (volume.restrict Ω)) :=
-        mul_le_mul' le_rfl (add_le_add (hA u hu.aestronglyMeasurable)
-          (Finset.sum_le_sum fun k _ => hA (g k) (hg k).aestronglyMeasurable))
-    _ = ((K₀ * A : ℝ≥0) : ℝ≥0∞) * (eLpNorm u (q : ℝ≥0∞) (volume.restrict Ω)
-          + ∑ k, eLpNorm (g k) (q : ℝ≥0∞) (volume.restrict Ω)) := by
-        rw [← Finset.mul_sum, ← mul_add, ENNReal.coe_mul, mul_assoc]
+  obtain ⟨K, hK⟩ := exists_eLpNorm_sobolevConj_le_domain hd hΩopen hΩb hC1 hp hpp'
+  exact RungBound.mono_exponent (hp.trans_lt' one_pos) hpq (K := K) hK
 
 end EllipticPdes.Embedding

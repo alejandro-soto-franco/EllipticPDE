@@ -383,8 +383,6 @@ theorem exists_eLpNorm_sobolevConj_le (hd : 0 < d) (c : EuclideanSpace ℝ (Fin 
   set B : Set (EuclideanSpace ℝ (Fin d)) := Metric.ball c R with hBdef
   have hBm : MeasurableSet B := measurableSet_ball
   have hR : 0 < R := hr.trans hrR
-  have : IsFiniteMeasure (volume.restrict B) :=
-    ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
   -- The cutoff, equal to `1` on the inner ball and supported in the outer one.
   obtain ⟨η, hηtest, hη1, hηIcc⟩ := exists_isTestFn_one_nhdsSet_of_isCompact
     (K := Metric.closedBall c r) (U := B) (isCompact_closedBall c r) Metric.isOpen_ball
@@ -516,6 +514,69 @@ theorem exists_eLpNorm_sobolevConj_le (hd : 0 < d) (c : EuclideanSpace ℝ (Fin 
   exact ENNReal.add_lt_top.mpr ⟨hv.eLpNorm_lt_top,
     ENNReal.sum_lt_top.mpr fun k _ => (hg k).eLpNorm_lt_top⟩
 
+/-- **Lowering an exponent on a finite measure space costs a constant.** For `0 < p ≤ q` there
+is `A` with `‖f‖_{Lᵖ} ≤ A ‖f‖_{Lq}`, namely `μ(univ)^{1/p - 1/q}`. -/
+theorem exists_const_eLpNorm_le_of_le {α E : Type*} {m : MeasurableSpace α} {μ : Measure α}
+    [IsFiniteMeasure μ] [NormedAddCommGroup E] {p q : ℝ≥0∞} (hp : p ≠ 0) (hpq : p ≤ q) :
+    ∃ A : ℝ≥0, ∀ f : α → E, AEStronglyMeasurable f μ → eLpNorm f p μ ≤ A * eLpNorm f q μ := by
+  have he : 0 ≤ 1 / p.toReal - 1 / q.toReal := by
+    rcases eq_or_ne q ⊤ with rfl | hq
+    · simp
+    · rw [sub_nonneg]
+      exact one_div_le_one_div_of_le (ENNReal.toReal_pos hp (ne_top_of_le_ne_top hq hpq))
+        (ENNReal.toReal_mono hq hpq)
+  refine ⟨(μ univ ^ (1 / p.toReal - 1 / q.toReal)).toNNReal, fun f hf => ?_⟩
+  rw [ENNReal.coe_toNNReal (ENNReal.rpow_ne_top_of_nonneg he (measure_ne_top μ _)), mul_comm]
+  exact eLpNorm_le_eLpNorm_mul_rpow_measure_univ hpq hf
+
+/-- A function bounded by `B` together with its `d` partial derivatives, each bounded by `B`,
+has total `a + ∑ k, b k` at most `(d + 1) B`. -/
+theorem add_sum_le_of_le {d : ℕ} {a B : ℝ≥0∞} {b : Fin d → ℝ≥0∞} (ha : a ≤ B)
+    (hb : ∀ k, b k ≤ B) : a + ∑ k, b k ≤ (d + 1) * B := by
+  calc a + ∑ k, b k ≤ B + ∑ _k : Fin d, B := add_le_add ha (Finset.sum_le_sum fun k _ => hb k)
+    _ = (d + 1) * B := by simp [add_mul, add_comm]
+
+/-- The sum of `d` seminorms, each at most `B`, is at most `d * B`, read in `ℝ≥0`. -/
+theorem sum_toNNReal_eLpNorm_le {α : Type*} {m : MeasurableSpace α} {μ : Measure α}
+    {g : Fin d → α → ℝ} {p : ℝ≥0∞} {B : ℝ≥0} (h : ∀ k, eLpNorm (g k) p μ ≤ B) :
+    ∑ k, (eLpNorm (g k) p μ).toNNReal ≤ d * B := by
+  calc ∑ k, (eLpNorm (g k) p μ).toNNReal ≤ ∑ _k : Fin d, B :=
+        Finset.sum_le_sum fun k _ =>
+          (ENNReal.toNNReal_mono ENNReal.coe_ne_top (h k)).trans_eq (ENNReal.toNNReal_coe B)
+    _ = d * B := by simp
+
+/-- **A Gagliardo-Nirenberg-Sobolev rung with its constant.** On the domains `D` and `D'`, a
+function in `Lq(D)` whose weak gradient is in `Lq(D)` lies in `L^{p'}(D')`, bounded by `K` times
+the sum of the `Lq(D)` seminorms of the function and its gradient. -/
+def RungBound (D D' : Set (EuclideanSpace ℝ (Fin d))) (q p' K : ℝ≥0) : Prop :=
+  ∀ (v : EuclideanSpace ℝ (Fin d) → ℝ) (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
+    MemLp v q (volume.restrict D) → (∀ k, MemLp (g k) q (volume.restrict D)) →
+    HasWeakGradOn D v g →
+    MemLp v p' (volume.restrict D') ∧
+      eLpNorm v p' (volume.restrict D') ≤ (K : ℝ≥0∞) * (eLpNorm v q (volume.restrict D)
+        + ∑ k, eLpNorm (g k) q (volume.restrict D))
+
+/-- **A rung fed by a higher exponent.** On a domain of finite measure, `Lq` data with `p ≤ q` is
+`Lᵖ` data at the price of a factor `|D|^{1/p - 1/q}` which the constant absorbs. -/
+theorem RungBound.mono_exponent {D D' : Set (EuclideanSpace ℝ (Fin d))}
+    [IsFiniteMeasure (volume.restrict D)] {p q p' K : ℝ≥0} (hp : 0 < p) (hpq : p ≤ q)
+    (h : RungBound D D' p p' K) : ∃ K' : ℝ≥0, RungBound D D' q p' K' := by
+  have hpqE : (p : ℝ≥0∞) ≤ (q : ℝ≥0∞) := by exact_mod_cast hpq
+  obtain ⟨A, hA⟩ := exists_const_eLpNorm_le_of_le (μ := volume.restrict D) (E := ℝ)
+    (by exact_mod_cast hp.ne') hpqE
+  refine ⟨K * A, fun v g hv hg hwg => ?_⟩
+  obtain ⟨hmem, hbd⟩ := h v g (hv.mono_exponent hpqE) (fun k => (hg k).mono_exponent hpqE) hwg
+  refine ⟨hmem, hbd.trans ?_⟩
+  calc (K : ℝ≥0∞) * (eLpNorm v (p : ℝ≥0∞) (volume.restrict D)
+          + ∑ k, eLpNorm (g k) (p : ℝ≥0∞) (volume.restrict D))
+      ≤ (K : ℝ≥0∞) * (A * eLpNorm v (q : ℝ≥0∞) (volume.restrict D)
+          + ∑ k, A * eLpNorm (g k) (q : ℝ≥0∞) (volume.restrict D)) :=
+        mul_le_mul' le_rfl (add_le_add (hA v hv.aestronglyMeasurable)
+          (Finset.sum_le_sum fun k _ => hA (g k) (hg k).aestronglyMeasurable))
+    _ = ((K * A : ℝ≥0) : ℝ≥0∞) * (eLpNorm v (q : ℝ≥0∞) (volume.restrict D)
+          + ∑ k, eLpNorm (g k) (q : ℝ≥0∞) (volume.restrict D)) := by
+        rw [← Finset.mul_sum, ← mul_add, ENNReal.coe_mul, mul_assoc]
+
 /-- **Bootstrap fed by a higher exponent.** The ball has finite measure, so `Lq` data with
 `p ≤ q` is `Lᵖ` data, at the price of a factor `|B|^{1/p - 1/q}` which the constant absorbs.
 This is the form the dimension-two chain uses: the interior `H²` estimate delivers `L²` data,
@@ -533,41 +594,8 @@ theorem exists_eLpNorm_sobolevConj_le_of_le (hd : 0 < d) (c : EuclideanSpace ℝ
         eLpNorm v p' (volume.restrict (Metric.ball c r))
           ≤ (K : ℝ≥0∞) * (eLpNorm v q (volume.restrict (Metric.ball c R))
               + ∑ k, eLpNorm (g k) q (volume.restrict (Metric.ball c R))) := by
-  classical
-  have hR : 0 < R := hr.trans hrR
-  set B : Set (EuclideanSpace ℝ (Fin d)) := Metric.ball c R with hBdef
-  have : IsFiniteMeasure (volume.restrict B) :=
-    ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
-  have hpqE : (p : ℝ≥0∞) ≤ (q : ℝ≥0∞) := by exact_mod_cast hpq
-  obtain ⟨K₀, hK₀⟩ := exists_eLpNorm_sobolevConj_le hd c hp hpp' hr hrR
-  set A : ℝ≥0∞ := (volume.restrict B) Set.univ
-      ^ (1 / (p : ℝ≥0∞).toReal - 1 / (q : ℝ≥0∞).toReal) with hAdef
-  have hunivne : (volume.restrict B) Set.univ ≠ 0 := by
-    rw [Measure.restrict_apply_univ, hBdef]
-    exact (measure_ball_pos volume c hR).ne'
-  have hunivtop : (volume.restrict B) Set.univ ≠ ⊤ := by
-    rw [Measure.restrict_apply_univ, hBdef]
-    exact measure_ball_lt_top.ne
-  have hAne : A ≠ ⊤ := ENNReal.rpow_ne_top_of_ne_zero hunivne hunivtop
-  refine ⟨K₀ * A.toNNReal, fun v g hv hg hwg => ?_⟩
-  obtain ⟨hmem, hbd⟩ :=
-    hK₀ v g (hv.mono_exponent hpqE) (fun k => (hg k).mono_exponent hpqE) hwg
-  refine ⟨hmem, ?_⟩
-  have hcmp : ∀ f : EuclideanSpace ℝ (Fin d) → ℝ,
-      AEStronglyMeasurable f (volume.restrict B) →
-      eLpNorm f p (volume.restrict B) ≤ eLpNorm f q (volume.restrict B) * A :=
-    fun f hf => eLpNorm_le_eLpNorm_mul_rpow_measure_univ hpqE hf
-  calc eLpNorm v p' (volume.restrict (Metric.ball c r))
-      ≤ (K₀ : ℝ≥0∞) * (eLpNorm v p (volume.restrict B)
-          + ∑ k, eLpNorm (g k) p (volume.restrict B)) := hbd
-    _ ≤ (K₀ : ℝ≥0∞) * (eLpNorm v q (volume.restrict B) * A
-          + ∑ k, eLpNorm (g k) q (volume.restrict B) * A) :=
-        mul_le_mul' le_rfl (add_le_add (hcmp v hv.aestronglyMeasurable)
-          (Finset.sum_le_sum fun k _ => hcmp (g k) (hg k).aestronglyMeasurable))
-    _ = ((K₀ * A.toNNReal : ℝ≥0) : ℝ≥0∞) * (eLpNorm v q (volume.restrict B)
-          + ∑ k, eLpNorm (g k) q (volume.restrict B)) := by
-        rw [ENNReal.coe_mul, ENNReal.coe_toNNReal hAne, ← Finset.sum_mul, ← add_mul]
-        ring
+  obtain ⟨K, hK⟩ := exists_eLpNorm_sobolevConj_le hd c hp hpp' hr hrR
+  exact RungBound.mono_exponent (hp.trans_lt' one_pos) hpq (K := K) hK
 
 /-- **From `L²` to `L⁶` in dimension three.** The Sobolev conjugate of `2` in dimension `3` is
 `2·3/(3-2) = 6`, so a function with an `L²` weak gradient on `Metric.ball c R` lies in `L⁶` of
@@ -606,37 +634,6 @@ theorem exists_eLpNorm_four_le (c : EuclideanSpace ℝ (Fin 2)) {r R : ℝ} (hr 
     (p := 4 / 3) (q := 2) (p' := 4) (by rw [← NNReal.coe_le_coe]; push_cast; norm_num)
     (by rw [← NNReal.coe_le_coe]; push_cast; norm_num) (by push_cast; norm_num) hr hrR
   simpa using h
-
-/-- **Lowering an exponent on a finite measure space costs a constant.** For `0 < p ≤ q` there
-is `A` with `‖f‖_{Lᵖ} ≤ A ‖f‖_{Lq}`, namely `μ(univ)^{1/p - 1/q}`. -/
-theorem exists_const_eLpNorm_le_of_le {α E : Type*} {m : MeasurableSpace α} {μ : Measure α}
-    [IsFiniteMeasure μ] [NormedAddCommGroup E] {p q : ℝ≥0∞} (hp : p ≠ 0) (hpq : p ≤ q) :
-    ∃ A : ℝ≥0, ∀ f : α → E, AEStronglyMeasurable f μ → eLpNorm f p μ ≤ A * eLpNorm f q μ := by
-  have he : 0 ≤ 1 / p.toReal - 1 / q.toReal := by
-    rcases eq_or_ne q ⊤ with rfl | hq
-    · simp
-    · rw [sub_nonneg]
-      exact one_div_le_one_div_of_le (ENNReal.toReal_pos hp (ne_top_of_le_ne_top hq hpq))
-        (ENNReal.toReal_mono hq hpq)
-  refine ⟨(μ univ ^ (1 / p.toReal - 1 / q.toReal)).toNNReal, fun f hf => ?_⟩
-  rw [ENNReal.coe_toNNReal (ENNReal.rpow_ne_top_of_nonneg he (measure_ne_top μ _)), mul_comm]
-  exact eLpNorm_le_eLpNorm_mul_rpow_measure_univ hpq hf
-
-/-- A function bounded by `B` together with its `d` partial derivatives, each bounded by `B`,
-has total `a + ∑ k, b k` at most `(d + 1) B`. -/
-theorem add_sum_le_of_le {d : ℕ} {a B : ℝ≥0∞} {b : Fin d → ℝ≥0∞} (ha : a ≤ B)
-    (hb : ∀ k, b k ≤ B) : a + ∑ k, b k ≤ (d + 1) * B := by
-  calc a + ∑ k, b k ≤ B + ∑ _k : Fin d, B := add_le_add ha (Finset.sum_le_sum fun k _ => hb k)
-    _ = (d + 1) * B := by simp [add_mul, add_comm]
-
-/-- The sum of `d` seminorms, each at most `B`, is at most `d * B`, read in `ℝ≥0`. -/
-theorem sum_toNNReal_eLpNorm_le {α : Type*} {m : MeasurableSpace α} {μ : Measure α}
-    {g : Fin d → α → ℝ} {p : ℝ≥0∞} {B : ℝ≥0} (h : ∀ k, eLpNorm (g k) p μ ≤ B) :
-    ∑ k, (eLpNorm (g k) p μ).toNNReal ≤ d * B := by
-  calc ∑ k, (eLpNorm (g k) p μ).toNNReal ≤ ∑ _k : Fin d, B :=
-        Finset.sum_le_sum fun k _ =>
-          (ENNReal.toNNReal_mono ENNReal.coe_ne_top (h k)).trans_eq (ENNReal.toNNReal_coe B)
-    _ = d * B := by simp
 
 end Bootstrap
 

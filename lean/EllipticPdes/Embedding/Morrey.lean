@@ -254,8 +254,6 @@ restricted ball. This is the `MemLp` witness fed to `exists_kernel_bound`. -/
 private theorem memLp_norm_fderiv {φ : EuclideanSpace ℝ (Fin d) → ℝ}
     (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) {p : ℝ} (z : EuclideanSpace ℝ (Fin d)) {r : ℝ} (_hr : 0 < r) :
     MemLp (fun y => ‖fderiv ℝ φ y‖) (ENNReal.ofReal p) (volume.restrict (Metric.ball z r)) := by
-  have : IsFiniteMeasure (volume.restrict (Metric.ball z r)) :=
-    ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
   have hcont : Continuous (fun y : EuclideanSpace ℝ (Fin d) => ‖fderiv ℝ φ y‖) :=
     (hφ.continuous_fderiv (by simp)).norm
   obtain ⟨C, hC⟩ := (isCompact_closedBall z r).exists_bound_of_continuousOn hcont.continuousOn

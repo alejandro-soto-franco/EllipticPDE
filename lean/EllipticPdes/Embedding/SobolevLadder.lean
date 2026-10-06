@@ -170,17 +170,6 @@ theorem ladder_induction {X : Type*} (G : ℕ → ℝ≥0 → X → Prop) (V : X
 
 /-! ### The ladder with its constant -/
 
-/-- **A Gagliardo-Nirenberg-Sobolev rung with its constant.** On the domains `D` and `D'`, a
-function in `Lq(D)` whose weak gradient is in `Lq(D)` lies in `L^{p'}(D')`, bounded by `K` times
-the sum of the `Lq(D)` seminorms of the function and its gradient. -/
-def RungBound (D D' : Set (EuclideanSpace ℝ (Fin d))) (q p' K : ℝ≥0) : Prop :=
-  ∀ (v : EuclideanSpace ℝ (Fin d) → ℝ) (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
-    MemLp v q (volume.restrict D) → (∀ k, MemLp (g k) q (volume.restrict D)) →
-    HasWeakGradOn D v g →
-    MemLp v p' (volume.restrict D') ∧
-      eLpNorm v p' (volume.restrict D') ≤ (K : ℝ≥0∞) * (eLpNorm v q (volume.restrict D)
-        + ∑ k, eLpNorm (g k) q (volume.restrict D))
-
 /-- **A rung is available from `D` to `D'`.** For every `1 ≤ p ≤ q` and every `p'` with
 `1/p' = 1/p - 1/d`, a rung with data at `q` has some constant. -/
 def IsSobolevRung (d : ℕ) (D D' : Set (EuclideanSpace ℝ (Fin d))) : Prop :=
