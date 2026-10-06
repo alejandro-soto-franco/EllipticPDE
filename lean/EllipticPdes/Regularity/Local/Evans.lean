@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.Local.InteriorSmooth
+
+module
+
+public import EllipticPdes.Regularity.Local.InteriorSmooth
 
 /-!
 # Infinite differentiability in the interior with classical hypotheses
@@ -44,6 +47,8 @@ space is a point and every function is smooth.
 * `exists_contDiffOn_of_localWeakSol`: Theorem 3 on an open set, for every dimension.
 * `exists_contDiffOn_of_weakSolution_evans`: Theorem 3 with Evans's hypotheses verbatim.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

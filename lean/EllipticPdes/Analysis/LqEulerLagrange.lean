@@ -3,10 +3,13 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Analysis.LqDerivative
-import Mathlib.Analysis.Calculus.LocalExtr.Basic
-import Mathlib.MeasureTheory.Function.LpSpace.Basic
-import Mathlib.Analysis.InnerProductSpace.Basic
+
+module
+
+public import EllipticPdes.Analysis.LqDerivative
+public import Mathlib.Analysis.Calculus.LocalExtr.Basic
+public import Mathlib.MeasureTheory.Function.LpSpace.Basic
+public import Mathlib.Analysis.InnerProductSpace.Basic
 
 /-!
 # Euler-Lagrange equation under an `L^q` constraint
@@ -44,6 +47,8 @@ rule through `x ↦ x^{2/q}` turns that into the derivative of the squared `L^q`
 Y. Guo, *Partial Differential Equations*, Section IX.1; L. C. Evans, *Partial Differential
 Equations* (2nd ed.), §8.4.1.
 -/
+
+@[expose] public section
 
 open MeasureTheory Filter
 open scoped ENNReal NNReal Topology RealInnerProductSpace

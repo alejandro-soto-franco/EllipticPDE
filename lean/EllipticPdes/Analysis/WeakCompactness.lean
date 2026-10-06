@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import Mathlib.Analysis.InnerProductSpace.Dual
-import Mathlib.Analysis.InnerProductSpace.Projection.Basic
+
+module
+
+public import Mathlib.Analysis.InnerProductSpace.Dual
+public import Mathlib.Analysis.InnerProductSpace.Projection.Basic
 
 /-!
 # Weak sequential compactness in a Hilbert space
@@ -39,6 +42,8 @@ working inside the closed span of the sequence.
 
 Y. Guo, *Partial Differential Equations*, Theorem V.2.5.
 -/
+
+@[expose] public section
 
 open Filter Topology
 open scoped RealInnerProductSpace

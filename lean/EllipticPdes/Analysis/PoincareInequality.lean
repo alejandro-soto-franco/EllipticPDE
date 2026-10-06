@@ -3,11 +3,14 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import Mathlib.MeasureTheory.Integral.IntervalIntegral.Basic
-import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
-import Mathlib.Analysis.Calculus.Deriv.Pow
-import Mathlib.Analysis.Calculus.Deriv.Mul
-import Mathlib.Algebra.QuadraticDiscriminant
+
+module
+
+public import Mathlib.MeasureTheory.Integral.IntervalIntegral.Basic
+public import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
+public import Mathlib.Analysis.Calculus.Deriv.Pow
+public import Mathlib.Analysis.Calculus.Deriv.Mul
+public import Mathlib.Algebra.QuadraticDiscriminant
 
 /-!
 # One-dimensional Poincaré inequality
@@ -33,6 +36,8 @@ integrating that estimate over `[a, b]` and evaluating
 * `MeasureTheory.sq_intervalIntegral_le`: the `g = 1` special case.
 * `MeasureTheory.poincare_1d`: the one-dimensional Poincaré inequality.
 -/
+
+@[expose] public section
 
 open MeasureTheory intervalIntegral Set
 

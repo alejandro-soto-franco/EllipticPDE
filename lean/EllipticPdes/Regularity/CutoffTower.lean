@@ -3,11 +3,14 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Sobolev.Basic
-import EllipticPdes.Regularity.DifferenceQuotient
-import Mathlib.Geometry.Manifold.PartitionOfUnity
-import Mathlib.Geometry.Manifold.ContMDiff.NormedSpace
-import Mathlib.Topology.MetricSpace.Thickening
+
+module
+
+public import EllipticPdes.Sobolev.Basic
+public import EllipticPdes.Regularity.DifferenceQuotient
+public import Mathlib.Geometry.Manifold.PartitionOfUnity
+public import Mathlib.Geometry.Manifold.ContMDiff.NormedSpace
+public import Mathlib.Topology.MetricSpace.Thickening
 
 /-!
 # Smooth cutoff tower for the interior `H²` estimate
@@ -36,6 +39,8 @@ This file provides:
   inside an open `Ω`, built by three applications of the Urysohn-type cutoff lemma followed by
   one application of the margin lemma.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Filter
 open scoped Manifold ContDiff Topology RealInnerProductSpace

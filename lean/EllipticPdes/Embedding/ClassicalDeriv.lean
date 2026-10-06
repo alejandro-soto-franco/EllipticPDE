@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.Morrey
+
+module
+
+public import EllipticPdes.Embedding.Morrey
 
 /-!
 # Continuous weak gradient as a classical gradient
@@ -34,6 +37,8 @@ to see it.
   continuous function converge uniformly on an interior ball.
 * `EllipticPdes.Embedding.hasFDerivAt_of_continuousOn_hasWeakGradOn`: the classical derivative.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Metric Filter
 open scoped NNReal ENNReal Convolution Topology

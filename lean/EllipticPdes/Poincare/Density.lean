@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Poincare.Domain
-import EllipticPdes.Sobolev.Basic
+
+module
+
+public import EllipticPdes.Poincare.Domain
+public import EllipticPdes.Sobolev.Basic
 
 /-!
 # Density extension to H₀¹ (dependency-chain step 4)
@@ -20,6 +23,8 @@ The base estimate on test functions is taken as a hypothesis here (it is supplie
 domain Poincaré inequality `poincare_domain` rewritten through the `L²` norms). This keeps
 the density mechanism independent of the geometry of `Ω`.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace

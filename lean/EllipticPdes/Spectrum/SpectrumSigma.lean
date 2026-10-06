@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Fredholm.FredholmComplete
-import Mathlib.Analysis.Normed.Operator.Compact.FiniteDimension
+
+module
+
+public import EllipticPdes.Fredholm.FredholmComplete
+public import Mathlib.Analysis.Normed.Operator.Compact.FiniteDimension
 
 /-!
 # Spectrum of compact operators and Existence III
@@ -30,6 +33,8 @@ solvable for every right-hand side. The reduction is the `opK` factorisation of
 `Fredholm.lean`, shifted: `opAlam = opE ∘ (1 - ((γ+λ)/γ)·opK)`. Eigenvalues of `opK`
 are positive (coercivity of the shifted form), which bounds `Σ` inside `(-γ, ∞)`.
 -/
+
+@[expose] public section
 
 open MeasureTheory InnerProductSpace
 open scoped RealInnerProductSpace

@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Form.BilinearForm
+
+module
+
+public import EllipticPdes.Form.BilinearForm
 
 /-!
 # Characterisation of `H⁻¹(Ω)`
@@ -33,6 +36,8 @@ on the Hilbert space `H₀¹(Ω)`:
 The `L² ⊆ H⁻¹` embedding `l2Functional` (Evans §5.9.1, Theorem 1(iii)) is the instance
 with the tuple `(f, 0, …, 0)`.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace

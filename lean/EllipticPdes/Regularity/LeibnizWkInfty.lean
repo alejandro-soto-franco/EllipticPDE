@@ -3,10 +3,13 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.MollifyWkInfty
-import EllipticPdes.Regularity.Interior
-import EllipticPdes.Regularity.Caccioppoli
-import EllipticPdes.Embedding.Convolution
+
+module
+
+public import EllipticPdes.Regularity.MollifyWkInfty
+public import EllipticPdes.Regularity.Interior
+public import EllipticPdes.Regularity.Caccioppoli
+public import EllipticPdes.Embedding.Convolution
 
 /-!
 # Leibniz rule for a `W^{1,∞}` weight
@@ -51,6 +54,8 @@ margin. That is `tendsto_setIntegral_mul_convolution_of_measurable`, which repla
   class, for a weight that is measurable and essentially bounded and nothing more.
 * `HasWeakDerivOn.mul_isWkInfty_left`: the Leibniz rule for a `W^{1,∞}` weight.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped Topology ENNReal Convolution

@@ -3,17 +3,20 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import Mathlib.MeasureTheory.Function.L2Space
-import Mathlib.MeasureTheory.Function.LpSpace.Indicator
-import Mathlib.MeasureTheory.Integral.Prod
-import Mathlib.MeasureTheory.Group.Integral
-import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
-import Mathlib.MeasureTheory.Group.Prod
-import Mathlib.MeasureTheory.Constructions.Pi
-import Mathlib.MeasureTheory.Measure.Lebesgue.Basic
-import Mathlib.Analysis.Normed.Module.FiniteDimension
-import Mathlib.Topology.MetricSpace.Bounded
-import EllipticPdes.Analysis.LpTranslation
+
+module
+
+public import Mathlib.MeasureTheory.Function.L2Space
+public import Mathlib.MeasureTheory.Function.LpSpace.Indicator
+public import Mathlib.MeasureTheory.Integral.Prod
+public import Mathlib.MeasureTheory.Group.Integral
+public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
+public import Mathlib.MeasureTheory.Group.Prod
+public import Mathlib.MeasureTheory.Constructions.Pi
+public import Mathlib.MeasureTheory.Measure.Lebesgue.Basic
+public import Mathlib.Analysis.Normed.Module.FiniteDimension
+public import Mathlib.Topology.MetricSpace.Bounded
+public import EllipticPdes.Analysis.LpTranslation
 
 /-!
 # Fréchet-Kolmogorov precompactness criterion in `L²(ℝⁿ)`
@@ -37,6 +40,8 @@ original family.
   `(∫_s f)² ≤ μ.real s * ∫_s f²`.
 * `MeasureTheory.totallyBounded_of_lipschitz_translation`: the Fréchet-Kolmogorov criterion.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Metric Filter
 open scoped ENNReal RealInnerProductSpace

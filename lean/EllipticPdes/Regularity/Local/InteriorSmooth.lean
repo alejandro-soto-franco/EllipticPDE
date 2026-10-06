@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.Local.HigherInterior
-import EllipticPdes.Regularity.InteriorSmoothGlobal
+
+module
+
+public import EllipticPdes.Regularity.Local.HigherInterior
+public import EllipticPdes.Regularity.InteriorSmoothGlobal
 
 /-!
 # Infinite differentiability in the interior for a weak solution in `H¹`
@@ -21,6 +24,8 @@ weak differentiability on a compact `V`, the Sobolev ladder
 * `interior_smooth_W12`: a smooth representative on the interior of each compact `V ⊆ Ω`.
 * `interior_smooth_global_W12`: one smooth representative on all of `Ω`.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.DifferentiatedEquation
+
+module
+
+public import EllipticPdes.Regularity.DifferentiatedEquation
 
 /-!
 # Dividing a `C¹` weight out of a weak derivative
@@ -44,6 +47,8 @@ matrix, and `EllipticCoeff.lam_le_diag` below supplies the second from elliptici
 * `exists_hasWeakDerivOn_of_mul_diag`: the packaged form for a `C¹` elliptic bundle, with
   the diagonal entry `a_{kk}` as the weight and ellipticity discharging the lower bound.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace Topology ENNReal

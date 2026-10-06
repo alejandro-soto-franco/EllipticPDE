@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Poincare.Geometry
-import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
-import Mathlib.Analysis.Normed.Lp.MeasurableSpace
+
+module
+
+public import EllipticPdes.Poincare.Geometry
+public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
+public import Mathlib.Analysis.Normed.Lp.MeasurableSpace
 
 /-!
 # Discharging the box Poincaré slice bound from the Euclidean geometry
@@ -36,6 +39,8 @@ The three bridges:
 The headline results are `slice_bound_euclBox` (the per-direction Poincaré bound on the box) and
 `laplaceBilin_coercive_euclBox` (Dirichlet coercivity on any open box, no abstract hypothesis).
 -/
+
+@[expose] public section
 
 open MeasureTheory Set
 open scoped RealInnerProductSpace

@@ -3,10 +3,13 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.HigherInterior
-import EllipticPdes.Regularity.SmoothGlue
-import EllipticPdes.Regularity.IteratedFamily
-import EllipticPdes.Embedding.SmoothOfGradClosed
+
+module
+
+public import EllipticPdes.Regularity.HigherInterior
+public import EllipticPdes.Regularity.SmoothGlue
+public import EllipticPdes.Regularity.IteratedFamily
+public import EllipticPdes.Embedding.SmoothOfGradClosed
 
 /-!
 # Infinite differentiability in the interior
@@ -46,6 +49,8 @@ From there it is two steps.
   smooth representative on the interior.
 * `interior_smooth`: Evans's Theorem 3.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.H01Sobolev
-import EllipticPdes.Existence.Garding
+
+module
+
+public import EllipticPdes.Embedding.H01Sobolev
+public import EllipticPdes.Existence.Garding
 
 /-!
 # Integrability of the weak solution above `L²`
@@ -27,6 +30,8 @@ coefficient, together with `2 < d`, which is what the critical exponent asks for
 
 L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.6.1 Theorem 3 and §6.2.2 Theorem 3.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped NNReal ENNReal

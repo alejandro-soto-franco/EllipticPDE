@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.DomainLadder
+
+module
+
+public import EllipticPdes.Embedding.DomainLadder
 
 /-!
 # Hölder continuity up to the boundary
@@ -40,6 +43,8 @@ depends on the two radii and the exponent alone, so one constant states both hal
 Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem IV.2.3 case
 (ii); L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.6.3 Theorem 6 clause (ii).
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric Set
 open scoped NNReal ENNReal

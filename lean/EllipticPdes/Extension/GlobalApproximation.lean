@@ -3,10 +3,13 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Extension.Operator
-import EllipticPdes.Embedding.Morrey
-import EllipticPdes.Embedding.WeakGradUnique
-import EllipticPdes.Embedding.DomainSobolev
+
+module
+
+public import EllipticPdes.Extension.Operator
+public import EllipticPdes.Embedding.Morrey
+public import EllipticPdes.Embedding.WeakGradUnique
+public import EllipticPdes.Embedding.DomainSobolev
 
 /-!
 # Global approximation by functions smooth up to the boundary
@@ -40,6 +43,8 @@ gradient on the open set `Ω`.
 L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.3.3 Theorem 3 (p. 266);
 Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem III.1.3.
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric Set Filter Topology
 open scoped NNReal ENNReal Convolution

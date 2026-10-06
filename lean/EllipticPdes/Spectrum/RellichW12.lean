@@ -3,12 +3,15 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Extension.GlobalApproximation
-import EllipticPdes.Extension.LinearOperator
-import EllipticPdes.Spectrum.RellichDischarge
-import EllipticPdes.Embedding.H01Sobolev
-import EllipticPdes.Extension.BallChart
-import EllipticPdes.Regularity.RestrictedDiffQuotient
+
+module
+
+public import EllipticPdes.Extension.GlobalApproximation
+public import EllipticPdes.Extension.LinearOperator
+public import EllipticPdes.Spectrum.RellichDischarge
+public import EllipticPdes.Embedding.H01Sobolev
+public import EllipticPdes.Extension.BallChart
+public import EllipticPdes.Regularity.RestrictedDiffQuotient
 
 /-!
 # Rellich-Kondrachov on the whole graph space
@@ -43,6 +46,8 @@ totally bounded and the embedding is compact.
 L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.7 Theorem 1 (p. 286);
 Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem IV.2.10.
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric Set Filter Topology
 open scoped NNReal ENNReal Convolution

@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.SobolevLadderFullStep
-import EllipticPdes.Embedding.ClassicalDeriv
+
+module
+
+public import EllipticPdes.Embedding.SobolevLadderFullStep
+public import EllipticPdes.Embedding.ClassicalDeriv
 
 /-!
 # Hölder regularity of finite order from a bounded supply of weak derivatives
@@ -43,6 +46,8 @@ reached and `2d` is the one this file fixes.
 Guo, *Partial Differential Equations*, Theorem IV.2.3.
 Evans, *Partial Differential Equations* (2nd ed.), §5.6.3.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Metric
 open scoped NNReal ENNReal

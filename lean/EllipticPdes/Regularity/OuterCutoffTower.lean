@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.Interior
+
+module
+
+public import EllipticPdes.Regularity.Interior
 
 /-!
 # Outer cutoff tower and second derivatives near `tsupport ξ`
@@ -25,6 +28,8 @@ inside `Ω`, so `cutoffTowerOfIsCompactSubsetIsOpen` builds the outer tower, and
   `EucL2 d` classes with one constant covering every direction pair.
 * `interior_H2_estimate_near_tsupport_xi`: the interior `H²` estimate on `tsupport T.ξ`.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace

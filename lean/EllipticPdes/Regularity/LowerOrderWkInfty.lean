@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.CoeffBridge
-import EllipticPdes.Existence.Garding
+
+module
+
+public import EllipticPdes.Regularity.CoeffBridge
+public import EllipticPdes.Existence.Garding
 
 /-!
 # `W^{k,∞}` regularity for the transport and zeroth-order coefficients
@@ -32,6 +35,8 @@ anything else the induction differentiates.
 * `IsWkInftyCoeff.entry`: one entry of the coefficient matrix, as a scalar bundle.
 * `IsWkInftyLower`: Guo's hypothesis on `b` and `c`, with a uniform constant.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

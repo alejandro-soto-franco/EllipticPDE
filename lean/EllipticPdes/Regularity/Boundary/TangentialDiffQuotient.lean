@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.Boundary.HalfBall
-import EllipticPdes.Regularity.RestrictedDiffQuotient
-import EllipticPdes.Regularity.CutoffTower
+
+module
+
+public import EllipticPdes.Regularity.Boundary.HalfBall
+public import EllipticPdes.Regularity.RestrictedDiffQuotient
+public import EllipticPdes.Regularity.CutoffTower
 
 /-!
 # Tangential difference quotients on the half-ball
@@ -50,6 +53,8 @@ Coordinate `0` is Evans' normal direction `xₙ` and tangential directions are `
 * `isTestFn_tangentialCutoff_diffQuotFn`: the cutoff of a tangential difference quotient of a
   test function on the half-ball is a test function on the half-ball.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Filter
 open scoped Topology RealInnerProductSpace

@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Extension.Translate
-import EllipticPdes.Embedding.H01Sobolev
-import Mathlib.MeasureTheory.Function.ContinuousMapDense
+
+module
+
+public import EllipticPdes.Extension.Translate
+public import EllipticPdes.Embedding.H01Sobolev
+public import Mathlib.MeasureTheory.Function.ContinuousMapDense
 
 /-!
 # Continuity of translation in `Lᵖ`
@@ -34,6 +37,8 @@ the sup bound converts to an `Lᵖ` bound against the measure of that set.
 L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.3.3, Theorem 3; H. Brezis,
 *Functional Analysis, Sobolev Spaces and Partial Differential Equations*, Lemma 4.3.
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric Set Filter
 open scoped ENNReal NNReal Topology

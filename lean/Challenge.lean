@@ -3,29 +3,27 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import Mathlib.MeasureTheory.Function.L2Space
-import Mathlib.MeasureTheory.Function.LpSpace.Indicator
-import Mathlib.MeasureTheory.Function.LpSeminorm.Monotonicity
-import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
-import Mathlib.Analysis.InnerProductSpace.PiL2
-import Mathlib.Analysis.InnerProductSpace.Adjoint
-import Mathlib.Analysis.Calculus.LineDeriv.IntegrationByParts
-import Mathlib.Analysis.Normed.Operator.Compact.Basic
+
+module
+
+public import Mathlib.MeasureTheory.Function.L2Space
+public import Mathlib.MeasureTheory.Function.LpSpace.Indicator
+public import Mathlib.MeasureTheory.Function.LpSeminorm.Monotonicity
+public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
+public import Mathlib.Analysis.InnerProductSpace.PiL2
+public import Mathlib.Analysis.InnerProductSpace.Adjoint
+public import Mathlib.Analysis.Calculus.LineDeriv.IntegrationByParts
+public import Mathlib.Analysis.Normed.Operator.Compact.Basic
 
 /-!
 # Solvability theory for second-order divergence-form elliptic operators
 
-Let `Ω ⊆ ℝ^d` and let
-
-  `L u = -∂_j (a_{ij} ∂_i u) + b_i ∂_i u + c u`
-
-be a second-order operator in divergence form whose coefficients are measurable and
-bounded and whose principal part is uniformly elliptic, `∑_{ij} a_{ij}(x) ξ_i ξ_j ≥ λ |ξ|²`
-for almost every `x` and every `ξ`. The drift `b` is unrestricted and `c` obeys no sign
-condition, so the operator is in general non-symmetric. The weak Dirichlet problem seeks
-`u ∈ H_0^1(Ω)` with `B[u, v] = ⟨f, v⟩` for every `v ∈ H_0^1(Ω)`, where
-
-  `B[u, v] = ∑_{ij} ∫_Ω a_{ij} ∂_i u ∂_j v + ∑_i ∫_Ω b_i ∂_i u v + ∫_Ω c u v`.
+Let `Ω ⊆ ℝ^d` and let `L u = -∂_j (a_{ij} ∂_i u) + b_i ∂_i u + c u` be a second-order operator in
+divergence form whose coefficients are measurable and bounded and whose principal part is uniformly
+elliptic, `∑_{ij} a_{ij}(x) ξ_i ξ_j ≥ λ |ξ|²` for almost every `x` and every `ξ`. The drift `b` is
+unrestricted and `c` obeys no sign condition, so the operator is in general non-symmetric. The weak
+Dirichlet problem seeks `u ∈ H_0^1(Ω)` with `B[u, v] = ⟨f, v⟩` for every `v ∈ H_0^1(Ω)`, where
+`B[u, v] = ∑_{ij} ∫_Ω a_{ij} ∂_i u ∂_j v + ∑_i ∫_Ω b_i ∂_i u v + ∫_Ω c u v`.
 
 Six results are stated below, all from Evans, *Partial Differential Equations* (2nd ed.),
 §6.2, on a bounded open `Ω` with no boundary hypothesis, the first asking nothing of `Ω`:
@@ -49,6 +47,8 @@ empty interior every test function vanishes. Compactness of the embedding `H_0^1
 the Rellich-Kondrachov theorem, is proved for a bounded `Ω` rather than assumed, so it appears
 in none of the statements below.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace ENNReal

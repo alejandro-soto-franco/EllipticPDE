@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.CoeffWkInfty
-import Mathlib.Analysis.Calculus.LineDeriv.IntegrationByParts
-import Mathlib.Analysis.Calculus.FDeriv.CompCLM
+
+module
+
+public import EllipticPdes.Regularity.CoeffWkInfty
+public import Mathlib.Analysis.Calculus.LineDeriv.IntegrationByParts
+public import Mathlib.Analysis.Calculus.FDeriv.CompCLM
 
 /-!
 # Classical `Cᵏ` coefficients satisfy Guo's `W^{k,∞}` hypothesis
@@ -38,6 +41,8 @@ bound is in particular an essential bound.
 * `hasWeakPartial_partialD`: a classical partial derivative of a `C¹` function is a weak one.
 * `IsCkCoeff.toIsWkInftyCoeff`: the bridge.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Spectrum.SpectrumSigma
-import EllipticPdes.Fredholm.Compactness
-import EllipticPdes.Spectrum.RellichDischarge
+
+module
+
+public import EllipticPdes.Spectrum.SpectrumSigma
+public import EllipticPdes.Fredholm.Compactness
+public import EllipticPdes.Spectrum.RellichDischarge
 
 /-!
 # Bounded-domain instances of the Σ-spectrum results
@@ -17,6 +20,8 @@ part `opK` is a compact operator. On a bounded measurable domain that hypothesis
 theorem (`embL2_isCompact` + `opK_isCompact`), so each result holds with no analytic
 hypotheses at all. These are the paper-facing statements.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace

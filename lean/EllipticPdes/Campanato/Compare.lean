@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Campanato.Basic
+
+module
+
+public import EllipticPdes.Campanato.Basic
 
 /-!
 # Comparing two ball means under the Campanato hypothesis
@@ -27,6 +30,8 @@ Three instances follow, each with the single constant `campanatoConst d = √(2^
 This is the computational core of property (H3) of Fernández-Real and Ros-Oton, *Regularity
 Theory for Elliptic PDE*.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Metric
 

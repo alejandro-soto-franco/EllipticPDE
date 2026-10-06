@@ -3,12 +3,15 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Analysis.WeakCompactness
-import Mathlib.Analysis.Normed.Operator.Compact.Basic
-import Mathlib.Analysis.Normed.Operator.NormedSpace
-import Mathlib.Analysis.InnerProductSpace.Dual
-import Mathlib.Analysis.InnerProductSpace.LaxMilgram
-import Mathlib.Analysis.LocallyConvex.SeparatingDual
+
+module
+
+public import EllipticPdes.Analysis.WeakCompactness
+public import Mathlib.Analysis.Normed.Operator.Compact.Basic
+public import Mathlib.Analysis.Normed.Operator.NormedSpace
+public import Mathlib.Analysis.InnerProductSpace.Dual
+public import Mathlib.Analysis.InnerProductSpace.LaxMilgram
+public import Mathlib.Analysis.LocallyConvex.SeparatingDual
 
 /-!
 # Direct method for a coercive symmetric form
@@ -46,6 +49,8 @@ semilinear problem, where the constraint is not quadratic and the equation is
 Y. Guo, *Partial Differential Equations*, Section IX.1; L. C. Evans, *Partial Differential
 Equations* (2nd ed.), §8.2.
 -/
+
+@[expose] public section
 
 open Filter Topology
 open scoped RealInnerProductSpace

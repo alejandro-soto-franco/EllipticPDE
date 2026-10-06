@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.IteratedFamily
-import EllipticPdes.Embedding.HolderOfGradClosed
+
+module
+
+public import EllipticPdes.Regularity.IteratedFamily
+public import EllipticPdes.Embedding.HolderOfGradClosed
 
 /-!
 # Second case of the Sobolev embedding of order k
@@ -42,6 +45,8 @@ conclusion says exactly: on the ball the classical derivative of `v α` is the t
 Guo, *Partial Differential Equations*, Theorem IV.2.3.
 Evans, *Partial Differential Equations* (2nd ed.), §5.6.3.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Metric
 open scoped NNReal ENNReal

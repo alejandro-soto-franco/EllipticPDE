@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Existence.Garding
+
+module
+
+public import EllipticPdes.Existence.Garding
 
 /-!
 # Extension of the weak formulation from test functions to `H₀¹(Ω)`
@@ -30,6 +33,8 @@ because it is an inner product against a fixed vector: `⟪f, w₀⟫ = ⟪singl
   integrals.
 * `weakForm_of_testFn`: the weak formulation, from test functions to `H₀¹(Ω)`.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace

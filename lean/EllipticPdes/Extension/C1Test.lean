@@ -3,11 +3,14 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.Convolution
-import EllipticPdes.Embedding.WeakGradient
-import EllipticPdes.Sobolev.Basic
-import Mathlib.Analysis.Calculus.ContDiff.Convolution
-import Mathlib.Analysis.Calculus.BumpFunction.Convolution
+
+module
+
+public import EllipticPdes.Embedding.Convolution
+public import EllipticPdes.Embedding.WeakGradient
+public import EllipticPdes.Sobolev.Basic
+public import Mathlib.Analysis.Calculus.ContDiff.Convolution
+public import Mathlib.Analysis.Calculus.BumpFunction.Convolution
 
 /-!
 # Integration by parts against a `C¹` test function
@@ -30,6 +33,8 @@ originals while converging pointwise. Dominated convergence passes the identity.
 * `EllipticPdes.Extension.hasWeakGradOn_contDiffOne`: the identity of a weak gradient, against
   a `C¹` test function.
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric Filter Topology Set
 open scoped NNReal ENNReal Convolution Pointwise

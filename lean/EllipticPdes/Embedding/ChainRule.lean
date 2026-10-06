@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.Morrey
-import EllipticPdes.Embedding.GagliardoNirenberg
-import EllipticPdes.Embedding.WeakGradUnique
+
+module
+
+public import EllipticPdes.Embedding.Morrey
+public import EllipticPdes.Embedding.GagliardoNirenberg
+public import EllipticPdes.Embedding.WeakGradUnique
 
 /-!
 # Chain rule for weak gradients
@@ -43,6 +46,8 @@ D. Gilbarg and N. S. Trudinger, *Elliptic Partial Differential Equations of Seco
 §7.4 Lemma 7.5 (p. 151), Lemma 7.6 and Lemma 7.7 (p. 152);
 L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.10 Problems 17 and 18 (p. 308).
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric Set Filter Topology
 open scoped NNReal ENNReal Convolution

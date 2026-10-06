@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.Boundary.TangentialDiffQuotient
+
+module
+
+public import EllipticPdes.Regularity.Boundary.TangentialDiffQuotient
 
 /-!
 # Admissibility of the cutoff of a tangential difference quotient
@@ -30,6 +33,8 @@ the half-ball for **every** step `h`.
 * `cutoffMulOn_tangDiffQuotG_mem_H01`: the cutoff of the tangential difference quotient of an
   `H₀¹(halfBall d r)` element is again in `H₀¹(halfBall d r)`.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace

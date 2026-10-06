@@ -13,9 +13,14 @@ declaration names across lines.
 This module is a build target in its own right. It is not imported by
 `EllipticPdes`, and nothing imports it.
 -/
-import EllipticPdes
+
+module
+
+public import EllipticPdes
 
 /-! ### Lax-Milgram -/
+
+@[expose] public section
 
 /-- info: 'EllipticPdes.lax_milgram' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in

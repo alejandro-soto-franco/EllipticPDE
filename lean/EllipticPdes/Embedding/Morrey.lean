@@ -3,18 +3,21 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.RayIntegral
-import EllipticPdes.Embedding.Convolution
-import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
-import Mathlib.MeasureTheory.Function.LpSeminorm.Indicator
-import Mathlib.Topology.MetricSpace.HolderNorm
-import Mathlib.Tactic.Module
-import Mathlib.Analysis.Convolution
-import Mathlib.Analysis.Calculus.ContDiff.Convolution
-import Mathlib.Analysis.Calculus.BumpFunction.Normed
-import Mathlib.Analysis.Calculus.BumpFunction.FiniteDimension
-import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
-import Mathlib.MeasureTheory.Measure.Haar.Unique
+
+module
+
+public import EllipticPdes.Embedding.RayIntegral
+public import EllipticPdes.Embedding.Convolution
+public import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
+public import Mathlib.MeasureTheory.Function.LpSeminorm.Indicator
+public import Mathlib.Topology.MetricSpace.HolderNorm
+public import Mathlib.Tactic.Module
+public import Mathlib.Analysis.Convolution
+public import Mathlib.Analysis.Calculus.ContDiff.Convolution
+public import Mathlib.Analysis.Calculus.BumpFunction.Normed
+public import Mathlib.Analysis.Calculus.BumpFunction.FiniteDimension
+public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
+public import Mathlib.MeasureTheory.Measure.Haar.Unique
 
 /-!
 # Riesz-kernel `Lᵖ` bound for the Morrey embedding
@@ -28,6 +31,8 @@ The kernel-norm computation is isolated in the private lemma `setIntegral_ball_d
 a closed-form value for the radial integral `∫_{B(x,R)} dist x y^s` over a ball centred at the
 singularity, valid for `s > -d`.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Metric
 open scoped NNReal ENNReal Convolution Topology

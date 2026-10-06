@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.WeakGradient
-import Mathlib.Analysis.Distribution.AEEqOfIntegralContDiff
+
+module
+
+public import EllipticPdes.Embedding.WeakGradient
+public import Mathlib.Analysis.Distribution.AEEqOfIntegralContDiff
 
 /-!
 # Uniqueness of the weak gradient on an open set
@@ -23,6 +26,8 @@ a single family closed under differentiation follows.
 * `EllipticPdes.Embedding.hasWeakGradOn_unique_ae`: two weak gradients of one function agree
   almost everywhere on an open set.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Metric
 

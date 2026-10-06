@@ -3,11 +3,14 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import Mathlib.MeasureTheory.Integral.Average
-import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
-import Mathlib.MeasureTheory.Function.L2Space
-import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
-import Mathlib.Analysis.SpecialFunctions.Pow.Real
+
+module
+
+public import Mathlib.MeasureTheory.Integral.Average
+public import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
+public import Mathlib.MeasureTheory.Function.L2Space
+public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
+public import Mathlib.Analysis.SpecialFunctions.Pow.Real
 
 /-!
 # Ball means and the Campanato decay hypothesis
@@ -31,6 +34,8 @@ The rest of the file records what the estimates downstream need: the volume of a
 number, and the integrability of `u` and of `(u - c)²` on a ball, both read off from
 `MemLp u 2 (volume.restrict Ω)`.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Metric
 

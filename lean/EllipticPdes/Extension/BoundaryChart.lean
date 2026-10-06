@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Extension.ShearWeakGrad
-import EllipticPdes.Extension.EvenReflection
+
+module
+
+public import EllipticPdes.Extension.ShearWeakGrad
+public import EllipticPdes.Extension.EvenReflection
 
 /-!
 # Extension across a `C¹` boundary chart
@@ -40,6 +43,8 @@ Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theore
 steps 1 and 2 (p. 21); L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.4 Theorem 1
 and §C.1.
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric Filter Topology Set
 open scoped NNReal ENNReal

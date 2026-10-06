@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Extension.Shear
-import EllipticPdes.Embedding.GagliardoNirenberg
+
+module
+
+public import EllipticPdes.Extension.Shear
+public import EllipticPdes.Embedding.GagliardoNirenberg
 
 /-!
 # Weak gradient through a shear
@@ -35,6 +38,8 @@ returns the identity as the mollification shrinks.
 
 L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.4 Theorem 1.
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric Filter Topology Set
 open scoped NNReal ENNReal Convolution Pointwise

@@ -3,11 +3,14 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Poincare.OneDim
-import Mathlib.MeasureTheory.Integral.Prod
-import Mathlib.MeasureTheory.Integral.Bochner.Set
-import Mathlib.MeasureTheory.Constructions.Pi
-import Mathlib.Data.Fin.Tuple.Basic
+
+module
+
+public import EllipticPdes.Poincare.OneDim
+public import Mathlib.MeasureTheory.Integral.Prod
+public import Mathlib.MeasureTheory.Integral.Bochner.Set
+public import Mathlib.MeasureTheory.Constructions.Pi
+public import Mathlib.Data.Fin.Tuple.Basic
 
 /-!
 # Per-coordinate-direction bound via Fubini (dependency-chain step 2)
@@ -26,6 +29,8 @@ variables `y` gives the per-direction bound on the box.
 * `poincare_slice_box`: the same bound written as a single integral over the box
   `B ×ˢ (a, b)`, obtained from the iterated form by Fubini (`setIntegral_prod`).
 -/
+
+@[expose] public section
 
 open MeasureTheory Set intervalIntegral
 

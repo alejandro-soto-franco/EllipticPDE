@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.Local.Reduction
-import EllipticPdes.Regularity.Local.Caccioppoli
-import EllipticPdes.Regularity.TestFnCut
+
+module
+
+public import EllipticPdes.Regularity.Local.Reduction
+public import EllipticPdes.Regularity.Local.Caccioppoli
+public import EllipticPdes.Regularity.TestFnCut
 
 /-!
 # Interior `H²` estimate for a weak solution in `H¹`
@@ -27,6 +30,8 @@ estimate, bounds that by `‖f‖ + ‖U₀‖`. The right-hand side is then Eva
 * `exists_norm_redDatum_le`: the bound on the reduction datum.
 * `interior_H2_estimate_W12`: Theorem 1.
 -/
+
+@[expose] public section
 
 open MeasureTheory Filter Topology
 open scoped RealInnerProductSpace

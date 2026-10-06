@@ -3,10 +3,13 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Existence.Garding
-import EllipticPdes.Embedding.ChainRule
-import EllipticPdes.Extension.GlobalApproximation
-import EllipticPdes.Poincare.BoundedDomain
+
+module
+
+public import EllipticPdes.Existence.Garding
+public import EllipticPdes.Embedding.ChainRule
+public import EllipticPdes.Extension.GlobalApproximation
+public import EllipticPdes.Poincare.BoundedDomain
 
 /-!
 # Weak maximum principle
@@ -40,6 +43,8 @@ D. Gilbarg and N. S. Trudinger, *Elliptic Partial Differential Equations of Seco
 §8.1 Theorem 8.1 (p. 179);
 L. C. Evans, *Partial Differential Equations* (2nd ed.), §6.4.1 Theorem 2 (p. 346).
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Filter
 open scoped RealInnerProductSpace

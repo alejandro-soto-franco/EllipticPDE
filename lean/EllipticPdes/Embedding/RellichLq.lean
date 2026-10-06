@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.H01Sobolev
-import EllipticPdes.Analysis.LpInterpolation
-import EllipticPdes.Spectrum.RellichDischarge
+
+module
+
+public import EllipticPdes.Embedding.H01Sobolev
+public import EllipticPdes.Analysis.LpInterpolation
+public import EllipticPdes.Spectrum.RellichDischarge
 
 /-!
 # Rellich-Kondrachov below the critical exponent
@@ -40,6 +43,8 @@ is what `2 < q < 2⋆` amounts to, in the form the estimates use.
 Y. Guo, *Partial Differential Equations*, Theorem IV.2.10; L. C. Evans, *Partial Differential
 Equations* (2nd ed.), §5.7 Theorem 1.
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric Bornology
 open scoped NNReal ENNReal

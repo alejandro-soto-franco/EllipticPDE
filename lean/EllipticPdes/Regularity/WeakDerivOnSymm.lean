@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.WeakDerivUnique
-import EllipticPdes.Regularity.DifferentiatedEquation
+
+module
+
+public import EllipticPdes.Regularity.WeakDerivUnique
+public import EllipticPdes.Regularity.DifferentiatedEquation
 
 /-!
 # Mixed second weak derivatives commute
@@ -39,6 +42,8 @@ identity is all that is ever asked for.
 * `mulTest_weakDerivOn_unique`: two weak derivatives of one class agree after a cutoff.
 * `mulTest_mixed_weakDeriv_comm`: the two mixed second weak derivatives agree after a cutoff.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

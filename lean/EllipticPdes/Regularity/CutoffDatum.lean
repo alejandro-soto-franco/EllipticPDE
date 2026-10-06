@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.DatumPiece
-import EllipticPdes.Regularity.LocalWeakFormWkInfty
+
+module
+
+public import EllipticPdes.Regularity.DatumPiece
+public import EllipticPdes.Regularity.LocalWeakFormWkInfty
 
 /-!
 # Datum of the induction step
@@ -27,6 +30,8 @@ depend on that direction, so their constants are collected over it.
 
 * `exists_cutoffDatum`: the datum, its family, its bound and its pairing.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

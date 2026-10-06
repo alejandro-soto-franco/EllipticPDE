@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Existence.Garding
-import Mathlib.Analysis.Normed.Operator.Compact.FredholmAlternative
+
+module
+
+public import EllipticPdes.Existence.Garding
+public import Mathlib.Analysis.Normed.Operator.Compact.FredholmAlternative
 
 /-!
 # Fredholm alternative for the elliptic Dirichlet problem
@@ -32,6 +35,8 @@ The reduction is exact:
   has a unique weak solution for every `f`. `fredholm_unique_imp_exists` is the usual corollary:
   uniqueness for the homogeneous problem forces solvability of the inhomogeneous one.
 -/
+
+@[expose] public section
 
 open MeasureTheory InnerProductSpace
 open scoped RealInnerProductSpace

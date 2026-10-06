@@ -127,6 +127,31 @@ def check_project_files() -> None:
               f"{package['name']} is pinned to a full lowercase SHA", rev)
 
 
+def first_command(text: str) -> str:
+    """The first line of a Lean file outside ordinary comments and blank lines."""
+    text = re.sub(r"/-(?![-!]).*?-/", "", text, flags=re.S)
+    for line in text.splitlines():
+        line = line.strip()
+        if line and not line.startswith("--"):
+            return line
+    return ""
+
+
+def check_sources() -> None:
+    """CONTRIBUTING section 3: every committed Lean file is a module of at most 10,000 lines."""
+    files = [ROOT / f for f in git("ls-files", "*.lean").split()]
+    links = [p for p in files if p.is_symlink()]
+    check(not links, "no committed .lean file is a symbolic link",
+          ", ".join(str(p.relative_to(ROOT)) for p in links[:3]))
+    headless = [p for p in files if p.name != "lakefile.lean"
+                and first_command(p.read_text(encoding="utf-8")) != "module"]
+    check(not headless, "every committed .lean file opens with a module header",
+          ", ".join(str(p.relative_to(ROOT)) for p in headless[:3]) or f"{len(files)} files")
+    long = [p for p in files if len(p.read_text(encoding="utf-8").splitlines()) > 10_000]
+    check(not long, "every committed .lean file has at most 10,000 lines",
+          ", ".join(str(p.relative_to(ROOT)) for p in long[:3]))
+
+
 def check_challenge_size() -> None:
     source = (PROJECT / "Challenge.lean").read_text(encoding="utf-8")
     lines, size = len(source.splitlines()), len(source.encode())
@@ -346,6 +371,7 @@ def main() -> int:
     check_repository()
     check_licence()
     check_project_files()
+    check_sources()
     check_challenge_size()
     config = check_config()
     check_solution_pins(config)

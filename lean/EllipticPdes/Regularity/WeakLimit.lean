@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.DiffQuotientBound
+
+module
+
+public import EllipticPdes.Regularity.DiffQuotientBound
 
 /-!
 # Weak limits of difference quotients
@@ -34,6 +37,8 @@ smooth compactly supported classes then upgrades the test class to an arbitrary 
 * `tendsto_inner_diffQuot_of_hasWeakDeriv`: `Dₖ^{hₘ} g ⇀ g'` whenever `g'` is the weak
   `k`-derivative of `g` and `hₘ → 0` through nonzero steps.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace

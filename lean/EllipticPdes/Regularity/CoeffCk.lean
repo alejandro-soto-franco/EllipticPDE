@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Sobolev.Coefficients
-import EllipticPdes.Regularity.CoeffC2
+
+module
+
+public import EllipticPdes.Sobolev.Coefficients
+public import EllipticPdes.Regularity.CoeffC2
 
 /-!
 # `Cᵏ` coefficients indexed by the derivative order
@@ -42,6 +45,8 @@ Both existing structures are left in place and unchanged, so every current consu
 `IsC1Coeff` and `IsC2Coeff` is untouched, and a consumer written against the family can be
 fed from either by the conversions above.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

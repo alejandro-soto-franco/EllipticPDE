@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.ExtendCutoff
-import EllipticPdes.Regularity.L2Pairing
-import EllipticPdes.Regularity.IteratedSum
+
+module
+
+public import EllipticPdes.Regularity.ExtendCutoff
+public import EllipticPdes.Regularity.L2Pairing
+public import EllipticPdes.Regularity.IteratedSum
 
 /-!
 # One piece of the differentiated datum
@@ -31,6 +34,8 @@ almost-everywhere description both of them are stated against.
 * `exists_datum_piece`: the class, its family, its bound, and its pairing.
 * `exists_datum_of_pieces`: a finite family of pieces, assembled.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

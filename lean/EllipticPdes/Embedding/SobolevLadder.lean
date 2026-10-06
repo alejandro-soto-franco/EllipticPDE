@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.GagliardoNirenberg
+
+module
+
+public import EllipticPdes.Embedding.GagliardoNirenberg
 
 /-!
 # Iterating the Sobolev ladder
@@ -48,6 +51,8 @@ the statement is between one fixed pair of radii `r < R` however many rungs it r
 
 Evans, *Partial Differential Equations* (2nd ed.), §5.6.1 Thm 1 and §5.6.3.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Metric
 open scoped NNReal ENNReal

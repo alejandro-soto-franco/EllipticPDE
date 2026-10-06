@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.InteriorSmooth
-import EllipticPdes.Existence.Garding
+
+module
+
+public import EllipticPdes.Regularity.InteriorSmooth
+public import EllipticPdes.Existence.Garding
 
 /-!
 # Solvability and interior smoothness composed
@@ -29,6 +32,8 @@ which `EllipticPdes.Regularity.PointwiseEquation` proves and
 L. C. Evans, *Partial Differential Equations* (2nd ed.), §6.3.1 Theorem 3 (p. 334);
 Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem VIII.3.3.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

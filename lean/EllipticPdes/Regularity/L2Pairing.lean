@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.MulIterated
+
+module
+
+public import EllipticPdes.Regularity.MulIterated
 
 /-!
 # Pairing an `L²` class against a test function
@@ -28,6 +31,8 @@ these steps localises.
   finite sum.
 * `setIntegral_mulL2_mul_testFn`: a weighted class pairs as the weight against the class.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

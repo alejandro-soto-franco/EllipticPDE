@@ -3,15 +3,18 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import Mathlib.MeasureTheory.Function.L2Space
-import Mathlib.MeasureTheory.Function.LpSpace.Indicator
-import Mathlib.MeasureTheory.Function.LpSeminorm.Monotonicity
-import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
-import Mathlib.Analysis.InnerProductSpace.PiL2
-import Mathlib.Analysis.InnerProductSpace.Adjoint
-import Mathlib.Analysis.Calculus.LineDeriv.IntegrationByParts
-import Mathlib.Analysis.Normed.Operator.Compact.Basic
-import EllipticPdes
+
+module
+
+public import Mathlib.MeasureTheory.Function.L2Space
+public import Mathlib.MeasureTheory.Function.LpSpace.Indicator
+public import Mathlib.MeasureTheory.Function.LpSeminorm.Monotonicity
+public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
+public import Mathlib.Analysis.InnerProductSpace.PiL2
+public import Mathlib.Analysis.InnerProductSpace.Adjoint
+public import Mathlib.Analysis.Calculus.LineDeriv.IntegrationByParts
+public import Mathlib.Analysis.Normed.Operator.Compact.Basic
+public import EllipticPdes
 
 /-!
 # Discharging the solvability theory from `EllipticPdes`
@@ -34,6 +37,8 @@ Three identifications take the statements across.
   `FullEllipticOp.fullBilin`, `FullEllipticOp.zerothForm` and the `L²` pairing, whose principal
   and lower-order parts are inner products of coefficient actions on `L²`.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace ENNReal

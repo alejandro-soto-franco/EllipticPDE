@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Sobolev.H01Lattice
-import EllipticPdes.Embedding.H01Sobolev
-import EllipticPdes.Embedding.H01SobolevTwo
+
+module
+
+public import EllipticPdes.Sobolev.H01Lattice
+public import EllipticPdes.Embedding.H01Sobolev
+public import EllipticPdes.Embedding.H01SobolevTwo
 
 /-!
 # Weak maximum principle with a transport term
@@ -39,6 +42,8 @@ truncation lemma of `EllipticPdes.Sobolev.H01Lattice`.
 D. Gilbarg and N. S. Trudinger, *Elliptic Partial Differential Equations of Second Order*,
 §8.1 Theorem 8.1 (pp. 179–180).
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Filter Topology
 open scoped ENNReal NNReal RealInnerProductSpace

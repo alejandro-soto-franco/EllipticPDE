@@ -3,9 +3,13 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Analysis.Dilation
-import EllipticPdes.Embedding.H01Sobolev
-import Mathlib.Analysis.Calculus.BumpFunction.FiniteDimension
+
+module
+
+public import EllipticPdes.Analysis.Dilation
+public import EllipticPdes.Embedding.H01Sobolev
+public import Mathlib.Analysis.Calculus.BumpFunction.FiniteDimension
+public import Mathlib.Analysis.Normed.Operator.Compact.Basic
 
 /-!
 # Sharpness of the Sobolev embedding
@@ -33,6 +37,8 @@ and the reason is `d/2⋆ = d/2 - 1`, the Sobolev relation itself. A family boun
 
 Y. Guo, *Partial Differential Equations*, Example IV.2.11.
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric
 open scoped ENNReal NNReal

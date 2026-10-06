@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.MulIterated
+
+module
+
+public import EllipticPdes.Regularity.MulIterated
 
 /-!
 # Cutoff transport of weak derivatives to the ambient domain
@@ -50,6 +53,8 @@ change at each step without leaving the hypothesis.
 * `hasWeakDeriv_extend_mulTest`: the same, on the whole space.
 * `exists_iteratedWeakDeriv_extend_mulTest`: the order-`k` family and its bound.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

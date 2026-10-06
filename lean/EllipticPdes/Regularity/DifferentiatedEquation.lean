@@ -3,19 +3,22 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.Interior
-import EllipticPdes.Regularity.CoeffC2
-import Mathlib.Analysis.Convolution
-import Mathlib.Analysis.Calculus.BumpFunction.Normed
-import Mathlib.Analysis.Calculus.BumpFunction.Convolution
-import Mathlib.Analysis.Calculus.ContDiff.Convolution
-import Mathlib.Analysis.Calculus.LineDeriv.IntegrationByParts
-import Mathlib.Analysis.Calculus.FDeriv.Symmetric
-import Mathlib.Analysis.Calculus.FDeriv.CompCLM
-import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
-import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
-import Mathlib.MeasureTheory.Measure.Haar.Unique
-import Mathlib.MeasureTheory.Integral.DominatedConvergence
+
+module
+
+public import EllipticPdes.Regularity.Interior
+public import EllipticPdes.Regularity.CoeffC2
+public import Mathlib.Analysis.Convolution
+public import Mathlib.Analysis.Calculus.BumpFunction.Normed
+public import Mathlib.Analysis.Calculus.BumpFunction.Convolution
+public import Mathlib.Analysis.Calculus.ContDiff.Convolution
+public import Mathlib.Analysis.Calculus.LineDeriv.IntegrationByParts
+public import Mathlib.Analysis.Calculus.FDeriv.Symmetric
+public import Mathlib.Analysis.Calculus.FDeriv.CompCLM
+public import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
+public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
+public import Mathlib.MeasureTheory.Measure.Haar.Unique
+public import Mathlib.MeasureTheory.Integral.DominatedConvergence
 
 /-!
 # Differentiated-equation integral identity
@@ -37,6 +40,8 @@ derivative of a smooth (resp. compactly supported) test function is again smooth
 compactly supported), so `∂ⱼφ` is again an admissible `HasWeakDerivOn` test function, and the
 pointwise Leibniz rule for `partialD` against a product.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace Topology ENNReal Convolution

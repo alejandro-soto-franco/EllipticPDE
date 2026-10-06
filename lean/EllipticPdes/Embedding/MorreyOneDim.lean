@@ -3,15 +3,18 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.WeakGradient
-import Mathlib.Analysis.Calculus.BumpFunction.Normed
-import Mathlib.Analysis.Distribution.AEEqOfIntegralContDiff
-import Mathlib.Analysis.Normed.Lp.MeasurableSpace
-import Mathlib.MeasureTheory.Constructions.Pi
-import Mathlib.MeasureTheory.Function.AbsolutelyContinuous
-import Mathlib.MeasureTheory.Integral.IntervalIntegral.AbsolutelyContinuousFun
-import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
-import Mathlib.Topology.MetricSpace.HolderNorm
+
+module
+
+public import EllipticPdes.Embedding.WeakGradient
+public import Mathlib.Analysis.Calculus.BumpFunction.Normed
+public import Mathlib.Analysis.Distribution.AEEqOfIntegralContDiff
+public import Mathlib.Analysis.Normed.Lp.MeasurableSpace
+public import Mathlib.MeasureTheory.Constructions.Pi
+public import Mathlib.MeasureTheory.Function.AbsolutelyContinuous
+public import Mathlib.MeasureTheory.Integral.IntervalIntegral.AbsolutelyContinuousFun
+public import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
+public import Mathlib.Topology.MetricSpace.HolderNorm
 
 /-!
 # Morrey's inequality on a one-dimensional ball
@@ -22,6 +25,8 @@ argument degenerates to the constant `1` here, so the whole content is the one-d
 weak fundamental theorem of calculus (recovering `u` a.e. from its weak derivative) followed
 by Cauchy-Schwarz.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Metric
 open scoped NNReal ENNReal

@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import Mathlib.Analysis.InnerProductSpace.Dual
-import Mathlib.Analysis.InnerProductSpace.PiL2
+
+module
+
+public import Mathlib.Analysis.InnerProductSpace.Dual
+public import Mathlib.Analysis.InnerProductSpace.PiL2
 
 /-!
 # Norm of a functional on Euclidean space in standard coordinates
@@ -18,6 +21,8 @@ Applied to `L = fderiv ℝ φ x`, this expresses the squared gradient norm `‖f
 sum of squared partial derivatives `∑ i, (∂ᵢ φ x)²`, the form in which the gradient `L²` norm of
 `MeasureTheory.integral_sq_sub_translation_le` meets a Sobolev `H¹` gradient bound.
 -/
+
+@[expose] public section
 
 open scoped RealInnerProductSpace
 open InnerProductSpace

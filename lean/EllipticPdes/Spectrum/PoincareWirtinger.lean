@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Spectrum.RellichW12
-import EllipticPdes.Embedding.ConstOfGradZero
-import EllipticPdes.Extension.BallChart
+
+module
+
+public import EllipticPdes.Spectrum.RellichW12
+public import EllipticPdes.Embedding.ConstOfGradZero
+public import EllipticPdes.Extension.BallChart
 
 /-!
 # Poincaré's inequality with the mean subtracted
@@ -34,6 +37,8 @@ against its unit norm.
 
 L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.8.1 Theorem 1 (p. 290).
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric Set Filter Topology
 open scoped NNReal ENNReal

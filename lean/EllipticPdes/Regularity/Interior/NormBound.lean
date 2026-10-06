@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.Interior.EnergyBound
+
+module
+
+public import EllipticPdes.Regularity.Interior.EnergyBound
 
 /-!
 # Uniform interior difference-quotient norm bound
@@ -18,6 +21,8 @@ converse consumes to produce the second weak derivative.
 * `interior_diffQuot_norm_bound`: the `h`-uniform bound on the difference quotient of the
   cut-off first derivatives.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace

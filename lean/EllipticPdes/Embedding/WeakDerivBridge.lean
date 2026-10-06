@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.WeakGradient
-import EllipticPdes.Regularity.Interior
+
+module
+
+public import EllipticPdes.Embedding.WeakGradient
+public import EllipticPdes.Regularity.Interior
 
 /-!
 # Bridge from `HasWeakDerivOn` to `HasWeakGradOn`
@@ -25,6 +28,8 @@ Dimension four and above needs the step iterated, which uses a weak derivative p
 asks for more than the `H²` estimate supplies. `EllipticPdes.Embedding.memLp_of_gradClosed` runs
 that ladder on a family closed under differentiation.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Metric
 

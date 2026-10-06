@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.HigherWeakDeriv
+
+module
+
+public import EllipticPdes.Regularity.HigherWeakDeriv
 
 /-!
 # Iterated weak derivatives pass to a smaller region
@@ -24,6 +27,8 @@ the norm and restriction does not increase it.
 * `HasIteratedWeakDerivOn.restrict`: the family.
 * `IteratedL2Bound.restrict`: the bound, with the same constant.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

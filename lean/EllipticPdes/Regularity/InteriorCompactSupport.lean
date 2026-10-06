@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.Caccioppoli
-import EllipticPdes.Analysis.LpExtendByZero
+
+module
+
+public import EllipticPdes.Regularity.Caccioppoli
+public import EllipticPdes.Analysis.LpExtendByZero
 
 /-!
 # Whole-space extension bridge for the interior `H²` estimate
@@ -25,6 +28,8 @@ keystone, and the Caccioppoli estimate live on the restricted-domain space `L2D 
 together with the compatibility that moves the cutoff-weighted gradient energy of the
 Caccioppoli estimate onto whole-space `EucL2 d` classes with the `L²` norm preserved.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace

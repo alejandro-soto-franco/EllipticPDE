@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Sobolev.Basic
-import Mathlib.MeasureTheory.Function.LpSeminorm.Monotonicity
+
+module
+
+public import EllipticPdes.Sobolev.Basic
+public import Mathlib.MeasureTheory.Function.LpSeminorm.Monotonicity
 
 /-!
 # Bounded measurable coefficients acting on `L²` (general elliptic operator)
@@ -23,6 +26,8 @@ This mirrors, on the scalar `PiLp` encoding of `Sobolev/Basic.lean`, the coeffic
 `coeffMulLpL` that DeGiorgi (`WeakFormulation/CoefficientOperator.lean`) builds on the
 vector-valued `L²(Ω; E)` encoding.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace

@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.InteriorCompactSupport
-import Mathlib.MeasureTheory.Integral.Bochner.Set
+
+module
+
+public import EllipticPdes.Regularity.InteriorCompactSupport
+public import Mathlib.MeasureTheory.Integral.Bochner.Set
 
 /-!
 # Interior difference quotient on `L2D Ω` / `H1amb Ω`
@@ -31,6 +34,8 @@ extend by zero, translate on the whole space where `diffQuot` already lives, res
 * `extendL2_diffQuotD_eq`: on classes whose translated support stays in `Ω`, the restricted
   difference quotient's extension equals the whole-space difference quotient.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace

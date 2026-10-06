@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Extension.Reflect
+
+module
+
+public import EllipticPdes.Extension.Reflect
 
 /-!
 # Translation of a weak gradient
@@ -26,6 +29,8 @@ the identity, so it moves a weak gradient with no sign and no Jacobian.
 
 L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.3.3, Theorem 3.
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric Set
 open scoped ENNReal NNReal

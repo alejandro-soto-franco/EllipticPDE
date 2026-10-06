@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import Mathlib.MeasureTheory.Function.LpSeminorm.CompareExp
-import Mathlib.Analysis.SpecialFunctions.Pow.Continuity
+
+module
+
+public import Mathlib.MeasureTheory.Function.LpSeminorm.CompareExp
+public import Mathlib.Analysis.SpecialFunctions.Pow.Continuity
 
 /-!
 # Interpolation of `Lᵖ` seminorms
@@ -35,6 +38,8 @@ step Guo's proof of Rellich-Kondrachov takes between `L¹` and `L^{p⋆}`.
 Y. Guo, *Partial Differential Equations*, proof of Theorem IV.2.10; H. Brezis, *Functional
 Analysis, Sobolev Spaces and Partial Differential Equations*, Remark 2 after Theorem 4.16.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped ENNReal NNReal

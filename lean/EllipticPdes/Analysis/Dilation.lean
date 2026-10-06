@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Sobolev.Basic
-import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
+
+module
+
+public import EllipticPdes.Sobolev.Basic
+public import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
 
 /-!
 # Dilations of a function on `ℝ^d`
@@ -24,6 +27,8 @@ dilated family keeps its `L^{p⋆}` norm while its `L²` norm tends to zero.
 
 Y. Guo, *Partial Differential Equations*, Example IV.2.11.
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric
 open scoped ENNReal NNReal

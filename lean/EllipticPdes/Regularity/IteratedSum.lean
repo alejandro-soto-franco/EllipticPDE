@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.MulIterated
+
+module
+
+public import EllipticPdes.Regularity.MulIterated
 
 /-!
 # Linear algebra of iterated weak derivatives
@@ -26,6 +29,8 @@ and nothing constrains its size.
 * `HasIteratedWeakDerivOn.neg`, `.sub`, `.sum`: the families.
 * `IteratedL2Bound.add`, `.neg`, `.sub`, `.sum`: the bounds.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

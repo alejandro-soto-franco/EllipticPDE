@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.Interior.NormBound
+
+module
+
+public import EllipticPdes.Regularity.Interior.NormBound
 
 /-!
 # Interior H² estimate
@@ -21,6 +24,8 @@ chain, so dependents see the same API as before the file was split.
 * `HasWeakDerivOn`: the region-restricted weak derivative.
 * `interior_H2_estimate`: the interior H² estimate.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace

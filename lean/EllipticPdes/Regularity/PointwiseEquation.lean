@@ -3,10 +3,13 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.ClassicalSolvability
-import EllipticPdes.Regularity.LocalWeakForm
-import EllipticPdes.Embedding.WeakGradUnique
-import EllipticPdes.Extension.GlobalApproximation
+
+module
+
+public import EllipticPdes.Regularity.ClassicalSolvability
+public import EllipticPdes.Regularity.LocalWeakForm
+public import EllipticPdes.Embedding.WeakGradUnique
+public import EllipticPdes.Extension.GlobalApproximation
 
 /-!
 # Pointwise equation of a smooth representative
@@ -44,6 +47,8 @@ Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Lemma 
 L. C. Evans, *Partial Differential Equations* (2nd ed.), §6.1.2 (pp. 313–315) and §6.3.1
 Theorem 3 (p. 334).
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric Set Filter Topology
 open scoped NNReal ENNReal

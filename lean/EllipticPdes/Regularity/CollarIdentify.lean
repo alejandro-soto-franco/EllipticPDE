@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.WeakDerivOnSymm
-import EllipticPdes.Regularity.IteratedRestrict
+
+module
+
+public import EllipticPdes.Regularity.WeakDerivOnSymm
+public import EllipticPdes.Regularity.IteratedRestrict
 
 /-!
 # Identifications on the collar
@@ -29,6 +32,8 @@ than on the compact set is what lets a single family supply every derivative the
   collar.
 * `exists_restrictFamily`, `exists_collarFamily`: a family and its bound, moved in one step.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

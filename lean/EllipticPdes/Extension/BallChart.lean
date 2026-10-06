@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Extension.C1Boundary
-import Mathlib.Analysis.InnerProductSpace.Projection.Reflection
-import Mathlib.Analysis.InnerProductSpace.Calculus
+
+module
+
+public import EllipticPdes.Extension.C1Boundary
+public import Mathlib.Analysis.InnerProductSpace.Projection.Reflection
+public import Mathlib.Analysis.InnerProductSpace.Calculus
 
 /-!
 # `C¹` boundary of the unit ball
@@ -37,6 +40,8 @@ there because `‖y‖² = ‖y'‖² + y_d²` with `y_d < 0`.
 L. C. Evans, *Partial Differential Equations* (2nd ed.), §C.1 (p. 665);
 Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Definition III.1.1.
 -/
+
+@[expose] public section
 
 open Metric Set
 

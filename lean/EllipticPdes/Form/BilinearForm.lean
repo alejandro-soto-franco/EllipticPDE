@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Poincare.Density
-import Mathlib.Analysis.InnerProductSpace.LaxMilgram
+
+module
+
+public import EllipticPdes.Poincare.Density
+public import Mathlib.Analysis.InnerProductSpace.LaxMilgram
 
 /-!
 # Divergence-form bilinear form (dependency-chain step 5)
@@ -28,6 +31,8 @@ Lax-Milgram theorem (M6) consumes. The general elliptic matrix `A` and `c ≥ 0`
 same shape with `A`'s ellipticity constant in place of `1` (cf. DeGiorgi
 `WeakFormulation/CoefficientOperator.lean`).
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace

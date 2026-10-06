@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Existence.StrongMaximum
+
+module
+
+public import EllipticPdes.Existence.StrongMaximum
 
 /-!
 # Corollaries of Hopf's lemma and the strong maximum principle
@@ -32,6 +35,8 @@ Neumann problem up to a constant then follow.
 Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Lemma XI.4.3,
 Theorem XI.4.5, Corollaries XI.4.6, XI.4.7 and XI.4.8 (pp. 100–103).
 -/
+
+@[expose] public section
 
 open Set Filter Topology Metric
 

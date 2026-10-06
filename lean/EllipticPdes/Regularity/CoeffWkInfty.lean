@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Sobolev.Coefficients
-import EllipticPdes.Regularity.CoeffCk
+
+module
+
+public import EllipticPdes.Sobolev.Coefficients
+public import EllipticPdes.Regularity.CoeffCk
 
 /-!
 # `W^{k,∞}` coefficients
@@ -57,6 +60,8 @@ mollification: `(∇a) * ρ_ε` inherits the essential bound of `∇a`, the clas
 applies to the smooth `a * ρ_ε`, and the bound passes to the limit almost everywhere. That
 yields the bound a.e. rather than everywhere, which is all its consumers integrate against.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

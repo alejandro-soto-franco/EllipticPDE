@@ -3,17 +3,20 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.HigherWeakDeriv
-import EllipticPdes.Regularity.LowerOrderWkInfty
-import EllipticPdes.Regularity.IteratedSum
-import EllipticPdes.Regularity.IteratedRestrict
-import EllipticPdes.Regularity.WeakFormDense
-import EllipticPdes.Regularity.LocalWeakFormWkInfty
-import EllipticPdes.Regularity.CutoffDeriv
-import EllipticPdes.Regularity.CutoffCommutator
-import EllipticPdes.Regularity.CollarIdentify
-import EllipticPdes.Regularity.DatumPiece
-import EllipticPdes.Regularity.CutoffDatum
+
+module
+
+public import EllipticPdes.Regularity.HigherWeakDeriv
+public import EllipticPdes.Regularity.LowerOrderWkInfty
+public import EllipticPdes.Regularity.IteratedSum
+public import EllipticPdes.Regularity.IteratedRestrict
+public import EllipticPdes.Regularity.WeakFormDense
+public import EllipticPdes.Regularity.LocalWeakFormWkInfty
+public import EllipticPdes.Regularity.CutoffDeriv
+public import EllipticPdes.Regularity.CutoffCommutator
+public import EllipticPdes.Regularity.CollarIdentify
+public import EllipticPdes.Regularity.DatumPiece
+public import EllipticPdes.Regularity.CutoffDatum
 
 /-!
 # Higher interior regularity
@@ -58,6 +61,8 @@ function it needs as `interior_cutoffGrad_mem_H01`.
 * `interiorRegularityAt_succ`: the induction step.
 * `higher_interior_regularity`: the theorem.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

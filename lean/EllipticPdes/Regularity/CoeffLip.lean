@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.CoeffC1
+
+module
+
+public import EllipticPdes.Regularity.CoeffC1
 
 /-!
 # `W^{1,∞}` principal coefficients
@@ -35,6 +38,8 @@ alone (`LipschitzWith.ae_differentiableAt`). Until it is proved the two hypothes
 distinct, and `interior_smooth` asks `IsLipCoeff` beside its `W^{k,∞}` bundles rather than
 reading the first from the second.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

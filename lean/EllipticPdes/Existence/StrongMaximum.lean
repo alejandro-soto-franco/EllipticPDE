@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Existence.ClassicalMaximum
+
+module
+
+public import EllipticPdes.Existence.ClassicalMaximum
 
 /-!
 # Hopf's lemma and the strong maximum principle
@@ -39,6 +42,8 @@ and Theorem 3 (p. 349);
 D. Gilbarg and N. S. Trudinger, *Elliptic Partial Differential Equations of Second Order*,
 §3.2 Lemma 3.4 (p. 34) and Theorem 3.5 (p. 35).
 -/
+
+@[expose] public section
 
 open Set Filter Topology Metric
 

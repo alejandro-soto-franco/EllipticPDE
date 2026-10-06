@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Poincare.Domain
-import EllipticPdes.Sobolev.Basic
-import EllipticPdes.Form.BilinearForm
+
+module
+
+public import EllipticPdes.Poincare.Domain
+public import EllipticPdes.Sobolev.Basic
+public import EllipticPdes.Form.BilinearForm
 
 /-!
 # Wiring the test-function Poincaré bound from the box geometry
@@ -31,6 +34,8 @@ The remaining input, the per-direction integral slice bound on a coordinate box,
 conclusion of `poincare_box_dir` (`Poincare/Fubini.lean`); this file is the bridge that turns
 it into the abstract-norm `hbase` the Hilbert-space layer wants.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace

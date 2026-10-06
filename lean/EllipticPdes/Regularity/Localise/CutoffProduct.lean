@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.LowerOrderWkInfty
-import EllipticPdes.Regularity.CutoffTower
+
+module
+
+public import EllipticPdes.Regularity.LowerOrderWkInfty
+public import EllipticPdes.Regularity.CutoffTower
 
 /-!
 # Cutting a locally smooth function off to a globally smooth one
@@ -30,6 +33,8 @@ applies it entrywise to build a global operator out of one with coefficients smo
   positive order.
 * `nonempty_isWkInfty`: a smooth compactly supported function lies in `W^{k,∞}` at every order.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Filter
 open scoped Topology ContDiff

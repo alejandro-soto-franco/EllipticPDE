@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.LocalWeakForm
-import EllipticPdes.Regularity.DifferentiatedWkInfty
+
+module
+
+public import EllipticPdes.Regularity.LocalWeakForm
+public import EllipticPdes.Regularity.DifferentiatedWkInfty
 
 /-!
 # Differentiated identity for a weak solution under Guo's coefficient hypothesis
@@ -26,6 +29,8 @@ first of the lower-order coefficients.
 * `differentiated_weakForm_of_weakSolution_wkInfty`: Evans's equation (34) for a weak solution,
   with every coefficient derivative read off a `W^{k,∞}` bundle.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

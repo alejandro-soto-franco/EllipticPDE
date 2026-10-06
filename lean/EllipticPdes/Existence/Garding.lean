@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Form.GeneralForm
-import EllipticPdes.Poincare.BoxSlice
-import EllipticPdes.Poincare.BoundedDomain
+
+module
+
+public import EllipticPdes.Form.GeneralForm
+public import EllipticPdes.Poincare.BoxSlice
+public import EllipticPdes.Poincare.BoundedDomain
 
 /-!
 # Transport, zeroth-order term, the Gårding inequality, and shifted existence
@@ -30,6 +33,8 @@ This is Evans §6.1.1's full divergence-form operator `Lu = -Dⱼ(aᵢⱼDᵢu) 
 The `γ = 0` symmetric case (no transport, `c ≥ 0`, needing Poincaré) is the separate
 `EllipticCoeff.bilin_coercive` of `GeneralForm.lean`.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace

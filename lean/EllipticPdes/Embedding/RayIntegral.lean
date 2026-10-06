@@ -3,13 +3,16 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.WeakGradient
-import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
-import Mathlib.Analysis.Calculus.FDeriv.Comp
-import Mathlib.MeasureTheory.Constructions.HaarToSphere
-import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
-import Mathlib.MeasureTheory.Integral.Average
-import Mathlib.Analysis.SpecialFunctions.Pow.Integral
+
+module
+
+public import EllipticPdes.Embedding.WeakGradient
+public import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
+public import Mathlib.Analysis.Calculus.FDeriv.Comp
+public import Mathlib.MeasureTheory.Constructions.HaarToSphere
+public import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
+public import Mathlib.MeasureTheory.Integral.Average
+public import Mathlib.Analysis.SpecialFunctions.Pow.Integral
 
 /-!
 # Ray fundamental theorem of calculus
@@ -19,6 +22,8 @@ For a smooth function `φ`, the increment `φ (x + v) - φ x` equals the integra
 `t ↦ x + t • v`. This is the pointwise identity consumed by the potential-estimate step
 of the Morrey embedding.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Metric
 open scoped NNReal ENNReal

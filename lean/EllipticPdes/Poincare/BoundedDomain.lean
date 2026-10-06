@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Poincare.BoxSlice
+
+module
+
+public import EllipticPdes.Poincare.BoxSlice
 
 /-!
 # Poincaré inequality on arbitrary bounded domains (chain step 5)
@@ -20,6 +23,8 @@ for `H₀¹`; the limit passage from test functions to `H₀¹(Ω)` by density i
 density step `poincare_H01`, which is architectural here because `H₀¹` is defined
 as the closure of the test-function graphs.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set
 

@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.WeakGradient
-import EllipticPdes.Sobolev.Basic
+
+module
+
+public import EllipticPdes.Embedding.WeakGradient
+public import EllipticPdes.Sobolev.Basic
 
 /-!
 # Rigid motion of a boundary chart
@@ -35,6 +38,8 @@ L. C. Evans, *Partial Differential Equations* (2nd ed.), §C.1 (p. 665), where t
 and reorientation of the axes appears; Y. Guo, *Partial Differential Equations I and II*
 (Course Lecture Notes), Theorem III.2.2 (p. 20).
 -/
+
+@[expose] public section
 
 open MeasureTheory Set
 open scoped ENNReal NNReal

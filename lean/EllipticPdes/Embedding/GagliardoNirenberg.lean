@@ -3,10 +3,13 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.Morrey
-import EllipticPdes.Embedding.Convolution
-import EllipticPdes.Regularity.CutoffTower
-import Mathlib.Analysis.FunctionalSpaces.SobolevInequality
+
+module
+
+public import EllipticPdes.Embedding.Morrey
+public import EllipticPdes.Embedding.Convolution
+public import EllipticPdes.Regularity.CutoffTower
+public import Mathlib.Analysis.FunctionalSpaces.SobolevInequality
 
 /-!
 # Sobolev bootstrap from `Lᵖ` to the conjugate exponent
@@ -56,6 +59,8 @@ support, neither of which an `Lᵖ` class with weak derivatives has. Two devices
 
 Evans, *Partial Differential Equations* (2nd ed.), §5.6.1 Thm 1.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Metric
 open scoped NNReal ENNReal Convolution Topology

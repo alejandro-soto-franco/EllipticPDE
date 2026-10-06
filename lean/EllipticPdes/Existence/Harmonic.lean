@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Existence.StrongMaximum
+
+module
+
+public import EllipticPdes.Existence.StrongMaximum
 
 /-!
 # Maximum principles for subharmonic functions
@@ -29,6 +32,8 @@ functions, in the sense of the sum of the second coordinate partials.
 Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Lemma XI.1.5,
 Corollary XI.1.6, Lemma XI.1.7 (p. 92) and Lemma XI.2.4 (p. 95).
 -/
+
+@[expose] public section
 
 open Set Filter Topology Metric
 

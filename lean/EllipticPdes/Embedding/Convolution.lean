@@ -3,18 +3,21 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import Mathlib.Analysis.Convolution
-import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
-import Mathlib.MeasureTheory.Measure.Haar.Unique
-import Mathlib.MeasureTheory.Integral.Prod
-import Mathlib.MeasureTheory.Integral.MeanInequalities
-import Mathlib.MeasureTheory.Function.LpSeminorm.Basic
-import Mathlib.MeasureTheory.Group.LIntegral
-import Mathlib.Analysis.Calculus.BumpFunction.Normed
-import Mathlib.Analysis.Calculus.BumpFunction.Convolution
-import Mathlib.Analysis.Normed.Lp.SmoothApprox
-import Mathlib.MeasureTheory.Function.LpSeminorm.TriangleInequality
-import Mathlib.MeasureTheory.Function.LocallyIntegrable
+
+module
+
+public import Mathlib.Analysis.Convolution
+public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
+public import Mathlib.MeasureTheory.Measure.Haar.Unique
+public import Mathlib.MeasureTheory.Integral.Prod
+public import Mathlib.MeasureTheory.Integral.MeanInequalities
+public import Mathlib.MeasureTheory.Function.LpSeminorm.Basic
+public import Mathlib.MeasureTheory.Group.LIntegral
+public import Mathlib.Analysis.Calculus.BumpFunction.Normed
+public import Mathlib.Analysis.Calculus.BumpFunction.Convolution
+public import Mathlib.Analysis.Normed.Lp.SmoothApprox
+public import Mathlib.MeasureTheory.Function.LpSeminorm.TriangleInequality
+public import Mathlib.MeasureTheory.Function.LocallyIntegrable
 
 /-!
 # Young's `Lᵖ` inequality for a probability kernel
@@ -38,6 +41,8 @@ bound above, and drive the middle term `w ⋆ ρ_ε - w` to zero using the unifo
 supplied by `ContDiffBump.dist_normed_convolution_le` on the fixed compact support. No
 `Lᵖ`-continuity of translation is required, and the argument is valid along an arbitrary filter.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Metric
 open scoped NNReal ENNReal Convolution Topology Pointwise

@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.Local.WeakSolution
-import EllipticPdes.Regularity.LeibnizWkInfty
+
+module
+
+public import EllipticPdes.Regularity.Local.WeakSolution
+public import EllipticPdes.Regularity.LeibnizWkInfty
 
 /-!
 # Cutoff reduction of a local weak solution to an `H₀¹` problem
@@ -35,6 +38,8 @@ so one reduction serves the `H²` estimate and the higher-order induction.
 * `reduction_testFn`: the reduced identity against test functions.
 * `redDatum`, `reduction_weakForm`: the datum as an `L²(Ω)` class, and the identity on `H₀¹(Ω)`.
 -/
+
+@[expose] public section
 
 open MeasureTheory Filter Topology
 open scoped RealInnerProductSpace

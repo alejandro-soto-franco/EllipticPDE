@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.DifferenceQuotient
-import Mathlib.Geometry.Manifold.Instances.Real
+
+module
+
+public import EllipticPdes.Regularity.DifferenceQuotient
+public import Mathlib.Geometry.Manifold.Instances.Real
 
 /-!
 # Half-ball and tangential directions
@@ -35,6 +38,8 @@ model space for manifolds with boundary: `EuclideanHalfSpace n := {x : Euclidean
   `r / 2`: the coordinate-`0` value is untouched by a tangential shift, so this is exact
   geometry, not a compactness-derived margin.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Filter
 open scoped Topology

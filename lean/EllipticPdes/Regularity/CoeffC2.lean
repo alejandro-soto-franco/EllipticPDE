@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Sobolev.Coefficients
-import EllipticPdes.Regularity.CoeffC1
+
+module
+
+public import EllipticPdes.Sobolev.Coefficients
+public import EllipticPdes.Regularity.CoeffC1
 
 /-!
 # `C²` coefficients
@@ -16,6 +19,8 @@ that hypothesis as `IsC2Coeff`, a mixin on top of `EllipticCoeff` one derivative
 `IsC1Coeff` (a mechanical copy of `CoeffC1.lean`), leaving every existing consumer of
 `EllipticCoeff` and `IsC1Coeff` untouched.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace

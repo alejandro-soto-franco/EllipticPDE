@@ -3,10 +3,13 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.RellichLq
-import EllipticPdes.Embedding.SobolevSharp
-import EllipticPdes.Analysis.WeakCompactness
-import EllipticPdes.Analysis.LqEulerLagrange
+
+module
+
+public import EllipticPdes.Embedding.RellichLq
+public import EllipticPdes.Embedding.SobolevSharp
+public import EllipticPdes.Analysis.WeakCompactness
+public import EllipticPdes.Analysis.LqEulerLagrange
 
 /-!
 # Direct method under a subcritical constraint
@@ -33,6 +36,8 @@ minimiser solves once the constraint is differentiated.
 Y. Guo, *Partial Differential Equations*, Section IX.1; L. C. Evans, *Partial Differential
 Equations* (2nd ed.), §8.2.
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric Filter Topology Bornology
 open scoped NNReal ENNReal RealInnerProductSpace

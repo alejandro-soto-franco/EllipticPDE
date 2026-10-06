@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import Mathlib.MeasureTheory.Function.LpSpace.Basic
-import Mathlib.MeasureTheory.Function.LpSeminorm.Indicator
+
+module
+
+public import Mathlib.MeasureTheory.Function.LpSpace.Basic
+public import Mathlib.MeasureTheory.Function.LpSeminorm.Indicator
 
 /-!
 # Extension by zero as an `Lp` isometry
@@ -23,6 +26,8 @@ extension by zero in `L²(ℝⁿ) = Lp ℝ 2 volume`, where the Fréchet-Kolmogo
 
 * `MeasureTheory.lpExtendByZero`: extension by zero `Lp ℝ p (μ.restrict s) →ₗᵢ[ℝ] Lp ℝ p μ`.
 -/
+
+@[expose] public section
 
 open Set Filter
 open scoped ENNReal

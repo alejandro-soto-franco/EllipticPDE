@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.GagliardoNirenberg
+
+module
+
+public import EllipticPdes.Embedding.GagliardoNirenberg
 
 /-!
 # Sobolev ladder for a compactly supported family
@@ -35,6 +38,8 @@ operator, which is where the boundary hypothesis is spent.
 
 L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.6.1 Thm 1 and §5.6.3 Thm 6.
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric
 open scoped NNReal ENNReal

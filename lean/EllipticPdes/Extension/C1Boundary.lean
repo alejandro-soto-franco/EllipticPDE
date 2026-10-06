@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Extension.BoundaryChart
+
+module
+
+public import EllipticPdes.Extension.BoundaryChart
 
 /-!
 # Domains with `C¹` boundary
@@ -45,6 +48,8 @@ Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theore
 (p. 20) and its proof, step 2 (p. 21); L. C. Evans, *Partial Differential Equations* (2nd ed.),
 §C.1 (p. 665) and §5.4 Theorem 1 (p. 253).
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric Set
 

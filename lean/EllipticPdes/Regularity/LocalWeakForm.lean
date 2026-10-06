@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.DifferentiatedEquation
+
+module
+
+public import EllipticPdes.Regularity.DifferentiatedEquation
 
 /-!
 # Localising the bilinear pairing to plain integrals
@@ -32,6 +35,8 @@ differentiated-equation identity of Evans, *Partial Differential Equations* (2nd
   hypothesis except the weak `ℓ`-derivative of the datum discharged from the weak formulation
   and the interior `H²` estimate.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace

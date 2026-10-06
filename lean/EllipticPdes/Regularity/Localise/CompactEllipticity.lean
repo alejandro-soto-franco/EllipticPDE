@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.Localise.LocalOp
+
+module
+
+public import EllipticPdes.Regularity.Localise.LocalOp
 
 /-!
 # Uniform ellipticity from pointwise positive definiteness
@@ -23,6 +26,8 @@ compactness of that product.
 * `exists_uniform_elliptic_of_continuousOn`: a matrix field continuous and pointwise positive
   definite on a compact set is uniformly elliptic there, with an explicit ellipticity constant.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Filter
 open scoped Topology ContDiff

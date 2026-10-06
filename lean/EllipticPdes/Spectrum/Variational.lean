@@ -3,10 +3,13 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Spectrum.RellichDischarge
-import EllipticPdes.Analysis.WeakCompactness
-import EllipticPdes.Analysis.DirectMethodForm
-import EllipticPdes.Poincare.BoundedDomain
+
+module
+
+public import EllipticPdes.Spectrum.RellichDischarge
+public import EllipticPdes.Analysis.WeakCompactness
+public import EllipticPdes.Analysis.DirectMethodForm
+public import EllipticPdes.Poincare.BoundedDomain
 
 /-!
 # Variational characterisation of the principal eigenvalue
@@ -51,6 +54,8 @@ constraint is quadratic and the minimiser satisfies a linear equation, which is 
 L. C. Evans, *Partial Differential Equations* (2nd ed.), §6.5.1, Theorem 2; Y. Guo, *Partial
 Differential Equations*, Section IX.1.
 -/
+
+@[expose] public section
 
 open MeasureTheory Filter Topology
 open scoped RealInnerProductSpace

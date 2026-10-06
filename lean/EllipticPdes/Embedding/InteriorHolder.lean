@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.GagliardoNirenberg
-import EllipticPdes.Embedding.WeakDerivBridge
+
+module
+
+public import EllipticPdes.Embedding.GagliardoNirenberg
+public import EllipticPdes.Embedding.WeakDerivBridge
 
 /-!
 # Interior Hölder continuity of a weak solution
@@ -37,6 +40,8 @@ ladder, which this library does not yet have.
 * `interior_holder_estimate_two`: the two-dimensional statement.
 * `interior_holder_estimate`: the three-dimensional statement.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Metric
 open scoped NNReal ENNReal

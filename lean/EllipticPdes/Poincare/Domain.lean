@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Poincare.Fubini
+
+module
+
+public import EllipticPdes.Poincare.Fubini
 
 /-!
 # Full Poincaré inequality on the domain (dependency-chain step 3)
@@ -15,6 +18,8 @@ dividing by `n` gives `∫_Ω u² ≤ (1 / n) * ∑_i c i * ∫_Ω (∂_i u)²`.
 constant is the domain constant `C_P` (for equal side lengths `c i = L² / 2` this
 is `L² / (2 n)`, matching the diameter-based bound).
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

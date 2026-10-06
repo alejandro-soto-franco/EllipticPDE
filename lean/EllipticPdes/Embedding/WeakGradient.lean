@@ -3,10 +3,13 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Sobolev.Basic
-import Mathlib.MeasureTheory.Integral.Bochner.Basic
-import Mathlib.MeasureTheory.Function.LpSpace.Basic
-import Mathlib.MeasureTheory.Integral.Average
+
+module
+
+public import EllipticPdes.Sobolev.Basic
+public import Mathlib.MeasureTheory.Integral.Bochner.Basic
+public import Mathlib.MeasureTheory.Function.LpSpace.Basic
+public import Mathlib.MeasureTheory.Integral.Average
 
 /-!
 # Pointwise weak gradients on a set
@@ -17,6 +20,8 @@ smooth test function supported in `B`. This is the interface the Morrey embeddin
 stated for functions (not `Lp` classes) and for a full gradient tuple so that a
 general exponent `p > d` is expressible, which the `L²`-only `HasWeakDerivOn` cannot do.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Metric
 open scoped NNReal

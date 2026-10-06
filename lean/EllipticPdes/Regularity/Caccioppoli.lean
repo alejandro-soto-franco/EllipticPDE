@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Existence.Garding
-import EllipticPdes.Regularity.DiffQuotientBound
+
+module
+
+public import EllipticPdes.Existence.Garding
+public import EllipticPdes.Regularity.DiffQuotientBound
 
 /-!
 # Caccioppoli (interior energy) estimate
@@ -29,6 +32,8 @@ which is exactly the Leibniz rule `∇(η u) = η ∇u + (∇η) u`. It is a bou
 sends the graph of a test function `φ` to the graph of the product `η φ`, hence by
 closure it maps `H₀¹(Ω)` into itself: [`cutoffMul_mem_H01`].
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace

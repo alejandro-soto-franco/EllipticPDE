@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Sobolev.H01Lattice
-import EllipticPdes.Regularity.Localise.Datum
-import EllipticPdes.Extension.GraphOperator
+
+module
+
+public import EllipticPdes.Sobolev.H01Lattice
+public import EllipticPdes.Regularity.Localise.Datum
+public import EllipticPdes.Extension.GraphOperator
 
 /-!
 # Weak solutions with no boundary condition
@@ -36,6 +39,8 @@ ambient element from square-integrable representatives with a weak gradient.
 * `cutoffMul_mem_H01_of_mem_W12`.
 * `isLocalWeakSolution_iff_localWeakSol`, `isLocalWeakSolution_of_localWeakSol`.
 -/
+
+@[expose] public section
 
 open MeasureTheory Filter Topology
 open scoped RealInnerProductSpace

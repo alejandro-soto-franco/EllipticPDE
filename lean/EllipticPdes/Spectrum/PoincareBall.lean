@@ -3,10 +3,13 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Spectrum.PoincareWirtinger
-import EllipticPdes.Extension.GraphOperator
-import EllipticPdes.Extension.Translate
-import EllipticPdes.Analysis.Dilation
+
+module
+
+public import EllipticPdes.Spectrum.PoincareWirtinger
+public import EllipticPdes.Extension.GraphOperator
+public import EllipticPdes.Extension.Translate
+public import EllipticPdes.Analysis.Dilation
 
 /-!
 # Poincaré's inequality on a ball
@@ -35,6 +38,8 @@ application of Mathlib's `MeasurePreserving` API.
 
 L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.8.1 Theorem 2 (p. 291).
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric Set Filter Topology
 open scoped NNReal ENNReal

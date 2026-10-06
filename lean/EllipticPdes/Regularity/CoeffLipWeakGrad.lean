@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.Local.Reduction
-import Mathlib.Analysis.Calculus.Rademacher
+
+module
+
+public import EllipticPdes.Regularity.Local.Reduction
+public import Mathlib.Analysis.Calculus.Rademacher
 
 /-!
 # Weak gradient of a `W^{1,infinity}` coefficient
@@ -55,6 +58,8 @@ of the quotient of `a` coming from `LipschitzWith.ae_differentiableAt` through
 theory ask `C¹` of the principal coefficients where Guo VIII.2.2 and Gilbarg-Trudinger 8.8
 ask `W^{1,∞}`.
 -/
+
+@[expose] public section
 
 open MeasureTheory Filter
 open scoped Topology NNReal

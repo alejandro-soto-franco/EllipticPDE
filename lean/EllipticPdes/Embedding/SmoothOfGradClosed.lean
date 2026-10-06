@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.SobolevLadder
-import EllipticPdes.Embedding.ClassicalDeriv
+
+module
+
+public import EllipticPdes.Embedding.SobolevLadder
+public import EllipticPdes.Embedding.ClassicalDeriv
 
 /-!
 # Smoothness of a family closed under differentiation
@@ -26,6 +29,8 @@ shrinking, no fixed ball would serve every order.
 * `EllipticPdes.Embedding.contDiffOn_of_gradClosed`: smooth representatives for a family closed
   under weak differentiation.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Metric
 open scoped NNReal ENNReal

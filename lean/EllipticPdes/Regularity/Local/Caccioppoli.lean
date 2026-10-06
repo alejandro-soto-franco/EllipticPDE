@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.Local.WeakSolution
+
+module
+
+public import EllipticPdes.Regularity.Local.WeakSolution
 
 /-!
 # Caccioppoli estimate for a weak solution in `H¹`
@@ -23,6 +26,8 @@ the proof before (8) to replace `‖u‖_{H¹(U)}` by `‖u‖_{L²(U)}` on the 
 * `exists_norm_mulTest_grad_le`: its consequence for each gradient coordinate, with the norms
   unsquared.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace

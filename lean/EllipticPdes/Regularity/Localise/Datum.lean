@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.Localise.LocalOp
-import EllipticPdes.Regularity.InteriorSmooth
-import Mathlib.Data.Set.Finite.List
+
+module
+
+public import EllipticPdes.Regularity.Localise.LocalOp
+public import EllipticPdes.Regularity.InteriorSmooth
+public import Mathlib.Data.Set.Finite.List
 
 /-!
 # The datum bridge and the localisation of a local weak solution
@@ -36,6 +39,8 @@ Neither bridge touches the global weak formulation against every member of `H01 
 * `LocalWeakSol`: a local weak solution on plain representatives, with `congr`, `mono`.
 * `localise`: the localisation step of Evans §6.3.1, Theorem 3.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Filter
 open scoped Topology ContDiff

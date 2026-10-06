@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Spectrum.Variational
+
+module
+
+public import EllipticPdes.Spectrum.Variational
 
 /-!
 # Later eigenvalues by constrained minimisation
@@ -34,6 +37,8 @@ plus a combination of the `wᵢ`, and both `B[U, wᵢ]` and `⟪U, wᵢ⟫_{L²}
 L. C. Evans, *Partial Differential Equations* (2nd ed.), §6.5.1, Theorem 1; Y. Guo, *Partial
 Differential Equations*, Section IX.1.
 -/
+
+@[expose] public section
 
 open MeasureTheory Filter Topology
 open scoped RealInnerProductSpace

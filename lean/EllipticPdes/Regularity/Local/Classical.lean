@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.Local.HigherInterior
-import EllipticPdes.Regularity.Localise.FiniteOrder
-import EllipticPdes.Regularity.IteratedNorm
+
+module
+
+public import EllipticPdes.Regularity.Local.HigherInterior
+public import EllipticPdes.Regularity.Localise.FiniteOrder
+public import EllipticPdes.Regularity.IteratedNorm
 
 /-!
 # Interior regularity with coefficients on the domain
@@ -30,6 +33,8 @@ the coefficients before the solution and the datum are, as in Evans.
 * `interior_H2_regularity_evans`: Theorem 1 with Evans's hypotheses.
 * `higher_interior_regularity_evans`: Theorem 2 with Evans's hypotheses.
 -/
+
+@[expose] public section
 
 open MeasureTheory Filter Topology
 

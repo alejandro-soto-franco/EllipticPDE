@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.HolderOfGradClosed
-import EllipticPdes.Embedding.SobolevLadderGeneral
+
+module
+
+public import EllipticPdes.Embedding.HolderOfGradClosed
+public import EllipticPdes.Embedding.SobolevLadderGeneral
 
 /-!
 # Hölder continuity at a general base exponent
@@ -36,6 +39,8 @@ the other case those statements separate out.
 Evans, *Partial Differential Equations* (2nd ed.), §5.6.3 Theorem 6 clause (ii).
 Guo, *Partial Differential Equations*, Theorem IV.2.3 case (ii).
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric Set
 open scoped ENNReal NNReal

@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.Morrey
-import EllipticPdes.Analysis.EuclideanFunctionalNorm
+
+module
+
+public import EllipticPdes.Embedding.Morrey
+public import EllipticPdes.Analysis.EuclideanFunctionalNorm
 
 /-!
 # Constancy of a class with zero weak gradient on a connected open set
@@ -36,6 +39,8 @@ set by such balls then puts the class equal to that constant almost everywhere.
 L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.8.1 Theorem 1 (p. 290) and
 Chapter 5 Problem 11.
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric Set Filter Topology
 open scoped NNReal ENNReal Convolution

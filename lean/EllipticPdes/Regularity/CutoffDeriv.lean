@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.Interior
-import EllipticPdes.Regularity.WeakLimit
+
+module
+
+public import EllipticPdes.Regularity.Interior
+public import EllipticPdes.Regularity.WeakLimit
 
 /-!
 # Membership of a cut-off directional derivative in `H₀¹(Ω)`
@@ -34,6 +37,8 @@ quotients.
 * `exists_mem_H01_mulTest_gradient`: the cutoff of a directional derivative lies in `H₀¹(Ω)`.
 * `interior_cutoffGrad_mem_H01`: the same, together with the weak gradient it has.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace ENNReal

@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Campanato.Compare
+
+module
+
+public import EllipticPdes.Campanato.Compare
 
 /-!
 # Dyadic telescoping estimate and Campanato limit
@@ -22,6 +25,8 @@ with `B(x,r) ⊆ Ω`. Since the bound does not degrade as `s → 0`, the means c
 inherits the same bound. That limit is the Hölder representative produced in
 `EllipticPdes.Campanato.Holder`.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Metric Filter
 

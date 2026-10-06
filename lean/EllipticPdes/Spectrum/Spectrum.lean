@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Fredholm.Compactness
-import EllipticPdes.Form.BilinearForm
-import Mathlib.Analysis.InnerProductSpace.Spectrum
+
+module
+
+public import EllipticPdes.Fredholm.Compactness
+public import EllipticPdes.Form.BilinearForm
+public import Mathlib.Analysis.InnerProductSpace.Spectrum
 
 /-!
 # Eigenvalue theory for the symmetric elliptic Dirichlet problem
@@ -35,6 +38,8 @@ Instantiated on the Dirichlet (Poisson) form `laplaceBilin`, giving the eigenval
 is the single analytic input, threaded as the hypothesis `IsCompactOperator (embL2 Ω)`
 (Rellich-Kondrachov) exactly as in `Compactness.lean`.
 -/
+
+@[expose] public section
 
 open MeasureTheory InnerProductSpace
 open scoped RealInnerProductSpace

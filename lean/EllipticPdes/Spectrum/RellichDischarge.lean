@@ -3,10 +3,13 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Spectrum.Spectrum
-import EllipticPdes.Analysis.FrechetKolmogorov
-import EllipticPdes.Analysis.LpExtendByZero
-import EllipticPdes.Analysis.EuclideanFunctionalNorm
+
+module
+
+public import EllipticPdes.Spectrum.Spectrum
+public import EllipticPdes.Analysis.FrechetKolmogorov
+public import EllipticPdes.Analysis.LpExtendByZero
+public import EllipticPdes.Analysis.EuclideanFunctionalNorm
 
 /-!
 # Discharging the Rellich-Kondrachov compact embedding
@@ -23,6 +26,8 @@ translation. The translation modulus comes from the gradient estimate
 `integral_sq_sub_translation_le` on the smooth approximants, passed to the limit through
 `transL2_sub_le_of_tendsto'`.
 -/
+
+@[expose] public section
 
 open MeasureTheory InnerProductSpace Metric Filter
 open scoped RealInnerProductSpace ENNReal Topology

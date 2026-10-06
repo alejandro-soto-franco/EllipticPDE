@@ -3,14 +3,17 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import Mathlib.Analysis.Calculus.ContDiff.Basic
-import Mathlib.Analysis.Calculus.Deriv.Comp
-import Mathlib.Analysis.Calculus.FDeriv.Add
-import Mathlib.MeasureTheory.Integral.Prod
-import Mathlib.MeasureTheory.Group.Integral
-import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
-import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
-import EllipticPdes.Analysis.PoincareInequality
+
+module
+
+public import Mathlib.Analysis.Calculus.ContDiff.Basic
+public import Mathlib.Analysis.Calculus.Deriv.Comp
+public import Mathlib.Analysis.Calculus.FDeriv.Add
+public import Mathlib.MeasureTheory.Integral.Prod
+public import Mathlib.MeasureTheory.Group.Integral
+public import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
+public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
+public import EllipticPdes.Analysis.PoincareInequality
 
 /-!
 # `L²` translation estimate
@@ -36,6 +39,8 @@ the inner translate back to the gradient integral.
 
 * `MeasureTheory.integral_sq_sub_translation_le`: the `L²` translation estimate.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set intervalIntegral Metric
 open scoped ENNReal

@@ -3,11 +3,14 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Campanato.Telescope
-import Mathlib.MeasureTheory.Covering.Besicovitch
-import Mathlib.MeasureTheory.Covering.BesicovitchVectorSpace
-import Mathlib.MeasureTheory.Covering.Differentiation
-import Mathlib.Topology.MetricSpace.Holder
+
+module
+
+public import EllipticPdes.Campanato.Telescope
+public import Mathlib.MeasureTheory.Covering.Besicovitch
+public import Mathlib.MeasureTheory.Covering.BesicovitchVectorSpace
+public import Mathlib.MeasureTheory.Covering.Differentiation
+public import Mathlib.Topology.MetricSpace.Holder
 
 /-!
 # Campanato's characterisation of Hölder continuity
@@ -29,6 +32,8 @@ The hypothesis quantifies over balls contained in `B(c, R)`, so the pair estimat
 concentric ball to all of `B(c, R)` is a separate chaining argument, property (H1') of the same
 source, and is not carried out here.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Metric Filter
 

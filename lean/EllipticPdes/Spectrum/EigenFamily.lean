@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Spectrum.HigherEigenvalues
+
+module
+
+public import EllipticPdes.Spectrum.HigherEigenvalues
 
 /-!
 # Eigenvalue sequence by iterated constrained minimisation
@@ -39,6 +42,8 @@ of a single vector at each stage rather than as a dimension count.
 L. C. Evans, *Partial Differential Equations* (2nd ed.), §6.5.1, Theorem 1; Y. Guo, *Partial
 Differential Equations*, Section VII.5.
 -/
+
+@[expose] public section
 
 open MeasureTheory Filter Topology
 open scoped RealInnerProductSpace

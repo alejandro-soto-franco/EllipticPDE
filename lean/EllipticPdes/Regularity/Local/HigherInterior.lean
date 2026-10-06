@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.Local.Datum
-import EllipticPdes.Regularity.HigherInterior
+
+module
+
+public import EllipticPdes.Regularity.Local.Datum
+public import EllipticPdes.Regularity.HigherInterior
 
 /-!
 # Higher interior regularity for a weak solution in `H¹`
@@ -41,6 +44,8 @@ The bound has `‖U₀‖_{L²(Ω)}` on the right, as in Evans.
   `b^i, c ∈ W^{k,∞}`.
 * `localRegularityAt_zero_of_isC1Coeff`: order zero from `C¹` principal coefficients alone.
 -/
+
+@[expose] public section
 
 open MeasureTheory Filter Topology
 

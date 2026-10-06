@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Spectrum.EigenFamily
-import EllipticPdes.Embedding.DirectMethod
+
+module
+
+public import EllipticPdes.Spectrum.EigenFamily
+public import EllipticPdes.Embedding.DirectMethod
 
 /-!
 # Dirichlet spectrum of the unit ball
@@ -30,6 +33,8 @@ beyond `2 < d`.
 
 L. C. Evans, *Partial Differential Equations* (2nd ed.), §6.5.1, Theorem 2.
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric Filter Topology Bornology
 open scoped NNReal ENNReal RealInnerProductSpace

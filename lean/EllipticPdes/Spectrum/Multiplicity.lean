@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Spectrum.Variational
-import Mathlib.Analysis.InnerProductSpace.Spectrum
+
+module
+
+public import EllipticPdes.Spectrum.Variational
+public import Mathlib.Analysis.InnerProductSpace.Spectrum
 
 /-!
 # Positivity and finite multiplicity of the Dirichlet eigenvalues
@@ -31,6 +34,8 @@ Finite multiplicity is the compactness of the solution operator, through Mathlib
 
 L. C. Evans, *Partial Differential Equations* (2nd ed.), §6.5.1, Theorem 1.
 -/
+
+@[expose] public section
 
 open MeasureTheory Filter Topology
 open scoped RealInnerProductSpace

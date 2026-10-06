@@ -3,11 +3,14 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.ChainRule
-import EllipticPdes.Regularity.WeakFormDense
-import EllipticPdes.Regularity.PointwiseEquation
-import EllipticPdes.Form.GeneralForm
-import EllipticPdes.Existence.WeakMaximum
+
+module
+
+public import EllipticPdes.Embedding.ChainRule
+public import EllipticPdes.Regularity.WeakFormDense
+public import EllipticPdes.Regularity.PointwiseEquation
+public import EllipticPdes.Form.GeneralForm
+public import EllipticPdes.Existence.WeakMaximum
 
 /-!
 # Truncation in `H₀¹`
@@ -45,6 +48,8 @@ D. Gilbarg and N. S. Trudinger, *Elliptic Partial Differential Equations of Seco
 §8.1 Theorem 8.1 and Corollary 8.2 (pp. 179–180);
 L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.3.1 Theorem 1 (p. 264).
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric Set Filter Topology
 open scoped NNReal ENNReal Convolution RealInnerProductSpace

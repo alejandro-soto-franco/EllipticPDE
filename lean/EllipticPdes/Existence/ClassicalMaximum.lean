@@ -3,13 +3,16 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Sobolev.Basic
-import Mathlib.Analysis.Matrix.PosDef
-import Mathlib.Analysis.Matrix.Spectrum
-import Mathlib.Analysis.Calculus.FDeriv.Symmetric
-import Mathlib.Analysis.Calculus.Deriv.MeanValue
-import Mathlib.Analysis.SpecialFunctions.ExpDeriv
-import Mathlib.Topology.Connected.Clopen
+
+module
+
+public import EllipticPdes.Sobolev.Basic
+public import Mathlib.Analysis.Matrix.PosDef
+public import Mathlib.Analysis.Matrix.Spectrum
+public import Mathlib.Analysis.Calculus.FDeriv.Symmetric
+public import Mathlib.Analysis.Calculus.Deriv.MeanValue
+public import Mathlib.Analysis.SpecialFunctions.ExpDeriv
+public import Mathlib.Topology.Connected.Clopen
 
 /-!
 # Classical weak maximum principle
@@ -47,6 +50,8 @@ D. Gilbarg and N. S. Trudinger, *Elliptic Partial Differential Equations of Seco
 §3.1 Theorem 3.1 (p. 32) and Corollary 3.2 (p. 33);
 Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem XI.3.7.
 -/
+
+@[expose] public section
 
 open Set Filter Topology Matrix
 

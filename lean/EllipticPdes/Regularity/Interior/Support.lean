@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.RestrictedDiffQuotientMem
-import EllipticPdes.Regularity.CoeffC1
-import EllipticPdes.Regularity.CutoffTower
+
+module
+
+public import EllipticPdes.Regularity.RestrictedDiffQuotientMem
+public import EllipticPdes.Regularity.CoeffC1
+public import EllipticPdes.Regularity.CutoffTower
 
 /-!
 # Internal support lemmas for the interior estimate
@@ -18,6 +21,8 @@ consumed in more than one of them, so no single module can keep it private.
 Consumers should use `interior_H2_estimate` and its siblings from
 `EllipticPdes.Regularity.Interior`.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Extension.LinearOperator
-import EllipticPdes.Extension.GlobalApproximation
-import EllipticPdes.Embedding.H01Sobolev
+
+module
+
+public import EllipticPdes.Extension.LinearOperator
+public import EllipticPdes.Extension.GlobalApproximation
+public import EllipticPdes.Embedding.H01Sobolev
 
 /-!
 # Extension operator between the graph spaces
@@ -35,6 +38,8 @@ the theorem are read off `exists_extLinear` through the representatives.
 Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem III.2.2
 (p. 20); L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.4 Theorem 1 (p. 253).
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric Set Filter Topology
 open scoped NNReal ENNReal

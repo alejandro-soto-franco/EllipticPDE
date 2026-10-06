@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.L2Pairing
-import EllipticPdes.Regularity.CutoffGradFormula
+
+module
+
+public import EllipticPdes.Regularity.L2Pairing
+public import EllipticPdes.Regularity.CutoffGradFormula
 
 /-!
 # Commutator of the bilinear form with a cutoff
@@ -42,6 +45,8 @@ own and no product is constructed twice.
 * `setIntegral_lower_entry`: one entry of a block with no derivative on the test function.
 * `setIntegral_blocks_eq`: all three blocks, as the shapes the datum names.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

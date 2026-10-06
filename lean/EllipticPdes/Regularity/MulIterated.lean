@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.DifferentiatedWkInfty
-import EllipticPdes.Regularity.HigherWeakDeriv
+
+module
+
+public import EllipticPdes.Regularity.DifferentiatedWkInfty
+public import EllipticPdes.Regularity.HigherWeakDeriv
 
 /-!
 # Multiplying an iterated weak derivative by a `W^{k,∞}` weight
@@ -35,6 +38,8 @@ about its size, so nothing is lost.
 * `exists_iteratedWeakDeriv_mul`: the product has `k` weak derivatives, with a bound linear in
   the bound on the family of `g`.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

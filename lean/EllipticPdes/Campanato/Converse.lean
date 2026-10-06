@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Campanato.Holder
+
+module
+
+public import EllipticPdes.Campanato.Holder
 
 /-!
 # Campanato decay of a Hölder function
@@ -18,6 +21,8 @@ Together with `campanato_holderOnWith` this makes `CampanatoOn` a characterisati
 continuity, which is the form Schauder theory consumes: a Hölder coefficient feeds in a Campanato
 decay rate, and a Campanato decay rate feeds out a Hölder bound.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Metric Filter
 

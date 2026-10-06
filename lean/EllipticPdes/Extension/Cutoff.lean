@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Extension.C1Test
-import Mathlib.Analysis.SpecialFunctions.SmoothTransition
+
+module
+
+public import EllipticPdes.Extension.C1Test
+public import Mathlib.Analysis.SpecialFunctions.SmoothTransition
 
 /-!
 # A one-sided cutoff along one coordinate
@@ -26,6 +29,8 @@ and supported in the slab, which is what the odd part of the reflection cancels 
 * `EllipticPdes.Extension.partialD_slabCut_of_ne`: it is constant along the interface.
 * `EllipticPdes.Extension.norm_partialD_slabCut_le`: the `C/ε` bound.
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric Filter Topology Set
 open scoped NNReal ENNReal

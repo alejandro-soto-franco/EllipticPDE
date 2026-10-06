@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.HigherInterior
-import EllipticPdes.Regularity.InteriorHolderFinite
+
+module
+
+public import EllipticPdes.Regularity.HigherInterior
+public import EllipticPdes.Regularity.InteriorHolderFinite
 
 /-!
 # Interior `C^{k,1/2}` estimate for the weak solution, in every dimension
@@ -37,6 +40,8 @@ coefficients and of the datum, and adds the Hölder seminorm bound, which the `C
 Y. Guo, *Partial Differential Equations*, Theorem IV.2.3(ii); L. C. Evans, *Partial Differential
 Equations* (2nd ed.), §6.3.1.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Metric
 open scoped NNReal ENNReal

@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Fredholm.Fredholm
-import Mathlib.Analysis.InnerProductSpace.Adjoint
-import Mathlib.Analysis.Normed.Operator.Compact.Basic
+
+module
+
+public import EllipticPdes.Fredholm.Fredholm
+public import Mathlib.Analysis.InnerProductSpace.Adjoint
+public import Mathlib.Analysis.Normed.Operator.Compact.Basic
 
 /-!
 # Rellich-Kondrachov reduction from the compact embedding to a compact `opK`
@@ -27,6 +30,8 @@ The Fredholm alternative of `Fredholm.lean` is conditioned on the abstract hypot
   the one analytic input (Rellich-Kondrachov), threaded as a hypothesis exactly as the Poincaré
   geometry input was, and deliberately not discharged here.
 -/
+
+@[expose] public section
 
 open MeasureTheory InnerProductSpace
 open scoped RealInnerProductSpace

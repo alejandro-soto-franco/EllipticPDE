@@ -3,13 +3,16 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.CoeffWkInfty
-import Mathlib.Analysis.Convolution
-import Mathlib.Analysis.Calculus.BumpFunction.Normed
-import Mathlib.Analysis.Calculus.BumpFunction.Convolution
-import Mathlib.Analysis.Calculus.ContDiff.Convolution
-import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
-import Mathlib.MeasureTheory.Measure.Haar.Unique
+
+module
+
+public import EllipticPdes.Regularity.CoeffWkInfty
+public import Mathlib.Analysis.Convolution
+public import Mathlib.Analysis.Calculus.BumpFunction.Normed
+public import Mathlib.Analysis.Calculus.BumpFunction.Convolution
+public import Mathlib.Analysis.Calculus.ContDiff.Convolution
+public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
+public import Mathlib.MeasureTheory.Measure.Haar.Unique
 
 /-!
 # Mollifying a `W^{1,∞}` weight
@@ -36,6 +39,8 @@ mollification the Leibniz rule needs, with continuity of the weight dropped thro
 * `partialD_convolution_eq_of_hasWeakPartial`: `∂_ℓ (a ⋆ ρ) = a' ⋆ ρ` when `a'` is the weak
   `ℓ`-derivative of `a`.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped Topology ENNReal Convolution

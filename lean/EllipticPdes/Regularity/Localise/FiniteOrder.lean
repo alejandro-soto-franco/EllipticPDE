@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.Localise.Datum
+
+module
+
+public import EllipticPdes.Regularity.Localise.Datum
 
 /-!
 # Localising coefficients of finite order on an open set
@@ -35,6 +38,8 @@ everywhere on `U`; for `C^m(U)` coefficients it multiplies the coefficient itsel
 * `LocalWeakSol.congr_ae`: the local weak formulation transported along coefficients equal
   almost everywhere.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Filter
 open scoped Topology ContDiff

@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.Caccioppoli
+
+module
+
+public import EllipticPdes.Regularity.Caccioppoli
 
 /-!
 # Cutting a test function against a cutoff
@@ -30,6 +33,8 @@ records its three cutoffs in.
 * `setIntegral_mul_cut_eq`, `setIntegral_mul_partialD_cut_eq`: their integral forms, for a
   weight vanishing almost everywhere off `K`.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace Topology

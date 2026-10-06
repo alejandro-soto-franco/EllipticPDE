@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Form.BilinearForm
-import EllipticPdes.Poincare.BoxSlice
+
+module
+
+public import EllipticPdes.Form.BilinearForm
+public import EllipticPdes.Poincare.BoxSlice
 
 /-!
 # Existence and uniqueness via Lax-Milgram (dependency-chain step 6)
@@ -19,6 +22,8 @@ This is the abstract existence-and-uniqueness statement. The elliptic right-hand
 Cauchy-Schwarz, the `L² ⊂ H⁻¹` embedding), so the classical Poisson-Dirichlet problem is
 the instance with that functional.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace

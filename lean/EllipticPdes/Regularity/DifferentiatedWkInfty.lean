@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.DifferentiatedEquation
-import EllipticPdes.Regularity.LeibnizWkInfty
-import EllipticPdes.Regularity.LowerOrderWkInfty
+
+module
+
+public import EllipticPdes.Regularity.DifferentiatedEquation
+public import EllipticPdes.Regularity.LeibnizWkInfty
+public import EllipticPdes.Regularity.LowerOrderWkInfty
 
 /-!
 # Moving a derivative onto the solution under Guo's coefficient hypothesis
@@ -31,6 +34,8 @@ reaches for the commutator by name sees the same shape.
 * `differentiated_weakForm_div_wkInfty`: the four moves assembled, divergence-datum form.
 * `differentiated_weakForm_wkInfty`: Evans's equation (34), strong-datum form.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

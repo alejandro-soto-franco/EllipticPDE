@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.H01Sobolev
+
+module
+
+public import EllipticPdes.Embedding.H01Sobolev
 
 /-!
 # Sobolev embedding of `H₀¹(Ω)` in dimension two
@@ -26,6 +29,8 @@ remark on `n = 2` in the proof of Gilbarg and Trudinger's Theorem 8.1, where any
 D. Gilbarg and N. S. Trudinger, *Elliptic Partial Differential Equations of Second Order*,
 §8.1 Theorem 8.1 (p. 180), the remark on `n = 2`.
 -/
+
+@[expose] public section
 
 open MeasureTheory Filter
 open scoped ENNReal NNReal Topology

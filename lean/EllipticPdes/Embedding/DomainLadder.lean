@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.DomainSobolev
+
+module
+
+public import EllipticPdes.Embedding.DomainSobolev
 
 /-!
 # Sobolev ladder on a bounded domain
@@ -39,6 +42,8 @@ what `EllipticPdes.Embedding.memLp_of_gradClosed_general` separates on a ball.
 Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem IV.2.3 case
 (i); L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.6.3 Theorem 6 clause (i).
 -/
+
+@[expose] public section
 
 open MeasureTheory Set
 open scoped NNReal ENNReal

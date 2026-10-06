@@ -3,14 +3,17 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import Mathlib.MeasureTheory.Function.L2Space
-import Mathlib.MeasureTheory.Function.LpSpace.Indicator
-import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
-import Mathlib.Analysis.InnerProductSpace.PiL2
-import Mathlib.Analysis.InnerProductSpace.Orthogonal
-import Mathlib.Analysis.InnerProductSpace.Subspace
-import Mathlib.Topology.UniformSpace.UniformEmbedding
-import Mathlib.Analysis.Calculus.LineDeriv.IntegrationByParts
+
+module
+
+public import Mathlib.MeasureTheory.Function.L2Space
+public import Mathlib.MeasureTheory.Function.LpSpace.Indicator
+public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
+public import Mathlib.Analysis.InnerProductSpace.PiL2
+public import Mathlib.Analysis.InnerProductSpace.Orthogonal
+public import Mathlib.Analysis.InnerProductSpace.Subspace
+public import Mathlib.Topology.UniformSpace.UniformEmbedding
+public import Mathlib.Analysis.Calculus.LineDeriv.IntegrationByParts
 
 /-!
 # H¹ and H₀¹ as weak-derivative Hilbert spaces
@@ -21,6 +24,8 @@ coordinate `i.succ` the `i`-th weak partial). The weak-gradient relation is orth
 family of explicit "constraint vectors", so `W^{1,2}` is an orthogonal complement: closed,
 complete, and a real Hilbert space with no further work.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace ENNReal

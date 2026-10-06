@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Sobolev.Coefficients
-import EllipticPdes.Poincare.Density
-import Mathlib.Analysis.InnerProductSpace.LaxMilgram
+
+module
+
+public import EllipticPdes.Sobolev.Coefficients
+public import EllipticPdes.Poincare.Density
+public import Mathlib.Analysis.InnerProductSpace.LaxMilgram
 
 /-!
 # General divergence-form bilinear form (general elliptic matrix `A`)
@@ -30,6 +33,8 @@ ellipticity plus Poincaré. It mirrors
 the technique of DeGiorgi `WeakFormulation/CoefficientOperator.lean`
 (`coeffBilinSubmodule_coercive`) on our scalar `PiLp` Sobolev encoding.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace

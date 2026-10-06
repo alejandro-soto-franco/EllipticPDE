@@ -3,10 +3,13 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.WeakGradUnique
-import EllipticPdes.Embedding.WeakDerivBridge
-import EllipticPdes.Embedding.GagliardoNirenberg
-import EllipticPdes.Regularity.HigherWeakDeriv
+
+module
+
+public import EllipticPdes.Embedding.WeakGradUnique
+public import EllipticPdes.Embedding.WeakDerivBridge
+public import EllipticPdes.Embedding.GagliardoNirenberg
+public import EllipticPdes.Regularity.HigherWeakDeriv
 
 /-!
 # One family closed under differentiation
@@ -28,6 +31,8 @@ differentiation up to a null set, which is all the ladder reads.
 * `EllipticPdes.Regularity.exists_gradClosed_of_hasIteratedWeakDerivOn_le`: the same at a bounded
   order, where one family is the whole supply and no uniqueness is spent.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Metric
 

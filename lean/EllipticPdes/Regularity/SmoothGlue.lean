@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.HigherWeakDeriv
+
+module
+
+public import EllipticPdes.Regularity.HigherWeakDeriv
 
 /-!
 # Smoothness of a locally smooth representative
@@ -36,6 +39,8 @@ Two observations do the work.
 * `exists_contDiffOn_of_closedBall_ae`: the same, stated over closed balls, which is what a
   bootstrap such as `interior_smooth` supplies directly.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

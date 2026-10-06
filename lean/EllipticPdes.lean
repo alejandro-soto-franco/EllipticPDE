@@ -3,179 +3,182 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Sobolev.Basic
-import EllipticPdes.Sobolev.Coefficients
-import EllipticPdes.Regularity.DifferenceQuotient
-import EllipticPdes.Regularity.DiffQuotientBound
-import EllipticPdes.Poincare.OneDim
-import EllipticPdes.Poincare.Fubini
-import EllipticPdes.Poincare.Domain
-import EllipticPdes.Poincare.Density
-import EllipticPdes.Poincare.Geometry
-import EllipticPdes.Poincare.BoxSlice
-import EllipticPdes.Poincare.BoundedDomain
-import EllipticPdes.Form.BilinearForm
-import EllipticPdes.Form.Hneg
-import EllipticPdes.Existence.Existence
-import EllipticPdes.Form.GeneralForm
-import EllipticPdes.Existence.Garding
-import EllipticPdes.Regularity.Caccioppoli
-import EllipticPdes.Regularity.InteriorCompactSupport
-import EllipticPdes.Regularity.CoeffC1
-import EllipticPdes.Regularity.CoeffLip
-import EllipticPdes.Regularity.CoeffLipWeakGrad
-import EllipticPdes.Regularity.CoeffC2
-import EllipticPdes.Regularity.CoeffCk
-import EllipticPdes.Regularity.CoeffWkInfty
-import EllipticPdes.Regularity.CoeffBridge
-import EllipticPdes.Regularity.MollifyWkInfty
-import EllipticPdes.Regularity.LowerOrderWkInfty
-import EllipticPdes.Regularity.CutoffTower
-import EllipticPdes.Regularity.RestrictedDiffQuotient
-import EllipticPdes.Regularity.RestrictedDiffQuotientMem
-import EllipticPdes.Regularity.Interior.Support
-import EllipticPdes.Regularity.Interior.EnergyBound
-import EllipticPdes.Regularity.Interior.NormBound
-import EllipticPdes.Regularity.Interior
-import EllipticPdes.Regularity.LeibnizWkInfty
-import EllipticPdes.Regularity.DifferentiatedWkInfty
-import EllipticPdes.Regularity.LocalWeakFormWkInfty
-import EllipticPdes.Regularity.WeakFormDense
-import EllipticPdes.Regularity.HigherWeakDeriv
-import EllipticPdes.Regularity.MulIterated
-import EllipticPdes.Regularity.IteratedSum
-import EllipticPdes.Regularity.IteratedRestrict
-import EllipticPdes.Regularity.L2Pairing
-import EllipticPdes.Regularity.ExtendCutoff
-import EllipticPdes.Regularity.WeakDerivOnSymm
-import EllipticPdes.Regularity.CutoffGradFormula
-import EllipticPdes.Regularity.CollarIdentify
-import EllipticPdes.Regularity.CutoffCommutator
-import EllipticPdes.Regularity.DatumPiece
-import EllipticPdes.Regularity.CutoffDatum
-import EllipticPdes.Regularity.SmoothGlue
-import EllipticPdes.Regularity.HigherInterior
-import EllipticPdes.Regularity.IteratedFamily
-import EllipticPdes.Regularity.InteriorSmooth
-import EllipticPdes.Regularity.InteriorSmoothGlobal
-import EllipticPdes.Regularity.Localise.CutoffProduct
-import EllipticPdes.Regularity.Localise.LocalOp
-import EllipticPdes.Regularity.Localise.CompactEllipticity
-import EllipticPdes.Regularity.Localise.Datum
-import EllipticPdes.Regularity.Local.WeakSolution
-import EllipticPdes.Regularity.Local.Reduction
-import EllipticPdes.Regularity.Local.Caccioppoli
-import EllipticPdes.Regularity.Local.InteriorH2
-import EllipticPdes.Regularity.Local.Datum
-import EllipticPdes.Regularity.Local.HigherInterior
-import EllipticPdes.Regularity.Local.InteriorSmooth
-import EllipticPdes.Regularity.Local.Evans
-import EllipticPdes.Regularity.Localise.FiniteOrder
-import EllipticPdes.Regularity.IteratedNorm
-import EllipticPdes.Regularity.Local.Classical
-import EllipticPdes.Regularity.ClassicalSolvability
-import EllipticPdes.Regularity.PointwiseEquation
-import EllipticPdes.Regularity.InteriorHolderFinite
-import EllipticPdes.Regularity.DifferentiatedEquation
-import EllipticPdes.Regularity.Boundary.HalfBall
-import EllipticPdes.Regularity.Boundary.TangentialDiffQuotient
-import EllipticPdes.Regularity.Boundary.TangentialDiffQuotientMem
-import EllipticPdes.Regularity.Boundary.WeakQuotientRule
-import EllipticPdes.Regularity.WeakLimit
-import EllipticPdes.Regularity.CutoffDeriv
-import EllipticPdes.Regularity.WeakDerivUnique
-import EllipticPdes.Regularity.TestFnCut
-import EllipticPdes.Regularity.OuterCutoffTower
-import EllipticPdes.Regularity.LocalWeakForm
-import EllipticPdes.Embedding.WeakGradient
-import EllipticPdes.Embedding.Convolution
-import EllipticPdes.Embedding.MorreyOneDim
-import EllipticPdes.Embedding.RayIntegral
-import EllipticPdes.Embedding.Morrey
-import EllipticPdes.Embedding.WeakDerivBridge
-import EllipticPdes.Campanato.Basic
-import EllipticPdes.Campanato.Compare
-import EllipticPdes.Campanato.Telescope
-import EllipticPdes.Campanato.Holder
-import EllipticPdes.Campanato.Converse
-import EllipticPdes.Embedding.GagliardoNirenberg
-import EllipticPdes.Embedding.SobolevLadder
-import EllipticPdes.Embedding.SobolevLadderCompactSupport
-import EllipticPdes.Embedding.SobolevLadderFullStep
-import EllipticPdes.Embedding.SobolevLadderGeneral
-import EllipticPdes.Embedding.HolderGeneral
-import EllipticPdes.Extension.C1Test
-import EllipticPdes.Extension.Cutoff
-import EllipticPdes.Extension.HalfSpace
-import EllipticPdes.Extension.EvenReflection
-import EllipticPdes.Extension.Shear
-import EllipticPdes.Extension.ShearWeakGrad
-import EllipticPdes.Extension.BoundaryChart
-import EllipticPdes.Extension.Linearity
-import EllipticPdes.Extension.C1Boundary
-import EllipticPdes.Extension.BallChart
-import EllipticPdes.Extension.Motion
-import EllipticPdes.Extension.Patch
-import EllipticPdes.Extension.PartitionOfUnity
-import EllipticPdes.Extension.LocalExtension
-import EllipticPdes.Extension.Operator
-import EllipticPdes.Extension.LinearOperator
-import EllipticPdes.Extension.GlobalApproximation
-import EllipticPdes.Extension.GraphOperator
-import EllipticPdes.Extension.Reflect
-import EllipticPdes.Extension.Translate
-import EllipticPdes.Analysis.LpTranslationContinuity
-import EllipticPdes.Extension.ShiftMollify
-import EllipticPdes.Embedding.WeakGradUnique
-import EllipticPdes.Embedding.ClassicalDeriv
-import EllipticPdes.Embedding.SmoothOfGradClosed
-import EllipticPdes.Embedding.HolderOfGradClosed
-import EllipticPdes.Embedding.InteriorHolder
-import EllipticPdes.Embedding.DomainSobolev
-import EllipticPdes.Embedding.DomainLadder
-import EllipticPdes.Embedding.DomainHolder
-import EllipticPdes.Embedding.DomainSmooth
-import EllipticPdes.Embedding.SobolevEmbedding
-import EllipticPdes.Fredholm.Fredholm
-import EllipticPdes.Fredholm.FredholmComplete
-import EllipticPdes.Spectrum.SpectrumSigma
-import EllipticPdes.Fredholm.Compactness
-import EllipticPdes.Spectrum.Spectrum
-import EllipticPdes.Spectrum.RellichDischarge
-import EllipticPdes.BoundedInstances
-import EllipticPdes.Analysis.WeakCompactness
-import EllipticPdes.Analysis.DirectMethodForm
-import EllipticPdes.Analysis.LpInterpolation
-import EllipticPdes.Analysis.Dilation
-import EllipticPdes.Embedding.H01Sobolev
-import EllipticPdes.Embedding.SobolevSolution
-import EllipticPdes.Embedding.RellichLq
-import EllipticPdes.Embedding.SobolevSharp
-import EllipticPdes.Analysis.LqDerivative
-import EllipticPdes.Analysis.LqEulerLagrange
-import EllipticPdes.Embedding.DirectMethod
-import EllipticPdes.Embedding.DirichletSemilinear
-import EllipticPdes.Regularity.InteriorHolderSolution
-import EllipticPdes.Spectrum.Variational
-import EllipticPdes.Spectrum.HigherEigenvalues
-import EllipticPdes.Spectrum.EigenFamily
-import EllipticPdes.Spectrum.Multiplicity
-import EllipticPdes.Spectrum.BallSpectrum
-import EllipticPdes.Spectrum.BallDimension
-import EllipticPdes.Embedding.ConstOfGradZero
-import EllipticPdes.Spectrum.RellichW12
-import EllipticPdes.Spectrum.PoincareWirtinger
-import EllipticPdes.Spectrum.PoincareBall
-import EllipticPdes.Embedding.ChainRule
-import EllipticPdes.Existence.WeakMaximum
-import EllipticPdes.Sobolev.H01Lattice
-import EllipticPdes.Embedding.H01SobolevTwo
-import EllipticPdes.Existence.WeakMaximumTransport
-import EllipticPdes.Existence.ClassicalMaximum
-import EllipticPdes.Existence.StrongMaximum
-import EllipticPdes.Existence.StrongMaximumCorollaries
-import EllipticPdes.Existence.AprioriBound
-import EllipticPdes.Existence.Harmonic
+
+module
+
+public import EllipticPdes.Sobolev.Basic
+public import EllipticPdes.Sobolev.Coefficients
+public import EllipticPdes.Regularity.DifferenceQuotient
+public import EllipticPdes.Regularity.DiffQuotientBound
+public import EllipticPdes.Poincare.OneDim
+public import EllipticPdes.Poincare.Fubini
+public import EllipticPdes.Poincare.Domain
+public import EllipticPdes.Poincare.Density
+public import EllipticPdes.Poincare.Geometry
+public import EllipticPdes.Poincare.BoxSlice
+public import EllipticPdes.Poincare.BoundedDomain
+public import EllipticPdes.Form.BilinearForm
+public import EllipticPdes.Form.Hneg
+public import EllipticPdes.Existence.Existence
+public import EllipticPdes.Form.GeneralForm
+public import EllipticPdes.Existence.Garding
+public import EllipticPdes.Regularity.Caccioppoli
+public import EllipticPdes.Regularity.InteriorCompactSupport
+public import EllipticPdes.Regularity.CoeffC1
+public import EllipticPdes.Regularity.CoeffLip
+public import EllipticPdes.Regularity.CoeffLipWeakGrad
+public import EllipticPdes.Regularity.CoeffC2
+public import EllipticPdes.Regularity.CoeffCk
+public import EllipticPdes.Regularity.CoeffWkInfty
+public import EllipticPdes.Regularity.CoeffBridge
+public import EllipticPdes.Regularity.MollifyWkInfty
+public import EllipticPdes.Regularity.LowerOrderWkInfty
+public import EllipticPdes.Regularity.CutoffTower
+public import EllipticPdes.Regularity.RestrictedDiffQuotient
+public import EllipticPdes.Regularity.RestrictedDiffQuotientMem
+public import EllipticPdes.Regularity.Interior.Support
+public import EllipticPdes.Regularity.Interior.EnergyBound
+public import EllipticPdes.Regularity.Interior.NormBound
+public import EllipticPdes.Regularity.Interior
+public import EllipticPdes.Regularity.LeibnizWkInfty
+public import EllipticPdes.Regularity.DifferentiatedWkInfty
+public import EllipticPdes.Regularity.LocalWeakFormWkInfty
+public import EllipticPdes.Regularity.WeakFormDense
+public import EllipticPdes.Regularity.HigherWeakDeriv
+public import EllipticPdes.Regularity.MulIterated
+public import EllipticPdes.Regularity.IteratedSum
+public import EllipticPdes.Regularity.IteratedRestrict
+public import EllipticPdes.Regularity.L2Pairing
+public import EllipticPdes.Regularity.ExtendCutoff
+public import EllipticPdes.Regularity.WeakDerivOnSymm
+public import EllipticPdes.Regularity.CutoffGradFormula
+public import EllipticPdes.Regularity.CollarIdentify
+public import EllipticPdes.Regularity.CutoffCommutator
+public import EllipticPdes.Regularity.DatumPiece
+public import EllipticPdes.Regularity.CutoffDatum
+public import EllipticPdes.Regularity.SmoothGlue
+public import EllipticPdes.Regularity.HigherInterior
+public import EllipticPdes.Regularity.IteratedFamily
+public import EllipticPdes.Regularity.InteriorSmooth
+public import EllipticPdes.Regularity.InteriorSmoothGlobal
+public import EllipticPdes.Regularity.Localise.CutoffProduct
+public import EllipticPdes.Regularity.Localise.LocalOp
+public import EllipticPdes.Regularity.Localise.CompactEllipticity
+public import EllipticPdes.Regularity.Localise.Datum
+public import EllipticPdes.Regularity.Local.WeakSolution
+public import EllipticPdes.Regularity.Local.Reduction
+public import EllipticPdes.Regularity.Local.Caccioppoli
+public import EllipticPdes.Regularity.Local.InteriorH2
+public import EllipticPdes.Regularity.Local.Datum
+public import EllipticPdes.Regularity.Local.HigherInterior
+public import EllipticPdes.Regularity.Local.InteriorSmooth
+public import EllipticPdes.Regularity.Local.Evans
+public import EllipticPdes.Regularity.Localise.FiniteOrder
+public import EllipticPdes.Regularity.IteratedNorm
+public import EllipticPdes.Regularity.Local.Classical
+public import EllipticPdes.Regularity.ClassicalSolvability
+public import EllipticPdes.Regularity.PointwiseEquation
+public import EllipticPdes.Regularity.InteriorHolderFinite
+public import EllipticPdes.Regularity.DifferentiatedEquation
+public import EllipticPdes.Regularity.Boundary.HalfBall
+public import EllipticPdes.Regularity.Boundary.TangentialDiffQuotient
+public import EllipticPdes.Regularity.Boundary.TangentialDiffQuotientMem
+public import EllipticPdes.Regularity.Boundary.WeakQuotientRule
+public import EllipticPdes.Regularity.WeakLimit
+public import EllipticPdes.Regularity.CutoffDeriv
+public import EllipticPdes.Regularity.WeakDerivUnique
+public import EllipticPdes.Regularity.TestFnCut
+public import EllipticPdes.Regularity.OuterCutoffTower
+public import EllipticPdes.Regularity.LocalWeakForm
+public import EllipticPdes.Embedding.WeakGradient
+public import EllipticPdes.Embedding.Convolution
+public import EllipticPdes.Embedding.MorreyOneDim
+public import EllipticPdes.Embedding.RayIntegral
+public import EllipticPdes.Embedding.Morrey
+public import EllipticPdes.Embedding.WeakDerivBridge
+public import EllipticPdes.Campanato.Basic
+public import EllipticPdes.Campanato.Compare
+public import EllipticPdes.Campanato.Telescope
+public import EllipticPdes.Campanato.Holder
+public import EllipticPdes.Campanato.Converse
+public import EllipticPdes.Embedding.GagliardoNirenberg
+public import EllipticPdes.Embedding.SobolevLadder
+public import EllipticPdes.Embedding.SobolevLadderCompactSupport
+public import EllipticPdes.Embedding.SobolevLadderFullStep
+public import EllipticPdes.Embedding.SobolevLadderGeneral
+public import EllipticPdes.Embedding.HolderGeneral
+public import EllipticPdes.Extension.C1Test
+public import EllipticPdes.Extension.Cutoff
+public import EllipticPdes.Extension.HalfSpace
+public import EllipticPdes.Extension.EvenReflection
+public import EllipticPdes.Extension.Shear
+public import EllipticPdes.Extension.ShearWeakGrad
+public import EllipticPdes.Extension.BoundaryChart
+public import EllipticPdes.Extension.Linearity
+public import EllipticPdes.Extension.C1Boundary
+public import EllipticPdes.Extension.BallChart
+public import EllipticPdes.Extension.Motion
+public import EllipticPdes.Extension.Patch
+public import EllipticPdes.Extension.PartitionOfUnity
+public import EllipticPdes.Extension.LocalExtension
+public import EllipticPdes.Extension.Operator
+public import EllipticPdes.Extension.LinearOperator
+public import EllipticPdes.Extension.GlobalApproximation
+public import EllipticPdes.Extension.GraphOperator
+public import EllipticPdes.Extension.Reflect
+public import EllipticPdes.Extension.Translate
+public import EllipticPdes.Analysis.LpTranslationContinuity
+public import EllipticPdes.Extension.ShiftMollify
+public import EllipticPdes.Embedding.WeakGradUnique
+public import EllipticPdes.Embedding.ClassicalDeriv
+public import EllipticPdes.Embedding.SmoothOfGradClosed
+public import EllipticPdes.Embedding.HolderOfGradClosed
+public import EllipticPdes.Embedding.InteriorHolder
+public import EllipticPdes.Embedding.DomainSobolev
+public import EllipticPdes.Embedding.DomainLadder
+public import EllipticPdes.Embedding.DomainHolder
+public import EllipticPdes.Embedding.DomainSmooth
+public import EllipticPdes.Embedding.SobolevEmbedding
+public import EllipticPdes.Fredholm.Fredholm
+public import EllipticPdes.Fredholm.FredholmComplete
+public import EllipticPdes.Spectrum.SpectrumSigma
+public import EllipticPdes.Fredholm.Compactness
+public import EllipticPdes.Spectrum.Spectrum
+public import EllipticPdes.Spectrum.RellichDischarge
+public import EllipticPdes.BoundedInstances
+public import EllipticPdes.Analysis.WeakCompactness
+public import EllipticPdes.Analysis.DirectMethodForm
+public import EllipticPdes.Analysis.LpInterpolation
+public import EllipticPdes.Analysis.Dilation
+public import EllipticPdes.Embedding.H01Sobolev
+public import EllipticPdes.Embedding.SobolevSolution
+public import EllipticPdes.Embedding.RellichLq
+public import EllipticPdes.Embedding.SobolevSharp
+public import EllipticPdes.Analysis.LqDerivative
+public import EllipticPdes.Analysis.LqEulerLagrange
+public import EllipticPdes.Embedding.DirectMethod
+public import EllipticPdes.Embedding.DirichletSemilinear
+public import EllipticPdes.Regularity.InteriorHolderSolution
+public import EllipticPdes.Spectrum.Variational
+public import EllipticPdes.Spectrum.HigherEigenvalues
+public import EllipticPdes.Spectrum.EigenFamily
+public import EllipticPdes.Spectrum.Multiplicity
+public import EllipticPdes.Spectrum.BallSpectrum
+public import EllipticPdes.Spectrum.BallDimension
+public import EllipticPdes.Embedding.ConstOfGradZero
+public import EllipticPdes.Spectrum.RellichW12
+public import EllipticPdes.Spectrum.PoincareWirtinger
+public import EllipticPdes.Spectrum.PoincareBall
+public import EllipticPdes.Embedding.ChainRule
+public import EllipticPdes.Existence.WeakMaximum
+public import EllipticPdes.Sobolev.H01Lattice
+public import EllipticPdes.Embedding.H01SobolevTwo
+public import EllipticPdes.Existence.WeakMaximumTransport
+public import EllipticPdes.Existence.ClassicalMaximum
+public import EllipticPdes.Existence.StrongMaximum
+public import EllipticPdes.Existence.StrongMaximumCorollaries
+public import EllipticPdes.Existence.AprioriBound
+public import EllipticPdes.Existence.Harmonic
 
 /-!
 # EllipticPdes
@@ -194,3 +197,5 @@ characterisation.
 
 Boundary `H²` regularity has its foundations here and its headline estimate open.
 -/
+
+@[expose] public section

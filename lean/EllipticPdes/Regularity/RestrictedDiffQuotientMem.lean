@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.RestrictedDiffQuotient
+
+module
+
+public import EllipticPdes.Regularity.RestrictedDiffQuotient
 
 /-!
 # Admissibility of the cutoff of an interior difference quotient
@@ -31,6 +34,8 @@ graph lies in the span, hence in `H₀¹(Ω)`. This mirrors `cutoffMul_mem_H01` 
 * `cutoffMul_diffQuotG_mem_H01`: the cutoff of the interior difference quotient of an
   `H₀¹` element is again in `H₀¹` (the crux admissibility).
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace

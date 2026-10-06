@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.Interior
+
+module
+
+public import EllipticPdes.Regularity.Interior
 
 /-!
 # Iterated weak derivatives on a region
@@ -35,6 +38,8 @@ family rather than part of its definition. Nothing here presumes it.
   (p. 65) runs on.
 * `IteratedL2Bound`: a uniform bound on every member of the family up to order `k`.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 
@@ -131,7 +136,7 @@ theorem hasWeakDerivOn_D_singleton (hu : HasIteratedWeakDerivOn V (k + 1) u) (m 
 /-- The assembly a family is read off: the empty list is the function, and a nonempty list is
 the family of its last direction's derivative, indexed by what remains. Reversing is what makes
 the last direction visible, since `D_step` conses on the left. -/
-private def famAux (u : L2D V) (E : Fin d → List (Fin d) → L2D V) :
+def famAux (u : L2D V) (E : Fin d → List (Fin d) → L2D V) :
     List (Fin d) → L2D V
   | [] => u
   | (ℓ :: βr) => E ℓ βr.reverse

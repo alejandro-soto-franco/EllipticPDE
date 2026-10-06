@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.CoeffLip
-import EllipticPdes.Regularity.Interior.Support
+
+module
+
+public import EllipticPdes.Regularity.CoeffLip
+public import EllipticPdes.Regularity.Interior.Support
 
 /-!
 # Master interior difference-quotient energy estimate
@@ -23,6 +26,8 @@ commutator, cross, zeroth-order, and right-hand terms.
   membership is two applications of `cutoffMul_diffQuotG_mem_H01`.
 * `interior_diffQuot_energy_bound`: the master energy estimate the sections below assemble.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace

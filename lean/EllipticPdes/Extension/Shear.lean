@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Extension.C1Test
-import Mathlib.MeasureTheory.Function.Jacobian
-import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
+
+module
+
+public import EllipticPdes.Extension.C1Test
+public import Mathlib.MeasureTheory.Function.Jacobian
+public import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 
 /-!
 # Shear of a `C¹` boundary chart
@@ -31,6 +34,8 @@ variables leaves every integral unchanged.
 
 L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.4, and §C.1 for the boundary chart.
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric Filter Topology Set
 open scoped NNReal ENNReal

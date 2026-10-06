@@ -3,17 +3,20 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.DifferenceQuotient
-import EllipticPdes.Sobolev.Basic
-import Mathlib.MeasureTheory.Measure.QuasiMeasurePreserving
-import Mathlib.Dynamics.Ergodic.MeasurePreserving
-import Mathlib.MeasureTheory.Function.LpSpace.ContinuousCompMeasurePreserving
-import Mathlib.MeasureTheory.Measure.SeparableMeasure
-import Mathlib.Analysis.InnerProductSpace.Dual
-import Mathlib.Analysis.Normed.Module.WeakDual
-import Mathlib.Topology.CompactOpen
-import Mathlib.Analysis.Normed.Lp.SmoothApprox
-import Mathlib.MeasureTheory.Integral.Prod
+
+module
+
+public import EllipticPdes.Regularity.DifferenceQuotient
+public import EllipticPdes.Sobolev.Basic
+public import Mathlib.MeasureTheory.Measure.QuasiMeasurePreserving
+public import Mathlib.Dynamics.Ergodic.MeasurePreserving
+public import Mathlib.MeasureTheory.Function.LpSpace.ContinuousCompMeasurePreserving
+public import Mathlib.MeasureTheory.Measure.SeparableMeasure
+public import Mathlib.Analysis.InnerProductSpace.Dual
+public import Mathlib.Analysis.Normed.Module.WeakDual
+public import Mathlib.Topology.CompactOpen
+public import Mathlib.Analysis.Normed.Lp.SmoothApprox
+public import Mathlib.MeasureTheory.Integral.Prod
 
 /-!
 # Difference-quotient norm bounds
@@ -29,6 +32,8 @@ representative `φ`, by the fundamental theorem of calculus along the segment
 (`MeasureTheory.sq_intervalIntegral_le`), a Tonelli swap of the order of
 integration, and translation invariance of the Lebesgue integral.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Metric
 open scoped RealInnerProductSpace

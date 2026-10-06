@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.DiffQuotientBound
+
+module
+
+public import EllipticPdes.Regularity.DiffQuotientBound
 
 /-!
 # Uniqueness of the whole-space weak derivative
@@ -25,6 +28,8 @@ class. This file supplies that step.
   supported class is zero.
 * `HasWeakDeriv.unique`: the weak `k`-derivative is unique as an `L²` class.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace ENNReal

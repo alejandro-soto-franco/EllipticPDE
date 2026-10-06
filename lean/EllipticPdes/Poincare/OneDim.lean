@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Analysis.PoincareInequality
+
+module
+
+public import EllipticPdes.Analysis.PoincareInequality
 
 /-!
 # One-dimensional Poincaré inequality
@@ -18,6 +21,8 @@ This file re-exports the Mathlib declarations under the
 * `sq_intervalIntegral_le`: the `g = 1` special case.
 * `poincare_oneDim`: the one-dimensional Poincaré inequality.
 -/
+
+@[expose] public section
 
 namespace EllipticPdes.Poincare
 

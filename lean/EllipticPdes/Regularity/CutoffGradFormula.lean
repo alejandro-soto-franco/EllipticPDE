@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.ExtendCutoff
-import EllipticPdes.Regularity.WeakDerivUnique
-import EllipticPdes.Regularity.CutoffDeriv
+
+module
+
+public import EllipticPdes.Regularity.ExtendCutoff
+public import EllipticPdes.Regularity.WeakDerivUnique
+public import EllipticPdes.Regularity.CutoffDeriv
 
 /-!
 # Gradient of a cut-off function in closed form
@@ -31,6 +34,8 @@ on `Ω`.
 * `extendL2_mulTest_eq`: a cut-off class is the cut-off restriction.
 * `extendL2_cutoffGrad_eq`: the gradient coordinates of the cut-off element, in closed form.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

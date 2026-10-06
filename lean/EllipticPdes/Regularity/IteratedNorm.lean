@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.HigherWeakDeriv
+
+module
+
+public import EllipticPdes.Regularity.HigherWeakDeriv
 
 /-!
 # `H^k` norm of an iterated family
@@ -30,6 +33,8 @@ not depend on the family chosen.
 * `norm_D_le_iteratedNorm`: every entry of the family is bounded by it.
 * `iteratedNorm_le`: a uniform bound on the entries bounds it, with a constant in `d` and `k`.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

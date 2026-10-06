@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Analysis.FrechetKolmogorov
+
+module
+
+public import EllipticPdes.Analysis.FrechetKolmogorov
 
 /-!
 # Difference quotients on `L²(ℝⁿ)`
@@ -14,6 +17,8 @@ here as a continuous linear map on the whole-space space `EucL2 d`, built from t
 isometry `transL2`, so that its adjoint and norm bounds descend from translation invariance of
 Lebesgue measure.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace

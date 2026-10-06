@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.InteriorSmooth
+
+module
+
+public import EllipticPdes.Regularity.InteriorSmooth
 
 /-!
 # Infinite differentiability on the whole of the interior
@@ -23,6 +26,8 @@ family `interior_smooth` supplies is the whole proof.
 * `interior_smooth_global`: Evans's Theorem 3, with one representative smooth on all of `Ω`
   rather than on the interior of each compact exhaustion piece.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 

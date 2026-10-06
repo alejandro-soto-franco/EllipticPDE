@@ -3,10 +3,13 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Sobolev.Basic
-import EllipticPdes.Embedding.Morrey
-import Mathlib.Analysis.FunctionalSpaces.SobolevInequality
-import Mathlib.MeasureTheory.Function.ConvergenceInMeasure
+
+module
+
+public import EllipticPdes.Sobolev.Basic
+public import EllipticPdes.Embedding.Morrey
+public import Mathlib.Analysis.FunctionalSpaces.SobolevInequality
+public import Mathlib.MeasureTheory.Function.ConvergenceInMeasure
 
 /-!
 # Sobolev embedding of `H₀¹(Ω)`
@@ -54,6 +57,8 @@ Two are supplied: the critical exponent on any `Ω`, and every exponent below it
 L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.6.1, Theorem 1; H. Brezis,
 *Functional Analysis, Sobolev Spaces and Partial Differential Equations*, Corollary 9.9.
 -/
+
+@[expose] public section
 
 noncomputable section
 

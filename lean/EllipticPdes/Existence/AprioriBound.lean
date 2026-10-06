@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Existence.ClassicalMaximum
+
+module
+
+public import EllipticPdes.Existence.ClassicalMaximum
 
 /-!
 # A priori bound from the maximum principle
@@ -26,6 +29,8 @@ Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theore
 (p. 103); D. Gilbarg and N. S. Trudinger, *Elliptic Partial Differential Equations of Second
 Order*, Theorem 3.7 (p. 36).
 -/
+
+@[expose] public section
 
 open Set Filter Topology Metric
 

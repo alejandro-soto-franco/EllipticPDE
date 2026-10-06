@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Sobolev.Coefficients
-import EllipticPdes.Regularity.DifferenceQuotient
-import Mathlib.Analysis.Calculus.MeanValue
+
+module
+
+public import EllipticPdes.Sobolev.Coefficients
+public import EllipticPdes.Regularity.DifferenceQuotient
+public import Mathlib.Analysis.Calculus.MeanValue
 
 /-!
 # `C¹` coefficients and the coefficient difference-quotient bound
@@ -19,6 +22,8 @@ top of `EllipticCoeff`, leaving every existing consumer of `EllipticCoeff` untou
 proves the coefficient difference-quotient bound `abs_diffQuot_coeff_le` by the segment
 mean-value inequality.
 -/
+
+@[expose] public section
 
 open MeasureTheory
 open scoped RealInnerProductSpace

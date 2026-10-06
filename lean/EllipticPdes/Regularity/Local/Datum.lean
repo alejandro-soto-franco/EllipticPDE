@@ -3,9 +3,12 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.Local.InteriorH2
-import EllipticPdes.Regularity.DatumPiece
-import EllipticPdes.Regularity.CollarIdentify
+
+module
+
+public import EllipticPdes.Regularity.Local.InteriorH2
+public import EllipticPdes.Regularity.DatumPiece
+public import EllipticPdes.Regularity.CollarIdentify
 
 /-!
 # Higher-order datum of the cutoff reduction
@@ -30,6 +33,8 @@ pairing reads off `reduction_testFn` with no classical derivative anywhere.
 * `exists_collarFamily_of_weakDerivOn`: `exists_collarFamily` with a weak derivative on the
   outer set in place of one on the whole space.
 -/
+
+@[expose] public section
 
 open MeasureTheory Filter Topology
 open scoped RealInnerProductSpace

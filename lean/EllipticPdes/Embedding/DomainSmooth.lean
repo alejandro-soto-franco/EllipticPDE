@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.DomainHolder
-import EllipticPdes.Embedding.ClassicalDeriv
+
+module
+
+public import EllipticPdes.Embedding.DomainHolder
+public import EllipticPdes.Embedding.ClassicalDeriv
 
 /-!
 # Classical derivatives up to the boundary
@@ -31,6 +34,8 @@ bounds the supremum and the Hölder seminorm of every member on `closure Ω` by 
 Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem IV.2.3 case
 (ii); L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.6.3 Theorem 6 clause (ii).
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric Set
 open scoped NNReal ENNReal

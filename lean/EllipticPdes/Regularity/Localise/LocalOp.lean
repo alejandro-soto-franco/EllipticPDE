@@ -3,7 +3,10 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Regularity.Localise.CutoffProduct
+
+module
+
+public import EllipticPdes.Regularity.Localise.CutoffProduct
 
 /-!
 # Localising coefficients smooth on an open set into a global elliptic operator
@@ -37,6 +40,8 @@ convexity of the quadratic form in `χ` between the two extremes, needing no sym
   `localOp` agrees with the given coefficients and meets every regularity mixin
   `interior_smooth` asks for.
 -/
+
+@[expose] public section
 
 open MeasureTheory Set Filter
 open scoped Topology ContDiff

@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Embedding.DomainSmooth
-import EllipticPdes.Embedding.HolderGeneral
+
+module
+
+public import EllipticPdes.Embedding.DomainSmooth
+public import EllipticPdes.Embedding.HolderGeneral
 
 /-!
 # Sobolev embedding at order `k`
@@ -52,6 +55,8 @@ reciprocal to zero, the ladder reaches every finite exponent, and the Hölder ex
 Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem IV.2.3
 (pp. 32-33); L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.6.3 Theorem 6.
 -/
+
+@[expose] public section
 
 open MeasureTheory Metric Set
 open scoped NNReal ENNReal

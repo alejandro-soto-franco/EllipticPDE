@@ -3,8 +3,11 @@ Copyright (c) 2026 Alejandro Soto Franco. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alejandro Soto Franco
 -/
-import EllipticPdes.Fredholm.Fredholm
-import Mathlib.Analysis.InnerProductSpace.Spectrum
+
+module
+
+public import EllipticPdes.Fredholm.Fredholm
+public import Mathlib.Analysis.InnerProductSpace.Spectrum
 
 /-!
 # Complete Fredholm theory
@@ -28,6 +31,8 @@ Remaining for the full Theorem 4(ii)/(iii) statement (planned here): closed rang
 `1 - opK`, the adjoint problem via the transpose form `B(·, v)`, the solvability
 criterion `Lu = f` solvable ↔ `f ⊥ N*`, and `dim N = dim N*`.
 -/
+
+@[expose] public section
 
 open MeasureTheory InnerProductSpace
 open scoped RealInnerProductSpace
