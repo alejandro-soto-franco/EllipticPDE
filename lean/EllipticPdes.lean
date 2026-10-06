@@ -63,7 +63,6 @@ public import EllipticPdes.Regularity.InteriorSmooth
 public import EllipticPdes.Regularity.InteriorSmoothGlobal
 public import EllipticPdes.Regularity.Localise.CutoffProduct
 public import EllipticPdes.Regularity.Localise.LocalOp
-public import EllipticPdes.Regularity.Localise.CompactEllipticity
 public import EllipticPdes.Regularity.Localise.Datum
 public import EllipticPdes.Regularity.Local.WeakSolution
 public import EllipticPdes.Regularity.Local.Reduction
