@@ -90,26 +90,6 @@ theorem indepCoord_convolution {j : Fin d} {c : EuclideanSpace ℝ (Fin d) → �
       = (y - s) + t • EuclideanSpace.single j (1 : ℝ) := by abel
   rw [hshift, hind (y - s) t]
 
-/-- **Bound on a mollification of a bounded factor.** The normed bump is a probability density,
-so the convolution is an average and inherits the bound with no compact support to lean on. -/
-theorem norm_convolution_normed_le_of_bound (ρ : ContDiffBump (0 : EuclideanSpace ℝ (Fin d)))
-    {h : EuclideanSpace ℝ (Fin d) → ℝ} (hc : Continuous h) {M : ℝ} (hM : ∀ y, ‖h y‖ ≤ M)
-    (x : EuclideanSpace ℝ (Fin d)) : ‖(ρ.normed volume ⋆[Lsm, volume] h) x‖ ≤ M := by
-  have hρc : Continuous (ρ.normed volume) :=
-    (ρ.contDiff_normed : ContDiff ℝ (⊤ : ℕ∞) _).continuous
-  have hρint : Integrable (ρ.normed volume) volume := ρ.integrable_normed
-  have hex : ConvolutionExistsAt (ρ.normed volume) h x Lsm volume :=
-    ρ.hasCompactSupport_normed.convolutionExists_left (L := Lsm) hρc hc.locallyIntegrable x
-  rw [convolution_def]
-  calc ‖∫ t, (Lsm (ρ.normed volume t)) (h (x - t))‖
-      ≤ ∫ t, ‖(Lsm (ρ.normed volume t)) (h (x - t))‖ := norm_integral_le_integral_norm _
-    _ ≤ ∫ t, ρ.normed volume t * M := by
-        refine integral_mono hex.norm (hρint.mul_const M) fun t => ?_
-        simp only [ContinuousLinearMap.lsmul_apply, smul_eq_mul, norm_mul, Real.norm_eq_abs,
-          abs_of_nonneg (ρ.nonneg_normed t)]
-        exact mul_le_mul_of_nonneg_left (hM _) (ρ.nonneg_normed t)
-    _ = M := by rw [integral_mul_const, ρ.integral_normed, one_mul]
-
 /-! ### Integration by parts against a scaled test function -/
 
 /-- **Integration by parts against a bounded factor independent of the `j`-th coordinate.** The
@@ -125,102 +105,33 @@ theorem integral_mul_indepCoord {B : Set (EuclideanSpace ℝ (Fin d))} (hBopen :
     {ψ : EuclideanSpace ℝ (Fin d) → ℝ} (hψ : ContDiff ℝ 1 ψ) (hψcs : HasCompactSupport ψ)
     (hψs : tsupport ψ ⊆ B) :
     ∫ x in B, u x * (c x * partialD j ψ x) = - ∫ x in B, g j x * (c x * ψ x) := by
-  classical
-  have hM0 : (0 : ℝ) ≤ M := le_trans (norm_nonneg (c 0)) (hcb 0)
-  have hψc : Continuous ψ := hψ.continuous
-  have hdc : Continuous (partialD j ψ) :=
-    (hψ.continuous_fderiv one_ne_zero).clm_apply continuous_const
-  have hdcs : HasCompactSupport (partialD j ψ) :=
-    (hψcs.fderiv ℝ).comp_left (g := fun T : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ =>
-      T (EuclideanSpace.single j (1 : ℝ))) (by simp)
-  obtain ⟨P, hP⟩ := hψcs.exists_bound_of_continuous hψc
-  obtain ⟨N, hN⟩ := hdcs.exists_bound_of_continuous hdc
-  have hN0 : (0 : ℝ) ≤ N := le_trans (norm_nonneg _) (hN 0)
-  have hP0 : (0 : ℝ) ≤ P := le_trans (norm_nonneg _) (hP 0)
-  -- the mollifier family
-  set ρ : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := fun n =>
-    { rIn := 1 / (n + 1) / 2
-      rOut := 1 / (n + 1)
-      rIn_pos := by positivity
-      rIn_lt_rOut := half_lt_self (by positivity) } with hρdef
-  have hrOut : Tendsto (fun n => (ρ n).rOut) atTop (𝓝 0) := by
-    simpa using tendsto_one_div_add_atTop_nhds_zero_nat
-  have hcnsmooth : ∀ n, ContDiff ℝ (⊤ : ℕ∞) ((ρ n).normed volume ⋆[Lsm, volume] c) := fun n =>
+  obtain ⟨P, hP⟩ := hψcs.exists_bound_of_continuous hψ.continuous
+  obtain ⟨N, hN⟩ := (hψcs.partialD j).exists_bound_of_continuous
+    (hψ.continuous_partialD one_ne_zero j)
+  set ρ : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := mollifier 1 one_pos
+  set cn : ℕ → EuclideanSpace ℝ (Fin d) → ℝ := fun n => (ρ n).normed volume ⋆[Lsm, volume] c
+  have hsm : ∀ n, ContDiff ℝ (⊤ : ℕ∞) (cn n) := fun n =>
     (ρ n).hasCompactSupport_normed.contDiff_convolution_left (L := Lsm) (ρ n).contDiff_normed
       hc.locallyIntegrable
-  have hcndiff : ∀ n, Differentiable ℝ ((ρ n).normed volume ⋆[Lsm, volume] c) := fun n =>
-    (hcnsmooth n).differentiable (by simp)
-  have hcnind : ∀ n, IndepCoord j ((ρ n).normed volume ⋆[Lsm, volume] c) := fun n =>
-    indepCoord_convolution hcind (ρ n)
-  have hcnb : ∀ n x, ‖((ρ n).normed volume ⋆[Lsm, volume] c) x‖ ≤ M := fun n x =>
-    norm_convolution_normed_le_of_bound (ρ n) hc hcb x
-  have hcnconv : ∀ x, Tendsto (fun n => ((ρ n).normed volume ⋆[Lsm, volume] c) x) atTop
-      (𝓝 (c x)) := fun x =>
-    ContDiffBump.convolution_tendsto_right_of_continuous (μ := volume) hrOut hc x
-  -- the mollified test functions
-  have hθC1 : ∀ n, ContDiff ℝ 1
-      (fun z => ((ρ n).normed volume ⋆[Lsm, volume] c) z * ψ z) := fun n =>
-    ((hcnsmooth n).of_le (by exact_mod_cast le_top)).mul hψ
-  have hθcs : ∀ n, HasCompactSupport
-      (fun z => ((ρ n).normed volume ⋆[Lsm, volume] c) z * ψ z) := fun n => hψcs.mul_left
-  have hθs : ∀ n, tsupport (fun z => ((ρ n).normed volume ⋆[Lsm, volume] c) z * ψ z) ⊆ B := by
-    intro n
-    refine subset_trans (closure_mono ?_) hψs
-    intro x hx
-    simp only [Function.mem_support] at hx ⊢
-    intro h
-    exact hx (by rw [h, mul_zero])
-  have hθd : ∀ n x, partialD j (fun z => ((ρ n).normed volume ⋆[Lsm, volume] c) z * ψ z) x
-      = ((ρ n).normed volume ⋆[Lsm, volume] c) x * partialD j ψ x := by
-    intro n x
-    have hzero : partialD j ((ρ n).normed volume ⋆[Lsm, volume] c) x = 0 :=
-      partialD_eq_zero_of_indepCoord (hcndiff n) (hcnind n) x
-    rw [partialD_mul j (hcndiff n x) (hψ.differentiable (by simp) x), hzero, zero_mul, zero_add]
-  -- the identity, at every mollification
-  have hid : ∀ n, ∫ x in B, u x * (((ρ n).normed volume ⋆[Lsm, volume] c) x * partialD j ψ x)
-      = - ∫ x in B, g j x * (((ρ n).normed volume ⋆[Lsm, volume] c) x * ψ x) := by
-    intro n
-    have h := hasWeakGradOn_contDiffOne hBopen hu hgi hwg (hθC1 n) (hθcs n) (hθs n) j
-    have hleft : ∫ x in B,
-          u x * partialD j (fun z => ((ρ n).normed volume ⋆[Lsm, volume] c) z * ψ z) x
-        = ∫ x in B, u x * (((ρ n).normed volume ⋆[Lsm, volume] c) x * partialD j ψ x) :=
-      integral_congr_ae (Filter.Eventually.of_forall fun x => by dsimp only; rw [hθd n x])
-    rw [← hleft]
-    exact h
-  -- both sides converge, by dominated convergence on `B`
-  have hL : Tendsto (fun n => ∫ x in B,
-        u x * (((ρ n).normed volume ⋆[Lsm, volume] c) x * partialD j ψ x)) atTop
-      (𝓝 (∫ x in B, u x * (c x * partialD j ψ x))) := by
-    refine tendsto_integral_of_dominated_convergence (fun x => M * N * ‖u x‖) ?_ ?_ ?_ ?_
-    · exact fun n => hu.1.mul (((hcnsmooth n).continuous.mul hdc)).aestronglyMeasurable
-    · exact hu.norm.const_mul (M * N)
-    · intro n
-      filter_upwards with x
-      have hb : ‖((ρ n).normed volume ⋆[Lsm, volume] c) x * partialD j ψ x‖ ≤ M * N := by
-        rw [norm_mul]
-        exact mul_le_mul (hcnb n x) (hN x) (norm_nonneg _) hM0
-      calc ‖u x * (((ρ n).normed volume ⋆[Lsm, volume] c) x * partialD j ψ x)‖
-          = ‖u x‖ * ‖((ρ n).normed volume ⋆[Lsm, volume] c) x * partialD j ψ x‖ := norm_mul _ _
-        _ ≤ ‖u x‖ * (M * N) := mul_le_mul_of_nonneg_left hb (norm_nonneg _)
-        _ = M * N * ‖u x‖ := by ring
-    · filter_upwards with x using ((hcnconv x).mul_const (partialD j ψ x)).const_mul (u x)
-  have hR : Tendsto (fun n => ∫ x in B,
-        g j x * (((ρ n).normed volume ⋆[Lsm, volume] c) x * ψ x)) atTop
-      (𝓝 (∫ x in B, g j x * (c x * ψ x))) := by
-    refine tendsto_integral_of_dominated_convergence (fun x => M * P * ‖g j x‖) ?_ ?_ ?_ ?_
-    · exact fun n => (hgi j).1.mul (((hcnsmooth n).continuous.mul hψc)).aestronglyMeasurable
-    · exact (hgi j).norm.const_mul (M * P)
-    · intro n
-      filter_upwards with x
-      have hb : ‖((ρ n).normed volume ⋆[Lsm, volume] c) x * ψ x‖ ≤ M * P := by
-        rw [norm_mul]
-        exact mul_le_mul (hcnb n x) (hP x) (norm_nonneg _) hM0
-      calc ‖g j x * (((ρ n).normed volume ⋆[Lsm, volume] c) x * ψ x)‖
-          = ‖g j x‖ * ‖((ρ n).normed volume ⋆[Lsm, volume] c) x * ψ x‖ := norm_mul _ _
-        _ ≤ ‖g j x‖ * (M * P) := mul_le_mul_of_nonneg_left hb (norm_nonneg _)
-        _ = M * P * ‖g j x‖ := by ring
-    · filter_upwards with x using ((hcnconv x).mul_const (ψ x)).const_mul (g j x)
-  exact tendsto_nhds_unique hL (by simpa only [hid] using hR.neg)
+  have hrOut := tendsto_rOut_mollifier (E := EuclideanSpace ℝ (Fin d)) 1 one_pos
+  refine integral_eq_neg_integral_of_tendsto hBopen.measurableSet hu (hgi j)
+    (F := fun n x => cn n x * partialD j ψ x) (G := fun n x => cn n x * ψ x)
+    (fun n => (hsm n).continuous.mul (hψ.continuous_partialD one_ne_zero j))
+    (fun n => (hsm n).continuous.mul hψ.continuous)
+    (N := M * N) (P := M * P)
+    (fun n x => norm_mul_le_of_le (norm_normed_convolution_le (ρ n) hc hcb x) (hN x))
+    (fun n x => norm_mul_le_of_le (norm_normed_convolution_le (ρ n) hc hcb x) (hP x))
+    (fun x _ => (ContDiffBump.convolution_tendsto_right_of_continuous (μ := volume) hrOut hc
+      x).mul_const _)
+    (fun x _ => (ContDiffBump.convolution_tendsto_right_of_continuous (μ := volume) hrOut hc
+      x).mul_const _) fun n => ?_
+  have hθd : ∀ x, partialD j (fun z => cn n z * ψ z) x = cn n x * partialD j ψ x := fun x => by
+    rw [partialD_mul j ((hsm n).differentiable (by simp) x) (hψ.differentiable (by simp) x),
+      partialD_eq_zero_of_indepCoord ((hsm n).differentiable (by simp))
+        (indepCoord_convolution hcind (ρ n)) x, zero_mul, zero_add]
+  simpa only [hθd] using hasWeakGradOn_contDiffOne hBopen hu hgi hwg
+    (((hsm n).of_le (by exact_mod_cast le_top)).mul hψ) hψcs.mul_left
+    (tsupport_mul_subset_right.trans hψs) j
 
 /-! ### The weak gradient of a composition with a shear -/
 
@@ -240,113 +151,68 @@ theorem hasWeakGradOn_comp_shear {B : Set (EuclideanSpace ℝ (Fin d))} (hBopen 
     (hγb : ∀ (k : Fin d) (y : EuclideanSpace ℝ (Fin d)), ‖partialD k γ y‖ ≤ M) :
     HasWeakGradOn (shear j γ ⁻¹' B) (fun y => u (shear j γ y))
       (fun k y => g k (shear j γ y) + g j (shear j γ y) * partialD k γ y) := by
-  classical
   intro φ hφ hφcs hφs k
   have hγd : Differentiable ℝ γ := hγ.differentiable (by simp)
-  have hnegC1 : ContDiff ℝ 1 fun z => -γ z := hγ.neg
-  have hnegcont : Continuous fun z => -γ z := hnegC1.continuous
-  have hckc : Continuous (partialD k γ) :=
-    (hγ.continuous_fderiv one_ne_zero).clm_apply continuous_const
+  have hnegcont : Continuous fun z => -γ z := hγ.continuous.neg
+  have hckc : Continuous (partialD k γ) := hγ.continuous_partialD one_ne_zero k
   have hckind : IndepCoord j (partialD k γ) := indepCoord_partialD hγd hind
   -- the chart's partial derivative sees no change along the shear
   have hckS : ∀ (m : Fin d) (y : EuclideanSpace ℝ (Fin d)),
       partialD m γ (shear j γ y) = partialD m γ y := fun m y =>
     indepCoord_partialD (k := m) hγd hind y (γ y)
   -- the test function, pulled back through the inverse shear
-  obtain ⟨Ψ, hΨ⟩ : ∃ Ψ, Ψ = fun x => φ (shear j (fun z => -γ z) x) := ⟨_, rfl⟩
-  have hΨC1 : ContDiff ℝ 1 Ψ := by
-    rw [hΨ]
-    exact (hφ.of_le (by exact_mod_cast le_top)).comp (contDiff_shear hnegC1)
-  have hΨcs : HasCompactSupport Ψ := by
-    rw [hΨ]
-    exact hφcs.comp_homeomorph (shearHomeomorph hnegcont hind.neg)
-  have hΨS : ∀ y, Ψ (shear j γ y) = φ y := by
-    intro y
-    simp only [hΨ]
-    rw [shear_shear_neg hind y]
-  have hΨs : tsupport Ψ ⊆ B := by
-    have hsub1 : tsupport Ψ ⊆ shear j (fun z => -γ z) ⁻¹' tsupport φ := by
-      refine closure_minimal ?_ (IsClosed.preimage (continuous_shear hnegcont) isClosed_closure)
-      intro x hx
-      refine Set.mem_preimage.mpr (subset_tsupport φ ?_)
-      simp only [hΨ, Function.mem_support] at hx
-      exact hx
-    intro x hx
-    have h2 := hφs (hsub1 hx)
-    simp only [Set.mem_preimage] at h2
-    rwa [shear_neg_shear hind x] at h2
+  set Ψ : EuclideanSpace ℝ (Fin d) → ℝ := φ ∘ shearHomeomorph hnegcont hind.neg with hΨ
+  have hΨC1 : ContDiff ℝ 1 Ψ :=
+    (hφ.of_le (by exact_mod_cast le_top)).comp (contDiff_shear hγ.neg)
+  have hΨcs : HasCompactSupport Ψ := hφcs.comp_homeomorph _
+  have hΨS : ∀ y, Ψ (shear j γ y) = φ y := fun y => by
+    simp only [hΨ, Function.comp_apply]
+    exact congrArg φ (shear_shear_neg hind y)
+  have hΨs : tsupport Ψ ⊆ B := fun x hx => by
+    rw [hΨ, tsupport_comp_homeomorph] at hx
+    simpa [shearHomeomorph, shear_neg_shear hind x] using hφs hx
   -- the chain rule for the smooth test function
   have hchain : ∀ y, partialD k φ y
-      = partialD k Ψ (shear j γ y) + partialD j Ψ (shear j γ y) * partialD k γ y := by
-    intro y
-    have hΨd : Differentiable ℝ Ψ := hΨC1.differentiable (by simp)
-    have hcomp := partialD_comp_shear (j := j) (γ := γ) (φ := Ψ) hγd hΨd k y
-    have hfun : (fun z => Ψ (shear j γ z)) = φ := funext hΨS
-    rwa [hfun] at hcomp
+      = partialD k Ψ (shear j γ y) + partialD j Ψ (shear j γ y) * partialD k γ y := fun y => by
+    have hcomp := partialD_comp_shear (j := j) (γ := γ) (φ := Ψ) hγd
+      (hΨC1.differentiable (by simp)) k y
+    rwa [show (fun z => Ψ (shear j γ z)) = φ from funext hΨS] at hcomp
   -- the change of variables, in both directions
   have hmp : MeasurePreserving (shear j γ) volume volume := measurePreserving_shear hγd hind
   have hme : MeasurableEmbedding (shear j γ) := measurableEmbedding_shear hγd.continuous hind
   have hcv : ∀ F : EuclideanSpace ℝ (Fin d) → ℝ,
       ∫ y in shear j γ ⁻¹' B, F (shear j γ y) = ∫ x in B, F x :=
     fun F => hmp.setIntegral_preimage_emb hme F B
-  -- bounds and integrability of the four pieces
-  have hΨc : Continuous Ψ := hΨC1.continuous
-  have hdkc : Continuous (partialD k Ψ) :=
-    (hΨC1.continuous_fderiv one_ne_zero).clm_apply continuous_const
-  have hdjc : Continuous (partialD j Ψ) :=
-    (hΨC1.continuous_fderiv one_ne_zero).clm_apply continuous_const
-  have hdkcs : HasCompactSupport (partialD k Ψ) :=
-    (hΨcs.fderiv ℝ).comp_left (g := fun T : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ =>
-      T (EuclideanSpace.single k (1 : ℝ))) (by simp)
-  have hdjcs : HasCompactSupport (partialD j Ψ) :=
-    (hΨcs.fderiv ℝ).comp_left (g := fun T : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ =>
-      T (EuclideanSpace.single j (1 : ℝ))) (by simp)
-  obtain ⟨Pk, hPk⟩ := hdkcs.exists_bound_of_continuous hdkc
-  obtain ⟨Pj, hPj⟩ := hdjcs.exists_bound_of_continuous hdjc
-  obtain ⟨PΨ, hPΨ⟩ := hΨcs.exists_bound_of_continuous hΨc
-  have hmul : ∀ {w h : EuclideanSpace ℝ (Fin d) → ℝ}, IntegrableOn w B volume →
-      Continuous h → ∀ {C : ℝ}, (∀ x, ‖h x‖ ≤ C) → IntegrableOn (fun x => w x * h x) B volume := by
-    intro w h hw hcont C hC
-    have hbd := hw.bdd_mul (f := h) hcont.aestronglyMeasurable
-      (Filter.Eventually.of_forall hC)
-    exact hbd.congr (Filter.Eventually.of_forall fun x => mul_comm (h x) (w x))
-  have hi1 : IntegrableOn (fun x => u x * partialD k Ψ x) B volume := hmul hu hdkc hPk
+  -- integrability of the four pieces
+  have hdj : Continuous (partialD j Ψ) := hΨC1.continuous_partialD one_ne_zero j
+  have hi1 : IntegrableOn (fun x => u x * partialD k Ψ x) B volume :=
+    hu.mul_of_hasCompactSupport (hΨC1.continuous_partialD one_ne_zero k) (hΨcs.partialD k)
   have hi2 : IntegrableOn (fun x => u x * (partialD k γ x * partialD j Ψ x)) B volume :=
-    hmul hu (hckc.mul hdjc) (fun x => by
-      rw [norm_mul]; exact mul_le_mul (hγb k x) (hPj x) (norm_nonneg _)
-        (le_trans (norm_nonneg _) (hγb k 0)))
-  have hi3 : IntegrableOn (fun x => g k x * Ψ x) B volume := hmul (hgi k) hΨc hPΨ
+    hu.mul_of_hasCompactSupport (hckc.mul hdj) (hΨcs.partialD j).mul_left
+  have hi3 : IntegrableOn (fun x => g k x * Ψ x) B volume :=
+    (hgi k).mul_of_hasCompactSupport hΨC1.continuous hΨcs
   have hi4 : IntegrableOn (fun x => g j x * (partialD k γ x * Ψ x)) B volume :=
-    hmul (hgi j) (hckc.mul hΨc) (fun x => by
-      rw [norm_mul]; exact mul_le_mul (hγb k x) (hPΨ x) (norm_nonneg _)
-        (le_trans (norm_nonneg _) (hγb k 0)))
-  -- both sides, moved onto `B`
+    (hgi j).mul_of_hasCompactSupport (hckc.mul hΨC1.continuous) hΨcs.mul_left
+  -- both sides, moved onto `B` and split
   have hLeq : ∫ y in shear j γ ⁻¹' B, u (shear j γ y) * partialD k φ y
-      = ∫ x in B, u x * (partialD k Ψ x + partialD j Ψ x * partialD k γ x) := by
-    rw [← hcv fun x => u x * (partialD k Ψ x + partialD j Ψ x * partialD k γ x)]
+      = (∫ x in B, u x * partialD k Ψ x)
+        + ∫ x in B, u x * (partialD k γ x * partialD j Ψ x) := by
+    rw [← integral_add hi1 hi2,
+      ← hcv fun x => u x * partialD k Ψ x + u x * (partialD k γ x * partialD j Ψ x)]
     refine integral_congr_ae (Filter.Eventually.of_forall fun y => ?_)
     dsimp only
     rw [hchain y, hckS k y]
+    ring
   have hReq : ∫ y in shear j γ ⁻¹' B,
         (g k (shear j γ y) + g j (shear j γ y) * partialD k γ y) * φ y
-      = ∫ x in B, (g k x + g j x * partialD k γ x) * Ψ x := by
-    rw [← hcv fun x => (g k x + g j x * partialD k γ x) * Ψ x]
+      = (∫ x in B, g k x * Ψ x) + ∫ x in B, g j x * (partialD k γ x * Ψ x) := by
+    rw [← integral_add hi3 hi4,
+      ← hcv fun x => g k x * Ψ x + g j x * (partialD k γ x * Ψ x)]
     refine integral_congr_ae (Filter.Eventually.of_forall fun y => ?_)
     dsimp only
     rw [hckS k y, hΨS y]
-  have hsplitL : ∫ x in B, u x * (partialD k Ψ x + partialD j Ψ x * partialD k γ x)
-      = (∫ x in B, u x * partialD k Ψ x)
-        + ∫ x in B, u x * (partialD k γ x * partialD j Ψ x) := by
-    rw [← integral_add hi1 hi2]
-    refine integral_congr_ae (Filter.Eventually.of_forall fun x => ?_)
     ring
-  have hsplitR : ∫ x in B, (g k x + g j x * partialD k γ x) * Ψ x
-      = (∫ x in B, g k x * Ψ x) + ∫ x in B, g j x * (partialD k γ x * Ψ x) := by
-    rw [← integral_add hi3 hi4]
-    refine integral_congr_ae (Filter.Eventually.of_forall fun x => ?_)
-    ring
-  rw [hLeq, hsplitL, hReq, hsplitR,
-    hasWeakGradOn_contDiffOne hBopen hu hgi hwg hΨC1 hΨcs hΨs k,
+  rw [hLeq, hReq, hasWeakGradOn_contDiffOne hBopen hu hgi hwg hΨC1 hΨcs hΨs k,
     integral_mul_indepCoord hBopen hu hgi hwg hckc hckind (hγb k) hΨC1 hΨcs hΨs]
   ring
 

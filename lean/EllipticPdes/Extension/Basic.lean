@@ -7,6 +7,8 @@ Authors: Alejandro Soto Franco
 module
 
 public import EllipticPdes.Embedding.WeakGradient
+public import Mathlib.MeasureTheory.Integral.DominatedConvergence
+public import Mathlib.LinearAlgebra.Matrix.SchurComplement
 
 /-!
 # Weak derivatives along a direction
@@ -28,7 +30,7 @@ Translations, reflections and linear isometries are then instances of one statem
 
 @[expose] public section
 
-open MeasureTheory Set
+open MeasureTheory Set Filter Topology
 
 noncomputable section
 
@@ -80,6 +82,60 @@ theorem partialD_comp {d : ℕ} {φ : EuclideanSpace ℝ (Fin d) → ℝ}
   have := (hφ.hasFDerivAt.comp x hf).fderiv
   rw [partialD, show (fun y => φ (f y)) = φ ∘ f from rfl, this]
   rfl
+
+/-- **Dominated convergence for a product with a fixed integrable factor.** -/
+theorem tendsto_setIntegral_mul {X : Type*} [MeasurableSpace X] [TopologicalSpace X]
+    [OpensMeasurableSpace X] {μ : Measure X} {B : Set X} (hB : MeasurableSet B) {u : X → ℝ}
+    (hu : IntegrableOn u B μ) {f : ℕ → X → ℝ} {f' : X → ℝ} (hf : ∀ n, Continuous (f n)) {C : ℝ}
+    (hb : ∀ n x, ‖f n x‖ ≤ C) (hc : ∀ x ∈ B, Tendsto (fun n => f n x) atTop (𝓝 (f' x))) :
+    Tendsto (fun n => ∫ x in B, u x * f n x ∂μ) atTop (𝓝 (∫ x in B, u x * f' x ∂μ)) := by
+  refine tendsto_integral_of_dominated_convergence (fun x => C * ‖u x‖)
+    (fun n => hu.1.mul (hf n).aestronglyMeasurable) (hu.norm.const_mul C) (fun n => ?_)
+    ((ae_restrict_iff' hB).2 (Eventually.of_forall fun x hx => (hc x hx).const_mul (u x)))
+  filter_upwards with x
+  rw [norm_mul, mul_comm]
+  exact mul_le_mul_of_nonneg_right (hb n x) (norm_nonneg _)
+
+/-- **Passing an integration by parts identity to a limit.** If `∫_B u F n = -∫_B g G n` for
+a sequence of continuous functions `F n`, `G n` that are uniformly bounded and converge
+pointwise, then the identity holds for the limits. -/
+theorem integral_eq_neg_integral_of_tendsto {X : Type*} [MeasurableSpace X] [TopologicalSpace X]
+    [OpensMeasurableSpace X] {μ : Measure X} {B : Set X} (hB : MeasurableSet B) {u g : X → ℝ}
+    (hu : IntegrableOn u B μ) (hg : IntegrableOn g B μ) {F G : ℕ → X → ℝ} {F' G' : X → ℝ}
+    (hF : ∀ n, Continuous (F n)) (hG : ∀ n, Continuous (G n)) {N P : ℝ}
+    (hFb : ∀ n x, ‖F n x‖ ≤ N) (hGb : ∀ n x, ‖G n x‖ ≤ P)
+    (hFc : ∀ x ∈ B, Tendsto (fun n => F n x) atTop (𝓝 (F' x)))
+    (hGc : ∀ x ∈ B, Tendsto (fun n => G n x) atTop (𝓝 (G' x)))
+    (hid : ∀ n, ∫ x in B, u x * F n x ∂μ = -∫ x in B, g x * G n x ∂μ) :
+    ∫ x in B, u x * F' x ∂μ = -∫ x in B, g x * G' x ∂μ :=
+  tendsto_nhds_unique (tendsto_setIntegral_mul hB hu hF hFb hFc)
+    (by simpa only [hid] using (tendsto_setIntegral_mul hB hg hG hGb hGc).neg)
+
+/-- The partial derivatives of a function of compact support have compact support. -/
+theorem _root_.HasCompactSupport.partialD {d : ℕ} {ψ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hψ : HasCompactSupport ψ) (k : Fin d) : HasCompactSupport (partialD k ψ) :=
+  hψ.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single k (1 : ℝ))
+
+/-- The partial derivatives of a `C¹` function are continuous. -/
+theorem _root_.ContDiff.continuous_partialD {d : ℕ} {ψ : EuclideanSpace ℝ (Fin d) → ℝ}
+    {n : WithTop ℕ∞} (hψ : ContDiff ℝ n ψ) (hn : n ≠ 0) (k : Fin d) : Continuous (partialD k ψ) :=
+  (hψ.continuous_fderiv hn).clm_apply continuous_const
+
+/-- **Determinant of the identity plus a rank-one map.** -/
+theorem _root_.LinearMap.det_id_add_smulRight {E : Type*} [AddCommGroup E] [Module ℝ E]
+    [FiniteDimensional ℝ E] (f : E →ₗ[ℝ] ℝ) (v : E) :
+    (LinearMap.id + f.smulRight v).det = 1 + f v := by
+  let b := Module.finBasis ℝ E
+  rw [← LinearMap.det_toMatrix b]
+  have : LinearMap.toMatrix b b (LinearMap.id + f.smulRight v)
+      = 1 + Matrix.replicateCol Unit (b.repr v) * Matrix.replicateRow Unit (fun i => f (b i)) := by
+    ext i k
+    simp [LinearMap.toMatrix_apply, Matrix.one_apply, Matrix.mul_apply, Matrix.replicateCol,
+      Matrix.replicateRow, Finsupp.single_apply, eq_comm, mul_comm]
+  rw [this, Matrix.det_one_add_replicateCol_mul_replicateRow]
+  have h := congrArg f (b.sum_repr v)
+  rw [map_sum] at h
+  simpa [dotProduct, mul_comm] using h
 
 section WeakDeriv
 
