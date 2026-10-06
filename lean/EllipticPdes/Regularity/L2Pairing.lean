@@ -24,7 +24,7 @@ these steps localises.
 
 ## Main declarations
 
-* `integrable_mul_testFn`: the product of an `L²(V)` class with a test function is integrable.
+* `pairTest`: the pairing against a test function as a continuous linear functional on `L²(V)`.
 * `setIntegral_add_mul_testFn`, `setIntegral_sub_mul_testFn`, `setIntegral_neg_mul_testFn`:
   the pairing is additive.
 * `setIntegral_finsetSum_mul_testFn`, `setIntegral_sum_mul_testFn`: the pairing commutes with a
@@ -44,31 +44,35 @@ open EllipticPdes.Sobolev
 
 variable {d : ℕ} {V : Set (EuclideanSpace ℝ (Fin d))}
 
+/-- **The pairing against a test function as a continuous linear functional.**
+`F ↦ ∫_V F φ` is the inner product against the class of `φ`, so additivity, subtraction and
+finite sums are the linearity of a functional. -/
+def pairTest {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφc : ContDiff ℝ (⊤ : ℕ∞) φ)
+    (hφcs : HasCompactSupport φ) : L2D V →L[ℝ] ℝ :=
+  innerSL ℝ (((hφc.continuous.memLp_of_hasCompactSupport (p := 2) (μ := volume) hφcs).restrict
+    V).toLp φ)
+
+/-- `pairTest hφc hφcs F` is the integral `∫_V F φ`. -/
+theorem pairTest_apply {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφc : ContDiff ℝ (⊤ : ℕ∞) φ)
+    (hφcs : HasCompactSupport φ) (F : L2D V) :
+    pairTest hφc hφcs F = ∫ x in V, (F x : ℝ) * φ x := by
+  rw [pairTest, innerSL_apply_apply,
+    inner_Lp_eq_integral_of_ae (MemLp.coeFn_toLp _) Filter.EventuallyEq.rfl]
+  exact integral_congr_ae (Filter.Eventually.of_forall fun x => mul_comm _ _)
+
 /-- The pairing is additive in the class. -/
 theorem setIntegral_add_mul_testFn (F G : L2D V) {φ : EuclideanSpace ℝ (Fin d) → ℝ}
     (hφc : ContDiff ℝ (⊤ : ℕ∞) φ) (hφcs : HasCompactSupport φ) :
     (∫ x in V, ((F + G) x : ℝ) * φ x)
       = (∫ x in V, (F x : ℝ) * φ x) + ∫ x in V, (G x : ℝ) * φ x := by
-  have hcong : (∫ x in V, ((F + G) x : ℝ) * φ x)
-      = ∫ x in V, ((F x : ℝ) * φ x + (G x : ℝ) * φ x) := by
-    refine integral_congr_ae ?_
-    filter_upwards [Lp.coeFn_add F G] with x hx
-    rw [hx, Pi.add_apply, add_mul]
-  rw [hcong, integral_add (integrable_mul_testFn F hφc hφcs)
-    (integrable_mul_testFn G hφc hφcs)]
+  simpa only [pairTest_apply] using (pairTest hφc hφcs).map_add F G
 
 /-- The pairing subtracts in the class. -/
 theorem setIntegral_sub_mul_testFn (F G : L2D V) {φ : EuclideanSpace ℝ (Fin d) → ℝ}
     (hφc : ContDiff ℝ (⊤ : ℕ∞) φ) (hφcs : HasCompactSupport φ) :
     (∫ x in V, ((F - G) x : ℝ) * φ x)
       = (∫ x in V, (F x : ℝ) * φ x) - ∫ x in V, (G x : ℝ) * φ x := by
-  have hcong : (∫ x in V, ((F - G) x : ℝ) * φ x)
-      = ∫ x in V, ((F x : ℝ) * φ x - (G x : ℝ) * φ x) := by
-    refine integral_congr_ae ?_
-    filter_upwards [Lp.coeFn_sub F G] with x hx
-    rw [hx, Pi.sub_apply, sub_mul]
-  rw [hcong, integral_sub (integrable_mul_testFn F hφc hφcs)
-    (integrable_mul_testFn G hφc hφcs)]
+  simpa only [pairTest_apply] using (pairTest hφc hφcs).map_sub F G
 
 /-- The pairing negates in the class. -/
 theorem setIntegral_neg_mul_testFn (F : L2D V) (φ : EuclideanSpace ℝ (Fin d) → ℝ) :
@@ -83,16 +87,7 @@ theorem setIntegral_finsetSum_mul_testFn {ι : Type*} (s : Finset ι) (F : ι �
     {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφc : ContDiff ℝ (⊤ : ℕ∞) φ)
     (hφcs : HasCompactSupport φ) :
     (∫ x in V, ((∑ i ∈ s, F i) x : ℝ) * φ x) = ∑ i ∈ s, ∫ x in V, (F i x : ℝ) * φ x := by
-  classical
-  induction s using Finset.induction with
-  | empty =>
-    simp only [Finset.sum_empty]
-    rw [show (∫ x in V, ((0 : L2D V) x : ℝ) * φ x) = 0 from ?_]
-    refine integral_eq_zero_of_ae ?_
-    filter_upwards [Lp.coeFn_zero (E := ℝ) (p := 2) (μ := volume.restrict V)] with x hx
-    rw [hx, Pi.zero_apply, zero_mul]
-  | insert i s hi ih =>
-    rw [Finset.sum_insert hi, Finset.sum_insert hi, setIntegral_add_mul_testFn _ _ hφc hφcs, ih]
+  simpa only [pairTest_apply] using map_sum (pairTest hφc hφcs) F s
 
 /-- The pairing commutes with a finite sum over a `Fintype`. -/
 theorem setIntegral_sum_mul_testFn {ι : Type*} [Fintype ι] (F : ι → L2D V)
