@@ -492,6 +492,20 @@ theorem fredholm_alternative_compact (hK : IsCompactOperator K) :
     rw [h1, finrank_bot] at hrank
     exact Submodule.finrank_eq_zero.mp hrank.symm
 
+/-- For a compact operator `K` and a nonzero scalar `c` such that `c⁻¹` is not an eigenvalue of
+`K`, the operator `1 - c K` is bijective. -/
+theorem bijective_one_sub_smul (hK : IsCompactOperator K) {c : ℝ} (hc : c ≠ 0)
+    (h : ¬ Module.End.HasEigenvalue (K : Module.End ℝ E) c⁻¹) :
+    Function.Bijective (1 - c • K : E →L[ℝ] E) := by
+  rcases hK.hasEigenvalue_or_mem_resolventSet (μ := c⁻¹) (inv_ne_zero hc) with he | hr
+  · exact absurd he h
+  · have hunit := spectrum.mem_resolventSet_iff.mp hr
+    have hfac : (1 - c • K : E →L[ℝ] E)
+        = algebraMap ℝ (E →L[ℝ] E) c * (algebraMap ℝ (E →L[ℝ] E) c⁻¹ - K) := by
+      rw [mul_sub, ← map_mul, mul_inv_cancel₀ hc, map_one, ← Algebra.smul_def]
+    exact ContinuousLinearMap.isUnit_iff_bijective.mp (hfac ▸
+      ((isUnit_iff_ne_zero.mpr hc).map (algebraMap ℝ (E →L[ℝ] E))).mul hunit)
+
 /-- **Fredholm dichotomy** (Evans Appendix D Theorem 5, the remark following it; Guo Theorem
 VII.4.4): either `(1 - K) u = h` has exactly one solution for every `h`, or the homogeneous
 equation has a nonzero solution. -/
