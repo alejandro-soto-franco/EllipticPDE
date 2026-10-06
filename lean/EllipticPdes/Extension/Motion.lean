@@ -42,7 +42,7 @@ noncomputable section
 
 namespace EllipticPdes.Extension
 
-open EllipticPdes.Embedding (HasWeakGradOn)
+open EllipticPdes.Embedding (HasWeakGradOn HasWeakDerivAlong hasWeakGradOn_iff)
 open EllipticPdes.Sobolev (partialD)
 
 variable {d : ℕ}
