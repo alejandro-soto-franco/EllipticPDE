@@ -109,49 +109,19 @@ private theorem sq_sub_translation_le {φ : EuclideanSpace ℝ (Fin d) → ℝ}
     (continuous_segment_deriv hφ x v).continuousOn
   simpa using this
 
-/-- The integrand `(x, t) ↦ ((fderiv ℝ φ (x + t • v)) v) ^ 2` is integrable for the
-product of Lebesgue measure with the unit-interval slice. -/
-private theorem integrable_uncurry_segment {φ : EuclideanSpace ℝ (Fin d) → ℝ}
-    (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (hcs : HasCompactSupport φ) (v : EuclideanSpace ℝ (Fin d)) :
-    Integrable (Function.uncurry fun (x : EuclideanSpace ℝ (Fin d)) (t : ℝ) =>
-        ((fderiv ℝ φ (x + t • v)) v) ^ 2)
-      (volume.prod (volume.restrict (Ioc (0 : ℝ) 1))) := by
-  set g : EuclideanSpace ℝ (Fin d) × ℝ → ℝ :=
-    Function.uncurry fun (x : EuclideanSpace ℝ (Fin d)) (t : ℝ) =>
-      ((fderiv ℝ φ (x + t • v)) v) ^ 2 with hg
+/-- **Integrability on a slab.** A continuous function of `(x, t)` that vanishes for
+`t ∈ (0, 1]` and `R < ‖x‖` is integrable for the product of Lebesgue measure with the
+unit-interval slice: it is supported in the compact set `closedBall 0 R × Icc 0 1`, up to a null
+set. -/
+private theorem integrable_uncurry_of_slab {g : EuclideanSpace ℝ (Fin d) × ℝ → ℝ}
+    (hg : Continuous g) {R : ℝ} (hzero : ∀ x t, t ∈ Ioc (0 : ℝ) 1 → R < ‖x‖ → g (x, t) = 0) :
+    Integrable g (volume.prod (volume.restrict (Ioc (0 : ℝ) 1))) := by
   set ρ : Measure (EuclideanSpace ℝ (Fin d) × ℝ) :=
     volume.prod (volume.restrict (Ioc (0 : ℝ) 1)) with hρ
-  have hcont : Continuous g := continuous_uncurry_segment hφ v
-  obtain ⟨R, hR⟩ := (hcs.fderiv ℝ).isCompact.isBounded.subset_closedBall 0
-  -- The joint support sits inside the compact slab `C`.
-  set C : Set (EuclideanSpace ℝ (Fin d) × ℝ) := closedBall 0 (R + ‖v‖) ×ˢ Icc 0 1 with hC
+  set C : Set (EuclideanSpace ℝ (Fin d) × ℝ) := closedBall 0 R ×ˢ Icc 0 1 with hC
   have hCcomp : IsCompact C := (isCompact_closedBall _ _).prod isCompact_Icc
-  have hIntOn : IntegrableOn g C ρ := hcont.locallyIntegrable.integrableOn_isCompact hCcomp
-  -- `g` vanishes off `C` on the support of `ρ` (where `t ∈ Ioc 0 1`).
-  have hzero : ∀ p : EuclideanSpace ℝ (Fin d) × ℝ, p.2 ∈ Ioc (0 : ℝ) 1 → p ∉ C → g p = 0 := by
-    rintro ⟨x, t⟩ ht hpC
-    have hxball : x ∉ closedBall (0 : EuclideanSpace ℝ (Fin d)) (R + ‖v‖) := by
-      intro hx; exact hpC ⟨hx, ⟨le_of_lt ht.1, ht.2⟩⟩
-    have hxt : x + t • v ∉ tsupport (fderiv ℝ φ) := by
-      intro hmem
-      apply hxball
-      have hxK : ‖x + t • v‖ ≤ R := by simpa [mem_closedBall, dist_eq_norm] using hR hmem
-      have htnorm : ‖t • v‖ ≤ ‖v‖ := by
-        rw [norm_smul]
-        have htle : ‖t‖ ≤ 1 := by rw [Real.norm_eq_abs, abs_of_pos ht.1]; exact ht.2
-        nlinarith [norm_nonneg v, htle]
-      have hxle : ‖x‖ ≤ R + ‖v‖ := by
-        calc ‖x‖ = ‖(x + t • v) - t • v‖ := by congr 1; abel
-          _ ≤ ‖x + t • v‖ + ‖t • v‖ := norm_sub_le _ _
-          _ ≤ R + ‖v‖ := by linarith
-      simpa [mem_closedBall, dist_eq_norm] using hxle
-    simp only [hg, Function.uncurry_apply_pair,
-      image_eq_zero_of_notMem_tsupport hxt, _root_.zero_apply]
-    norm_num
-  -- Almost everywhere `t ∈ Ioc 0 1`, so `g =ᵐ[ρ] C.indicator g`.
   have htioc : ∀ᵐ p ∂ρ, p.2 ∈ Ioc (0 : ℝ) 1 := by
     rw [ae_iff]
-    -- The bad set is a product with the (Lebesgue-null) complement of `Ioc 0 1`.
     have hset : {p : EuclideanSpace ℝ (Fin d) × ℝ | p.2 ∉ Ioc (0 : ℝ) 1}
         = univ ×ˢ (Ioc (0 : ℝ) 1)ᶜ := by ext p; simp
     rw [hset, hρ, Measure.prod_prod, Measure.restrict_apply' measurableSet_Ioc,
@@ -160,9 +130,39 @@ private theorem integrable_uncurry_segment {φ : EuclideanSpace ℝ (Fin d) → 
     filter_upwards [htioc] with p hp
     by_cases hpC : p ∈ C
     · rw [indicator_of_mem hpC]
-    · rw [indicator_of_notMem hpC, hzero p hp hpC]
+    · rw [indicator_of_notMem hpC]
+      exact hzero p.1 p.2 hp (by
+        by_contra hle
+        exact hpC ⟨by simpa using not_lt.mp hle, ⟨hp.1.le, hp.2⟩⟩)
   rw [integrable_congr hae]
-  exact (integrable_indicator_iff hCcomp.measurableSet).mpr hIntOn
+  exact (integrable_indicator_iff hCcomp.measurableSet).mpr
+    (hg.locallyIntegrable.integrableOn_isCompact hCcomp)
+
+/-- A function supported in `closedBall 0 R` vanishes at `x + t v` for `t ∈ (0, 1]` once
+`R + ‖v‖ < ‖x‖`. -/
+private theorem eq_zero_of_far {F : Type*} [Zero F] {ψ : EuclideanSpace ℝ (Fin d) → F} {R : ℝ}
+    (hR : tsupport ψ ⊆ closedBall 0 R) {x v : EuclideanSpace ℝ (Fin d)} {t : ℝ}
+    (ht : t ∈ Ioc (0 : ℝ) 1) (hx : R + ‖v‖ < ‖x‖) : ψ (x + t • v) = 0 := by
+  refine image_eq_zero_of_notMem_tsupport fun hmem => ?_
+  have h1 : ‖x + t • v‖ ≤ R := by simpa [mem_closedBall, dist_eq_norm] using hR hmem
+  have h2 : ‖t • v‖ ≤ ‖v‖ := by
+    rw [norm_smul, Real.norm_eq_abs, abs_of_pos ht.1]
+    exact mul_le_of_le_one_left (norm_nonneg v) ht.2
+  have h3 : ‖x‖ ≤ ‖x + t • v‖ + ‖t • v‖ := by
+    simpa using norm_sub_le (x + t • v) (t • v)
+  linarith
+
+/-- The integrand `(x, t) ↦ ((fderiv ℝ φ (x + t • v)) v) ^ 2` is integrable for the
+product of Lebesgue measure with the unit-interval slice. -/
+private theorem integrable_uncurry_segment {φ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (hcs : HasCompactSupport φ) (v : EuclideanSpace ℝ (Fin d)) :
+    Integrable (Function.uncurry fun (x : EuclideanSpace ℝ (Fin d)) (t : ℝ) =>
+        ((fderiv ℝ φ (x + t • v)) v) ^ 2)
+      (volume.prod (volume.restrict (Ioc (0 : ℝ) 1))) := by
+  obtain ⟨R, hR⟩ := (hcs.fderiv ℝ).isCompact.isBounded.subset_closedBall 0
+  refine integrable_uncurry_of_slab (R := R + ‖v‖) (continuous_uncurry_segment hφ v)
+    fun x t ht hx => ?_
+  simp [eq_zero_of_far hR ht hx]
 
 /-- Squaring the pointwise identity `(fderiv ℝ φ x) (hshift k h) = h * ∂ₖφ x`, obtained
 from linearity of `fderiv` and `hshift k h = h • single k 1`. -/
@@ -308,57 +308,14 @@ private theorem integrable_uncurry_transDiff {ψ : EuclideanSpace ℝ (Fin d) �
     Integrable (Function.uncurry fun (x : EuclideanSpace ℝ (Fin d)) (t : ℝ) =>
         (ψ (x + t • v) - ψ x) ^ 2)
       (volume.prod (volume.restrict (Ioc (0 : ℝ) 1))) := by
-  set g : EuclideanSpace ℝ (Fin d) × ℝ → ℝ :=
-    Function.uncurry fun (x : EuclideanSpace ℝ (Fin d)) (t : ℝ) =>
-      (ψ (x + t • v) - ψ x) ^ 2 with hg
-  set ρ : Measure (EuclideanSpace ℝ (Fin d) × ℝ) :=
-    volume.prod (volume.restrict (Ioc (0 : ℝ) 1)) with hρ
-  have hcont : Continuous g :=
-    ((hψc.comp (by fun_prop : Continuous fun p : EuclideanSpace ℝ (Fin d) × ℝ =>
-      p.1 + p.2 • v)).sub (hψc.comp continuous_fst)).pow 2
   obtain ⟨R, hR⟩ := hψcs.isCompact.isBounded.subset_closedBall 0
-  set C : Set (EuclideanSpace ℝ (Fin d) × ℝ) := closedBall 0 (R + ‖v‖) ×ˢ Icc 0 1 with hC
-  have hCcomp : IsCompact C := (isCompact_closedBall _ _).prod isCompact_Icc
-  have hIntOn : IntegrableOn g C ρ := hcont.locallyIntegrable.integrableOn_isCompact hCcomp
-  have hzero : ∀ p : EuclideanSpace ℝ (Fin d) × ℝ, p.2 ∈ Ioc (0 : ℝ) 1 → p ∉ C → g p = 0 := by
-    rintro ⟨x, t⟩ ht hpC
-    have hxball : x ∉ closedBall (0 : EuclideanSpace ℝ (Fin d)) (R + ‖v‖) := by
-      intro hx; exact hpC ⟨hx, ⟨le_of_lt ht.1, ht.2⟩⟩
-    have hxnorm : R + ‖v‖ < ‖x‖ :=
-      lt_of_not_ge fun hle => hxball (by simpa [mem_closedBall, dist_eq_norm] using hle)
-    have htnorm : ‖t • v‖ ≤ ‖v‖ := by
-      rw [norm_smul]
-      have htle : ‖t‖ ≤ 1 := by rw [Real.norm_eq_abs, abs_of_pos ht.1]; exact ht.2
-      nlinarith [norm_nonneg v, htle]
-    have hψx : ψ x = 0 := by
-      apply image_eq_zero_of_notMem_tsupport
-      intro hmem
-      have hle : ‖x‖ ≤ R := by simpa [mem_closedBall, dist_eq_norm] using hR hmem
-      nlinarith [norm_nonneg v]
-    have hψxv : ψ (x + t • v) = 0 := by
-      apply image_eq_zero_of_notMem_tsupport
-      intro hmem
-      have hxvR : ‖x + t • v‖ ≤ R := by simpa [mem_closedBall, dist_eq_norm] using hR hmem
-      have hxle : ‖x‖ ≤ R + ‖v‖ := by
-        calc ‖x‖ = ‖(x + t • v) - t • v‖ := by congr 1; abel
-          _ ≤ ‖x + t • v‖ + ‖t • v‖ := norm_sub_le _ _
-          _ ≤ R + ‖v‖ := by linarith
-      linarith
-    simp only [hg, Function.uncurry_apply_pair, hψx, hψxv, sub_self]
-    norm_num
-  have htioc : ∀ᵐ p ∂ρ, p.2 ∈ Ioc (0 : ℝ) 1 := by
-    rw [ae_iff]
-    have hset : {p : EuclideanSpace ℝ (Fin d) × ℝ | p.2 ∉ Ioc (0 : ℝ) 1}
-        = univ ×ˢ (Ioc (0 : ℝ) 1)ᶜ := by ext p; simp
-    rw [hset, hρ, Measure.prod_prod, Measure.restrict_apply' measurableSet_Ioc,
-      compl_inter_self, measure_empty, mul_zero]
-  have hae : g =ᵐ[ρ] C.indicator g := by
-    filter_upwards [htioc] with p hp
-    by_cases hpC : p ∈ C
-    · rw [indicator_of_mem hpC]
-    · rw [indicator_of_notMem hpC, hzero p hp hpC]
-  rw [integrable_congr hae]
-  exact (integrable_indicator_iff hCcomp.measurableSet).mpr hIntOn
+  refine integrable_uncurry_of_slab (R := R + ‖v‖)
+    (((hψc.comp (by fun_prop : Continuous fun p : EuclideanSpace ℝ (Fin d) × ℝ =>
+      p.1 + p.2 • v)).sub (hψc.comp continuous_fst)).pow 2) fun x t ht hx => ?_
+  have hψx : ψ x = 0 := by
+    simpa using eq_zero_of_far (v := (0 : EuclideanSpace ℝ (Fin d))) (t := 1) hR
+      ⟨one_pos, le_rfl⟩ (by simpa using hx.trans_le' (le_add_of_nonneg_right (norm_nonneg v)))
+  simp [eq_zero_of_far hR ht hx, hψx]
 
 /-- **Squared `L²` bound on the difference-quotient defect.** For `φ` smooth with compact
 support and `h ≠ 0`, the squared `L²` distance from the difference quotient `Dₖʰφ` to the
@@ -682,19 +639,9 @@ private theorem integrable_uncurry_weak (g : EucL2 d) {ψ : EuclideanSpace ℝ (
       _ = M * ‖g p.1‖ := by ring
   · rw [hDx, indicator_of_notMem hpB]
     have hzero : ψ (p.1 - p.2 • v) = 0 := by
-      apply image_eq_zero_of_notMem_tsupport
-      intro hmem
-      apply hpB
-      have hxK : ‖p.1 - p.2 • v‖ ≤ R := by simpa [mem_closedBall, dist_eq_norm] using hR hmem
-      have htnorm : ‖p.2 • v‖ ≤ ‖v‖ := by
-        rw [norm_smul]
-        have htle : ‖p.2‖ ≤ 1 := by rw [Real.norm_eq_abs, abs_of_pos hp.1]; exact hp.2
-        nlinarith [norm_nonneg v, htle]
-      have hxle : ‖p.1‖ ≤ R + ‖v‖ := by
-        calc ‖p.1‖ = ‖(p.1 - p.2 • v) + p.2 • v‖ := by congr 1; abel
-          _ ≤ ‖p.1 - p.2 • v‖ + ‖p.2 • v‖ := norm_add_le _ _
-          _ ≤ R + ‖v‖ := by linarith
-      simpa [hB, mem_closedBall, dist_eq_norm] using hxle
+      have := eq_zero_of_far hR (x := p.1) (v := -v) hp
+        (by simpa [hB, mem_closedBall, dist_eq_norm] using hpB)
+      simpa [sub_eq_add_neg] using this
     rw [hzero, mul_zero, norm_zero]
 
 /-- **Segment-integral representation of the difference quotient (weak derivative).** For `g`

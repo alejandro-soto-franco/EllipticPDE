@@ -268,15 +268,15 @@ structure CutoffDerivWeakForm (Op : FullEllipticOp (n + 1))
   /-- The cut-off derivative. -/
   U : H01 Ω
   /-- The datum of its equation. -/
-  F : L2D Ω
+  datum : L2D Ω
   /-- The weak derivatives of the datum. -/
-  hFk : HasIteratedWeakDerivOn Ω k F
+  hFk : HasIteratedWeakDerivOn Ω k datum
   /-- `U` agrees with `∂_ℓ u` on `V`. -/
   restrict_eq : restrictL2 (Ω := V) (extendL2 hΩm ((U : H1amb Ω) 0))
     = restrictL2 (Ω := V) (extendL2 hΩm ((u : H1amb Ω) ℓ.succ))
   /-- The weak formulation of the equation of `U`. -/
   weakForm : ∀ w : H01 Ω, Op.fullBilin Ω U w
-    = ∫ x in Ω, (F x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)
+    = ∫ x in Ω, (datum x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)
   /-- The `H^k` bound on the datum. -/
   bound_F : IteratedL2Bound hFk B
   /-- The bound on the function value of `U`. -/
@@ -451,7 +451,7 @@ theorem interiorRegularityAt_succ (Op : FullEllipticOp (n + 1))
       IteratedL2Bound H ((2 * C₁ * C₀ + 1) * (M + ‖(u : H1amb Ω) 0‖)) := by
     intro ℓ
     obtain ⟨S⟩ := hdat u f M hfk hM hu ℓ
-    obtain ⟨HU, hHU⟩ := hIH S.U S.F (C₀ * (M + ‖(u : H1amb Ω) 0‖)) S.hFk S.bound_F S.weakForm
+    obtain ⟨HU, hHU⟩ := hIH S.U S.datum (C₀ * (M + ‖(u : H1amb Ω) 0‖)) S.hFk S.bound_F S.weakForm
     exact ⟨HU.congr S.restrict_eq, hHU.congr.mono_const (by nlinarith [S.bound_U])⟩
   choose H hH using hstep
   refine ⟨HasIteratedWeakDerivOn.ofDeriv

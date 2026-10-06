@@ -220,7 +220,7 @@ theorem tendsto_setIntegral_mul_convolution_of_measurable
             * ‖(h x : ℝ) * η x‖ := by simp only [norm_mul]; ring
       _ ≤ _ := mul_le_mul_of_nonneg_right hk' (norm_nonneg _)
   · filter_upwards [ae_restrict_of_ae hae] with x hx
-    simp only [convolution_lsmul_comm c] 
+    simp only [convolution_lsmul_comm c]
     exact (hx.mul_const _).const_mul _
 
 /-- **Weak-derivative Leibniz with a `W^{1,∞}` weight.** If `g` has weak `ℓ`-derivative `g'` on
