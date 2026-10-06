@@ -73,7 +73,7 @@ theorem restrictL2_extendL2_eq_of_mulTest_eq {W N : Set (EuclideanSpace ℝ (Fin
     restrictL2 (Ω := N) (extendL2 hWm X) = restrictL2 (Ω := N) (extendL2 hWm Y) := by
   refine Lp.ext ?_
   have hXY : ∀ᵐ x ∂(volume.restrict W), θ x * (X x : ℝ) = θ x * (Y x : ℝ) := by
-    filter_upwards [mulTest_coeFn hθW X, mulTest_coeFn hθW Y] with x h1 h2
+    filter_upwards [mulCutoff_coeFn hθW X, mulCutoff_coeFn hθW Y] with x h1 h2
     rw [← h1, ← h2, h]
   have hXYN : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), x ∈ W →
       θ x * (X x : ℝ) = θ x * (Y x : ℝ) := (ae_restrict_iff' hWm).mp hXY

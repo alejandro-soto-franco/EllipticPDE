@@ -271,13 +271,13 @@ theorem exists_iteratedWeakDeriv_extend_mulTest {W Ω : Set (EuclideanSpace ℝ 
         (restrictL2 (Ω := Ω) (extendL2 hWm (hp.D [ℓ]))) with hq2def
       have hq1ae : q1 =ᵐ[volume.restrict Ω]
           fun x => partialD ℓ χ x * (extendL2 hWm p x : ℝ) := by
-        filter_upwards [mulTest_coeFn ((isTestFn_partialD hχ ℓ).mono hWΩ)
+        filter_upwards [mulCutoff_coeFn ((isTestFn_partialD hχ ℓ).mono hWΩ)
             (restrictL2 (Ω := Ω) (extendL2 hWm p)),
           coeFn_restrictL2 (Ω := Ω) (extendL2 hWm p)] with x h1 h2
         rw [h1, h2]
       have hq2ae : q2 =ᵐ[volume.restrict Ω]
           fun x => χ x * (extendL2 hWm (hp.D [ℓ]) x : ℝ) := by
-        filter_upwards [mulTest_coeFn (hχ.mono hWΩ)
+        filter_upwards [mulCutoff_coeFn (hχ.mono hWΩ)
             (restrictL2 (Ω := Ω) (extendL2 hWm (hp.D [ℓ]))),
           coeFn_restrictL2 (Ω := Ω) (extendL2 hWm (hp.D [ℓ]))] with x h1 h2
         rw [h1, h2]

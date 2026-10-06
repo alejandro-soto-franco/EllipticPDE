@@ -62,8 +62,8 @@ theorem mulTest_diffQuotD_eq_of_small (hζ : IsTestFn Ω ζ) (k : Fin d) {h : �
     mulTest hζ (diffQuotD k h hΩm g)
       = mulTest hζ (restrictL2 (diffQuot k h (extendL2 hΩm g))) := by
   apply Lp.ext
-  filter_upwards [mulTest_coeFn hζ (diffQuotD k h hΩm g),
-      mulTest_coeFn hζ (restrictL2 (diffQuot k h (extendL2 hΩm g))),
+  filter_upwards [mulCutoff_coeFn hζ (diffQuotD k h hΩm g),
+      mulCutoff_coeFn hζ (restrictL2 (diffQuot k h (extendL2 hΩm g))),
       coeFn_diffQuotD k h hΩm g,
       coeFn_restrictL2 (diffQuot k h (extendL2 hΩm g)),
       ae_restrict_of_ae (coeFn_diffQuot k h (extendL2 hΩm g)),
@@ -111,23 +111,6 @@ private lemma partialD_diffQuotFn (hφ : Differentiable ℝ φ) (i k : Fin d) (h
   simp only [_root_.smul_apply, _root_.sub_apply, smul_eq_mul]
   ring
 
-/-! ### Extension by zero of a test-function class is the test function -/
-
-/-- Extension by zero of the `L²(Ω)` class of a function supported inside `Ω` recovers the
-function itself a.e. on the whole space: off `Ω` the function already vanishes (its
-`tsupport` is inside `Ω`), and on `Ω` extension agrees with the class. -/
-private lemma extendL2_toLp_ae_eq (hΩm : MeasurableSet Ω)
-    {ψ : EuclideanSpace ℝ (Fin d) → ℝ} (hmem : MemLp ψ 2 (volume.restrict Ω))
-    (hsupp : tsupport ψ ⊆ Ω) :
-    (extendL2 hΩm (hmem.toLp ψ) : EuclideanSpace ℝ (Fin d) → ℝ) =ᵐ[volume] ψ := by
-  filter_upwards [coeFn_extendL2 hΩm (hmem.toLp ψ),
-      ae_imp_of_ae_restrict hmem.coeFn_toLp] with x hx himp
-  rw [hx]
-  by_cases hxΩ : x ∈ Ω
-  · rw [Set.indicator_of_mem hxΩ, himp hxΩ]
-  · rw [Set.indicator_of_notMem hxΩ,
-      image_eq_zero_of_notMem_tsupport (fun hc => hxΩ (hsupp hc))]
-
 /-! ### Discrete graph identity -/
 
 /-- **Discrete graph identity.** On a test-function graph, the cutoff of the interior
@@ -151,10 +134,10 @@ private lemma cutoffMul_diffQuotG_testGraph (hζ : IsTestFn Ω ζ) (hφ : IsTest
   intro j
   refine Fin.cases ?_ (fun i => ?_) j
   · -- coordinate `0`: `ζ · Dₖ^h φ`
-    rw [cutoffMul_apply_zero]
+    rw [cutoffMulOn_apply_zero]
     simp only [diffQuotG_apply, IsTestFn.testGraph_zero]
     apply Lp.ext
-    filter_upwards [mulTest_coeFn hζ (diffQuotD k h hΩm hφ.testCls),
+    filter_upwards [mulCutoff_coeFn hζ (diffQuotD k h hΩm hφ.testCls),
         coeFn_diffQuotD k h hΩm hφ.testCls, ae_restrict_of_ae hsh_test,
         (show (⇑hφ.testCls : EuclideanSpace ℝ (Fin d) → ℝ)
           =ᵐ[volume.restrict Ω] φ from hφ.mem_lp.coeFn_toLp),
@@ -178,13 +161,13 @@ private lemma cutoffMul_diffQuotG_testGraph (hζ : IsTestFn Ω ζ) (hφ : IsTest
       rw [partialD_mul (hζ.1.differentiable (by simp))
           ((contDiff_diffQuotFn hφ.1 k h).differentiable (by simp)) i,
         partialD_diffQuotFn (hφ.1.differentiable (by simp)) i k h]
-    rw [cutoffMul_apply_succ]
+    rw [cutoffMulOn_apply_succ]
     simp only [diffQuotG_apply, IsTestFn.testGraph_zero, IsTestFn.testGraph_succ]
     apply Lp.ext
     filter_upwards [Lp.coeFn_add (mulTest hζ (diffQuotD k h hΩm (hφ.partialCls i)))
           (mulTestPartial hζ i (diffQuotD k h hΩm hφ.testCls)),
-        mulTest_coeFn hζ (diffQuotD k h hΩm (hφ.partialCls i)),
-        mulTestPartial_coeFn hζ i (diffQuotD k h hΩm hφ.testCls),
+        mulCutoff_coeFn hζ (diffQuotD k h hΩm (hφ.partialCls i)),
+        mulCutoffPartial_coeFn hζ i (diffQuotD k h hΩm hφ.testCls),
         coeFn_diffQuotD k h hΩm (hφ.partialCls i),
         coeFn_diffQuotD k h hΩm hφ.testCls,
         ae_restrict_of_ae hsh_part, ae_restrict_of_ae hsh_test,

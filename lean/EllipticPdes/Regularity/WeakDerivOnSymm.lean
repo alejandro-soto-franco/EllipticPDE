@@ -85,7 +85,7 @@ theorem mulTest_eq_zero_of_forall_testFn {V : Set (EuclideanSpace ℝ (Fin d))}
     have e3 : (∫ x in V, Set.indicator V (mulTest hχ w : EuclideanSpace ℝ (Fin d) → ℝ) x * ρ x)
         = ∫ x in V, (w x : ℝ) * (χ x * ρ x) := by
       refine integral_congr_ae ?_
-      filter_upwards [mulTest_coeFn hχ w, ae_restrict_mem hVm] with x h1 h2
+      filter_upwards [mulCutoff_coeFn hχ w, ae_restrict_mem hVm] with x h1 h2
       rw [Set.indicator_of_mem h2, h1]
       ring
     rw [e1, e2, e3]

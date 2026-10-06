@@ -119,8 +119,6 @@ private lemma grad_ae_eq_partialD {Ω W : Set (EuclideanSpace ℝ (Fin d))} (u :
   refine hasWeakGradOn_unique_ae isOpen_ball measurableSet_ball ?_ ?_ (hweak.mono hball)
     (hclass.mono hball) i
   · intro k
-    have : IsFiniteMeasure (volume.restrict (ball x r)) :=
-      ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
     exact ((Lp.memLp ((u : H1amb Ω) k.succ)).mono_measure
       (Measure.restrict_mono (hball.trans hWΩ) le_rfl)).integrable one_le_two
   · intro k

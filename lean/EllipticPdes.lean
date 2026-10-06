@@ -63,7 +63,6 @@ public import EllipticPdes.Regularity.InteriorSmooth
 public import EllipticPdes.Regularity.InteriorSmoothGlobal
 public import EllipticPdes.Regularity.Localise.CutoffProduct
 public import EllipticPdes.Regularity.Localise.LocalOp
-public import EllipticPdes.Regularity.Localise.CompactEllipticity
 public import EllipticPdes.Regularity.Localise.Datum
 public import EllipticPdes.Regularity.Local.WeakSolution
 public import EllipticPdes.Regularity.Local.Reduction
@@ -159,7 +158,6 @@ public import EllipticPdes.Spectrum.Variational
 public import EllipticPdes.Spectrum.HigherEigenvalues
 public import EllipticPdes.Spectrum.EigenFamily
 public import EllipticPdes.Spectrum.Multiplicity
-public import EllipticPdes.Spectrum.BallSpectrum
 public import EllipticPdes.Spectrum.BallDimension
 public import EllipticPdes.Embedding.ConstOfGradZero
 public import EllipticPdes.Spectrum.RellichW12

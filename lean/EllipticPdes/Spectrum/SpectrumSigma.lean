@@ -248,9 +248,7 @@ theorem spectrum_diff_eq_eigenvalues (hK : IsCompactOperator K) :
 infinite-dimensional real Hilbert space, a compact operator `K` has `0` in its real
 spectrum; away from zero the spectrum consists exactly of the eigenvalues; the nonzero
 spectrum is countable; and only finitely many spectral points have `|μ| ≥ δ` for each
-`δ > 0`, so an enumeration of the nonzero spectrum converges to `0`.
-
-Terminal result of the library, stated in the manuscript. Nothing else consumes it. -/
+`δ > 0`, so an enumeration of the nonzero spectrum converges to `0`. -/
 theorem spectrum_compact_operator (hK : IsCompactOperator K)
     (hinf : ¬ FiniteDimensional ℝ E) :
     (0 : ℝ) ∈ spectrum ℝ K
@@ -385,9 +383,6 @@ lemma opAlam_solves_iff (lam : ℝ) (f : H01 Ω →L[ℝ] ℝ) (u : H01 Ω) :
     rw [hu, hgrep v] at h1
     linarith [h1]
 
-set_option maxHeartbeats 1600000 in
--- The `algebraMap` into the operator algebra over the `H01` subtype makes the
--- elaboration of the Fredholm branch heavy; the proof itself is short.
 /-- The `λ`-shifted Riesz operator is bijective off `Σ`. -/
 lemma opAlam_bijective_of_notMem (hK : IsCompactOperator (Op.opK Ω)) {lam : ℝ}
     (hlam : lam ∉ Op.sigmaSet Ω) : Function.Bijective (Op.opAlam Ω lam) := by
@@ -400,36 +395,15 @@ lemma opAlam_bijective_of_notMem (hK : IsCompactOperator (Op.opK Ω)) {lam : ℝ
     rw [h1]
     simpa using (Op.opE Ω).bijective
   · -- otherwise: the Fredholm alternative at `μ = γ/(γ+λ) ≠ 0`
-    set μ : ℝ := Op.gardingγ / (Op.gardingγ + lam) with hμdef
-    have hμ0 : μ ≠ 0 := div_ne_zero hγ.ne' hcase
-    have hnoteig : ¬ Module.End.HasEigenvalue (Op.opK Ω).toLinearMap μ := by
-      intro h
-      exact hlam ⟨hcase, h⟩
-    rcases hK.hasEigenvalue_or_mem_resolventSet (μ := μ) hμ0 with he | hr
-    · exact absurd he hnoteig
-    · have hunit : IsUnit ((algebraMap ℝ (H01 Ω →L[ℝ] H01 Ω)) μ - Op.opK Ω) :=
-        spectrum.mem_resolventSet_iff.mp hr
-      set c : ℝ := (Op.gardingγ + lam) / Op.gardingγ with hcdef
-      have hc0 : c ≠ 0 := div_ne_zero hcase hγ.ne'
-      have hcμ : c * μ = 1 := by
-        rw [hcdef, hμdef]
-        field_simp
-      have hfac : (1 : H01 Ω →L[ℝ] H01 Ω) - c • Op.opK Ω
-          = (algebraMap ℝ (H01 Ω →L[ℝ] H01 Ω)) c
-            * ((algebraMap ℝ (H01 Ω →L[ℝ] H01 Ω)) μ - Op.opK Ω) := by
-        rw [mul_sub, ← map_mul, hcμ, map_one, ← Algebra.smul_def]
-      have hcunit : IsUnit ((algebraMap ℝ (H01 Ω →L[ℝ] H01 Ω)) c) :=
-        (isUnit_iff_ne_zero.mpr hc0).map (algebraMap ℝ (H01 Ω →L[ℝ] H01 Ω))
-      have hKunit : IsUnit ((1 : H01 Ω →L[ℝ] H01 Ω) - c • Op.opK Ω) := by
-        rw [hfac]
-        exact hcunit.mul hunit
-      have h1bij : Function.Bijective
-          ((1 : H01 Ω →L[ℝ] H01 Ω) - c • Op.opK Ω) :=
-        ContinuousLinearMap.isUnit_iff_bijective.mp hKunit
-      have hEbij : Function.Bijective (Op.opE Ω : H01 Ω →L[ℝ] H01 Ω) := by
-        simpa using (Op.opE Ω).bijective
-      rw [Op.opAlam_factor Ω lam]
-      exact hEbij.comp h1bij
+    have hnoteig : ¬ Module.End.HasEigenvalue (Op.opK Ω).toLinearMap
+        (((Op.gardingγ + lam) / Op.gardingγ)⁻¹) := by
+      rw [inv_div]
+      exact fun h => hlam ⟨hcase, h⟩
+    have h1bij := bijective_one_sub_smul (E := H01 Ω) hK (div_ne_zero hcase hγ.ne') hnoteig
+    have hEbij : Function.Bijective (Op.opE Ω : H01 Ω →L[ℝ] H01 Ω) := by
+      simpa using (Op.opE Ω).bijective
+    rw [Op.opAlam_factor Ω lam]
+    exact hEbij.comp h1bij
 
 /-- A point of `Σ` defeats uniqueness already for `f = 0`: the eigenvector of `opK` at
 `γ/(γ+λ)` is a nonzero weak solution of the homogeneous `λ`-problem. -/

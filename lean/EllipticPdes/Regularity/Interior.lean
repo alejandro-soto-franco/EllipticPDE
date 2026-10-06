@@ -84,7 +84,7 @@ private lemma interior_secondDeriv_step (Op : FullEllipticOp d) (hΩm : Measurab
   refine ⟨Cd + dcoef + 1, fun u f hu => ?_⟩
   obtain ⟨w, hw, hwCd⟩ := hCd u f hu
   set P : ℝ := ‖f‖ + ‖(u : H1amb Ω) 0‖ with hP
-  have hDiuEq := restrictL2_extendL2_mulTest_eq_of_eqOn hΩm hVm hVΩ T.hζ T.zeta_eqOn_one
+  have hDiuEq := restrictL2_extendL2_mulTest_of_eqOn hΩm hVm hVΩ T.hζ T.zeta_eqOn_one
     ((u : H1amb Ω) i.succ)
   refine ⟨restrictL2 w, ?_, ?_⟩
   · rw [← hDiuEq]; exact hasWeakDerivOn_of_hasWeakDeriv k hw

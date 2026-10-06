@@ -25,7 +25,6 @@ smooth function agree, and a class in `L²(V)` is integrable against a test func
   function.
 * `partialD_partialD_swap`: the mixed partials of a smooth function agree.
 * `integrable_mul_testFn`: an `L²(V)` class is integrable against a test function.
-* `HasWeakDerivOn.mul_contDiff_left`: the weak Leibniz rule for a `C¹` weight.
 -/
 
 @[expose] public section
@@ -73,26 +72,5 @@ lemma partialD_partialD_swap {φ : EuclideanSpace ℝ (Fin d) → ℝ}
   refine (hφ.contDiffAt.isSymmSndFDerivAt ?_) _ _
   simp only [minSmoothness_of_isRCLikeNormedField]
   exact WithTop.coe_le_coe.mpr le_top
-
-/-- **Weak Leibniz rule with a `C¹` weight.** If `g` has weak `ℓ`-derivative `g'` on `V`, and
-`a` is `C¹` with `a` and `∂_ℓ a` essentially bounded, then `a·g` has weak `ℓ`-derivative
-`(∂_ℓ a)·g + a·g'` on `V`. This is `HasWeakDerivOn.mul_isWkInfty_left` for the weak derivative
-`∂_ℓ a` of a `C¹` function. -/
-theorem HasWeakDerivOn.mul_contDiff_left {V : Set (EuclideanSpace ℝ (Fin d))}
-    (_hVm : MeasurableSet V) (ℓ : Fin d)
-    {g g' : Lp ℝ 2 (volume.restrict V)} (hg : HasWeakDerivOn V ℓ g g')
-    {a : EuclideanSpace ℝ (Fin d) → ℝ} (ha : ContDiff ℝ 1 a)
-    {Ma Mda : ℝ}
-    (haM : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |a x| ≤ Ma)
-    (hdaM : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |partialD ℓ a x| ≤ Mda)
-    (ag : Lp ℝ 2 (volume.restrict V))
-    (hag : ag =ᵐ[volume.restrict V] fun x => a x * (g x : ℝ))
-    (dag : Lp ℝ 2 (volume.restrict V))
-    (hdag : dag =ᵐ[volume.restrict V]
-              fun x => partialD ℓ a x * (g x : ℝ) + a x * (g' x : ℝ)) :
-    HasWeakDerivOn V ℓ ag dag :=
-  HasWeakDerivOn.mul_isWkInfty_left ℓ hg ha.continuous.measurable
-    ((ha.continuous_fderiv one_ne_zero).clm_apply continuous_const).measurable
-    (hasWeakPartial_partialD ha ℓ) haM hdaM ag hag dag hdag
 
 end EllipticPdes.Regularity

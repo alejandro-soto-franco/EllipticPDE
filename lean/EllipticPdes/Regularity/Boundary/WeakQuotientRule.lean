@@ -20,7 +20,7 @@ At the point that step is invoked only the tangential second derivatives are kno
 `L²`, so (53) is available as a statement about the weak derivative of the *product*
 `a^{nn} u_{x_n}`, and the passage to `u_{x_n} ∈ H¹` needs a division. This file supplies
 that division: the inverse of the weighted product rule
-`EllipticPdes.Regularity.HasWeakDerivOn.mul_contDiff_left`.
+`EllipticPdes.Regularity.HasWeakDerivOn.mul_isWkInfty_left`.
 
 The mathematical content is one line, `v = a⁻¹ · (a · v)`, and the whole difficulty sits in the
 hypotheses on `a`. A bounded measurable `a` bounded away from zero falls short, since
@@ -122,17 +122,19 @@ private theorem partialD_inv {a : EuclideanSpace ℝ (Fin d) → ℝ} (ha : Cont
 
 /-! ### Dividing the weight out -/
 
+set_option linter.unusedVariables false in
 /-- **Weak-derivative division by a `C¹` weight bounded away from zero.** If `a · v` has weak
 `ℓ`-derivative `dav` on `V`, and `a` is `C¹` with `a ≥ θ > 0` almost everywhere and
 `∂_ℓ a` bounded almost everywhere, then `v` itself has weak `ℓ`-derivative
 `(dav - (∂_ℓ a) · v) / a` on `V`.
 
-This is the inverse of `HasWeakDerivOn.mul_contDiff_left`, and is what step 5 of the proof
-of Evans, *Partial Differential Equations* (2nd ed.), §6.3.2, Theorem 4 (*Boundary `H²`
-regularity*) needs to pass from the rearranged equation (53), which controls the weak
-derivative of the product `a^{nn} u_{x_n}`, to `u_{x_n} ∈ H¹` and hence to the pointwise
-bound (55). Proved by writing `v = a⁻¹ · (a · v)` and applying the product rule at the
+This is the inverse of the weak Leibniz rule `HasWeakDerivOn.mul_isWkInfty_left`, and is what
+step 5 of the proof of Evans, *Partial Differential Equations* (2nd ed.), §6.3.2, Theorem 4
+(*Boundary `H²` regularity*) needs to pass from the rearranged equation (53), which controls
+the weak derivative of the product `a^{nn} u_{x_n}`, to `u_{x_n} ∈ H¹` and hence to the
+pointwise bound (55). Proved by writing `v = a⁻¹ · (a · v)` and applying the product rule at the
 weight `a⁻¹`, whose `C¹` regularity is where the hypotheses on `a` are spent. -/
+@[nolint unusedArguments]
 theorem HasWeakDerivOn.of_mul_contDiff_left {V : Set (EuclideanSpace ℝ (Fin d))}
     (hVm : MeasurableSet V) (ℓ : Fin d)
     {a : EuclideanSpace ℝ (Fin d) → ℝ} (ha : ContDiff ℝ 1 a)
@@ -173,7 +175,9 @@ theorem HasWeakDerivOn.of_mul_contDiff_left {V : Set (EuclideanSpace ℝ (Fin d)
     rw [hx, hax, partialD_inv ha hne ℓ x]
     field_simp
     ring
-  exact HasWeakDerivOn.mul_contDiff_left hVm ℓ hd hbC1 hbM hdbM v hvrep v' hv'rep
+  exact HasWeakDerivOn.mul_isWkInfty_left ℓ hd hbC1.continuous.measurable
+    ((hbC1.continuous_fderiv one_ne_zero).clm_apply continuous_const).measurable
+    (hasWeakPartial_partialD hbC1 ℓ) hbM hdbM v hvrep v' hv'rep
 
 /-- **Existence and estimate of the quotient class.** Under the hypotheses of
 `HasWeakDerivOn.of_mul_contDiff_left`, the weak `ℓ`-derivative of `v` is an `L²(V)` class
@@ -236,6 +240,7 @@ coefficient entry, ellipticity supplies the lower bound `a_{kk} ≥ lam > 0` (Ev
 on the data the boundary programme already has. At `ℓ = k = n` this is exactly the passage from
 the rearranged equation (53) to `u_{x_n} ∈ H¹` in step 5 of the proof of Evans, *Partial
 Differential Equations* (2nd ed.), §6.3.2, Theorem 4 (*Boundary `H²` regularity*). -/
+@[nolint unusedArguments]
 theorem exists_hasWeakDerivOn_of_mul_diag {V : Set (EuclideanSpace ℝ (Fin d))}
     (hVm : MeasurableSet V) (A : EllipticCoeff d) (hA : IsC1Coeff A) (ℓ k : Fin d)
     {v av dav : Lp ℝ 2 (volume.restrict V)}

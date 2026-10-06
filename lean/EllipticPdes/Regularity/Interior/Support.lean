@@ -40,7 +40,7 @@ lemma mulTest_ae_eq_zero_off_tsupport {η : EuclideanSpace ℝ (Fin d) → ℝ}
     (hη : IsTestFn Ω η) (g : L2D Ω) :
     ∀ᵐ x ∂(volume.restrict Ω),
       x ∉ tsupport η → (mulTest hη g x : ℝ) = 0 := by
-  filter_upwards [mulTest_coeFn hη g] with x hx hxns
+  filter_upwards [mulCutoff_coeFn hη g] with x hx hxns
   rw [hx, image_eq_zero_of_notMem_tsupport hxns, zero_mul]
 
 /-- If a class `g` vanishes a.e. (on `Ω`) off a set `S`, then its extension by zero to the
@@ -80,13 +80,13 @@ lemma inner_Lp_eq_integral_of_ae {α : Type*} [MeasurableSpace α] {μ : Measure
 
 /-- **Invisibility of a cutoff on the set where it is `1`.** If `η ≡ 1` on `V ⊆ Ω`, the
 `V`-restriction of the whole-space extension of `η · g` agrees with that of `g`. -/
-theorem restrictL2_extendL2_mulTest_eq_of_eqOn (hΩm : MeasurableSet Ω)
+theorem restrictL2_extendL2_mulTest_of_eqOn (hΩm : MeasurableSet Ω)
     {V : Set (EuclideanSpace ℝ (Fin d))} (hVm : MeasurableSet V) (hVΩ : V ⊆ Ω)
     {η : EuclideanSpace ℝ (Fin d) → ℝ} (hη : IsTestFn Ω η) (h1 : Set.EqOn η 1 V) (g : L2D Ω) :
     restrictL2 (Ω := V) (extendL2 hΩm (mulTest hη g)) = restrictL2 (Ω := V) (extendL2 hΩm g) := by
   have hmt : (mulTest hη g : EuclideanSpace ℝ (Fin d) → ℝ)
       =ᵐ[volume.restrict V] fun x => η x * (g x : ℝ) :=
-    (mulTest_coeFn hη g).filter_mono (ae_mono (Measure.restrict_mono hVΩ le_rfl))
+    (mulCutoff_coeFn hη g).filter_mono (ae_mono (Measure.restrict_mono hVΩ le_rfl))
   apply Lp.ext
   filter_upwards [coeFn_restrictL2 (Ω := V) (extendL2 hΩm (mulTest hη g)),
     coeFn_restrictL2 (Ω := V) (extendL2 hΩm g),

@@ -91,7 +91,7 @@ theorem weightL_mulTest_eq {c ψ ζ : EuclideanSpace ℝ (Fin d) → ℝ}
     weightL Ω hcm hc hψ hψcs (mulTest hζ g) = weightL Ω hcm hc hψ hψcs g := by
   apply Lp.ext
   filter_upwards [weightL_coeFn hcm hc hψ hψcs (mulTest hζ g), weightL_coeFn hcm hc hψ hψcs g,
-    mulTest_coeFn hζ g] with x h1 h2 h3
+    mulCutoff_coeFn hζ g] with x h1 h2 h3
   rw [h1, h2, h3]
   by_cases hx : x ∈ tsupport ψ
   · rw [hζψ hx, Pi.one_apply, one_mul]
@@ -107,20 +107,13 @@ theorem exists_norm_redDatum_le (Op : FullEllipticOp d) (D : CoeffWeakGrad Op.to
       Set.EqOn ζ 1 (tsupport η) → ∀ (U : H1amb Ω) (f : L2D Ω),
       ‖redDatum Op D hη U f‖ ≤ K * (‖f‖ + (‖U 0‖ + ∑ i : Fin d, ‖mulTest hζ (U i.succ)‖)) := by
   classical
-  set Mη : ℝ := (exists_abs_bound hη).choose
-  have hMη : 0 ≤ Mη := le_trans (abs_nonneg _) ((exists_abs_bound hη).choose_spec 0)
-  set K1 : Fin d → Fin d → ℝ := fun _ j => max Op.Λ 0 *
-    ((hη.hasCompactSupport_partialD j).exists_bound_of_continuous
-      (hη.continuous_partialD j)).choose
-  set K2 : Fin d → Fin d → ℝ := fun i _ => max D.bound 0 *
-    ((hη.hasCompactSupport_partialD i).exists_bound_of_continuous
-      (hη.continuous_partialD i)).choose
-  set K4 : Fin d → Fin d → ℝ := fun i j => max Op.Λ 0 *
-    (((isTestFn_partialD hη i).hasCompactSupport_partialD j).exists_bound_of_continuous
-      ((isTestFn_partialD hη i).continuous_partialD j)).choose
-  set K5 : Fin d → ℝ := fun i => max Op.Bsup 0 *
-    ((hη.hasCompactSupport_partialD i).exists_bound_of_continuous
-      (hη.continuous_partialD i)).choose
+  set Mη : ℝ := hη.supNorm
+  have hMη : 0 ≤ Mη := hη.supNorm_nonneg
+  set K1 : Fin d → Fin d → ℝ := fun _ j => max Op.Λ 0 * hη.partialSupNorm j
+  set K2 : Fin d → Fin d → ℝ := fun i _ => max D.bound 0 * hη.partialSupNorm i
+  set K4 : Fin d → Fin d → ℝ := fun i j =>
+    max Op.Λ 0 * (isTestFn_partialD hη i).partialSupNorm j
+  set K5 : Fin d → ℝ := fun i => max Op.Bsup 0 * hη.partialSupNorm i
   have hK1 : ∀ i j, 0 ≤ K1 i j := fun _ j => weightL_bound_nonneg
     (hη.continuous_partialD j) (hη.hasCompactSupport_partialD j)
   have hK2 : ∀ i j, 0 ≤ K2 i j := fun i _ => weightL_bound_nonneg
@@ -150,7 +143,7 @@ theorem exists_norm_redDatum_le (Op : FullEllipticOp d) (D : CoeffWeakGrad Op.to
     rw [hN]; linarith [hGi i, norm_nonneg (U 0)]
   have hEq : ∀ j : Fin d, Set.EqOn ζ 1 (tsupport (partialD j η)) := fun j =>
     hζη.mono (tsupport_partialD_subset j η)
-  have t0 : ‖mulTest hη f‖ ≤ Mη * ‖f‖ := norm_mulTest_le hη f
+  have t0 : ‖mulTest hη f‖ ≤ Mη * ‖f‖ := norm_mulTest_le_supNorm hη f
   have t1 := norm_double_sum_le (fun i j => weightL Ω (Op.measurable i j) (Op.bdd i j)
       (hη.continuous_partialD j) (hη.hasCompactSupport_partialD j) (U i.succ)) K1 N
     (fun i j => by
@@ -192,16 +185,16 @@ theorem cutoffMul_zero_ae {η : EuclideanSpace ℝ (Fin d) → ℝ} (hη : IsTes
     (U : H1amb Ω) :
     ((cutoffMul hη U) 0 : EuclideanSpace ℝ (Fin d) → ℝ)
       =ᵐ[volume.restrict Ω] fun x => η x * (U 0 x : ℝ) := by
-  rw [cutoffMul_apply_zero]; exact mulTest_coeFn hη (U 0)
+  rw [cutoffMulOn_apply_zero]; exact mulCutoff_coeFn hη (U 0)
 
 /-- The gradient coordinates of `η U` are `η U_{i+1} + ∂_i η U₀`. -/
 theorem cutoffMul_succ_ae {η : EuclideanSpace ℝ (Fin d) → ℝ} (hη : IsTestFn Ω η)
     (U : H1amb Ω) (i : Fin d) :
     ((cutoffMul hη U) i.succ : EuclideanSpace ℝ (Fin d) → ℝ)
       =ᵐ[volume.restrict Ω] fun x => η x * (U i.succ x : ℝ) + partialD i η x * (U 0 x : ℝ) := by
-  rw [cutoffMul_apply_succ]
+  rw [cutoffMulOn_apply_succ]
   filter_upwards [Lp.coeFn_add (mulTest hη (U i.succ)) (mulTestPartial hη i (U 0)),
-    mulTest_coeFn hη (U i.succ), mulTestPartial_coeFn hη i (U 0)] with x h1 h2 h3
+    mulCutoff_coeFn hη (U i.succ), mulCutoffPartial_coeFn hη i (U 0)] with x h1 h2 h3
   rw [h1, Pi.add_apply, h2, h3]
 
 /-- **Invisibility of the cutoff where it is one.** If `η = 1` near `V ⊆ Ω`, every coordinate of
@@ -252,8 +245,8 @@ theorem interior_H2_estimate_W12 {n : ℕ} (Op : FullEllipticOp (n + 1))
   obtain ⟨C, hC0, hC⟩ := interior_H2_estimate Op hΩm hΩo hA.toIsLipCoeff hVc hVΩ
   obtain ⟨K, hK0, hK⟩ := exists_norm_redDatum_le Op hA.coeffWeakGrad hη
   obtain ⟨Cg, hCg0, hCg⟩ := exists_norm_mulTest_grad_le Op hΩo hζ
-  set Mη : ℝ := (exists_abs_bound hη).choose
-  have hMη : 0 ≤ Mη := le_trans (abs_nonneg _) ((exists_abs_bound hη).choose_spec 0)
+  set Mη : ℝ := hη.supNorm
+  have hMη : 0 ≤ Mη := hη.supNorm_nonneg
   refine ⟨C * (K * (1 + (n + 1) * Cg) + Mη),
     mul_nonneg hC0 (add_nonneg (mul_nonneg hK0 (by positivity)) hMη),
     fun U f hsol k i => ?_⟩
@@ -264,8 +257,8 @@ theorem interior_H2_estimate_W12 {n : ℕ} (Op : FullEllipticOp (n + 1))
   refine ⟨wki, hid ▸ hwd, ?_⟩
   have hW0 : ‖(W : H1amb Ω) 0‖ ≤ Mη * ‖U 0‖ := by
     change ‖(cutoffMul hη U) 0‖ ≤ _
-    rw [cutoffMul_apply_zero]
-    exact norm_mulTest_le hη _
+    rw [cutoffMulOn_apply_zero]
+    exact norm_mulTest_le_supNorm hη _
   have hf0 := norm_nonneg f
   have hU0 := norm_nonneg (U 0)
   have hG : ∑ j : Fin (n + 1), ‖mulTest hζ (U j.succ)‖ ≤ (n + 1) * Cg * (‖f‖ + ‖U 0‖) := by

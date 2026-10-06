@@ -105,7 +105,7 @@ private lemma norm_diffQuotD_mulTest_le (hΩm : MeasurableSet Ω) {ζ : Euclidea
   have hζext : (extendL2 hΩm (mulTest hζ g) : EuclideanSpace ℝ (Fin d) → ℝ)
       =ᵐ[volume] fun y => ζ y * (extendL2 hΩm g : EuclideanSpace ℝ (Fin d) → ℝ) y := by
     have hg : ∀ᵐ x ∂volume, x ∈ Ω → (mulTest hζ g x : ℝ) = ζ x * (g x : ℝ) :=
-      (ae_restrict_iff' hΩm).mp (mulTest_coeFn hζ g)
+      (ae_restrict_iff' hΩm).mp (mulCutoff_coeFn hζ g)
     filter_upwards [coeFn_extendL2 hΩm (mulTest hζ g), coeFn_extendL2 hΩm g, hg] with y h1 h2 h3
     rw [h1, h2]
     by_cases hyΩ : y ∈ Ω
@@ -128,8 +128,8 @@ private lemma norm_diffQuotD_mulTest_le (hΩm : MeasurableSet Ω) {ζ : Euclidea
           * (extendL2 hΩm g : EuclideanSpace ℝ (Fin d) → ℝ) (x + hshift k h) := hqmp.ae hζext
     filter_upwards [coeFn_diffQuotD k h hΩm (mulTest hζ g),
       mulCoeffL_add_coeFn hm1 hm1b hm2 hm2b (mulTest hξ (diffQuotD k h hΩm g)) g,
-      mulTest_coeFn hξ (diffQuotD k h hΩm g), coeFn_diffQuotD k h hΩm g,
-      ae_restrict_of_ae hζext', mulTest_coeFn hζ g] with x hx1 hx2 hx3 hx4 hx5 hx6
+      mulCutoff_coeFn hξ (diffQuotD k h hΩm g), coeFn_diffQuotD k h hΩm g,
+      ae_restrict_of_ae hζext', mulCutoff_coeFn hζ g] with x hx1 hx2 hx3 hx4 hx5 hx6
     rw [hx1, hx5, hx6, hx2, hx3, hx4]
     rcases hloc x with hz | hone
     · rw [hz]; field_simp; ring

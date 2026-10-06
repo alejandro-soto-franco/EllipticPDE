@@ -41,16 +41,6 @@ variable {d : ℕ}
 
 /-! ### The translation -/
 
-/-- Translation by `h` preserves Lebesgue measure. -/
-lemma measurePreserving_translate (h : EuclideanSpace ℝ (Fin d)) :
-    MeasurePreserving (fun y : EuclideanSpace ℝ (Fin d) => y + h) volume volume :=
-  measurePreserving_add_right volume h
-
-/-- Translation by `h` is a measurable embedding. -/
-lemma measurableEmbedding_translate (h : EuclideanSpace ℝ (Fin d)) :
-    MeasurableEmbedding (fun y : EuclideanSpace ℝ (Fin d) => y + h) :=
-  (Homeomorph.addRight h).measurableEmbedding
-
 /-! ### Derivatives and supports -/
 
 /-- **Partial derivatives of a translate.** Translation has derivative the identity, so a
@@ -73,12 +63,12 @@ theorem hasWeakGradOn_comp_translate {B : Set (EuclideanSpace ℝ (Fin d))}
   rw [hasWeakGradOn_iff] at hw ⊢
   exact fun k => by
     simpa using (hw k).comp_affine (ContinuousLinearEquiv.refl ℝ _) h
-      (measurePreserving_translate h)
+      (measurePreserving_add_right volume h)
 
 /-- **Translation preserves every `Lᵖ` seminorm.** -/
 theorem eLpNorm_comp_translate {f : EuclideanSpace ℝ (Fin d) → ℝ}
     (hf : AEStronglyMeasurable f volume) (h : EuclideanSpace ℝ (Fin d)) (p : ℝ≥0∞) :
     eLpNorm (fun y => f (y + h)) p volume = eLpNorm f p volume :=
-  eLpNorm_comp_measurePreserving hf (measurePreserving_translate h)
+  eLpNorm_comp_measurePreserving hf (measurePreserving_add_right volume h)
 
 end EllipticPdes.Extension

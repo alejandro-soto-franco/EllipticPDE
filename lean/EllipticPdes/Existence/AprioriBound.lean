@@ -46,29 +46,28 @@ theorem le_diag_of_ell {a : EuclideanSpace ℝ (Fin d) → Fin d → Fin d → �
     (hell : ∀ ξ : Fin d → ℝ, θ * ∑ i, ξ i ^ 2 ≤ ∑ i, ∑ j, a z i j * ξ i * ξ j) (i₀ : Fin d) :
     θ ≤ a z i₀ i₀ := by
   classical
-  have h := hell (Pi.single i₀ (1 : ℝ) : Fin d → ℝ)
-  have hs1 : ∑ i, ((Pi.single i₀ (1 : ℝ) : Fin d → ℝ) i) ^ 2 = 1 := by
-    rw [Finset.sum_eq_single i₀]
-    · simp
-    · intro i _ hi
-      simp [hi]
-    · intro h
-      exact absurd (Finset.mem_univ _) h
-  have hs2 : ∑ i, ∑ j, a z i j * (Pi.single i₀ (1 : ℝ) : Fin d → ℝ) i
-      * (Pi.single i₀ (1 : ℝ) : Fin d → ℝ) j = a z i₀ i₀ := by
-    rw [Finset.sum_eq_single i₀]
-    · rw [Finset.sum_eq_single i₀]
-      · simp
-      · intro j _ hj
-        simp [hj]
-      · intro h
-        exact absurd (Finset.mem_univ _) h
-    · intro i _ hi
-      simp [hi]
-    · intro h
-      exact absurd (Finset.mem_univ _) h
-  rw [hs1, hs2, mul_one] at h
-  exact h
+  simpa [Pi.single_apply] using hell (Pi.single i₀ (1 : ℝ) : Fin d → ℝ)
+
+/-- **Principal part of the slab comparison function.** If `θ ≤ a₀`, `b₀ ≤ B` and
+`α = B / θ + 1` with `B ≥ 0`, then `θ ≤ (a₀ α² - b₀ α) w` whenever `1 ≤ w`. -/
+theorem le_slab_principal {θ B α a₀ b₀ w : ℝ} (hθ : 0 < θ) (hB : 0 ≤ B) (hα : α = B / θ + 1)
+    (ha : θ ≤ a₀) (hb : b₀ ≤ B) (hw : 1 ≤ w) : θ ≤ (a₀ * α ^ 2 - b₀ * α) * w := by
+  have hα1 : 1 ≤ α := by
+    have : 0 ≤ B / θ := div_nonneg hB hθ.le
+    linarith
+  have hθα : θ * α = B + θ := by
+    rw [hα]
+    field_simp
+  have h3 : θ * α ≤ a₀ * α ^ 2 - b₀ * α := by
+    have e1 : θ * α ^ 2 ≤ a₀ * α ^ 2 := mul_le_mul_of_nonneg_right ha (sq_nonneg α)
+    have e2 : b₀ * α ≤ B * α := mul_le_mul_of_nonneg_right hb (by linarith)
+    have e3 : θ * α ^ 2 - B * α = θ * α := by linear_combination α * hθα
+    linarith
+  have h4 : θ ≤ θ * α := by nlinarith
+  have h5 : 0 ≤ a₀ * α ^ 2 - b₀ * α := by linarith
+  calc θ ≤ a₀ * α ^ 2 - b₀ * α := h4.trans h3
+    _ = (a₀ * α ^ 2 - b₀ * α) * 1 := (mul_one _).symm
+    _ ≤ (a₀ * α ^ 2 - b₀ * α) * w := mul_le_mul_of_nonneg_left hw h5
 
 /-- The coordinate map is continuous. -/
 theorem continuous_coord (i₀ : Fin d) :
@@ -164,22 +163,8 @@ theorem apriori_bound_sub (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))}
     have hwpos : 0 < expFn α i₀ x := expFn_pos α i₀ x
     have hepos : 0 < Real.exp (-α * m) := Real.exp_pos _
     -- the principal and transport part of `L (e^{α(x - m)})` is at least `θ`
-    have hprin : θ ≤ (a x i₀ i₀ * α ^ 2 - b x i₀ * α) * (Real.exp (-α * m) * expFn α i₀ x) := by
-      have hθα : θ * α = B + θ := by
-        rw [hα]
-        field_simp
-      have h3 : θ * α ≤ a x i₀ i₀ * α ^ 2 - b x i₀ * α := by
-        have e1 : θ * α ^ 2 ≤ a x i₀ i₀ * α ^ 2 := mul_le_mul_of_nonneg_right haa (sq_nonneg α)
-        have e2 : b x i₀ * α ≤ B * α := mul_le_mul_of_nonneg_right hbb hα0.le
-        have e3 : θ * α ^ 2 - B * α = θ * α := by linear_combination α * hθα
-        linarith
-      have h4 : θ ≤ θ * α := by nlinarith
-      have h5 : 0 ≤ a x i₀ i₀ * α ^ 2 - b x i₀ * α := by linarith
-      calc θ ≤ θ * α := h4
-        _ ≤ a x i₀ i₀ * α ^ 2 - b x i₀ * α := h3
-        _ = (a x i₀ i₀ * α ^ 2 - b x i₀ * α) * 1 := (mul_one _).symm
-        _ ≤ (a x i₀ i₀ * α ^ 2 - b x i₀ * α) * (Real.exp (-α * m) * expFn α i₀ x) :=
-            mul_le_mul_of_nonneg_left hw h5
+    have hprin : θ ≤ (a x i₀ i₀ * α ^ 2 - b x i₀ * α) * (Real.exp (-α * m) * expFn α i₀ x) :=
+      le_slab_principal hθ hB0 hα haa hbb hw
     -- the zeroth-order part is `c v ≥ 0`
     have hcv : 0 ≤ c x * v x := mul_nonneg hcx (hvbd x (subset_closure hx)).1
     have hvx' := hvx x

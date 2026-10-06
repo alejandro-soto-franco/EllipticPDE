@@ -423,31 +423,31 @@ theorem finrank_ker_one_sub_adjoint_eq (hK : IsCompactOperator K) :
   have h := finrank_ker_one_sub_adjoint_le (isCompactOperator_adjoint hK)
   rwa [ContinuousLinearMap.adjoint_adjoint] at h
 
-/-- The adjoint of (the underlying map of) a continuous linear equivalence is
-bijective: the adjoint of the inverse is a two-sided inverse. -/
+/-- The adjoint of (the underlying map of) a continuous linear equivalence is bijective: it is
+the star of a unit. -/
 lemma bijective_adjoint_of_equiv (e : E ≃L[ℝ] E) :
     Function.Bijective (ContinuousLinearMap.adjoint (e : E →L[ℝ] E)) := by
-  have h1 : (ContinuousLinearMap.adjoint (e : E →L[ℝ] E)).comp
-      (ContinuousLinearMap.adjoint (e.symm : E →L[ℝ] E)) = 1 := by
-    rw [← ContinuousLinearMap.adjoint_comp]
-    have hcomp : (e.symm : E →L[ℝ] E).comp (e : E →L[ℝ] E) = 1 := by
-      ext x
-      simp
-    rw [hcomp, ContinuousLinearMap.adjoint_one]
-  have h2 : (ContinuousLinearMap.adjoint (e.symm : E →L[ℝ] E)).comp
-      (ContinuousLinearMap.adjoint (e : E →L[ℝ] E)) = 1 := by
-    rw [← ContinuousLinearMap.adjoint_comp]
-    have hcomp : (e : E →L[ℝ] E).comp (e.symm : E →L[ℝ] E) = 1 := by
-      ext x
-      simp
-    rw [hcomp, ContinuousLinearMap.adjoint_one]
-  have hl : Function.LeftInverse (ContinuousLinearMap.adjoint (e.symm : E →L[ℝ] E))
-      (ContinuousLinearMap.adjoint (e : E →L[ℝ] E)) := fun x => by
-    rw [← ContinuousLinearMap.comp_apply, h2, one_apply_eq_self]
-  have hr : Function.RightInverse (ContinuousLinearMap.adjoint (e.symm : E →L[ℝ] E))
-      (ContinuousLinearMap.adjoint (e : E →L[ℝ] E)) := fun x => by
-    rw [← ContinuousLinearMap.comp_apply, h1, one_apply_eq_self]
-  exact ⟨hl.injective, hr.surjective⟩
+  have h := (ContinuousLinearMap.isUnit_iff_bijective.2
+    (show Function.Bijective (e : E →L[ℝ] E) from e.bijective)).star
+  rwa [ContinuousLinearMap.star_eq_adjoint, ContinuousLinearMap.isUnit_iff_bijective] at h
+
+/-- If `A = e ∘ (1 - K)` for an equivalence `e`, then `ker A†` has the same dimension as
+`ker (1 - K†)`: `ker A† = (e†)⁻¹ ker (1 - K†)`. -/
+lemma finrank_ker_adjoint_of_eq_comp_equiv {A : E →L[ℝ] E} (e : E ≃L[ℝ] E)
+    (hA : A = (e : E →L[ℝ] E).comp (1 - K)) :
+    Module.finrank ℝ (LinearMap.ker (ContinuousLinearMap.adjoint A).toLinearMap)
+      = Module.finrank ℝ
+          (LinearMap.ker ((1 - ContinuousLinearMap.adjoint K : E →L[ℝ] E)).toLinearMap) := by
+  let T : E ≃ₗ[ℝ] E := LinearEquiv.ofBijective
+    (ContinuousLinearMap.adjoint (e : E →L[ℝ] E)).toLinearMap (bijective_adjoint_of_equiv e)
+  have hker : LinearMap.ker (ContinuousLinearMap.adjoint A).toLinearMap
+      = (LinearMap.ker ((1 - ContinuousLinearMap.adjoint K : E →L[ℝ] E)).toLinearMap).map
+        (T.symm : E →ₗ[ℝ] E) := by
+    rw [← Submodule.comap_equiv_eq_map_symm]
+    ext x
+    simp [LinearMap.mem_ker, hA, ContinuousLinearMap.adjoint_comp,
+      ContinuousLinearMap.adjoint_one, T]
+  rw [hker, LinearEquiv.finrank_map_eq]
 
 /-- **Fredholm alternative** (Evans Appendix D Theorem 5, Guo Theorem VII.4.4) for a compact
 operator `K` on a real Hilbert space: the kernel of `1 - K` is finite dimensional, the range of
@@ -491,6 +491,20 @@ theorem fredholm_alternative_compact (hK : IsCompactOperator K) :
     rw [Submodule.orthogonal_eq_top_iff] at h1
     rw [h1, finrank_bot] at hrank
     exact Submodule.finrank_eq_zero.mp hrank.symm
+
+/-- For a compact operator `K` and a nonzero scalar `c` such that `c⁻¹` is not an eigenvalue of
+`K`, the operator `1 - c K` is bijective. -/
+theorem bijective_one_sub_smul (hK : IsCompactOperator K) {c : ℝ} (hc : c ≠ 0)
+    (h : ¬ Module.End.HasEigenvalue (K : Module.End ℝ E) c⁻¹) :
+    Function.Bijective (1 - c • K : E →L[ℝ] E) := by
+  rcases hK.hasEigenvalue_or_mem_resolventSet (μ := c⁻¹) (inv_ne_zero hc) with he | hr
+  · exact absurd he h
+  · have hunit := spectrum.mem_resolventSet_iff.mp hr
+    have hfac : (1 - c • K : E →L[ℝ] E)
+        = algebraMap ℝ (E →L[ℝ] E) c * (algebraMap ℝ (E →L[ℝ] E) c⁻¹ - K) := by
+      rw [mul_sub, ← map_mul, mul_inv_cancel₀ hc, map_one, ← Algebra.smul_def]
+    exact ContinuousLinearMap.isUnit_iff_bijective.mp (hfac ▸
+      ((isUnit_iff_ne_zero.mpr hc).map (algebraMap ℝ (E →L[ℝ] E))).mul hunit)
 
 /-- **Fredholm dichotomy** (Evans Appendix D Theorem 5, the remark following it; Guo Theorem
 VII.4.4): either `(1 - K) u = h` has exactly one solution for every `h`, or the homogeneous
@@ -570,9 +584,7 @@ half of Evans §6.2.3, Theorem 4(ii)).
 Under the Rellich-Kondrachov input (`opK` compact), the space of weak solutions of the
 homogeneous problem `Lu = 0` is finite-dimensional: it is the eigenspace of the compact
 operator `opK` at the nonzero eigenvalue `1`, and Riesz theory makes such eigenspaces
-finite-dimensional.
-
-Terminal result of the library, stated in the manuscript. Nothing else consumes it. -/
+finite-dimensional. -/
 theorem finiteDimensional_solSpace (hK : IsCompactOperator (Op.opK Ω)) :
     FiniteDimensional ℝ (Op.solSpace Ω) := by
   rw [solSpace_eq_eigenspace]
@@ -634,15 +646,7 @@ theorem solvable_iff_orthogonal_solSpaceStar (hK : IsCompactOperator (Op.opK Ω)
   have hiff : (∃ u : H01 Ω, ∀ v : H01 Ω, Op.fullBilin Ω u v = f v)
       ↔ g ∈ LinearMap.range (Op.opA Ω).toLinearMap := by
     rw [LinearMap.mem_range]
-    constructor
-    · rintro ⟨u, hu⟩
-      refine ⟨u, ?_⟩
-      change Op.opA Ω u = g
-      refine ext_inner_right (𝕜 := ℝ) (fun v => ?_)
-      rw [Op.inner_opA Ω u v, hu v, hgrep v]
-    · rintro ⟨u, hu⟩
-      have hu' : Op.opA Ω u = g := hu
-      exact ⟨u, fun v => by rw [← Op.inner_opA Ω u v, hu', hgrep v]⟩
+    exact exists_congr fun u => (Op.opA_eq_toDual_symm_iff Ω f u).symm
   rw [hiff, range_eq_orthogonal_ker_adjoint _ (Op.isClosed_range_opA Ω hK),
     Submodule.mem_orthogonal]
   constructor
@@ -653,64 +657,46 @@ theorem solvable_iff_orthogonal_solSpaceStar (hK : IsCompactOperator (Op.opK Ω)
     rw [real_inner_comm, hgrep w]
     exact h w hw
 
-set_option maxHeartbeats 1600000 in
--- The bijectivity proof for the restricted adjoint `Trest` unfolds nested
--- `ContinuousLinearMap.adjoint` and `LinearMap.restrict` coercions through `simpa`, each
--- re-resolving the Hilbert-space instance chain on `H01 Ω`; the default `maxHeartbeats` is
--- insufficient for the combined injectivity and surjectivity arguments.
-/-- **`dim N = dim N*` for the elliptic problem** (Evans §6.2.3, Theorem 4(ii)). The
-space of weak
-solutions of the homogeneous problem and the space of weak solutions of the transpose
-problem have the same (finite) dimension. The factorisation `opA = opE ∘ (1 - opK)`
-maps `solSpaceStar = ker(opA†)` onto `ker(1 - opK†)` along the bijection `(opE)†`,
-and the abstract index theorem `finrank_ker_one_sub_adjoint_eq` applies.
-
-Terminal result of the library, stated in the manuscript. Nothing else consumes it. -/
+/-- **`dim N = dim N*` for the elliptic problem** (Evans §6.2.3, Theorem 4(ii)). The space of
+weak solutions of the homogeneous problem and the space of weak solutions of the transpose
+problem have the same (finite) dimension. The factorisation `opA = opE ∘ (1 - opK)` maps
+`solSpaceStar = ker(opA†)` onto `ker(1 - opK†)` along the bijection `(opE)†`, and the abstract
+index theorem `finrank_ker_one_sub_adjoint_eq` applies. -/
 theorem finrank_solSpaceStar_eq_finrank_solSpace (hK : IsCompactOperator (Op.opK Ω)) :
     Module.finrank ℝ (Op.solSpaceStar Ω) = Module.finrank ℝ (Op.solSpace Ω) := by
-  set T : H01 Ω →L[ℝ] H01 Ω :=
-    ContinuousLinearMap.adjoint (Op.opE Ω : H01 Ω →L[ℝ] H01 Ω) with hTdef
-  set Q := LinearMap.ker ((1 - ContinuousLinearMap.adjoint (Op.opK Ω) :
-    H01 Ω →L[ℝ] H01 Ω)).toLinearMap with hQdef
-  -- `opA† = (1 - opK†) ∘ T`, then pointwise
-  have hadj : ContinuousLinearMap.adjoint (Op.opA Ω)
-      = ((1 : H01 Ω →L[ℝ] H01 Ω) - ContinuousLinearMap.adjoint (Op.opK Ω)).comp T := by
-    rw [Op.opA_factor Ω, ContinuousLinearMap.adjoint_comp, adjoint_one_sub]
-  have hadjpt : ∀ u : H01 Ω, ContinuousLinearMap.adjoint (Op.opA Ω) u
-      = ((1 : H01 Ω →L[ℝ] H01 Ω) - ContinuousLinearMap.adjoint (Op.opK Ω)) (T u) := by
-    intro u
-    rw [hadj, ContinuousLinearMap.comp_apply]
-  have hTbij : Function.Bijective T := bijective_adjoint_of_equiv (Op.opE Ω)
-  -- `T` restricts to a linear equivalence `solSpaceStar ≃ ker(1 - opK†)`
-  have hrestrict : ∀ u : H01 Ω, u ∈ Op.solSpaceStar Ω → T u ∈ Q := by
-    intro u hu
-    rw [solSpaceStar, LinearMap.mem_ker, ContinuousLinearMap.coe_coe] at hu
-    rw [hQdef, LinearMap.mem_ker, ContinuousLinearMap.coe_coe, ← hadjpt u]
-    exact hu
-  set Trest : Op.solSpaceStar Ω →ₗ[ℝ] Q := T.toLinearMap.restrict hrestrict with hTrest
-  have hinj : Function.Injective Trest := by
-    intro a b hab
-    apply Subtype.coe_injective
-    apply hTbij.1
-    have h := congrArg (Subtype.val) hab
-    simpa [hTrest, LinearMap.coe_restrict_apply] using h
-  have hsurj : Function.Surjective Trest := by
-    intro w
-    obtain ⟨u, hu⟩ := hTbij.2 (↑w : H01 Ω)
-    have humem : u ∈ Op.solSpaceStar Ω := by
-      rw [solSpaceStar, LinearMap.mem_ker, ContinuousLinearMap.coe_coe, hadjpt u, hu]
-      have hw : ((1 - ContinuousLinearMap.adjoint (Op.opK Ω) : H01 Ω →L[ℝ] H01 Ω))
-          (↑w : H01 Ω) = 0 := LinearMap.mem_ker.mp w.2
-      exact hw
-    refine ⟨⟨u, humem⟩, ?_⟩
-    apply Subtype.coe_injective
-    simpa [hTrest, LinearMap.coe_restrict_apply] using hu
-  have heq : Module.finrank ℝ (Op.solSpaceStar Ω) = Module.finrank ℝ Q :=
-    (LinearEquiv.ofBijective Trest ⟨hinj, hsurj⟩).finrank_eq
-  have hNs : LinearMap.ker ((1 - Op.opK Ω : H01 Ω →L[ℝ] H01 Ω)).toLinearMap
-      = Op.solSpace Ω := by
-    rw [ker_one_sub_eq_eigenspace, ← Op.solSpace_eq_eigenspace Ω]
-  rw [heq, hQdef, finrank_ker_one_sub_adjoint_eq hK, hNs]
+  rw [solSpaceStar, finrank_ker_adjoint_of_eq_comp_equiv (Op.opE Ω) (Op.opA_factor Ω),
+    finrank_ker_one_sub_adjoint_eq hK, ker_one_sub_eq_eigenspace, ← Op.solSpace_eq_eigenspace Ω]
+
+/-- **Fredholm alternative for the elliptic Dirichlet problem** (Evans §6.2.3, Theorem 4).
+Assume the operator `opK` is compact: the Rellich-Kondrachov input, that `H₀¹(Ω) ↪ L²(Ω)` is a
+compact embedding. Then exactly one of two alternatives holds: either the homogeneous problem
+`Lu = 0` has a nontrivial weak solution `u ≠ 0` (`∀ v, B[u, v] = 0`), or the inhomogeneous
+problem `Lu = f` has a unique weak solution for every continuous functional `f`. -/
+theorem fredholm_alternative (hK : IsCompactOperator (Op.opK Ω)) :
+    (∃ u : H01 Ω, u ≠ 0 ∧ ∀ v : H01 Ω, Op.fullBilin Ω u v = 0)
+      ∨ (∀ f : H01 Ω →L[ℝ] ℝ, ∃! u : H01 Ω, ∀ v : H01 Ω, Op.fullBilin Ω u v = f v) := by
+  rcases fredholm_dichotomy_compact hK with h | ⟨u, hu0, hu⟩
+  · right
+    intro f
+    refine (existsUnique_congr fun u => ?_).mp (h ((Op.opE Ω).symm
+      ((InnerProductSpace.toDual ℝ (H01 Ω)).symm f)))
+    rw [← Op.opA_eq_toDual_symm_iff Ω f u, (Op.opE Ω).eq_symm_apply, Op.opA_factor Ω]
+    exact Iff.rfl
+  · left
+    refine ⟨u, hu0, (Op.mem_solSpace_iff Ω u).1 ?_⟩
+    rw [solSpace, LinearMap.mem_ker, ContinuousLinearMap.coe_coe, Op.opA_factor Ω,
+      ContinuousLinearMap.comp_apply, hu, map_zero]
+
+/-- **Fredholm corollary** (the usual working form, Evans §6.2.3): if the homogeneous problem
+`Lu = 0` has only the trivial weak solution, then `Lu = f` has a unique weak solution for every
+`f`. Uniqueness of the homogeneous problem rules out the eigenvalue alternative. -/
+theorem fredholm_unique_imp_exists (hK : IsCompactOperator (Op.opK Ω))
+    (huniq : ∀ u : H01 Ω, (∀ v : H01 Ω, Op.fullBilin Ω u v = 0) → u = 0)
+    (f : H01 Ω →L[ℝ] ℝ) :
+    ∃! u : H01 Ω, ∀ v : H01 Ω, Op.fullBilin Ω u v = f v := by
+  rcases Op.fredholm_alternative Ω hK with ⟨u, hu_ne, hu_hom⟩ | hexists
+  · exact absurd (huniq u hu_hom) hu_ne
+  · exact hexists f
 
 end FullEllipticOp
 

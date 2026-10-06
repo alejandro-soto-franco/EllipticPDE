@@ -158,7 +158,7 @@ theorem exists_contDiffOn_of_weakSolution_evans {d : ℕ} {U : Set (EuclideanSpa
     ∃ u' : EuclideanSpace ℝ (Fin d) → ℝ,
       ContDiffOn ℝ (⊤ : ℕ∞) u' U ∧ u' =ᵐ[volume.restrict U] u := by
   let P : SmoothOpOn d U :=
-    { a := a, b := b, c := c, lam := θ, lam_pos := hθ, a_smooth := ha, b_smooth := hb
+    { a := a, b := b, c := c, lam := θ, lam_pos := hθ, contDiffOn := ha, b_smooth := hb
       c_smooth := hc, elliptic := hell }
   have hK : ∀ {g : EuclideanSpace ℝ (Fin d) → ℝ}, MemLp g 2 (volume.restrict U) →
       ∀ K, IsCompact K → K ⊆ U → MemLp g 2 (volume.restrict K) := fun hg _ _ hKU =>

@@ -50,8 +50,7 @@ namespace EllipticPdes.Sobolev
 
 open EllipticPdes.Embedding (HasWeakGradOn)
 open EllipticPdes.Analysis (partialD_comp_smul)
-open EllipticPdes.Extension (hasC1Boundary_ball mem_W12_of_hasWeakGradOn
-  measurableEmbedding_translate partialD_comp_translate exists_lt_radius_of_isCompact_subset_ball)
+open EllipticPdes.Extension (hasC1Boundary_ball mem_W12_of_hasWeakGradOn partialD_comp_translate)
 
 variable {d : ℕ}
 
@@ -72,7 +71,7 @@ theorem affineBall_preimage_ball (x : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr 
 /-- `affineBall x r` is a measurable embedding for `r ≠ 0`. -/
 theorem measurableEmbedding_affineBall (x : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr : r ≠ 0) :
     MeasurableEmbedding (affineBall x r) :=
-  (measurableEmbedding_translate x).comp (MeasurableEquiv.smul₀ r hr).measurableEmbedding
+  (Homeomorph.addRight x).measurableEmbedding.comp (MeasurableEquiv.smul₀ r hr).measurableEmbedding
 
 /-- The factor by which Lebesgue measure scales under the map, as a measure multiplier. -/
 def ballScale (d : ℕ) (r : ℝ) : ℝ≥0∞ := ENNReal.ofReal |(r ^ d)⁻¹|
@@ -159,8 +158,7 @@ theorem hasWeakGradOn_comp_affineBall (x : EuclideanSpace ℝ (Fin d)) {r : ℝ}
       ((Homeomorph.addRight (-x)).trans (Homeomorph.smulOfNeZero r⁻¹ (inv_ne_zero hr0)))
     exact this
   have hψB : tsupport ψ ⊆ ball x r := by
-    obtain ⟨ρ, hρ1, hρ0, hK⟩ := exists_lt_radius_of_isCompact_subset_ball one_pos
-      hφcs.isCompact hφB
+    obtain ⟨ρ, ⟨hρ0, hρ1⟩, hK⟩ := exists_pos_lt_subset_ball one_pos hφcs.isClosed hφB
     refine (closure_minimal ?_ isClosed_closedBall).trans
       (closedBall_subset_ball (by nlinarith : r * ρ < r))
     intro z hz

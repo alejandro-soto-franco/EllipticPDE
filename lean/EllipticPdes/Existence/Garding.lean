@@ -56,6 +56,21 @@ lemma young_peterPaul {lam B x y : ℝ} (hlam : 0 < lam) :
   rw [key]
   exact div_nonneg (sq_nonneg _) h2l.le
 
+/-- The `i`-th coordinate `U ↦ Uᵢ` of an element of `H₀¹(Ω) ⊆ H1amb Ω`, as a continuous linear map
+into `L²(Ω)`: the `PiLp` projection precomposed with the submodule inclusion. -/
+def coordL (Ω : Set (EuclideanSpace ℝ (Fin d))) (i : Fin (d + 1)) : H01 Ω →L[ℝ] L2D Ω :=
+  (PiLp.proj (𝕜 := ℝ) 2 (fun _ : Fin (d + 1) => L2D Ω) i).comp (H01 Ω).subtypeL
+
+/-- Simp lemma: `coordL Ω i U` is the `i`-th coordinate of `U`. -/
+@[simp] lemma coordL_apply (Ω : Set (EuclideanSpace ℝ (Fin d))) (i : Fin (d + 1)) (U : H01 Ω) :
+    coordL Ω i U = (U : H1amb Ω) i := rfl
+
+/-- The test-function Poincaré bound on `Ω` with constant `CP`: for every test function `φ`
+of `Ω`, `‖φ‖²_{L²} ≤ CP ∑ᵢ ‖∂ᵢφ‖²_{L²}`. -/
+def HasTestPoincare (Ω : Set (EuclideanSpace ℝ (Fin d))) (CP : ℝ) : Prop :=
+  ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ),
+    ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2
+
 /-! ### Full divergence-form operator -/
 
 /-- A full second-order divergence-form operator: a uniformly elliptic principal part `A`
@@ -106,67 +121,18 @@ lemma norm_cAct_le {Ω : Set (EuclideanSpace ℝ (Fin d))} (g : L2D Ω) :
 
 /-! ### Lower-order (transport + zeroth) bilinear form -/
 
-/-- The lower-order part `∑ᵢ ⟪bᵢ ∂ᵢu, v₀⟫ + ⟪c u₀, v₀⟫` as a bare bilinear map. -/
-def lowerBilinₗ (Ω : Set (EuclideanSpace ℝ (Fin d))) :
-    (H01 Ω) →ₗ[ℝ] (H01 Ω) →ₗ[ℝ] ℝ :=
-  LinearMap.mk₂ ℝ
-    (fun U V => (∑ i : Fin d, ⟪Op.bAct i ((U : H1amb Ω) i.succ), ((V : H1amb Ω) 0)⟫)
-      + ⟪Op.cAct ((U : H1amb Ω) 0), ((V : H1amb Ω) 0)⟫)
-    (by intro U₁ U₂ V; simp only [Submodule.coe_add, PiLp.add_apply, map_add,
-          inner_add_left, Finset.sum_add_distrib]; ring)
-    (by intro c U V; simp only [Submodule.coe_smul, PiLp.smul_apply, map_smul,
-          real_inner_smul_left, smul_eq_mul, mul_add, Finset.mul_sum])
-    (by intro U V₁ V₂; simp only [Submodule.coe_add, PiLp.add_apply,
-          inner_add_right, Finset.sum_add_distrib]; ring)
-    (by intro c U V; simp only [Submodule.coe_smul, PiLp.smul_apply,
-          real_inner_smul_right, smul_eq_mul, mul_add, Finset.mul_sum])
-
-/-- The lower-order bilinear form as a bounded form, with norm bound `d·Bsup + Csup`. -/
+/-- The lower-order part `∑ᵢ ⟪bᵢ ∂ᵢu, v₀⟫ + ⟪c u₀, v₀⟫` as a bounded bilinear form. -/
 def lowerBilin (Ω : Set (EuclideanSpace ℝ (Fin d))) :
     (H01 Ω) →L[ℝ] (H01 Ω) →L[ℝ] ℝ :=
-  (Op.lowerBilinₗ Ω).mkContinuous₂ ((d : ℝ) * Op.Bsup + Op.Csup) (by
-    intro U V
-    simp only [FullEllipticOp.lowerBilinₗ, LinearMap.mk₂_apply]
-    have hb : ‖∑ i : Fin d, ⟪Op.bAct i ((U : H1amb Ω) i.succ), ((V : H1amb Ω) 0)⟫‖
-        ≤ (d : ℝ) * Op.Bsup * ‖U‖ * ‖V‖ := by
-      calc ‖∑ i : Fin d, ⟪Op.bAct i ((U : H1amb Ω) i.succ), ((V : H1amb Ω) 0)⟫‖
-          ≤ ∑ i : Fin d, ‖⟪Op.bAct i ((U : H1amb Ω) i.succ), ((V : H1amb Ω) 0)⟫‖ :=
-            norm_sum_le _ _
-        _ ≤ ∑ _i : Fin d, Op.Bsup * ‖U‖ * ‖V‖ := by
-            apply Finset.sum_le_sum; intro i _
-            calc ‖⟪Op.bAct i ((U : H1amb Ω) i.succ), ((V : H1amb Ω) 0)⟫‖
-                ≤ ‖Op.bAct i ((U : H1amb Ω) i.succ)‖ * ‖(V : H1amb Ω) 0‖ :=
-                  norm_inner_le_norm _ _
-              _ ≤ (Op.Bsup * ‖U‖) * ‖V‖ :=
-                  mul_le_mul (le_trans (Op.norm_bAct_le i _)
-                    (mul_le_mul_of_nonneg_left (PiLp.norm_apply_le _ _) Op.Bsup_nonneg))
-                    (PiLp.norm_apply_le _ _) (norm_nonneg _)
-                    (mul_nonneg Op.Bsup_nonneg (norm_nonneg _))
-        _ = (d : ℝ) * Op.Bsup * ‖U‖ * ‖V‖ := by
-            simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
-            ring
-    have hc : ‖⟪Op.cAct ((U : H1amb Ω) 0), ((V : H1amb Ω) 0)⟫‖ ≤ Op.Csup * ‖U‖ * ‖V‖ :=
-      calc ‖⟪Op.cAct ((U : H1amb Ω) 0), ((V : H1amb Ω) 0)⟫‖
-          ≤ ‖Op.cAct ((U : H1amb Ω) 0)‖ * ‖(V : H1amb Ω) 0‖ := norm_inner_le_norm _ _
-        _ ≤ (Op.Csup * ‖U‖) * ‖V‖ :=
-            mul_le_mul (le_trans (Op.norm_cAct_le _)
-              (mul_le_mul_of_nonneg_left (PiLp.norm_apply_le _ _) Op.Csup_nonneg))
-              (PiLp.norm_apply_le _ _) (norm_nonneg _)
-              (mul_nonneg Op.Csup_nonneg (norm_nonneg _))
-    calc ‖(∑ i : Fin d, ⟪Op.bAct i ((U : H1amb Ω) i.succ), ((V : H1amb Ω) 0)⟫)
-            + ⟪Op.cAct ((U : H1amb Ω) 0), ((V : H1amb Ω) 0)⟫‖
-        ≤ ‖∑ i : Fin d, ⟪Op.bAct i ((U : H1amb Ω) i.succ), ((V : H1amb Ω) 0)⟫‖
-            + ‖⟪Op.cAct ((U : H1amb Ω) 0), ((V : H1amb Ω) 0)⟫‖ := norm_add_le _ _
-      _ ≤ (d : ℝ) * Op.Bsup * ‖U‖ * ‖V‖ + Op.Csup * ‖U‖ * ‖V‖ := add_le_add hb hc
-      _ = ((d : ℝ) * Op.Bsup + Op.Csup) * ‖U‖ * ‖V‖ := by ring)
+  (∑ i : Fin d, (innerSL ℝ).bilinearComp ((Op.bAct i).comp (coordL Ω i.succ)) (coordL Ω 0))
+    + (innerSL ℝ).bilinearComp (Op.cAct.comp (coordL Ω 0)) (coordL Ω 0)
 
 /-- Simp lemma: unfolds `lowerBilin Ω U V` to the transport and zeroth-order inner products. -/
 @[simp] lemma lowerBilin_apply (Ω : Set (EuclideanSpace ℝ (Fin d))) (U V : H01 Ω) :
     Op.lowerBilin Ω U V
       = (∑ i : Fin d, ⟪Op.bAct i ((U : H1amb Ω) i.succ), ((V : H1amb Ω) 0)⟫)
         + ⟪Op.cAct ((U : H1amb Ω) 0), ((V : H1amb Ω) 0)⟫ := by
-  simp only [FullEllipticOp.lowerBilin, LinearMap.mkContinuous₂_apply,
-    FullEllipticOp.lowerBilinₗ, LinearMap.mk₂_apply]
+  simp [FullEllipticOp.lowerBilin, _root_.sum_apply]
 
 /-- The full divergence-form bilinear form `B = B_A + (transport + zeroth)`. -/
 def fullBilin (Ω : Set (EuclideanSpace ℝ (Fin d))) :
@@ -254,25 +220,12 @@ theorem garding (Ω : Set (EuclideanSpace ℝ (Fin d))) (U : H01 Ω) :
 /-- The zeroth `L²` form `⟪u₀, v₀⟫` on `H₀¹(Ω)`, used for the spectral shift. -/
 def zerothForm (Ω : Set (EuclideanSpace ℝ (Fin d))) :
     (H01 Ω) →L[ℝ] (H01 Ω) →L[ℝ] ℝ :=
-  (LinearMap.mk₂ ℝ (fun U V : H01 Ω => ⟪(U : H1amb Ω) 0, ((V : H1amb Ω) 0)⟫)
-    (by intro U₁ U₂ V; simp only [Submodule.coe_add, PiLp.add_apply, inner_add_left])
-    (by intro c U V; simp only [Submodule.coe_smul, PiLp.smul_apply, real_inner_smul_left,
-          smul_eq_mul])
-    (by intro U V₁ V₂; simp only [Submodule.coe_add, PiLp.add_apply, inner_add_right])
-    (by intro c U V; simp only [Submodule.coe_smul, PiLp.smul_apply, real_inner_smul_right,
-          smul_eq_mul])).mkContinuous₂ 1 (by
-    intro U V
-    simp only [LinearMap.mk₂_apply]
-    calc ‖⟪(U : H1amb Ω) 0, ((V : H1amb Ω) 0)⟫‖
-        ≤ ‖(U : H1amb Ω) 0‖ * ‖(V : H1amb Ω) 0‖ := norm_inner_le_norm _ _
-      _ ≤ ‖U‖ * ‖V‖ := mul_le_mul (PiLp.norm_apply_le _ _) (PiLp.norm_apply_le _ _)
-          (norm_nonneg _) (norm_nonneg _)
-      _ = 1 * ‖U‖ * ‖V‖ := by ring)
+  (innerSL ℝ).bilinearComp (coordL Ω 0) (coordL Ω 0)
 
 /-- Simp lemma: `zerothForm Ω U V = ⟪(U : H1amb Ω) 0, (V : H1amb Ω) 0⟫`. -/
 @[simp] lemma zerothForm_apply (Ω : Set (EuclideanSpace ℝ (Fin d))) (U V : H01 Ω) :
-    zerothForm Ω U V = ⟪(U : H1amb Ω) 0, ((V : H1amb Ω) 0)⟫ := by
-  simp only [FullEllipticOp.zerothForm, LinearMap.mkContinuous₂_apply, LinearMap.mk₂_apply]
+    zerothForm Ω U V = ⟪(U : H1amb Ω) 0, ((V : H1amb Ω) 0)⟫ :=
+  rfl
 
 /-- The shifted bilinear form `B_μ[U, V] = B[U, V] + μ ⟪u₀, v₀⟫` associated to `Lu + μu`. -/
 def shiftedBilin (Ω : Set (EuclideanSpace ℝ (Fin d))) (μ : ℝ) :
@@ -355,9 +308,7 @@ constant feeds the Lax-Milgram a-priori estimate. -/
 theorem fullBilin_coercive_const_of_nonneg_zeroth (Ω : Set (EuclideanSpace ℝ (Fin d)))
     (hb : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
     (hc : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x) (CP : ℝ) (hCP : 0 ≤ CP)
-    (hbase : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ),
-      ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2)
-    (U : H01 Ω) :
+    (hbase : HasTestPoincare Ω CP) (U : H01 Ω) :
     Op.lam / (CP + 1) * ‖U‖ * ‖U‖ ≤ Op.fullBilin Ω U U := by
   have hpos : (0 : ℝ) < CP + 1 := by linarith
   have hne : (CP : ℝ) + 1 ≠ 0 := hpos.ne'
@@ -396,171 +347,84 @@ theorem fullBilin_coercive_of_nonneg_zeroth (Ω : Set (EuclideanSpace ℝ (Fin d
   ⟨Op.lam / (CP + 1), div_pos Op.lam_pos (by linarith),
     Op.fullBilin_coercive_const_of_nonneg_zeroth Ω hb hc CP hCP hbase⟩
 
-/-- **Existence and uniqueness for the transport-free, nonnegative-zeroth operator**
-(the `γ = 0` specialisation of Evans's First Existence Theorem, §6.2.2). With `b ≡ 0`,
-`c ≥ 0`, and the test-function Poincaré bound, the full
-divergence form `B = B_A + c` is coercive with no spectral shift, so Lax-Milgram yields for
-every continuous functional `f` on `H₀¹(Ω)` a unique weak solution `u` of `Lu = f`. This is
-the existence theorem for `Lu = -Dⱼ(aᵢⱼ Dᵢu) + cu` with general uniformly elliptic `A`. -/
+/-- **Existence, uniqueness and a-priori bound for the transport-free, nonnegative-zeroth
+operator** (the `γ = 0` specialisation of Evans's First Existence Theorem, §6.2.2). With
+`b ≡ 0`, `c ≥ 0`, and the test-function Poincaré bound, the full divergence form `B = B_A + c`
+is coercive with no spectral shift, so Lax-Milgram yields for every continuous functional `f`
+on `H₀¹(Ω)` a unique weak solution `u` of `Lu = f`, with `‖u‖_{H₀¹} ≤ (C_P + 1) / λ · ‖f‖`,
+the reciprocal of the coercivity constant `λ / (C_P + 1)`. -/
 theorem weak_solution_of_nonneg_zeroth (Ω : Set (EuclideanSpace ℝ (Fin d)))
     (hb : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
-    (hc : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x) (CP : ℝ) (hCP : 0 ≤ CP)
-    (hbase : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ),
-      ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2)
-    (f : H01 Ω →L[ℝ] ℝ) :
-    ∃! u : H01 Ω, ∀ v : H01 Ω, Op.fullBilin Ω u v = f v :=
-  EllipticPdes.lax_milgram (Op.fullBilin_coercive_of_nonneg_zeroth Ω hb hc CP hCP hbase) f
+    (hc : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x) {CP : ℝ} (hCP : 0 ≤ CP)
+    (hbase : HasTestPoincare Ω CP) (f : H01 Ω →L[ℝ] ℝ) :
+    (∃! u : H01 Ω, ∀ v : H01 Ω, Op.fullBilin Ω u v = f v) ∧
+      ∀ u : H01 Ω, (∀ v : H01 Ω, Op.fullBilin Ω u v = f v) →
+        ‖u‖ ≤ (CP + 1) / Op.lam * ‖f‖ := by
+  have hco := Op.fullBilin_coercive_const_of_nonneg_zeroth Ω hb hc CP hCP hbase
+  have hα : 0 < Op.lam / (CP + 1) := div_pos Op.lam_pos (by linarith)
+  refine ⟨EllipticPdes.lax_milgram ⟨_, hα, hco⟩ f, fun u hu => ?_⟩
+  simpa [inv_div] using norm_weak_solution_le hα hco hu
 
-/-- **A-priori estimate for the weak solution** (general uniformly elliptic operator,
-`b ≡ 0`, `c ≥ 0`; the Lax-Milgram a-priori bound of Evans §6.2.1, Theorem 1). Under the
-hypotheses of
-[`weak_solution_of_nonneg_zeroth`], any weak solution obeys the Lax-Milgram estimate
-`‖u‖_{H₀¹} ≤ α⁻¹ ‖f‖` with the coercivity constant `α = λ / (C_P + 1)` of the form,
-i.e. `‖u‖_{H₀¹} ≤ (C_P + 1) / λ · ‖f‖`. -/
-theorem weak_solution_of_nonneg_zeroth_bound (Ω : Set (EuclideanSpace ℝ (Fin d)))
+/-- **`L²` right-hand side.** Under the hypotheses of `weak_solution_of_nonneg_zeroth`, every
+`f ∈ L²(Ω)`, entering through the pairing `⟨f, v⟩ = ∫_Ω f · v₀` (the embedding
+`L²(Ω) ⊆ H⁻¹(Ω)`, [`l2Functional`]), has a unique weak solution `u ∈ H₀¹(Ω)` of
+`B[u, v] = ⟨f, v⟩`, and every weak solution obeys `‖u‖_{H₀¹} ≤ (C_P + 1) / λ · ‖f‖_{L²}`. -/
+theorem weak_solution_L2_of_nonneg_zeroth (Ω : Set (EuclideanSpace ℝ (Fin d)))
     (hb : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
-    (hc : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x) (CP : ℝ) (hCP : 0 ≤ CP)
-    (hbase : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ),
-      ‖(h.testGraph 0 : L2D Ω)‖ ^ 2 ≤ CP * ∑ i : Fin d, ‖h.testGraph i.succ‖ ^ 2)
-    {f : H01 Ω →L[ℝ] ℝ} {u : H01 Ω}
-    (hu : ∀ v : H01 Ω, Op.fullBilin Ω u v = f v) :
-    ‖u‖ ≤ (CP + 1) / Op.lam * ‖f‖ := by
-  have h := norm_weak_solution_le
-    (div_pos Op.lam_pos (by linarith : (0 : ℝ) < CP + 1))
-    (Op.fullBilin_coercive_const_of_nonneg_zeroth Ω hb hc CP hCP hbase) hu
-  rwa [inv_div] at h
-
-/-- **Unconditional existence, uniqueness, and a-priori bound on an open box, general
-uniformly elliptic operator.** The box specialisation of `weak_solution_of_nonneg_zeroth`:
-on the coordinate box `∏ₖ (aₖ, bₖ)`, with `b ≡ 0` and `c ≥ 0`, the test-function Poincaré
-hypothesis is discharged from the box geometry. The per-direction slice bound
-`Poincare.slice_bound_euclBox` (which rests on `Poincare.poincare_box_dir`) is averaged by
-`Poincare.poincare_testfn` into the graph-coordinate bound with constant
-`C_P = C / (n + 1)`, so for every continuous functional `f` on `H₀¹` of the box there is a
-unique weak solution of `Lu = -Dⱼ(aᵢⱼ Dᵢu) + cu = f`, obeying the Lax-Milgram estimate
-`‖u‖_{H₀¹} ≤ α⁻¹ ‖f‖` with coercivity constant `α = λ / (C / (n + 1) + 1)`, with no
-abstract Poincaré input. This is Theorem `thm: main` with an `H⁻¹` right-hand side; the
-`L²` instance is [`weak_solution_L2_of_nonneg_zeroth_euclBox`]. -/
-theorem weak_solution_of_nonneg_zeroth_euclBox {n : ℕ} (Op : FullEllipticOp (n + 1))
-    (a b : Fin (n + 1) → ℝ) (hab : ∀ k, a k ≤ b k) (C : ℝ) (hC : ∀ i, (b i - a i) ^ 2 / 2 ≤ C)
-    (hb : ∀ i, ∀ᵐ x ∂(volume.restrict (Poincare.euclBox a b)), Op.b x i = 0)
-    (hc : ∀ᵐ x ∂(volume.restrict (Poincare.euclBox a b)), 0 ≤ Op.c x)
-    (f : H01 (Poincare.euclBox a b) →L[ℝ] ℝ) :
-    (∃! u : H01 (Poincare.euclBox a b),
-      ∀ v : H01 (Poincare.euclBox a b), Op.fullBilin (Poincare.euclBox a b) u v = f v)
-    ∧ ∀ u : H01 (Poincare.euclBox a b),
-        (∀ v : H01 (Poincare.euclBox a b), Op.fullBilin (Poincare.euclBox a b) u v = f v) →
-          ‖u‖ ≤ (C / (n + 1) + 1) / Op.lam * ‖f‖ := by
-  have hCnonneg : 0 ≤ C := le_trans (by positivity) (hC 0)
-  have hbase : ∀ {φ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ}
-      (h : IsTestFn (Poincare.euclBox a b) φ),
-      ‖(h.testGraph 0 : L2D (Poincare.euclBox a b))‖ ^ 2
-        ≤ C / (n + 1) * ∑ i : Fin (n + 1), ‖h.testGraph i.succ‖ ^ 2 :=
-    fun {_φ} h => Poincare.testfn_bound_euclBox hab hC h
-  have hCP : (0 : ℝ) ≤ C / (n + 1) := div_nonneg hCnonneg (by positivity)
-  exact ⟨Op.weak_solution_of_nonneg_zeroth (Poincare.euclBox a b) hb hc _ hCP hbase f,
-    fun u hu =>
-      Op.weak_solution_of_nonneg_zeroth_bound (Poincare.euclBox a b) hb hc _ hCP hbase hu⟩
-
-/-- **Theorem `thm: main`: existence, uniqueness, and the a-priori bound on an open box,
-`L²` right-hand side.** For the general uniformly elliptic operator
-`Lu = -Dⱼ(aᵢⱼ Dᵢu) + cu` with `c ≥ 0` on the coordinate box `∏ₖ (aₖ, bₖ)`, and for every
-`f ∈ L²(Ω)` entering through the pairing `⟨f, v⟩ = ∫_Ω f · v₀` (the embedding
-`L²(Ω) ⊆ H⁻¹(Ω)`, [`l2Functional`]), there is a unique weak solution `u ∈ H₀¹(Ω)` of
-`B[u, v] = ⟨f, v⟩`, and every weak solution obeys `‖u‖_{H₀¹} ≤ α⁻¹ ‖f‖_{L²}` with the
-coercivity constant `α = λ / (C / (n + 1) + 1)` of the form. The Poincaré input is
-discharged from the box geometry; no abstract hypothesis remains. -/
-theorem weak_solution_L2_of_nonneg_zeroth_euclBox {n : ℕ} (Op : FullEllipticOp (n + 1))
-    (a b : Fin (n + 1) → ℝ) (hab : ∀ k, a k ≤ b k) (C : ℝ) (hC : ∀ i, (b i - a i) ^ 2 / 2 ≤ C)
-    (hb : ∀ i, ∀ᵐ x ∂(volume.restrict (Poincare.euclBox a b)), Op.b x i = 0)
-    (hc : ∀ᵐ x ∂(volume.restrict (Poincare.euclBox a b)), 0 ≤ Op.c x)
-    (f : L2D (Poincare.euclBox a b)) :
-    (∃! u : H01 (Poincare.euclBox a b),
-      ∀ v : H01 (Poincare.euclBox a b),
-        Op.fullBilin (Poincare.euclBox a b) u v
-          = ∫ x in Poincare.euclBox a b,
-              (f x : ℝ) * ((v : H1amb (Poincare.euclBox a b)) 0 x : ℝ))
-    ∧ ∀ u : H01 (Poincare.euclBox a b),
-        (∀ v : H01 (Poincare.euclBox a b),
-          Op.fullBilin (Poincare.euclBox a b) u v
-            = ∫ x in Poincare.euclBox a b,
-                (f x : ℝ) * ((v : H1amb (Poincare.euclBox a b)) 0 x : ℝ)) →
-          ‖u‖ ≤ (C / (n + 1) + 1) / Op.lam * ‖f‖ := by
-  have h := Op.weak_solution_of_nonneg_zeroth_euclBox a b hab C hC hb hc
-    (l2Functional (Poincare.euclBox a b) f)
+    (hc : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x) {CP : ℝ} (hCP : 0 ≤ CP)
+    (hbase : HasTestPoincare Ω CP) (f : L2D Ω) :
+    (∃! u : H01 Ω, ∀ v : H01 Ω,
+      Op.fullBilin Ω u v = ∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ)) ∧
+    ∀ u : H01 Ω, (∀ v : H01 Ω,
+        Op.fullBilin Ω u v = ∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ)) →
+      ‖u‖ ≤ (CP + 1) / Op.lam * ‖f‖ := by
+  have h := Op.weak_solution_of_nonneg_zeroth Ω hb hc hCP hbase (l2Functional Ω f)
   simp only [l2Functional_eq_integral] at h
-  refine ⟨h.1, fun u hu => ?_⟩
-  refine le_trans (h.2 u hu) ?_
-  have hCnonneg : 0 ≤ C := le_trans (by positivity) (hC 0)
-  have hCP : (0 : ℝ) ≤ C / (n + 1) := div_nonneg hCnonneg (by positivity)
-  have hK : (0 : ℝ) ≤ (C / (n + 1) + 1) / Op.lam :=
-    div_nonneg (by linarith) Op.lam_pos.le
-  exact mul_le_mul_of_nonneg_left (norm_l2Functional_le _ f) hK
+  refine ⟨h.1, fun u hu => (h.2 u hu).trans ?_⟩
+  exact mul_le_mul_of_nonneg_left (norm_l2Functional_le _ f)
+    (div_nonneg (by linarith) Op.lam_pos.le)
 
-/-- **Existence, uniqueness, and the a-priori bound on any domain inside a coordinate
-box, `H⁻¹` right-hand side.** For the uniformly elliptic operator
-`Lu = -Dⱼ(aᵢⱼ Dᵢu) + cu` with `c ≥ 0` on a domain `Ω` contained in the open box
-`∏ₖ (aₖ, bₖ)`, the test-function Poincaré hypothesis is discharged by
-[`Poincare.testfn_bound_of_subset_euclBox`] from the geometry of the bounding box, with
-side contributions `(bᵢ - aᵢ)² / 2 ≤ C`. Every continuous functional `f` on `H₀¹(Ω)`
-admits a unique weak solution, obeying the Lax-Milgram estimate with coercivity
-constant `α = λ / (C / (n + 1) + 1)`. The `L²` instance is
-[`weak_solution_L2_of_nonneg_zeroth_of_subset_euclBox`]. -/
+/-- **Existence, uniqueness and the a-priori bound on any domain inside a coordinate box,
+`H⁻¹` right-hand side.** For `Lu = -Dⱼ(aᵢⱼ Dᵢu) + cu` with `c ≥ 0` on a domain `Ω` contained
+in the open box `∏ₖ (aₖ, bₖ)`, the test-function Poincaré hypothesis follows from
+[`Poincare.testfn_bound_of_subset_euclBox`] with side contributions `(bᵢ - aᵢ)² / 2 ≤ C`. Every
+continuous functional `f` on `H₀¹(Ω)` admits a unique weak solution, obeying the Lax-Milgram
+estimate with coercivity constant `α = λ / (C / (n + 1) + 1)`. -/
 theorem weak_solution_of_nonneg_zeroth_of_subset_euclBox {n : ℕ}
     (Op : FullEllipticOp (n + 1)) {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))}
     (a b : Fin (n + 1) → ℝ) (hab : ∀ k, a k ≤ b k) (hsub : Ω ⊆ Poincare.euclBox a b)
     (C : ℝ) (hC : ∀ i, (b i - a i) ^ 2 / 2 ≤ C)
     (hb : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
-    (hc : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x)
-    (f : H01 Ω →L[ℝ] ℝ) :
-    (∃! u : H01 Ω, ∀ v : H01 Ω, Op.fullBilin Ω u v = f v)
-    ∧ ∀ u : H01 Ω, (∀ v : H01 Ω, Op.fullBilin Ω u v = f v) →
-        ‖u‖ ≤ (C / (n + 1) + 1) / Op.lam * ‖f‖ := by
-  have hCnonneg : 0 ≤ C := le_trans (by positivity) (hC 0)
-  have hbase : ∀ {φ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ} (h : IsTestFn Ω φ),
-      ‖(h.testGraph 0 : L2D Ω)‖ ^ 2
-        ≤ C / (n + 1) * ∑ i : Fin (n + 1), ‖h.testGraph i.succ‖ ^ 2 :=
-    fun {_φ} h => Poincare.testfn_bound_of_subset_euclBox hab hsub hC h
-  have hCP : (0 : ℝ) ≤ C / (n + 1) := div_nonneg hCnonneg (by positivity)
-  exact ⟨Op.weak_solution_of_nonneg_zeroth Ω hb hc _ hCP hbase f,
-    fun u hu =>
-      Op.weak_solution_of_nonneg_zeroth_bound Ω hb hc _ hCP hbase hu⟩
+    (hc : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x) (f : H01 Ω →L[ℝ] ℝ) :
+    (∃! u : H01 Ω, ∀ v : H01 Ω, Op.fullBilin Ω u v = f v) ∧
+      ∀ u : H01 Ω, (∀ v : H01 Ω, Op.fullBilin Ω u v = f v) →
+        ‖u‖ ≤ (C / (n + 1) + 1) / Op.lam * ‖f‖ :=
+  Op.weak_solution_of_nonneg_zeroth Ω hb hc
+    (div_nonneg (le_trans (by positivity) (hC 0)) (by positivity))
+    (fun h => Poincare.testfn_bound_of_subset_euclBox hab hsub hC h) f
 
 /-- **`L²` right-hand-side instance on any domain inside a coordinate box.** For
-`f ∈ L²(Ω)` entering through the pairing `⟨f, v⟩ = ∫_Ω f · v₀` ([`l2Functional`]), the
-weak problem has a unique solution with `‖u‖_{H₀¹} ≤ α⁻¹ ‖f‖_{L²}`,
-`α = λ / (C / (n + 1) + 1)`. Derived from
-[`weak_solution_of_nonneg_zeroth_of_subset_euclBox`]. -/
+`f ∈ L²(Ω)` the weak problem `B[u, v] = ∫_Ω f · v₀` has a unique solution with
+`‖u‖_{H₀¹} ≤ α⁻¹ ‖f‖_{L²}`, `α = λ / (C / (n + 1) + 1)`. -/
 theorem weak_solution_L2_of_nonneg_zeroth_of_subset_euclBox {n : ℕ}
     (Op : FullEllipticOp (n + 1)) {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))}
     (a b : Fin (n + 1) → ℝ) (hab : ∀ k, a k ≤ b k) (hsub : Ω ⊆ Poincare.euclBox a b)
     (C : ℝ) (hC : ∀ i, (b i - a i) ^ 2 / 2 ≤ C)
     (hb : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), Op.b x i = 0)
-    (hc : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x)
-    (f : L2D Ω) :
+    (hc : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ Op.c x) (f : L2D Ω) :
     (∃! u : H01 Ω, ∀ v : H01 Ω,
-      Op.fullBilin Ω u v = ∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ))
-    ∧ ∀ u : H01 Ω,
-        (∀ v : H01 Ω,
-          Op.fullBilin Ω u v = ∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ)) →
-          ‖u‖ ≤ (C / (n + 1) + 1) / Op.lam * ‖f‖ := by
-  have h := Op.weak_solution_of_nonneg_zeroth_of_subset_euclBox a b hab hsub C hC hb hc
-    (l2Functional Ω f)
-  simp only [l2Functional_eq_integral] at h
-  refine ⟨h.1, fun u hu => ?_⟩
-  refine le_trans (h.2 u hu) ?_
-  have hCnonneg : 0 ≤ C := le_trans (by positivity) (hC 0)
-  have hCP : (0 : ℝ) ≤ C / (n + 1) := div_nonneg hCnonneg (by positivity)
-  have hK : (0 : ℝ) ≤ (C / (n + 1) + 1) / Op.lam :=
-    div_nonneg (by linarith) Op.lam_pos.le
-  exact mul_le_mul_of_nonneg_left (norm_l2Functional_le _ f) hK
+      Op.fullBilin Ω u v = ∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ)) ∧
+    ∀ u : H01 Ω, (∀ v : H01 Ω,
+        Op.fullBilin Ω u v = ∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ)) →
+      ‖u‖ ≤ (C / (n + 1) + 1) / Op.lam * ‖f‖ :=
+  Op.weak_solution_L2_of_nonneg_zeroth Ω hb hc
+    (div_nonneg (le_trans (by positivity) (hC 0)) (by positivity))
+    (fun h => Poincare.testfn_bound_of_subset_euclBox hab hsub hC h) f
 
-/-- **Existence, uniqueness, and the a-priori bound on an arbitrary bounded domain,
-`L²` right-hand side** (Theorem `thm: main` in full generality). The Poincaré constant
-`CP` is supplied by `poincare_H01_of_bounded` and is quantified before the datum, so it
-depends only on `Ω`; every `f ∈ L²(Ω)` then obeys `‖u‖_{H₀¹} ≤ (CP + 1)/λ · ‖f‖_{L²}`.
-
-Terminal result of the library, stated in the manuscript. Nothing else consumes it. -/
+/-- **Existence, uniqueness and the a-priori bound on an arbitrary bounded domain, `L²`
+right-hand side.** The Poincaré constant `CP` is supplied by `poincare_H01_of_bounded` and is
+quantified before the datum, so it depends only on `Ω`; every `f ∈ L²(Ω)` then obeys
+`‖u‖_{H₀¹} ≤ (CP + 1)/λ · ‖f‖_{L²}`. -/
 theorem weak_solution_L2_of_nonneg_zeroth_of_bounded {n : ℕ}
     (Op : FullEllipticOp (n + 1)) {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))}
     (hΩb : Bornology.IsBounded Ω)
@@ -574,23 +438,8 @@ theorem weak_solution_L2_of_nonneg_zeroth_of_bounded {n : ℕ}
             Op.fullBilin Ω u v = ∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ)) →
             ‖u‖ ≤ (CP + 1) / Op.lam * ‖f‖) := by
   obtain ⟨CP, hCP, hpoin⟩ := Poincare.poincare_H01_of_bounded hΩb
-  have hbase : ∀ {φ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ} (h : IsTestFn Ω φ),
-      ‖(h.testGraph 0 : L2D Ω)‖ ^ 2
-        ≤ CP * ∑ i : Fin (n + 1), ‖h.testGraph i.succ‖ ^ 2 :=
-    fun {φ} h => hpoin h.testGraph
-      ((Submodule.le_topologicalClosure _) (Submodule.subset_span ⟨φ, h, rfl⟩))
-  refine ⟨CP, hCP, fun f => ?_⟩
-  have hexist := Op.weak_solution_of_nonneg_zeroth Ω hb hc CP hCP hbase (l2Functional Ω f)
-  simp only [l2Functional_eq_integral] at hexist
-  refine ⟨hexist, fun u hu => ?_⟩
-  -- Refold to `l2Functional` form: `_bound` expects the functional, while `hu` states the
-  -- unfolded integral.
-  have hhu : ∀ v : H01 Ω, Op.fullBilin Ω u v = l2Functional Ω f v := by
-    intro v; rw [l2Functional_eq_integral]; exact hu v
-  have hbound := Op.weak_solution_of_nonneg_zeroth_bound Ω hb hc CP hCP hbase hhu
-  refine le_trans hbound ?_
-  have hK : (0 : ℝ) ≤ (CP + 1) / Op.lam := div_nonneg (by linarith) Op.lam_pos.le
-  exact mul_le_mul_of_nonneg_left (norm_l2Functional_le _ f) hK
+  exact ⟨CP, hCP, Op.weak_solution_L2_of_nonneg_zeroth Ω hb hc hCP fun {φ} h =>
+    hpoin h.testGraph ((Submodule.le_topologicalClosure _) (Submodule.subset_span ⟨φ, h, rfl⟩))⟩
 
 end FullEllipticOp
 

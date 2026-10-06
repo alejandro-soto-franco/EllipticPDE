@@ -78,11 +78,11 @@ theorem extendL2_mulTest_eq {Ω W : Set (EuclideanSpace ℝ (Fin d))}
   refine Lp.ext ?_
   have hmtΩ : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), x ∈ Ω →
       (mulTest hξΩ g x : ℝ) = ξ x * (g x : ℝ) :=
-    (ae_restrict_iff' hΩm).mp (mulTest_coeFn hξΩ g)
+    (ae_restrict_iff' hΩm).mp (mulCutoff_coeFn hξΩ g)
   have hmtW : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), x ∈ W →
       (mulTest hξW (restrictL2 (Ω := W) (extendL2 hΩm g)) x : ℝ)
         = ξ x * (restrictL2 (Ω := W) (extendL2 hΩm g) x : ℝ) :=
-    (ae_restrict_iff' hWm).mp (mulTest_coeFn hξW _)
+    (ae_restrict_iff' hWm).mp (mulCutoff_coeFn hξW _)
   have hrW : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), x ∈ W →
       (restrictL2 (Ω := W) (extendL2 hΩm g) x : ℝ) = (extendL2 hΩm g x : ℝ) :=
     (ae_restrict_iff' hWm).mp (coeFn_restrictL2 (Ω := W) (extendL2 hΩm g))
@@ -127,7 +127,7 @@ theorem extendL2_cutoffGrad_eq {Ω W : Set (EuclideanSpace ℝ (Fin d))}
       =ᵐ[volume] fun x => ξ x * (extendL2 hWm p x : ℝ) := by
     have hmt : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), x ∈ Ω →
         (mulTest hξΩ g x : ℝ) = ξ x * (g x : ℝ) :=
-      (ae_restrict_iff' hΩm).mp (mulTest_coeFn hξΩ g)
+      (ae_restrict_iff' hΩm).mp (mulCutoff_coeFn hξΩ g)
     filter_upwards [coeFn_extendL2 hΩm (mulTest hξΩ g), hEp, hmt] with x h1 h2 h3
     rw [h1, h2]
     by_cases hxW : x ∈ W
@@ -148,7 +148,7 @@ theorem extendL2_cutoffGrad_eq {Ω W : Set (EuclideanSpace ℝ (Fin d))}
           = partialD i ξ x * (p x : ℝ) + ξ x * (Dg i x : ℝ) := by
       refine (ae_restrict_iff' hWm).mp ?_
       filter_upwards [Lp.coeFn_add (mulTest (isTestFn_partialD hξW i) p) (mulTest hξW (Dg i)),
-        mulTest_coeFn (isTestFn_partialD hξW i) p, mulTest_coeFn hξW (Dg i)] with x hadd h1 h2
+        mulCutoff_coeFn (isTestFn_partialD hξW i) p, mulCutoff_coeFn hξW (Dg i)] with x hadd h1 h2
       rw [hadd, Pi.add_apply, h1, h2]
     filter_upwards [coeFn_extendL2 hWm (mulTest (isTestFn_partialD hξW i) p
         + mulTest hξW (Dg i)),

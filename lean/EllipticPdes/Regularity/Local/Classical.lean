@@ -67,11 +67,11 @@ theorem norm_toLp_le_of_subset {U V : Set (EuclideanSpace ℝ (Fin d))} (hVU : V
   exact ENNReal.toReal_mono hU.eLpNorm_ne_top
     (eLpNorm_mono_measure _ (Measure.restrict_mono hVU le_rfl))
 
-/-- A function in `L^∞(U)` is essentially bounded on `U`. -/
-theorem exists_ae_abs_le_of_memLp_top {U : Set (EuclideanSpace ℝ (Fin d))}
+/-- A function in `L^∞(U)` is bounded in absolute value by its essential supremum, almost
+everywhere on `U`. -/
+theorem ae_abs_le_toReal_eLpNorm_top {U : Set (EuclideanSpace ℝ (Fin d))}
     {g : EuclideanSpace ℝ (Fin d) → ℝ} (hg : MemLp g ⊤ (volume.restrict U)) :
-    ∃ B : ℝ, ∀ᵐ x ∂(volume.restrict U), |g x| ≤ B := by
-  refine ⟨(eLpNorm g ⊤ (volume.restrict U)).toReal, ?_⟩
+    ∀ᵐ x ∂(volume.restrict U), |g x| ≤ (eLpNorm g ⊤ (volume.restrict U)).toReal := by
   filter_upwards [ae_le_eLpNormEssSup (f := g) (μ := volume.restrict U)] with x hx
   rw [← eLpNorm_exponent_top hg.aestronglyMeasurable] at hx
   have h := ENNReal.toReal_mono hg.eLpNorm_ne_top hx
@@ -164,16 +164,16 @@ def C1OpOn.ofMemLp {U : Set (EuclideanSpace ℝ (Fin d))}
   elliptic := hell
   b := b
   c := c
-  Bsup := ∑ i, max (Classical.choose (exists_ae_abs_le_of_memLp_top (hb i))) 0
-  Csup := Classical.choose (exists_ae_abs_le_of_memLp_top hc)
+  Bsup := ∑ i, (eLpNorm (fun x => b x i) ⊤ (volume.restrict U)).toReal
+  Csup := (eLpNorm c ⊤ (volume.restrict U)).toReal
   b_aesm i := (hb i).aestronglyMeasurable
   c_aesm := hc.aestronglyMeasurable
   b_bdd i := by
-    filter_upwards [Classical.choose_spec (exists_ae_abs_le_of_memLp_top (hb i))] with x hx
-    exact (hx.trans (le_max_left _ 0)).trans (Finset.single_le_sum
-      (f := fun i => max (Classical.choose (exists_ae_abs_le_of_memLp_top (hb i))) 0)
-      (fun _ _ => le_max_right _ _) (Finset.mem_univ i))
-  c_bdd := Classical.choose_spec (exists_ae_abs_le_of_memLp_top hc)
+    filter_upwards [ae_abs_le_toReal_eLpNorm_top (hb i)] with x hx
+    exact hx.trans (Finset.single_le_sum
+      (f := fun i => (eLpNorm (fun x => b x i) ⊤ (volume.restrict U)).toReal)
+      (fun _ _ => ENNReal.toReal_nonneg) (Finset.mem_univ i))
+  c_bdd := ae_abs_le_toReal_eLpNorm_top hc
 
 /-- **Interior `H²`-regularity (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1,
 Theorem 1, p. 327), with Evans's hypotheses.** `U ⊆ ℝᵈ` is bounded and open,

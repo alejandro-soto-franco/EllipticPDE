@@ -75,8 +75,6 @@ section Datum
 
 variable {n : ℕ}
 
-set_option maxHeartbeats 800000 in
--- Six families of pieces, each with its own constant, and the pairing checked against all six.
 /-- **Datum of the cutoff reduction at order `k`.** For a cutoff `η` supported in `N ⊆ Ω`, with
 `W^{k+1,∞}` principal and `W^{k,∞}` transport coefficients, there is a constant `K` such that
 every `U` whose coordinates have `k` weak derivatives on `N`, and every datum `f` with `k` weak
