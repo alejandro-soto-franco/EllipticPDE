@@ -287,17 +287,25 @@ theorem tendsto_integral_deriv_comp_mul {α : Type*} {m : MeasurableSpace α} {�
       exact (((hfc.tendsto (U x)).comp hx).mul_const (G x)).mul_const (ψ x)
   simpa [hsplit] using hpiece1.add hpiece2
 
-/-- **Chain rule for weak gradients** (Gilbarg and Trudinger Lemma 7.5, Evans §5.10 Problem
-17). A `C¹` function with bounded derivative, composed with a class with a locally integrable
-weak gradient on an open set, has the weak gradient `f'(u) ∇u` there. -/
-theorem hasWeakGradOn_comp (hΩ : IsOpen Ω) {u : EuclideanSpace ℝ (Fin d) → ℝ}
-    {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ} (hu : LocallyIntegrableOn u Ω volume)
-    (hg : ∀ k, LocallyIntegrableOn (g k) Ω volume) (hwg : HasWeakGradOn Ω u g)
-    {f : ℝ → ℝ} (hf : ContDiff ℝ 1 f) {M : ℝ≥0} (hM : ∀ t, ‖deriv f t‖₊ ≤ M) :
-    HasWeakGradOn Ω (fun x => f (u x)) (fun k x => deriv f (u x) * g k x) := by
-  classical
-  intro φ hφc hφcs hφΩ k
-  set L := ContinuousLinearMap.lsmul ℝ ℝ (E := ℝ) with hL
+/-- **The chain rule identity for compactly supported integrable extensions.** Let `U` and `G` be
+integrable with compact support, `f` of class `C¹` with bounded derivative, `φ` a test function,
+and suppose the partial of every standard mollification of `U` agrees with the mollification of
+`G` on the support of `φ`. Then `∫ f(U) ∂ₖφ = -∫ f'(U) G φ`. -/
+theorem integral_comp_mul_partialD_eq_neg {f : ℝ → ℝ} (hf : ContDiff ℝ 1 f) {M : ℝ≥0}
+    (hM : ∀ t, ‖deriv f t‖₊ ≤ M) {U G φ : EuclideanSpace ℝ (Fin d) → ℝ} (k : Fin d)
+    (hUint : Integrable U volume) (hUcs : HasCompactSupport U) (hGint : Integrable G volume)
+    (hGcs : HasCompactSupport G) (hφc : ContDiff ℝ (⊤ : ℕ∞) φ) (hφcs : HasCompactSupport φ)
+    {δ : ℝ} (hδ : 0 < δ)
+    (hpartial : ∀ n x, partialD k (U ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume]
+        (stdBump δ hδ n : ContDiffBump (0 : EuclideanSpace ℝ (Fin d))).normed volume) x * φ x
+      = (G ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume]
+        (stdBump δ hδ n : ContDiffBump (0 : EuclideanSpace ℝ (Fin d))).normed volume) x * φ x) :
+    ∫ x, f (U x) * partialD k φ x = -∫ x, deriv f (U x) * G x * φ x := by
+  set ρ : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := stdBump δ hδ with hρ
+  set v : ℕ → EuclideanSpace ℝ (Fin d) → ℝ :=
+    fun n => U ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] (ρ n).normed volume
+  set w : ℕ → EuclideanSpace ℝ (Fin d) → ℝ :=
+    fun n => G ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] (ρ n).normed volume
   have hfl : LipschitzWith M f :=
     lipschitzWith_of_nnnorm_deriv_le (hf.differentiable one_ne_zero) hM
   have hf'c : Continuous (deriv f) := hf.continuous_deriv_one
@@ -310,41 +318,15 @@ theorem hasWeakGradOn_comp (hΩ : IsOpen Ω) {u : EuclideanSpace ℝ (Fin d) →
     hφcs.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single k (1 : ℝ))
   obtain ⟨Cφ, hCφ⟩ := hφcs.exists_bound_of_continuous hφc.continuous
   obtain ⟨Cp, hCp⟩ := hpcs.exists_bound_of_continuous hpc
-  -- a compact neighbourhood of the support inside the domain, and the extensions by zero
-  obtain ⟨δ, hδ, hK'⟩ := IsCompact.exists_cthickening_subset_open hφcs hΩ hφΩ
-  set K' := cthickening δ (tsupport φ) with hK'def
-  have hK'c : IsCompact K' := IsCompact.cthickening hφcs
-  have hK'm : MeasurableSet K' := hK'c.isClosed.measurableSet
-  have huK : IntegrableOn u K' volume := hu.integrableOn_compact_subset hK' hK'c
-  have hgK : IntegrableOn (g k) K' volume := (hg k).integrableOn_compact_subset hK' hK'c
-  have hUint : Integrable (K'.indicator u) volume := (integrable_indicator_iff hK'm).mpr huK
-  have hGint : Integrable (K'.indicator (g k)) volume := (integrable_indicator_iff hK'm).mpr hgK
-  have hcs : ∀ h : EuclideanSpace ℝ (Fin d) → ℝ, HasCompactSupport (K'.indicator h) := fun h =>
-    hK'c.of_isClosed_subset isClosed_closure
-      (closure_minimal support_indicator_subset hK'c.isClosed)
-  -- the mollifications of the extensions
-  set ρ : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := stdBump δ hδ with hρ
-  set v : ℕ → EuclideanSpace ℝ (Fin d) → ℝ :=
-    fun n => K'.indicator u ⋆[L, volume] (ρ n).normed volume
-  set w : ℕ → EuclideanSpace ℝ (Fin d) → ℝ :=
-    fun n => K'.indicator (g k) ⋆[L, volume] (ρ n).normed volume
   have hvsmooth : ∀ n, ContDiff ℝ (⊤ : ℕ∞) (v n) := fun n =>
     contDiff_convolution_normed (ρ n) hUint.locallyIntegrable
-  have hwsmooth : ∀ n, ContDiff ℝ (⊤ : ℕ∞) (w n) := fun n =>
-    contDiff_convolution_normed (ρ n) hGint.locallyIntegrable
   have hwint : ∀ n, Integrable (w n) volume := fun n =>
-    (hwsmooth n).continuous.integrable_of_hasCompactSupport
-      (hasCompactSupport_convolution_normed (ρ n) (hcs _))
+    (contDiff_convolution_normed (ρ n)
+      hGint.locallyIntegrable).continuous.integrable_of_hasCompactSupport
+      (hasCompactSupport_convolution_normed (ρ n) hGcs)
   have hvint : ∀ n, Integrable (v n) volume := fun n =>
     (hvsmooth n).continuous.integrable_of_hasCompactSupport
-      (hasCompactSupport_convolution_normed (ρ n) (hcs _))
-  -- on the support of `φ` the partial of the mollification is the mollified gradient
-  have hpartial : ∀ n x, partialD k (v n) x * φ x = w n x * φ x := fun n x => by
-    by_cases hx : x ∈ tsupport φ
-    · rw [partialD_convolution_eq_of_hasWeakGradOn hK'm huK (hwg.mono hK') (ρ n) k
-        ((closedBall_subset_closedBall (rOut_stdBump_le_self hδ n)).trans
-          (closedBall_subset_cthickening hx δ))]
-    · rw [image_eq_zero_of_notMem_tsupport hx, mul_zero, mul_zero]
+      (hasCompactSupport_convolution_normed (ρ n) hUcs)
   -- `L¹` convergence of the mollifications, and an a.e. convergent subsequence
   obtain ⟨ns, hns, hae⟩ := (tendstoInMeasure_of_tendsto_eLpNorm one_ne_zero
     (tendsto_eLpNorm_one_stdBump_convolution_sub hδ hUint)).exists_seq_tendsto_ae
@@ -356,16 +338,50 @@ theorem hasWeakGradOn_comp (hΩ : IsOpen Ω) {u : EuclideanSpace ℝ (Fin d) →
       exact congrArg Neg.neg (integral_congr_ae (Eventually.of_forall fun x => by
         dsimp only; rw [mul_assoc, hpartial n x, ← mul_assoc]))
   -- the two limits agree
-  have hintU : Integrable (fun x => f (K'.indicator u x) * partialD k φ x) volume :=
+  have hintU : Integrable (fun x => f (U x) * partialD k φ x) volume :=
     integrable_comp_mul_of_lipschitz hUint hfl hpc hpcs
-  have hconvU := tendsto_eLpNorm_one_stdBump_convolution_sub hδ hUint
   have hlimL := (tendsto_integral_comp_mul hfl hCp hvint hUint (fun n =>
     ((hfl.continuous.comp (hvsmooth n).continuous).mul hpc).integrable_of_hasCompactSupport
-      hpcs.mul_left) hintU hconvU).comp hns.tendsto_atTop
+      hpcs.mul_left) hintU (tendsto_eLpNorm_one_stdBump_convolution_sub hδ hUint)).comp
+    hns.tendsto_atTop
   have hlimR := (tendsto_integral_deriv_comp_mul hf'c hMr hφc.continuous.aestronglyMeasurable hCφ
     (fun n => (hvsmooth (ns n)).continuous.aestronglyMeasurable) (fun n => hwint (ns n)) hGint
     ((tendsto_eLpNorm_one_stdBump_convolution_sub hδ hGint).comp hns.tendsto_atTop) hae).neg
-  have hwhole := tendsto_nhds_unique hlimL (hlimR.congr fun i => (hclassical (ns i)).symm)
+  exact tendsto_nhds_unique hlimL (hlimR.congr fun i => (hclassical (ns i)).symm)
+
+/-- **Chain rule for weak gradients** (Gilbarg and Trudinger Lemma 7.5, Evans §5.10 Problem
+17). A `C¹` function with bounded derivative, composed with a class with a locally integrable
+weak gradient on an open set, has the weak gradient `f'(u) ∇u` there. -/
+theorem hasWeakGradOn_comp (hΩ : IsOpen Ω) {u : EuclideanSpace ℝ (Fin d) → ℝ}
+    {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ} (hu : LocallyIntegrableOn u Ω volume)
+    (hg : ∀ k, LocallyIntegrableOn (g k) Ω volume) (hwg : HasWeakGradOn Ω u g)
+    {f : ℝ → ℝ} (hf : ContDiff ℝ 1 f) {M : ℝ≥0} (hM : ∀ t, ‖deriv f t‖₊ ≤ M) :
+    HasWeakGradOn Ω (fun x => f (u x)) (fun k x => deriv f (u x) * g k x) := by
+  intro φ hφc hφcs hφΩ k
+  -- a compact neighbourhood of the support inside the domain, and the extensions by zero
+  obtain ⟨δ, hδ, hK'⟩ := IsCompact.exists_cthickening_subset_open hφcs hΩ hφΩ
+  set K' := cthickening δ (tsupport φ) with hK'def
+  have hK'c : IsCompact K' := IsCompact.cthickening hφcs
+  have hK'm : MeasurableSet K' := hK'c.isClosed.measurableSet
+  have huK : IntegrableOn u K' volume := hu.integrableOn_compact_subset hK' hK'c
+  have hgK : IntegrableOn (g k) K' volume := (hg k).integrableOn_compact_subset hK' hK'c
+  have hcs : ∀ h : EuclideanSpace ℝ (Fin d) → ℝ, HasCompactSupport (K'.indicator h) := fun h =>
+    hK'c.of_isClosed_subset isClosed_closure
+      (closure_minimal support_indicator_subset hK'c.isClosed)
+  -- on the support of `φ` the partial of the mollification is the mollified gradient
+  have hpartial : ∀ n x, partialD k (K'.indicator u ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume]
+      (stdBump δ hδ n : ContDiffBump (0 : EuclideanSpace ℝ (Fin d))).normed volume) x * φ x
+      = (K'.indicator (g k) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume]
+        (stdBump δ hδ n : ContDiffBump (0 : EuclideanSpace ℝ (Fin d))).normed volume) x * φ x :=
+    fun n x => by
+    by_cases hx : x ∈ tsupport φ
+    · rw [partialD_convolution_eq_of_hasWeakGradOn hK'm huK (hwg.mono hK') (stdBump δ hδ n) k
+        ((closedBall_subset_closedBall (rOut_stdBump_le_self hδ n)).trans
+          (closedBall_subset_cthickening hx δ))]
+    · rw [image_eq_zero_of_notMem_tsupport hx, mul_zero, mul_zero]
+  have hwhole := integral_comp_mul_partialD_eq_neg hf hM k
+    ((integrable_indicator_iff hK'm).mpr huK) (hcs u) ((integrable_indicator_iff hK'm).mpr hgK)
+    (hcs (g k)) hφc hφcs hδ hpartial
   -- back to the domain
   have hps : tsupport (partialD k φ) ⊆ Ω := (tsupport_partialD_subset k φ).trans hφΩ
   rw [setIntegral_eq_integral_of_forall_compl_eq_zero fun x hx => by
