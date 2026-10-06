@@ -398,37 +398,39 @@ theorem convolution_lsmul_comm {G : Type*} [NormedAddCommGroup G] [MeasurableSpa
 
 /-- **The standard shrinking mollifiers.** The bump of outer radius `δ / (n + 1)` and inner
 radius half of it. -/
-def stdBump {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [HasContDiffBump E] (δ : ℝ)
+def stdBump {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] (δ : ℝ)
     (hδ : 0 < δ) (n : ℕ) : ContDiffBump (0 : E) where
   rIn := δ / (n + 1) / 2
   rOut := δ / (n + 1)
   rIn_pos := half_pos (by positivity)
   rIn_lt_rOut := half_lt_self (by positivity)
 
+/-- The outer radius of the standard mollifier. -/
 @[simp]
-theorem rOut_stdBump {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [HasContDiffBump E]
+theorem rOut_stdBump {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
     {δ : ℝ} (hδ : 0 < δ) (n : ℕ) : (stdBump (E := E) δ hδ n).rOut = δ / (n + 1) := rfl
 
+/-- The inner radius of the standard mollifier. -/
 @[simp]
-theorem rIn_stdBump {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [HasContDiffBump E]
+theorem rIn_stdBump {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
     {δ : ℝ} (hδ : 0 < δ) (n : ℕ) : (stdBump (E := E) δ hδ n).rIn = δ / (n + 1) / 2 := rfl
 
 /-- The outer radii of the standard mollifiers tend to zero. -/
 theorem tendsto_rOut_stdBump {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
-    [HasContDiffBump E] {δ : ℝ} (hδ : 0 < δ) :
+    {δ : ℝ} (hδ : 0 < δ) :
     Filter.Tendsto (fun n => (stdBump (E := E) δ hδ n).rOut) Filter.atTop (𝓝 0) := by
   simp only [rOut_stdBump]
   exact tendsto_const_nhds.div_atTop (tendsto_natCast_atTop_atTop.atTop_add tendsto_const_nhds)
 
 /-- The outer radii of the standard mollifiers are at most `δ`. -/
 theorem rOut_stdBump_le_self {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
-    [HasContDiffBump E] {δ : ℝ} (hδ : 0 < δ) (n : ℕ) :
+    {δ : ℝ} (hδ : 0 < δ) (n : ℕ) :
     (stdBump (E := E) δ hδ n).rOut ≤ δ := by
   rw [rOut_stdBump]
   exact div_le_self hδ.le (by linarith [(n.cast_nonneg : (0 : ℝ) ≤ n)])
 
 /-- The standard mollifiers have bounded ratio of radii. -/
-theorem rOut_stdBump_le {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [HasContDiffBump E]
+theorem rOut_stdBump_le {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
     {δ : ℝ} (hδ : 0 < δ) (n : ℕ) :
     (stdBump (E := E) δ hδ n).rOut ≤ 2 * (stdBump (E := E) δ hδ n).rIn := by
   simp only [rOut_stdBump, rIn_stdBump]

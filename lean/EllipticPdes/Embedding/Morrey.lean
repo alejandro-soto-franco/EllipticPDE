@@ -114,6 +114,64 @@ private theorem setIntegral_ball_dist_rpow (hd : 0 < d) (x : EuclideanSpace ℝ 
   rw [hinner, finrank_euclideanSpace_fin, nsmul_eq_mul, smul_eq_mul]
   ring
 
+/-- Almost every point of Euclidean space differs from a given point. -/
+private theorem ae_ne_point [Nontrivial (EuclideanSpace ℝ (Fin d))]
+    (x : EuclideanSpace ℝ (Fin d)) :
+    ∀ᵐ y ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), y ≠ x := by
+  filter_upwards [(Set.countable_singleton x).ae_notMem volume] with y hy h
+  exact hy (by simp [h])
+
+/-- **The Riesz kernel is in `Lq` of a ball about its singularity.** The kernel
+`y ↦ dist x y ^ (-(d-1))` lies in `Lq(ball x R)` as soon as `(d - 1) q < d`, and the `q`-th power
+of the kernel is a power of the distance. -/
+theorem memLp_inv_dist_pow_ball (hd : 0 < d) (x : EuclideanSpace ℝ (Fin d)) {R q : ℝ}
+    (hq0 : 0 < q) (hs : -(d : ℝ) < -((d - 1 : ℕ) : ℝ) * q) :
+    MemLp (fun y => (dist x y ^ (d - 1))⁻¹) (ENNReal.ofReal q) (volume.restrict (ball x R)) := by
+  have : Nontrivial (EuclideanSpace ℝ (Fin d)) :=
+    Module.nontrivial_of_finrank_pos (R := ℝ) (by rw [finrank_euclideanSpace_fin]; exact hd)
+  set n : ℕ := d - 1 with hn_def
+  set s : ℝ := -(n : ℝ) * q with hs_def
+  have hxne := ae_ne_point x
+  -- The `q`-power of the kernel is a `dist`-power with exponent `s`.
+  have hpt : ∀ y : EuclideanSpace ℝ (Fin d), y ≠ x → ((dist x y ^ n)⁻¹) ^ q = dist x y ^ s := by
+    intro y hy
+    have hD : 0 < dist x y := dist_pos.mpr (fun h => hy h.symm)
+    rw [← Real.rpow_natCast (dist x y) n, ← Real.rpow_neg hD.le, ← Real.rpow_mul hD.le, hs_def,
+      neg_mul]
+  -- Integrability of the `dist`-power on the ball.
+  have hdist_int : IntegrableOn (fun y => dist x y ^ s) (ball x R) volume := by
+    have hmp : MeasurePreserving (fun w : EuclideanSpace ℝ (Fin d) => x + w) volume volume :=
+      measurePreserving_add_left volume x
+    rw [← hmp.integrableOn_comp_preimage (measurableEmbedding_addLeft x)]
+    rw [show (fun w : EuclideanSpace ℝ (Fin d) => x + w) ⁻¹' ball x R
+        = ball (0 : EuclideanSpace ℝ (Fin d)) R from by
+      ext w; simp only [Set.mem_preimage, mem_ball, dist_eq_norm, add_sub_cancel_left,
+        sub_zero]]
+    rw [show (fun y => dist x y ^ s) ∘ (fun w : EuclideanSpace ℝ (Fin d) => x + w)
+        = fun w => ‖w‖ ^ s from by
+      funext w
+      simp only [Function.comp_apply, dist_eq_norm, show x - (x + w) = -w from by abel, norm_neg]]
+    apply MeasureTheory.integrableOn_ball_of_norm_le_rpow (C := 1) (α := -s)
+      (by rw [finrank_euclideanSpace_fin]; exact hd)
+    · rw [finrank_euclideanSpace_fin]; linarith [hs]
+    · filter_upwards with w
+      rw [Real.norm_eq_abs, abs_of_nonneg (Real.rpow_nonneg (norm_nonneg _) _), neg_neg, one_mul]
+    · exact (measurable_norm.pow measurable_const).aestronglyMeasurable
+  have hKint : IntegrableOn (fun y => ((dist x y ^ n)⁻¹) ^ q) (ball x R) volume :=
+    hdist_int.congr (by filter_upwards [ae_restrict_of_ae hxne] with y hy using (hpt y hy).symm)
+  have hpe : ∀ y : EuclideanSpace ℝ (Fin d),
+      ‖(dist x y ^ n)⁻¹‖ₑ ^ q = ‖((dist x y ^ n)⁻¹) ^ q‖ₑ := fun y => by
+    have ha : (0 : ℝ) ≤ (dist x y ^ n)⁻¹ := by positivity
+    rw [← ofReal_norm ((dist x y ^ n)⁻¹ ^ q), ← ofReal_norm ((dist x y ^ n)⁻¹),
+      Real.norm_eq_abs, Real.norm_eq_abs, abs_of_nonneg ha,
+      abs_of_nonneg (Real.rpow_nonneg ha q), ENNReal.ofReal_rpow_of_nonneg ha hq0.le]
+  have hKm : AEStronglyMeasurable (fun y => (dist x y ^ n)⁻¹) (volume.restrict (ball x R)) :=
+    (((continuous_const.dist continuous_id).pow n).measurable.inv).aestronglyMeasurable
+  rw [memLp_iff, eLpNorm_lt_top_iff_lintegral_rpow_enorm_lt_top
+      (by rw [Ne, ENNReal.ofReal_eq_zero, not_le]; exact hq0) ENNReal.ofReal_ne_top hKm,
+    ENNReal.toReal_ofReal hq0.le, lintegral_congr hpe]
+  exact hasFiniteIntegral_iff_enorm.mp hKint.2
+
 /-- **Riesz-kernel `Lᵖ` bound.** For `p > d` there is a constant `Cdp` (depending only on
 `d, p`) such that the `(d-1)`-Riesz potential of any `Lᵖ` function over a ball of radius
 `R` centred at the base point is bounded by `Cdp · R^{1-d/p} · ‖g‖_{Lᵖ}`. The exponent
@@ -127,16 +185,11 @@ theorem exists_kernel_bound (hd : 0 < d) {p : ℝ} (hp : (d : ℝ) < p) :
               * (eLpNorm g (ENNReal.ofReal p) (volume.restrict (Metric.ball x R))).toReal := by
   have : Nontrivial (EuclideanSpace ℝ (Fin d)) :=
     Module.nontrivial_of_finrank_pos (R := ℝ) (by rw [finrank_euclideanSpace_fin]; exact hd)
-  have h1d : (1 : ℝ) ≤ (d : ℝ) := by exact_mod_cast hd
-  have hp1 : (1 : ℝ) < p := lt_of_le_of_lt h1d hp
+  have hp1 : (1 : ℝ) < p := lt_of_le_of_lt (by exact_mod_cast hd) hp
   obtain ⟨q, hpq⟩ : ∃ q, p.HolderConjugate q := ⟨_, Real.HolderConjugate.conjExponent hp1⟩
   have hp0 : 0 < p := hpq.pos
   have hq0 : 0 < q := hpq.symm.pos
-  have hqconj : q = p / (p - 1) := hpq.conjugate_eq
   have hpm1 : 0 < p - 1 := hpq.sub_one_pos
-  have hp0' : p ≠ 0 := hp0.ne'
-  have hpm1' : p - 1 ≠ 0 := hpm1.ne'
-  have hq0' : q ≠ 0 := hq0.ne'
   set n : ℕ := d - 1 with hn_def
   have hn : ((n : ℝ)) = (d : ℝ) - 1 := by rw [hn_def, Nat.cast_sub hd, Nat.cast_one]
   set s : ℝ := (-(n : ℝ)) * q with hs_def
@@ -145,108 +198,48 @@ theorem exists_kernel_bound (hd : 0 < d) {p : ℝ} (hp : (d : ℝ) < p) :
     rw [hω_def, measureReal_def, ENNReal.toReal_pos_iff]
     exact ⟨measure_ball_pos volume 0 one_pos, measure_ball_lt_top⟩
   have ha_eq : s + (d : ℝ) = (p - (d : ℝ)) / (p - 1) := by
-    rw [hs_def, hn, hqconj]; field_simp; ring
-  have ha_pos : 0 < s + (d : ℝ) := by
-    rw [ha_eq]; exact div_pos (by linarith) hpm1
-  have hs_lb : -(d : ℝ) < s := by linarith [ha_pos]
+    rw [hs_def, hn, hpq.conjugate_eq]; field_simp; ring
+  have ha_pos : 0 < s + (d : ℝ) := by rw [ha_eq]; exact div_pos (by linarith) hpm1
   have haq : (s + (d : ℝ)) / q = 1 - (d : ℝ) / p := by
-    rw [ha_eq, hqconj]; field_simp
-  have hp_ne0 : ENNReal.ofReal p ≠ 0 := by rw [Ne, ENNReal.ofReal_eq_zero, not_le]; exact hp0
-  have hp_netop : ENNReal.ofReal p ≠ ⊤ := ENNReal.ofReal_ne_top
+    rw [ha_eq, hpq.conjugate_eq]; field_simp
   have hCnn : 0 ≤ ((d : ℝ) * ω / (s + (d : ℝ))) ^ (1 / q) :=
     Real.rpow_nonneg (div_nonneg (mul_nonneg (Nat.cast_nonneg d) hω_pos.le) ha_pos.le) _
-  refine ⟨⟨((d : ℝ) * ω / (s + (d : ℝ))) ^ (1 / q), hCnn⟩, ?_⟩
-  intro x R hR g hmem
-  -- Almost-everywhere the running point differs from the centre.
-  have hxne : ∀ᵐ y ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), y ≠ x := by
-    rw [ae_iff, show {y : EuclideanSpace ℝ (Fin d) | ¬ y ≠ x} = {x} from by ext z; simp]
-    exact measure_singleton x
-  -- Pointwise: the `q`-power of the kernel is a `dist`-power with exponent `s`.
-  have hpt : ∀ y : EuclideanSpace ℝ (Fin d), y ≠ x →
-      ((dist x y ^ n)⁻¹) ^ q = dist x y ^ s := by
-    intro y hy
-    have hD : 0 < dist x y := dist_pos.mpr (fun h => hy h.symm)
-    rw [← Real.rpow_natCast (dist x y) n, ← Real.rpow_neg hD.le, ← Real.rpow_mul hD.le, hs_def]
-  -- Integrability of the `dist`-power on the ball (Task 4b pattern).
-  have hdist_int : IntegrableOn (fun y => dist x y ^ s) (ball x R) volume := by
-    have hfrk : 1 ≤ Module.finrank ℝ (EuclideanSpace ℝ (Fin d)) := by
-      rw [finrank_euclideanSpace_fin]; exact hd
-    have hmp : MeasurePreserving (fun w : EuclideanSpace ℝ (Fin d) => x + w) volume volume :=
-      measurePreserving_add_left volume x
-    rw [← hmp.integrableOn_comp_preimage (measurableEmbedding_addLeft x)]
-    rw [show (fun w : EuclideanSpace ℝ (Fin d) => x + w) ⁻¹' ball x R
-        = ball (0 : EuclideanSpace ℝ (Fin d)) R from by
-      ext w; simp only [Set.mem_preimage, mem_ball, dist_eq_norm, add_sub_cancel_left,
-        sub_zero]]
-    rw [show (fun y => dist x y ^ s) ∘ (fun w : EuclideanSpace ℝ (Fin d) => x + w)
-        = fun w => ‖w‖ ^ s from by
-      funext w
-      simp only [Function.comp_apply, dist_eq_norm, show x - (x + w) = -w from by abel, norm_neg]]
-    apply MeasureTheory.integrableOn_ball_of_norm_le_rpow (C := 1) (α := -s) hfrk
-    · rw [finrank_euclideanSpace_fin]; linarith [hs_lb]
-    · filter_upwards with w
-      rw [Real.norm_eq_abs, abs_of_nonneg (Real.rpow_nonneg (norm_nonneg _) _), neg_neg, one_mul]
-    · exact (measurable_norm.pow measurable_const).aestronglyMeasurable
-  -- Transfer integrability to the kernel's `q`-power.
-  have hae : (fun y => dist x y ^ s)
-      =ᵐ[volume.restrict (ball x R)] (fun y => ((dist x y ^ n)⁻¹) ^ q) := by
-    filter_upwards [ae_restrict_of_ae hxne] with y hy
-    exact (hpt y hy).symm
-  have hKint : IntegrableOn (fun y => ((dist x y ^ n)⁻¹) ^ q) (ball x R) volume :=
-    hdist_int.congr hae
-  -- Membership of the kernel in `L^q`.
-  have hpe : ∀ y : EuclideanSpace ℝ (Fin d),
-      ‖(dist x y ^ n)⁻¹‖ₑ ^ q = ‖((dist x y ^ n)⁻¹) ^ q‖ₑ := by
-    intro y
-    have ha : (0 : ℝ) ≤ (dist x y ^ n)⁻¹ := by positivity
-    rw [← ofReal_norm ((dist x y ^ n)⁻¹ ^ q), ← ofReal_norm ((dist x y ^ n)⁻¹),
-      Real.norm_eq_abs, Real.norm_eq_abs, abs_of_nonneg ha,
-      abs_of_nonneg (Real.rpow_nonneg ha q), ENNReal.ofReal_rpow_of_nonneg ha hq0.le]
-  have hKmem : MemLp (fun y => (dist x y ^ n)⁻¹) (ENNReal.ofReal q)
-      (volume.restrict (ball x R)) := by
-    have hKm : AEStronglyMeasurable (fun y => (dist x y ^ n)⁻¹)
-        (volume.restrict (ball x R)) :=
-      (((continuous_const.dist continuous_id).pow n).measurable.inv).aestronglyMeasurable
-    rw [memLp_iff, eLpNorm_lt_top_iff_lintegral_rpow_enorm_lt_top
-        (by rw [Ne, ENNReal.ofReal_eq_zero, not_le]; exact hq0) ENNReal.ofReal_ne_top hKm,
-      ENNReal.toReal_ofReal hq0.le, lintegral_congr hpe]
-    exact hasFiniteIntegral_iff_enorm.mp hKint.2
+  refine ⟨⟨((d : ℝ) * ω / (s + (d : ℝ))) ^ (1 / q), hCnn⟩, fun x R hR g hmem => ?_⟩
+  have hKmem := memLp_inv_dist_pow_ball hd x (R := R) hq0 (by linarith [ha_pos])
   -- Hölder's inequality at the Bochner level.
-  have hf_nn : 0 ≤ᵐ[volume.restrict (ball x R)] (fun y => ‖g y‖) :=
-    ae_of_all _ (fun y => norm_nonneg _)
-  have hK_nn : 0 ≤ᵐ[volume.restrict (ball x R)] (fun y => (dist x y ^ n)⁻¹) :=
-    ae_of_all _ (fun y => by positivity)
-  have holder := integral_mul_le_Lp_mul_Lq_of_nonneg hpq hf_nn hK_nn hmem.norm hKmem
+  have holder := integral_mul_le_Lp_mul_Lq_of_nonneg hpq
+    (ae_of_all _ (fun y => norm_nonneg (g y)) : 0 ≤ᵐ[volume.restrict (ball x R)] fun y => ‖g y‖)
+    (ae_of_all _ (fun y => by positivity) : 0 ≤ᵐ[volume.restrict (ball x R)]
+      fun y => (dist x y ^ n)⁻¹) hmem.norm hKmem
   -- The `Lᵖ` factor equals the `toReal` of the `eLpNorm`.
-  have hpint_nn : 0 ≤ ∫ y in ball x R, ‖g y‖ ^ p ∂volume :=
-    integral_nonneg (fun y => Real.rpow_nonneg (norm_nonneg _) _)
   have heLp : (eLpNorm g (ENNReal.ofReal p) (volume.restrict (ball x R))).toReal
       = (∫ y in ball x R, ‖g y‖ ^ p ∂volume) ^ (1 / p) := by
-    rw [hmem.eLpNorm_eq_integral_rpow_norm hp_ne0 hp_netop, ENNReal.toReal_ofReal hp0.le,
-      ENNReal.toReal_ofReal (Real.rpow_nonneg hpint_nn _), one_div]
+    rw [hmem.eLpNorm_eq_integral_rpow_norm (by rw [Ne, ENNReal.ofReal_eq_zero, not_le]; exact hp0)
+        ENNReal.ofReal_ne_top, ENNReal.toReal_ofReal hp0.le,
+      ENNReal.toReal_ofReal (Real.rpow_nonneg (integral_nonneg fun y =>
+        Real.rpow_nonneg (norm_nonneg _) _) _), one_div]
   -- The kernel factor equals the constant times `R^{1-d/p}`.
   have hker_val : ∫ y in ball x R, ((dist x y ^ n)⁻¹) ^ q ∂volume
       = (d : ℝ) * ω * (R ^ (s + (d : ℝ)) / (s + (d : ℝ))) := by
     rw [setIntegral_congr_ae measurableSet_ball (g := fun y => dist x y ^ s)
-        (by filter_upwards [hxne] with y hy; exact fun _ => hpt y hy),
-      setIntegral_ball_dist_rpow hd x hR hs_lb, ← hω_def]
+        (by
+          filter_upwards [ae_ne_point x] with y hy _
+          rw [← Real.rpow_natCast (dist x y) n, ← Real.rpow_neg dist_nonneg,
+            ← Real.rpow_mul dist_nonneg, hs_def, neg_mul]),
+      setIntegral_ball_dist_rpow hd x hR (by linarith [ha_pos]), ← hω_def]
   have hKfac : (∫ y in ball x R, ((dist x y ^ n)⁻¹) ^ q ∂volume) ^ (1 / q)
       = ((d : ℝ) * ω / (s + (d : ℝ))) ^ (1 / q) * R ^ (1 - (d : ℝ) / p) := by
-    rw [hker_val]
-    rw [show (d : ℝ) * ω * (R ^ (s + (d : ℝ)) / (s + (d : ℝ)))
-        = ((d : ℝ) * ω / (s + (d : ℝ))) * R ^ (s + (d : ℝ)) from by field_simp]
-    rw [Real.mul_rpow (div_nonneg (mul_nonneg (Nat.cast_nonneg d) hω_pos.le) ha_pos.le)
+    rw [hker_val, show (d : ℝ) * ω * (R ^ (s + (d : ℝ)) / (s + (d : ℝ)))
+        = ((d : ℝ) * ω / (s + (d : ℝ))) * R ^ (s + (d : ℝ)) from by field_simp,
+      Real.mul_rpow (div_nonneg (mul_nonneg (Nat.cast_nonneg d) hω_pos.le) ha_pos.le)
         (Real.rpow_nonneg hR.le _), ← Real.rpow_mul hR.le, mul_one_div, haq]
-  -- Assemble.
   calc ∫ y in ball x R, ‖g y‖ / dist x y ^ n ∂volume
       = ∫ y in ball x R, ‖g y‖ * (dist x y ^ n)⁻¹ ∂volume := by simp_rw [div_eq_mul_inv]
     _ ≤ (∫ y in ball x R, ‖g y‖ ^ p ∂volume) ^ (1 / p)
           * (∫ y in ball x R, ((dist x y ^ n)⁻¹) ^ q ∂volume) ^ (1 / q) := holder
-    _ = (eLpNorm g (ENNReal.ofReal p) (volume.restrict (ball x R))).toReal
-          * (((d : ℝ) * ω / (s + (d : ℝ))) ^ (1 / q) * R ^ (1 - (d : ℝ) / p)) := by
-        rw [← heLp, hKfac]
     _ = ((d : ℝ) * ω / (s + (d : ℝ))) ^ (1 / q) * R ^ (1 - (d : ℝ) / p)
-          * (eLpNorm g (ENNReal.ofReal p) (volume.restrict (ball x R))).toReal := by ring
+          * (eLpNorm g (ENNReal.ofReal p) (volume.restrict (ball x R))).toReal := by
+        rw [← heLp, hKfac]; ring
 
 /-- **Gradient norm is `Lᵖ` on a ball.** For a smooth `φ` the map `y ↦ ‖fderiv ℝ φ y‖` is
 continuous, hence bounded on the compact closed ball, hence `Lᵖ` on the finite-measure
@@ -371,6 +364,76 @@ private theorem lens_volume_lower_bound (_hd : 0 < d) (c x x' : EuclideanSpace �
     _ ≤ volume.real (ball x (2 * ρ) ∩ ball x' (2 * ρ) ∩ ball c r) :=
         ENNReal.toReal_mono hWtop (measure_mono hsub)
 
+/-- **Hölder continuity from a pointwise bound.** A function whose increments are bounded by
+`C · dist x y ^ γ` on `s` is Hölder-`γ` on `s` with constant `C`. -/
+theorem holderOnWith_of_dist_le {X Y : Type*} [PseudoMetricSpace X] [PseudoMetricSpace Y]
+    {f : X → Y} {s : Set X} {C γ : ℝ≥0}
+    (h : ∀ x ∈ s, ∀ y ∈ s, dist (f x) (f y) ≤ C * dist x y ^ (γ : ℝ)) : HolderOnWith C γ f s := by
+  intro x hx y hy
+  rw [edist_dist, edist_dist, ← ENNReal.ofReal_coe_nnreal,
+    ENNReal.ofReal_rpow_of_nonneg dist_nonneg γ.coe_nonneg, ← ENNReal.ofReal_mul C.coe_nonneg]
+  exact ENNReal.ofReal_le_ofReal (h x hx y hy)
+
+/-- **Oscillation of a smooth function over a convex set.** For `p > d` there is a constant `K`
+such that, for a smooth `φ`, a convex measurable `W ⊆ ball c r` of volume at least
+`(ρ/4)^d ω_d`, and a point `a ∈ W` with `W ⊆ ball a (2ρ)`, the oscillation of `φ` at `a` about
+its `W`-average is at most `K ρ^{1-d/p} ‖∇φ‖_{Lᵖ(ball c r)}`. The averaging identity bounds it by
+the Riesz potential of the gradient over `W`, which the subset kernel bound estimates. -/
+theorem exists_abs_sub_average_le (hd : 0 < d) {p : ℝ} (hp : (d : ℝ) < p) :
+    ∃ K : ℝ≥0, ∀ (φ : EuclideanSpace ℝ (Fin d) → ℝ), ContDiff ℝ (⊤ : ℕ∞) φ →
+      ∀ (c : EuclideanSpace ℝ (Fin d)) {r : ℝ}, 0 < r → ∀ {ρ : ℝ}, 0 < ρ →
+      ∀ {W : Set (EuclideanSpace ℝ (Fin d))}, MeasurableSet W → Convex ℝ W → W ⊆ ball c r →
+      (ρ / 4) ^ d * volume.real (ball (0 : EuclideanSpace ℝ (Fin d)) 1) ≤ volume.real W →
+      ∀ a ∈ W, W ⊆ ball a (2 * ρ) →
+        |φ a - ⨍ y in W, φ y| ≤ K * ρ ^ (1 - (d : ℝ) / p)
+          * (eLpNorm (fun y => ‖fderiv ℝ φ y‖) (ENNReal.ofReal p)
+              (volume.restrict (ball c r))).toReal := by
+  have : Nontrivial (EuclideanSpace ℝ (Fin d)) :=
+    Module.nontrivial_of_finrank_pos (R := ℝ) (by rw [finrank_euclideanSpace_fin]; exact hd)
+  have hdR : (0 : ℝ) < d := by exact_mod_cast hd
+  set ω : ℝ := volume.real (ball (0 : EuclideanSpace ℝ (Fin d)) 1) with hω_def
+  have hω_pos : 0 < ω := by
+    rw [hω_def, measureReal_def, ENNReal.toReal_pos_iff]
+    exact ⟨measure_ball_pos volume 0 one_pos, measure_ball_lt_top⟩
+  obtain ⟨Cdp, hCdp⟩ := exists_kernel_bound_subset hd hp
+  set K : ℝ := 8 ^ d / ((d : ℝ) * ω) * (Cdp : ℝ) * (2 : ℝ) ^ (1 - (d : ℝ) / p) with hK_def
+  have hK0 : 0 ≤ K := by positivity
+  refine ⟨K.toNNReal, fun φ hφ c r hr ρ hρ W hWmeas hWconv hWc hBlb a haW hWsub => ?_⟩
+  set E := eLpNorm (fun y => ‖fderiv ℝ φ y‖) (ENNReal.ofReal p) (volume.restrict (ball c r))
+    with hE_def
+  have hE_ne_top : E ≠ ⊤ := (memLp_norm_fderiv (p := p) hφ c hr).eLpNorm_lt_top.ne
+  have h2ρ : (0 : ℝ) < 2 * ρ := by positivity
+  have hWposR : 0 < volume.real W :=
+    lt_of_lt_of_le (mul_pos (pow_pos (by positivity) d) hω_pos) hBlb
+  obtain ⟨hWpos, hWtop⟩ := ENNReal.toReal_pos_iff.mp (measureReal_def (μ := volume) W ▸ hWposR)
+  have hEW_le_N :
+      (eLpNorm (fun y => ‖fderiv ℝ φ y‖) (ENNReal.ofReal p) (volume.restrict W)).toReal
+        ≤ E.toReal :=
+    ENNReal.toReal_mono hE_ne_top
+      (eLpNorm_mono_measure _ (Measure.restrict_mono hWc le_rfl))
+  have hosc := oscillation_le_potential_convex hφ hd a hWmeas hWconv haW hWpos.ne' hWtop.ne h2ρ
+    hWsub ((riesz_potential_integrableOn hφ hd c a hr (hWc haW)).mono_set hWc)
+  have hker_a := hCdp a h2ρ (fun y => ‖fderiv ℝ φ y‖) (memLp_norm_fderiv (p := p) hφ a h2ρ)
+    hWmeas hWsub
+  simp only [norm_norm] at hker_a
+  have hP_bound : (∫ z in W, ‖fderiv ℝ φ z‖ / dist a z ^ (d - 1))
+      ≤ (Cdp : ℝ) * (2 * ρ) ^ (1 - (d : ℝ) / p) * E.toReal :=
+    hker_a.trans (mul_le_mul_of_nonneg_left hEW_le_N (by positivity))
+  have hA_bound : (2 * ρ) ^ d / ((d : ℝ) * volume.real W) ≤ 8 ^ d / ((d : ℝ) * ω) := by
+    rw [div_le_div_iff₀ (mul_pos hdR hWposR) (mul_pos hdR hω_pos)]
+    calc (2 * ρ) ^ d * ((d : ℝ) * ω) = 8 ^ d * (d : ℝ) * ((ρ / 4) ^ d * ω) := by
+          rw [show (2 * ρ) ^ d = 8 ^ d * (ρ / 4) ^ d by rw [← mul_pow]; congr 1; ring]; ring
+      _ ≤ 8 ^ d * (d : ℝ) * volume.real W := mul_le_mul_of_nonneg_left hBlb (by positivity)
+      _ = 8 ^ d * ((d : ℝ) * volume.real W) := by ring
+  calc |φ a - ⨍ y in W, φ y|
+      ≤ (2 * ρ) ^ d / ((d : ℝ) * volume.real W)
+          * ∫ z in W, ‖fderiv ℝ φ z‖ / dist a z ^ (d - 1) := hosc
+    _ ≤ 8 ^ d / ((d : ℝ) * ω) * ((Cdp : ℝ) * (2 * ρ) ^ (1 - (d : ℝ) / p) * E.toReal) :=
+        mul_le_mul hA_bound hP_bound (integral_nonneg fun z => by positivity)
+          (div_nonneg (by positivity) (mul_nonneg hdR.le hω_pos.le))
+    _ = K.toNNReal * ρ ^ (1 - (d : ℝ) / p) * E.toReal := by
+        rw [Real.coe_toNNReal _ hK0, Real.mul_rpow (by norm_num) hρ.le, hK_def]; ring
+
 /-- **Smooth Morrey Hölder estimate on a ball.** For `p > d` there is a constant `C`,
 depending only on `d` and `p`, such that every smooth `φ` is Hölder continuous on `ball c r`
 with exponent `1 - d/p` and constant `C · ‖∇φ‖_{Lᵖ(ball c r)}`. This is Gilbarg–Trudinger
@@ -385,115 +448,31 @@ theorem exists_holder_smooth (hd : 0 < d) {p : ℝ} (hp : (d : ℝ) < p) :
           (C * (eLpNorm (fun y => ‖fderiv ℝ φ y‖) (ENNReal.ofReal p)
                   (volume.restrict (Metric.ball c r))).toNNReal)
           (morreyExponent d p) φ (Metric.ball c r) := by
-  have : Nontrivial (EuclideanSpace ℝ (Fin d)) :=
-    Module.nontrivial_of_finrank_pos (R := ℝ) (by rw [finrank_euclideanSpace_fin]; exact hd)
-  have hdR : (0 : ℝ) < d := by exact_mod_cast hd
-  have hp0 : (0 : ℝ) < p := lt_trans hdR hp
-  set ω : ℝ := volume.real (ball (0 : EuclideanSpace ℝ (Fin d)) 1) with hω_def
-  have hω_pos : 0 < ω := by
-    rw [hω_def, measureReal_def, ENNReal.toReal_pos_iff]
-    exact ⟨measure_ball_pos volume 0 one_pos, measure_ball_lt_top⟩
-  obtain ⟨Cdp, hCdp⟩ := exists_kernel_bound_subset hd hp
-  set K : ℝ := 8 ^ d / ((d : ℝ) * ω) * (Cdp : ℝ) * (2 : ℝ) ^ (1 - (d : ℝ) / p) with hK_def
-  refine ⟨(2 * K).toNNReal, ?_⟩
-  intro φ hφ c r hr
-  set E := eLpNorm (fun y => ‖fderiv ℝ φ y‖) (ENNReal.ofReal p) (volume.restrict (ball c r))
-    with hE_def
-  have hE_ne_top : E ≠ ⊤ := (memLp_norm_fderiv (p := p) hφ c hr).eLpNorm_lt_top.ne
-  intro x hx x' hx'
+  obtain ⟨K, hK⟩ := exists_abs_sub_average_le hd hp
+  refine ⟨2 * K, fun φ hφ c r hr => holderOnWith_of_dist_le fun x hx x' hx' => ?_⟩
+  rw [NNReal.coe_mul, ENNReal.coe_toNNReal_eq_toReal, coe_morreyExponent hp hd]
   by_cases hxx : x = x'
-  · subst hxx; simp
-  · have hρpos : 0 < dist x x' := dist_pos.mpr hxx
-    have hρ4 : (0 : ℝ) < dist x x' / 4 := by positivity
-    have h2ρ : (0 : ℝ) < 2 * dist x x' := by positivity
-    set W : Set (EuclideanSpace ℝ (Fin d)) :=
-      ball x (2 * dist x x') ∩ ball x' (2 * dist x x') ∩ ball c r with hW_def
-    have hWmeas : MeasurableSet W :=
-      (measurableSet_ball.inter measurableSet_ball).inter measurableSet_ball
-    have hWconv : Convex ℝ W :=
-      ((convex_ball _ _).inter (convex_ball _ _)).inter (convex_ball _ _)
-    have hBlb : (dist x x' / 4) ^ d * ω ≤ volume.real W := by
-      have h := lens_volume_lower_bound hd c x x' hr hx hx' hxx
-      rwa [← hW_def, ← hω_def] at h
-    have hWposR : 0 < volume.real W :=
-      lt_of_lt_of_le (mul_pos (pow_pos hρ4 d) hω_pos) hBlb
-    have hWposR' : 0 < (volume W).toReal := by rw [← measureReal_def]; exact hWposR
-    obtain ⟨hWpos, hWtop⟩ := ENNReal.toReal_pos_iff.mp hWposR'
-    have hEW_le_N :
-        (eLpNorm (fun y => ‖fderiv ℝ φ y‖) (ENNReal.ofReal p) (volume.restrict W)).toReal
-          ≤ E.toReal :=
-      ENNReal.toReal_mono hE_ne_top
-        (eLpNorm_mono_measure _ (Measure.restrict_mono (fun z hz => hz.2) le_rfl))
-    -- Per-point lens bound (applied at `x` and at `x'`).
-    have hkey : ∀ a : EuclideanSpace ℝ (Fin d), a ∈ ball c r → a ∈ W →
-        W ⊆ ball a (2 * dist x x') →
-        |φ a - ⨍ y in W, φ y| ≤ K * dist x x' ^ (1 - (d : ℝ) / p) * E.toReal := by
-      intro a ha haW hWsub_a
-      have hint_a : IntegrableOn (fun z => ‖fderiv ℝ φ z‖ / dist a z ^ (d - 1)) W volume :=
-        (riesz_potential_integrableOn hφ hd c a hr ha).mono_set (fun z hz => hz.2)
-      have hosc := oscillation_le_potential_convex hφ hd a hWmeas hWconv haW hWpos.ne' hWtop.ne
-        h2ρ hWsub_a hint_a
-      have hmemA : MemLp (fun y => ‖fderiv ℝ φ y‖) (ENNReal.ofReal p)
-          (volume.restrict (ball a (2 * dist x x'))) := memLp_norm_fderiv (p := p) hφ a h2ρ
-      have hker_a := hCdp a h2ρ (fun y => ‖fderiv ℝ φ y‖) hmemA hWmeas hWsub_a
-      simp only [norm_norm] at hker_a
-      have hP_nonneg : 0 ≤ ∫ z in W, ‖fderiv ℝ φ z‖ / dist a z ^ (d - 1) :=
-        integral_nonneg (fun z => by positivity)
-      have hP_bound : (∫ z in W, ‖fderiv ℝ φ z‖ / dist a z ^ (d - 1))
-          ≤ (Cdp : ℝ) * (2 * dist x x') ^ (1 - (d : ℝ) / p) * E.toReal :=
-        le_trans hker_a (mul_le_mul_of_nonneg_left hEW_le_N (by positivity))
-      have hA_bound :
-          (2 * dist x x') ^ d / ((d : ℝ) * volume.real W) ≤ 8 ^ d / ((d : ℝ) * ω) := by
-        rw [div_le_div_iff₀ (mul_pos hdR hWposR) (mul_pos hdR hω_pos)]
-        have hkey84 : (2 * dist x x') ^ d = 8 ^ d * (dist x x' / 4) ^ d := by
-          rw [← mul_pow]; congr 1; ring
-        calc (2 * dist x x') ^ d * ((d : ℝ) * ω)
-            = 8 ^ d * (dist x x' / 4) ^ d * ((d : ℝ) * ω) := by rw [hkey84]
-          _ = 8 ^ d * (d : ℝ) * ((dist x x' / 4) ^ d * ω) := by ring
-          _ ≤ 8 ^ d * (d : ℝ) * volume.real W :=
-              mul_le_mul_of_nonneg_left hBlb (by positivity)
-          _ = 8 ^ d * ((d : ℝ) * volume.real W) := by ring
-      have hC1_nonneg : (0 : ℝ) ≤ 8 ^ d / ((d : ℝ) * ω) :=
-        div_nonneg (by positivity) (mul_nonneg hdR.le hω_pos.le)
-      calc |φ a - ⨍ y in W, φ y|
-          ≤ (2 * dist x x') ^ d / ((d : ℝ) * volume.real W)
-              * ∫ z in W, ‖fderiv ℝ φ z‖ / dist a z ^ (d - 1) := hosc
-        _ ≤ 8 ^ d / ((d : ℝ) * ω)
-              * ((Cdp : ℝ) * (2 * dist x x') ^ (1 - (d : ℝ) / p) * E.toReal) :=
-            mul_le_mul hA_bound hP_bound hP_nonneg hC1_nonneg
-        _ = K * dist x x' ^ (1 - (d : ℝ) / p) * E.toReal := by
-            rw [Real.mul_rpow (by norm_num) hρpos.le, hK_def]; ring
-    -- Assemble the two-point bound.
-    have hxW : x ∈ W :=
-      Set.mem_inter
-        (Set.mem_inter (mem_ball_self h2ρ)
-          (mem_ball.mpr (by linarith : dist x x' < 2 * dist x x'))) hx
-    have hx'W : x' ∈ W :=
-      Set.mem_inter
-        (Set.mem_inter (mem_ball.mpr (by rw [dist_comm]; linarith : dist x' x < 2 * dist x x'))
-          (mem_ball_self h2ρ)) hx'
-    have hbx := hkey x hx hxW (fun z hz => hz.1.1)
-    have hbx' := hkey x' hx' hx'W (fun z hz => hz.1.2)
-    have hreal : |φ x - φ x'| ≤ 2 * K * E.toReal * dist x x' ^ (1 - (d : ℝ) / p) := by
-      have htri := abs_sub_le (φ x) (⨍ y in W, φ y) (φ x')
-      rw [abs_sub_comm (⨍ y in W, φ y) (φ x')] at htri
-      calc |φ x - φ x'|
-          ≤ |φ x - ⨍ y in W, φ y| + |φ x' - ⨍ y in W, φ y| := htri
-        _ ≤ K * dist x x' ^ (1 - (d : ℝ) / p) * E.toReal
-              + K * dist x x' ^ (1 - (d : ℝ) / p) * E.toReal := add_le_add hbx hbx'
-        _ = 2 * K * E.toReal * dist x x' ^ (1 - (d : ℝ) / p) := by ring
-    rw [edist_dist (φ x) (φ x'), Real.dist_eq, edist_dist x x', coe_morreyExponent hp hd]
-    calc ENNReal.ofReal |φ x - φ x'|
-        ≤ ENNReal.ofReal (2 * K * E.toReal * dist x x' ^ (1 - (d : ℝ) / p)) :=
-          ENNReal.ofReal_le_ofReal hreal
-      _ = ENNReal.ofReal (2 * K) * ENNReal.ofReal E.toReal
-            * ENNReal.ofReal (dist x x' ^ (1 - (d : ℝ) / p)) := by
-          rw [← ENNReal.ofReal_mul (by positivity), ← ENNReal.ofReal_mul (by positivity)]
-      _ = ((2 * K).toNNReal * E.toNNReal : ℝ≥0)
-            * ENNReal.ofReal (dist x x') ^ (1 - (d : ℝ) / p) := by
-          rw [ENNReal.coe_mul, ENNReal.coe_toNNReal hE_ne_top, ENNReal.ofReal_toReal hE_ne_top,
-            ENNReal.ofReal_rpow_of_pos hρpos]
-          rfl
+  · subst hxx
+    simp only [dist_self]
+    positivity
+  have hρpos : 0 < dist x x' := dist_pos.mpr hxx
+  set W : Set (EuclideanSpace ℝ (Fin d)) :=
+    ball x (2 * dist x x') ∩ ball x' (2 * dist x x') ∩ ball c r with hW_def
+  have hWmeas : MeasurableSet W :=
+    (measurableSet_ball.inter measurableSet_ball).inter measurableSet_ball
+  have hWconv : Convex ℝ W := ((convex_ball _ _).inter (convex_ball _ _)).inter (convex_ball _ _)
+  have hBlb := lens_volume_lower_bound hd c x x' hr hx hx' hxx
+  have hxW : x ∈ W := ⟨⟨mem_ball_self (by positivity), mem_ball.mpr (by linarith)⟩, hx⟩
+  have hx'W : x' ∈ W :=
+    ⟨⟨mem_ball.mpr (by rw [dist_comm]; linarith), mem_ball_self (by positivity)⟩, hx'⟩
+  have hbx := hK φ hφ c hr hρpos hWmeas hWconv (fun z hz => hz.2) hBlb x hxW (fun z hz => hz.1.1)
+  have hbx' := hK φ hφ c hr hρpos hWmeas hWconv (fun z hz => hz.2) hBlb x' hx'W
+    (fun z hz => hz.1.2)
+  have htri := abs_sub_le (φ x) (⨍ y in W, φ y) (φ x')
+  rw [abs_sub_comm (⨍ y in W, φ y) (φ x')] at htri
+  rw [Real.dist_eq]
+  push_cast
+  linarith
 
 /-- **Operator norm of a derivative bounded by its coordinate partials.** On
 `EuclideanSpace ℝ (Fin d)` the operator norm of `fderiv ℝ u y` is bounded by the sum of the
