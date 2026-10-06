@@ -47,18 +47,13 @@ coefficient itself and `D_step` makes each successive entry a weak derivative of
 * `IsWkInftyCoeff`: Guo's coefficient hypothesis at order `k`.
 * `IsWkInftyCoeff.mono`: an order-`k` bundle is an order-`l` bundle for every `l ≤ k`.
 
-## Statements this file does not yet supply
+## Relation to the classical hypotheses
 
-The bridge `IsCkCoeff A k → IsWkInftyCoeff A k` and the difference-quotient bound under the
-weaker hypothesis. The latter cannot be had in the everywhere-pointwise form that
-`IsC1Coeff.abs_diffQuot_coeff_le` currently has: that proof is the classical mean value
-inequality, which needs a derivative at every point, and recovering a pointwise bound from an
-essentially bounded weak derivative is the statement that `W^{1,∞}` functions have Lipschitz
-representatives. Mathlib has Rademacher's theorem in the opposite direction
-(`LipschitzWith.ae_differentiableAt`) and not this one. The route that avoids it is
-mollification: `(∇a) * ρ_ε` inherits the essential bound of `∇a`, the classical inequality
-applies to the smooth `a * ρ_ε`, and the bound passes to the limit almost everywhere. That
-yields the bound a.e. rather than everywhere, which is all its consumers integrate against.
+`IsCkCoeff.toIsWkInftyCoeff` (in `CoeffBridge`) shows a `Cᵏ` bundle to be a `W^{k,∞}` bundle, and
+`IsLipCoeff.toIsWkInftyCoeff` (in `CoeffLipWeakGrad`) does the same for a Lipschitz bundle. The
+converse for `k = 1` is the statement that a `W^{1,∞}` function has a Lipschitz representative,
+which Mathlib does not have. Rademacher's theorem
+(`LipschitzWith.ae_differentiableAt`) is the opposite direction.
 -/
 
 @[expose] public section

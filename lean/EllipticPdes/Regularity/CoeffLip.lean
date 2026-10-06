@@ -29,14 +29,12 @@ the interior estimate, higher interior regularity and interior smoothness all ru
 * `IsLipCoeff.abs_diffQuot_coeff_le`: the coefficient difference-quotient bound.
 * `IsC1Coeff.toIsLipCoeff`: the bridge, by the segment mean value inequality.
 
-## Statements this file does not supply
+## Relation to the weak hypothesis
 
-The passage from an `IsWkInftyCoeff A 1` bundle, whose derivative bound is essential rather
-than pointwise, to `IsLipCoeff`. That passage is the statement that a `W^{1,∞}` function has
-a Lipschitz representative, and Mathlib has Rademacher's theorem in the opposite direction
-alone (`LipschitzWith.ae_differentiableAt`). Until it is proved the two hypotheses are
-distinct, and `interior_smooth` asks `IsLipCoeff` beside its `W^{k,∞}` bundles rather than
-reading the first from the second.
+`IsLipCoeff.toIsWkInftyCoeff` (in `CoeffLipWeakGrad`) shows a Lipschitz coefficient to be a
+`W^{1,∞}` coefficient, through Rademacher's theorem and integration by parts for Lipschitz
+functions. The converse, that a `W^{1,∞}` function has a Lipschitz representative, is not in
+Mathlib, so `interior_smooth` asks `IsLipCoeff` beside its `W^{k,∞}` bundles.
 -/
 
 @[expose] public section
