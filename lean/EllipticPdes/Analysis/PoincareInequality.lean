@@ -10,7 +10,7 @@ public import Mathlib.MeasureTheory.Integral.IntervalIntegral.Basic
 public import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
 public import Mathlib.Analysis.Calculus.Deriv.Pow
 public import Mathlib.Analysis.Calculus.Deriv.Mul
-public import Mathlib.Algebra.QuadraticDiscriminant
+public import EllipticPdes.Sobolev.Basic
 
 /-!
 # One-dimensional Poincaré inequality
@@ -22,8 +22,7 @@ norm of its derivative:
 
 The argument has three steps. First, `intervalIntegral_mul_sq_le` is the
 Cauchy-Schwarz inequality for the interval integral, obtained from the
-nonnegativity of `∫ (f - λ g) ^ 2` read as a quadratic in `λ` whose
-discriminant is therefore nonpositive. Second, the fundamental theorem of
+inner product of `L²`. Second, the fundamental theorem of
 calculus writes `u x` as `∫ t in a..x, u' t`, which the Cauchy-Schwarz bound
 (with `g = 1`, `sq_intervalIntegral_le`) turns into the pointwise estimate
 `(u x) ^ 2 ≤ M * (x - a)` with `M = ∫ t in a..b, (u' t) ^ 2`. Third,
@@ -32,53 +31,68 @@ integrating that estimate over `[a, b]` and evaluating
 
 ## Main results
 
-* `MeasureTheory.intervalIntegral_mul_sq_le`: Cauchy-Schwarz for `∫ f g`.
-* `MeasureTheory.sq_intervalIntegral_le`: the `g = 1` special case.
-* `MeasureTheory.poincare_1d`: the one-dimensional Poincaré inequality.
+* `EllipticPdes.Analysis.sq_integral_mul_le`: Cauchy-Schwarz for `∫ f g` in `L²`.
+* `EllipticPdes.Analysis.sq_setIntegral_le_measureReal_mul`: the case `g = 1` on a set.
+* `EllipticPdes.Analysis.intervalIntegral_mul_sq_le` and `sq_intervalIntegral_le`: the interval
+  forms.
+* `EllipticPdes.Analysis.poincare_1d`: the one-dimensional Poincaré inequality.
 -/
 
 @[expose] public section
 
 open MeasureTheory intervalIntegral Set
+open scoped RealInnerProductSpace
+
+namespace EllipticPdes.Analysis
+
+section CauchySchwarz
+
+variable {α : Type*} [MeasurableSpace α] {μ : Measure α} {f g : α → ℝ}
+
+/-- Cauchy-Schwarz for the integral of a product of two square-integrable functions. -/
+theorem sq_integral_mul_le (hf : MemLp f 2 μ) (hg : MemLp g 2 μ) :
+    (∫ x, f x * g x ∂μ) ^ 2 ≤ (∫ x, f x ^ 2 ∂μ) * ∫ x, g x ^ 2 ∂μ := by
+  have h := real_inner_mul_inner_self_le (hf.toLp f) (hg.toLp g)
+  rw [L2.real_inner_eq_integral, real_inner_self_eq_norm_sq, real_inner_self_eq_norm_sq,
+    L2.norm_sq_eq_integral_sq, L2.norm_sq_eq_integral_sq] at h
+  have hfg : ∫ x, hf.toLp f x * hg.toLp g x ∂μ = ∫ x, f x * g x ∂μ :=
+    integral_congr_ae (by filter_upwards [hf.coeFn_toLp, hg.coeFn_toLp] with x hx hy; rw [hx, hy])
+  have hff : ∫ x, hf.toLp f x ^ 2 ∂μ = ∫ x, f x ^ 2 ∂μ :=
+    integral_congr_ae (by filter_upwards [hf.coeFn_toLp] with x hx; rw [hx])
+  have hgg : ∫ x, hg.toLp g x ^ 2 ∂μ = ∫ x, g x ^ 2 ∂μ :=
+    integral_congr_ae (by filter_upwards [hg.coeFn_toLp] with x hx; rw [hx])
+  rw [hfg, hff, hgg] at h
+  nlinarith [h]
+
+/-- **Finite-measure Cauchy-Schwarz with one constant factor.** The square of the integral of a
+square-integrable `f` over a set of finite measure is at most the measure of the set times the
+integral of `f ^ 2`. -/
+theorem sq_setIntegral_le_measureReal_mul {s : Set α} (hμs : μ s ≠ ⊤)
+    (hf : MemLp f 2 (μ.restrict s)) :
+    (∫ x in s, f x ∂μ) ^ 2 ≤ μ.real s * ∫ x in s, f x ^ 2 ∂μ := by
+  have : IsFiniteMeasure (μ.restrict s) := ⟨by simpa [lt_top_iff_ne_top] using hμs⟩
+  have h := sq_integral_mul_le hf (memLp_const (1 : ℝ) : MemLp (fun _ => (1 : ℝ)) 2 (μ.restrict s))
+  simpa [mul_comm, Measure.real, mul_one, one_pow] using h
+
+end CauchySchwarz
 
 /-- Cauchy-Schwarz for the interval integral: the square of `∫ f g` is at most
-the product of `∫ f ^ 2` and `∫ g ^ 2`. Proved from `0 ≤ ∫ (f - λ g) ^ 2`, read
-as a nonnegative quadratic in `λ` whose discriminant must therefore be
-nonpositive. -/
-theorem MeasureTheory.intervalIntegral_mul_sq_le {a b : ℝ} (hab : a ≤ b) {f g : ℝ → ℝ}
+the product of `∫ f ^ 2` and `∫ g ^ 2`. -/
+theorem intervalIntegral_mul_sq_le {a b : ℝ} (hab : a ≤ b) {f g : ℝ → ℝ}
     (hf : ContinuousOn f (uIcc a b)) (hg : ContinuousOn g (uIcc a b)) :
     (∫ t in a..b, f t * g t) ^ 2 ≤ (∫ t in a..b, (f t) ^ 2) * ∫ t in a..b, (g t) ^ 2 := by
-  have hf2I : IntervalIntegrable (fun t => (f t) ^ 2) volume a b := (hf.pow 2).intervalIntegrable
-  have hg2I : IntervalIntegrable (fun t => (g t) ^ 2) volume a b := (hg.pow 2).intervalIntegrable
-  have hfgI : IntervalIntegrable (fun t => f t * g t) volume a b := (hf.mul hg).intervalIntegrable
-  -- The quadratic `λ ↦ (∫ g²) λ² - 2 (∫ f g) λ + ∫ f²` is nonnegative.
-  have key : ∀ lam : ℝ,
-      0 ≤ (∫ t in a..b, (g t) ^ 2) * (lam * lam)
-          + (-(2 * ∫ t in a..b, f t * g t)) * lam + ∫ t in a..b, (f t) ^ 2 := by
-    intro lam
-    have hnn : 0 ≤ ∫ t in a..b, (f t - lam * g t) ^ 2 :=
-      intervalIntegral.integral_nonneg hab (fun t _ => by positivity)
-    have hexp : (∫ t in a..b, (f t - lam * g t) ^ 2)
-        = (∫ t in a..b, (g t) ^ 2) * (lam * lam)
-          + (-(2 * ∫ t in a..b, f t * g t)) * lam + ∫ t in a..b, (f t) ^ 2 := by
-      have hrw : (fun t => (f t - lam * g t) ^ 2)
-          = (fun t => (f t) ^ 2 - (2 * lam) * (f t * g t) + lam ^ 2 * (g t) ^ 2) := by
-        funext t; ring
-      rw [hrw,
-        intervalIntegral.integral_add (hf2I.sub (hfgI.const_mul (2 * lam)))
-          (hg2I.const_mul (lam ^ 2)),
-        intervalIntegral.integral_sub hf2I (hfgI.const_mul (2 * lam)),
-        intervalIntegral.integral_const_mul, intervalIntegral.integral_const_mul]
-      ring
-    rw [← hexp]; exact hnn
-  have hdisc := discrim_le_zero key
-  rw [discrim] at hdisc
-  nlinarith [hdisc]
+  have hmem : ∀ {u : ℝ → ℝ}, ContinuousOn u (uIcc a b) → MemLp u 2 (volume.restrict (Ioc a b)) :=
+    fun hu => (memLp_two_iff_integrable_sq
+      (hu.mono (by rw [uIcc_of_le hab]; exact Ioc_subset_Icc_self) |>.aestronglyMeasurable
+        measurableSet_Ioc)).2
+      (((hu.pow 2).intervalIntegrable (a := a) (b := b)).1)
+  simp only [intervalIntegral.integral_of_le hab]
+  exact sq_integral_mul_le (hmem hf) (hmem hg)
 
 /-- Cauchy-Schwarz with one factor constant: on `[a, x]` the square of the
 integral of `f` is at most `(x - a)` times the integral of `f ^ 2`. The `g = 1`
 case of `intervalIntegral_mul_sq_le`. -/
-theorem MeasureTheory.sq_intervalIntegral_le {a x : ℝ} (hax : a ≤ x) {f : ℝ → ℝ}
+theorem sq_intervalIntegral_le {a x : ℝ} (hax : a ≤ x) {f : ℝ → ℝ}
     (hf : ContinuousOn f (uIcc a x)) :
     (∫ t in a..x, f t) ^ 2 ≤ (x - a) * ∫ t in a..x, (f t) ^ 2 := by
   have h := intervalIntegral_mul_sq_le hax hf (continuousOn_const (c := (1 : ℝ)))
@@ -93,7 +107,7 @@ every point of `[a, b]` with `u'` continuous there, and `u a = 0`, then
 A function compactly supported in `(a, b)` satisfies `u a = 0`, so this applies
 to each one-dimensional slice in the Fubini proof of the Poincaré inequality on
 a box, with constant `(b - a) ^ 2 / 2`. -/
-theorem MeasureTheory.poincare_1d {a b : ℝ} (hab : a ≤ b) {u u' : ℝ → ℝ}
+theorem poincare_1d {a b : ℝ} (hab : a ≤ b) {u u' : ℝ → ℝ}
     (hderiv : ∀ y ∈ uIcc a b, HasDerivAt u (u' y) y)
     (hu' : ContinuousOn u' (uIcc a b)) (ha : u a = 0) :
     ∫ x in a..b, (u x) ^ 2 ≤ (b - a) ^ 2 / 2 * ∫ x in a..b, (u' x) ^ 2 := by
@@ -152,16 +166,7 @@ theorem MeasureTheory.poincare_1d {a b : ℝ} (hab : a ≤ b) {u u' : ℝ → �
     _ = M * ((b - a) ^ 2 / 2) := by rw [hxa]
     _ = (b - a) ^ 2 / 2 * M := by ring
 
-/-- The one-dimensional Poincaré inequality for a function compactly supported
-in the open interval `(a, b)`. Such a `u` vanishes at the left endpoint, so
-`poincare_1d` applies.
+end EllipticPdes.Analysis
 
-The compact-support companion of `poincare_1d`, kept for callers that have a `tsupport`
-hypothesis. The Fubini proof of the Poincaré inequality on a box takes `poincare_1d` directly,
-having the endpoint value to hand, so nothing else consumes this form. -/
-theorem MeasureTheory.poincare_1d_of_tsupport {a b : ℝ} (hab : a ≤ b) {u u' : ℝ → ℝ}
-    (hderiv : ∀ y ∈ uIcc a b, HasDerivAt u (u' y) y)
-    (hu' : ContinuousOn u' (uIcc a b)) (hsupp : tsupport u ⊆ Ioo a b) :
-    ∫ x in a..b, (u x) ^ 2 ≤ (b - a) ^ 2 / 2 * ∫ x in a..b, (u' x) ^ 2 :=
-  poincare_1d hab hderiv hu'
-    (image_eq_zero_of_notMem_tsupport (fun h => lt_irrefl a (hsupp h).1))
+/-- Alias for backward compatibility. -/
+alias MeasureTheory.sq_intervalIntegral_le := EllipticPdes.Analysis.sq_intervalIntegral_le

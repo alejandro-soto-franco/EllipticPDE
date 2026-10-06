@@ -17,7 +17,7 @@ To pass from the Poisson form `∑ᵢ ⟪∂ᵢu, ∂ᵢv⟫` to the general div
 bounded measurable coefficient and still land in `L²`. This file provides
 
 * `mulCoeffL` : a bounded measurable scalar `f` (`|f| ≤ M`) acting on `L²(Ω)` as a
-  continuous linear map `g ↦ [f · g]`, with operator-norm bound `M`;
+  continuous linear map `g ↦ [f · g]`, the Hölder action of `L^∞` on `L²`;
 * `mulCoeffL_coeFn` : its pointwise a.e. representative `x ↦ f x · g x`;
 * `EllipticCoeff` : the bundle of a measurable, bounded, uniformly elliptic coefficient
   matrix `a` (Evans §6.1.1: `∑ aᵢⱼ ξᵢ ξⱼ ≥ λ |ξ|²`).
@@ -30,7 +30,7 @@ vector-valued `L²(Ω; E)` encoding.
 @[expose] public section
 
 open MeasureTheory
-open scoped RealInnerProductSpace
+open scoped RealInnerProductSpace ENNReal
 
 noncomputable section
 
@@ -40,83 +40,37 @@ variable {d : ℕ}
 
 /-! ### Pointwise multiplication by a bounded measurable coefficient -/
 
-/-- The pointwise product of a bounded measurable scalar function with an `L²` class is `L²`. -/
-lemma memLp_mul_of_bdd {Ω : Set (EuclideanSpace ℝ (Fin d))}
-    {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : Measurable f) {M : ℝ}
-    (hM : ∀ᵐ x ∂(volume.restrict Ω), |f x| ≤ M) (g : L2D Ω) :
-    MemLp (fun x => f x * (g x : ℝ)) 2 (volume.restrict Ω) := by
-  refine (Lp.memLp g).of_le_mul (c := M)
-    (hf.aestronglyMeasurable.mul (Lp.aestronglyMeasurable g)) ?_
-  filter_upwards [hM] with x hx
-  rw [Real.norm_eq_abs, Real.norm_eq_abs, abs_mul]
-  exact mul_le_mul_of_nonneg_right hx (abs_nonneg _)
-
-/-- The `L²` class of `f · g` for a bounded measurable `f`. -/
-def mulCoeffCls {Ω : Set (EuclideanSpace ℝ (Fin d))}
-    {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : Measurable f) {M : ℝ}
-    (hM : ∀ᵐ x ∂(volume.restrict Ω), |f x| ≤ M) (g : L2D Ω) : L2D Ω :=
-  (memLp_mul_of_bdd hf hM g).toLp _
-
-/-- The class `mulCoeffCls hf hM g` has pointwise representative `x ↦ f x · g x` a.e. -/
-lemma mulCoeffCls_coeFn {Ω : Set (EuclideanSpace ℝ (Fin d))}
-    {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : Measurable f) {M : ℝ}
-    (hM : ∀ᵐ x ∂(volume.restrict Ω), |f x| ≤ M) (g : L2D Ω) :
-    mulCoeffCls hf hM g =ᵐ[volume.restrict Ω] fun x => f x * (g x : ℝ) :=
-  MemLp.coeFn_toLp _
-
-/-- A bounded measurable scalar `f` acting on `L²(Ω)` by pointwise multiplication,
-as a (bare) linear map `g ↦ [f · g]`. -/
-def mulCoeffLM {Ω : Set (EuclideanSpace ℝ (Fin d))}
-    {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : Measurable f) {M : ℝ}
-    (hM : ∀ᵐ x ∂(volume.restrict Ω), |f x| ≤ M) : L2D Ω →ₗ[ℝ] L2D Ω where
-  toFun := mulCoeffCls hf hM
-  map_add' := by
-    intro g h
-    apply Lp.ext
-    filter_upwards [mulCoeffCls_coeFn hf hM (g + h), mulCoeffCls_coeFn hf hM g,
-      mulCoeffCls_coeFn hf hM h, Lp.coeFn_add g h,
-      Lp.coeFn_add (mulCoeffCls hf hM g) (mulCoeffCls hf hM h)] with x h1 h2 h3 h4 h5
-    simp only [h1, h2, h3, h4, h5, Pi.add_apply]
-    ring
-  map_smul' := by
-    intro c g
-    apply Lp.ext
-    filter_upwards [mulCoeffCls_coeFn hf hM (c • g), mulCoeffCls_coeFn hf hM g,
-      Lp.coeFn_smul c g, Lp.coeFn_smul c (mulCoeffCls hf hM g)] with x h1 h2 h3 h4
-    simp only [h1, h2, h3, h4, Pi.smul_apply, smul_eq_mul, RingHom.id_apply]
-    ring
-
-/-- Simp lemma: `mulCoeffLM hf hM g = mulCoeffCls hf hM g`. -/
-@[simp] private lemma mulCoeffLM_apply {Ω : Set (EuclideanSpace ℝ (Fin d))}
-    {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : Measurable f) {M : ℝ}
-    (hM : ∀ᵐ x ∂(volume.restrict Ω), |f x| ≤ M) (g : L2D Ω) :
-    mulCoeffLM hf hM g = mulCoeffCls hf hM g := rfl
+/-- A bounded measurable scalar function is a class of `L^∞(Ω)`. -/
+def coeffLinfty {Ω : Set (EuclideanSpace ℝ (Fin d))} {f : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hf : Measurable f) {M : ℝ} (hM : ∀ᵐ x ∂(volume.restrict Ω), |f x| ≤ M) :
+    Lp ℝ ∞ (volume.restrict Ω) :=
+  (memLp_top_of_bound hf.aestronglyMeasurable M (hM.mono fun _ hx => by
+    rwa [Real.norm_eq_abs])).toLp f
 
 /-- A bounded measurable scalar `f` (`|f| ≤ M`) acting on `L²(Ω)` by pointwise
-multiplication, as a continuous linear map with operator norm `≤ M`. -/
+multiplication, as a continuous linear map: the Hölder action of `L^∞` on `L²`. -/
 def mulCoeffL {Ω : Set (EuclideanSpace ℝ (Fin d))}
     {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : Measurable f) {M : ℝ}
     (hM : ∀ᵐ x ∂(volume.restrict Ω), |f x| ≤ M) : L2D Ω →L[ℝ] L2D Ω :=
-  (mulCoeffLM hf hM).mkContinuous M (by
-    intro g
-    apply Lp.norm_le_mul_norm_of_ae_le_mul
-    filter_upwards [mulCoeffCls_coeFn hf hM g, hM] with x hx hMx
-    rw [mulCoeffLM_apply hf hM g, hx,
-      Real.norm_eq_abs, Real.norm_eq_abs, abs_mul]
-    exact mul_le_mul_of_nonneg_right hMx (abs_nonneg _))
+  (ContinuousLinearMap.lsmul ℝ ℝ (E := ℝ)).holderL (volume.restrict Ω) ∞ 2 2
+    (coeffLinfty hf hM)
 
-/-- Simp lemma: `mulCoeffL hf hM g = mulCoeffCls hf hM g`. -/
-@[simp] lemma mulCoeffL_apply {Ω : Set (EuclideanSpace ℝ (Fin d))}
+/-- A representative of `coeffLinfty hf hM` is `f` almost everywhere. -/
+lemma coeFn_coeffLinfty {Ω : Set (EuclideanSpace ℝ (Fin d))}
     {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : Measurable f) {M : ℝ}
-    (hM : ∀ᵐ x ∂(volume.restrict Ω), |f x| ≤ M) (g : L2D Ω) :
-    mulCoeffL hf hM g = mulCoeffCls hf hM g := rfl
+    (hM : ∀ᵐ x ∂(volume.restrict Ω), |f x| ≤ M) :
+    ⇑(coeffLinfty hf hM) =ᵐ[volume.restrict Ω] f :=
+  MemLp.coeFn_toLp _
 
 /-- The pointwise a.e. representative of the coefficient action. -/
 lemma mulCoeffL_coeFn {Ω : Set (EuclideanSpace ℝ (Fin d))}
     {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : Measurable f) {M : ℝ}
     (hM : ∀ᵐ x ∂(volume.restrict Ω), |f x| ≤ M) (g : L2D Ω) :
     mulCoeffL hf hM g =ᵐ[volume.restrict Ω] fun x => f x * (g x : ℝ) := by
-  rw [mulCoeffL_apply]; exact mulCoeffCls_coeFn hf hM g
+  filter_upwards [ContinuousLinearMap.coeFn_holder (ContinuousLinearMap.lsmul ℝ ℝ (E := ℝ))
+    (coeffLinfty hf hM) g (r := 2), coeFn_coeffLinfty hf hM] with x h1 h2
+  rw [mulCoeffL, ContinuousLinearMap.holderL_apply_apply, h1, h2]
+  rfl
 
 /-- Operator-norm bound for the coefficient action: `‖[f · g]‖ ≤ M ‖g‖`. -/
 lemma norm_mulCoeffL_le {Ω : Set (EuclideanSpace ℝ (Fin d))}
@@ -134,35 +88,21 @@ lemma inner_mulCoeffL_eq {Ω : Set (EuclideanSpace ℝ (Fin d))}
     {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : Measurable f) {M : ℝ}
     (hM : ∀ᵐ x ∂(volume.restrict Ω), |f x| ≤ M) (g h : L2D Ω) :
     ⟪mulCoeffL hf hM g, h⟫ = ∫ x in Ω, f x * (g x : ℝ) * (h x : ℝ) := by
-  rw [L2.inner_def]
+  rw [L2.real_inner_eq_integral]
   refine integral_congr_ae ?_
   filter_upwards [mulCoeffL_coeFn hf hM g] with a ha
-  rw [Real.inner_apply, ha]
+  rw [ha]
 
 /-! ### Uniformly elliptic coefficient matrices (Evans §6.1.1) -/
 
 /-- A measurable, bounded coefficient matrix `a` that is **uniformly elliptic** with
 ellipticity constant `lam > 0` and sup bound `Λ`: `∑ᵢⱼ aᵢⱼ(x) ξᵢ ξⱼ ≥ lam · |ξ|²` and
-`|aᵢⱼ(x)| ≤ Λ` for almost every `x` (Evans §6.1.1 states ellipticity pointwise for
-a.e. `x ∈ U`; the bundle has a measurable representative on `ℝᵈ` with the bounds holding
-`volume`-a.e., which restricts to a.e. on every domain `Ω`). This is exactly the data the
-divergence-form operator `Lu = -Dⱼ(aᵢⱼ Dᵢu)` needs for the energy estimate.
+`|aᵢⱼ(x)| ≤ Λ` for almost every `x` (Evans §6.1.1). The bounds hold `volume`-almost
+everywhere on `ℝᵈ`, so they hold almost everywhere on every domain `Ω`.
 
-**No symmetry is assumed**, where Evans §6.1.1 assumes `aᵢⱼ = aⱼᵢ` throughout and
-Gilbarg-Trudinger ch. 8 assumes it for the principal part. Neither field above sees the
-antisymmetric part of `a x`: `elliptic` constrains the quadratic form `ξ ↦ ∑ᵢⱼ aᵢⱼ ξᵢ ξⱼ`,
-which the antisymmetric part annihilates, and `bdd` constrains the entries one at a time.
-
-Symmetry is asked for at one place in the development, as the explicit hypothesis
-`hAsymm : ∀ᵐ x ∂(volume.restrict Ω), ∀ i j, a x i j = a x j i` of `bilin_symm` and of the
-spectral theorems above it (`symmetric_fullElliptic_spectral` and its bounded-set form).
-It enters there because the spectral theorem for compact self-adjoint operators asks the
-bilinear form to be symmetric, and `bilin` is symmetric exactly when `a` is (with the drift
-vanishing). Every other result of the library is proved for an arbitrary `a`: Gårding,
-existence and uniqueness, Fredholm, the resolvent bound, and the whole
-interior-regularity chain. With `a` non-symmetric the formal adjoint
-`L* v = -Dᵢ(aᵢⱼ Dⱼv) - bⁱ Dᵢv + (c - Dᵢbⁱ)v` has principal part built from the
-transpose, which is the transpose problem the Fredholm solvability criterion states. -/
+The matrix need not be symmetric: `elliptic` constrains the quadratic form
+`ξ ↦ ∑ᵢⱼ aᵢⱼ ξᵢ ξⱼ`, which the antisymmetric part annihilates, and `bdd` constrains the
+entries one at a time. -/
 structure EllipticCoeff (d : ℕ) where
   /-- The coefficient matrix entries. -/
   a : EuclideanSpace ℝ (Fin d) → Fin d → Fin d → ℝ

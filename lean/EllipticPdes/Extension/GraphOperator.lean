@@ -138,16 +138,14 @@ theorem eq_toLp_cons {F : EuclideanSpace ℝ (Fin d) → ℝ}
   · exact Lp.ext ((hk k).trans (hG k).coeFn_toLp.symm)
 
 /-- The pair of a class and a gradient that an element of the graph space presents. -/
-@[irreducible] def pairOf (U : W12 Ω) : SobolevPair d :=
-  (rep (U : H1amb Ω) 0, fun k => rep (U : H1amb Ω) k.succ)
+def pairOf (U : W12 Ω) : SobolevPair d :=
+  (⇑(W12.fn U), fun k => ⇑(W12.grad U k))
 
 /-- The function component of the pair an element presents. -/
-theorem pairOf_fst (U : W12 Ω) : (pairOf U).1 = rep (U : H1amb Ω) 0 := by
-  unfold pairOf; rfl
+theorem pairOf_fst (U : W12 Ω) : (pairOf U).1 = ⇑(W12.fn U) := rfl
 
 /-- The gradient components of the pair an element presents. -/
-theorem pairOf_snd (U : W12 Ω) (k : Fin d) : (pairOf U).2 k = rep (U : H1amb Ω) k.succ := by
-  unfold pairOf; rfl
+theorem pairOf_snd (U : W12 Ω) (k : Fin d) : (pairOf U).2 k = ⇑(W12.grad U k) := rfl
 
 /-- An element of the graph space presents a good pair. -/
 theorem pairOf_mem_goodPairs [IsFiniteMeasure (volume.restrict Ω)] (U : W12 Ω) :
@@ -203,8 +201,8 @@ theorem exists_clm_of_bounded_goodPairs [IsFiniteMeasure (volume.restrict Ω)]
   have hrep : ∀ U : W12 Ω, ce (pairOf U) = rep (U : H1amb Ω) := fun U => by
     funext i
     refine Fin.cases ?_ (fun k => ?_) i
-    · rw [hce0, pairOf_fst]
-    · rw [hces, pairOf_snd]
+    · exact (hce0 _).trans (pairOf_fst U)
+    · exact (hces _ k).trans (pairOf_snd U k)
   have hT'0 : ∀ U : W12 Ω, T' (rep (U : H1amb Ω)) 0 = (T (pairOf U)).1 := fun U => by
     rw [hT', ← hrep U, ce.symm_apply_apply, hce0]
   have hT's : ∀ (U : W12 Ω) k, T' (rep (U : H1amb Ω)) k.succ = (T (pairOf U)).2 k :=

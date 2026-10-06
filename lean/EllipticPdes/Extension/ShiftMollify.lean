@@ -7,6 +7,7 @@ Authors: Alejandro Soto Franco
 module
 
 public import EllipticPdes.Analysis.LpTranslationContinuity
+public import EllipticPdes.Extension.Translate
 public import EllipticPdes.Embedding.Convolution
 
 /-!

@@ -48,7 +48,7 @@ noncomputable section
 
 namespace EllipticPdes.Extension
 
-open EllipticPdes.Embedding (HasWeakGradOn partialD_mul)
+open EllipticPdes.Embedding (HasWeakGradOn partialD_mul tsupport_comp_homeomorph)
 open EllipticPdes.Sobolev (partialD)
 
 variable {d : ℕ}

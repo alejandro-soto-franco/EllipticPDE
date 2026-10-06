@@ -70,10 +70,6 @@ theorem norm_lp_rpow_eq_integral {p : ℝ≥0∞} (hp0 : p ≠ 0) (hptop : p ≠
     ENNReal.toReal_ofReal (Real.rpow_nonneg hint _), ← Real.rpow_mul hint,
     inv_mul_cancel₀ hr.ne', Real.rpow_one]
 
-/-- The real square is the real power at exponent two. -/
-private lemma rpow_two_eq_sq (x : ℝ) : x ^ (2 : ℝ) = x ^ 2 := by
-  rw [show (2 : ℝ) = ((2 : ℕ) : ℝ) by norm_num, Real.rpow_natCast]
-
 /-! ### The equation for a quadratic -/
 
 section Quadratic
@@ -125,7 +121,7 @@ theorem euler_lagrange_of_quadratic_min {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp0 :
   have hgN : ∀ t : ℝ, N t ^ (2 / r) = ‖T (U + t • V)‖ ^ 2 := by
     intro t
     rw [hNeq t, ← Real.rpow_mul (norm_nonneg _), show r * (2 / r) = 2 by field_simp,
-      rpow_two_eq_sq _]
+      Real.rpow_two _]
   have hN0 : N 0 = 1 := by rw [hNeq 0]; simp [hU]
   -- The function Fermat's theorem is applied to.
   set g : ℝ → ℝ := fun t => Q (U + t • V) - Q U * N t ^ (2 / r) with hgdef

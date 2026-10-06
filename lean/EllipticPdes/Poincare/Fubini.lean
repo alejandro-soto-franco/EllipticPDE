@@ -15,7 +15,7 @@ public import Mathlib.Data.Fin.Tuple.Basic
 /-!
 # Per-coordinate-direction bound via Fubini (dependency-chain step 2)
 
-Apply the one-dimensional Poincaré inequality (`MeasureTheory.poincare_1d`) on
+Apply the one-dimensional Poincaré inequality (`EllipticPdes.Analysis.poincare_1d`) on
 each coordinate slice of a box and integrate the remaining variables out.
 
 A box `Ω = B ×ˢ (a, b) ⊆ β × ℝ` is integrated over by Fubini as
@@ -24,10 +24,8 @@ one-dimensional Poincaré inequality controls the `L²` norm by the `L²` norm o
 the slice derivative `∂_x f`. Integrating that estimate over the remaining
 variables `y` gives the per-direction bound on the box.
 
-* `poincare_slice_iterated`: the bound in iterated form, for a general measure
-  on the remaining variables. This is the Fubini-decomposed statement.
-* `poincare_slice_box`: the same bound written as a single integral over the box
-  `B ×ˢ (a, b)`, obtained from the iterated form by Fubini (`setIntegral_prod`).
+* `poincare_slice_box`: the bound written as a single integral over the box
+  `B ×ˢ (a, b)`, obtained by Fubini (`setIntegral_prod`).
 -/
 
 @[expose] public section
@@ -35,30 +33,6 @@ variables `y` gives the per-direction bound on the box.
 open MeasureTheory Set intervalIntegral
 
 namespace EllipticPdes.Poincare
-
-/-- The per-direction Poincaré bound in iterated form. For a family of
-one-dimensional slices `x ↦ Φ y x`, each satisfying the Poincaré hypotheses on
-`[a, b]` (a derivative `Φ' y` continuous on `[a, b]`, vanishing at `a`), the
-integral over the remaining variables `y` of the slice `L²` norms is bounded by
-the same integral of the slice derivative `L²` norms. -/
-theorem poincare_slice_iterated
-    {β : Type*} [MeasurableSpace β] {ν : Measure β}
-    {a b : ℝ} (hab : a ≤ b) {Φ Φ' : β → ℝ → ℝ}
-    (hderiv : ∀ y, ∀ x ∈ uIcc a b, HasDerivAt (Φ y) (Φ' y x) x)
-    (hcont : ∀ y, ContinuousOn (Φ' y) (uIcc a b))
-    (hzero : ∀ y, Φ y a = 0)
-    (hg : Integrable (fun y => ∫ x in a..b, (Φ y x) ^ 2) ν)
-    (hh : Integrable (fun y => ∫ x in a..b, (Φ' y x) ^ 2) ν) :
-    (∫ y, (∫ x in a..b, (Φ y x) ^ 2) ∂ν)
-      ≤ (b - a) ^ 2 / 2 * ∫ y, (∫ x in a..b, (Φ' y x) ^ 2) ∂ν := by
-  have hslice : (fun y => ∫ x in a..b, (Φ y x) ^ 2)
-      ≤ fun y => (b - a) ^ 2 / 2 * ∫ x in a..b, (Φ' y x) ^ 2 :=
-    fun y => poincare_1d hab (hderiv y) (hcont y) (hzero y)
-  calc (∫ y, (∫ x in a..b, (Φ y x) ^ 2) ∂ν)
-      ≤ ∫ y, ((b - a) ^ 2 / 2 * ∫ x in a..b, (Φ' y x) ^ 2) ∂ν :=
-        MeasureTheory.integral_mono hg (hh.const_mul _) hslice
-    _ = (b - a) ^ 2 / 2 * ∫ y, (∫ x in a..b, (Φ' y x) ^ 2) ∂ν :=
-        MeasureTheory.integral_const_mul _ _
 
 /-- The per-direction Poincaré bound on a box `B ×ˢ (a, b) ⊆ β × ℝ`, written as
 a single integral over the box. For a function `Φ` whose one-dimensional slices
@@ -83,7 +57,7 @@ theorem poincare_slice_box
   have hslice : ∀ y, (∫ x in Ioo a b, (Φ (y, x)) ^ 2)
       ≤ (b - a) ^ 2 / 2 * ∫ x in Ioo a b, (Φ' (y, x)) ^ 2 := by
     intro y
-    have hp := poincare_1d hab (hderiv y) (hcont y) (hzero y)
+    have hp := EllipticPdes.Analysis.poincare_1d hab (hderiv y) (hcont y) (hzero y)
     rwa [intervalIntegral.integral_of_le hab, integral_Ioc_eq_integral_Ioo,
       intervalIntegral.integral_of_le hab, integral_Ioc_eq_integral_Ioo] at hp
   -- Marginal integrability of each slice integral, from product integrability.

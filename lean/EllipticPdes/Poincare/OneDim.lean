@@ -11,11 +11,8 @@ public import EllipticPdes.Analysis.PoincareInequality
 /-!
 # One-dimensional Poincaré inequality
 
-Upstreamed to Mathlib as
-`EllipticPdes.Analysis.PoincareInequality`.
-
-This file re-exports the Mathlib declarations under the
-`EllipticPdes.Poincare` namespace for backward compatibility.
+Aliases of the declarations of `EllipticPdes.Analysis.PoincareInequality` in the
+`EllipticPdes.Poincare` namespace.
 
 * `intervalIntegral_mul_sq_le`: Cauchy-Schwarz for `∫ f g`.
 * `sq_intervalIntegral_le`: the `g = 1` special case.
@@ -26,8 +23,8 @@ This file re-exports the Mathlib declarations under the
 
 namespace EllipticPdes.Poincare
 
-alias intervalIntegral_mul_sq_le := MeasureTheory.intervalIntegral_mul_sq_le
-alias sq_intervalIntegral_le     := MeasureTheory.sq_intervalIntegral_le
-alias poincare_oneDim            := MeasureTheory.poincare_1d
+alias intervalIntegral_mul_sq_le := EllipticPdes.Analysis.intervalIntegral_mul_sq_le
+alias sq_intervalIntegral_le     := EllipticPdes.Analysis.sq_intervalIntegral_le
+alias poincare_oneDim            := EllipticPdes.Analysis.poincare_1d
 
 end EllipticPdes.Poincare
