@@ -82,9 +82,11 @@ def fn (U : H1amb Ω) : L2D Ω := U 0
 /-- The `i`-th gradient component of an ambient vector (coordinate `i.succ`). -/
 def grad (U : H1amb Ω) (i : Fin d) : L2D Ω := U i.succ
 
-@[simp] lemma fn_def (U : H1amb Ω) : U.fn = U 0 := rfl
+/-- The function component is coordinate `0`. -/
+lemma fn_def (U : H1amb Ω) : U.fn = U 0 := rfl
 
-@[simp] lemma grad_def (U : H1amb Ω) (i : Fin d) : U.grad i = U i.succ := rfl
+/-- The `i`-th gradient component is coordinate `i.succ`. -/
+lemma grad_def (U : H1amb Ω) (i : Fin d) : U.grad i = U i.succ := rfl
 
 /-- The `H¹` norm splits into the function part and the gradient part. -/
 lemma norm_sq_eq (U : H1amb Ω) : ‖U‖ ^ 2 = ‖U.fn‖ ^ 2 + ∑ i, ‖U.grad i‖ ^ 2 := by
@@ -374,9 +376,11 @@ def fn (U : W12 Ω) : L2D Ω := H1amb.fn (U : H1amb Ω)
 /-- The `i`-th weak partial derivative of an element of `W^{1,2}(Ω)`. -/
 def grad (U : W12 Ω) (i : Fin d) : L2D Ω := H1amb.grad (U : H1amb Ω) i
 
-@[simp] lemma fn_def (U : W12 Ω) : fn U = (U : H1amb Ω) 0 := rfl
+/-- The function component is coordinate `0`. -/
+lemma fn_def (U : W12 Ω) : fn U = (U : H1amb Ω) 0 := rfl
 
-@[simp] lemma grad_def (U : W12 Ω) (i : Fin d) : grad U i = (U : H1amb Ω) i.succ := rfl
+/-- The `i`-th weak partial derivative is coordinate `i.succ`. -/
+lemma grad_def (U : W12 Ω) (i : Fin d) : grad U i = (U : H1amb Ω) i.succ := rfl
 
 /-- The `W^{1,2}` norm splits into the function part and the gradient part. -/
 lemma norm_sq_eq (U : W12 Ω) : ‖U‖ ^ 2 = ‖fn U‖ ^ 2 + ∑ i, ‖grad U i‖ ^ 2 :=
@@ -470,9 +474,11 @@ def fn (U : H01 Ω) : L2D Ω := H1amb.fn (U : H1amb Ω)
 /-- The `i`-th weak partial derivative of an element of `H₀¹(Ω)`. -/
 def grad (U : H01 Ω) (i : Fin d) : L2D Ω := H1amb.grad (U : H1amb Ω) i
 
-@[simp] lemma fn_def (U : H01 Ω) : fn U = (U : H1amb Ω) 0 := rfl
+/-- The function component is coordinate `0`. -/
+lemma fn_def (U : H01 Ω) : fn U = (U : H1amb Ω) 0 := rfl
 
-@[simp] lemma grad_def (U : H01 Ω) (i : Fin d) : grad U i = (U : H1amb Ω) i.succ := rfl
+/-- The `i`-th weak partial derivative is coordinate `i.succ`. -/
+lemma grad_def (U : H01 Ω) (i : Fin d) : grad U i = (U : H1amb Ω) i.succ := rfl
 
 /-- The `H₀¹` norm splits into the function part and the gradient part. -/
 lemma norm_sq_eq (U : H01 Ω) : ‖U‖ ^ 2 = ‖fn U‖ ^ 2 + ∑ i, ‖grad U i‖ ^ 2 :=

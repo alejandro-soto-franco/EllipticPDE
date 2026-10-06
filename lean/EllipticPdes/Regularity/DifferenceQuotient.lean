@@ -20,7 +20,7 @@ Lebesgue measure.
 
 @[expose] public section
 
-open MeasureTheory EllipticPdes.Analysis
+open MeasureTheory
 open scoped RealInnerProductSpace
 
 noncomputable section

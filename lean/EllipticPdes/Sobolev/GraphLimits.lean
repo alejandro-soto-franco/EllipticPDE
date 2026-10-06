@@ -49,8 +49,10 @@ namespace H1amb
 /-- The ambient vector with function part `u` and gradient components `g`. -/
 def mk (u : L2D Ω) (g : Fin d → L2D Ω) : H1amb Ω := WithLp.toLp 2 (Fin.cons u g)
 
+/-- The function part of `mk u g` is `u`. -/
 @[simp] lemma fn_mk (u : L2D Ω) (g : Fin d → L2D Ω) : (mk u g).fn = u := rfl
 
+/-- The `i`-th gradient component of `mk u g` is `g i`. -/
 @[simp] lemma grad_mk (u : L2D Ω) (g : Fin d → L2D Ω) (i : Fin d) : (mk u g).grad i = g i := rfl
 
 /-- Convergence in `H¹` is convergence of the function part and of each gradient component

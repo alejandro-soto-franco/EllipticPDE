@@ -27,20 +27,25 @@ sum of squared partial derivatives `∑ i, (∂ᵢ φ x)²`, the form in which t
 open scoped RealInnerProductSpace
 open InnerProductSpace
 
+namespace EllipticPdes.Analysis
+
+/-- The squared norm of a functional on a finite-dimensional inner product space is the sum of
+the squares of its values on an orthonormal basis: Parseval for the Riesz vector of the
+functional. -/
+theorem norm_sq_dual_eq_sum {ι E : Type*} [Fintype ι] [NormedAddCommGroup E]
+    [InnerProductSpace ℝ E] [FiniteDimensional ℝ E] (b : OrthonormalBasis ι ℝ E)
+    (L : StrongDual ℝ E) : ‖L‖ ^ 2 = ∑ i, (L (b i)) ^ 2 := by
+  set v : E := (toDual ℝ E).symm L
+  have hnorm : ‖L‖ = ‖v‖ := ((toDual ℝ E).symm.norm_map L).symm
+  have happ : ∀ i, L (b i) = ⟪b i, v⟫ := fun i => by
+    rw [real_inner_comm, toDual_symm_apply]
+  rw [hnorm, ← b.sum_sq_norm_inner_right v]
+  exact Finset.sum_congr rfl fun i _ => by rw [happ, Real.norm_eq_abs, sq_abs]
+
+end EllipticPdes.Analysis
+
 /-- The squared operator norm of a functional on Euclidean space is the sum of the squares of its
 values on the standard basis vectors. -/
 theorem norm_sq_clm_eq_sum_apply_single {n : ℕ} (L : EuclideanSpace ℝ (Fin n) →L[ℝ] ℝ) :
     ‖L‖ ^ 2 = ∑ i, (L (EuclideanSpace.single i 1)) ^ 2 := by
-  set E := EuclideanSpace ℝ (Fin n)
-  set v : E := (InnerProductSpace.toDual ℝ E).symm L with hv
-  have hLv : (InnerProductSpace.toDual ℝ E) v = L := by
-    rw [hv]; exact (InnerProductSpace.toDual ℝ E).apply_symm_apply L
-  have hnorm : ‖L‖ = ‖v‖ := by
-    rw [hv]; exact ((InnerProductSpace.toDual ℝ E).symm.norm_map L).symm
-  have happ : ∀ i, L (EuclideanSpace.single i 1) = v i := by
-    intro i
-    rw [← hLv, InnerProductSpace.toDual_apply_apply, EuclideanSpace.inner_single_right]
-    simp
-  rw [hnorm, EuclideanSpace.norm_eq, Real.sq_sqrt (Finset.sum_nonneg fun i _ => by positivity)]
-  refine Finset.sum_congr rfl (fun i _ => ?_)
-  rw [happ i, Real.norm_eq_abs, sq_abs]
+  simpa using EllipticPdes.Analysis.norm_sq_dual_eq_sum (EuclideanSpace.basisFun (Fin n) ℝ) L

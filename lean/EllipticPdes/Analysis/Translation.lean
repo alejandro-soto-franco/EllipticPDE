@@ -19,13 +19,10 @@ public import EllipticPdes.Sobolev.Basic
 
 ## Main declarations
 
-* `EllipticPdes.Analysis.EucL2`: `L²(ℝⁿ)` with Lebesgue measure.
-* `EllipticPdes.Analysis.transL2`: translation as a linear isometry.
-* `EllipticPdes.Analysis.transL2_apply`: `transL2 h g` is `DomAddAct.mk h +ᵥ g`.
-* `EllipticPdes.Analysis.norm_sq_transL2_sub`: the squared norm of a translation difference.
-
-The names `EucL2`, `transL2`, `coeFn_transL2`, `norm_sq_transL2_sub` and `norm_sq_eq_integral_sq`
-are also exported into `MeasureTheory`.
+* `MeasureTheory.EucL2`: `L²(ℝⁿ)` with Lebesgue measure.
+* `MeasureTheory.transL2`: translation as a linear isometry.
+* `MeasureTheory.transL2_apply`: `transL2 h g` is `DomAddAct.mk h +ᵥ g`.
+* `MeasureTheory.norm_sq_transL2_sub`: the squared norm of a translation difference.
 -/
 
 @[expose] public section
@@ -34,7 +31,7 @@ open MeasureTheory
 
 noncomputable section
 
-namespace EllipticPdes.Analysis
+namespace MeasureTheory
 
 /-- `L²(ℝⁿ)` with Lebesgue measure. -/
 abbrev EucL2 (n : ℕ) := Lp ℝ 2 (volume : Measure (EuclideanSpace ℝ (Fin n)))
@@ -79,12 +76,5 @@ theorem norm_sq_transL2_sub (h : EuclideanSpace ℝ (Fin n)) (g : EucL2 n) :
   refine integral_congr_ae ?_
   filter_upwards [Lp.coeFn_sub (transL2 h g) g, coeFn_transL2 h g] with x hx hx1
   rw [hx]; simp only [Pi.sub_apply]; rw [hx1]
-
-end EllipticPdes.Analysis
-
-namespace MeasureTheory
-
-export EllipticPdes.Analysis (EucL2 transL2 coeFn_transL2 norm_sq_transL2_sub
-  norm_sq_eq_integral_sq)
 
 end MeasureTheory
