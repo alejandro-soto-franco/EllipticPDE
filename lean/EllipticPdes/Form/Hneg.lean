@@ -119,13 +119,6 @@ lemma isHnegRepr_iff_inner {Ω : Set (EuclideanSpace ℝ (Fin d))} (F : H1amb Ω
   refine forall_congr' (fun v => ?_)
   rw [inner_gradFlip_left]
 
-/-- The `L²` inner product on `Ω` as an integral, for restating representations in
-integral form. -/
-lemma inner_L2_eq_integral {Ω : Set (EuclideanSpace ℝ (Fin d))} (a b : L2D Ω) :
-    ⟪a, b⟫ = ∫ x in Ω, (a x : ℝ) * (b x : ℝ) := by
-  rw [L2.inner_def]
-  exact integral_congr_ae (Filter.Eventually.of_forall (fun x => Real.inner_apply _ _))
-
 /-- The representation property in integral form:
 `⟨f, v⟩ = ∫_Ω f₀ v - ∑ᵢ ∫_Ω fᵢ ∂ᵢv`. -/
 lemma isHnegRepr_iff_integral {Ω : Set (EuclideanSpace ℝ (Fin d))} (F : H1amb Ω)
@@ -133,7 +126,7 @@ lemma isHnegRepr_iff_integral {Ω : Set (EuclideanSpace ℝ (Fin d))} (F : H1amb
     IsHnegRepr Ω F f ↔ ∀ v : H01 Ω,
       f v = (∫ x in Ω, (F 0 x : ℝ) * ((v : H1amb Ω) 0 x : ℝ))
         - ∑ i : Fin d, ∫ x in Ω, (F i.succ x : ℝ) * ((v : H1amb Ω) i.succ x : ℝ) := by
-  simp only [IsHnegRepr, inner_L2_eq_integral]
+  simp only [IsHnegRepr, L2.real_inner_eq_integral]
 
 /-- **Existence of a norm-attaining representation.** The gradient flip of the Riesz
 representative of `f` on the Hilbert space `H₀¹(Ω)` represents `f` with tuple norm

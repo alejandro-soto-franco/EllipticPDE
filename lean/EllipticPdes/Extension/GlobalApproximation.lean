@@ -166,9 +166,7 @@ theorem exists_smooth_tendsto_of_hasWeakGradOn (hd : 0 < d) (hΩopen : IsOpen Ω
 /-- The real inner product of two `L²(Ω)` classes is the integral of their product over `Ω`. -/
 theorem inner_L2D_eq_integral (f h : L2D Ω) :
     inner ℝ f h = ∫ x in Ω, f x * h x := by
-  rw [L2.inner_def]
-  simp only [RCLike.inner_apply, conj_trivial]
-  exact integral_congr_ae (Eventually.of_forall fun x => mul_comm _ _)
+  rw [L2.real_inner_eq_integral]
 
 /-- **Weak gradient of an element of the graph space.** The constraint defining `W12 Ω`
 is integration by parts against every test function, read coordinate by coordinate: the

@@ -51,26 +51,22 @@ variable {d : ℕ}
 
 /-- The square of an `L²` class is integrable. -/
 lemma integrable_sq {Ω : Set (EuclideanSpace ℝ (Fin d))} (p : L2D Ω) :
-    Integrable (fun x => (p x : ℝ) ^ 2) (volume.restrict Ω) := by
-  refine (MeasureTheory.L2.integrable_inner p p).congr ?_
-  filter_upwards with x
-  simp only [Real.inner_apply, pow_two]
+    Integrable (fun x => (p x : ℝ) ^ 2) (volume.restrict Ω) :=
+  L2.integrable_sq p
 
 /-- `∫_Ω (p)² = ‖p‖²` for an `L²` class `p`. -/
 lemma sq_integral_eq_norm_sq {Ω : Set (EuclideanSpace ℝ (Fin d))} (p : L2D Ω) :
-    ∫ x in Ω, (p x : ℝ) ^ 2 = ‖p‖ ^ 2 := by
-  rw [← real_inner_self_eq_norm_sq, L2.inner_def]
-  refine integral_congr_ae (Filter.Eventually.of_forall fun x => ?_)
-  simp only [Real.inner_apply, pow_two]
+    ∫ x in Ω, (p x : ℝ) ^ 2 = ‖p‖ ^ 2 :=
+  (L2.norm_sq_eq_integral_sq p).symm
 
 /-- The triple product `aᵢⱼ · p · q` of bounded coefficient and two `L²` classes is
 integrable on `Ω`. -/
 lemma EllipticCoeff.integrable_triple (A : EllipticCoeff d)
     {Ω : Set (EuclideanSpace ℝ (Fin d))} (i j : Fin d) (p q : L2D Ω) :
     Integrable (fun x => A.a x i j * (p x : ℝ) * (q x : ℝ)) (volume.restrict Ω) := by
-  refine (MeasureTheory.L2.integrable_inner (A.actL i j p) q).congr ?_
+  refine (L2.integrable_mul (A.actL i j p) q).congr ?_
   filter_upwards [A.actL_coeFn i j p] with x hx
-  simp only [Real.inner_apply, hx]
+  rw [hx]
 
 /-! ### General divergence-form bilinear form -/
 

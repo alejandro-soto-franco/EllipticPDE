@@ -195,8 +195,7 @@ def l2Functional (Ω : Set (EuclideanSpace ℝ (Fin d))) (f : L2D Ω) : (H01 Ω)
 lemma l2Functional_eq_integral (Ω : Set (EuclideanSpace ℝ (Fin d))) (f : L2D Ω)
     (V : H01 Ω) :
     l2Functional Ω f V = ∫ x in Ω, (f x : ℝ) * ((V : H1amb Ω) 0 x : ℝ) := by
-  rw [l2Functional_apply, L2.inner_def]
-  exact integral_congr_ae (Filter.Eventually.of_forall fun x => Real.inner_apply _ _)
+  rw [l2Functional_apply, L2.real_inner_eq_integral]
 
 /-- The embedding `L²(Ω) ⊆ H⁻¹(Ω)` is a contraction: `‖⟨f, ·⟩‖_{H⁻¹} ≤ ‖f‖_{L²}`,
 since `‖v₀‖_{L²} ≤ ‖V‖_{H¹}` in the graph encoding. -/

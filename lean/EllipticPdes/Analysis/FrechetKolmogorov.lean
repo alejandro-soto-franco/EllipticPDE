@@ -17,6 +17,8 @@ public import Mathlib.MeasureTheory.Measure.Lebesgue.Basic
 public import Mathlib.Analysis.Normed.Module.FiniteDimension
 public import Mathlib.Topology.MetricSpace.Bounded
 public import EllipticPdes.Analysis.LpTranslation
+public import EllipticPdes.Analysis.Translation
+public import EllipticPdes.Analysis.PoincareInequality
 
 /-!
 # Fréchet-Kolmogorov precompactness criterion in `L²(ℝⁿ)`
@@ -30,15 +32,13 @@ The proof approximates each member of the family by its average over a fixed gri
 axis-aligned cubes of side `η`. The averaging operator lands in the finite-dimensional
 span of the cube indicators, so its image is totally bounded; the approximation error is
 controlled by the translation modulus through a cube-averaging estimate that reuses the
-squared-Tonelli pattern of `MeasureTheory.integral_sq_sub_translation_le`. A finite net of
+squared-Tonelli pattern of `EllipticPdes.Analysis.integral_sq_sub_translation_le`. A finite net of
 the averaged family, widened by the uniform approximation error, is a finite net of the
 original family.
 
 ## Main results
 
-* `MeasureTheory.sq_setIntegral_le`: the finite-measure Cauchy-Schwarz bound
-  `(∫_s f)² ≤ μ.real s * ∫_s f²`.
-* `MeasureTheory.totallyBounded_of_lipschitz_translation`: the Fréchet-Kolmogorov criterion.
+* `EllipticPdes.Analysis.totallyBounded_of_lipschitz_translation`: the Fréchet-Kolmogorov criterion.
 -/
 
 @[expose] public section
@@ -47,6 +47,8 @@ open MeasureTheory Set Metric Filter
 open scoped ENNReal RealInnerProductSpace
 
 noncomputable section
+
+namespace EllipticPdes.Analysis.FrechetKolmogorov
 
 /-- **Approximation by totally bounded sets.** If every member of `S` is approximable to arbitrary
 precision by a totally bounded set, then `S` is totally bounded. -/
@@ -83,75 +85,7 @@ theorem totallyBounded_of_finiteDimensional_bounded {E : Type*} [NormedAddCommGr
   rw [← himg]
   exact htb.image V.subtypeₗᵢ.isometry.uniformContinuous
 
-namespace MeasureTheory
-
-/-! ### Finite-measure Cauchy-Schwarz bound -/
-
-variable {α : Type*} [MeasurableSpace α] {μ : Measure α} {s : Set α}
-
-/-- **Finite-measure Cauchy-Schwarz with one constant factor.** For a set of finite measure,
-the square of the integral of `f` is at most `μ.real s` times the integral of `f ^ 2`. This is
-the general-measure analogue of `MeasureTheory.sq_intervalIntegral_le`. -/
-theorem sq_setIntegral_le (hs : MeasurableSet s) (hμs : μ s ≠ ⊤) {f : α → ℝ}
-    (hf : IntegrableOn f s μ) (hf2 : IntegrableOn (fun x => (f x) ^ 2) s μ) :
-    (∫ x in s, f x ∂μ) ^ 2 ≤ (μ.real s) * ∫ x in s, (f x) ^ 2 ∂μ := by
-  have key : ∀ lam : ℝ,
-      0 ≤ (μ.real s) * (lam * lam) + (-2 * ∫ x in s, f x ∂μ) * lam + ∫ x in s, (f x) ^ 2 ∂μ := by
-    intro lam
-    have hnn : 0 ≤ ∫ x in s, (f x - lam) ^ 2 ∂μ :=
-      setIntegral_nonneg hs (fun x _ => by positivity)
-    have i2 : IntegrableOn (fun x => (-(2 * lam)) * f x) s μ := hf.const_mul _
-    have i12 : IntegrableOn (fun x => (f x) ^ 2 + (-(2 * lam)) * f x) s μ := hf2.add i2
-    have i3 : IntegrableOn (fun _ : α => lam ^ 2) s μ := integrableOn_const hμs
-    have hexp : ∫ x in s, (f x - lam) ^ 2 ∂μ
-        = (μ.real s) * (lam * lam) + (-2 * ∫ x in s, f x ∂μ) * lam + ∫ x in s, (f x) ^ 2 ∂μ := by
-      calc ∫ x in s, (f x - lam) ^ 2 ∂μ
-          = ∫ x in s, ((f x) ^ 2 + (-(2 * lam)) * f x + lam ^ 2) ∂μ := by
-            refine integral_congr_ae ?_; filter_upwards with x; ring
-        _ = (∫ x in s, ((f x) ^ 2 + (-(2 * lam)) * f x) ∂μ) + (∫ _x in s, lam ^ 2 ∂μ) :=
-            integral_add i12 i3
-        _ = ((∫ x in s, (f x) ^ 2 ∂μ) + (∫ x in s, (-(2 * lam)) * f x ∂μ))
-              + (∫ _x in s, lam ^ 2 ∂μ) := by rw [integral_add hf2 i2]
-        _ = (μ.real s) * (lam * lam) + (-2 * ∫ x in s, f x ∂μ) * lam + ∫ x in s, (f x) ^ 2 ∂μ := by
-            rw [integral_const_mul, setIntegral_const, smul_eq_mul]; ring
-    rw [← hexp]; exact hnn
-  have hdisc := discrim_le_zero key
-  rw [discrim] at hdisc
-  nlinarith [hdisc]
-
-/-! ### `L²` space, translation, and the squared norm as an integral -/
-
-/-- `L²(ℝⁿ)` with Lebesgue measure. -/
-abbrev EucL2 (n : ℕ) := Lp ℝ 2 (volume : Measure (EuclideanSpace ℝ (Fin n)))
-
 variable {n : ℕ}
-
-/-- The squared `L²` norm is the integral of the square. -/
-theorem norm_sq_eq_integral_sq (g : EucL2 n) : ‖g‖ ^ 2 = ∫ x, (g x) ^ 2 := by
-  rw [← real_inner_self_eq_norm_sq, L2.inner_def]
-  simp only [RCLike.inner_apply, conj_trivial]
-  simp_rw [pow_two]
-
-/-- Translation by `h` as a linear isometry of `L²(ℝⁿ)`. -/
-def transL2 (h : EuclideanSpace ℝ (Fin n)) : EucL2 n →ₗᵢ[ℝ] EucL2 n :=
-  Lp.compMeasurePreservingₗᵢ (𝕜 := ℝ) (· + h) (measurePreserving_add_right volume h)
-
-/-- A translate is represented almost everywhere by the shifted function. -/
-theorem coeFn_transL2 (h : EuclideanSpace ℝ (Fin n)) (g : EucL2 n) :
-    (transL2 h g : EuclideanSpace ℝ (Fin n) → ℝ) =ᵐ[volume] fun x => g (x + h) :=
-  Lp.coeFn_compMeasurePreserving _ _
-
-/-- The squared `L²` norm of a translation difference, as an integral. -/
-theorem norm_sq_transL2_sub (h : EuclideanSpace ℝ (Fin n)) (g : EucL2 n) :
-    ‖transL2 h g - g‖ ^ 2 = ∫ x, (g (x + h) - g x) ^ 2 := by
-  have hnorm : ‖transL2 h g - g‖ ^ 2 = ∫ x, ((transL2 h g - g) x) ^ 2 := by
-    rw [← real_inner_self_eq_norm_sq, L2.inner_def]
-    simp only [RCLike.inner_apply, conj_trivial]
-    simp_rw [pow_two]
-  rw [hnorm]
-  refine integral_congr_ae ?_
-  filter_upwards [Lp.coeFn_sub (transL2 h g) g, coeFn_transL2 h g] with x hx hx1
-  rw [hx]; simp only [Pi.sub_apply]; rw [hx1]
 
 /-! ### Cube grid -/
 
@@ -631,8 +565,9 @@ theorem cube_variance_le {η : ℝ} (hη : 0 < η) (k : Fin n → ℤ) (g : EucL
           = (fun y => ((g : EuclideanSpace ℝ (Fin n) → ℝ) y - g x) ^ 2) := by funext y; ring
       rw [heq]; exact integrableOn_cube_sq_sub η k g (g x)
     have hcs : (∫ y in cube η k, (g x - g y)) ^ 2 ≤ (η ^ n) * ∫ y in cube η k, (g x - g y) ^ 2 := by
-      have := sq_setIntegral_le (measurableSet_cube η k) hμne
-        ((integrableOn_const (C := g x) hμne).sub hgint) hsqint
+      have hdiff := (integrableOn_const (C := g x) hμne).sub hgint
+      have := sq_setIntegral_le_measureReal_mul hμne
+        ((memLp_two_iff_integrable_sq hdiff.aestronglyMeasurable).2 hsqint)
       rwa [hμreal] at this
     rw [hpt_eq x, mul_pow]
     calc ((η ^ n)⁻¹) ^ 2 * (∫ y in cube η k, (g x - g y)) ^ 2
@@ -700,15 +635,6 @@ theorem norm_sq_sub_avg_le_const {η : ℝ} (hη : 0 < η) {K : Finset (Fin n �
 
 /-! ### Fréchet-Kolmogorov criterion -/
 
-/-- Each coordinate of a Euclidean vector is bounded in absolute value by the norm. -/
-theorem coord_abs_le_norm (x : EuclideanSpace ℝ (Fin n)) (i : Fin n) : |x i| ≤ ‖x‖ := by
-  rw [show |x i| = Real.sqrt ((x i) ^ 2) from (Real.sqrt_sq_eq_abs (x i)).symm,
-    EuclideanSpace.norm_eq]
-  apply Real.sqrt_le_sqrt
-  rw [show (x i) ^ 2 = ‖x i‖ ^ 2 from by rw [Real.norm_eq_abs, sq_abs]]
-  exact Finset.single_le_sum (f := fun j => ‖x j‖ ^ 2) (fun j _ => by positivity)
-    (Finset.mem_univ i)
-
 /-- **Coverage.** A closed ball of radius `R` is covered by the finitely many grid cubes of
 side `η` whose lattice index lies in a box scaled to `R / η`. -/
 theorem closedBall_subset_iUnion_cube {η : ℝ} (hη : 0 < η) (R : ℝ) :
@@ -732,7 +658,7 @@ theorem closedBall_subset_iUnion_cube {η : ℝ} (hη : 0 < η) (R : ℝ) :
   rw [Finset.mem_coe, Fintype.mem_piFinset]
   intro i
   rw [Finset.mem_Icc]
-  have hxiR : |x i| ≤ R := (coord_abs_le_norm x i).trans hx
+  have hxiR : |x i| ≤ R := ((by simpa using PiLp.norm_apply_le x i : |x i| ≤ ‖x‖)).trans hx
   obtain ⟨hxle, hxlt⟩ := hmem i
   have hub : k i ≤ ⌈R / η⌉ := by
     have h1 : (k i : ℝ) ≤ R / η := by
@@ -749,6 +675,10 @@ theorem closedBall_subset_iUnion_cube {η : ℝ} (hη : 0 < η) (R : ℝ) :
     have h4 : (-(⌈R / η⌉ + 1) : ℝ) < (k i : ℝ) := by linarith
     exact_mod_cast h4.le
   exact ⟨hlb, le_trans hub (by omega)⟩
+
+end FrechetKolmogorov
+
+open FrechetKolmogorov
 
 /-- **Fréchet-Kolmogorov precompactness criterion.** A family `S` of `L²(ℝⁿ)` functions that
 is uniformly bounded in norm, uniformly supported in a fixed closed ball, and uniformly Lipschitz
@@ -808,25 +738,11 @@ theorem totallyBounded_of_lipschitz_translation (S : Set (EucL2 n)) {R M Λ : �
 /-! ### Passing a translation modulus to `L²` limits
 
 The translation modulus that feeds `totallyBounded_of_lipschitz_translation` is closed under `L²`
-limits. This is the bridge from `MeasureTheory.integral_sq_sub_translation_le`, which supplies the
-estimate for smooth compactly supported functions, to its consequence on the `L²` classes of Sobolev
-functions: a Sobolev function is an `L²` limit of smooth compactly supported functions whose
-gradients are uniformly bounded, and the modulus passes to the limit. Both the graph-closure `H₀¹`
-of the elliptic problem and the `W^{1,p}` structure of the Navier-Stokes development obtain their
-modulus through this lemma.
+limits. This is the bridge from `EllipticPdes.Analysis.integral_sq_sub_translation_le`, which
+supplies the estimate for smooth compactly supported functions, to its consequence on the `L²`
+classes of Sobolev functions: a Sobolev function is an `L²` limit of smooth compactly supported
+functions whose gradients are uniformly bounded, and the modulus passes to the limit.
 -/
-
-/-- A uniform translation modulus passes to an `L²` limit: if every `gk k` satisfies
-`‖transL2 h (gk k) - gk k‖ ≤ Λ * ‖h‖` and `gk` converges to `g`, then `g` satisfies the same
-bound. -/
-theorem transL2_sub_le_of_tendsto {g : EucL2 n} {Λ : ℝ} {gk : ℕ → EucL2 n}
-    (htend : Filter.Tendsto gk Filter.atTop (nhds g))
-    (hmod : ∀ k, ∀ h, ‖transL2 h (gk k) - gk k‖ ≤ Λ * ‖h‖)
-    (h : EuclideanSpace ℝ (Fin n)) : ‖transL2 h g - g‖ ≤ Λ * ‖h‖ := by
-  have hcont : Filter.Tendsto (fun k => transL2 h (gk k) - gk k) Filter.atTop
-      (nhds (transL2 h g - g)) :=
-    (((transL2 h).continuous.tendsto g).comp htend).sub htend
-  exact le_of_tendsto hcont.norm (Filter.Eventually.of_forall (fun k => hmod k h))
 
 /-- A sharper limit form of `transL2_sub_le_of_tendsto`: the per-term moduli `Λ k` need only
 converge to `Λ`, not be uniformly bounded by it. This is the form a Sobolev function uses, since
@@ -841,5 +757,24 @@ theorem transL2_sub_le_of_tendsto' {g : EucL2 n} {Λ : ℝ} {gk : ℕ → EucL2 
     (((transL2 h).continuous.tendsto g).comp htend).sub htend
   exact le_of_tendsto_of_tendsto' hcont.norm (hΛ.mul_const ‖h‖) (fun k => hmod k h)
 
-end MeasureTheory
+/-- A uniform translation modulus passes to an `L²` limit: if every `gk k` satisfies
+`‖transL2 h (gk k) - gk k‖ ≤ Λ * ‖h‖` and `gk` converges to `g`, then `g` satisfies the same
+bound. -/
+theorem transL2_sub_le_of_tendsto {g : EucL2 n} {Λ : ℝ} {gk : ℕ → EucL2 n}
+    (htend : Filter.Tendsto gk Filter.atTop (nhds g))
+    (hmod : ∀ k, ∀ h, ‖transL2 h (gk k) - gk k‖ ≤ Λ * ‖h‖)
+    (h : EuclideanSpace ℝ (Fin n)) : ‖transL2 h g - g‖ ≤ Λ * ‖h‖ :=
+  transL2_sub_le_of_tendsto' htend tendsto_const_nhds hmod h
 
+end EllipticPdes.Analysis
+
+/-- Alias for backward compatibility. -/
+alias MeasureTheory.totallyBounded_of_lipschitz_translation :=
+  EllipticPdes.Analysis.totallyBounded_of_lipschitz_translation
+
+/-- Alias for backward compatibility. -/
+alias MeasureTheory.transL2_sub_le_of_tendsto :=
+  EllipticPdes.Analysis.transL2_sub_le_of_tendsto
+
+/-- Alias for backward compatibility. -/
+alias MeasureTheory.transL2_sub_le_of_tendsto' := EllipticPdes.Analysis.transL2_sub_le_of_tendsto'

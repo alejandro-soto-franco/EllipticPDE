@@ -30,14 +30,14 @@ compact embedding.
 The argument writes `f (x + h) - f x = ∫ t in 0..1, (fderiv ℝ f (x + t • h)) h`
 by the fundamental theorem of calculus along the segment `t ↦ x + t • h`, squares
 through the one-variable Cauchy-Schwarz bound on `[0, 1]`
-(`MeasureTheory.sq_intervalIntegral_le`), integrates over `x`, swaps the order of
+(`EllipticPdes.Analysis.sq_intervalIntegral_le`), integrates over `x`, swaps the order of
 integration (Tonelli, the integrand being a continuous function supported in a
 bounded slab), and uses translation invariance of the Lebesgue integral to collapse
 the inner translate back to the gradient integral.
 
 ## Main results
 
-* `MeasureTheory.integral_sq_sub_translation_le`: the `L²` translation estimate.
+* `EllipticPdes.Analysis.integral_sq_sub_translation_le`: the `L²` translation estimate.
 -/
 
 @[expose] public section
@@ -47,7 +47,7 @@ open scoped ENNReal
 
 noncomputable section
 
-namespace MeasureTheory
+namespace EllipticPdes.Analysis
 
 variable {n : ℕ} {f : EuclideanSpace ℝ (Fin n) → ℝ}
 
@@ -92,7 +92,7 @@ private theorem sq_sub_translation_le (hf : ContDiff ℝ 1 f)
     (f (x + h) - f x) ^ 2 ≤ ∫ t in (0 : ℝ)..1, ((fderiv ℝ f (x + t • h)) h) ^ 2 := by
   rw [sub_translation_eq_integral hf x h]
   have h01 : (0 : ℝ) ≤ 1 := by norm_num
-  have := MeasureTheory.sq_intervalIntegral_le h01
+  have := sq_intervalIntegral_le h01
     (continuous_segment_deriv hf x h).continuousOn
   simpa using this
 
@@ -222,4 +222,8 @@ theorem integral_sq_sub_translation_le (hf : ContDiff ℝ 1 f)
     _ = ∫ x, ((fderiv ℝ f x) h) ^ 2 := stepC
     _ ≤ ‖h‖ ^ 2 * ∫ x, ‖fderiv ℝ f x‖ ^ 2 := stepD
 
-end MeasureTheory
+end EllipticPdes.Analysis
+
+/-- Alias for backward compatibility. -/
+alias MeasureTheory.integral_sq_sub_translation_le :=
+  EllipticPdes.Analysis.integral_sq_sub_translation_le
