@@ -219,29 +219,15 @@ theorem measure_superlevel_eq_zero {μ : Measure (EuclideanSpace ℝ (Fin d))} [
 /-- Truncating twice is truncating once. -/
 theorem max_max_sub_eq {a k₀ k : ℝ} (hk : k₀ ≤ k) :
     max (max (a - k₀) 0 - (k - k₀)) 0 = max (a - k) 0 := by
-  rcases le_or_gt a k₀ with h | h
-  · have h1 : max (a - k₀) 0 = 0 := max_eq_right (by linarith)
-    have h2 : max (a - k) 0 = 0 := max_eq_right (by linarith)
-    rw [h1, h2]
-    exact max_eq_right (by linarith)
-  · have h1 : max (a - k₀) 0 = a - k₀ := max_eq_left (by linarith)
-    rw [h1]
-    congr 1
-    ring
+  simp only [max_def]
+  split_ifs <;> linarith
 
 /-- The indicator of the second truncation is the indicator of `{k < a}`. -/
 theorem ite_lt_max_sub {k₀ k : ℝ} (hk : k₀ ≤ k) (a b : ℝ) :
     (if k - k₀ < max (a - k₀) 0 then (if k₀ < a then b else 0) else 0)
       = if k < a then b else 0 := by
-  rcases lt_or_ge k a with h | h
-  · have h1 : max (a - k₀) 0 = a - k₀ := max_eq_left (by linarith)
-    have h2 : k - k₀ < max (a - k₀) 0 := by rw [h1]; linarith
-    have h3 : k₀ < a := by linarith
-    rw [ite_eq_left h2, ite_eq_left h3, ite_eq_left h]
-  · have h2 : ¬ k - k₀ < max (a - k₀) 0 := by
-      rw [not_lt]
-      exact max_le (by linarith) (by linarith)
-    rw [ite_eq_right h2, ite_eq_right (not_lt.mpr h)]
+  simp only [max_def]
+  split_ifs <;> first | rfl | (exfalso; linarith)
 
 /-- **Truncations at every level above the boundary value in `H₀¹`.** If `(u - k₀)⁺` is
 the function coordinate of an element of `H₀¹(Ω)`, then for every `k ≥ k₀` there is an element
@@ -444,6 +430,89 @@ theorem energy_le_transport (Op : FullEllipticOp d)
 
 /-! ### The Sobolev-Hölder lower bound -/
 
+/-- **Hölder's inequality on a subset.** For `q ≥ 2` and a finite measure, the `L²` norm of a
+function over `Γ` is at most its `Lᵠ` norm times `μ(Γ)^{1/2 - 1/q}`. -/
+theorem toReal_eLpNorm_restrict_le {α : Type*} [MeasurableSpace α] {μ : Measure α}
+    [IsFiniteMeasure μ] {f : α → ℝ} (hf : AEStronglyMeasurable f μ) {q : ℝ≥0} (hq : 2 ≤ q)
+    (hfin : eLpNorm f q μ ≠ ⊤) (Γ : Set α) :
+    (eLpNorm f 2 (μ.restrict Γ)).toReal
+      ≤ (eLpNorm f q μ).toReal * (μ Γ).toReal ^ (1 / 2 - 1 / (q : ℝ)) := by
+  have hq' : (2 : ℝ) ≤ q := by exact_mod_cast hq
+  have hθ : 0 ≤ 1 / 2 - 1 / (q : ℝ) := by
+    have := one_div_le_one_div_of_le (by norm_num) hq'
+    linarith
+  have h2q : (2 : ℝ≥0∞) ≤ (q : ℝ≥0∞) := by exact_mod_cast hq
+  have h1 := eLpNorm_le_eLpNorm_mul_rpow_measure_univ (μ := μ.restrict Γ) h2q
+    (hf.mono_measure Measure.restrict_le_self)
+  have hres : eLpNorm f q (μ.restrict Γ) ≤ eLpNorm f q μ :=
+    eLpNorm_mono_measure _ Measure.restrict_le_self
+  have hθ' : 0 ≤ 1 / (2 : ℝ≥0∞).toReal - 1 / (q : ℝ≥0∞).toReal := by
+    simpa only [ENNReal.toReal_ofNat, ENNReal.coe_toReal] using hθ
+  have hfin' : eLpNorm f q (μ.restrict Γ)
+      * (μ.restrict Γ) univ ^ (1 / (2 : ℝ≥0∞).toReal - 1 / (q : ℝ≥0∞).toReal) ≠ ⊤ :=
+    ENNReal.mul_ne_top (ne_top_of_le_ne_top hfin hres)
+      (ENNReal.rpow_ne_top_of_nonneg hθ' (measure_ne_top _ _))
+  have h2 := ENNReal.toReal_mono hfin' h1
+  rw [ENNReal.toReal_mul, ← ENNReal.toReal_rpow, Measure.restrict_apply_univ,
+    ENNReal.toReal_ofNat, ENNReal.coe_toReal] at h2
+  exact h2.trans (mul_le_mul_of_nonneg_right (ENNReal.toReal_mono hfin hres)
+    (Real.rpow_nonneg ENNReal.toReal_nonneg _))
+
+/-- Inverting `1 ≤ K γ^θ`: `K⁻¹^{1/θ} ≤ γ`. -/
+theorem inv_rpow_inv_le_of_one_le_mul_rpow {K γ θ : ℝ} (hK : 0 < K) (hγ : 0 ≤ γ) (hθ : 0 < θ)
+    (h : 1 ≤ K * γ ^ θ) : K⁻¹ ^ θ⁻¹ ≤ γ := by
+  have hinv : K⁻¹ ≤ γ ^ θ := by
+    rw [inv_le_iff_one_le_mul₀' hK]
+    exact h
+  calc K⁻¹ ^ θ⁻¹ ≤ (γ ^ θ) ^ θ⁻¹ :=
+        Real.rpow_le_rpow (inv_nonneg.mpr hK.le) hinv (inv_nonneg.mpr hθ.le)
+    _ = γ := Real.rpow_rpow_inv hγ hθ.ne'
+
+/-- **Gradient norm from the energy inequality.** If `λ ∑ xᵢ² ≤ B (∑ xᵢ) v` with `xᵢ ≥ 0`, then
+`λ ∑ xᵢ ≤ d B v`: Cauchy-Schwarz gives `(∑ xᵢ)² ≤ d ∑ xᵢ²`. -/
+theorem mul_sum_le_card_mul {lam B v : ℝ} {n : ℕ} (x : Fin n → ℝ) (hx : ∀ i, 0 ≤ x i)
+    (hlam : 0 < lam) (hB : 0 ≤ B) (hv : 0 ≤ v)
+    (h : lam * ∑ i, x i ^ 2 ≤ B * (∑ i, x i) * v) : lam * ∑ i, x i ≤ n * B * v := by
+  have hs : 0 ≤ ∑ i, x i := Finset.sum_nonneg fun i _ => hx i
+  have hcs : (∑ i, x i) ^ 2 ≤ n * ∑ i, x i ^ 2 := by
+    simpa using sq_sum_le_card_mul_sum_sq (s := Finset.univ) (f := x)
+  rcases hs.lt_or_eq with hpos | hzero
+  · refine le_of_mul_le_mul_right ?_ hpos
+    nlinarith [mul_le_mul_of_nonneg_left hcs hlam.le]
+  · rw [← hzero, mul_zero]
+    positivity
+
+/-- A function equal to `(u - k)⁺` that vanishes in `Lᵠ` forces the superlevel set `{u > k}` to
+be null. -/
+theorem measure_superlevel_eq_zero_of_eLpNorm_eq_zero {α : Type*} [MeasurableSpace α]
+    {μ : Measure α} {f u : α → ℝ} {k : ℝ} {q : ℝ≥0∞} (hq : q ≠ 0)
+    (hf : f =ᵐ[μ] fun x => max (u x - k) 0) (h0 : eLpNorm f q μ = 0) : μ {x | k < u x} = 0 := by
+  have hae := (eLpNorm_eq_zero_iff hq).mp h0
+  have hle : ∀ᵐ x ∂μ, u x ≤ k := by
+    filter_upwards [hae, hf] with x hx hx0
+    simp only [Pi.zero_apply] at hx
+    rw [hx0] at hx
+    by_contra hlt
+    rw [max_eq_left (by linarith [not_le.mp hlt])] at hx
+    linarith [not_le.mp hlt]
+  simpa only [not_le] using ae_iff.mp hle
+
+/-- **Bound on the measure of `Γ_k` for a fixed Sobolev exponent.** The conclusion of
+`exists_measure_truncSupport_ge`: for every `V ∈ H₀¹(Ω)` whose function coordinate is `(u - k)⁺`,
+with positive superlevel set and the energy estimate, the set `Γ_k` has measure at least `c`. -/
+def TruncSupportBound (Ω : Set (EuclideanSpace ℝ (Fin d))) (Op : FullEllipticOp d) (c : ℝ) :
+    Prop :=
+  ∀ (V : H01 Ω) (u : EuclideanSpace ℝ (Fin d) → ℝ)
+    (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ), Measurable u → (∀ i, Measurable (g i)) →
+    ∀ k : ℝ, (((V : H1amb Ω) 0 : EuclideanSpace ℝ (Fin d) → ℝ)
+      =ᵐ[volume.restrict Ω] fun x => max (u x - k) 0) →
+    0 < (volume.restrict Ω) {x | k < u x} →
+    Op.lam * ∑ i : Fin d, ‖(V : H1amb Ω) i.succ‖ ^ 2
+      ≤ Op.Bsup * (∑ i : Fin d, ‖(V : H1amb Ω) i.succ‖)
+        * (eLpNorm ((V : H1amb Ω) 0) 2
+            ((volume.restrict Ω).restrict (truncSupport u g k))).toReal →
+    c ≤ ((volume.restrict Ω) (truncSupport u g k)).toReal
+
 /-- **Uniform lower bound on the measure of `Γ_k`**, from a Sobolev inequality on `H₀¹(Ω)` at
 an exponent above `2`. On a bounded open set there is `c > 0`, depending on the domain, the
 dimension, the operator and the Sobolev constant alone, such that, whenever the truncation
@@ -453,16 +522,7 @@ theorem exists_measure_truncSupport_ge_of_sobolev (hΩb : Bornology.IsBounded Ω
     (Op : FullEllipticOp d) {q : ℝ≥0} (hq2 : 2 < q) {C : ℝ≥0}
     (hsobolev : ∀ V : H01 Ω, eLpNorm ((V : H1amb Ω) 0) q (volume.restrict Ω)
       ≤ C * ∑ i : Fin d, ‖(V : H1amb Ω) i.succ‖ₑ) :
-    ∃ c : ℝ, 0 < c ∧ ∀ (V : H01 Ω) (u : EuclideanSpace ℝ (Fin d) → ℝ)
-      (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ), Measurable u → (∀ i, Measurable (g i)) →
-      ∀ k : ℝ, (((V : H1amb Ω) 0 : EuclideanSpace ℝ (Fin d) → ℝ)
-        =ᵐ[volume.restrict Ω] fun x => max (u x - k) 0) →
-      0 < (volume.restrict Ω) {x | k < u x} →
-      Op.lam * ∑ i : Fin d, ‖(V : H1amb Ω) i.succ‖ ^ 2
-        ≤ Op.Bsup * (∑ i : Fin d, ‖(V : H1amb Ω) i.succ‖)
-          * (eLpNorm ((V : H1amb Ω) 0) 2
-              ((volume.restrict Ω).restrict (truncSupport u g k))).toReal →
-      c ≤ ((volume.restrict Ω) (truncSupport u g k)).toReal := by
+    ∃ c : ℝ, 0 < c ∧ TruncSupportBound Ω Op c := by
   classical
   have : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
   set μ : Measure (EuclideanSpace ℝ (Fin d)) := volume.restrict Ω with hμdef
@@ -472,24 +532,17 @@ theorem exists_measure_truncSupport_ge_of_sobolev (hΩb : Bornology.IsBounded Ω
     have : 1 / (q : ℝ) < 1 / 2 := one_div_lt_one_div_of_lt (by norm_num) hq2r
     rw [hθdef]
     linarith
-  have h2q : (2 : ℝ≥0∞) ≤ (q : ℝ≥0∞) := by
-    have : (2 : ℝ≥0∞) = ((2 : ℝ≥0) : ℝ≥0∞) := (ENNReal.coe_ofNat 2).symm
-    rw [this]
-    exact ENNReal.coe_le_coe.mpr hq2.le
   have hq0 : (q : ℝ≥0∞) ≠ 0 := by
     rw [ENNReal.coe_ne_zero]
     exact (lt_trans (by norm_num) hq2).ne'
-  -- the constant
-  set K : ℝ := (C : ℝ) * d * (Op.Bsup * d / Op.lam) + 1 with hKdef
-  have hKbase : 0 ≤ (C : ℝ) * d * (Op.Bsup * d / Op.lam) :=
-    mul_nonneg (mul_nonneg (NNReal.coe_nonneg _) (Nat.cast_nonneg _))
-      (div_nonneg (mul_nonneg Op.Bsup_nonneg (Nat.cast_nonneg _)) Op.lam_pos.le)
+  set K : ℝ := (C : ℝ) * (d * Op.Bsup / Op.lam) + 1 with hKdef
+  have hKbase : 0 ≤ (C : ℝ) * (d * Op.Bsup / Op.lam) :=
+    mul_nonneg (NNReal.coe_nonneg _)
+      (div_nonneg (mul_nonneg (Nat.cast_nonneg _) Op.Bsup_nonneg) Op.lam_pos.le)
   have hKpos : 0 < K := by linarith
   refine ⟨K⁻¹ ^ θ⁻¹, Real.rpow_pos_of_pos (inv_pos.mpr hKpos) _,
     fun V u g hu hg k hV0 hpos henergy => ?_⟩
-  set Γ := truncSupport u g k with hΓdef
-  have hΓ : MeasurableSet Γ := measurableSet_truncSupport hu hg k
-  set γ : ℝ := (μ Γ).toReal with hγdef
+  set γ : ℝ := (μ (truncSupport u g k)).toReal with hγdef
   have hγ0 : 0 ≤ γ := ENNReal.toReal_nonneg
   -- the Sobolev inequality on `H₀¹`
   have hsob := hsobolev V
@@ -500,117 +553,40 @@ theorem exists_measure_truncSupport_ge_of_sobolev (hΩb : Bornology.IsBounded Ω
       (ENNReal.sum_ne_top.mpr fun i _ => by rw [enorm_eq_nnnorm]; exact ENNReal.coe_ne_top)) hsob
     rwa [ENNReal.toReal_mul, ENNReal.coe_toReal, ENNReal.toReal_sum
       (fun i _ => by rw [enorm_eq_nnnorm]; exact ENNReal.coe_ne_top)] at this
-  -- the gradient norm
-  set S : ℝ := Real.sqrt (∑ i : Fin d, ‖(V : H1amb Ω) i.succ‖ ^ 2) with hSdef
-  have hS0 : 0 ≤ S := Real.sqrt_nonneg _
-  have hS2 : S ^ 2 = ∑ i : Fin d, ‖(V : H1amb Ω) i.succ‖ ^ 2 :=
-    Real.sq_sqrt (Finset.sum_nonneg fun i _ => sq_nonneg _)
-  have hsumle : ∑ i : Fin d, ‖(V : H1amb Ω) i.succ‖ ≤ d * S := by
-    calc ∑ i : Fin d, ‖(V : H1amb Ω) i.succ‖ ≤ ∑ _i : Fin d, S := by
-          refine Finset.sum_le_sum fun i _ => ?_
-          rw [hSdef, Real.le_sqrt (norm_nonneg _) (Finset.sum_nonneg fun j _ => sq_nonneg _)]
-          exact Finset.single_le_sum (f := fun j : Fin d => ‖(V : H1amb Ω) j.succ‖ ^ 2)
-            (fun j _ => sq_nonneg _) (Finset.mem_univ i)
-      _ = d * S := by simp
-  -- the `L²` norm of the truncation over `Γ`
-  set vΓ : ℝ := (eLpNorm ((V : H1amb Ω) 0) 2 (μ.restrict Γ)).toReal with hvΓdef
-  have hvΓ0 : 0 ≤ vΓ := ENNReal.toReal_nonneg
-  have hB0 : 0 ≤ Op.Bsup := Op.Bsup_nonneg
-  have hS : Op.lam * S ≤ Op.Bsup * d * vΓ := by
-    have h1 : Op.lam * S * S ≤ (Op.Bsup * d * vΓ) * S := by
-      calc Op.lam * S * S = Op.lam * ∑ i : Fin d, ‖(V : H1amb Ω) i.succ‖ ^ 2 := by
-            rw [← hS2]; ring
-        _ ≤ Op.Bsup * (∑ i : Fin d, ‖(V : H1amb Ω) i.succ‖) * vΓ := henergy
-        _ ≤ Op.Bsup * (d * S) * vΓ := by gcongr
-        _ = (Op.Bsup * d * vΓ) * S := by ring
-    rcases hS0.lt_or_eq with hSpos | hSzero
-    · exact le_of_mul_le_mul_right h1 hSpos
-    · rw [← hSzero, mul_zero]
-      exact mul_nonneg (mul_nonneg Op.Bsup_nonneg (Nat.cast_nonneg _)) hvΓ0
-  -- Hölder's inequality on `Γ`
-  have hhold : vΓ ≤ N * γ ^ θ := by
-    have h1 := eLpNorm_le_eLpNorm_mul_rpow_measure_univ (μ := μ.restrict Γ) h2q
-      ((Lp.aestronglyMeasurable ((V : H1amb Ω) 0)).mono_measure Measure.restrict_le_self)
-    have hres : eLpNorm ((V : H1amb Ω) 0) q (μ.restrict Γ) ≤ eLpNorm ((V : H1amb Ω) 0) q μ :=
-      eLpNorm_mono_measure _ Measure.restrict_le_self
-    have hθ' : 0 ≤ 1 / (2 : ℝ≥0∞).toReal - 1 / (q : ℝ≥0∞).toReal := by
-      simp only [ENNReal.toReal_ofNat, ENNReal.coe_toReal]
-      exact hθpos.le
-    have hfin : eLpNorm ((V : H1amb Ω) 0) q (μ.restrict Γ)
-        * (μ.restrict Γ) univ ^ (1 / (2 : ℝ≥0∞).toReal - 1 / (q : ℝ≥0∞).toReal) ≠ ⊤ :=
-      ENNReal.mul_ne_top (ne_top_of_le_ne_top hNfin hres)
-        (ENNReal.rpow_ne_top_of_nonneg hθ' (measure_ne_top _ _))
-    have h2 := ENNReal.toReal_mono hfin h1
-    rw [ENNReal.toReal_mul, ← ENNReal.toReal_rpow, Measure.restrict_apply_univ,
-      ENNReal.toReal_ofNat, ENNReal.coe_toReal] at h2
-    calc vΓ ≤ (eLpNorm ((V : H1amb Ω) 0) q (μ.restrict Γ)).toReal * γ ^ θ := h2
-      _ ≤ N * γ ^ θ :=
-          mul_le_mul_of_nonneg_right (ENNReal.toReal_mono hNfin hres) (Real.rpow_nonneg hγ0 _)
+  -- the gradient norm is controlled by the `L²` norm of the truncation over `Γ`
+  set vΓ : ℝ := (eLpNorm ((V : H1amb Ω) 0) 2 (μ.restrict (truncSupport u g k))).toReal
+    with hvΓdef
+  have hS : Op.lam * ∑ i : Fin d, ‖(V : H1amb Ω) i.succ‖ ≤ d * Op.Bsup * vΓ :=
+    mul_sum_le_card_mul (fun i => ‖(V : H1amb Ω) i.succ‖) (fun i => norm_nonneg _)
+      Op.lam_pos Op.Bsup_nonneg ENNReal.toReal_nonneg henergy
+  have hhold : vΓ ≤ N * γ ^ θ :=
+    toReal_eLpNorm_restrict_le (Lp.aestronglyMeasurable _) hq2.le hNfin _
   -- the truncation is not zero
   have hNpos : 0 < N := by
-    rcases (ENNReal.toReal_nonneg : 0 ≤ N).lt_or_eq with h | h
-    · exact h
-    · exfalso
-      have hzero : eLpNorm ((V : H1amb Ω) 0) q μ = 0 := by
-        rcases (ENNReal.toReal_eq_zero_iff _).mp h.symm with h0 | htop
-        · exact h0
-        · exact absurd htop hNfin
-      have hae := (eLpNorm_eq_zero_iff hq0).mp hzero
-      have hle : ∀ᵐ x ∂μ, u x ≤ k := by
-        filter_upwards [hae, hV0] with x hx hx0
-        simp only [Pi.zero_apply] at hx
-        rw [hx0] at hx
-        by_contra hlt
-        rw [max_eq_left (by linarith [not_le.mp hlt])] at hx
-        linarith [not_le.mp hlt]
-      have : μ {x | k < u x} = 0 := by
-        have := ae_iff.mp hle
-        simpa only [not_le] using this
-      exact absurd this hpos.ne'
-  -- assembling the chain
+    refine (ENNReal.toReal_nonneg : 0 ≤ N).lt_of_ne fun h => hpos.ne' ?_
+    refine measure_superlevel_eq_zero_of_eLpNorm_eq_zero hq0 hV0 ?_
+    rcases (ENNReal.toReal_eq_zero_iff _).mp h.symm with h0 | htop
+    · exact h0
+    · exact absurd htop hNfin
   have hchain : N ≤ K * γ ^ θ * N := by
-    have hSle : S ≤ Op.Bsup * d * vΓ / Op.lam := by
+    have hsum : ∑ i : Fin d, ‖(V : H1amb Ω) i.succ‖ ≤ d * Op.Bsup * vΓ / Op.lam := by
       rw [le_div_iff₀ Op.lam_pos]
       linarith [hS]
-    have hK0 : 0 ≤ (C : ℝ) * d := by positivity
     calc N ≤ (C : ℝ) * ∑ i : Fin d, ‖(V : H1amb Ω) i.succ‖ := hN
-      _ ≤ (C : ℝ) * (d * S) := by gcongr
-      _ = ((C : ℝ) * d) * S := by ring
-      _ ≤ ((C : ℝ) * d) * (Op.Bsup * d * vΓ / Op.lam) := by gcongr
-      _ = ((C : ℝ) * d * (Op.Bsup * d / Op.lam)) * vΓ := by ring
-      _ ≤ ((C : ℝ) * d * (Op.Bsup * d / Op.lam)) * (N * γ ^ θ) := by
-          gcongr
+      _ ≤ (C : ℝ) * (d * Op.Bsup * vΓ / Op.lam) := by gcongr
+      _ = (C : ℝ) * (d * Op.Bsup / Op.lam) * vΓ := by ring
       _ ≤ K * (N * γ ^ θ) := by
-          refine mul_le_mul_of_nonneg_right (by rw [hKdef]; linarith)
-            (mul_nonneg hNpos.le (Real.rpow_nonneg hγ0 _))
+          refine mul_le_mul (by rw [hKdef]; linarith) hhold ENNReal.toReal_nonneg hKpos.le
       _ = K * γ ^ θ * N := by ring
   have hone : 1 ≤ K * γ ^ θ := by
-    have := hchain
-    rw [← one_mul N] at this
-    nth_rewrite 2 [mul_comm] at this
-    exact le_of_mul_le_mul_right (by rw [one_mul]; linarith) hNpos
-  have hinv : K⁻¹ ≤ γ ^ θ := by
-    calc K⁻¹ = K⁻¹ * 1 := (mul_one _).symm
-      _ ≤ K⁻¹ * (K * γ ^ θ) := mul_le_mul_of_nonneg_left hone (inv_nonneg.mpr hKpos.le)
-      _ = γ ^ θ := by rw [← mul_assoc, inv_mul_cancel₀ hKpos.ne', one_mul]
-  calc K⁻¹ ^ θ⁻¹ ≤ (γ ^ θ) ^ θ⁻¹ :=
-        Real.rpow_le_rpow (inv_nonneg.mpr hKpos.le) hinv (inv_nonneg.mpr hθpos.le)
-    _ = γ := Real.rpow_rpow_inv hγ0 hθpos.ne'
+    refine le_of_mul_le_mul_right (a := N) ?_ hNpos
+    linarith [hchain]
+  exact inv_rpow_inv_le_of_one_le_mul_rpow hKpos hγ0 hθpos hone
 
 /-- **Uniform lower bound on the measure of `Γ_k` in dimension at least three**, through the
 Sobolev inequality at the exponent `2d/(d - 1)`. -/
 theorem exists_measure_truncSupport_ge (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBounded Ω)
-    (hd : 2 < d) (Op : FullEllipticOp d) :
-    ∃ c : ℝ, 0 < c ∧ ∀ (V : H01 Ω) (u : EuclideanSpace ℝ (Fin d) → ℝ)
-      (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ), Measurable u → (∀ i, Measurable (g i)) →
-      ∀ k : ℝ, (((V : H1amb Ω) 0 : EuclideanSpace ℝ (Fin d) → ℝ)
-        =ᵐ[volume.restrict Ω] fun x => max (u x - k) 0) →
-      0 < (volume.restrict Ω) {x | k < u x} →
-      Op.lam * ∑ i : Fin d, ‖(V : H1amb Ω) i.succ‖ ^ 2
-        ≤ Op.Bsup * (∑ i : Fin d, ‖(V : H1amb Ω) i.succ‖)
-          * (eLpNorm ((V : H1amb Ω) 0) 2
-              ((volume.restrict Ω).restrict (truncSupport u g k))).toReal →
-      c ≤ ((volume.restrict Ω) (truncSupport u g k)).toReal := by
+    (hd : 2 < d) (Op : FullEllipticOp d) : ∃ c : ℝ, 0 < c ∧ TruncSupportBound Ω Op c := by
   have hd3 : (3 : ℝ) ≤ d := by exact_mod_cast hd
   have hd1 : (0 : ℝ) < d - 1 := by linarith
   set q : ℝ≥0 := ⟨2 * d / (d - 1), div_nonneg (by positivity) hd1.le⟩ with hqdef
@@ -633,34 +609,16 @@ theorem exists_measure_truncSupport_ge (hΩopen : IsOpen Ω) (hΩb : Bornology.I
 into `L⁴(Ω)`. -/
 theorem exists_measure_truncSupport_ge_two {Ω : Set (EuclideanSpace ℝ (Fin 2))}
     (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBounded Ω) (Op : FullEllipticOp 2) :
-    ∃ c : ℝ, 0 < c ∧ ∀ (V : H01 Ω) (u : EuclideanSpace ℝ (Fin 2) → ℝ)
-      (g : Fin 2 → EuclideanSpace ℝ (Fin 2) → ℝ), Measurable u → (∀ i, Measurable (g i)) →
-      ∀ k : ℝ, (((V : H1amb Ω) 0 : EuclideanSpace ℝ (Fin 2) → ℝ)
-        =ᵐ[volume.restrict Ω] fun x => max (u x - k) 0) →
-      0 < (volume.restrict Ω) {x | k < u x} →
-      Op.lam * ∑ i : Fin 2, ‖(V : H1amb Ω) i.succ‖ ^ 2
-        ≤ Op.Bsup * (∑ i : Fin 2, ‖(V : H1amb Ω) i.succ‖)
-          * (eLpNorm ((V : H1amb Ω) 0) 2
-              ((volume.restrict Ω).restrict (truncSupport u g k))).toReal →
-      c ≤ ((volume.restrict Ω) (truncSupport u g k)).toReal :=
+    ∃ c : ℝ, 0 < c ∧ TruncSupportBound Ω Op c :=
   exists_measure_truncSupport_ge_of_sobolev hΩb Op (q := 4) (by norm_num)
     (C := sobolevConstTwo Ω) fun V => by
     have := eLpNorm_le_of_mem_H01_two hΩopen.measurableSet hΩb V.2
     rwa [ENNReal.coe_ofNat]
 
 /-- **Uniform lower bound on the measure of `Γ_k` in dimension at least two.** -/
-theorem exists_measure_truncSupport_ge' (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBounded Ω)
-    (hd : 2 ≤ d) (Op : FullEllipticOp d) :
-    ∃ c : ℝ, 0 < c ∧ ∀ (V : H01 Ω) (u : EuclideanSpace ℝ (Fin d) → ℝ)
-      (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ), Measurable u → (∀ i, Measurable (g i)) →
-      ∀ k : ℝ, (((V : H1amb Ω) 0 : EuclideanSpace ℝ (Fin d) → ℝ)
-        =ᵐ[volume.restrict Ω] fun x => max (u x - k) 0) →
-      0 < (volume.restrict Ω) {x | k < u x} →
-      Op.lam * ∑ i : Fin d, ‖(V : H1amb Ω) i.succ‖ ^ 2
-        ≤ Op.Bsup * (∑ i : Fin d, ‖(V : H1amb Ω) i.succ‖)
-          * (eLpNorm ((V : H1amb Ω) 0) 2
-              ((volume.restrict Ω).restrict (truncSupport u g k))).toReal →
-      c ≤ ((volume.restrict Ω) (truncSupport u g k)).toReal := by
+theorem exists_measure_truncSupport_ge_of_two_le (hΩopen : IsOpen Ω)
+    (hΩb : Bornology.IsBounded Ω) (hd : 2 ≤ d) (Op : FullEllipticOp d) :
+    ∃ c : ℝ, 0 < c ∧ TruncSupportBound Ω Op c := by
   rcases lt_or_eq_of_le hd with hd' | hd'
   · exact exists_measure_truncSupport_ge hΩopen hΩb hd' Op
   · subst hd'
@@ -701,7 +659,7 @@ theorem weak_maximum_principle_transport (hd : 2 ≤ d) (hΩopen : IsOpen Ω)
     fun T i => ae_eq_zero_of_eq_const_of_hasWeakGradOn hΩopen huint.locallyIntegrableOn
       (fun i => (hgint i).locallyIntegrableOn) (hasWeakGradOn_of_mem_W12 hU) T i
   -- the uniform lower bound
-  obtain ⟨c, hc0, hest⟩ := exists_measure_truncSupport_ge' hΩopen hΩb hd Op
+  obtain ⟨c, hc0, hest⟩ := exists_measure_truncSupport_ge_of_two_le hΩopen hΩb hd Op
   have hest' : ∀ k', k ≤ k' → 0 < (volume.restrict Ω) {x | k' < u x} →
       c ≤ ((volume.restrict Ω) (truncSupport u g k')).toReal := by
     intro k' hkk' hpos
