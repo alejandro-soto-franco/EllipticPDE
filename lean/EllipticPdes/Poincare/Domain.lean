@@ -6,12 +6,12 @@ Authors: Alejandro Soto Franco
 
 module
 
-public import EllipticPdes.Poincare.Fubini
+public import Mathlib.MeasureTheory.Integral.Bochner.Set
 
 /-!
-# Full Poincaré inequality on the domain (dependency-chain step 3)
+# Averaging the directional Poincaré bounds
 
-Average the `n` directional bounds from `poincare_slice_box` to obtain the
+Average `n` directional bounds (on a box, `slice_bound_euclBox`) to obtain the
 domain Poincaré inequality. Each coordinate direction `i` of the box contributes
 a bound `∫_Ω u² ≤ c i * ∫_Ω (∂_i u)²`; summing over the `n` directions and
 dividing by `n` gives `∫_Ω u² ≤ (1 / n) * ∑_i c i * ∫_Ω (∂_i u)²`. The resulting
