@@ -57,6 +57,94 @@ open EllipticPdes.Extension (HasC1Boundary exists_extension_subset_bound)
 
 variable {d : ℕ}
 
+/-- A Hölder function that vanishes at a point `z` is bounded there by its constant times a
+power of the distance. -/
+theorem norm_le_of_holderOnWith_of_eq_zero {X : Type*} [PseudoMetricSpace X] {C γ : ℝ≥0}
+    {w : X → ℝ} {S : Set X} (h : HolderOnWith C γ w S) {z y : X} (hz : z ∈ S) (hy : y ∈ S)
+    (hw : w z = 0) {D : ℝ} (hD : dist y z ≤ D) : ‖w y‖ ≤ C * D ^ (γ : ℝ) := by
+  have := h.dist_le hy hz
+  rw [hw, Real.dist_eq, sub_zero] at this
+  exact this.trans (by gcongr)
+
+/-- An a.e. vanishing function vanishes at some point of every nonempty open set. -/
+theorem exists_apply_eq_zero_of_ae_eq_zero {E : Type*} [TopologicalSpace E] {m : MeasurableSpace E}
+    [BorelSpace E] {μ : Measure E} [μ.IsOpenPosMeasure] {w : E → ℝ} {V : Set E} (hV : IsOpen V)
+    (hne : V.Nonempty) (h : ∀ᵐ x ∂μ.restrict V, w x = 0) : ∃ z ∈ V, w z = 0 := by
+  have : (ae (μ.restrict V)).NeBot := ae_neBot.mpr (by
+    rw [Ne, Measure.restrict_eq_zero]; exact (hV.measure_pos μ hne).ne')
+  obtain ⟨z, hz, hz0⟩ := (h.and (ae_restrict_mem hV.measurableSet)).exists
+  exact ⟨z, hz0, hz⟩
+
+/-- **Hölder representative of an extended class.** For `P > d` there is one constant such that a
+class `u` on a bounded domain with `C¹` boundary, whose weak gradient `g` has all of `u` and `gₖ`
+bounded by `B` in `L^P(Ω)`, has a representative that is bounded by `C B` and Hölder with
+constant `C B` on the closure of the domain. The class is extended across the boundary into a ball,
+Morrey runs on a larger ball, and the extension vanishes somewhere in the annulus, which bounds
+the representative by its seminorm times a power of the diameter. -/
+theorem exists_holderOnWith_of_extension (hd : 0 < d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBounded Ω) (hC1 : HasC1Boundary Ω) {P : ℝ≥0}
+    (hP1 : 1 ≤ P) (hPd : (d : ℝ) < (P : ℝ)) :
+    ∃ C : ℝ≥0, ∀ (u : EuclideanSpace ℝ (Fin d) → ℝ) (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ)
+      (B : ℝ≥0), IntegrableOn u Ω volume → (∀ k, IntegrableOn (g k) Ω volume) →
+      HasWeakGradOn Ω u g → eLpNorm u P (volume.restrict Ω) ≤ B →
+      (∀ k, eLpNorm (g k) P (volume.restrict Ω) ≤ B) →
+      ∃ w : EuclideanSpace ℝ (Fin d) → ℝ, w =ᵐ[volume.restrict Ω] u ∧
+        (∀ y ∈ closure Ω, ‖w y‖ ≤ ((C * B : ℝ≥0) : ℝ)) ∧
+        HolderOnWith (C * B) (morreyExponent d (P : ℝ)) w (closure Ω) := by
+  have : Nontrivial (EuclideanSpace ℝ (Fin d)) := Module.nontrivial_of_finrank_pos (R := ℝ)
+    (by rw [finrank_euclideanSpace_fin]; exact hd)
+  obtain ⟨rb, rb', hrb, hrbb', hcl, z, hz, hzn⟩ := exists_balls_around_isBounded hΩb
+  obtain ⟨KE, hKE⟩ := exists_extension_subset_bound hd hΩopen hΩb hC1
+    (isOpen_ball (x := (0 : EuclideanSpace ℝ (Fin d))) (ε := rb)) hcl
+    (p := (P : ℝ≥0∞)) (by exact_mod_cast hP1)
+  obtain ⟨Cm, hCm⟩ := morrey_ball hd hPd (0 : EuclideanSpace ℝ (Fin d)) (hrb.trans hrbb')
+  set Cb : ℝ≥0 := Cm * (d * (KE * (d + 1))) with hCb
+  set Cd : ℝ≥0 := ((2 * rb') ^ ((morreyExponent d (P : ℝ) : ℝ≥0) : ℝ)).toNNReal with hCd
+  refine ⟨Cb + Cb * Cd, fun u g B hui hgi hwg hu hg => ?_⟩
+  obtain ⟨U, G, hwgU, -, hsuppU, hUint, hGint, hag, -, hGb⟩ := hKE u g hui hgi hwg
+  have hGB : ∀ k, eLpNorm (G k) (P : ℝ≥0∞) volume ≤ ((KE * ((d + 1) * B) : ℝ≥0) : ℝ≥0∞) :=
+    fun k => (hGb k).trans (by
+      push_cast; exact mul_le_mul_right (add_sum_le_of_le hu hg) _)
+  obtain ⟨w, hwae, hwhol⟩ := hCm U G hUint.integrableOn (fun k => by
+    rw [ENNReal.ofReal_coe_nnreal]
+    have hm : MemLp (G k) (P : ℝ≥0∞) volume := lt_of_le_of_lt (hGB k) ENNReal.coe_lt_top
+    exact hm.restrict _)
+    (hwgU.mono (subset_univ _))
+  have hhol : HolderOnWith (Cb * B) (morreyExponent d (P : ℝ)) w (ball 0 rb') := by
+    refine hwhol.mono_const ?_
+    calc _ ≤ Cm * (d * (KE * ((d + 1) * B))) := mul_le_mul_right (sum_toNNReal_eLpNorm_le
+        fun k => by
+          rw [ENNReal.ofReal_coe_nnreal]
+          exact (eLpNorm_mono_measure _ Measure.restrict_le_self).trans (hGB k)) _
+      _ = Cb * B := by rw [hCb]; ring
+  -- the representative vanishes in the annulus, outside the support of the extension
+  obtain ⟨z₀, hz₀V, hz₀⟩ := exists_apply_eq_zero_of_ae_eq_zero (μ := volume) (w := w)
+    (V := ball 0 rb' \ tsupport U) (isOpen_ball.sdiff (isClosed_tsupport U))
+    ⟨z, hz, fun hc => hzn (hsuppU hc)⟩ (by
+      filter_upwards [ae_restrict_of_ae_restrict_of_subset sdiff_subset hwae,
+        ae_restrict_mem (isOpen_ball.sdiff (isClosed_tsupport U)).measurableSet] with x hx hxV
+      rw [hx, image_eq_zero_of_notMem_tsupport hxV.2])
+  have hsup : ∀ y ∈ closure Ω, ‖w y‖ ≤ (((Cb + Cb * Cd) * B : ℝ≥0) : ℝ) := fun y hy => by
+    have hyb : y ∈ ball (0 : EuclideanSpace ℝ (Fin d)) rb' := ball_subset_ball hrbb'.le (hcl hy)
+    have hyz : dist y z₀ ≤ 2 * rb' := by
+      have := mem_ball.mp hyb
+      have := mem_ball.mp hz₀V.1
+      rw [dist_comm z₀] at *
+      linarith [dist_triangle y 0 z₀]
+    refine (norm_le_of_holderOnWith_of_eq_zero hhol hz₀V.1 hyb hz₀ hyz).trans ?_
+    have hCdc : ((Cd : ℝ≥0) : ℝ) = (2 * rb') ^ ((morreyExponent d (P : ℝ) : ℝ≥0) : ℝ) := by
+      rw [hCd, Real.coe_toNNReal _ (Real.rpow_nonneg (by linarith) _)]
+    rw [← hCdc]
+    push_cast
+    nlinarith [Cb.coe_nonneg, B.coe_nonneg, Cd.coe_nonneg]
+  refine ⟨w, ?_, hsup, ?_⟩
+  · refine Filter.EventuallyEq.trans (ae_restrict_of_ae_restrict_of_subset
+      (subset_closure.trans (hcl.trans (ball_subset_ball hrbb'.le))) hwae) ?_
+    exact (ae_restrict_iff' hΩopen.measurableSet).mpr
+      (Filter.Eventually.of_forall fun y hy => hag y hy)
+  · exact (hhol.mono (hcl.trans (ball_subset_ball hrbb'.le))).mono_const
+      (mul_le_mul_left le_self_add _)
+
 /-- **Clause (ii) of the embedding on a bounded domain with `C¹` boundary.** One constant,
 depending on the domain, the dimension, the base exponent, the rung count and the landing
 exponent, bounds both the supremum and the Hölder seminorm on the closure of the domain of a
@@ -78,171 +166,20 @@ theorem exists_const_holderOnWith_of_gradClosed_domain (hd : 1 < d)
           w =ᵐ[volume.restrict Ω] F i ∧
             (∀ y ∈ closure Ω, ‖w y‖ ≤ ((C * M : ℝ≥0) : ℝ)) ∧
             HolderOnWith (C * M) (morreyExponent d (P : ℝ)) w (closure Ω) := by
-  classical
-  have hd0 : 0 < d := by omega
-  have : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
-  have hP1 : (1 : ℝ≥0) ≤ P := le_trans hp₀ hp₀P
-  have hP1E : (1 : ℝ≥0∞) ≤ (P : ℝ≥0∞) := by exact_mod_cast hP1
-  have hcast : ((P : ℝ≥0) : ℝ≥0∞) = ENNReal.ofReal (P : ℝ) := by rw [ENNReal.ofReal_coe_nnreal]
-  -- two balls: the extension is supported in the inner one, Morrey runs on the outer one
-  obtain ⟨R₀, hR₀⟩ := hΩb.subset_closedBall (0 : EuclideanSpace ℝ (Fin d))
-  set rb : ℝ := |R₀| + 1 with hrbdef
-  set rb' : ℝ := |R₀| + 2 with hrb'def
-  have habs : (0 : ℝ) ≤ |R₀| := abs_nonneg R₀
-  have hrb : 0 < rb := by rw [hrbdef]; linarith
-  have hrb' : 0 < rb' := by rw [hrb'def]; linarith
-  have hbb : ball (0 : EuclideanSpace ℝ (Fin d)) rb ⊆ ball (0 : EuclideanSpace ℝ (Fin d)) rb' :=
-    ball_subset_ball (by rw [hrbdef, hrb'def]; linarith)
-  have hΩcb : Ω ⊆ closedBall (0 : EuclideanSpace ℝ (Fin d)) |R₀| := fun y hy =>
-    mem_closedBall.mpr (le_trans (mem_closedBall.mp (hR₀ hy)) (le_abs_self R₀))
-  have hclrb : closure Ω ⊆ ball (0 : EuclideanSpace ℝ (Fin d)) rb :=
-    (closure_minimal hΩcb isClosed_closedBall).trans
-      (closedBall_subset_ball (by rw [hrbdef]; linarith))
-  have hclrb' : closure Ω ⊆ ball (0 : EuclideanSpace ℝ (Fin d)) rb' := hclrb.trans hbb
-  have hΩrb' : Ω ⊆ ball (0 : EuclideanSpace ℝ (Fin d)) rb' := subset_closure.trans hclrb'
-  -- a point of the outer ball outside the inner one, where every such extension vanishes
-  set z : EuclideanSpace ℝ (Fin d) :=
-    (|R₀| + 3 / 2) • EuclideanSpace.single (⟨0, hd0⟩ : Fin d) (1 : ℝ) with hzdef
-  have hznorm : ‖z‖ = |R₀| + 3 / 2 := by
-    rw [hzdef, norm_smul, PiLp.norm_single, norm_one, mul_one, Real.norm_eq_abs,
-      abs_of_nonneg (by linarith)]
-  have hzin : z ∈ ball (0 : EuclideanSpace ℝ (Fin d)) rb' := by
-    rw [mem_ball_zero_iff, hznorm, hrb'def]; linarith
-  have hzout : z ∉ ball (0 : EuclideanSpace ℝ (Fin d)) rb := by
-    rw [mem_ball_zero_iff, hznorm, hrbdef, not_lt]
-    linarith
-  obtain ⟨K, hK⟩ :=
-    exists_const_memLp_of_gradClosed_domain hd hΩopen hΩb hC1 hp₀ ι s hsd hp₀P hPs
-  obtain ⟨KE, hKE⟩ := exists_extension_subset_bound hd0 hΩopen hΩb hC1
-    (Metric.isOpen_ball (x := (0 : EuclideanSpace ℝ (Fin d))) (ε := rb)) hclrb
-    (p := (P : ℝ≥0∞)) hP1E
-  obtain ⟨Cm, hCm⟩ := morrey_ball hd0 hPd (0 : EuclideanSpace ℝ (Fin d)) hrb'
-  -- the seminorm's constant, and the power of the diameter the supremum adds to it
-  set Cb : ℝ≥0 := Cm * ((d : ℝ≥0) * (KE * (((d + 1 : ℕ) : ℝ≥0) * K))) with hCbdef
-  set Cd : ℝ≥0 := Real.toNNReal ((2 * rb') ^ ((morreyExponent d (P : ℝ) : ℝ≥0) : ℝ)) with hCddef
-  have hCdcoe : ((Cd : ℝ≥0) : ℝ) = (2 * rb') ^ ((morreyExponent d (P : ℝ) : ℝ≥0) : ℝ) := by
-    rw [hCddef, Real.coe_toNNReal _ (Real.rpow_nonneg (by linarith) _)]
-  refine ⟨Cb + Cb * Cd, ?_⟩
-  intro F nxt dep m hdep hgrad hmem M hM i hi
-  -- the ladder, run to the exponent Morrey consumes
+  obtain ⟨K, hK⟩ := exists_const_memLp_of_gradClosed_domain hd hΩopen hΩb hC1 hp₀ ι s hsd hp₀P hPs
+  obtain ⟨CE, hCE⟩ := exists_holderOnWith_of_extension (by omega) hΩopen hΩb hC1 (P := P)
+    (hp₀.trans hp₀P) hPd
+  refine ⟨CE * K, fun {F nxt dep m} hdep hgrad hmem M hM i hi => ?_⟩
+  have := isFiniteMeasure_restrict_of_isBounded hΩb
   have hlad : ∀ j, dep j + s ≤ m → MemLp (F j) P (volume.restrict Ω) ∧
-      eLpNorm (F j) P (volume.restrict Ω) ≤ (K : ℝ≥0∞) * (M : ℝ≥0∞) :=
-    fun j hj => hK hdep hgrad hmem (M : ℝ≥0∞) hM j hj
-  have hi' : dep i + s ≤ m := by omega
-  have hik : ∀ k, dep (nxt i k) + s ≤ m := fun k => by have := hdep i k; omega
-  have hFint : ∀ j, dep j + s ≤ m → IntegrableOn (F j) Ω volume :=
-    fun j hj => (hlad j hj).1.integrable hP1E
-  -- the extension across the boundary, supported in the inner ball
-  obtain ⟨U, G, hwgU, -, hsuppU, hUint, hGint, hag, hUb, hGb⟩ :=
-    hKE (F i) (fun k => F (nxt i k)) (hFint i hi') (fun k => hFint (nxt i k) (hik k))
-      (hgrad i (by omega))
-  have hN : eLpNorm (F i) P (volume.restrict Ω)
-      + ∑ k, eLpNorm (F (nxt i k)) P (volume.restrict Ω)
-      ≤ (((d + 1 : ℕ) : ℝ≥0) : ℝ≥0∞) * ((K : ℝ≥0∞) * (M : ℝ≥0∞)) := by
-    have hsum : ∑ k, eLpNorm (F (nxt i k)) P (volume.restrict Ω)
-        ≤ ∑ _k : Fin d, (K : ℝ≥0∞) * (M : ℝ≥0∞) :=
-      Finset.sum_le_sum fun k _ => (hlad (nxt i k) (hik k)).2
-    calc eLpNorm (F i) P (volume.restrict Ω)
-          + ∑ k, eLpNorm (F (nxt i k)) P (volume.restrict Ω)
-        ≤ (K : ℝ≥0∞) * (M : ℝ≥0∞) + ∑ _k : Fin d, (K : ℝ≥0∞) * (M : ℝ≥0∞) :=
-          add_le_add (hlad i hi').2 hsum
-      _ = (((d + 1 : ℕ) : ℝ≥0) : ℝ≥0∞) * ((K : ℝ≥0∞) * (M : ℝ≥0∞)) := by
-          rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
-          push_cast
-          ring
-  have hGtot : ∀ k, eLpNorm (G k) (P : ℝ≥0∞) volume
-      ≤ ((KE * (((d + 1 : ℕ) : ℝ≥0) * K) * M : ℝ≥0) : ℝ≥0∞) := by
-    intro k
-    calc eLpNorm (G k) (P : ℝ≥0∞) volume
-        ≤ (KE : ℝ≥0∞) * (eLpNorm (F i) P (volume.restrict Ω)
-            + ∑ j, eLpNorm (F (nxt i j)) P (volume.restrict Ω)) := hGb k
-      _ ≤ (KE : ℝ≥0∞) * ((((d + 1 : ℕ) : ℝ≥0) : ℝ≥0∞) * ((K : ℝ≥0∞) * (M : ℝ≥0∞))) :=
-          mul_le_mul' le_rfl hN
-      _ = ((KE * (((d + 1 : ℕ) : ℝ≥0) * K) * M : ℝ≥0) : ℝ≥0∞) := by
-          push_cast
-          ring
-  have hGP : ∀ k, MemLp (G k) (ENNReal.ofReal (P : ℝ))
-      (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) rb')) := by
-    intro k
-    have hm : MemLp (G k) (P : ℝ≥0∞) volume :=
-      lt_of_le_of_lt (hGtot k) ENNReal.coe_lt_top
-    have := hm.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) rb')
-    rwa [hcast] at this
-  -- Morrey on the outer ball
-  obtain ⟨w, hwae, hwhol⟩ := hCm U G (MeasureTheory.Integrable.integrableOn hUint) hGP
-    (hwgU.mono (Set.subset_univ _))
-  have hseminorm : Cm * ∑ k, (eLpNorm (G k) (ENNReal.ofReal (P : ℝ))
-      (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) rb'))).toNNReal ≤ Cb * M := by
-    have hterm : ∀ k : Fin d, (eLpNorm (G k) (ENNReal.ofReal (P : ℝ))
-        (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) rb'))).toNNReal
-        ≤ KE * (((d + 1 : ℕ) : ℝ≥0) * K) * M := by
-      intro k
-      have hle : eLpNorm (G k) (ENNReal.ofReal (P : ℝ))
-          (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) rb'))
-          ≤ ((KE * (((d + 1 : ℕ) : ℝ≥0) * K) * M : ℝ≥0) : ℝ≥0∞) := by
-        rw [← hcast]
-        exact le_trans (eLpNorm_mono_measure _ Measure.restrict_le_self) (hGtot k)
-      have hne : eLpNorm (G k) (ENNReal.ofReal (P : ℝ))
-          (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) rb')) ≠ ⊤ :=
-        ne_top_of_le_ne_top ENNReal.coe_ne_top hle
-      have h2 := (ENNReal.toNNReal_le_toNNReal hne ENNReal.coe_ne_top).mpr hle
-      rwa [ENNReal.toNNReal_coe] at h2
-    calc Cm * ∑ k, (eLpNorm (G k) (ENNReal.ofReal (P : ℝ))
-            (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) rb'))).toNNReal
-        ≤ Cm * ∑ _k : Fin d, KE * (((d + 1 : ℕ) : ℝ≥0) * K) * M := by
-          gcongr with k _
-          exact hterm k
-      _ = Cb * M := by
-          rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, hCbdef]
-          ring
-  have hwhol' : HolderOnWith (Cb * M) (morreyExponent d (P : ℝ)) w
-      (ball (0 : EuclideanSpace ℝ (Fin d)) rb') := hwhol.mono_const hseminorm
-  -- the representative vanishes somewhere in the outer ball
-  set V : Set (EuclideanSpace ℝ (Fin d)) :=
-    ball (0 : EuclideanSpace ℝ (Fin d)) rb' \ tsupport U with hVdef
-  have hVopen : IsOpen V := Metric.isOpen_ball.sdiff (isClosed_tsupport U)
-  have hVsub : V ⊆ ball (0 : EuclideanSpace ℝ (Fin d)) rb' := Set.sdiff_subset
-  have hzV : z ∈ V := ⟨hzin, fun hc => hzout (hsuppU hc)⟩
-  have hVpos : 0 < volume V := hVopen.measure_pos volume ⟨z, hzV⟩
-  have hVne : volume.restrict V ≠ 0 := by
-    intro h
-    have huniv : (volume.restrict V) Set.univ = 0 := by rw [h]; rfl
-    rw [Measure.restrict_apply_univ] at huniv
-    exact hVpos.ne' huniv
-  have : (ae (volume.restrict V)).NeBot := ae_neBot.mpr hVne
-  have hwV : ∀ᵐ x ∂(volume.restrict V), x ∈ V ∧ w x = 0 := by
-    have hres : w =ᵐ[volume.restrict V] U :=
-      ae_restrict_of_ae_restrict_of_subset hVsub hwae
-    filter_upwards [hres, ae_restrict_mem hVopen.measurableSet] with x hx hxV
-    exact ⟨hxV, by rw [hx, image_eq_zero_of_notMem_tsupport hxV.2]⟩
-  obtain ⟨z₀, hz₀V, hz₀⟩ := hwV.exists
-  -- the supremum, read off the estimate against that point
-  have hsup : ∀ y ∈ closure Ω, ‖w y‖ ≤ (((Cb + Cb * Cd) * M : ℝ≥0) : ℝ) := by
-    intro y hy
-    have hyb : y ∈ ball (0 : EuclideanSpace ℝ (Fin d)) rb' := hclrb' hy
-    have hdist := hwhol'.dist_le hyb (hVsub hz₀V)
-    rw [hz₀, Real.dist_eq, sub_zero] at hdist
-    have hyz : dist y z₀ ≤ 2 * rb' := by
-      have h1 : dist y (0 : EuclideanSpace ℝ (Fin d)) < rb' := mem_ball.mp hyb
-      have h2 : dist z₀ (0 : EuclideanSpace ℝ (Fin d)) < rb' := mem_ball.mp (hVsub hz₀V)
-      calc dist y z₀ ≤ dist y (0 : EuclideanSpace ℝ (Fin d))
-            + dist (0 : EuclideanSpace ℝ (Fin d)) z₀ := dist_triangle _ _ _
-        _ ≤ 2 * rb' := by rw [dist_comm (0 : EuclideanSpace ℝ (Fin d)) z₀]; linarith
-    have hpow : dist y z₀ ^ ((morreyExponent d (P : ℝ) : ℝ≥0) : ℝ)
-        ≤ (2 * rb') ^ ((morreyExponent d (P : ℝ) : ℝ≥0) : ℝ) :=
-      Real.rpow_le_rpow dist_nonneg hyz (by positivity)
-    have hstep : ((Cb * M : ℝ≥0) : ℝ) * dist y z₀ ^ ((morreyExponent d (P : ℝ) : ℝ≥0) : ℝ)
-        ≤ ((Cb * M : ℝ≥0) : ℝ) * ((Cd : ℝ≥0) : ℝ) := by
-      rw [hCdcoe]
-      exact mul_le_mul_of_nonneg_left hpow (by positivity)
-    rw [Real.norm_eq_abs]
-    refine le_trans hdist (le_trans hstep ?_)
-    push_cast
-    nlinarith [(Cb : ℝ≥0).coe_nonneg, (M : ℝ≥0).coe_nonneg, (Cd : ℝ≥0).coe_nonneg]
-  refine ⟨w, ?_, hsup, ?_⟩
-  · refine Filter.EventuallyEq.trans (ae_restrict_of_ae_restrict_of_subset hΩrb' hwae) ?_
-    exact (ae_restrict_iff' hΩopen.measurableSet).mpr
-      (Filter.Eventually.of_forall fun y hy => hag y hy)
-  · exact (hwhol'.mono hclrb').mono_const (mul_le_mul_left le_self_add _)
+      eLpNorm (F j) P (volume.restrict Ω) ≤ ((K * M : ℝ≥0) : ℝ≥0∞) := fun j hj => by
+    rw [ENNReal.coe_mul]; exact hK hdep hgrad hmem M hM j hj
+  have hP1 : (1 : ℝ≥0∞) ≤ P := by exact_mod_cast hp₀.trans hp₀P
+  obtain ⟨w, hwae, hwsup, hwhol⟩ := hCE (F i) (fun k => F (nxt i k)) (K * M)
+    ((hlad i (by omega)).1.integrable hP1)
+    (fun k => (hlad _ (by have := hdep i k; omega)).1.integrable hP1) (hgrad i (by omega))
+    (hlad i (by omega)).2 (fun k => (hlad _ (by have := hdep i k; omega)).2)
+  rw [← mul_assoc] at hwsup hwhol
+  exact ⟨w, hwae, hwsup, hwhol⟩
 
 end EllipticPdes.Embedding

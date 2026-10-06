@@ -50,11 +50,22 @@ variable {d : ℕ}
 
 /-- **Finite measure of a bounded domain.** Lowering an exponent on it uses this. -/
 theorem isFiniteMeasure_restrict_of_isBounded {Ω : Set (EuclideanSpace ℝ (Fin d))}
-    (hΩb : Bornology.IsBounded Ω) : IsFiniteMeasure (volume.restrict Ω) := by
-  obtain ⟨R, hR⟩ := hΩb.subset_closedBall (0 : EuclideanSpace ℝ (Fin d))
-  exact ⟨by
-    rw [Measure.restrict_apply_univ]
-    exact lt_of_le_of_lt (measure_mono hR) measure_closedBall_lt_top⟩
+    (hΩb : Bornology.IsBounded Ω) : IsFiniteMeasure (volume.restrict Ω) :=
+  isFiniteMeasure_restrict.2 hΩb.measure_lt_top.ne
+
+/-- **Two balls around a bounded set.** The closure of a bounded set lies in a ball about the
+origin, and a larger concentric ball contains a point outside the smaller one. -/
+theorem exists_balls_around_isBounded {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    [Nontrivial E] {Ω : Set E} (hΩ : Bornology.IsBounded Ω) :
+    ∃ r R : ℝ, 0 < r ∧ r < R ∧ closure Ω ⊆ ball (0 : E) r ∧ ∃ z ∈ ball (0 : E) R, z ∉ ball 0 r := by
+  obtain ⟨R₀, hR₀⟩ := hΩ.subset_closedBall (0 : E)
+  have habs : (0 : ℝ) ≤ |R₀| := abs_nonneg R₀
+  obtain ⟨z, hz⟩ := exists_norm_eq E (show (0 : ℝ) ≤ |R₀| + 3 / 2 by linarith)
+  refine ⟨|R₀| + 1, |R₀| + 2, by linarith, by linarith, ?_, z, ?_, ?_⟩
+  · refine (closure_minimal hR₀ isClosed_closedBall).trans (closedBall_subset_ball ?_)
+    linarith [le_abs_self R₀]
+  · rw [mem_ball_zero_iff, hz]; linarith
+  · rw [mem_ball_zero_iff, hz, not_lt]; linarith
 
 /-- **Gagliardo-Nirenberg-Sobolev on a bounded domain with `C¹` boundary.** A class on `Ω`
 with an `Lᵖ` weak gradient lies in `L^{p'}(Ω)` at the Sobolev conjugate
@@ -73,19 +84,10 @@ theorem exists_eLpNorm_sobolevConj_le_domain (hd : 0 < d)
           + ∑ k, eLpNorm (g k) p (volume.restrict Ω)) := by
   classical
   have hp1 : (1 : ℝ≥0∞) ≤ (p : ℝ≥0∞) := by exact_mod_cast hp
-  obtain ⟨R₀, hR₀⟩ := hΩb.subset_closedBall (0 : EuclideanSpace ℝ (Fin d))
-  set r : ℝ := |R₀| + 1 with hrdef
-  set R : ℝ := |R₀| + 2 with hRdef
-  have habs : (0 : ℝ) ≤ |R₀| := abs_nonneg R₀
-  have hr : 0 < r := by rw [hrdef]; linarith
-  have hrR : r < R := by rw [hrdef, hRdef]; linarith
-  have hΩr : Ω ⊆ ball (0 : EuclideanSpace ℝ (Fin d)) r := by
-    intro y hy
-    have h := hR₀ hy
-    rw [mem_closedBall] at h
-    rw [mem_ball, hrdef]
-    have hle : R₀ ≤ |R₀| := le_abs_self R₀
-    linarith
+  have : Nontrivial (EuclideanSpace ℝ (Fin d)) := Module.nontrivial_of_finrank_pos (R := ℝ)
+    (by rw [finrank_euclideanSpace_fin]; exact hd)
+  obtain ⟨r, R, hr, hrR, hcl, -⟩ := exists_balls_around_isBounded hΩb
+  have hΩr : Ω ⊆ ball (0 : EuclideanSpace ℝ (Fin d)) r := subset_closure.trans hcl
   have : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
   obtain ⟨K₀, hK₀⟩ := exists_extension_bound hd hΩopen hΩb hC1 (p := (p : ℝ≥0∞)) hp1
   obtain ⟨K₁, hK₁⟩ :=
@@ -163,40 +165,23 @@ theorem exists_eLpNorm_sobolevConj_le_domain_of_le (hd : 0 < d)
       MemLp u p' (volume.restrict Ω) ∧
         eLpNorm u p' (volume.restrict Ω) ≤ (K : ℝ≥0∞) * (eLpNorm u q (volume.restrict Ω)
           + ∑ k, eLpNorm (g k) q (volume.restrict Ω)) := by
-  classical
-  have : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
-  have hp1 : (1 : ℝ) ≤ (p : ℝ) := by exact_mod_cast hp
-  have hp0 : (0 : ℝ) < (p : ℝ) := by linarith
-  have hpqR : (p : ℝ) ≤ (q : ℝ) := by exact_mod_cast hpq
+  have := isFiniteMeasure_restrict_of_isBounded hΩb
   have hpqE : (p : ℝ≥0∞) ≤ (q : ℝ≥0∞) := by exact_mod_cast hpq
   obtain ⟨K₀, hK₀⟩ := exists_eLpNorm_sobolevConj_le_domain hd hΩopen hΩb hC1 hp hpp'
-  set A : ℝ≥0∞ := (volume.restrict Ω) Set.univ
-      ^ (1 / (p : ℝ≥0∞).toReal - 1 / (q : ℝ≥0∞).toReal) with hAdef
-  have he : (0 : ℝ) ≤ 1 / (p : ℝ≥0∞).toReal - 1 / (q : ℝ≥0∞).toReal := by
-    have hpc : (p : ℝ≥0∞).toReal = (p : ℝ) := by simp
-    have hqc : (q : ℝ≥0∞).toReal = (q : ℝ) := by simp
-    rw [hpc, hqc, sub_nonneg]
-    exact one_div_le_one_div_of_le hp0 hpqR
-  have hAne : A ≠ ⊤ :=
-    ENNReal.rpow_ne_top_of_nonneg he (measure_ne_top (volume.restrict Ω) Set.univ)
-  refine ⟨K₀ * A.toNNReal, fun u g hu hg hwg => ?_⟩
+  obtain ⟨A, hA⟩ := exists_const_eLpNorm_le_of_le (μ := volume.restrict Ω) (E := ℝ)
+    (by exact_mod_cast (hp.trans_lt' one_pos).ne') hpqE
+  refine ⟨K₀ * A, fun u g hu hg hwg => ?_⟩
   obtain ⟨hmem, hbd⟩ :=
     hK₀ u g (hu.mono_exponent hpqE) (fun k => (hg k).mono_exponent hpqE) hwg
-  refine ⟨hmem, ?_⟩
-  have hcmp : ∀ f : EuclideanSpace ℝ (Fin d) → ℝ,
-      AEStronglyMeasurable f (volume.restrict Ω) →
-      eLpNorm f p (volume.restrict Ω) ≤ eLpNorm f q (volume.restrict Ω) * A :=
-    fun f hf => eLpNorm_le_eLpNorm_mul_rpow_measure_univ hpqE hf
-  calc eLpNorm u (p' : ℝ≥0∞) (volume.restrict Ω)
-      ≤ (K₀ : ℝ≥0∞) * (eLpNorm u (p : ℝ≥0∞) (volume.restrict Ω)
-          + ∑ k, eLpNorm (g k) (p : ℝ≥0∞) (volume.restrict Ω)) := hbd
-    _ ≤ (K₀ : ℝ≥0∞) * (eLpNorm u (q : ℝ≥0∞) (volume.restrict Ω) * A
-          + ∑ k, eLpNorm (g k) (q : ℝ≥0∞) (volume.restrict Ω) * A) :=
-        mul_le_mul' le_rfl (add_le_add (hcmp u hu.aestronglyMeasurable)
-          (Finset.sum_le_sum fun k _ => hcmp (g k) (hg k).aestronglyMeasurable))
-    _ = ((K₀ * A.toNNReal : ℝ≥0) : ℝ≥0∞) * (eLpNorm u (q : ℝ≥0∞) (volume.restrict Ω)
+  refine ⟨hmem, hbd.trans ?_⟩
+  calc (K₀ : ℝ≥0∞) * (eLpNorm u (p : ℝ≥0∞) (volume.restrict Ω)
+          + ∑ k, eLpNorm (g k) (p : ℝ≥0∞) (volume.restrict Ω))
+      ≤ (K₀ : ℝ≥0∞) * (A * eLpNorm u (q : ℝ≥0∞) (volume.restrict Ω)
+          + ∑ k, A * eLpNorm (g k) (q : ℝ≥0∞) (volume.restrict Ω)) :=
+        mul_le_mul' le_rfl (add_le_add (hA u hu.aestronglyMeasurable)
+          (Finset.sum_le_sum fun k _ => hA (g k) (hg k).aestronglyMeasurable))
+    _ = ((K₀ * A : ℝ≥0) : ℝ≥0∞) * (eLpNorm u (q : ℝ≥0∞) (volume.restrict Ω)
           + ∑ k, eLpNorm (g k) (q : ℝ≥0∞) (volume.restrict Ω)) := by
-        rw [ENNReal.coe_mul, ENNReal.coe_toNNReal hAne, ← Finset.sum_mul, ← add_mul]
-        ring
+        rw [← Finset.mul_sum, ← mul_add, ENNReal.coe_mul, mul_assoc]
 
 end EllipticPdes.Embedding
