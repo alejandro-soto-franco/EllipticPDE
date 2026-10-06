@@ -584,9 +584,7 @@ half of Evans §6.2.3, Theorem 4(ii)).
 Under the Rellich-Kondrachov input (`opK` compact), the space of weak solutions of the
 homogeneous problem `Lu = 0` is finite-dimensional: it is the eigenspace of the compact
 operator `opK` at the nonzero eigenvalue `1`, and Riesz theory makes such eigenspaces
-finite-dimensional.
-
-Terminal result of the library, stated in the manuscript. Nothing else consumes it. -/
+finite-dimensional. -/
 theorem finiteDimensional_solSpace (hK : IsCompactOperator (Op.opK Ω)) :
     FiniteDimensional ℝ (Op.solSpace Ω) := by
   rw [solSpace_eq_eigenspace]

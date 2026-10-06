@@ -14,8 +14,8 @@ public import EllipticPdes.Regularity.Local.WeakSolution
 `caccioppoli_W12` bounds the cutoff-weighted energy of a weak solution in `H¹` by
 `‖f‖² + ‖u‖²`. Its proof tests the equation with `ζ² u`, and that test function is admissible
 for a local weak solution `U ∈ W12 Ω` as well (`cutoffMul_mem_H01_of_mem_W12`), with the
-identity against it supplied by `IsLocalWeakSolution.weakForm`. Nothing else in the proof uses
-the boundary condition, so the statement holds for `W12` solutions with the same constant
+identity against it supplied by `IsLocalWeakSolution.weakForm`. The proof uses no boundary
+condition, so the statement holds for `W12` solutions with the same constant
 (`caccioppoli_core`).
 
 This is the step Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 1 takes in
