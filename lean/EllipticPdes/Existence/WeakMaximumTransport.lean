@@ -303,6 +303,86 @@ theorem integrable_coeff_mul_mul {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : 
   filter_upwards [mulCoeffL_coeFn hf hM p] with x hx
   simp only [Real.inner_apply, hx]
 
+/-- **The transport term against the truncation.** For `V` with coordinates the truncation
+`(u - k)⁺` and its gradient, `⟪bᵢ ∂ᵢu, v⟫` is at least minus the transport bound times
+`‖∂ᵢv‖` times the `L²` norm of the truncation over `Γ_k`: where `∂ᵢu ≠ 0` and `v ≠ 0` the point
+lies in `Γ_k`. -/
+theorem neg_mul_le_inner_bAct_truncation (Op : FullEllipticOp d) {U : H1amb Ω} {k : ℝ}
+    (V : H01 Ω)
+    (hV0 : ((V : H1amb Ω) 0 : EuclideanSpace ℝ (Fin d) → ℝ)
+      =ᵐ[volume.restrict Ω] fun x => max ((U 0 x : ℝ) - k) 0)
+    (hVi : ∀ i : Fin d, ((V : H1amb Ω) i.succ : EuclideanSpace ℝ (Fin d) → ℝ)
+      =ᵐ[volume.restrict Ω] fun x => if k < (U 0 x : ℝ) then (U i.succ x : ℝ) else 0) (i : Fin d) :
+    -(Op.Bsup * (‖(V : H1amb Ω) i.succ‖ * (eLpNorm ((V : H1amb Ω) 0) 2 ((volume.restrict Ω).restrict
+      (truncSupport (fun x => (U 0 x : ℝ)) (fun i x => (U i.succ x : ℝ)) k))).toReal))
+      ≤ ⟪Op.bAct i (U i.succ), (V : H1amb Ω) 0⟫ := by
+  classical
+  set μ : Measure (EuclideanSpace ℝ (Fin d)) := volume.restrict Ω with hμdef
+  set u : EuclideanSpace ℝ (Fin d) → ℝ := fun x => (U 0 x : ℝ) with hudef
+  set g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ := fun i x => (U i.succ x : ℝ) with hgdef
+  have hum : Measurable u := (Lp.stronglyMeasurable (U 0)).measurable
+  have hgm : ∀ i, Measurable (g i) := fun i => (Lp.stronglyMeasurable (U i.succ)).measurable
+  set Γ := truncSupport u g k with hΓdef
+  have hΓ : MeasurableSet Γ := measurableSet_truncSupport hum hgm k
+  set vΓ : EuclideanSpace ℝ (Fin d) → ℝ := Γ.indicator fun x => ((V : H1amb Ω) 0 x : ℝ)
+    with hvΓdef
+  have hvΓm : MemLp vΓ 2 μ := (Lp.memLp _).indicator hΓ
+  have hnormΓ : (eLpNorm vΓ 2 μ).toReal = (eLpNorm ((V : H1amb Ω) 0) 2 (μ.restrict Γ)).toReal := by
+    rw [hvΓdef, eLpNorm_indicator_eq_eLpNorm_restrict hΓ]
+  simp only [FullEllipticOp.bAct, inner_mulCoeffL_eq]
+  -- the classes `|∂ᵢv|` and `|v 1_Γ|`
+  set A : L2D Ω := (Lp.memLp ((V : H1amb Ω) i.succ)).norm.toLp _ with hAdef
+  set B : L2D Ω := hvΓm.norm.toLp _ with hBdef
+  have hA : ‖A‖ = ‖(V : H1amb Ω) i.succ‖ := by
+    rw [hAdef, Lp.norm_toLp, eLpNorm_norm _ (Lp.aestronglyMeasurable _), Lp.norm_def]
+  have hB : ‖B‖ = (eLpNorm ((V : H1amb Ω) 0) 2 (μ.restrict Γ)).toReal := by
+    rw [hBdef, Lp.norm_toLp, eLpNorm_norm _ hvΓm.aestronglyMeasurable, hnormΓ]
+  have hAB : ⟪A, B⟫ = ∫ x, ‖((V : H1amb Ω) i.succ x : ℝ)‖ * ‖vΓ x‖ ∂μ := by
+    rw [hAdef, hBdef, inner_toLp_eq]
+  have hint1 : Integrable (fun x => Op.b x i * (U i.succ x : ℝ) * ((V : H1amb Ω) 0 x : ℝ)) μ :=
+    integrable_coeff_mul_mul (Op.b_meas i) (ae_restrict_of_ae (Op.b_bdd i)) _ _
+  have hint2 : Integrable (fun x => ‖((V : H1amb Ω) i.succ x : ℝ)‖ * ‖vΓ x‖) μ := by
+    refine (MeasureTheory.L2.integrable_inner A B).congr ?_
+    filter_upwards [(Lp.memLp ((V : H1amb Ω) i.succ)).norm.coeFn_toLp, hvΓm.norm.coeFn_toLp]
+      with x hx1 hx2
+    simp only [hAdef, hBdef, Real.inner_apply, hx1, hx2]
+  have hpt : ∀ᵐ x ∂μ, -(Op.Bsup * (‖((V : H1amb Ω) i.succ x : ℝ)‖ * ‖vΓ x‖))
+      ≤ Op.b x i * (U i.succ x : ℝ) * ((V : H1amb Ω) 0 x : ℝ) := by
+    filter_upwards [ae_restrict_of_ae (Op.b_bdd i), hV0, hVi i] with x hbx hx0 hxi
+    have hxi' : ((V : H1amb Ω) i.succ x : ℝ) = if k < u x then g i x else 0 := hxi
+    -- the product `∂ᵢu · v` is `∂ᵢv · (v 1_Γ)`
+    have hprod : (U i.succ x : ℝ) * ((V : H1amb Ω) 0 x : ℝ)
+        = ((V : H1amb Ω) i.succ x : ℝ) * vΓ x := by
+      rw [hxi', hvΓdef, Set.indicator_apply, hx0]
+      by_cases hxk : k < u x
+      · rw [ite_eq_left hxk]
+        by_cases hxΓ : x ∈ Γ
+        · rw [ite_eq_left hxΓ]
+        · have h0 : g i x = 0 := by
+            by_contra hne
+            exact hxΓ ⟨hxk, i, hne⟩
+          rw [ite_eq_right hxΓ]
+          simp only [hgdef] at h0
+          rw [h0, zero_mul, mul_zero]
+      · have hle : u x ≤ k := not_lt.mp hxk
+        rw [ite_eq_right hxk, max_eq_right (by linarith), mul_zero, zero_mul]
+    rw [mul_assoc, hprod, ← mul_assoc]
+    have habs : |Op.b x i * ((V : H1amb Ω) i.succ x : ℝ) * vΓ x|
+        ≤ Op.Bsup * (‖((V : H1amb Ω) i.succ x : ℝ)‖ * ‖vΓ x‖) := by
+      rw [abs_mul, abs_mul, Real.norm_eq_abs, Real.norm_eq_abs, mul_assoc]
+      gcongr
+    linarith [neg_abs_le (Op.b x i * ((V : H1amb Ω) i.succ x : ℝ) * vΓ x)]
+  calc -(Op.Bsup * (‖(V : H1amb Ω) i.succ‖
+          * (eLpNorm ((V : H1amb Ω) 0) 2 (μ.restrict Γ)).toReal))
+      = -(Op.Bsup * ⟪A, B⟫) + -(Op.Bsup * (‖A‖ * ‖B‖ - ⟪A, B⟫)) := by rw [hA, hB]; ring
+    _ ≤ -(Op.Bsup * ⟪A, B⟫) := by
+        have : 0 ≤ ‖A‖ * ‖B‖ - ⟪A, B⟫ := sub_nonneg.mpr (real_inner_le_norm A B)
+        nlinarith [Op.Bsup_nonneg]
+    _ = ∫ x, -(Op.Bsup * (‖((V : H1amb Ω) i.succ x : ℝ)‖ * ‖vΓ x‖)) ∂μ := by
+        rw [hAB, integral_neg, integral_const_mul]
+    _ ≤ ∫ x, Op.b x i * (U i.succ x : ℝ) * ((V : H1amb Ω) 0 x : ℝ) ∂μ :=
+        integral_mono_ae ((hint2.const_mul _).neg) hint1 hpt
+
 /-- **Energy estimate from testing with the truncation.** For a subsolution `U` and an
 element `V` of `H₀¹(Ω)` whose coordinates are the truncation `(u - k)⁺` and its gradient,
 ellipticity times the gradient norm squared of `V` is at most the transport bound times the
@@ -369,63 +449,7 @@ theorem energy_le_transport (Op : FullEllipticOp d)
     simp only [hgdef]
     split_ifs <;> simp
   -- the transport term is bounded below
-  have hbi : ∀ i : Fin d,
-      -(Op.Bsup * (‖(V : H1amb Ω) i.succ‖ * (eLpNorm ((V : H1amb Ω) 0) 2 (μ.restrict Γ)).toReal))
-        ≤ ⟪Op.bAct i (U i.succ), (V : H1amb Ω) 0⟫ := by
-    intro i
-    simp only [FullEllipticOp.bAct, inner_mulCoeffL_eq]
-    -- the classes `|∂ᵢv|` and `|v 1_Γ|`
-    set A : L2D Ω := (Lp.memLp ((V : H1amb Ω) i.succ)).norm.toLp _ with hAdef
-    set B : L2D Ω := hvΓm.norm.toLp _ with hBdef
-    have hA : ‖A‖ = ‖(V : H1amb Ω) i.succ‖ := by
-      rw [hAdef, Lp.norm_toLp, eLpNorm_norm _ (Lp.aestronglyMeasurable _), Lp.norm_def]
-    have hB : ‖B‖ = (eLpNorm ((V : H1amb Ω) 0) 2 (μ.restrict Γ)).toReal := by
-      rw [hBdef, Lp.norm_toLp, eLpNorm_norm _ hvΓm.aestronglyMeasurable, hnormΓ]
-    have hAB : ⟪A, B⟫ = ∫ x, ‖((V : H1amb Ω) i.succ x : ℝ)‖ * ‖vΓ x‖ ∂μ := by
-      rw [hAdef, hBdef, inner_toLp_eq]
-    have hint1 : Integrable (fun x => Op.b x i * (U i.succ x : ℝ) * ((V : H1amb Ω) 0 x : ℝ)) μ :=
-      integrable_coeff_mul_mul (Op.b_meas i) (ae_restrict_of_ae (Op.b_bdd i)) _ _
-    have hint2 : Integrable (fun x => ‖((V : H1amb Ω) i.succ x : ℝ)‖ * ‖vΓ x‖) μ := by
-      refine (MeasureTheory.L2.integrable_inner A B).congr ?_
-      filter_upwards [(Lp.memLp ((V : H1amb Ω) i.succ)).norm.coeFn_toLp, hvΓm.norm.coeFn_toLp]
-        with x hx1 hx2
-      simp only [hAdef, hBdef, Real.inner_apply, hx1, hx2]
-    have hpt : ∀ᵐ x ∂μ, -(Op.Bsup * (‖((V : H1amb Ω) i.succ x : ℝ)‖ * ‖vΓ x‖))
-        ≤ Op.b x i * (U i.succ x : ℝ) * ((V : H1amb Ω) 0 x : ℝ) := by
-      filter_upwards [ae_restrict_of_ae (Op.b_bdd i), hV0, hVi i] with x hbx hx0 hxi
-      have hxi' : ((V : H1amb Ω) i.succ x : ℝ) = if k < u x then g i x else 0 := hxi
-      -- the product `∂ᵢu · v` is `∂ᵢv · (v 1_Γ)`
-      have hprod : (U i.succ x : ℝ) * ((V : H1amb Ω) 0 x : ℝ)
-          = ((V : H1amb Ω) i.succ x : ℝ) * vΓ x := by
-        rw [hxi', hvΓdef, Set.indicator_apply, hx0]
-        by_cases hxk : k < u x
-        · rw [ite_eq_left hxk]
-          by_cases hxΓ : x ∈ Γ
-          · rw [ite_eq_left hxΓ]
-          · have h0 : g i x = 0 := by
-              by_contra hne
-              exact hxΓ ⟨hxk, i, hne⟩
-            rw [ite_eq_right hxΓ]
-            simp only [hgdef] at h0
-            rw [h0, zero_mul, mul_zero]
-        · have hle : u x ≤ k := not_lt.mp hxk
-          rw [ite_eq_right hxk, max_eq_right (by linarith), mul_zero, zero_mul]
-      rw [mul_assoc, hprod, ← mul_assoc]
-      have habs : |Op.b x i * ((V : H1amb Ω) i.succ x : ℝ) * vΓ x|
-          ≤ Op.Bsup * (‖((V : H1amb Ω) i.succ x : ℝ)‖ * ‖vΓ x‖) := by
-        rw [abs_mul, abs_mul, Real.norm_eq_abs, Real.norm_eq_abs, mul_assoc]
-        gcongr
-      linarith [neg_abs_le (Op.b x i * ((V : H1amb Ω) i.succ x : ℝ) * vΓ x)]
-    calc -(Op.Bsup * (‖(V : H1amb Ω) i.succ‖
-            * (eLpNorm ((V : H1amb Ω) 0) 2 (μ.restrict Γ)).toReal))
-        = -(Op.Bsup * ⟪A, B⟫) + -(Op.Bsup * (‖A‖ * ‖B‖ - ⟪A, B⟫)) := by rw [hA, hB]; ring
-      _ ≤ -(Op.Bsup * ⟪A, B⟫) := by
-          have : 0 ≤ ‖A‖ * ‖B‖ - ⟪A, B⟫ := sub_nonneg.mpr (real_inner_le_norm A B)
-          nlinarith [Op.Bsup_nonneg]
-      _ = ∫ x, -(Op.Bsup * (‖((V : H1amb Ω) i.succ x : ℝ)‖ * ‖vΓ x‖)) ∂μ := by
-          rw [hAB, integral_neg, integral_const_mul]
-      _ ≤ ∫ x, Op.b x i * (U i.succ x : ℝ) * ((V : H1amb Ω) 0 x : ℝ) ∂μ :=
-          integral_mono_ae ((hint2.const_mul _).neg) hint1 hpt
+  have hbi := neg_mul_le_inner_bAct_truncation (U := U) Op V hV0 hVi
   have hbsum : -(Op.Bsup * (∑ i : Fin d, ‖(V : H1amb Ω) i.succ‖)
         * (eLpNorm ((V : H1amb Ω) 0) 2 (μ.restrict Γ)).toReal)
       ≤ ∑ i, ⟪Op.bAct i (U i.succ), (V : H1amb Ω) 0⟫ := by
