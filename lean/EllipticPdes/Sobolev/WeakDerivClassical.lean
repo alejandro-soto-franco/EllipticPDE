@@ -80,6 +80,15 @@ theorem smul_indicator_eq_of_tsupport_subset {K : Set E} {ψ : E → ℝ} (hψ :
   · rw [indicator_of_mem ht]
   · rw [image_eq_zero_of_notMem_tsupport fun h => ht (hψ h), zero_smul, zero_smul]
 
+omit [CompleteSpace F] in
+/-- The normed bump reflected through `y` is supported in the closed ball of radius `rOut`
+around `y`. -/
+theorem tsupport_normed_sub_subset (ρ : ContDiffBump (0 : E)) (y : E) :
+    tsupport (fun t => ρ.normed μ (y - t)) ⊆ closedBall y ρ.rOut := by
+  refine closure_minimal (fun t ht => ?_) isClosed_closedBall
+  have : y - t ∈ ball (0 : E) ρ.rOut := ρ.support_normed_eq (μ := μ) ▸ ht
+  simpa [dist_comm, dist_eq_norm] using (mem_ball_zero_iff.1 this).le
+
 variable {Ω : Opens E} {u : E → F} {G : E → E →L[ℝ] F}
 
 omit [CompleteSpace F] in
@@ -103,10 +112,7 @@ theorem HasWeakFDerivOn.hasFDerivAt_convolution (hw : HasWeakFDerivOn Ω u G μ)
   -- The bump reflected through `y`, a test function on `Ω`.
   set ψ : E → ℝ := fun t => ρ.normed μ (y - t) with hψ_def
   have hψ : ContDiff ℝ (⊤ : ℕ∞) ψ := (hρd ⊤).comp (contDiff_const.sub contDiff_id)
-  have hψs : tsupport ψ ⊆ K := by
-    refine (closure_minimal (fun t ht => ?_) isClosed_closedBall).trans hy
-    have : y - t ∈ ball (0 : E) ρ.rOut := ρ.support_normed_eq (μ := μ) ▸ ht
-    simpa [dist_comm, dist_eq_norm] using (mem_ball_zero_iff.1 this).le
+  have hψs : tsupport ψ ⊆ K := (tsupport_normed_sub_subset ρ y).trans hy
   have hψc : HasCompactSupport ψ := hK.of_isClosed_subset (isClosed_tsupport ψ) hψs
   have hψd : ∀ t v, fderiv ℝ ψ t v = -fderiv ℝ (ρ.normed μ) (y - t) v := fun t v => by
     have h : HasFDerivAt ψ ((fderiv ℝ (ρ.normed μ) (y - t)).comp (-ContinuousLinearMap.id ℝ E))

@@ -125,59 +125,27 @@ private theorem integrable_grad_norm_sq (hf : ContDiff ℝ 1 f) (hfc : HasCompac
   · exact ((hfc.fderiv ℝ).norm.comp_left (g := fun r : ℝ => r ^ 2) (by simp))
 
 /-- The integrand `(x, t) ↦ ((fderiv ℝ f (x + t • h)) h) ^ 2` is integrable for the
-product of Lebesgue measure with the unit-interval slice. -/
+product of `μ` with the unit-interval slice: it is continuous, and for `t ∈ (0, 1]` it vanishes
+off a compact slab. -/
 private theorem integrable_uncurry_segment (hf : ContDiff ℝ 1 f)
     (hfc : HasCompactSupport f) (h : E) :
-    Integrable (Function.uncurry fun (x : E) (t : ℝ) =>
-        ((fderiv ℝ f (x + t • h)) h) ^ 2)
+    Integrable (Function.uncurry fun (x : E) (t : ℝ) => ((fderiv ℝ f (x + t • h)) h) ^ 2)
       (μ.prod (volume.restrict (Ioc (0 : ℝ) 1))) := by
-  set g : E × ℝ → ℝ :=
-    Function.uncurry fun (x : E) (t : ℝ) =>
-      ((fderiv ℝ f (x + t • h)) h) ^ 2 with hg
-  set ρ : Measure (E × ℝ) :=
-    μ.prod (volume.restrict (Ioc (0 : ℝ) 1)) with hρ
-  have hcont : Continuous g := continuous_uncurry_segment hf h
   obtain ⟨R, hR⟩ := (hfc.fderiv ℝ).isCompact.isBounded.subset_closedBall 0
-  set C : Set (E × ℝ) := closedBall 0 (R + ‖h‖) ×ˢ Icc 0 1 with hC
-  have hCcomp : IsCompact C := (isCompact_closedBall _ _).prod isCompact_Icc
-  -- Integrable on the compact slab `C`.
-  have hIntOn : IntegrableOn g C ρ := hcont.locallyIntegrable.integrableOn_isCompact hCcomp
-  -- `g` vanishes off `C` on the support of `ρ` (where `t ∈ Ioc 0 1`).
-  have hzero : ∀ p : E × ℝ, p.2 ∈ Ioc (0 : ℝ) 1 → p ∉ C → g p = 0 := by
-    rintro ⟨x, t⟩ ht hpC
-    have hxball : x ∉ closedBall (0 : E) (R + ‖h‖) := by
-      intro hx; exact hpC ⟨hx, ⟨le_of_lt ht.1, ht.2⟩⟩
-    have hxt : x + t • h ∉ tsupport (fderiv ℝ f) := by
-      intro hmem
-      apply hxball
-      have hxK : ‖x + t • h‖ ≤ R := by simpa [mem_closedBall, dist_eq_norm] using hR hmem
-      have htnorm : ‖t • h‖ ≤ ‖h‖ := by
-        rw [norm_smul]
-        have htle : ‖t‖ ≤ 1 := by rw [Real.norm_eq_abs, abs_of_pos ht.1]; exact ht.2
-        nlinarith [norm_nonneg h, htle]
-      have hxle : ‖x‖ ≤ R + ‖h‖ := by
-        calc ‖x‖ = ‖(x + t • h) - t • h‖ := by congr 1; abel
-          _ ≤ ‖x + t • h‖ + ‖t • h‖ := norm_sub_le _ _
-          _ ≤ R + ‖h‖ := by linarith
-      simpa [mem_closedBall, dist_eq_norm] using hxle
-    simp only [hg, Function.uncurry_apply_pair,
-      image_eq_zero_of_notMem_tsupport hxt, _root_.zero_apply]
-    norm_num
-  -- Almost everywhere `t ∈ Ioc 0 1`, so `g =ᵐ[ρ] C.indicator g`.
-  have htioc : ∀ᵐ p ∂ρ, p.2 ∈ Ioc (0 : ℝ) 1 := by
-    have hnull : ρ {p : E × ℝ | p.2 ∉ Ioc (0 : ℝ) 1} = 0 := by
-      have hset : {p : E × ℝ | p.2 ∉ Ioc (0 : ℝ) 1}
-          = univ ×ˢ (Ioc (0 : ℝ) 1)ᶜ := by ext p; simp
-      rw [hset, hρ, Measure.prod_prod, Measure.restrict_apply' measurableSet_Ioc,
-        compl_inter_self, measure_empty, mul_zero]
-    rw [ae_iff]; exact hnull
-  have hae : g =ᵐ[ρ] C.indicator g := by
-    filter_upwards [htioc] with p hp
-    by_cases hpC : p ∈ C
-    · rw [indicator_of_mem hpC]
-    · rw [indicator_of_notMem hpC, hzero p hp hpC]
-  rw [integrable_congr hae]
-  exact (integrable_indicator_iff hCcomp.measurableSet).mpr hIntOn
+  have hC : IsCompact (closedBall (0 : E) (R + ‖h‖) ×ˢ Icc (0 : ℝ) 1) :=
+    (isCompact_closedBall _ _).prod isCompact_Icc
+  rw [← Measure.restrict_univ (μ := μ), Measure.prod_restrict, ← IntegrableOn]
+  refine ((continuous_uncurry_segment hf h).locallyIntegrable.integrableOn_isCompact
+    hC).of_forall_sdiff_eq_zero (MeasurableSet.univ.prod measurableSet_Ioc) ?_
+  rintro ⟨x, t⟩ ⟨⟨-, ht⟩, hxC⟩
+  have hx : x + t • h ∉ tsupport (fderiv ℝ f) := fun hmem => hxC ⟨by
+    have h1 : ‖x + t • h‖ ≤ R := by simpa using hR hmem
+    have h2 : ‖t • h‖ ≤ ‖h‖ := by
+      rw [norm_smul, Real.norm_of_nonneg ht.1.le]
+      exact mul_le_of_le_one_left (norm_nonneg h) ht.2
+    rw [mem_closedBall_zero_iff, ← add_sub_cancel_right x (t • h)]
+    exact (norm_sub_le _ _).trans (add_le_add h1 h2), Ioc_subset_Icc_self ht⟩
+  simp [image_eq_zero_of_notMem_tsupport hx]
 
 /-- **`L²` translation estimate along a direction.** For a continuously differentiable,
 compactly supported `f` on a finite-dimensional space with an additive Haar measure,
