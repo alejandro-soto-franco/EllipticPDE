@@ -255,6 +255,66 @@ private theorem inner_t_bound (hd : 0 < d) {D w : ℝ} (hD : 0 < D) (hw : 0 < w)
   congr 1
   rw [ha_def, zpow_neg, zpow_natCast, div_pow, inv_div, div_div, mul_comm (w ^ d) (d : ℝ)]
 
+/-- **Measurability of the indicator of a growing family of balls.** For measurable `h`, the map
+`(t, z) ↦ (ball x (D t)).indicator h z` is measurable on `ℝ × E`. -/
+private theorem measurable_indicator_ball_family {X : Type*} [PseudoMetricSpace X]
+    [MeasurableSpace X] [OpensMeasurableSpace X] [SecondCountableTopology X] {h : X → ℝ≥0∞}
+    (hh : Measurable h) (x : X) (D : ℝ) :
+    Measurable (fun p : ℝ × X => (ball x (D * p.1)).indicator h p.2) := by
+  have hrw : (fun p : ℝ × X => (ball x (D * p.1)).indicator h p.2)
+      = {q : ℝ × X | dist q.2 x < D * q.1}.indicator (fun q => h q.2) := by
+    funext p
+    by_cases hc : dist p.2 x < D * p.1
+    · rw [Set.indicator_of_mem (show p.2 ∈ ball x (D * p.1) from mem_ball.mpr hc) h,
+        Set.indicator_of_mem (show p ∈ {q : ℝ × X | dist q.2 x < D * q.1} from hc)]
+    · rw [Set.indicator_of_notMem
+          (show p.2 ∉ ball x (D * p.1) from fun hm => hc (mem_ball.mp hm)) h,
+        Set.indicator_of_notMem (show p ∉ {q : ℝ × X | dist q.2 x < D * q.1} from hc)]
+  rw [hrw]
+  exact (hh.comp measurable_snd).indicator
+    (measurableSet_lt (by fun_prop) (by fun_prop))
+
+/-- **The per-point scale integral.** For a point `z` at distance `w > 0` from `x`, integrating the
+singular kernel against the indicator of the growing balls `ball x (D t)` at `z` gives `f z` times
+the Riesz weight `D^d / (d w^d)`. -/
+private theorem lintegral_scale_indicator_le (hd : 0 < d) {D : ℝ} (hD : 0 < D)
+    {x z : EuclideanSpace ℝ (Fin d)} (hzx : z ≠ x) (f : EuclideanSpace ℝ (Fin d) → ℝ≥0∞) :
+    ∫⁻ t in Ioc (0 : ℝ) 1, ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) * (ball x (D * t)).indicator f z
+      ≤ f z * ENNReal.ofReal (D ^ d / (d * ‖z - x‖ ^ d)) := by
+  have hw : 0 < ‖z - x‖ := norm_pos_iff.mpr (sub_ne_zero.mpr hzx)
+  have hzpow_meas : Measurable (fun t : ℝ => t ^ (-((d : ℤ) + 1))) := by
+    have hrw : (fun t : ℝ => t ^ (-((d : ℤ) + 1))) = fun t : ℝ => (t ^ (d + 1))⁻¹ := by
+      funext t
+      rw [zpow_neg, show ((d : ℤ) + 1) = ((d + 1 : ℕ) : ℤ) by push_cast; ring, zpow_natCast]
+    rw [hrw]; exact (measurable_id.pow_const (d + 1)).inv
+  have hstep : ∀ t : ℝ, ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) * (ball x (D * t)).indicator f z
+      = f z * {p : ℝ | ‖z - x‖ < D * p}.indicator
+          (fun p => ENNReal.ofReal (p ^ (-((d : ℤ) + 1)))) t := fun t => by
+    by_cases hc : ‖z - x‖ < D * t
+    · rw [Set.indicator_of_mem (by rw [mem_ball, dist_eq_norm]; exact hc) f,
+        Set.indicator_of_mem (show t ∈ {p : ℝ | ‖z - x‖ < D * p} from hc), mul_comm]
+    · rw [Set.indicator_of_notMem (by rw [mem_ball, dist_eq_norm]; exact hc) f,
+        Set.indicator_of_notMem (show t ∉ {p : ℝ | ‖z - x‖ < D * p} from hc), mul_zero, mul_zero]
+  rw [setLIntegral_congr_fun measurableSet_Ioc (fun t _ => hstep t)]
+  refine (le_of_eq (lintegral_const_mul _
+    ((ENNReal.continuous_ofReal.measurable.comp hzpow_meas).indicator
+      (measurableSet_lt measurable_const (by fun_prop))))).trans ?_
+  exact mul_le_mul' le_rfl (inner_t_bound hd hD hw)
+
+/-- The Riesz weight, written with the extended-real norms of the gradient and of `z - x`. -/
+private theorem enorm_mul_riesz_weight (hd : 0 < d) {D N w : ℝ} (hD : 0 < D) (hN : 0 ≤ N)
+    (hw : 0 < w) :
+    ENNReal.ofReal N * ENNReal.ofReal w * ENNReal.ofReal (D ^ d / (d * w ^ d))
+      = ENNReal.ofReal (D ^ d / d) * (ENNReal.ofReal N / ENNReal.ofReal w ^ (d - 1)) := by
+  have hd1 : d - 1 + 1 = d := Nat.succ_pred_eq_of_pos hd
+  have hreal : N * w * (D ^ d / (d * w ^ d)) = D ^ d / d * (N / w ^ (d - 1)) := by
+    rw [show w ^ d = w ^ (d - 1) * w from by rw [← pow_succ, hd1]]
+    field_simp
+  have hdR : (0 : ℝ) < d := by exact_mod_cast hd
+  rw [← ENNReal.ofReal_mul hN, ← ENNReal.ofReal_mul (mul_nonneg hN hw.le), hreal,
+    ← ENNReal.ofReal_pow hw.le, ← ENNReal.ofReal_div_of_pos (pow_pos hw _),
+    ← ENNReal.ofReal_mul (div_nonneg (pow_nonneg hD.le _) hdR.le)]
+
 /-- **Morrey kernel bound (convex form).** The double gradient line integral over a bounded
 convex measurable set `W` containing the base point `x` is controlled by the Riesz potential of
 the gradient, with a dimensional factor `D^d/d`, where `D` is any radius with `W ⊆ ball x D`.
@@ -281,8 +341,7 @@ theorem kernel_bound_convex {φ : EuclideanSpace ℝ (Fin d) → ℝ}
     intro t ht z hz
     obtain ⟨y, hy, rfl⟩ := hz
     refine ⟨?_, ?_⟩
-    · have hcombo := hWconv hxW hy (by linarith [ht.2] : (0 : ℝ) ≤ 1 - t)
-        ht.1.le (by ring)
+    · have hcombo := hWconv hxW hy (by linarith [ht.2] : (0 : ℝ) ≤ 1 - t) ht.1.le (by ring)
       have : (1 - t) • x + t • y = x + t • (y - x) := by rw [sub_smul, one_smul, smul_sub]; abel
       rwa [this] at hcombo
     · rw [mem_ball, dist_eq_norm, add_sub_cancel_left]
@@ -302,14 +361,13 @@ theorem kernel_bound_convex {φ : EuclideanSpace ℝ (Fin d) → ℝ}
   have hbound : ∀ t ∈ Ioc (0 : ℝ) 1,
       ∫⁻ y in W, ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂volume
         ≤ ∫⁻ z in W,
-            ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) * (ball x (D * t)).indicator h z ∂volume := by
-    intro t ht
+            ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) * (ball x (D * t)).indicator h z ∂volume :=
+    fun t ht => by
     rw [potential_inner_cov hφ x ht.1 hWmeas,
       lintegral_const_mul _ (hhmeas.indicator (measurableSet_ball))]
     refine mul_le_mul' le_rfl ?_
     calc ∫⁻ z in (fun y => x + t • (y - x)) '' W, h z ∂volume
-        ≤ ∫⁻ z in W ∩ ball x (D * t), h z ∂volume :=
-          lintegral_mono_set (hregion t ht)
+        ≤ ∫⁻ z in W ∩ ball x (D * t), h z ∂volume := lintegral_mono_set (hregion t ht)
       _ = ∫⁻ z in W, (ball x (D * t)).indicator h z ∂volume := by
           rw [← lintegral_indicator (hWmeas.inter measurableSet_ball), ← lintegral_indicator hWmeas,
             Set.indicator_indicator]
@@ -322,63 +380,19 @@ theorem kernel_bound_convex {φ : EuclideanSpace ℝ (Fin d) → ℝ}
   have hper : ∀ z : EuclideanSpace ℝ (Fin d),
       ∫⁻ t in Ioc (0 : ℝ) 1,
           ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) * (ball x (D * t)).indicator h z ∂volume
-        ≤ ENNReal.ofReal (D ^ d / d) * (‖fderiv ℝ φ z‖ₑ / ‖z - x‖ₑ ^ (d - 1)) := by
-    intro z
+        ≤ ENNReal.ofReal (D ^ d / d) * (‖fderiv ℝ φ z‖ₑ / ‖z - x‖ₑ ^ (d - 1)) := fun z => by
     by_cases hzx : z = x
     · subst hzx
-      have h0 : h z = 0 := by rw [hh_def]; simp
-      have hzero : ∀ t : ℝ,
-          ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) * (ball z (D * t)).indicator h z = 0 := by
-        intro t; simp [h0]
-      calc ∫⁻ t in Ioc (0 : ℝ) 1,
-              ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) * (ball z (D * t)).indicator h z ∂volume
-          = ∫⁻ _t in Ioc (0 : ℝ) 1, (0 : ℝ≥0∞) ∂volume :=
-            setLIntegral_congr_fun measurableSet_Ioc (fun t _ => hzero t)
-        _ = 0 := by simp
-        _ ≤ _ := bot_le
-    · have hw : 0 < ‖z - x‖ := by rw [norm_pos_iff]; exact sub_ne_zero.mpr hzx
-      have hd1 : d - 1 + 1 = d := Nat.succ_pred_eq_of_pos hd
-      have hwe : ‖z - x‖ₑ = ENNReal.ofReal ‖z - x‖ := (ofReal_norm (z - x)).symm
-      have hNe : ‖fderiv ℝ φ z‖ₑ = ENNReal.ofReal ‖fderiv ℝ φ z‖ := (ofReal_norm _).symm
-      have hne : ‖z - x‖ ^ (d - 1) ≠ 0 := by positivity
-      have hreal : ‖fderiv ℝ φ z‖ * ‖z - x‖ * (D ^ d / (d * ‖z - x‖ ^ d))
-          = D ^ d / d * (‖fderiv ℝ φ z‖ / ‖z - x‖ ^ (d - 1)) := by
-        rw [show ‖z - x‖ ^ d = ‖z - x‖ ^ (d - 1) * ‖z - x‖ from by rw [← pow_succ, hd1]]
-        field_simp
-      have hL : h z * ENNReal.ofReal (D ^ d / (d * ‖z - x‖ ^ d))
-          = ENNReal.ofReal (‖fderiv ℝ φ z‖ * ‖z - x‖ * (D ^ d / (d * ‖z - x‖ ^ d))) := by
-        simp only [hh_def]
-        rw [hwe, hNe, ← ENNReal.ofReal_mul (norm_nonneg _), ← ENNReal.ofReal_mul (by positivity)]
-      have hR : ENNReal.ofReal (D ^ d / d) * (‖fderiv ℝ φ z‖ₑ / ‖z - x‖ₑ ^ (d - 1))
-          = ENNReal.ofReal (D ^ d / d * (‖fderiv ℝ φ z‖ / ‖z - x‖ ^ (d - 1))) := by
-        rw [hNe, hwe, ← ENNReal.ofReal_pow (norm_nonneg _),
-          ← ENNReal.ofReal_div_of_pos (by positivity), ← ENNReal.ofReal_mul (by positivity)]
-      have hzeq : h z * ENNReal.ofReal (D ^ d / (d * ‖z - x‖ ^ d))
-          = ENNReal.ofReal (D ^ d / d) * (‖fderiv ℝ φ z‖ₑ / ‖z - x‖ₑ ^ (d - 1)) := by
-        rw [hL, hR, hreal]
-      have hstep1 : ∀ t : ℝ,
-          ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) * (ball x (D * t)).indicator h z
-            = h z * {p : ℝ | ‖z - x‖ < D * p}.indicator
-                (fun p => ENNReal.ofReal (p ^ (-((d : ℤ) + 1)))) t := by
-        intro t
-        by_cases hc : ‖z - x‖ < D * t
-        · rw [Set.indicator_of_mem (by rw [mem_ball, dist_eq_norm]; exact hc) h,
-            Set.indicator_of_mem (show t ∈ {p : ℝ | ‖z - x‖ < D * p} from hc), mul_comm]
-        · rw [Set.indicator_of_notMem (by rw [mem_ball, dist_eq_norm]; exact hc) h,
-            Set.indicator_of_notMem (show t ∉ {p : ℝ | ‖z - x‖ < D * p} from hc),
-            mul_zero, mul_zero]
-      calc ∫⁻ t in Ioc (0 : ℝ) 1,
-              ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) * (ball x (D * t)).indicator h z ∂volume
-          = ∫⁻ t in Ioc (0 : ℝ) 1, h z * {p : ℝ | ‖z - x‖ < D * p}.indicator
-              (fun p => ENNReal.ofReal (p ^ (-((d : ℤ) + 1)))) t ∂volume :=
-            setLIntegral_congr_fun measurableSet_Ioc (fun t _ => hstep1 t)
-        _ = h z * ∫⁻ t in Ioc (0 : ℝ) 1, {p : ℝ | ‖z - x‖ < D * p}.indicator
-              (fun p => ENNReal.ofReal (p ^ (-((d : ℤ) + 1)))) t ∂volume :=
-            lintegral_const_mul _ ((ENNReal.continuous_ofReal.measurable.comp hzpow_meas).indicator
-              (measurableSet_lt measurable_const (by fun_prop)))
-        _ ≤ h z * ENNReal.ofReal (D ^ d / (d * ‖z - x‖ ^ d)) :=
-            mul_le_mul' le_rfl (inner_t_bound hd hD hw)
-        _ = _ := hzeq
+      have h0 : h z = 0 := by simp [hh_def]
+      refine le_trans (le_of_eq ?_) bot_le
+      refine (setLIntegral_congr_fun measurableSet_Ioc (fun t _ => ?_)).trans
+        (lintegral_zero_fun (μ := volume.restrict (Ioc (0 : ℝ) 1)))
+      simp [h0]
+    · refine (lintegral_scale_indicator_le hd hD hzx h).trans (le_of_eq ?_)
+      have hw : 0 < ‖z - x‖ := norm_pos_iff.mpr (sub_ne_zero.mpr hzx)
+      have := enorm_mul_riesz_weight hd hD (norm_nonneg (fderiv ℝ φ z)) hw
+      simp only [hh_def, ofReal_norm] at this ⊢
+      exact this
   calc ∫⁻ t in Ioc (0 : ℝ) 1, ∫⁻ y in W,
           ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂volume ∂volume
       ≤ ∫⁻ t in Ioc (0 : ℝ) 1, ∫⁻ z in W,
@@ -395,33 +409,15 @@ theorem kernel_bound_convex {φ : EuclideanSpace ℝ (Fin d) → ℝ}
         apply Measurable.aemeasurable
         apply Measurable.fun_mul
         · exact (ENNReal.continuous_ofReal.measurable.comp hzpow_meas).comp measurable_fst
-        · have hrw : (fun p : ℝ × EuclideanSpace ℝ (Fin d) =>
-              (ball x (D * p.1)).indicator h p.2)
-              = {q : ℝ × EuclideanSpace ℝ (Fin d) | dist q.2 x < D * q.1}.indicator
-                (fun q => h q.2) := by
-            funext p
-            by_cases hc : dist p.2 x < D * p.1
-            · rw [Set.indicator_of_mem (show p.2 ∈ ball x (D * p.1) from mem_ball.mpr hc) h,
-                Set.indicator_of_mem
-                  (show p ∈ {q : ℝ × EuclideanSpace ℝ (Fin d) | dist q.2 x < D * q.1} from hc)]
-            · rw [Set.indicator_of_notMem
-                  (show p.2 ∉ ball x (D * p.1) from fun hm => hc (mem_ball.mp hm)) h,
-                Set.indicator_of_notMem
-                  (show p ∉ {q : ℝ × EuclideanSpace ℝ (Fin d) | dist q.2 x < D * q.1} from hc)]
-          rw [hrw]
-          exact (hhmeas.comp measurable_snd).indicator
-            (measurableSet_lt (by fun_prop) (by fun_prop))
+        · exact measurable_indicator_ball_family hhmeas x D
     -- Step 4: per-point Riesz bound and reassembly.
     _ ≤ ∫⁻ z in W,
           ENNReal.ofReal (D ^ d / d) * (‖fderiv ℝ φ z‖ₑ / ‖z - x‖ₑ ^ (d - 1)) ∂volume :=
         setLIntegral_mono' hWmeas (fun z _ => hper z)
     _ = ENNReal.ofReal (D ^ d / d)
-          * ∫⁻ z in W, ‖fderiv ℝ φ z‖ₑ / ‖z - x‖ₑ ^ (d - 1) ∂volume := by
-        have hg : Measurable (fun z : EuclideanSpace ℝ (Fin d) =>
-            ‖fderiv ℝ φ z‖ₑ / ‖z - x‖ₑ ^ (d - 1)) :=
-          (hfd.enorm.measurable).div
-            (((continuous_id.sub continuous_const).enorm).measurable.pow_const _)
-        rw [lintegral_const_mul _ hg]
+          * ∫⁻ z in W, ‖fderiv ℝ φ z‖ₑ / ‖z - x‖ₑ ^ (d - 1) ∂volume :=
+        lintegral_const_mul _ ((hfd.enorm.measurable).div
+          (((continuous_id.sub continuous_const).enorm).measurable.pow_const _))
 
 /-- **Integrability of the Riesz potential.** For smooth `φ` and `x` in the ball, the singular
 integrand `‖∇φ‖ / dist x ·^{d-1}` is integrable on the ball: the singularity `dist x ·^{-(d-1)}`
