@@ -360,8 +360,8 @@ theorem tendsto_eLpNorm_convolution_sub {p : ℝ} (hp : 1 ≤ p)
 
 /-- **The standard shrinking mollifiers.** The bump of outer radius `δ / (n + 1)` and inner
 radius half of it. -/
-def stdBump {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] (δ : ℝ)
-    (hδ : 0 < δ) (n : ℕ) : ContDiffBump (0 : E) where
+def stdBump {E : Type*} [NormedAddCommGroup E] (δ : ℝ) (hδ : 0 < δ) (n : ℕ) :
+    ContDiffBump (0 : E) where
   rIn := δ / (n + 1) / 2
   rOut := δ / (n + 1)
   rIn_pos := half_pos (by positivity)

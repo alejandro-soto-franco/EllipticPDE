@@ -83,9 +83,11 @@ def sobolevConstOfLe (Ω : Set (EuclideanSpace ℝ (Fin d))) (q : ℝ≥0) : ℝ
 
 /-! ### The estimate on a test function -/
 
-/-- A function supported in `Ω` has the same `Lᵖ` seminorm over `Ω` as over the whole space. -/
-lemma eLpNorm_restrict_eq_of_tsupport_subset (hΩm : MeasurableSet Ω)
-    {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : tsupport f ⊆ Ω) (p : ℝ≥0∞) :
+/-- A function supported in `Ω` has the same `Lᵖ` seminorm over `Ω` as over the whole space,
+for functions into any normed group. -/
+lemma eLpNorm_restrict_eq_of_tsupport_subset (hΩm : MeasurableSet Ω) {F : Type*}
+    [NormedAddCommGroup F] {f : EuclideanSpace ℝ (Fin d) → F} (hf : tsupport f ⊆ Ω)
+    (p : ℝ≥0∞) :
     eLpNorm f p (volume.restrict Ω) = eLpNorm f p volume := by
   rw [← eLpNorm_indicator_eq_eLpNorm_restrict hΩm]
   refine eLpNorm_congr_ae (EventuallyEq.of_eq (funext fun x => ?_))
@@ -167,12 +169,7 @@ theorem eLpNorm_testGraph_le_of_isBounded (hΩm : MeasurableSet Ω)
 /-! ### The transfer to `H₀¹(Ω)` -/
 
 /-- Each coordinate of the graph is bounded by the ambient `H¹` norm. -/
-lemma norm_apply_le (U : H1amb Ω) (j : Fin (d + 1)) : ‖U j‖ ≤ ‖U‖ := by
-  rw [← Real.sqrt_sq (norm_nonneg (U j)), ← Real.sqrt_sq (norm_nonneg U)]
-  apply Real.sqrt_le_sqrt
-  rw [PiLp.norm_sq_eq_of_L2 (fun _ : Fin (d + 1) => L2D Ω) U]
-  exact Finset.single_le_sum (f := fun i : Fin (d + 1) => ‖U i‖ ^ 2)
-    (fun _ _ => sq_nonneg _) (Finset.mem_univ j)
+lemma norm_apply_le (U : H1amb Ω) (j : Fin (d + 1)) : ‖U j‖ ≤ ‖U‖ := PiLp.norm_apply_le U j
 
 /-- **Transfer principle.** An estimate of the function coordinate by the gradient
 coordinates, valid on every test graph, is valid on all of `H₀¹(Ω)`.
