@@ -48,38 +48,13 @@ theorem HasWeakDerivOn.restrict (hWm : MeasurableSet W) (hVm : MeasurableSet V) 
     HasWeakDerivOn V ℓ (restrictL2 (Ω := V) (extendL2 hWm g))
       (restrictL2 (Ω := V) (extendL2 hWm g')) := by
   intro φ hφc hφcs hφV
-  -- The `V`-restriction of the whole-space extension agrees with the class itself on `V`.
-  have hres : ∀ p : L2D W,
-      (restrictL2 (Ω := V) (extendL2 hWm p) : EuclideanSpace ℝ (Fin d) → ℝ)
-        =ᵐ[volume.restrict V] (p : EuclideanSpace ℝ (Fin d) → ℝ) := by
-    intro p
-    filter_upwards [coeFn_restrictL2 (Ω := V) (extendL2 hWm p),
-      ae_restrict_of_ae (coeFn_extendL2 hWm p), ae_restrict_mem hVm] with x h1 h2 h3
-    rw [h1, h2, Set.indicator_of_mem (hVW h3)]
-  -- An integrand vanishing off `V` sees the same integral over `W` and over `V`.
-  have hshrink : ∀ F : EuclideanSpace ℝ (Fin d) → ℝ, (∀ x, x ∉ V → F x = 0) →
-      ∫ x in W, F x = ∫ x in V, F x := by
-    intro F hF
-    rw [setIntegral_eq_integral_of_forall_compl_eq_zero
-        (fun x hx => hF x (fun hc => hx (hVW hc))),
-      setIntegral_eq_integral_of_forall_compl_eq_zero hF]
-  have e1 : (∫ x in V, (restrictL2 (Ω := V) (extendL2 hWm g) x : ℝ) * partialD ℓ φ x)
-      = ∫ x in W, (g x : ℝ) * partialD ℓ φ x := by
-    rw [hshrink _ (fun x hx => by
-      rw [show partialD ℓ φ x = 0 from image_eq_zero_of_notMem_tsupport
-        (fun hc => hx (hφV (tsupport_partialD_subset ℓ φ hc))), mul_zero])]
-    refine integral_congr_ae ?_
-    filter_upwards [hres g] with x hx
-    rw [hx]
-  have e2 : (∫ x in V, (restrictL2 (Ω := V) (extendL2 hWm g') x : ℝ) * φ x)
-      = ∫ x in W, (g' x : ℝ) * φ x := by
-    rw [hshrink _ (fun x hx => by
-      rw [show φ x = 0 from image_eq_zero_of_notMem_tsupport (fun hc => hx (hφV hc)),
-        mul_zero])]
-    refine integral_congr_ae ?_
-    filter_upwards [hres g'] with x hx
-    rw [hx]
-  rw [e1, e2]
+  have e1 := setIntegral_mul_restrictL2_extendL2 hWm hVm hVW g (fun _ => 1) (partialD ℓ φ)
+    fun x hx => image_eq_zero_of_notMem_tsupport
+      fun hc => hx (hφV (tsupport_partialD_subset ℓ φ hc))
+  have e2 := setIntegral_mul_restrictL2_extendL2 hWm hVm hVW g' (fun _ => 1) φ
+    fun x hx => image_eq_zero_of_notMem_tsupport fun hc => hx (hφV hc)
+  simp only [one_mul] at e1 e2
+  rw [← e1, ← e2]
   exact h φ hφc hφcs (hφV.trans hVW)
 
 /-- The order-`k` family on a smaller region, entry by entry. -/

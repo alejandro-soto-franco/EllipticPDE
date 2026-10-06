@@ -96,6 +96,37 @@ theorem restrictL2_extendL2_mulTest_eq_of_eqOn (hΩm : MeasurableSet Ω)
   rw [h1', h2', h3, h4, Set.indicator_of_mem (hVΩ hxV), Set.indicator_of_mem (hVΩ hxV), hmtx,
     h1 hxV, Pi.one_apply, one_mul]
 
+/-- An integral over `Ω` of an integrand vanishing off `W ⊆ Ω` is an integral over `W`. -/
+theorem setIntegral_shrink_of_forall_eq_zero
+    {W Ω : Set (EuclideanSpace ℝ (Fin d))} (hWΩ : W ⊆ Ω)
+    {F : EuclideanSpace ℝ (Fin d) → ℝ} (hF : ∀ x, x ∉ W → F x = 0) :
+    ∫ x in Ω, F x = ∫ x in W, F x := by
+  rw [setIntegral_eq_integral_of_forall_compl_eq_zero
+      (fun x hx => hF x (fun hc => hx (hWΩ hc))),
+    setIntegral_eq_integral_of_forall_compl_eq_zero hF]
+
+/-- The restriction to `V ⊆ Ω` of the whole-space extension of an `L²(Ω)` class agrees with the
+class itself on `V`. -/
+theorem coeFn_restrictL2_extendL2_of_subset {Ω V : Set (EuclideanSpace ℝ (Fin d))}
+    (hΩm : MeasurableSet Ω) (hVm : MeasurableSet V) (hVΩ : V ⊆ Ω) (g : L2D Ω) :
+    (restrictL2 (Ω := V) (extendL2 hΩm g) : EuclideanSpace ℝ (Fin d) → ℝ)
+      =ᵐ[volume.restrict V] (g : EuclideanSpace ℝ (Fin d) → ℝ) := by
+  filter_upwards [coeFn_restrictL2 (Ω := V) (extendL2 hΩm g),
+    ae_restrict_of_ae (coeFn_extendL2 hΩm g), ae_restrict_mem hVm] with x h1 h2 h3
+  rw [h1, h2, Set.indicator_of_mem (hVΩ h3)]
+
+/-- An integral over `Ω` of a weight times an `L²(Ω)` class times a function vanishing off
+`V ⊆ Ω` is the integral over `V` against the restricted extension of the class. -/
+theorem setIntegral_mul_restrictL2_extendL2 {Ω V : Set (EuclideanSpace ℝ (Fin d))}
+    (hΩm : MeasurableSet Ω) (hVm : MeasurableSet V) (hVΩ : V ⊆ Ω) (g : L2D Ω)
+    (c w : EuclideanSpace ℝ (Fin d) → ℝ) (hw : ∀ x, x ∉ V → w x = 0) :
+    ∫ x in Ω, c x * (g x : ℝ) * w x
+      = ∫ x in V, c x * (restrictL2 (Ω := V) (extendL2 hΩm g) x : ℝ) * w x := by
+  rw [setIntegral_shrink_of_forall_eq_zero hVΩ (fun x hx => by rw [hw x hx, mul_zero])]
+  refine integral_congr_ae ?_
+  filter_upwards [coeFn_restrictL2_extendL2_of_subset hΩm hVm hVΩ g] with x hx
+  rw [hx]
+
 /-- Restriction to `Ω` is non-expansive on `L²`: `‖restrictL2 w‖ ≤ ‖w‖`. -/
 lemma norm_restrictL2_le (w : EucL2 d) :
     ‖restrictL2 (Ω := Ω) w‖ ≤ ‖w‖ :=
