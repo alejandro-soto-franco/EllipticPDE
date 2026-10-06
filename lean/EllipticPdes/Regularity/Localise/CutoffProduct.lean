@@ -8,6 +8,7 @@ module
 
 public import EllipticPdes.Regularity.LowerOrderWkInfty
 public import EllipticPdes.Regularity.CutoffTower
+public import EllipticPdes.Regularity.Caccioppoli
 
 /-!
 # Cutting a locally smooth function off to a globally smooth one
@@ -24,14 +25,15 @@ applies it entrywise to build a global operator out of one with coefficients smo
 
 ## Main declarations
 
-* `contDiff_mul_of_contDiffOn`: a function smooth on `U`, cut off by a test function of `U`, is
-  globally smooth.
+* `contDiff_mul_of_contDiffOn`: a function of class `C^n` on `U`, cut off by a test function of
+  `U`, is globally of class `C^n`.
 * `hasCompactSupport_mul`: the product has compact support.
-* `exists_iteratedFDeriv_bound`: a smooth compactly supported function has every iterated
-  derivative uniformly bounded.
+* `exists_iteratedFDeriv_bound`: a compactly supported function of class `C^m` has every iterated
+  derivative of order at most `m` uniformly bounded.
 * `exists_iteratedFDeriv_bound_const_add`: the same for a constant shift of one, at every
   positive order.
-* `nonempty_isWkInfty`: a smooth compactly supported function lies in `W^{k,∞}` at every order.
+* `nonempty_isWkInfty`: a compactly supported function of class `C^m` lies in `W^{k,∞}` for
+  `k ≤ m`.
 -/
 
 @[expose] public section
@@ -49,17 +51,18 @@ variable {d : ℕ}
 
 local notation "E" => EuclideanSpace ℝ (Fin d)
 
-/-- A function smooth on an open `U`, multiplied by a test function supported in `U`, is
-globally smooth: away from the topological support of the cutoff the product is eventually zero,
-and on that support the cutoff itself is smooth wherever `g` is, since the support sits inside
-`U`. -/
+/-- A function of class `C^n` on an open `U`, multiplied by a test function supported in `U`, is
+of class `C^n` on the whole space: away from the topological support of the cutoff the product is
+eventually zero, and on that support the cutoff is smooth and `g` is of class `C^n` near the
+point, since the support sits inside `U`. -/
 theorem contDiff_mul_of_contDiffOn {U : Set E} (hU : IsOpen U) {χ g : E → ℝ}
-    (hχ : IsTestFn U χ) (hg : ContDiffOn ℝ (⊤ : ℕ∞) g U) :
-    ContDiff ℝ (⊤ : ℕ∞) (fun x => χ x * g x) := by
+    (hχ : IsTestFn U χ) {n : ℕ∞} (hg : ContDiffOn ℝ n g U) :
+    ContDiff ℝ n (fun x => χ x * g x) := by
   rw [contDiff_iff_contDiffAt]
   intro x
   by_cases hx : x ∈ tsupport χ
-  · exact (hχ.1.contDiffAt).mul (hg.contDiffAt (hU.mem_nhds (hχ.2.2 hx)))
+  · exact ((hχ.1.of_le (by exact_mod_cast le_top)).contDiffAt).mul
+      (hg.contDiffAt (hU.mem_nhds (hχ.2.2 hx)))
   · have h0 : χ =ᶠ[𝓝 x] 0 := (notMem_tsupport_iff_eventuallyEq).1 hx
     have h1 : (fun y => χ y * g y) =ᶠ[𝓝 x] fun _ => (0 : ℝ) := by
       filter_upwards [h0] with y hy
@@ -72,42 +75,51 @@ theorem hasCompactSupport_mul {U : Set E} {χ g : E → ℝ} (hχ : IsTestFn U �
     HasCompactSupport (fun x => χ x * g x) :=
   hχ.2.1.mul_right (f' := g)
 
-/-- A smooth compactly supported function has every iterated derivative bounded, with a
-nonnegative bound at each order: the derivative is continuous and vanishes off a compact set, so
-it is bounded, and the bound is truncated at `0` to be usable at every order uniformly. -/
-theorem exists_iteratedFDeriv_bound {g : E → ℝ} (hg : ContDiff ℝ (⊤ : ℕ∞) g)
+/-- A compactly supported function of class `C^m` has every iterated derivative of order at
+most `m` bounded, with a nonnegative bound at each order. -/
+theorem exists_iteratedFDeriv_bound {g : E → ℝ} {m : ℕ∞} (hg : ContDiff ℝ m g)
     (hc : HasCompactSupport g) :
-    ∃ B : ℕ → ℝ, (∀ m, 0 ≤ B m) ∧ ∀ m x, ‖iteratedFDeriv ℝ m g x‖ ≤ B m := by
-  have h : ∀ m : ℕ, ∃ C, ∀ x, ‖iteratedFDeriv ℝ m g x‖ ≤ C := fun m =>
-    (hc.iteratedFDeriv m).exists_bound_of_continuous
-      (hg.continuous_iteratedFDeriv (by exact_mod_cast le_top))
-  choose C hC using h
-  exact ⟨fun m => max (C m) 0, fun m => le_max_right _ _,
-    fun m x => (hC m x).trans (le_max_left _ _)⟩
+    ∃ B : ℕ → ℝ, (∀ j, 0 ≤ B j) ∧ ∀ j : ℕ, (j : ℕ∞) ≤ m → ∀ x, ‖iteratedFDeriv ℝ j g x‖ ≤ B j := by
+  have h : ∀ j : ℕ, ∃ C : ℝ, 0 ≤ C ∧ ((j : ℕ∞) ≤ m → ∀ x, ‖iteratedFDeriv ℝ j g x‖ ≤ C) := by
+    intro j
+    by_cases hj : (j : ℕ∞) ≤ m
+    · obtain ⟨C, hC⟩ := (hc.iteratedFDeriv j).exists_bound_of_continuous
+        (hg.continuous_iteratedFDeriv (by exact_mod_cast hj))
+      exact ⟨C, (norm_nonneg _).trans (hC 0), fun _ => hC⟩
+    · exact ⟨0, le_rfl, fun h => absurd h hj⟩
+  choose B hB0 hB using h
+  exact ⟨B, hB0, fun j hj => hB j hj⟩
 
-/-- A constant plus a smooth compactly supported function has every iterated derivative of
-positive order bounded: the constant contributes nothing past order zero, so the bound of
-`exists_iteratedFDeriv_bound` for the compactly supported part serves unchanged. -/
-theorem exists_iteratedFDeriv_bound_const_add {g : E → ℝ} (hg : ContDiff ℝ (⊤ : ℕ∞) g)
+/-- A constant plus a compactly supported function of class `C^m` has every iterated derivative
+of order between `1` and `m` bounded: the constant contributes nothing past order zero. -/
+theorem exists_iteratedFDeriv_bound_const_add {g : E → ℝ} {m : ℕ∞} (hg : ContDiff ℝ m g)
     (hc : HasCompactSupport g) (c : ℝ) :
-    ∃ B : ℕ → ℝ, (∀ m, 0 ≤ B m) ∧ ∀ m, 1 ≤ m → ∀ x,
-      ‖iteratedFDeriv ℝ m (fun y => c + g y) x‖ ≤ B m := by
+    ∃ B : ℕ → ℝ, (∀ j, 0 ≤ B j) ∧ ∀ j : ℕ, 1 ≤ j → (j : ℕ∞) ≤ m → ∀ x,
+      ‖iteratedFDeriv ℝ j (fun y => c + g y) x‖ ≤ B j := by
   obtain ⟨B, hB0, hB⟩ := exists_iteratedFDeriv_bound hg hc
-  refine ⟨B, hB0, fun m hm x => ?_⟩
-  have hadd : iteratedFDeriv ℝ m (fun y => c + g y) x
-      = iteratedFDeriv ℝ m (fun _ : E => c) x + iteratedFDeriv ℝ m g x :=
-    iteratedFDeriv_add_apply contDiffAt_const
-      ((hg.of_le (by exact_mod_cast le_top)).contDiffAt)
+  refine ⟨B, hB0, fun j hj hjm x => ?_⟩
+  have hadd : iteratedFDeriv ℝ j (fun y => c + g y) x
+      = iteratedFDeriv ℝ j (fun _ : E => c) x + iteratedFDeriv ℝ j g x :=
+    iteratedFDeriv_add_apply contDiffAt_const ((hg.of_le (by exact_mod_cast hjm)).contDiffAt)
   rw [hadd, iteratedFDeriv_const_of_ne (by omega), Pi.zero_apply, zero_add]
-  exact hB m x
+  exact hB j hjm x
 
-/-- A smooth compactly supported function lies in `W^{k,∞}` at every order: its classical
-iterated partials serve as the weak-derivative family, and `exists_iteratedFDeriv_bound` supplies
-the uniform bound each order needs. -/
-theorem nonempty_isWkInfty {g : E → ℝ} (hg : ContDiff ℝ (⊤ : ℕ∞) g)
-    (hc : HasCompactSupport g) (k : ℕ) : Nonempty (IsWkInfty g k) := by
+/-- A compactly supported function of class `C^m` lies in `W^{k,∞}` for every `k ≤ m`: its
+classical iterated partials serve as the weak-derivative family, and
+`exists_iteratedFDeriv_bound` supplies the uniform bound each order needs. -/
+theorem nonempty_isWkInfty {g : E → ℝ} {m : ℕ∞} {k : ℕ} (hk : (k : ℕ∞) ≤ m)
+    (hg : ContDiff ℝ m g) (hc : HasCompactSupport g) : Nonempty (IsWkInfty g k) := by
   obtain ⟨B, hB0, hB⟩ := exists_iteratedFDeriv_bound hg hc
-  exact ⟨IsWkInfty.ofContDiff (hg.of_le (by exact_mod_cast le_top)) hB0
-    (fun m _ x => hB m x)⟩
+  exact ⟨IsWkInfty.ofContDiff (hg.of_le (by exact_mod_cast hk)) hB0
+    (fun j hj x => hB j ((by exact_mod_cast hj : (j : ℕ∞) ≤ k).trans hk) x)⟩
+
+/-- A family of continuous compactly supported functions is bounded in absolute value by the sum
+of the suprema of the absolute values. -/
+theorem abs_le_sum_iSup_abs {ι : Type*} [Fintype ι] {f : ι → E → ℝ}
+    (hc : ∀ i, Continuous (f i)) (hs : ∀ i, HasCompactSupport (f i)) (i : ι) (x : E) :
+    |f i x| ≤ ∑ j, ⨆ y, |f j y| :=
+  ((hs i).abs_le_iSup_abs (hc i) x).trans
+    (Finset.single_le_sum (f := fun j => ⨆ y, |f j y|)
+      (fun j _ => (hs j).iSup_abs_nonneg (hc j)) (Finset.mem_univ i))
 
 end EllipticPdes.Regularity

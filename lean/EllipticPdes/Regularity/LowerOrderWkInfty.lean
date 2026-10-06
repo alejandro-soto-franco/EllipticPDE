@@ -189,6 +189,20 @@ def mono (hOp : IsWkInftyLower Op k) (hlk : l ≤ k) : IsWkInftyLower Op l where
   b_le i m := hOp.b_le i m
   c_le m := hOp.c_le m
 
+/-- The bundle of an operator whose transport components and zeroth-order coefficient each lie
+in `W^{k,∞}`, with the sum of the individual bounds as the uniform constant. -/
+def ofBundles (hb : ∀ i, IsWkInfty (fun x => Op.b x i) k) (hc : IsWkInfty Op.c k) :
+    IsWkInftyLower Op k where
+  bReg := hb
+  cReg := hc
+  bound m := ∑ i, (hb i).bound m + hc.bound m
+  bound_nonneg m := add_nonneg (Finset.sum_nonneg fun i _ => (hb i).bound_nonneg m)
+    (hc.bound_nonneg m)
+  b_le i m := le_add_of_le_of_nonneg
+    (Finset.single_le_sum (f := fun i => (hb i).bound m)
+      (fun i _ => (hb i).bound_nonneg m) (Finset.mem_univ i)) (hc.bound_nonneg m)
+  c_le m := le_add_of_nonneg_left (Finset.sum_nonneg fun i _ => (hb i).bound_nonneg m)
+
 end IsWkInftyLower
 
 end EllipticPdes.Regularity
