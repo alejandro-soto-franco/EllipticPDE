@@ -135,25 +135,10 @@ theorem setIntegral_mul_cutoff_partialD_split (P : L2D V) {χ v : EuclideanSpace
   linarith [hmid]
 
 /-- **Two classes agreeing under a cutoff pair identically against anything the cutoff fixes.**
-Where `θ·X = θ·Y` almost everywhere and `θψ = ψ` pointwise, the pairings against `ψ` agree.
-
-This is how an identification valid only after a cutoff is used: every weight the datum
-assembly pairs against is supported where the outer cutoff of the tower is identically `1`, so
-`θψ = ψ` there and the cutoff disappears from the conclusion. -/
-theorem setIntegral_mul_congr_of_cutoff_ae {θ : EuclideanSpace ℝ (Fin d) → ℝ} {X Y : L2D V}
-    (h : (fun x => θ x * (X x : ℝ)) =ᵐ[volume.restrict V] fun x => θ x * (Y x : ℝ))
-    {ψ : EuclideanSpace ℝ (Fin d) → ℝ} (hψ : ∀ x, θ x * ψ x = ψ x) :
-    (∫ x in V, (X x : ℝ) * ψ x) = ∫ x in V, (Y x : ℝ) * ψ x := by
-  refine integral_congr_ae ?_
-  filter_upwards [h] with x hx
-  have e : ∀ z : ℝ, θ x * z * ψ x = z * ψ x := by
-    intro z
-    conv_rhs => rw [← hψ x]
-    ring
-  rw [← e (X x : ℝ), hx, e (Y x : ℝ)]
-
-/-- The same with a weight in front, which is the shape every block of the bilinear form takes.
-The cutoff passes through the weight, so the hypothesis is unchanged. -/
+Where `θ·X = θ·Y` almost everywhere and `θψ = ψ` pointwise, the pairings against `ψ` agree, with
+a weight in front, which is the shape every block of the bilinear form takes. This is how an
+identification valid only after a cutoff is used: every weight the datum assembly pairs against
+is supported where the outer cutoff of the tower is identically `1`. -/
 theorem setIntegral_weight_mul_congr_of_cutoff_ae {θ : EuclideanSpace ℝ (Fin d) → ℝ}
     {X Y : L2D V}
     (h : (fun x => θ x * (X x : ℝ)) =ᵐ[volume.restrict V] fun x => θ x * (Y x : ℝ))

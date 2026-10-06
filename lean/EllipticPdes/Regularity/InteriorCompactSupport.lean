@@ -25,8 +25,7 @@ whole-space space `EucL2 d = Lp ℝ 2 volume`, while the weak solution, the cuto
 keystone, and the Caccioppoli estimate live on the restricted-domain space `L2D Ω = Lp ℝ 2
 (volume.restrict Ω)`. This file provides the bridge between them: extension by zero `L2D Ω
 →ₗᵢ[ℝ] EucL2 d`, packaged from the Mathlib linear isometry `MeasureTheory.lpExtendByZero`,
-together with the compatibility that moves the cutoff-weighted gradient energy of the
-Caccioppoli estimate onto whole-space `EucL2 d` classes with the `L²` norm preserved.
+together with its compatibility with coefficient multiplication and with translated coefficients.
 -/
 
 @[expose] public section
@@ -70,36 +69,6 @@ theorem extendL2_ae_eq_zero {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩm : Meas
     (g : L2D Ω) :
     ∀ᵐ x ∂volume, x ∉ Ω → (extendL2 hΩm g : EuclideanSpace ℝ (Fin d) → ℝ) x = 0 :=
   lpExtendByZero_ae_eq_zero hΩm g
-
-/-! ### Caccioppoli energy on whole-space classes -/
-
-/-- **Caccioppoli energy on whole-space classes.** Feeding the interior energy estimate
-`EllipticPdes.Regularity.caccioppoli` through the norm-preserving extension bridge, the
-cutoff-weighted gradient energy of a weak solution `u ∈ H₀¹(Ω)` of `L u = f`, measured on the
-whole-space `EucL2 d` classes `extendL2 hΩm (ζ · ∂ᵢu)`, is bounded by the data:
-`(λ/2) ∑ᵢ ‖extendL2 hΩm (ζ · ∂ᵢu)‖² ≤ C (‖f‖² + ‖u₀‖²)`. These whole-space classes are the
-gradient data on which the difference-quotient method of the interior second-derivative
-estimate operates (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1;
-Gilbarg-Trudinger, *Elliptic PDE of Second Order*, Theorem 8.8).
-
-One of the two deliverables the module docstring names. The interior chain reaches the same
-energy through `Caccioppoli` on the restricted-domain classes. -/
-theorem extendL2_cutoffGrad_energy_le (Op : FullEllipticOp d)
-    {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩm : MeasurableSet Ω)
-    {ζ : EuclideanSpace ℝ (Fin d) → ℝ} (hζ : IsTestFn Ω ζ) :
-    ∃ C : ℝ, 0 ≤ C ∧ ∀ (u : H01 Ω) (f : L2D Ω),
-      (∀ v : H01 Ω, Op.fullBilin Ω u v
-        = ∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ)) →
-      Op.lam / 2 * ∑ i : Fin d, ‖extendL2 hΩm (mulTest hζ ((u : H1amb Ω) i.succ))‖ ^ 2
-        ≤ C * (‖f‖ ^ 2 + ‖(u : H1amb Ω) 0‖ ^ 2) := by
-  obtain ⟨C, hC0, hC⟩ := caccioppoli Op hζ
-  refine ⟨C, hC0, fun u f hu => ?_⟩
-  have hnorm : ∀ i : Fin d,
-      ‖extendL2 hΩm (mulTest hζ ((u : H1amb Ω) i.succ))‖
-        = ‖mulTest hζ ((u : H1amb Ω) i.succ)‖ :=
-    fun i => norm_extendL2 hΩm _
-  simp_rw [hnorm]
-  exact hC u f hu
 
 /-! ### Leibniz for extension against a coefficient, and translated coefficients
 

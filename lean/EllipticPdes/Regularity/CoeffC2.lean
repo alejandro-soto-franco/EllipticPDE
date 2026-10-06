@@ -59,12 +59,4 @@ def IsC2Coeff.toIsC1Coeff {A : EllipticCoeff d} (hA : IsC2Coeff A) : IsC1Coeff A
   { contDiff := fun i j => (hA.contDiff i j).of_le (by norm_num)
     A1 := hA.A1, A1_nonneg := hA.A1_nonneg, grad_bdd := hA.grad_bdd }
 
-/-- The gradient entry `∂_ℓ a_{ij}` is `C¹`. -/
-theorem IsC2Coeff.contDiff_partialD_coeff {A : EllipticCoeff d} (hA : IsC2Coeff A)
-    (i j ℓ : Fin d) : ContDiff ℝ 1 (partialD ℓ (fun y => A.a y i j)) := by
-  have hf : ContDiff ℝ 1 (fderiv ℝ (fun y => A.a y i j)) :=
-    (hA.contDiff i j).fderiv_right (by norm_num)
-  change ContDiff ℝ 1 (fun x => (fderiv ℝ (fun y => A.a y i j) x) (EuclideanSpace.single ℓ 1))
-  exact hf.clm_apply (contDiff_const (c := EuclideanSpace.single ℓ (1 : ℝ)))
-
 end EllipticPdes.Regularity

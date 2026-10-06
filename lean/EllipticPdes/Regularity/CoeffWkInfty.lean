@@ -117,13 +117,6 @@ def mono (hA : IsWkInftyCoeff A k) (hlk : l ≤ k) : IsWkInftyCoeff A l where
   bound_nonneg := hA.bound_nonneg
   ess_bdd i j α hα := hA.ess_bdd i j α (hα.trans hlk)
 
-/-- The order-zero bound applies to the coefficient entries themselves. -/
-theorem ae_abs_coeff_le (hA : IsWkInftyCoeff A k) (i j : Fin d) :
-    ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |A.a x i j| ≤ hA.bound 0 := by
-  have h := hA.ess_bdd i j [] (Nat.zero_le k)
-  rw [hA.D_nil i j] at h
-  exact h
-
 end IsWkInftyCoeff
 
 end EllipticPdes.Regularity

@@ -189,23 +189,6 @@ def mono (hOp : IsWkInftyLower Op k) (hlk : l ≤ k) : IsWkInftyLower Op l where
   b_le i m := hOp.b_le i m
   c_le m := hOp.c_le m
 
-/-- Every transport component is essentially bounded by the uniform constant at every order
-up to `k`. -/
-theorem ae_abs_b_le (hOp : IsWkInftyLower Op k) (i : Fin d) (α : List (Fin d))
-    (hα : α.length ≤ k) :
-    ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))),
-      |(hOp.bReg i).D α x| ≤ hOp.bound α.length := by
-  filter_upwards [(hOp.bReg i).ess_bdd α hα] with x hx
-  exact hx.trans (hOp.b_le i α.length)
-
-/-- The zeroth-order coefficient is essentially bounded by the uniform constant at every order
-up to `k`. -/
-theorem ae_abs_c_le (hOp : IsWkInftyLower Op k) (α : List (Fin d)) (hα : α.length ≤ k) :
-    ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))),
-      |hOp.cReg.D α x| ≤ hOp.bound α.length := by
-  filter_upwards [hOp.cReg.ess_bdd α hα] with x hx
-  exact hx.trans (hOp.c_le α.length)
-
 end IsWkInftyLower
 
 end EllipticPdes.Regularity

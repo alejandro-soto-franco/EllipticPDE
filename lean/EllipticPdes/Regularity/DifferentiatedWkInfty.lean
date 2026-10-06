@@ -48,12 +48,6 @@ namespace IsWkInftyCoeff
 
 variable {A : EllipticCoeff d} {k : ℕ}
 
-/-- The coefficient entry is measurable, read off the order-zero member of the family. -/
-theorem measurable_coeff (hA : IsWkInftyCoeff A k) (i j : Fin d) :
-    Measurable (fun x => A.a x i j) := by
-  have h := hA.D_meas i j [] (by simp)
-  rwa [hA.D_nil i j] at h
-
 /-- The order-one member of the family is a weak partial derivative of the coefficient entry. -/
 theorem hasWeakPartial_D (hA : IsWkInftyCoeff A (k + 1)) (ℓ i j : Fin d) :
     HasWeakPartial ℓ (fun x => A.a x i j) (hA.D [ℓ] i j) := by
