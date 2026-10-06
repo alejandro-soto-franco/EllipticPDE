@@ -312,18 +312,116 @@ theorem nondivOp_barrier_nonpos (hd : 0 < d)
         - 2 * lam * ∑ i, b x i * (x i - y i) + C) := by ring
     _ ≤ 0 := mul_nonpos_of_nonneg_of_nonpos hw.le hX
 
-/-! ### Hopf's lemma -/
+/-! ### Steps of Hopf's lemma -/
 
-/-- **One-sided derivative at a right-sided maximum.** -/
-theorem deriv_nonpos_of_le_on_Ioo {φ : ℝ → ℝ} {φ' δ : ℝ} (hδ : 0 < δ) (hφ : HasDerivAt φ φ' 0)
-    (hle : ∀ t ∈ Ioo (0 : ℝ) δ, φ t ≤ φ 0) : φ' ≤ 0 := by
-  rw [hasDerivAt_iff_tendsto_slope_zero] at hφ
-  have h := tendsto_nhdsWithin_mono_left
-    (fun t (ht : t ∈ Ioi (0 : ℝ)) => Set.mem_compl_singleton_iff.mpr (ne_of_gt ht)) hφ
-  refine le_of_tendsto h ?_
-  filter_upwards [Ioo_mem_nhdsGT hδ] with t ht
-  simp only [zero_add, smul_eq_mul]
-  exact mul_nonpos_of_nonneg_of_nonpos (inv_nonneg.mpr ht.1.le) (by linarith [hle t ht])
+section Topology
+
+variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+
+/-- The frontier of an open annulus lies on its two boundary spheres. -/
+theorem frontier_ball_sdiff_closedBall_subset (y : E) {r s : ℝ} (hr : 0 < r) (hs : 0 < s) :
+    frontier (ball y r \ closedBall y s) ⊆ sphere y r ∪ sphere y s := by
+  rw [sdiff_eq]
+  refine (frontier_inter_subset _ _).trans ?_
+  rw [frontier_compl, frontier_ball y hr.ne', frontier_closedBall y hs.ne']
+  exact union_subset_union inter_subset_left inter_subset_right
+
+/-- A function continuous on a closed ball and at most `c` on the open ball is at most `c` on
+the sphere. -/
+theorem le_of_forall_ball_le {u : E → ℝ} {y z : E} {r c : ℝ} (hr : 0 < r)
+    (huc : ContinuousOn u (closedBall y r)) (h : ∀ x ∈ ball y r, u x ≤ c)
+    (hz : dist z y = r) : u z ≤ c :=
+  ContinuousWithinAt.closure_le (s := ball y r) (by rw [closure_ball y hr.ne']; exact hz.le)
+    ((huc z (mem_closedBall.2 hz.le)).mono ball_subset_closedBall) continuousWithinAt_const h
+
+end Topology
+
+/-- A function continuous on a closed ball and strictly below `u x₀` on the open ball stays a
+fixed margin `δ` below `u x₀` on each concentric sphere of smaller radius. -/
+theorem exists_gap_on_sphere {E : Type*} [MetricSpace E] [ProperSpace E] {u : E → ℝ} {y x₀ : E}
+    {r s : ℝ} (hsr : s < r) (huc : ContinuousOn u (closedBall y r))
+    (hlt : ∀ x ∈ ball y r, u x < u x₀) (hne : (sphere y s).Nonempty) :
+    ∃ δ > 0, ∀ z ∈ sphere y s, u z ≤ u x₀ - δ := by
+  obtain ⟨p, hp, hpmax⟩ := (isCompact_sphere y s).exists_isMaxOn hne
+    (huc.mono (sphere_subset_closedBall.trans (closedBall_subset_closedBall hsr.le)))
+  have hpb : p ∈ ball y r := by rw [mem_ball, mem_sphere.1 hp]; exact hsr
+  exact ⟨u x₀ - u p, sub_pos.2 (hlt p hpb),
+    fun z hz => by linarith [(show u z ≤ u p from hpmax hz)]⟩
+
+/-- The barrier vanishes on the outer sphere. -/
+theorem barrier_eq_zero (lam : ℝ) {r : ℝ} {y z : EuclideanSpace ℝ (Fin d)} (hz : dist z y = r) :
+    barrier lam r y z = 0 := by
+  simp only [barrier, barrierExp, sqDist_eq]
+  rw [← dist_eq_norm, hz, sub_self]
+
+/-- The maximum `exp (-λ (r/2)²) - exp (-λ r²)` of the barrier outside the inner ball. -/
+def barrierMax (lam r : ℝ) : ℝ := Real.exp (-lam * (r / 2) ^ 2) - Real.exp (-lam * r ^ 2)
+
+/-- The maximum of the barrier outside the inner ball is positive. -/
+theorem barrierMax_pos {lam r : ℝ} (hlam : 0 < lam) (hr : 0 < r) : 0 < barrierMax lam r := by
+  rw [barrierMax, sub_pos]
+  apply Real.exp_lt_exp.mpr
+  have hsq : (r / 2) ^ 2 < r ^ 2 := by nlinarith
+  nlinarith [mul_lt_mul_of_pos_left hsq hlam]
+
+/-- Outside the inner ball of radius `r / 2` the barrier is at most `barrierMax`. -/
+theorem barrier_le_barrierMax {lam r : ℝ} (hlam : 0 ≤ lam) (hr : 0 ≤ r)
+    {y z : EuclideanSpace ℝ (Fin d)} (hz : r / 2 ≤ dist z y) :
+    barrier lam r y z ≤ barrierMax lam r := by
+  simp only [barrier, barrierExp, sqDist_eq, barrierMax]
+  rw [← dist_eq_norm]
+  have h1 : (r / 2) ^ 2 ≤ dist z y ^ 2 := by nlinarith
+  have : -lam * dist z y ^ 2 ≤ -lam * (r / 2) ^ 2 := by nlinarith
+  linarith [Real.exp_le_exp.mpr this]
+
+/-- **Radial derivative of the barrier.** At a point of the outer sphere the derivative of the
+barrier along the inward radius is `2 λ r² exp (-λ r²)`. -/
+theorem fderiv_barrier_radial (lam r : ℝ) {y x₀ : EuclideanSpace ℝ (Fin d)}
+    (hx₀ : dist x₀ y = r) :
+    fderiv ℝ (barrier lam r y) x₀ (y - x₀) = 2 * lam * r ^ 2 * barrierExp lam y x₀ := by
+  have hfv : fderiv ℝ (barrier lam r y) x₀ = fderiv ℝ (barrierExp lam y) x₀ :=
+    fderiv_sub_const _
+  rw [hfv, fderiv_barrierExp_apply]
+  have hsq : ∑ i, (x₀ i - y i) ^ 2 = r ^ 2 := by
+    have := sqDist_eq y x₀
+    rwa [sqDist, ← dist_eq_norm, hx₀] at this
+  have hsum : ∑ i, 2 * (x₀ i - y i) * (y - x₀) i = -2 * r ^ 2 := by
+    calc ∑ i, 2 * (x₀ i - y i) * (y - x₀) i = ∑ i, -2 * (x₀ i - y i) ^ 2 :=
+          Finset.sum_congr rfl fun i _ => by rw [PiLp.sub_apply]; ring
+      _ = -2 * r ^ 2 := by rw [← Finset.mul_sum, hsq]
+  rw [hsum]
+  ring
+
+/-- **The perturbed function is a subsolution on the annulus.** At a point `z` of the annulus
+`r/2 < |z - y| < r` where `u` is a subsolution and `λ` is large, `u + ε v - k` is a subsolution
+for every `ε ≥ 0`, with `v` the barrier. -/
+theorem nondivOp_perturbation_nonpos (hd : 0 < d)
+    {a : EuclideanSpace ℝ (Fin d) → Fin d → Fin d → ℝ}
+    {b : EuclideanSpace ℝ (Fin d) → Fin d → ℝ} {c : EuclideanSpace ℝ (Fin d) → ℝ}
+    {θ A B C : ℝ} (hθ : 0 < θ) {R : Set (EuclideanSpace ℝ (Fin d))} (hRo : IsOpen R)
+    {u : EuclideanSpace ℝ (Fin d) → ℝ} (hu : ContDiffOn ℝ 2 u R) {z y : EuclideanSpace ℝ (Fin d)}
+    (hz : z ∈ R) (hell : ∀ ξ : Fin d → ℝ, θ * ∑ i, ξ i ^ 2 ≤ ∑ i, ∑ j, a z i j * ξ i * ξ j)
+    (ha : ∀ i j, |a z i j| ≤ A) (hb : ∀ i, |b z i| ≤ B) (hc0 : 0 ≤ c z) (hcC : c z ≤ C)
+    {r : ℝ} (hr : 0 < r) (hq1 : r ^ 2 / 4 ≤ sqDist y z) (hq2 : sqDist y z ≤ r ^ 2)
+    {lam : ℝ} (hlam : (2 * d * A + B * (d + r ^ 2) + C) / (θ * r ^ 2) + 1 ≤ lam)
+    (hsub : nondivOp a b c u z ≤ 0) {k ε : ℝ} (hε : 0 ≤ ε) (hck : 0 ≤ c z * k) :
+    nondivOp a b c (fun x => u x + ε * barrier lam r y x - k) z ≤ 0 := by
+  have hvC := (contDiff_barrier lam r y).contDiffOn (s := R)
+  have hgC2 : ContDiffOn ℝ 2 (fun x => u x + ε * barrier lam r y x) R :=
+    hu.add (contDiffOn_const.mul hvC)
+  rw [nondivOp_sub_const hRo hgC2 a b c k hz, nondivOp_add_smul hRo hu hvC a b c ε hz]
+  have h2 := nondivOp_barrier_nonpos hd hθ hell ha hb hc0 hcC hr hq1 hq2 hlam
+  nlinarith [mul_nonpos_of_nonneg_of_nonpos hε h2]
+
+/-- A point moved from `x₀` towards the centre `y` by the fraction `s ≤ 1` of the radius is at
+distance `(1 - s) r` from the centre. -/
+theorem dist_add_smul_sub_center {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] {x₀ y : E}
+    {r s : ℝ} (hx₀ : dist x₀ y = r) (hs : s ≤ 1) : dist (x₀ + s • (y - x₀)) y = (1 - s) * r := by
+  have e : x₀ + s • (y - x₀) - y = (1 - s) • (x₀ - y) := by
+    simp only [sub_smul, one_smul, smul_sub]
+    abel
+  rw [dist_eq_norm, e, norm_smul, Real.norm_eq_abs, abs_of_nonneg (by linarith), ← dist_eq_norm,
+    hx₀]
 
 /-- **Hopf's lemma on a ball** (Evans §6.4.2 Lemma, Gilbarg and Trudinger Lemma 3.4). A
 subsolution on a ball, continuous on the closed ball, strictly below its value at a point
@@ -349,10 +447,8 @@ theorem hopf_lemma_ball (hd : 0 < d) {y : EuclideanSpace ℝ (Fin d)} {r : ℝ} 
   have hA0 : 0 ≤ A := (abs_nonneg _).trans (ha y (mem_ball_self hr) i₀ i₀)
   have hB0 : 0 ≤ B := (abs_nonneg _).trans (hb y (mem_ball_self hr) i₀)
   have hC0 : 0 ≤ C := (hc0 y (mem_ball_self hr)).trans (hcC y (mem_ball_self hr))
-  -- the annulus
   set R : Set (EuclideanSpace ℝ (Fin d)) := ball y r \ closedBall y (r / 2) with hRdef
   have hRo : IsOpen R := isOpen_ball.sdiff isClosed_closedBall
-  have hRb : Bornology.IsBounded R := isBounded_ball.subset sdiff_subset
   have hRsub : R ⊆ ball y r := sdiff_subset
   have hnorm : ∀ c : ℝ, 0 < c → dist (y + c • e i₀) y = c := by
     intro c hc
@@ -364,42 +460,11 @@ theorem hopf_lemma_ball (hd : 0 < d) {y : EuclideanSpace ℝ (Fin d)} {r : ℝ} 
       linarith
     · rw [mem_closedBall, not_le, hnorm _ (by positivity)]
       linarith
-  have hclR : closure R ⊆ closedBall y r := by
-    refine (closure_mono hRsub).trans ?_
-    rw [closure_ball y hr.ne']
-  have hclR' : closure R ⊆ (ball y (r / 2))ᶜ := by
-    have h1 : R ⊆ (closedBall y (r / 2))ᶜ := fun z hz => hz.2
-    refine (closure_mono h1).trans ?_
-    rw [closure_compl, interior_closedBall y (by positivity)]
-  have hfrR : ∀ z ∈ frontier R, dist z y = r ∨ dist z y = r / 2 := by
-    intro z hz
-    have h1 : z ∈ closure R := frontier_subset_closure hz
-    have h2 : z ∉ R := by
-      rw [← hRo.interior_eq]
-      exact hz.2
-    have h3 : dist z y ≤ r := hclR h1
-    have h4 : r / 2 ≤ dist z y := by
-      have := hclR' h1
-      rw [mem_compl_iff, mem_ball, not_lt] at this
-      exact this
-    rcases lt_or_eq_of_le h3 with h3' | h3'
-    · rcases lt_or_eq_of_le h4 with h4' | h4'
-      · exact absurd ⟨mem_ball.mpr h3', fun h => absurd (mem_closedBall.mp h) (not_le.mpr h4')⟩ h2
-      · exact Or.inr h4'.symm
-    · exact Or.inl h3'
+  have hclR : closure R ⊆ closedBall y r :=
+    (closure_mono hRsub).trans (closure_ball y hr.ne').subset
   -- the inner sphere: `u` is below `u x₀` by a margin `δ`
-  have hsph : IsCompact (sphere y (r / 2)) := isCompact_sphere y (r / 2)
-  have hsphne : (sphere y (r / 2)).Nonempty :=
-    ⟨y + (r / 2) • e i₀, by rw [mem_sphere, hnorm _ (by positivity)]⟩
-  have hsphsub : sphere y (r / 2) ⊆ closedBall y r :=
-    sphere_subset_closedBall.trans (closedBall_subset_closedBall (by linarith))
-  obtain ⟨s, hs, hsmax⟩ := hsph.exists_isMaxOn hsphne (huc.mono hsphsub)
-  have hsball : s ∈ ball y r := by
-    rw [mem_sphere] at hs
-    rw [mem_ball, hs]
-    linarith
-  set δ : ℝ := u x₀ - u s with hδ
-  have hδpos : 0 < δ := by linarith [hlt s hsball]
+  obtain ⟨δ, hδ, hgap⟩ := exists_gap_on_sphere (u := u) (y := y) (x₀ := x₀) (s := r / 2)
+    (by linarith) huc hlt ⟨y + (r / 2) • e i₀, by rw [mem_sphere, hnorm _ (by positivity)]⟩
   -- the barrier constants
   set lam : ℝ := (2 * d * A + B * (d + r ^ 2) + C) / (θ * r ^ 2) + 1 with hlam
   have hlam_pos : 0 < lam := by
@@ -407,143 +472,78 @@ theorem hopf_lemma_ball (hd : 0 < d) {y : EuclideanSpace ℝ (Fin d)} {r : ℝ} 
       div_nonneg (add_nonneg (add_nonneg (mul_nonneg (by positivity) hA0)
         (mul_nonneg hB0 (by positivity))) hC0) (by positivity)
     linarith
-  set vmax : ℝ := Real.exp (-lam * (r / 2) ^ 2) - Real.exp (-lam * r ^ 2) with hvmax
-  have hvmax_pos : 0 < vmax := by
-    rw [hvmax, sub_pos]
-    apply Real.exp_lt_exp.mpr
-    have hsq : (r / 2) ^ 2 < r ^ 2 := by nlinarith
-    nlinarith [mul_lt_mul_of_pos_left hsq hlam_pos]
-  set ε : ℝ := δ / (2 * vmax) with hε
+  have hvmax := barrierMax_pos hlam_pos hr
+  set ε : ℝ := δ / (2 * barrierMax lam r) with hε
   have hεpos : 0 < ε := by positivity
-  have hv_outer : ∀ z, dist z y = r → barrier lam r y z = 0 := by
-    intro z hz
-    simp only [barrier, barrierExp, sqDist_eq]
-    rw [← dist_eq_norm, hz, sub_self]
-  have hv_le : ∀ z, r / 2 ≤ dist z y → barrier lam r y z ≤ vmax := by
-    intro z hz
-    simp only [barrier, barrierExp, sqDist_eq, hvmax]
-    rw [← dist_eq_norm]
-    have : -lam * dist z y ^ 2 ≤ -lam * (r / 2) ^ 2 := by
-      have h1 : (r / 2) ^ 2 ≤ dist z y ^ 2 := by nlinarith [dist_nonneg (x := z) (y := y)]
-      nlinarith
-    linarith [Real.exp_le_exp.mpr this]
-  -- `u + ε v` is a subsolution on the annulus
+  -- `u + ε v` is a subsolution on the annulus, and the weak maximum principle applies
   have hvC : ContDiff ℝ 2 (barrier lam r y) := contDiff_barrier lam r y
-  have hgC2 : ContDiffOn ℝ 2 (fun x => u x + ε * barrier lam r y x) R :=
-    (hu.mono hRsub).add (contDiffOn_const.mul hvC.contDiffOn)
-  have hgsub : ∀ z ∈ R,
-      nondivOp a b c (fun x => u x + ε * barrier lam r y x - u x₀) z ≤ 0 := by
+  have hgC2 : ContDiffOn ℝ 2 (fun x => u x + ε * barrier lam r y x - u x₀) R :=
+    ((hu.mono hRsub).add (contDiffOn_const.mul hvC.contDiffOn)).sub contDiffOn_const
+  have hgsub : ∀ z ∈ R, nondivOp a b c (fun x => u x + ε * barrier lam r y x - u x₀) z ≤ 0 := by
     intro z hz
     have hzb := hRsub hz
-    rw [nondivOp_sub_const hRo hgC2 a b c (u x₀) hz,
-      nondivOp_add_smul hRo (hu.mono hRsub) hvC.contDiffOn a b c ε hz]
-    have h1 := hsub z hzb
-    have h0 := hcu z hzb
-    have h2 : nondivOp a b c (barrier lam r y) z ≤ 0 := by
-      refine nondivOp_barrier_nonpos hd hθ (hell z hzb) (ha z hzb) (hb z hzb) (hc0 z hzb)
-        (hcC z hzb) hr ?_ ?_ le_rfl
-      · rw [sqDist_eq, ← dist_eq_norm]
-        have := hz.2
-        rw [mem_closedBall, not_le] at this
-        nlinarith
-      · rw [sqDist_eq, ← dist_eq_norm]
-        have := hz.1
-        rw [mem_ball] at this
-        nlinarith [dist_nonneg (x := z) (y := y)]
-    nlinarith
-  -- the weak maximum principle on the annulus
+    refine nondivOp_perturbation_nonpos hd hθ hRo (hu.mono hRsub) hz (hell z hzb) (ha z hzb)
+      (hb z hzb) (hc0 z hzb) (hcC z hzb) hr ?_ ?_ le_rfl (hsub z hzb) hεpos.le (hcu z hzb)
+    · rw [sqDist_eq, ← dist_eq_norm]
+      have := hz.2
+      rw [mem_closedBall, not_le] at this
+      nlinarith
+    · rw [sqDist_eq, ← dist_eq_norm]
+      have := hz.1
+      rw [mem_ball] at this
+      nlinarith [dist_nonneg (x := z) (y := y)]
   have hgc : ContinuousOn (fun x => u x + ε * barrier lam r y x - u x₀) (closure R) :=
     ((huc.mono hclR).add (continuousOn_const.mul hvC.continuous.continuousOn)).sub
       continuousOn_const
-  have hgC2' : ContDiffOn ℝ 2 (fun x => u x + ε * barrier lam r y x - u x₀) R :=
-    hgC2.sub contDiffOn_const
-  obtain ⟨z, hzfr, hzmax⟩ := weak_maximum_principle_of_nonneg hd hRo hRb hRne hθ
-    (fun x hx => hsymm x (hRsub hx)) (fun x hx => hell x (hRsub hx))
-    (fun x hx => hb x (hRsub hx)) (fun x hx => hc0 x (hRsub hx)) hgC2' hgc hgsub
+  obtain ⟨z, hzfr, hzmax⟩ := weak_maximum_principle_of_nonneg hd hRo
+    (isBounded_ball.subset hRsub) hRne hθ (fun x hx => hsymm x (hRsub hx))
+    (fun x hx => hell x (hRsub hx)) (fun x hx => hb x (hRsub hx)) (fun x hx => hc0 x (hRsub hx))
+    hgC2 hgc hgsub
   have hgbound : ∀ x ∈ closure R, u x + ε * barrier lam r y x ≤ u x₀ := by
     intro x hx
-    have hx' := hzmax x hx
     have hz' : u z + ε * barrier lam r y z - u x₀ ≤ 0 := by
-      rcases hfrR z hzfr with hz | hz
-      · have huz : u z ≤ u x₀ := by
-          have hzcl : z ∈ closure (ball y r) := by
-            rw [closure_ball y hr.ne']
-            exact mem_closedBall.mpr hz.le
-          obtain ⟨w, hw, hwz⟩ := mem_closure_iff_seq_limit.mp hzcl
-          have h1 : Tendsto w atTop (𝓝[closedBall y r] z) :=
-            tendsto_nhdsWithin_iff.mpr
-              ⟨hwz, Eventually.of_forall fun n => ball_subset_closedBall (hw n)⟩
-          have hcont : Tendsto (fun n => u (w n)) atTop (𝓝 (u z)) :=
-            (huc z (mem_closedBall.mpr hz.le)).tendsto.comp h1
-          exact le_of_tendsto' hcont fun n => (hlt (w n) (hw n)).le
-        rw [hv_outer z hz, mul_zero, add_zero]
+      rcases frontier_ball_sdiff_closedBall_subset y hr (half_pos hr) hzfr with hz | hz
+      · have huz := le_of_forall_ball_le hr huc (fun x hx => (hlt x hx).le) (mem_sphere.1 hz)
+        rw [barrier_eq_zero lam (mem_sphere.1 hz), mul_zero, add_zero]
         linarith
-      · have h1 : u z ≤ u s := hsmax (mem_sphere.mpr hz)
-        have h2 : barrier lam r y z ≤ vmax := hv_le z hz.ge
-        have h3 : ε * barrier lam r y z ≤ δ / 2 := by
-          calc ε * barrier lam r y z ≤ ε * vmax := mul_le_mul_of_nonneg_left h2 hεpos.le
-            _ = δ / 2 := by
-                rw [hε]
-                field_simp
-        linarith
-    rw [max_eq_right hz'] at hx'
+      · have h3 : ε * barrier lam r y z ≤ δ / 2 :=
+          (mul_le_mul_of_nonneg_left (barrier_le_barrierMax hlam_pos.le hr.le
+            (mem_sphere.1 hz).ge) hεpos.le).trans_eq (by rw [hε]; field_simp)
+        linarith [hgap z hz]
+    have := hzmax x hx
+    rw [max_eq_right hz'] at this
     linarith
   -- the one-sided derivative along the inward radius
-  set ξ : EuclideanSpace ℝ (Fin d) := y - x₀ with hξ
-  have hpt : ∀ t ∈ Ioo (0 : ℝ) (1 / 2), x₀ + t • ξ ∈ R := by
-    intro t ht
-    have hdist : dist (x₀ + t • ξ) y = (1 - t) * r := by
-      rw [dist_eq_norm, hξ]
-      have e : x₀ + t • (y - x₀) - y = (1 - t) • (x₀ - y) := by
-        simp only [sub_smul, one_smul, smul_sub]
-        abel
-      rw [e, norm_smul, Real.norm_eq_abs, abs_of_pos (by linarith [ht.2]), ← dist_eq_norm, hx₀]
-    constructor
-    · rw [mem_ball, hdist]
-      nlinarith [ht.1]
-    · rw [mem_closedBall, not_le, hdist]
-      nlinarith [ht.2]
-  have hφ : HasDerivAt (fun t : ℝ => u (x₀ + t • ξ) + ε * barrier lam r y (x₀ + t • ξ))
-      (fderiv ℝ u x₀ ξ + ε * fderiv ℝ (barrier lam r y) x₀ ξ) 0 := by
-    have h1 : HasDerivAt (fun t : ℝ => u (x₀ + t • ξ)) (fderiv ℝ u (x₀ + (0 : ℝ) • ξ) ξ) 0 :=
-      hasDerivAt_line (by simpa using hdiff)
-    have h2 : HasDerivAt (fun t : ℝ => barrier lam r y (x₀ + t • ξ))
-        (fderiv ℝ (barrier lam r y) (x₀ + (0 : ℝ) • ξ) ξ) 0 :=
-      hasDerivAt_line (hvC.differentiable (by simp) _)
-    have := h1.add (h2.const_mul ε)
-    simp only [zero_smul, add_zero] at this
-    exact this
-  have hle : ∀ t ∈ Ioo (0 : ℝ) (1 / 2),
-      (fun t : ℝ => u (x₀ + t • ξ) + ε * barrier lam r y (x₀ + t • ξ)) t
-        ≤ (fun t : ℝ => u (x₀ + t • ξ) + ε * barrier lam r y (x₀ + t • ξ)) 0 := by
-    intro t ht
-    have := hgbound _ (subset_closure (hpt t ht))
-    simp only [zero_smul, add_zero]
-    rw [hv_outer x₀ hx₀, mul_zero, add_zero]
-    exact this
-  have hder := deriv_nonpos_of_le_on_Ioo (by norm_num : (0 : ℝ) < 1 / 2) hφ hle
-  -- the derivative of the barrier at `x₀` along `ξ`
-  have hvder : fderiv ℝ (barrier lam r y) x₀ ξ = 2 * lam * r ^ 2 * barrierExp lam y x₀ := by
-    have hfv : fderiv ℝ (barrier lam r y) x₀ = fderiv ℝ (barrierExp lam y) x₀ := by
-      have e : barrier lam r y = fun z => barrierExp lam y z - Real.exp (-lam * r ^ 2) := rfl
-      rw [e]
-      exact fderiv_sub_const _
-    rw [hfv, fderiv_barrierExp_apply, hξ]
-    have hsq : ∑ i, (x₀ i - y i) ^ 2 = r ^ 2 := by
-      have := sqDist_eq y x₀
-      rw [sqDist, ← dist_eq_norm, hx₀] at this
-      exact this
-    have hsum : ∑ i, 2 * (x₀ i - y i) * (y - x₀) i = -2 * r ^ 2 := by
-      calc ∑ i, 2 * (x₀ i - y i) * (y - x₀) i = ∑ i, -2 * (x₀ i - y i) ^ 2 :=
-            Finset.sum_congr rfl fun i _ => by rw [PiLp.sub_apply]; ring
-        _ = -2 * r ^ 2 := by rw [← Finset.mul_sum, hsq]
-    rw [hsum]
-    ring
-  have hexp := barrierExp_pos lam y x₀
-  have hfu : fderiv ℝ u x₀ ξ = -fderiv ℝ u x₀ (x₀ - y) := by
-    rw [hξ, ← neg_sub, map_neg]
-  rw [hfu, hvder] at hder
-  have hpos : 0 < ε * (2 * lam * r ^ 2 * barrierExp lam y x₀) := by positivity
+  have hgd : HasFDerivAt (fun x => u x + ε * barrier lam r y x)
+      (fderiv ℝ u x₀ + ε • fderiv ℝ (barrier lam r y) x₀) x₀ :=
+    hdiff.hasFDerivAt.add ((hvC.differentiable (by simp) x₀).hasFDerivAt.const_mul ε)
+  have hmax : IsLocalMaxOn (fun x => u x + ε * barrier lam r y x) (insert x₀ R) x₀ := by
+    refine (isMaxOn_iff.2 fun x hx => ?_).isLocalMaxOn
+    rcases hx with rfl | hx
+    · exact le_rfl
+    · rw [barrier_eq_zero lam hx₀, mul_zero, add_zero]
+      exact hgbound x (subset_closure hx)
+  have hseg : (1 / 4 : ℝ) • (y - x₀) ∈ posTangentConeAt (insert x₀ R) x₀ := by
+    refine mem_posTangentConeAt_of_segment_subset ?_
+    rw [segment_eq_image']
+    rintro _ ⟨t, ht, rfl⟩
+    rcases eq_or_lt_of_le ht.1 with h0 | h0
+    · simp [← h0]
+    · simp only [add_sub_cancel_left, smul_smul]
+      refine Or.inr ⟨?_, ?_⟩
+      · rw [mem_ball, dist_add_smul_sub_center hx₀ (by nlinarith [ht.2])]
+        nlinarith [ht.2]
+      · rw [mem_closedBall, not_le, dist_add_smul_sub_center hx₀ (by nlinarith [ht.2])]
+        nlinarith [ht.2]
+  have hder := hmax.hasFDerivWithinAt_nonpos hgd.hasFDerivWithinAt hseg
+  simp only [_root_.add_apply, _root_.smul_apply, map_smul, smul_eq_mul,
+    fderiv_barrier_radial lam r hx₀] at hder
+  have hfu : fderiv ℝ u x₀ (y - x₀) = -fderiv ℝ u x₀ (x₀ - y) := by
+    rw [← neg_sub, map_neg]
+  rw [hfu] at hder
+  have hpos : 0 < ε * (2 * lam * r ^ 2 * barrierExp lam y x₀) := by
+    have := barrierExp_pos lam y x₀
+    positivity
   linarith
 
 /-- **Hopf's lemma** (Evans §6.4.2 Lemma, Gilbarg and Trudinger Lemma 3.4). A subsolution on
