@@ -224,7 +224,7 @@ def zerothForm (Ω : Set (EuclideanSpace ℝ (Fin d))) :
 
 /-- Simp lemma: `zerothForm Ω U V = ⟪(U : H1amb Ω) 0, (V : H1amb Ω) 0⟫`. -/
 @[simp] lemma zerothForm_apply (Ω : Set (EuclideanSpace ℝ (Fin d))) (U V : H01 Ω) :
-    zerothForm Ω U V = ⟪(U : H1amb Ω) 0, ((V : H1amb Ω) 0)⟫ := by
+    zerothForm Ω U V = ⟪(U : H1amb Ω) 0, ((V : H1amb Ω) 0)⟫ :=
   rfl
 
 /-- The shifted bilinear form `B_μ[U, V] = B[U, V] + μ ⟪u₀, v₀⟫` associated to `Lu + μu`. -/
