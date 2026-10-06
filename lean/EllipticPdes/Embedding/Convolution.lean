@@ -387,4 +387,44 @@ theorem tendsto_eLpNorm_convolution_sub {p : ℝ} (hp : 1 ≤ p)
           ← ENNReal.ofReal_add hδ0.le (by positivity : (0 : ℝ) ≤ δ + δ),
           show δ + (δ + δ) = η.toReal from by rw [hδdef]; ring, ENNReal.ofReal_toReal hηtop]
 
+/-- Convolution against scalar multiplication is commutative. -/
+theorem convolution_lsmul_comm {G : Type*} [NormedAddCommGroup G] [MeasurableSpace G]
+    [MeasurableAdd G] [MeasurableNeg G] {μ : Measure G} [μ.IsAddLeftInvariant]
+    [μ.IsNegInvariant] (f g : G → ℝ) :
+    f ⋆[ContinuousLinearMap.lsmul ℝ ℝ, μ] g = g ⋆[ContinuousLinearMap.lsmul ℝ ℝ, μ] f := by
+  rw [← convolution_flip]
+  congr 1
+  exact ContinuousLinearMap.ext fun a => ContinuousLinearMap.ext fun b => mul_comm b a
+
+/-- **The standard shrinking mollifiers.** The bump of outer radius `δ / (n + 1)` and inner
+radius half of it. -/
+def stdBump {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [HasContDiffBump E] (δ : ℝ)
+    (hδ : 0 < δ) (n : ℕ) : ContDiffBump (0 : E) where
+  rIn := δ / (n + 1) / 2
+  rOut := δ / (n + 1)
+  rIn_pos := half_pos (by positivity)
+  rIn_lt_rOut := half_lt_self (by positivity)
+
+@[simp]
+theorem rOut_stdBump {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [HasContDiffBump E]
+    {δ : ℝ} (hδ : 0 < δ) (n : ℕ) : (stdBump (E := E) δ hδ n).rOut = δ / (n + 1) := rfl
+
+@[simp]
+theorem rIn_stdBump {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [HasContDiffBump E]
+    {δ : ℝ} (hδ : 0 < δ) (n : ℕ) : (stdBump (E := E) δ hδ n).rIn = δ / (n + 1) / 2 := rfl
+
+/-- The outer radii of the standard mollifiers tend to zero. -/
+theorem tendsto_rOut_stdBump {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    [HasContDiffBump E] {δ : ℝ} (hδ : 0 < δ) :
+    Filter.Tendsto (fun n => (stdBump (E := E) δ hδ n).rOut) Filter.atTop (𝓝 0) := by
+  simp only [rOut_stdBump]
+  exact tendsto_const_nhds.div_atTop (tendsto_natCast_atTop_atTop.atTop_add tendsto_const_nhds)
+
+/-- The standard mollifiers have bounded ratio of radii. -/
+theorem rOut_stdBump_le {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [HasContDiffBump E]
+    {δ : ℝ} (hδ : 0 < δ) (n : ℕ) :
+    (stdBump (E := E) δ hδ n).rOut ≤ 2 * (stdBump (E := E) δ hδ n).rIn := by
+  simp only [rOut_stdBump, rIn_stdBump]
+  exact le_of_eq (by ring)
+
 end EllipticPdes.Embedding
