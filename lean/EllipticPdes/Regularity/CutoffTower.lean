@@ -34,7 +34,13 @@ This file provides:
   back to plain `ContDiff` via `contMDiff_iff_contDiff`.
 * `exists_margin_of_isCompact_subset_isOpen`: the positive-margin fact for a compact-in-open
   pair, from `IsCompact.exists_cthickening_subset_open`.
+* `exists_one_margin`: a cutoff `≡ 1` near a compact set is `≡ 1` near every point within a
+  margin of it.
+* `ShiftAdmissible`: the conditions on a step `h` under which the Evans test element built from
+  the cutoffs `ξ` and `θ` is admissible.
 * `CutoffTower`: the bundle of the three nested cutoffs and the margin.
+* `CutoffTower.exists_shiftAdmissible`, `CutoffTower.exists_zeta_shift`: every sufficiently
+  small step is admissible for the tower, and a shifted point of `tsupport ζ` lies where `ξ = 1`.
 * `cutoffTowerOfIsCompactSubsetIsOpen`: existence of a `CutoffTower` for every compact `V`
   inside an open `Ω`, built by three applications of the Urysohn-type cutoff lemma followed by
   one application of the margin lemma.

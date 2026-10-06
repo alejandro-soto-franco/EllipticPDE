@@ -15,10 +15,9 @@ public import Mathlib.Analysis.Calculus.MeanValue
 
 The interior `H²` estimate (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1;
 Gilbarg–Trudinger, *Elliptic Partial Differential Equations of Second Order*, Thm 8.8)
-needs the manuscript hypothesis `aᵢⱼ ∈ C¹` only through one quantitative consequence: the
-difference quotient of each coefficient entry is uniformly bounded by the sup of its
-gradient. This file bundles that hypothesis as an added structure `IsC1Coeff` (a mixin on
-top of `EllipticCoeff`, leaving every existing consumer of `EllipticCoeff` untouched) and
+reads the hypothesis `aᵢⱼ ∈ C¹` only through one quantitative consequence: the difference
+quotient of each coefficient entry is uniformly bounded by the sup of its gradient. This file
+bundles the hypothesis as the structure `IsC1Coeff`, a mixin on top of `EllipticCoeff`, and
 proves the coefficient difference-quotient bound `abs_diffQuot_coeff_le` by the segment
 mean-value inequality.
 -/

@@ -32,6 +32,13 @@ ambient graph space,
 which is exactly the Leibniz rule `∇(η u) = η ∇u + (∇η) u`. It is a bounded operator, it
 sends the graph of a test function `φ` to the graph of the product `η φ`, hence by
 closure it maps `H₀¹(Ω)` into itself: [`cutoffMul_mem_H01`].
+
+## Estimates shared by the energy bounds
+
+`IsTestFn.supNorm` is the supremum norm of a test function. `absorb_energy` is the Peter-Paul
+absorption `λ e² ≤ K₁ N e + K₂ N² ⟹ (λ/2) e² ≤ (K₁²/(2λ) + K₂) N²` that closes the Caccioppoli
+estimate and the difference-quotient energy estimate, and `neg_cross_sum_le` bounds the cross
+term both of them produce.
 -/
 
 @[expose] public section

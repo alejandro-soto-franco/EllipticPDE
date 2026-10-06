@@ -15,13 +15,12 @@ The capstone of the interior regularity chain. This file passes to the limit in 
 difference-quotient bound of `EllipticPdes.Regularity.Interior.NormBound` to produce the
 second weak derivative, then assembles the coordinates into the interior H² estimate.
 
-This module keeps the import path `EllipticPdes.Regularity.Interior` and re-exports the whole
-chain, so dependents see the same API as before the file was split.
+The module imports the whole chain (`Interior.Support`, `Interior.EnergyBound`,
+`Interior.NormBound`).
 
 ## Main declarations
 
 * `interior_secondWeakDeriv`: existence of the interior second weak derivative.
-* `HasWeakDerivOn`: the region-restricted weak derivative.
 * `interior_H2_estimate`: the interior H² estimate.
 -/
 
