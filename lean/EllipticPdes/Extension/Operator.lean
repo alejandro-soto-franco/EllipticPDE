@@ -66,13 +66,6 @@ open EllipticPdes.Sobolev (partialD)
 
 variable {d : ℕ}
 
-/-- **Shrinking an open ball around a compact subset.** -/
-theorem exists_lt_radius_of_isCompact_subset_ball {K : Set (EuclideanSpace ℝ (Fin d))}
-    {x : EuclideanSpace ℝ (Fin d)} {R : ℝ} (hR : 0 < R) (hK : IsCompact K)
-    (hKR : K ⊆ ball x R) : ∃ r, r < R ∧ 0 < r ∧ K ⊆ ball x r :=
-  let ⟨r, hr, h⟩ := exists_pos_lt_subset_ball hR hK.isClosed hKR
-  ⟨r, hr.2, hr.1, h⟩
-
 /-! ### The pieces and their sum -/
 
 /-- **One piece of the glued extension, as a linear map on pairs.** The interior piece is the

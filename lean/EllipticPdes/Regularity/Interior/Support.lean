@@ -80,7 +80,7 @@ lemma inner_Lp_eq_integral_of_ae {α : Type*} [MeasurableSpace α] {μ : Measure
 
 /-- **Invisibility of a cutoff on the set where it is `1`.** If `η ≡ 1` on `V ⊆ Ω`, the
 `V`-restriction of the whole-space extension of `η · g` agrees with that of `g`. -/
-theorem restrictL2_extendL2_mulTest_eq_of_eqOn (hΩm : MeasurableSet Ω)
+theorem restrictL2_extendL2_mulTest_of_eqOn (hΩm : MeasurableSet Ω)
     {V : Set (EuclideanSpace ℝ (Fin d))} (hVm : MeasurableSet V) (hVΩ : V ⊆ Ω)
     {η : EuclideanSpace ℝ (Fin d) → ℝ} (hη : IsTestFn Ω η) (h1 : Set.EqOn η 1 V) (g : L2D Ω) :
     restrictL2 (Ω := V) (extendL2 hΩm (mulTest hη g)) = restrictL2 (Ω := V) (extendL2 hΩm g) := by

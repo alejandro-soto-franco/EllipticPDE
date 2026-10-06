@@ -276,15 +276,4 @@ theorem CutoffTower.xi_eqOn_one_base {V : Set (EuclideanSpace ℝ (Fin d))}
   rw [Function.mem_support, T.zeta_eqOn_one hx]
   exact one_ne_zero
 
-/-- **Invisibility of the cutoff on the base set.** Because `ξ ≡ 1` on `V`, the `V`-restriction of
-the whole-space extension of `ξ · g` agrees with that of `g`. Applied to the function coordinate
-of `interior_cutoffGrad_mem_H01`, this says that the admissible element has `∂_ℓ u` itself on
-`V`. -/
-theorem restrictL2_extendL2_mulTest_xi (hΩm : MeasurableSet Ω)
-    {V : Set (EuclideanSpace ℝ (Fin d))} (hVm : MeasurableSet V) (hVΩ : V ⊆ Ω)
-    (T : CutoffTower Ω V) (g : L2D Ω) :
-    restrictL2 (Ω := V) (extendL2 hΩm (mulTest T.hξ g))
-      = restrictL2 (Ω := V) (extendL2 hΩm g) :=
-  restrictL2_extendL2_mulTest_eq_of_eqOn hΩm hVm hVΩ T.hξ T.xi_eqOn_one_base g
-
 end EllipticPdes.Regularity

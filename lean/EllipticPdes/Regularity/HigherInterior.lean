@@ -293,7 +293,7 @@ shape the induction consumes, and it is where the analytic content of the step s
 
 `U` is `ξ · ∂_ℓ u` for the middle cutoff of a tower for `V ⋐ Ω`, which
 `EllipticPdes.Regularity.interior_cutoffGrad_mem_H01` places in `H₀¹(Ω)` and
-`EllipticPdes.Regularity.restrictL2_extendL2_mulTest_xi` makes invisible on `V`. `F` collects
+`EllipticPdes.Regularity.restrictL2_extendL2_mulTest_of_eqOn` makes invisible on `V`. `F` collects
 `∂_ℓ f`, the terms of `EllipticPdes.Regularity.differentiated_weakForm_wkInfty` in which the
 differentiation lands on a coefficient, and the commutator with `ξ`. Each of those is a
 `W^{k,∞}` weight against a derivative of `u` of order at most two, so
@@ -382,7 +382,8 @@ theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
   · -- The cutoff is invisible on the base set, so nothing is lost there.
     change restrictL2 (Ω := V) (extendL2 hΩm (Uamb 0)) = _
     rw [hU0]
-    exact restrictL2_extendL2_mulTest_xi hΩm hVm hVΩ T ((u : H1amb Ω) ℓ.succ)
+    exact restrictL2_extendL2_mulTest_of_eqOn hΩm hVm hVΩ T.hξ T.xi_eqOn_one_base
+      ((u : H1amb Ω) ℓ.succ)
   · -- The weak formulation, extended from test functions by density.
     intro w
     refine weakForm_of_testFn Op ⟨Uamb, hUmem⟩ F (fun v hv => ?_) w

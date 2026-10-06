@@ -83,24 +83,6 @@ def LocalFamiliesAt (Op : FullEllipticOp (n + 1))
         ∃ H : HasIteratedWeakDerivOn W k (restrictL2 (Ω := W) (extendL2 hΩm (U j))),
           IteratedL2Bound H (C * (M + ‖U 0‖))
 
-/-- **Invisibility of a cutoff on a set where it is one.** For `ζ = 1` on `W ⊆ Ω`, cutting
-`ζ g` down to `W` is cutting `g` down to `W`. -/
-theorem restrictL2_extendL2_mulTest_of_eqOn {Ω W : Set (EuclideanSpace ℝ (Fin (n + 1)))}
-    (hΩm : MeasurableSet Ω) (hWm : MeasurableSet W) (hWΩ : W ⊆ Ω)
-    {ζ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ} (hζ : IsTestFn Ω ζ) (hζW : Set.EqOn ζ 1 W)
-    (g : L2D Ω) :
-    restrictL2 (Ω := W) (extendL2 hΩm (mulTest hζ g))
-      = restrictL2 (Ω := W) (extendL2 hΩm g) := by
-  apply Lp.ext
-  filter_upwards [coeFn_restrictL2 (Ω := W) (extendL2 hΩm (mulTest hζ g)),
-    coeFn_restrictL2 (Ω := W) (extendL2 hΩm g),
-    ae_restrict_of_ae (coeFn_extendL2 hΩm (mulTest hζ g)),
-    ae_restrict_of_ae (coeFn_extendL2 hΩm g),
-    ae_restrict_of_ae_restrict_of_subset hWΩ (mulCutoff_coeFn hζ g), ae_restrict_mem hWm]
-    with x h1 h2 h3 h4 h5 h6
-  rw [h1, h2, h3, h4, Set.indicator_of_mem (hWΩ h6), Set.indicator_of_mem (hWΩ h6), h5,
-    hζW h6, Pi.one_apply, one_mul]
-
 /-- **Hypothesis at order zero.** At order zero the hypothesis on the coordinates asks only for
 their `L²` norms on `W`. `‖U₀‖` bounds the function, and the gradient, cut off by `ζ = 1` near
 `W`, is bounded by `‖f‖ + ‖U₀‖` through the Caccioppoli estimate. -/
