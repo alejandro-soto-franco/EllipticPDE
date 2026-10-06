@@ -81,14 +81,9 @@ lemma gradFlip_gradFlip {Ω : Set (EuclideanSpace ℝ (Fin d))} (F : H1amb Ω) :
 lemma norm_gradFlip {Ω : Set (EuclideanSpace ℝ (Fin d))} (F : H1amb Ω) :
     ‖gradFlip F‖ = ‖F‖ := by
   have h2 : ‖gradFlip F‖ ^ 2 = ‖F‖ ^ 2 := by
-    rw [PiLp.norm_sq_eq_of_L2, PiLp.norm_sq_eq_of_L2]
-    refine Finset.sum_congr rfl (fun j _ => ?_)
-    refine Fin.cases ?_ (fun i => ?_) j
-    · rw [gradFlip_zero]
-    · rw [gradFlip_succ, norm_neg]
-  calc ‖gradFlip F‖ = Real.sqrt (‖gradFlip F‖ ^ 2) := (Real.sqrt_sq (norm_nonneg _)).symm
-    _ = Real.sqrt (‖F‖ ^ 2) := by rw [h2]
-    _ = ‖F‖ := Real.sqrt_sq (norm_nonneg _)
+    rw [H1amb.norm_sq_eq, H1amb.norm_sq_eq]
+    simp [H1amb.fn, H1amb.grad]
+  exact (sq_eq_sq₀ (norm_nonneg _) (norm_nonneg _)).mp h2
 
 /-- Pairing a flipped tuple against an ambient vector is exactly the signed sum of
 our sign convention: function term minus gradient terms. -/
@@ -168,10 +163,7 @@ theorem hneg_norm_isLeast (Ω : Set (EuclideanSpace ℝ (Fin d))) (f : H01 Ω �
     exact norm_le_of_isHnegRepr hF
 
 /-- `‖f‖_{H⁻¹}` as the infimum of the tuple norms over all
-representations of `f`.
-
-Terminal result of the library, the infimum form of `hneg_norm_isLeast`.
-Nothing else consumes it. -/
+representations of `f`: the infimum form of `hneg_norm_isLeast`. -/
 theorem hneg_norm_eq_sInf (Ω : Set (EuclideanSpace ℝ (Fin d))) (f : H01 Ω →L[ℝ] ℝ) :
     ‖f‖ = sInf {r : ℝ | ∃ F : H1amb Ω, IsHnegRepr Ω F f ∧ ‖F‖ = r} :=
   ((hneg_norm_isLeast Ω f).csInf_eq).symm
@@ -182,9 +174,7 @@ functional `f` on `H₀¹(Ω)` is represented by a tuple `F = (f₀, f₁, …, 
 functions through `⟨f, v⟩ = ∫_Ω f₀ v - ∑ᵢ ∫_Ω fᵢ ∂ᵢv`, whose
 tuple norm `(∫_Ω ∑ᵢ |fᵢ|²)^{1/2} = ‖F‖` equals `‖f‖_{H⁻¹}` and is least among all
 representing tuples: the infimum is attained at the Riesz
-representative.
-
-Terminal result of the library, stated in the manuscript. Nothing else consumes it. -/
+representative. -/
 theorem hneg_characterization (Ω : Set (EuclideanSpace ℝ (Fin d)))
     (f : H01 Ω →L[ℝ] ℝ) :
     ∃ F : H1amb Ω,

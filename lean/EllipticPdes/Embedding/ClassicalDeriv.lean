@@ -55,30 +55,31 @@ variable {d : ℕ}
 
 /-! ### Gradient tuple as a functional -/
 
-/-- The continuous linear functional whose coordinate values are the entries of `g` at `y`: the
-Riesz dual of the vector `(g k y)ₖ`. This is the shape `HasFDerivAt` asks for, assembled from the
-shape a weak gradient comes in. -/
+/-- The continuous linear functional whose coordinate values are the entries of `g` at `y`. This
+is the shape `HasFDerivAt` asks for, assembled from the shape a weak gradient comes in. -/
 def gradCLM (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (y : EuclideanSpace ℝ (Fin d)) :
     EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ :=
-  InnerProductSpace.toDual ℝ (EuclideanSpace ℝ (Fin d)) (WithLp.toLp 2 fun k => g k y)
+  ∑ k, g k y • (EuclideanSpace.proj k : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ)
+
+/-- `gradCLM g y` is the Riesz dual of the vector `(g k y)ₖ`. -/
+theorem gradCLM_eq_toDual (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ)
+    (y : EuclideanSpace ℝ (Fin d)) :
+    gradCLM g y = InnerProductSpace.toDual ℝ (EuclideanSpace ℝ (Fin d))
+      (WithLp.toLp 2 fun k => g k y) := by
+  ext x
+  simp [gradCLM, InnerProductSpace.toDual_apply_apply, PiLp.inner_apply, mul_comm]
 
 /-- `gradCLM g y` evaluated on a vector is the inner product with `(g k y)ₖ`. -/
 theorem gradCLM_apply (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (y x : EuclideanSpace ℝ (Fin d)) :
-    gradCLM g y x = ⟪(WithLp.toLp 2 fun k => g k y : EuclideanSpace ℝ (Fin d)), x⟫ :=
-  InnerProductSpace.toDual_apply_apply
-
-/-- `gradCLM g y` is the sum of the coordinate functionals weighted by `g k y`. -/
-theorem gradCLM_eq_sum (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (y : EuclideanSpace ℝ (Fin d)) :
-    gradCLM g y = ∑ k, g k y • (EuclideanSpace.proj k : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ) := by
-  ext x
-  simp [gradCLM_apply, PiLp.inner_apply, mul_comm]
+    gradCLM g y x = ⟪(WithLp.toLp 2 fun k => g k y : EuclideanSpace ℝ (Fin d)), x⟫ := by
+  rw [gradCLM_eq_toDual, InnerProductSpace.toDual_apply_apply]
 
 /-- `gradCLM g y` evaluated on the `j`-th basis vector is `g j y`. -/
 @[simp]
 theorem gradCLM_apply_single (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ)
     (y : EuclideanSpace ℝ (Fin d)) (j : Fin d) :
     gradCLM g y (EuclideanSpace.single j (1 : ℝ)) = g j y := by
-  simp [gradCLM_apply, EuclideanSpace.inner_single_right]
+  simp [gradCLM]
 
 /-- **Control of a functional by its coordinate values.** On `EuclideanSpace ℝ (Fin d)` every
 vector is the sum of its coordinates against the standard directions, so the operator norm is at

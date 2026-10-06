@@ -6,7 +6,7 @@ Authors: Alejandro Soto Franco
 
 module
 
-public import EllipticPdes.Analysis.Translation
+public import EllipticPdes.Analysis.FrechetKolmogorov
 
 /-!
 # Difference quotients on `L²(ℝⁿ)`
@@ -20,7 +20,7 @@ Lebesgue measure.
 
 @[expose] public section
 
-open MeasureTheory
+open MeasureTheory EllipticPdes.Analysis
 open scoped RealInnerProductSpace
 
 noncomputable section
