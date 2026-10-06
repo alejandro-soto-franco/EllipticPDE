@@ -413,6 +413,24 @@ theorem nondivOp_perturbation_nonpos (hd : 0 < d)
   have h2 := nondivOp_barrier_nonpos hd hθ hell ha hb hc0 hcC hr hq1 hq2 hlam
   nlinarith [mul_nonpos_of_nonneg_of_nonpos hε h2]
 
+/-- **The perturbed function is below `u x₀` on the boundary of the annulus.** On the outer
+sphere `v` vanishes and `u ≤ u x₀`; on the inner sphere `u ≤ u x₀ - δ` and `ε v ≤ δ / 2`. -/
+theorem add_mul_barrier_le_of_mem_frontier {u : EuclideanSpace ℝ (Fin d) → ℝ}
+    {y x₀ z : EuclideanSpace ℝ (Fin d)} {r lam δ ε : ℝ} (hr : 0 < r) (hlam : 0 ≤ lam)
+    (hδ : 0 ≤ δ) (hε : 0 ≤ ε) (hεv : ε * barrierMax lam r ≤ δ / 2)
+    (huc : ContinuousOn u (closedBall y r))
+    (hlt : ∀ x ∈ ball y r, u x < u x₀) (hgap : ∀ z ∈ sphere y (r / 2), u z ≤ u x₀ - δ)
+    (hz : z ∈ frontier (ball y r \ closedBall y (r / 2))) :
+    u z + ε * barrier lam r y z ≤ u x₀ := by
+  rcases frontier_ball_sdiff_closedBall_subset y hr (half_pos hr) hz with hz | hz
+  · have huz := le_of_forall_ball_le hr huc (fun x hx => (hlt x hx).le) (mem_sphere.1 hz)
+    rw [barrier_eq_zero lam (mem_sphere.1 hz), mul_zero, add_zero]
+    exact huz
+  · have h3 : ε * barrier lam r y z ≤ δ / 2 :=
+      (mul_le_mul_of_nonneg_left (barrier_le_barrierMax hlam hr.le (mem_sphere.1 hz).ge) hε).trans
+        hεv
+    linarith [hgap z hz]
+
 /-- A point moved from `x₀` towards the centre `y` by the fraction `s ≤ 1` of the radius is at
 distance `(1 - s) r` from the centre. -/
 theorem dist_add_smul_sub_center {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] {x₀ y : E}
@@ -450,21 +468,17 @@ theorem hopf_lemma_ball (hd : 0 < d) {y : EuclideanSpace ℝ (Fin d)} {r : ℝ} 
   set R : Set (EuclideanSpace ℝ (Fin d)) := ball y r \ closedBall y (r / 2) with hRdef
   have hRo : IsOpen R := isOpen_ball.sdiff isClosed_closedBall
   have hRsub : R ⊆ ball y r := sdiff_subset
-  have hnorm : ∀ c : ℝ, 0 < c → dist (y + c • e i₀) y = c := by
-    intro c hc
-    rw [dist_eq_norm, add_sub_cancel_left, norm_smul, PiLp.norm_single, norm_one, mul_one,
-      Real.norm_eq_abs, abs_of_pos hc]
-  have hRne : R.Nonempty := by
-    refine ⟨y + (3 * r / 4) • e i₀, ?_, ?_⟩
-    · rw [mem_ball, hnorm _ (by positivity)]
-      linarith
-    · rw [mem_closedBall, not_le, hnorm _ (by positivity)]
-      linarith
+  have : Nontrivial (EuclideanSpace ℝ (Fin d)) := ⟨⟨e i₀, 0, by simp [e]⟩⟩
+  obtain ⟨p, hp⟩ : (sphere y (3 * r / 4)).Nonempty :=
+    NormedSpace.sphere_nonempty.mpr (by positivity)
+  have hRne : R.Nonempty := ⟨p, by
+    rw [mem_sphere] at hp
+    exact ⟨mem_ball.2 (by linarith), by rw [mem_closedBall, not_le]; linarith⟩⟩
   have hclR : closure R ⊆ closedBall y r :=
     (closure_mono hRsub).trans (closure_ball y hr.ne').subset
   -- the inner sphere: `u` is below `u x₀` by a margin `δ`
   obtain ⟨δ, hδ, hgap⟩ := exists_gap_on_sphere (u := u) (y := y) (x₀ := x₀) (s := r / 2)
-    (by linarith) huc hlt ⟨y + (r / 2) • e i₀, by rw [mem_sphere, hnorm _ (by positivity)]⟩
+    (by linarith) huc hlt (NormedSpace.sphere_nonempty.mpr (by positivity))
   -- the barrier constants
   set lam : ℝ := (2 * d * A + B * (d + r ^ 2) + C) / (θ * r ^ 2) + 1 with hlam
   have hlam_pos : 0 < lam := by
@@ -502,14 +516,9 @@ theorem hopf_lemma_ball (hd : 0 < d) {y : EuclideanSpace ℝ (Fin d)} {r : ℝ} 
   have hgbound : ∀ x ∈ closure R, u x + ε * barrier lam r y x ≤ u x₀ := by
     intro x hx
     have hz' : u z + ε * barrier lam r y z - u x₀ ≤ 0 := by
-      rcases frontier_ball_sdiff_closedBall_subset y hr (half_pos hr) hzfr with hz | hz
-      · have huz := le_of_forall_ball_le hr huc (fun x hx => (hlt x hx).le) (mem_sphere.1 hz)
-        rw [barrier_eq_zero lam (mem_sphere.1 hz), mul_zero, add_zero]
-        linarith
-      · have h3 : ε * barrier lam r y z ≤ δ / 2 :=
-          (mul_le_mul_of_nonneg_left (barrier_le_barrierMax hlam_pos.le hr.le
-            (mem_sphere.1 hz).ge) hεpos.le).trans_eq (by rw [hε]; field_simp)
-        linarith [hgap z hz]
+      have hεv : ε * barrierMax lam r ≤ δ / 2 := by rw [hε]; field_simp; rfl
+      linarith [add_mul_barrier_le_of_mem_frontier hr hlam_pos.le hδ.le hεpos.le hεv huc hlt hgap
+        hzfr]
     have := hzmax x hx
     rw [max_eq_right hz'] at this
     linarith
