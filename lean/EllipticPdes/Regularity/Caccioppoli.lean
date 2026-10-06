@@ -144,6 +144,30 @@ lemma isTestFn_mul {Ω : Set (EuclideanSpace ℝ (Fin d))}
   · exact HasCompactSupport.mul_left (f' := φ) (f := η) hφ.2.1
   · exact (closure_mono (Function.support_mul_subset_right η φ)).trans hφ.2.2
 
+/-! ### Test-function calculus -/
+
+/-- The partial derivative of a `C^∞` function is `C^∞`. -/
+theorem contDiff_partialD {φ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (j : Fin d) :
+    ContDiff ℝ (⊤ : ℕ∞) (partialD j φ) := by
+  have hf : ContDiff ℝ (⊤ : ℕ∞) (fderiv ℝ φ) := (contDiff_infty_iff_fderiv.mp hφ).2
+  change ContDiff ℝ (⊤ : ℕ∞) (fun x => (fderiv ℝ φ x) (EuclideanSpace.single j 1))
+  exact hf.clm_apply (contDiff_const (c := EuclideanSpace.single j (1 : ℝ)))
+
+/-- The partial derivative of a compactly-supported function has compact support. -/
+theorem hasCompactSupport_partialD {φ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hφ : HasCompactSupport φ) (j : Fin d) : HasCompactSupport (partialD j φ) :=
+  hφ.mono' ((subset_tsupport (partialD j φ)).trans (tsupport_partialD_subset j φ))
+
+/-- `∂ⱼφ` is again an admissible `HasWeakDerivOn` test function on `V` when `φ` is. -/
+theorem isTest_partialD {V : Set (EuclideanSpace ℝ (Fin d))}
+    {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hc : ContDiff ℝ (⊤ : ℕ∞) φ) (hcs : HasCompactSupport φ)
+    (hV : tsupport φ ⊆ V) (j : Fin d) :
+    ContDiff ℝ (⊤ : ℕ∞) (partialD j φ) ∧ HasCompactSupport (partialD j φ)
+      ∧ tsupport (partialD j φ) ⊆ V :=
+  ⟨contDiff_partialD hc j, hasCompactSupport_partialD hcs j,
+    (tsupport_partialD_subset j φ).trans hV⟩
+
 /-! ### Cutoff multiplication sending a graph to the product graph -/
 
 /-- **Keystone (graphs).** The cutoff-multiplication operator sends the graph of a test

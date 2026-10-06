@@ -102,7 +102,6 @@ theorem setIntegral_mul_mulTest_partialD {W : Set (EuclideanSpace ℝ (Fin d))}
     (hφc : ContDiff ℝ (⊤ : ℕ∞) φ) :
     (∫ x in W, (p x : ℝ) * (χ x * partialD ℓ φ x))
       = -∫ x in W, (partialD ℓ χ x * (p x : ℝ) + χ x * (p' x : ℝ)) * φ x := by
-  have : ENNReal.HolderTriple (2 : ENNReal) 2 1 := ⟨by rw [ENNReal.inv_two_add_inv_two, inv_one]⟩
   have hχd : Differentiable ℝ χ := hχ.1.differentiable (by simp)
   have hφd : Differentiable ℝ φ := hφc.differentiable (by simp)
   -- The three continuous compactly supported weights the identity is tested against.
