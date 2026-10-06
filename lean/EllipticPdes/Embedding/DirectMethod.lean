@@ -10,6 +10,7 @@ public import EllipticPdes.Embedding.RellichLq
 public import EllipticPdes.Embedding.SobolevSharp
 public import EllipticPdes.Analysis.WeakCompactness
 public import EllipticPdes.Analysis.LqEulerLagrange
+public import EllipticPdes.Analysis.DirectMethodForm
 
 /-!
 # Direct method under a subcritical constraint
@@ -66,156 +67,28 @@ private lemma norm_rellichEmbL_eq (hΩb : IsBounded (ball (0 : EuclideanSpace �
       =ᵐ[volume.restrict B1] ⇑((U : H1amb B1) 0) := coeFn_sobolevEmbL _ U
   rw [Lp.norm_def, eLpNorm_congr_ae hcoe]
 
-set_option maxHeartbeats 1000000 in
--- The minimising sequence, the weak limit and the strong limit are one argument over graphs in
--- `H₀¹`, and elaborating it needs more than the default.
 /-- **Direct method.** Below the critical exponent the `H₀¹` norm attains its minimum on the
-functions of unit `L^q` norm. -/
+functions of unit `L^q` norm. It is the minimisation of the inner product, a coercive symmetric
+form, over `{U | ‖T U‖ = 1}` for the compact embedding `T`. -/
 theorem exists_minimiser_of_lt (hΩb : IsBounded (ball (0 : EuclideanSpace ℝ (Fin d)) 1))
     (hd : 2 < d) (hq : ((2 : ℝ≥0) : ℝ)⁻¹ - (d : ℝ)⁻¹ ≤ (q : ℝ)⁻¹) (hq0 : q ≠ 0)
     (hp' : (p' : ℝ)⁻¹ = ((2 : ℝ≥0) : ℝ)⁻¹ - (d : ℝ)⁻¹) (hp'0 : p' ≠ 0) (hqlt : q < p')
-    (hq2 : (2 : ℝ≥0) ≤ q)
+    (_hq2 : (2 : ℝ≥0) ≤ q)
     (hne : ∃ V : H01 B1, ‖rellichEmbL measurableSet_ball hΩb hd hq V‖ = 1) :
     ∃ U : H01 B1, ‖rellichEmbL measurableSet_ball hΩb hd hq U‖ = 1 ∧
       ∀ V : H01 B1, ‖rellichEmbL measurableSet_ball hΩb hd hq V‖ = 1 → ‖U‖ ≤ ‖V‖ := by
-  set T := rellichEmbL measurableSet_ball hΩb hd hq with hTdef
-  set C : Set (H01 B1) := {U | ‖T U‖ = 1} with hCdef
-  set E : Set ℝ := (fun U : H01 B1 => ‖U‖) '' C with hEdef
-  have hEne : E.Nonempty := by
-    obtain ⟨V, hV⟩ := hne
-    exact ⟨‖V‖, V, hV, rfl⟩
-  have hEbdd : BddBelow E := ⟨0, by rintro _ ⟨V, -, rfl⟩; exact norm_nonneg _⟩
-  set m : ℝ := sInf E with hmdef
-  have hm0 : 0 ≤ m := le_csInf hEne (by rintro _ ⟨V, -, rfl⟩; exact norm_nonneg _)
-  -- A minimising sequence.
-  have hchoice : ∀ n : ℕ, ∃ U : H01 B1, ‖T U‖ = 1 ∧ ‖U‖ < m + 1 / (n + 1) := by
-    intro n
-    have hlt : m < m + 1 / ((n : ℝ) + 1) := by
-      have : (0 : ℝ) < 1 / ((n : ℝ) + 1) := by positivity
-      linarith
-    obtain ⟨r, hrE, hr⟩ := exists_lt_of_csInf_lt hEne hlt
-    obtain ⟨U, hU, rfl⟩ := hrE
-    exact ⟨U, hU, hr⟩
-  choose U hUC hUlt using hchoice
-  have hUbound : ∀ n, ‖U n‖ ≤ m + 1 := by
-    intro n
-    have h1 : (1 : ℝ) / ((n : ℝ) + 1) ≤ 1 := by
-      rw [div_le_one (by positivity)]
-      have : (0 : ℝ) ≤ (n : ℝ) := Nat.cast_nonneg n
-      linarith
-    linarith [hUlt n]
-  have hUnorm : Tendsto (fun n => ‖U n‖) atTop (𝓝 m) := by
-    refine tendsto_of_tendsto_of_tendsto_of_le_of_le (g := fun _ : ℕ => m)
-      (h := fun n => m + 1 / ((n : ℝ) + 1)) tendsto_const_nhds ?_ ?_ ?_
-    · have : Tendsto (fun n : ℕ => 1 / ((n : ℝ) + 1)) atTop (𝓝 0) :=
-        tendsto_one_div_add_atTop_nhds_zero_nat
-      simpa using tendsto_const_nhds.add this
-    · intro n
-      exact le_csInf hEne (by rintro _ ⟨V, hV, rfl⟩; exact csInf_le hEbdd ⟨V, hV, rfl⟩) |>.trans
-        (le_of_eq rfl) |>.trans (csInf_le hEbdd ⟨U n, hUC n, rfl⟩)
-    · exact fun n => (hUlt n).le
-  -- Weak compactness gives a limit, and it stays in `H₀¹`.
-  obtain ⟨w, φ, hφ, hweak⟩ :=
-    exists_weakLimit (u := fun n => ((U n : H01 B1) : H1amb B1)) (M := m + 1) hUbound
-  have hwH01 : w ∈ H01 B1 :=
-    mem_of_weakLimit (Submodule.isClosed_topologicalClosure _) (fun k => (U (φ k)).2) hweak
-  have hwnorm : ‖w‖ ≤ m :=
-    norm_weakLimit_le_of_tendsto (hUnorm.comp hφ.tendsto_atTop) hweak
-  -- Rellich gives a further subsequence converging strongly in `L^q`.
-  have hm1 : (0 : ℝ) < m + 1 := by linarith
-  have hTL : IsCompactOperator (T.toLinearMap) :=
-    rellichEmbL_isCompact_of_lt measurableSet_ball hΩb hd hq hq0 hp' hp'0 hqlt
-  have hcl := (isCompactOperator_iff_isCompact_closure_image_closedBall T.toLinearMap hm1).mp hTL
-  have hmemcl : ∀ k, T (U (φ k)) ∈ closure (⇑T.toLinearMap '' closedBall (0 : H01 B1) (m + 1)) :=
-    fun k => subset_closure ⟨U (φ k), by
-      simpa [mem_closedBall, dist_zero_right] using hUbound (φ k), rfl⟩
-  obtain ⟨z, -, ψ, hψ, hψtend⟩ := hcl.tendsto_subseq hmemcl
-  -- The strong limit has norm one.
-  have hznorm : ‖z‖ = 1 := by
-    have h1 : Tendsto (fun j => ‖T (U (φ (ψ j)))‖) atTop (𝓝 ‖z‖) := by
-      have hc := (continuous_norm.tendsto z).comp hψtend
-      simpa [Function.comp_def] using hc
-    have h2 : Tendsto (fun j => ‖T (U (φ (ψ j)))‖) atTop (𝓝 1) := by
-      simp only [hUC]
-      exact tendsto_const_nhds
-    exact tendsto_nhds_unique h1 h2
-  -- It is the function coordinate of the weak limit.
-  have : IsFiniteMeasure (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) :=
-    ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
-  have h2q : (2 : ℝ≥0∞) ≤ (q : ℝ≥0∞) := by exact_mod_cast hq2
-  have hz2 : MemLp (⇑z) 2 (volume.restrict B1) := (Lp.memLp z).mono_exponent h2q
-  set z2 : L2D B1 := hz2.toLp _ with hz2def
-  have hz2coe : ⇑z2 =ᵐ[volume.restrict B1] ⇑z := hz2.coeFn_toLp
-  have hL2conv : Tendsto (fun j => ‖((U (φ (ψ j)) : H01 B1) : H1amb B1) 0 - z2‖) atTop (𝓝 0) := by
-    have hbnd : ∀ j, ‖((U (φ (ψ j)) : H01 B1) : H1amb B1) 0 - z2‖
-        ≤ ((volume.restrict B1) Set.univ ^ (1 / (2 : ℝ≥0∞).toReal - 1 / ((q : ℝ≥0∞)).toReal)).toReal
-          * ‖T (U (φ (ψ j))) - z‖ := by
-      intro j
-      have hTcoe : ⇑(T (U (φ (ψ j))))
-          =ᵐ[volume.restrict B1] ⇑(((U (φ (ψ j)) : H01 B1) : H1amb B1) 0) :=
-        coeFn_sobolevEmbL _ (U (φ (ψ j)))
-      have hcoe : ⇑(((U (φ (ψ j)) : H01 B1) : H1amb B1) 0 - z2)
-          =ᵐ[volume.restrict B1] ⇑(T (U (φ (ψ j))) - z) := by
-        filter_upwards [Lp.coeFn_sub (((U (φ (ψ j)) : H01 B1) : H1amb B1) 0) z2,
-          Lp.coeFn_sub (T (U (φ (ψ j)))) z, hz2coe, hTcoe] with x h1 h2 h3 h4
-        rw [h1, h2, Pi.sub_apply, Pi.sub_apply, h3, h4]
-      rw [Lp.norm_def, eLpNorm_congr_ae hcoe, Lp.norm_def]
-      rw [← ENNReal.toReal_mul]
-      refine ENNReal.toReal_mono ?_ ?_
-      · exact ENNReal.mul_ne_top
-          (ENNReal.rpow_ne_top_of_nonneg (by
-            have h2R : (2 : ℝ≥0∞).toReal = 2 := by simp
-            have hqR : ((q : ℝ≥0∞)).toReal = (q : ℝ) := by simp
-            have hq2R : (2 : ℝ) ≤ (q : ℝ) := by exact_mod_cast hq2
-            rw [h2R, hqR, sub_nonneg]
-            exact one_div_le_one_div_of_le (by norm_num) hq2R)
-            (by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top.ne))
-          (Lp.memLp _).eLpNorm_lt_top.ne
-      · rw [mul_comm]
-        exact eLpNorm_le_eLpNorm_mul_rpow_measure_univ h2q (Lp.aestronglyMeasurable _)
-    have hto : Tendsto (fun j => ‖T (U (φ (ψ j))) - z‖) atTop (𝓝 0) := by
-      have hsub : Tendsto (fun j => T (U (φ (ψ j))) - z) atTop
-          (𝓝 (0 : Lp ℝ (q : ℝ≥0∞) (volume.restrict B1))) := by
-        have h := hψtend.sub (tendsto_const_nhds (x := z))
-        simpa [Function.comp_def] using h
-      simpa using hsub.norm
-    refine squeeze_zero (fun j => norm_nonneg _) hbnd ?_
-    simpa using hto.const_mul _
-  -- Weak and strong limits of the same subsequence agree.
-  have hzw : z2 = ((w : H1amb B1)) 0 := by
-    refine ext_inner_right ℝ (fun a => ?_)
-    have hstrong : Tendsto
-        (fun j => ⟪((U (φ (ψ j)) : H01 B1) : H1amb B1) 0, a⟫) atTop (𝓝 ⟪z2, a⟫) := by
-      have hdiff : ∀ j, |⟪((U (φ (ψ j)) : H01 B1) : H1amb B1) 0, a⟫ - ⟪z2, a⟫|
-          ≤ ‖((U (φ (ψ j)) : H01 B1) : H1amb B1) 0 - z2‖ * ‖a‖ := by
-        intro j
-        rw [← inner_sub_left]
-        exact abs_real_inner_le_norm _ _
-      refine tendsto_of_tendsto_of_tendsto_of_le_of_le
-        (g := fun j => ⟪z2, a⟫ - ‖((U (φ (ψ j)) : H01 B1) : H1amb B1) 0 - z2‖ * ‖a‖)
-        (h := fun j => ⟪z2, a⟫ + ‖((U (φ (ψ j)) : H01 B1) : H1amb B1) 0 - z2‖ * ‖a‖)
-        ?_ ?_ (fun j => by linarith [abs_le.mp (hdiff j)]) (fun j => by
-          linarith [abs_le.mp (hdiff j)])
-      · simpa using tendsto_const_nhds.sub (hL2conv.mul_const ‖a‖)
-      · simpa using tendsto_const_nhds.add (hL2conv.mul_const ‖a‖)
-    have hweak0 : Tendsto
-        (fun j => ⟪((U (φ (ψ j)) : H01 B1) : H1amb B1) 0, a⟫) atTop (𝓝 ⟪(w : H1amb B1) 0, a⟫) := by
-      have hs := (hweak (PiLp.single 2 (0 : Fin (d + 1)) a)).comp hψ.tendsto_atTop
-      simp only [Function.comp_def] at hs
-      have hrw : ∀ V : H1amb B1, ⟪V, PiLp.single 2 (0 : Fin (d + 1)) a⟫ = ⟪V 0, a⟫ := by
-        intro V
-        rw [real_inner_comm, inner_single_left, real_inner_comm]
-      simpa only [hrw] using hs
-    exact tendsto_nhds_unique hstrong hweak0
-  refine ⟨⟨w, hwH01⟩, ?_, fun V hV => le_trans hwnorm (csInf_le hEbdd ⟨V, hV, rfl⟩)⟩
-  rw [hTdef, norm_rellichEmbL_eq]
-  have : eLpNorm (((⟨w, hwH01⟩ : H01 B1) : H1amb B1) 0) (q : ℝ≥0∞) (volume.restrict B1)
-      = eLpNorm (⇑z) (q : ℝ≥0∞) (volume.restrict B1) := by
-    refine eLpNorm_congr_ae ?_
-    rw [← hzw]
-    exact hz2coe
-  rw [this, ← Lp.norm_def, hznorm]
-
+  have hco : IsCoercive (innerSL ℝ : H01 B1 →L[ℝ] H01 B1 →L[ℝ] ℝ) :=
+    ⟨1, one_pos, fun u => by
+      change 1 * ‖u‖ * ‖u‖ ≤ ⟪u, u⟫
+      rw [real_inner_self_eq_norm_mul_norm, one_mul]⟩
+  obtain ⟨U, hU, hmin⟩ := exists_bilin_minimiser hco (fun U V => real_inner_comm V U)
+    (rellichEmbL measurableSet_ball hΩb hd hq)
+    (rellichEmbL_isCompact_of_lt measurableSet_ball hΩb hd hq hq0 hp' hp'0 hqlt) hne
+  refine ⟨U, hU, fun V hV => ?_⟩
+  have h := hmin V hV
+  change ⟪U, U⟫ ≤ ⟪V, V⟫ at h
+  rw [real_inner_self_eq_norm_sq, real_inner_self_eq_norm_sq] at h
+  exact le_of_sq_le_sq h (norm_nonneg V)
 
 /-- The constraint set is inhabited: a renormalised bump sits on it. -/
 theorem exists_norm_rellichEmbL_eq_one

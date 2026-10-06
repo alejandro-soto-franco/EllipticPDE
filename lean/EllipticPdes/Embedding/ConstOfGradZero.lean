@@ -58,13 +58,11 @@ variable {d : ℕ}
 /-- **Constancy of an `L¹` limit of constants.** On a set of positive finite measure the
 constants span a line in `L¹`, which is closed, so a limit of almost-everywhere constant
 functions is almost-everywhere constant. -/
-theorem ae_const_of_tendsto_ae_const {B : Set (EuclideanSpace ℝ (Fin d))}
-    (hBfin : IsFiniteMeasure (volume.restrict B)) {f : EuclideanSpace ℝ (Fin d) → ℝ}
-    (hf : MemLp f 1 (volume.restrict B)) {fn : ℕ → EuclideanSpace ℝ (Fin d) → ℝ} {c : ℕ → ℝ}
-    (hfn : ∀ n, fn n =ᵐ[volume.restrict B] fun _ => c n)
-    (htend : Tendsto (fun n => eLpNorm (fn n - f) 1 (volume.restrict B)) atTop (𝓝 0)) :
-    ∃ c₀ : ℝ, f =ᵐ[volume.restrict B] fun _ => c₀ := by
-  set μ := volume.restrict B with hμ
+theorem ae_const_of_tendsto_ae_const {α : Type*} {m : MeasurableSpace α} {μ : Measure α}
+    [IsFiniteMeasure μ] {f : α → ℝ} (hf : MemLp f 1 μ) {fn : ℕ → α → ℝ} {c : ℕ → ℝ}
+    (hfn : ∀ n, fn n =ᵐ[μ] fun _ => c n)
+    (htend : Tendsto (fun n => eLpNorm (fn n - f) 1 μ) atTop (𝓝 0)) :
+    ∃ c₀ : ℝ, f =ᵐ[μ] fun _ => c₀ := by
   -- the constant class
   set one : Lp ℝ 1 μ := (memLp_const (1 : ℝ)).toLp _ with hone
   have hfnmem : ∀ n, MemLp (fn n) 1 μ := fun n =>
@@ -89,7 +87,7 @@ theorem ae_const_of_tendsto_ae_const {B : Set (EuclideanSpace ℝ (Fin d))}
     exact Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self one)
   obtain ⟨a, ha⟩ := Submodule.mem_span_singleton.mp hmem
   refine ⟨a, ?_⟩
-  have h1 : (hf.toLp f : EuclideanSpace ℝ (Fin d) → ℝ) =ᵐ[μ] f := hf.coeFn_toLp
+  have h1 : (hf.toLp f : α → ℝ) =ᵐ[μ] f := hf.coeFn_toLp
   rw [← ha] at h1
   filter_upwards [h1, Lp.coeFn_smul a one,
     (memLp_const (1 : ℝ)).coeFn_toLp (p := 1) (μ := μ)] with x h1 h2 h3
@@ -98,6 +96,27 @@ theorem ae_const_of_tendsto_ae_const {B : Set (EuclideanSpace ℝ (Fin d))}
   rw [h3, smul_eq_mul, mul_one]
 
 /-! ### Constancy on a ball -/
+
+/-- **A mollification of a class with zero weak gradient has zero derivative.** Where the
+mollifier's ball lies in `Ω`, the partial derivatives of the mollification of the extension by
+zero are the mollified weak gradient, which is zero. -/
+theorem fderiv_convolution_eq_zero_of_hasWeakGradOn_zero {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    (hΩm : MeasurableSet Ω) {u : EuclideanSpace ℝ (Fin d) → ℝ} (hu : IntegrableOn u Ω volume)
+    (hwg : HasWeakGradOn Ω u fun _ _ => 0) (ρ : ContDiffBump (0 : EuclideanSpace ℝ (Fin d)))
+    {y : EuclideanSpace ℝ (Fin d)} (hsub : closedBall y ρ.rOut ⊆ Ω) :
+    fderiv ℝ (Ω.indicator u ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ρ.normed volume) y = 0 := by
+  have hpart : ∀ k, partialD k
+      (Ω.indicator u ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ρ.normed volume) y = 0 := fun k => by
+    have h := partialD_convolution_eq_of_hasWeakGradOn hΩm hu hwg ρ k hsub
+    rw [show Ω.indicator (fun _ : EuclideanSpace ℝ (Fin d) => (0 : ℝ)) = 0 from
+      indicator_zero ℝ Ω] at h
+    rw [h]
+    simp [convolution]
+  rw [← norm_eq_zero, ← sq_eq_zero_iff, norm_sq_clm_eq_sum_apply_single]
+  exact Finset.sum_eq_zero fun k _ => by
+    have := hpart k
+    simp only [partialD] at this
+    rw [this]; ring
 
 /-- **Constancy on a ball whose double lies in the set.** The mollifications of the class
 have zero gradient on the ball, since the mollified weak gradient is the classical gradient of
@@ -108,65 +127,26 @@ theorem ae_const_on_ball_of_hasWeakGradOn_zero {Ω : Set (EuclideanSpace ℝ (Fi
     (hwg : HasWeakGradOn Ω u fun _ _ => 0) {x : EuclideanSpace ℝ (Fin d)} {r : ℝ}
     (hr : 0 < r) (hx : closedBall x (2 * r) ⊆ Ω) :
     ∃ c : ℝ, u =ᵐ[volume.restrict (ball x r)] fun _ => c := by
-  classical
   set L := ContinuousLinearMap.lsmul ℝ ℝ (E := ℝ) with hL
-  let φb : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := fun n =>
-    { rIn := r / (n + 1 : ℝ) / 2
-      rOut := r / (n + 1 : ℝ)
-      rIn_pos := half_pos (by positivity)
-      rIn_lt_rOut := half_lt_self (by positivity) }
-  have hrOut : ∀ n : ℕ, (φb n).rOut = r / (n + 1 : ℝ) := fun _ => rfl
-  have hrIn : ∀ n : ℕ, (φb n).rIn = r / (n + 1 : ℝ) / 2 := fun _ => rfl
-  have hrOut_le : ∀ n : ℕ, (φb n).rOut ≤ r := fun n => by
-    rw [hrOut]
-    exact div_le_self hr.le (by linarith [(n.cast_nonneg : (0 : ℝ) ≤ n)])
-  have hφrOut : Tendsto (fun n => (φb n).rOut) atTop (𝓝 0) := by
-    simp only [hrOut]
-    have := (tendsto_one_div_add_atTop_nhds_zero_nat (𝕜 := ℝ)).const_mul r
-    rw [mul_zero] at this
-    refine this.congr fun n => ?_
-    ring
-  have hφratio : ∀ᶠ n in atTop, (φb n).rOut ≤ 2 * (φb n).rIn :=
-    Eventually.of_forall fun n => le_of_eq (by rw [hrOut, hrIn]; ring)
+  set φb : ℕ → ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) := stdBump r hr with hφb
+  have hφle : ∀ n, (φb n).rOut ≤ r := rOut_stdBump_le_self hr
   set uΩ : EuclideanSpace ℝ (Fin d) → ℝ := Ω.indicator u with huΩ
   set v : ℕ → EuclideanSpace ℝ (Fin d) → ℝ :=
     fun n => uΩ ⋆[L, volume] (φb n).normed volume with hvdef
   have huΩint : Integrable uΩ volume := hu.integrable_indicator hΩm
   have hvsmooth : ∀ n, ContDiff ℝ (⊤ : ℕ∞) (v n) := fun n =>
-    (φb n).hasCompactSupport_normed.contDiff_convolution_right (L := L)
-      huΩint.locallyIntegrable (φb n).contDiff_normed
-  -- the gradient of a mollification vanishes on the ball
-  have hgrad : ∀ n, ∀ y ∈ ball x r, fderiv ℝ (v n) y = 0 := by
-    intro n y hy
-    have hsub : closedBall y (φb n).rOut ⊆ Ω := by
-      refine subset_trans ?_ hx
-      intro z hz
-      rw [mem_closedBall] at hz ⊢
-      have := hrOut_le n
-      have hyx : dist y x < r := mem_ball.mp hy
-      linarith [dist_triangle z y x]
-    have hpart : ∀ k, partialD k (v n) y = 0 := by
-      intro k
-      have h := partialD_convolution_eq_of_hasWeakGradOn hΩm hu hwg (φb n) k hsub
-      rw [show Ω.indicator (fun _ : EuclideanSpace ℝ (Fin d) => (0 : ℝ)) = 0 from
-        indicator_zero ℝ Ω] at h
-      rw [h]
-      simp [convolution]
-    rw [← norm_eq_zero, ← sq_eq_zero_iff, norm_sq_clm_eq_sum_apply_single]
-    exact Finset.sum_eq_zero fun k _ => by
-      have := hpart k
-      simp only [partialD] at this
-      rw [this]; ring
-  have hconst : ∀ n, ∀ y ∈ ball x r, v n y = v n x := by
-    intro n y hy
-    exact isOpen_ball.is_const_of_fderiv_eq_zero (convex_ball x r).isPreconnected
+    contDiff_convolution_normed (φb n) huΩint.locallyIntegrable
+  -- each mollification is constant on the ball
+  have hconst : ∀ n, ∀ y ∈ ball x r, v n y = v n x := fun n y hy =>
+    isOpen_ball.is_const_of_fderiv_eq_zero (convex_ball x r).isPreconnected
       ((hvsmooth n).differentiable (by simp)).differentiableOn
-      (fun z hz => hgrad n z hz) hy (mem_ball_self hr)
+      (fun z hz => fderiv_convolution_eq_zero_of_hasWeakGradOn_zero hΩm hu hwg (φb n)
+        (subset_trans (fun w hw => by
+          rw [mem_closedBall] at hw ⊢
+          linarith [hφle n, mem_ball.mp hz, dist_triangle w z x]) hx))
+      hy (mem_ball_self hr)
   -- the mollifications converge to the class in `L¹` on the ball
-  have h1 : ENNReal.ofReal (1 : ℝ) = 1 := by norm_num
-  have hconv := tendsto_eLpNorm_convolution_sub le_rfl (h := uΩ)
-    (by rw [h1]; exact memLp_one_iff_integrable.mpr huΩint) hφrOut hφratio
-  rw [h1] at hconv
+  have hconv := tendsto_eLpNorm_one_stdBump_convolution_sub hr huΩint
   have hball : ball x r ⊆ Ω := fun z hz => hx (ball_subset_closedBall.trans
     (closedBall_subset_closedBall (by linarith)) hz)
   have hue : u =ᵐ[volume.restrict (ball x r)] uΩ :=
@@ -182,9 +162,7 @@ theorem ae_const_on_ball_of_hasWeakGradOn_zero {Ω : Set (EuclideanSpace ℝ (Fi
           filter_upwards [hue] with y hy
           simp only [Pi.sub_apply, hy]
       _ ≤ eLpNorm (v n - uΩ) 1 volume := eLpNorm_mono_measure _ Measure.restrict_le_self
-  have : IsFiniteMeasure (volume.restrict (ball x r)) :=
-    ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
-  refine ae_const_of_tendsto_ae_const (c := fun n => v n x) inferInstance
+  refine ae_const_of_tendsto_ae_const (c := fun n => v n x)
     (memLp_one_iff_integrable.mpr (hu.mono_set hball)) (fun n => ?_) htend
   exact (ae_restrict_iff' measurableSet_ball).mpr
     (Eventually.of_forall fun y hy => hconst n y hy)

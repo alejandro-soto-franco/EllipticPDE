@@ -92,7 +92,6 @@ public import EllipticPdes.Regularity.OuterCutoffTower
 public import EllipticPdes.Regularity.LocalWeakForm
 public import EllipticPdes.Embedding.WeakGradient
 public import EllipticPdes.Embedding.Convolution
-public import EllipticPdes.Embedding.MorreyOneDim
 public import EllipticPdes.Embedding.RayIntegral
 public import EllipticPdes.Embedding.Morrey
 public import EllipticPdes.Embedding.WeakDerivBridge
@@ -104,8 +103,6 @@ public import EllipticPdes.Campanato.Converse
 public import EllipticPdes.Embedding.GagliardoNirenberg
 public import EllipticPdes.Embedding.SobolevLadder
 public import EllipticPdes.Embedding.SobolevLadderCompactSupport
-public import EllipticPdes.Embedding.SobolevLadderFullStep
-public import EllipticPdes.Embedding.SobolevLadderGeneral
 public import EllipticPdes.Embedding.HolderGeneral
 public import EllipticPdes.Extension.C1Test
 public import EllipticPdes.Extension.Cutoff

@@ -136,6 +136,51 @@ theorem norm_rellichEmbL_sub_le (hΩm : MeasurableSet Ω) (hΩb : IsBounded Ω) 
       (by positivity : (0:ℝ) ≤ 2 * (sobolevConst d : ℝ) * d) (by linarith),
     ofReal_norm]
 
+/-- **Compactness from a Hölder-type bound.** If `S` is a compact operator and
+`‖T x - T y‖ ≤ C ‖S x - S y‖ ^ θ` on the closed unit ball for some `θ > 0`, then `T` is a compact
+operator: a finite `δ`-net of the image of the unit ball under `S` pulls back to a finite
+`C δ ^ θ`-net of the image under `T`. -/
+theorem isCompactOperator_of_holder_dist {X Y Z : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
+    [NormedAddCommGroup Y] [NormedSpace ℝ Y] [NormedAddCommGroup Z] [NormedSpace ℝ Z]
+    [CompleteSpace Z] {S : X →L[ℝ] Y} {T : X →L[ℝ] Z} (hS : IsCompactOperator S) {θ C : ℝ}
+    (hθ : 0 < θ) (hC : 0 ≤ C)
+    (h : ∀ x y, ‖x‖ ≤ 1 → ‖y‖ ≤ 1 → ‖T x - T y‖ ≤ ‖S x - S y‖ ^ θ * C) :
+    IsCompactOperator T := by
+  have hSL : TotallyBounded (⇑S '' closedBall (0 : X) 1) :=
+    ((isCompactOperator_iff_isCompact_closure_image_closedBall S.toLinearMap one_pos).mp hS
+      ).totallyBounded.subset subset_closure
+  refine (isCompactOperator_iff_isCompact_closure_image_closedBall T.toLinearMap one_pos).mpr ?_
+  refine TotallyBounded.isCompact_of_isClosed (TotallyBounded.closure ?_) isClosed_closure
+  rw [Metric.totallyBounded_iff]
+  intro ε hε
+  -- The radius the Hölder bound turns into `ε`.
+  have hK0 : 0 < C + 1 := by linarith
+  set δ : ℝ := (ε / (C + 1)) ^ θ⁻¹ with hδ
+  have hδ0 : 0 < δ := Real.rpow_pos_of_pos (by positivity) _
+  obtain ⟨t, hts, htf, htcov⟩ := totallyBounded_iff_subset.1 hSL _ (Metric.dist_mem_uniformity hδ0)
+  -- A preimage in the unit ball for each net point.
+  have hchoice : ∀ y : Y, ∃ x : X, ‖x‖ ≤ 1 ∧ (y ∈ ⇑S '' closedBall (0 : X) 1 → S x = y) := by
+    intro y
+    by_cases hy : y ∈ ⇑S '' closedBall (0 : X) 1
+    · obtain ⟨x, hx, rfl⟩ := hy
+      exact ⟨x, by simpa using hx, fun _ => rfl⟩
+    · exact ⟨0, by simp, fun h => absurd h hy⟩
+  choose g hg1 hg2 using hchoice
+  refine ⟨(fun y => T (g y)) '' t, htf.image _, ?_⟩
+  rintro _ ⟨x, hx, rfl⟩
+  have hxball : ‖x‖ ≤ 1 := by simpa using hx
+  obtain ⟨y, hyt, hdy⟩ : ∃ y ∈ t, dist (S x) y < δ := by simpa using htcov ⟨x, hx, rfl⟩
+  refine Set.mem_iUnion₂.2 ⟨T (g y), Set.mem_image_of_mem _ hyt, ?_⟩
+  rw [Metric.mem_ball, dist_eq_norm]
+  have hdist : ‖S x - S (g y)‖ < δ := by rw [hg2 y (hts hyt), ← dist_eq_norm]; exact hdy
+  calc ‖T x - T (g y)‖ ≤ ‖S x - S (g y)‖ ^ θ * C := h _ _ hxball (hg1 y)
+    _ ≤ δ ^ θ * C := by gcongr
+    _ = ε / (C + 1) * C := by
+        rw [hδ, ← Real.rpow_mul (div_pos hε hK0).le, inv_mul_cancel₀ hθ.ne', Real.rpow_one]
+    _ < ε := by
+        rw [div_mul_eq_mul_div, div_lt_iff₀ hK0]
+        nlinarith
+
 /-- **Rellich-Kondrachov below the critical exponent.** On a bounded measurable domain the
 embedding `H₀¹(Ω) ↪ L^q(Ω)` is a compact operator for every `q` strictly between `2` and the
 Sobolev conjugate `2⋆`, the strictness being the hypothesis `1/q = θ/2 + (1-θ)/2⋆` with
@@ -149,60 +194,9 @@ theorem rellichEmbL_isCompact (hΩm : MeasurableSet Ω) (hΩb : IsBounded Ω) (h
     (hp' : (p' : ℝ)⁻¹ = ((2 : ℝ≥0) : ℝ)⁻¹ - (d : ℝ)⁻¹) (hp'0 : p' ≠ 0)
     {θ : ℝ} (hθ0 : 0 < θ) (hθ1 : θ < 1)
     (hqθ : (q : ℝ)⁻¹ = θ * ((2 : ℝ≥0) : ℝ)⁻¹ + (1 - θ) * (p' : ℝ)⁻¹) :
-    IsCompactOperator (rellichEmbL hΩm hΩb hd hq) := by
-  set T := rellichEmbL hΩm hΩb hd hq with hT
-  set M : ℝ := 2 * (sobolevConst d : ℝ) * d with hM
-  have hM0 : 0 ≤ M := by positivity
-  -- The `L²` image of the unit ball is totally bounded.
-  have hL2 : TotallyBounded (⇑(embL2 Ω) '' closedBall (0 : H01 Ω) 1) := by
-    have hcpt : IsCompactOperator ((embL2 Ω).toLinearMap) := embL2_isCompact hΩm hΩb
-    have hcl := (isCompactOperator_iff_isCompact_closure_image_closedBall
-      (embL2 Ω).toLinearMap one_pos).mp hcpt
-    exact hcl.totallyBounded.subset subset_closure
-  refine (isCompactOperator_iff_isCompact_closure_image_closedBall T.toLinearMap one_pos).mpr ?_
-  refine TotallyBounded.isCompact_of_isClosed ?_ isClosed_closure
-  refine TotallyBounded.closure ?_
-  rw [Metric.totallyBounded_iff]
-  intro ε hε
-  -- The radius the interpolation estimate turns into `ε`.
-  set K : ℝ := M ^ (1 - θ) + 1 with hK
-  have hK0 : 0 < K := by positivity
-  set δ : ℝ := (ε / K) ^ θ⁻¹ with hδ
-  have hδ0 : 0 < δ := Real.rpow_pos_of_pos (by positivity) _
-  obtain ⟨t, hts, htf, htcov⟩ :=
-    totallyBounded_iff_subset.1 hL2 _ (Metric.dist_mem_uniformity hδ0)
-  -- A preimage in the unit ball for each net point.
-  have hchoice : ∀ y : L2D Ω, ∃ U : H01 Ω, ‖U‖ ≤ 1 ∧
-      (y ∈ ⇑(embL2 Ω) '' closedBall (0 : H01 Ω) 1 → embL2 Ω U = y) := by
-    intro y
-    by_cases hy : y ∈ ⇑(embL2 Ω) '' closedBall (0 : H01 Ω) 1
-    · obtain ⟨U, hU, rfl⟩ := hy
-      exact ⟨U, by simpa using hU, fun _ => rfl⟩
-    · exact ⟨0, by simp, fun h => absurd h hy⟩
-  choose g hg1 hg2 using hchoice
-  refine ⟨(fun y => T (g y)) '' t, htf.image _, ?_⟩
-  rintro _ ⟨U, hU, rfl⟩
-  have hUball : ‖U‖ ≤ 1 := by simpa using hU
-  have hUim : embL2 Ω U ∈ ⇑(embL2 Ω) '' closedBall (0 : H01 Ω) 1 := ⟨U, hU, rfl⟩
-  obtain ⟨y, hyt, hdy⟩ : ∃ y ∈ t, dist (embL2 Ω U) y < δ := by
-    have := htcov hUim
-    simpa using this
-  refine Set.mem_iUnion₂.2 ⟨T (g y), Set.mem_image_of_mem _ hyt, ?_⟩
-  rw [Metric.mem_ball, dist_eq_norm]
-  have hgy : embL2 Ω (g y) = y := hg2 y (hts hyt)
-  have hdist : ‖embL2 Ω U - embL2 Ω (g y)‖ < δ := by
-    rw [hgy, ← dist_eq_norm]; exact hdy
-  calc ‖T U - T (g y)‖
-      ≤ ‖embL2 Ω U - embL2 Ω (g y)‖ ^ θ * M ^ (1 - θ) :=
-        norm_rellichEmbL_sub_le hΩm hΩb hd hq hq0 hp' hp'0 hθ0 hθ1 hqθ hUball (hg1 y)
-    _ ≤ δ ^ θ * M ^ (1 - θ) := by gcongr
-    _ = ε / K * M ^ (1 - θ) := by
-        rw [← Real.rpow_mul (le_of_lt (div_pos hε hK0)), inv_mul_cancel₀ (ne_of_gt hθ0),
-          Real.rpow_one]
-    _ < ε := by
-        rw [div_mul_eq_mul_div, div_lt_iff₀ hK0]
-        have hMK : M ^ (1 - θ) < K := by rw [hK]; linarith
-        nlinarith [Real.rpow_nonneg hM0 (1 - θ)]
+    IsCompactOperator (rellichEmbL hΩm hΩb hd hq) :=
+  isCompactOperator_of_holder_dist (embL2_isCompact hΩm hΩb) hθ0 (by positivity)
+    fun _ _ hU hV => norm_rellichEmbL_sub_le hΩm hΩb hd hq hq0 hp' hp'0 hθ0 hθ1 hqθ hU hV
 
 end
 
@@ -216,44 +210,7 @@ variable [Fact (1 ≤ (q : ℝ≥0∞))]
 map, with the operator norm the measure supplies. -/
 def lqOfL2 [IsFiniteMeasure (volume.restrict Ω)] (hq2 : (q : ℝ≥0∞) ≤ 2) :
     L2D Ω →L[ℝ] Lp ℝ (q : ℝ≥0∞) (volume.restrict Ω) :=
-  LinearMap.mkContinuous
-    { toFun := fun f => ((Lp.memLp f).mono_exponent hq2).toLp f
-      map_add' := fun f g => by
-        rw [MemLp.toLp_congr _ (((Lp.memLp f).mono_exponent hq2).add
-              ((Lp.memLp g).mono_exponent hq2)) (Lp.coeFn_add f g), MemLp.toLp_add]
-      map_smul' := fun c f => by
-        rw [MemLp.toLp_congr _ (((Lp.memLp f).mono_exponent hq2).const_smul c)
-          (Lp.coeFn_smul c f), MemLp.toLp_const_smul]
-        rfl }
-    (((volume.restrict Ω) Set.univ).toReal ^
-      (1 / (q : ℝ≥0∞).toReal - 1 / (2 : ℝ≥0∞).toReal))
-    (fun f => by
-      change ‖((Lp.memLp f).mono_exponent hq2).toLp f‖ ≤ _ * ‖f‖
-      rw [Lp.norm_toLp, Lp.norm_def]
-      have hq1 : (1 : ℝ) ≤ (q : ℝ≥0∞).toReal := by
-        have := ENNReal.toReal_mono ENNReal.coe_ne_top (Fact.out : (1 : ℝ≥0∞) ≤ (q : ℝ≥0∞))
-        simpa using this
-      have hq2' : (q : ℝ≥0∞).toReal ≤ (2 : ℝ≥0∞).toReal :=
-        ENNReal.toReal_mono (by simp) hq2
-      have he : (0 : ℝ) ≤ 1 / (q : ℝ≥0∞).toReal - 1 / (2 : ℝ≥0∞).toReal := by
-        rw [sub_nonneg]
-        exact one_div_le_one_div_of_le (by linarith) hq2'
-      have hb := eLpNorm_le_eLpNorm_mul_rpow_measure_univ (μ := volume.restrict Ω) hq2
-        (Lp.aestronglyMeasurable f)
-      have hfin : eLpNorm (f : EuclideanSpace ℝ (Fin d) → ℝ) 2 (volume.restrict Ω)
-          * (volume.restrict Ω) Set.univ ^ (1 / (q : ℝ≥0∞).toReal - 1 / (2 : ℝ≥0∞).toReal)
-          ≠ ⊤ :=
-        ENNReal.mul_ne_top (Lp.memLp f).eLpNorm_lt_top.ne
-          (ENNReal.rpow_ne_top_of_nonneg he (measure_ne_top _ _))
-      calc (eLpNorm (f : EuclideanSpace ℝ (Fin d) → ℝ) (q : ℝ≥0∞) (volume.restrict Ω)).toReal
-          ≤ (eLpNorm (f : EuclideanSpace ℝ (Fin d) → ℝ) 2 (volume.restrict Ω)
-              * (volume.restrict Ω) Set.univ
-                ^ (1 / (q : ℝ≥0∞).toReal - 1 / (2 : ℝ≥0∞).toReal)).toReal :=
-            ENNReal.toReal_mono hfin hb
-        _ = ((volume.restrict Ω) Set.univ).toReal
-              ^ (1 / (q : ℝ≥0∞).toReal - 1 / (2 : ℝ≥0∞).toReal)
-            * (eLpNorm (f : EuclideanSpace ℝ (Fin d) → ℝ) 2 (volume.restrict Ω)).toReal := by
-            rw [ENNReal.toReal_mul, ENNReal.toReal_rpow, mul_comm])
+  lpInclusion (volume.restrict Ω) hq2
 
 /-- **Compactness at every exponent up to `2`.** Below the `L²` exponent the embedding factors
 through `embL2`, the finite measure supplying the inclusion, so compactness is inherited rather

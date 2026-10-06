@@ -69,24 +69,6 @@ open EllipticPdes.Extension (HasC1Boundary)
 
 variable {d : ℕ}
 
-private theorem inv_anti_emb {a b : ℝ} (ha : 0 < a) (h : a ≤ b) : b⁻¹ ≤ a⁻¹ := by
-  have hb : 0 < b := lt_of_lt_of_le ha h
-  nlinarith [mul_inv_cancel₀ ha.ne', mul_inv_cancel₀ hb.ne', inv_pos.mpr ha, inv_pos.mpr hb]
-
-private theorem coe_toNNReal_inv_emb {t : ℝ} (ht : 0 < t) :
-    ((Real.toNNReal t⁻¹ : ℝ≥0) : ℝ) = t⁻¹ :=
-  Real.coe_toNNReal _ (inv_nonneg.mpr ht.le)
-
-/-- **Positivity of the landing reciprocal.** The strict rung condition `p₀ s < d`, which is
-the condition `k < n/p`, says exactly that `1/p₀ - s/d` is positive. -/
-private theorem landing_pos {p₀ : ℝ≥0} (hp₀0 : (0 : ℝ) < (p₀ : ℝ)) (hdpos : (0 : ℝ) < (d : ℝ))
-    {s : ℕ} (hsd : (p₀ : ℝ) * s < (d : ℝ)) : 0 < (p₀ : ℝ)⁻¹ - (s : ℝ) * (d : ℝ)⁻¹ := by
-  have hmul := mul_lt_mul_of_pos_right hsd (mul_pos (inv_pos.mpr hdpos) (inv_pos.mpr hp₀0))
-  have hc1 : (d : ℝ) * ((d : ℝ)⁻¹ * (p₀ : ℝ)⁻¹) = (p₀ : ℝ)⁻¹ := by field_simp
-  have hc2 : (p₀ : ℝ) * (s : ℝ) * ((d : ℝ)⁻¹ * (p₀ : ℝ)⁻¹) = (s : ℝ) * (d : ℝ)⁻¹ := by field_simp
-  rw [hc1, hc2] at hmul
-  linarith
-
 /-! ### Clause (i) -/
 
 /-- **Clause (i) of the Sobolev embedding.** Under the strict rung condition `p₀ s < d`,
@@ -108,63 +90,32 @@ theorem exists_const_memLp_of_gradClosed_domain_ideal (hd : 1 < d)
             (volume.restrict Ω) ∧
           eLpNorm (F i) (Real.toNNReal ((p₀ : ℝ)⁻¹ - (s : ℝ) * (d : ℝ)⁻¹)⁻¹)
             (volume.restrict Ω) ≤ (K : ℝ≥0∞) * M := by
-  have hdpos : (0 : ℝ) < (d : ℝ) := by positivity
-  have hp₀1 : (1 : ℝ) ≤ (p₀ : ℝ) := by exact_mod_cast hp₀
-  have hp₀0 : (0 : ℝ) < (p₀ : ℝ) := by linarith
-  have ht0 : 0 < (p₀ : ℝ)⁻¹ - (s : ℝ) * (d : ℝ)⁻¹ := landing_pos hp₀0 hdpos hsd
-  have ht_le : (p₀ : ℝ)⁻¹ - (s : ℝ) * (d : ℝ)⁻¹ ≤ (p₀ : ℝ)⁻¹ := by
-    have : 0 ≤ (s : ℝ) * (d : ℝ)⁻¹ := by positivity
-    linarith
-  have hqcoe : ((Real.toNNReal ((p₀ : ℝ)⁻¹ - (s : ℝ) * (d : ℝ)⁻¹)⁻¹ : ℝ≥0) : ℝ)
-      = ((p₀ : ℝ)⁻¹ - (s : ℝ) * (d : ℝ)⁻¹)⁻¹ := coe_toNNReal_inv_emb ht0
-  have hqinv : ((Real.toNNReal ((p₀ : ℝ)⁻¹ - (s : ℝ) * (d : ℝ)⁻¹)⁻¹ : ℝ≥0) : ℝ)⁻¹
-      = (p₀ : ℝ)⁻¹ - (s : ℝ) * (d : ℝ)⁻¹ := by rw [hqcoe, inv_inv]
-  have hp₀q : p₀ ≤ Real.toNNReal ((p₀ : ℝ)⁻¹ - (s : ℝ) * (d : ℝ)⁻¹)⁻¹ := by
-    rw [← NNReal.coe_le_coe, hqcoe]
-    have := inv_anti_emb ht0 ht_le
-    simpa using this
-  exact exists_const_memLp_of_gradClosed_domain hd hΩopen hΩb hC1 hp₀ ι s hsd.le hp₀q
-    (le_of_eq hqinv.symm)
+  obtain ⟨Q, hp₀Q, hQ⟩ := exists_rung_exponent hp₀ (by omega) hsd
+  rw [← hQ, inv_inv, Real.toNNReal_coe]
+  exact exists_const_memLp_of_gradClosed_domain hd hΩopen hΩb hC1 hp₀ ι s hsd.le hp₀Q hQ.ge
 
 /-! ### Landing exponents of clause (ii) -/
 
 /-- **Landing exponent when `n/p ∉ ℕ`.** The two rung conditions place the exponent
 `1/P = 1/p₀ - s/d` strictly above the dimension, and Morrey's exponent there is the
 `⌊n/p⌋ - n/p + 1` the clause names. -/
-private theorem exists_landing_ideal (hd0 : 0 < d) {p₀ : ℝ≥0} (hp₀0 : (0 : ℝ) < (p₀ : ℝ))
+private theorem exists_landing_ideal (hd0 : 0 < d) {p₀ : ℝ≥0} (hp₀ : 1 ≤ p₀)
     (s : ℕ) (hsd : (p₀ : ℝ) * s < (d : ℝ)) (hlt : (d : ℝ) < (p₀ : ℝ) * ((s : ℝ) + 1)) :
     ∃ P : ℝ≥0, p₀ ≤ P ∧ (d : ℝ) < (P : ℝ) ∧
       (p₀ : ℝ)⁻¹ - (s : ℝ) * (d : ℝ)⁻¹ ≤ (P : ℝ)⁻¹ ∧
       morreyExponent d (P : ℝ) = Real.toNNReal ((s : ℝ) + 1 - (d : ℝ) / (p₀ : ℝ)) := by
   have hdpos : (0 : ℝ) < (d : ℝ) := by exact_mod_cast hd0
-  have ht0 : 0 < (p₀ : ℝ)⁻¹ - (s : ℝ) * (d : ℝ)⁻¹ := landing_pos hp₀0 hdpos hsd
-  have ht_le : (p₀ : ℝ)⁻¹ - (s : ℝ) * (d : ℝ)⁻¹ ≤ (p₀ : ℝ)⁻¹ := by
-    have : 0 ≤ (s : ℝ) * (d : ℝ)⁻¹ := by positivity
-    linarith
-  set P : ℝ≥0 := Real.toNNReal ((p₀ : ℝ)⁻¹ - (s : ℝ) * (d : ℝ)⁻¹)⁻¹ with hP_def
-  have hPcoe : ((P : ℝ≥0) : ℝ) = ((p₀ : ℝ)⁻¹ - (s : ℝ) * (d : ℝ)⁻¹)⁻¹ := by
-    rw [hP_def]; exact coe_toNNReal_inv_emb ht0
-  have hPinv : ((P : ℝ≥0) : ℝ)⁻¹ = (p₀ : ℝ)⁻¹ - (s : ℝ) * (d : ℝ)⁻¹ := by rw [hPcoe, inv_inv]
-  have hp₀P : p₀ ≤ P := by
-    rw [← NNReal.coe_le_coe, hPcoe]
-    have := inv_anti_emb ht0 ht_le
-    simpa using this
+  have hp₀0 : (0 : ℝ) < (p₀ : ℝ) := by exact_mod_cast hp₀.trans_lt' one_pos
+  obtain ⟨P, hp₀P, hPinv⟩ := exists_rung_exponent hp₀ hd0 hsd
+  have hPpos : (0 : ℝ) < (P : ℝ) := by exact_mod_cast (hp₀.trans_lt' one_pos).trans_le hp₀P
   -- the upper rung condition places the landing exponent above the dimension
   have hPd : (d : ℝ) < (P : ℝ) := by
-    have hstrict : (p₀ : ℝ)⁻¹ - (s : ℝ) * (d : ℝ)⁻¹ < (d : ℝ)⁻¹ := by
-      have hmul := mul_lt_mul_of_pos_right hlt (mul_pos (inv_pos.mpr hdpos) (inv_pos.mpr hp₀0))
-      have hc1 : (d : ℝ) * ((d : ℝ)⁻¹ * (p₀ : ℝ)⁻¹) = (p₀ : ℝ)⁻¹ := by field_simp
-      have hc2 : (p₀ : ℝ) * ((s : ℝ) + 1) * ((d : ℝ)⁻¹ * (p₀ : ℝ)⁻¹)
-          = ((s : ℝ) + 1) * (d : ℝ)⁻¹ := by field_simp
-      rw [hc1, hc2] at hmul
-      have : (s : ℝ) * (d : ℝ)⁻¹ + (d : ℝ)⁻¹ = ((s : ℝ) + 1) * (d : ℝ)⁻¹ := by ring
+    rw [← inv_lt_inv₀ hPpos hdpos, hPinv]
+    have : (p₀ : ℝ)⁻¹ < ((s : ℝ) + 1) * (d : ℝ)⁻¹ := by
+      rw [← div_eq_mul_inv, ← one_div, div_lt_div_iff₀ hp₀0 hdpos]
       linarith
-    have hPpos : (0 : ℝ) < (P : ℝ) := by rw [hPcoe]; exact inv_pos.mpr ht0
-    have hinv : ((P : ℝ≥0) : ℝ)⁻¹ < (d : ℝ)⁻¹ := by rw [hPinv]; exact hstrict
-    by_contra hcon
-    have hle : (P : ℝ) ≤ (d : ℝ) := le_of_not_gt hcon
-    exact absurd (inv_anti_emb hPpos hle) (not_le.mpr hinv)
-  refine ⟨P, hp₀P, hPd, le_of_eq hPinv.symm, ?_⟩
+    linarith
+  refine ⟨P, hp₀P, hPd, hPinv.ge, ?_⟩
   -- Morrey's exponent at the landing exponent is the one the theorem names
   have hval := morreyExponent_eq_ladder (d := d) (p₀ := p₀) (P := P) (s := s) hd0 hp₀0 hPd.le
     hPinv
@@ -181,38 +132,21 @@ private theorem exists_landing_free (hd0 : 0 < d) {p₀ : ℝ≥0} (hp₀0 : (0 
     ∃ P : ℝ≥0, p₀ ≤ P ∧ (d : ℝ) < (P : ℝ) ∧
       (p₀ : ℝ)⁻¹ - (s : ℝ) * (d : ℝ)⁻¹ ≤ (P : ℝ)⁻¹ ∧ morreyExponent d (P : ℝ) = γ := by
   have hdpos : (0 : ℝ) < (d : ℝ) := by exact_mod_cast hd0
-  have hγ1R : ((γ : ℝ≥0) : ℝ) < 1 := by exact_mod_cast hγ1
-  have hγ0R : (0 : ℝ) < ((γ : ℝ≥0) : ℝ) := by exact_mod_cast hγ0
-  have hden : (0 : ℝ) < 1 - (γ : ℝ) := by linarith
-  set P : ℝ≥0 := Real.toNNReal ((d : ℝ) / (1 - (γ : ℝ))) with hP_def
-  have hPcoe : ((P : ℝ≥0) : ℝ) = (d : ℝ) / (1 - (γ : ℝ)) := by
-    rw [hP_def, Real.coe_toNNReal _ (by positivity)]
-  have hPd : (d : ℝ) < (P : ℝ) := by
-    rw [hPcoe, lt_div_iff₀ hden]
-    nlinarith
+  obtain ⟨P, hPd, hγP⟩ := exists_nnreal_morreyExponent_eq hd0 hγ0 hγ1
   -- the base exponent is at most the dimension, the rung count being at least one
   have hp₀d : (p₀ : ℝ) ≤ (d : ℝ) := by
     rcases Nat.eq_zero_or_pos s with rfl | hs
     · simp at hsd; linarith
     · have hs1 : (1 : ℝ) ≤ (s : ℝ) := by exact_mod_cast hs
       nlinarith
-  have hp₀P : p₀ ≤ P := by
-    rw [← NNReal.coe_le_coe]
+  refine ⟨P, ?_, hPd, ?_, hγP⟩
+  · rw [← NNReal.coe_le_coe]
     linarith [hPd, hp₀d]
-  have hPs : (p₀ : ℝ)⁻¹ - (s : ℝ) * (d : ℝ)⁻¹ ≤ (P : ℝ)⁻¹ := by
-    have hzero : (p₀ : ℝ)⁻¹ - (s : ℝ) * (d : ℝ)⁻¹ = 0 := by
+  · have hzero : (p₀ : ℝ)⁻¹ - (s : ℝ) * (d : ℝ)⁻¹ = 0 := by
       field_simp
       linarith [hsd]
     rw [hzero]
     positivity
-  refine ⟨P, hp₀P, hPd, hPs, ?_⟩
-  have hdne : (d : ℝ) ≠ 0 := ne_of_gt hdpos
-  have hdenne : (1 : ℝ) - (γ : ℝ) ≠ 0 := ne_of_gt hden
-  have h1 : (d : ℝ) / ((d : ℝ) / (1 - (γ : ℝ))) = 1 - (γ : ℝ) := by
-    field_simp
-  refine NNReal.coe_injective ?_
-  rw [coe_morreyExponent hPd hd0, hPcoe, h1]
-  ring
 
 /-! ### Clause (ii) -/
 
@@ -240,7 +174,7 @@ theorem exists_const_holderOnWith_domain_ideal (hd : 1 < d)
   have hd0 : 0 < d := by omega
   have hp₀1 : (1 : ℝ) ≤ (p₀ : ℝ) := by exact_mod_cast hp₀
   have hp₀0 : (0 : ℝ) < (p₀ : ℝ) := by linarith
-  obtain ⟨P, hp₀P, hPd, hPs, hexp⟩ := exists_landing_ideal hd0 hp₀0 s hsd hlt
+  obtain ⟨P, hp₀P, hPd, hPs, hexp⟩ := exists_landing_ideal hd0 hp₀ s hsd hlt
   obtain ⟨C, hC⟩ := exists_const_holderOnWith_of_gradClosed_domain hd hΩopen hΩb hC1 ι hp₀
     (P := P) (s := s) hsd.le hp₀P hPd hPs
   rw [hexp] at hC
@@ -299,7 +233,7 @@ theorem exists_const_contDiffOn_holderOnWith_domain_ideal (hd : 1 < d)
   have hd0 : 0 < d := by omega
   have hp₀1 : (1 : ℝ) ≤ (p₀ : ℝ) := by exact_mod_cast hp₀
   have hp₀0 : (0 : ℝ) < (p₀ : ℝ) := by linarith
-  obtain ⟨P, hp₀P, hPd, hPs, hexp⟩ := exists_landing_ideal hd0 hp₀0 s hsd hlt
+  obtain ⟨P, hp₀P, hPd, hPs, hexp⟩ := exists_landing_ideal hd0 hp₀ s hsd hlt
   obtain ⟨C, hC⟩ := exists_const_contDiffOn_holderOnWith_of_gradClosed_domain hd hΩopen hΩb hC1 ι
     hp₀ (P := P) (s := s) hsd.le hp₀P hPd hPs
   rw [hexp] at hC

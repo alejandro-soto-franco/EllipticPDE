@@ -41,6 +41,42 @@ namespace EllipticPdes.Embedding
 
 variable {d : ℕ}
 
+/-- **Classical derivatives of continuous representatives of a family.** Let `v i` represent
+`F i` on the open set `B`, let `F i` have its weak gradient in the family, and let `Good n i` say
+that `n` more orders are available at `i`, so that the derivative of a member that has `n + 1`
+has `n`. If every `v i` with `Good n i` is continuous, then each `v i` with `Good (n + 1) i` is
+differentiable on `B` with the next members as its partial derivatives, and each `v i` with
+`Good n i` is `C^n`. -/
+theorem contDiffOn_of_ae_eq_family {B : Set (EuclideanSpace ℝ (Fin d))} (hBo : IsOpen B)
+    {ι : Type*} {F v : ι → EuclideanSpace ℝ (Fin d) → ℝ} {nxt : ι → Fin d → ι}
+    (Good : ℕ → ι → Prop) (hstep : ∀ n i k, Good (n + 1) i → Good n (nxt i k))
+    (hae : ∀ n i, Good n i → v i =ᵐ[volume.restrict B] F i)
+    (hint : ∀ n i, Good n i → IntegrableOn (F i) B volume)
+    (hgrad : ∀ n i, Good (n + 1) i → HasWeakGradOn B (F i) (fun k => F (nxt i k)))
+    (hcont : ∀ n i, Good n i → ContinuousOn (v i) B) :
+    (∀ n i, Good (n + 1) i → ∀ y ∈ B, HasFDerivAt (v i) (gradCLM (fun k => v (nxt i k)) y) y) ∧
+      ∀ n i, Good n i → ContDiffOn ℝ (n : ℕ) (v i) B := by
+  have hfd : ∀ n i, Good (n + 1) i →
+      ∀ y ∈ B, HasFDerivAt (v i) (gradCLM (fun k => v (nxt i k)) y) y := fun n i hi y hy =>
+    hasFDerivAt_of_continuousOn_hasWeakGradOn hBo.measurableSet hBo
+      ((hint _ i hi).congr (hae _ i hi).symm)
+      (fun k => (hint n _ (hstep n i k hi)).congr (hae n _ (hstep n i k hi)).symm)
+      (hcont _ i hi) (fun k => hcont n _ (hstep n i k hi))
+      ((hgrad n i hi).congr_ae (hae _ i hi).symm fun k => (hae n _ (hstep n i k hi)).symm) hy
+  refine ⟨hfd, fun n => ?_⟩
+  induction n with
+  | zero => exact fun i hi => by simpa using hcont 0 i hi
+  | succ n ih =>
+    intro i hi
+    rw [show ((n + 1 : ℕ) : WithTop ℕ∞) = (n : WithTop ℕ∞) + 1 by push_cast; ring,
+      contDiffOn_succ_iff_fderiv_of_isOpen hBo]
+    refine ⟨fun y hy => ((hfd n i hi y hy).differentiableAt).differentiableWithinAt, by simp, ?_⟩
+    have hsum : ContDiffOn ℝ (n : ℕ) (fun y => gradCLM (fun k => v (nxt i k)) y) B := by
+      change ContDiffOn ℝ (n : ℕ) (fun y => ∑ k, v (nxt i k) y •
+        (EuclideanSpace.proj k : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ)) B
+      exact ContDiffOn.sum fun k _ => (ih (nxt i k) (hstep n i k hi)).smul contDiffOn_const
+    exact hsum.congr fun y hy => (hfd n i hi y hy).fderiv
+
 /-- **Smooth representatives of a family closed under weak differentiation.** Let `F` assign a
 function to each index, let `nxt i k` name a weak `k`-derivative of `F i` on `Metric.ball c R`,
 and let every member lie in `L²` there. Then on any smaller concentric ball every member has a
@@ -58,59 +94,24 @@ theorem contDiffOn_of_gradClosed (hd : 0 < d) (c : EuclideanSpace ℝ (Fin d)) {
     ∃ v : ι → EuclideanSpace ℝ (Fin d) → ℝ,
       (∀ i, ContDiffOn ℝ (⊤ : ℕ∞) (v i) (Metric.ball c r)) ∧
         ∀ i, v i =ᵐ[volume.restrict (Metric.ball c r)] F i := by
-  classical
-  have : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
-    ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
   have hdR : (0 : ℝ) < (d : ℝ) := by exact_mod_cast hd
   have hp : (d : ℝ) < 2 * (d : ℝ) := by linarith
-  have hp0 : (0 : ℝ) < 2 * (d : ℝ) := by linarith
-  -- The ladder, and the exponent it lands on read as an extended real.
-  have hladder : ∀ i, MemLp (F i) (ENNReal.ofReal (2 * (d : ℝ)))
-      (volume.restrict (Metric.ball c r)) := by
-    intro i
-    have h := memLp_two_mul_of_gradClosed hd c hr hrR hgrad hmem i
-    have hcast : ENNReal.ofReal (2 * (d : ℝ)) = ((2 * (d : ℝ≥0) : ℝ≥0) : ℝ≥0∞) := by
-      rw [← ENNReal.ofReal_coe_nnreal]
-      congr 1
-    rwa [hcast]
   have hFint : ∀ i, IntegrableOn (F i) (Metric.ball c r) volume := fun i =>
     ((hmem i).mono_measure
       (Measure.restrict_mono (Metric.ball_subset_ball hrR.le) le_rfl)).integrable (by norm_num)
-  have hgradr : ∀ i, HasWeakGradOn (Metric.ball c r) (F i) (fun k => F (nxt i k)) := fun i =>
-    (hgrad i).mono (Metric.ball_subset_ball hrR.le)
-  -- Morrey, applied to every member at once.
+  -- The ladder lifts every member to `L^{2d}`, and Morrey gives each a Hölder representative.
   obtain ⟨C, hC⟩ := morrey_ball hd hp c hr
-  choose v hvae hvhol using fun i =>
-    hC (F i) (fun k => F (nxt i k)) (hFint i) (fun k => hladder (nxt i k)) (hgradr i)
+  choose v hvae hvhol using fun i => hC (F i) (fun k => F (nxt i k)) (hFint i)
+    (fun k => by
+      rw [ofReal_two_mul_natCast]
+      exact memLp_two_mul_of_gradClosed hd c hr hrR hgrad hmem (nxt i k))
+    ((hgrad i).mono (Metric.ball_subset_ball hrR.le))
   have hγ : 0 < morreyExponent d (2 * (d : ℝ)) :=
-    Real.toNNReal_pos.mpr (sub_pos.mpr ((div_lt_one hp0).mpr hp))
-  have hvc : ∀ i, ContinuousOn (v i) (Metric.ball c r) := fun i => (hvhol i).continuousOn hγ
-  have hvint : ∀ i, IntegrableOn (v i) (Metric.ball c r) volume := fun i =>
-    (hFint i).congr (hvae i).symm
-  have hvgrad : ∀ i, HasWeakGradOn (Metric.ball c r) (v i) (fun k => v (nxt i k)) := fun i =>
-    (hgradr i).congr_ae (hvae i).symm fun k => (hvae (nxt i k)).symm
-  -- The classical derivative of a representative is the representative of the derivative.
-  have hfd : ∀ (i : ι), ∀ y ∈ Metric.ball c r,
-      HasFDerivAt (v i) (gradCLM (fun k => v (nxt i k)) y) y := fun i y hy =>
-    hasFDerivAt_of_continuousOn_hasWeakGradOn measurableSet_ball Metric.isOpen_ball (hvint i)
-      (fun k => hvint (nxt i k)) (hvc i) (fun k => hvc (nxt i k)) (hvgrad i) hy
-  -- Every finite order, by induction, with no further shrinking.
-  have hcn : ∀ (n : ℕ) (i : ι), ContDiffOn ℝ (n : ℕ) (v i) (Metric.ball c r) := by
-    intro n
-    induction n with
-    | zero => exact fun i => by simpa using (hvc i)
-    | succ n ih =>
-      intro i
-      rw [show ((n + 1 : ℕ) : WithTop ℕ∞) = (n : WithTop ℕ∞) + 1 by push_cast; ring,
-        contDiffOn_succ_iff_fderiv_of_isOpen Metric.isOpen_ball]
-      refine ⟨fun y hy => ((hfd i y hy).differentiableAt).differentiableWithinAt, by simp, ?_⟩
-      have hsum : ContDiffOn ℝ (n : ℕ) (fun y => gradCLM (fun k => v (nxt i k)) y)
-          (Metric.ball c r) := by
-        change ContDiffOn ℝ (n : ℕ)
-          (fun y => ∑ k, v (nxt i k) y •
-            (EuclideanSpace.proj k : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ)) (Metric.ball c r)
-        exact ContDiffOn.sum fun k _ => (ih (nxt i k)).smul contDiffOn_const
-      exact hsum.congr fun y hy => (hfd i y hy).fderiv
-  exact ⟨v, fun i => contDiffOn_infty.mpr fun n => hcn n i, hvae⟩
+    Real.toNNReal_pos.mpr (sub_pos.mpr ((div_lt_one (by linarith)).mpr hp))
+  obtain ⟨-, hcn⟩ := contDiffOn_of_ae_eq_family (F := F) (v := v) Metric.isOpen_ball
+    (fun _ _ => True) (fun _ _ _ _ => trivial) (fun _ i _ => hvae i) (fun _ i _ => hFint i)
+    (fun _ i _ => (hgrad i).mono (Metric.ball_subset_ball hrR.le))
+    (fun _ i _ => (hvhol i).continuousOn hγ)
+  exact ⟨v, fun i => contDiffOn_infty.mpr fun n => hcn n i trivial, hvae⟩
 
 end EllipticPdes.Embedding

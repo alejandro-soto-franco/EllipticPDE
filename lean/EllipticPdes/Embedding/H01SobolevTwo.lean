@@ -47,18 +47,6 @@ noncomputable def sobolevConstTwo (Ω : Set (EuclideanSpace ℝ (Fin 2))) : ℝ�
   eLpNormLESNormFDerivOfLeConst ℝ (volume : Measure (EuclideanSpace ℝ (Fin 2))) Ω (3 / 2) 4
     * (volume Ω).toNNReal ^ (1 / 6 : ℝ)
 
-/-- A function supported in `Ω` has the same `Lᵖ` seminorm over `Ω` as over the whole space,
-for functions into any normed group. -/
-lemma eLpNorm_restrict_eq_of_tsupport_subset' {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))}
-    (hΩm : MeasurableSet Ω) {F : Type*} [NormedAddCommGroup F]
-    {f : EuclideanSpace ℝ (Fin d) → F} (hf : tsupport f ⊆ Ω) (p : ℝ≥0∞) :
-    eLpNorm f p (volume.restrict Ω) = eLpNorm f p volume := by
-  rw [← eLpNorm_indicator_eq_eLpNorm_restrict hΩm]
-  refine eLpNorm_congr_ae (EventuallyEq.of_eq (funext fun x => ?_))
-  by_cases hx : x ∈ Ω
-  · rw [Set.indicator_of_mem hx]
-  · rw [Set.indicator_of_notMem hx, image_eq_zero_of_notMem_tsupport (fun hc => hx (hf hc))]
-
 /-- **Two-dimensional Sobolev inequality on a test function**: the `L⁴(Ω)` seminorm of the
 function coordinate is bounded by the sum of the `L²(Ω)` norms of the gradient coordinates. -/
 theorem eLpNorm_testGraph_le_two (hΩm : MeasurableSet Ω) (hΩb : Bornology.IsBounded Ω)
@@ -87,7 +75,7 @@ theorem eLpNorm_testGraph_le_two (hΩm : MeasurableSet Ω) (hΩb : Bornology.IsB
     exact ENNReal.coe_le_coe.mpr (by rw [← NNReal.coe_le_coe]; push_cast; norm_num)
   have hholder : eLpNorm (fderiv ℝ φ) ((3 / 2 : ℝ≥0) : ℝ≥0∞) volume
       ≤ eLpNorm (fderiv ℝ φ) 2 volume * (volume Ω) ^ (1 / 6 : ℝ) := by
-    rw [← eLpNorm_restrict_eq_of_tsupport_subset' hΩm hfd, ← eLpNorm_restrict_eq_of_tsupport_subset'
+    rw [← eLpNorm_restrict_eq_of_tsupport_subset hΩm hfd, ← eLpNorm_restrict_eq_of_tsupport_subset
       hΩm hfd 2]
     have := eLpNorm_le_eLpNorm_mul_rpow_measure_univ (μ := volume.restrict Ω) hle hmeas
     rwa [Measure.restrict_apply_univ, hexp] at this

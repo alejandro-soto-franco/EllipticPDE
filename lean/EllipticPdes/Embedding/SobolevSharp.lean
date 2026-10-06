@@ -305,205 +305,112 @@ lemma norm_critEmb (hd : 0 < d) (hp' : (p' : ℝ)⁻¹ = ((2 : ℝ≥0) : ℝ)�
 
 end Crit
 
-set_option maxHeartbeats 1000000 in
--- The family, its three norm identities and the extraction are one argument over the graphs of
--- dilated bump functions, and elaborating it needs more than the default.
+/-- **A bounded sequence with images of fixed norm that vanish under an injective map is no
+compact family.** If `‖T xₙ‖ = c > 0` with `‖xₙ‖ ≤ 1`, and `S` is continuous and injective with
+`S (T xₙ) → 0`, then `T` is not compact: a convergent subsequence of `T xₙ` would have a limit of
+norm `c` which `S` sends to `0`. -/
+theorem not_isCompactOperator_of_tendsto_zero {X Y Z : Type*} [NormedAddCommGroup X]
+    [NormedSpace ℝ X] [NormedAddCommGroup Y] [NormedSpace ℝ Y] [NormedAddCommGroup Z]
+    [NormedSpace ℝ Z] (T : X →L[ℝ] Y) (S : Y →L[ℝ] Z) (hS : Function.Injective S) {x : ℕ → X}
+    (hx : ∀ n, ‖x n‖ ≤ 1) {c : ℝ} (hc : 0 < c) (hT : ∀ n, ‖T (x n)‖ = c)
+    (hlim : Filter.Tendsto (fun n => S (T (x n))) Filter.atTop (nhds 0)) :
+    ¬ IsCompactOperator T := by
+  intro hcpt
+  have hcl := (isCompactOperator_iff_isCompact_closure_image_closedBall T.toLinearMap
+    one_pos).mp hcpt
+  obtain ⟨v, -, ψ, hψ, hψtend⟩ := hcl.tendsto_subseq (x := fun n => T (x n))
+    fun n => subset_closure ⟨x n, by simpa using hx n, rfl⟩
+  have hv : ‖v‖ = c := tendsto_nhds_unique ((continuous_norm.tendsto v).comp hψtend)
+    (by simp [Function.comp_def, hT])
+  have hSv : S v = 0 := tendsto_nhds_unique ((S.continuous.tendsto v).comp hψtend)
+    (hlim.comp hψ.tendsto_atTop)
+  rw [hS (hSv.trans (map_zero S).symm), norm_zero] at hv
+  exact hc.ne hv
+
+/-- The norm of an element of `H1amb` is bounded by those of its coordinates. -/
+lemma norm_H1amb_le {Ω : Set (EuclideanSpace ℝ (Fin d))} (U : H1amb Ω) {a : ℝ}
+    (ha : ‖U 0‖ ≤ a) {b : Fin d → ℝ} (hb : ∀ i, ‖U i.succ‖ ≤ b i) :
+    ‖U‖ ≤ Real.sqrt (a ^ 2 + ∑ i, b i ^ 2) := by
+  rw [PiLp.norm_eq_of_L2, Fin.sum_univ_succ]
+  exact Real.sqrt_le_sqrt (add_le_add (pow_le_pow_left₀ (norm_nonneg _) ha 2)
+    (Finset.sum_le_sum fun i _ => pow_le_pow_left₀ (norm_nonneg _) (hb i) 2))
+
+/-- At the critical conjugate exponent `p' ≠ 0`, one has `2 ≤ p'`. -/
+lemma two_le_of_sobolevConj {p' : ℝ≥0} (hp'0 : p' ≠ 0)
+    (hp' : (p' : ℝ)⁻¹ = ((2 : ℝ≥0) : ℝ)⁻¹ - (d : ℝ)⁻¹) : (2 : ℝ≥0) ≤ p' := by
+  have hpos : (0 : ℝ) < p' := by exact_mod_cast pos_iff_ne_zero.mpr hp'0
+  rw [← NNReal.coe_le_coe, NNReal.coe_ofNat]
+  refine (inv_le_inv₀ hpos two_pos).mp ?_
+  have : (0 : ℝ) ≤ (d : ℝ)⁻¹ := by positivity
+  simp only [NNReal.coe_ofNat] at hp'
+  linarith
+
 /-- **Failure of compactness at the critical exponent.** The renormalised dilates
 stay in the unit ball of `H₀¹`, keep the `L^{2⋆}` norm of the bump, and lose their `L²` norm, so
 their images have no convergent subsequence.
 
 Compactness below the critical exponent is `rellichEmbL_isCompact_of_lt`. This is where that
 range stops. -/
-theorem not_isCompactOperator_critEmb (hd : 2 < d) (hdpos : 0 < d) {p' : ℝ≥0}
+theorem not_isCompactOperator_critEmb (_hd : 2 < d) (hdpos : 0 < d) {p' : ℝ≥0}
     [Fact (1 ≤ (p' : ℝ≥0∞))] (hp'0 : p' ≠ 0)
     (hp' : (p' : ℝ)⁻¹ = ((2 : ℝ≥0) : ℝ)⁻¹ - (d : ℝ)⁻¹) :
     ¬ IsCompactOperator (critEmb d hdpos hp') := by
-  intro hcpt
-  -- The bump's two seminorms, both positive and finite.
   have hfin : ∀ q : ℝ≥0∞, eLpNorm (⇑(sharpBump d)) q volume ≠ ⊤ := fun q =>
     ((sharpBump d).continuous.memLp_of_hasCompactSupport
       (μ := volume) (p := q) (sharpBump d).hasCompactSupport).eLpNorm_lt_top.ne
+  have hbump : ∀ q : ℝ≥0∞, q ≠ 0 → 0 < (eLpNorm (⇑(sharpBump d)) q volume).toReal :=
+    fun q hq => ENNReal.toReal_pos (eLpNorm_sharpBump_ne_zero hq) (hfin q)
   set a : ℝ := (eLpNorm (⇑(sharpBump d)) 2 volume).toReal with hadef
   set c : ℝ := (eLpNorm (⇑(sharpBump d)) (p' : ℝ≥0∞) volume).toReal with hcdef
-  have ha0 : 0 < a := by
-    rw [hadef, ENNReal.toReal_pos_iff]
-    exact ⟨pos_iff_ne_zero.mpr (eLpNorm_sharpBump_ne_zero two_ne_zero),
-      lt_top_iff_ne_top.mpr (hfin 2)⟩
-  have hc0 : 0 < c := by
-    rw [hcdef, ENNReal.toReal_pos_iff]
-    exact ⟨pos_iff_ne_zero.mpr (eLpNorm_sharpBump_ne_zero (by simpa using hp'0)),
-      lt_top_iff_ne_top.mpr (hfin _)⟩
-  -- The dilation parameters.
+  have ha0 : 0 < a := hbump 2 two_ne_zero
+  have hc0 : 0 < c := hbump _ (by simpa using hp'0)
+  -- The dilation parameters `1 / (n + 2)`, and the family they define.
   have hl0 : ∀ n : ℕ, (0 : ℝ) < 1 / (n + 2) := fun n => by positivity
-  have hl1 : ∀ n : ℕ, (1 : ℝ) / (n + 2) ≤ 1 / 2 := fun n => by
-    have h2 : (2 : ℝ) ≤ (n : ℝ) + 2 := by
-      have hn : (0 : ℝ) ≤ (n : ℝ) := Nat.cast_nonneg n
-      linarith
-    exact one_div_le_one_div_of_le (by norm_num) h2
+  have hl1 : ∀ n : ℕ, (1 : ℝ) / (n + 2) ≤ 1 / 2 := fun n =>
+    one_div_le_one_div_of_le (by norm_num) (by linarith [(Nat.cast_nonneg n : (0 : ℝ) ≤ n)])
   have hltend : Filter.Tendsto (fun n : ℕ => 1 / ((n : ℝ) + 2)) Filter.atTop (nhds 0) := by
-    have hto : Filter.Tendsto (fun n : ℕ => ((n : ℝ) + 2)) Filter.atTop Filter.atTop :=
-      Filter.tendsto_atTop_add_const_right _ 2 tendsto_natCast_atTop_atTop
-    simpa [Pi.inv_def, one_div] using hto.inv_tendsto_atTop
-  -- The family and its coordinates.
+    simpa [Pi.inv_def, one_div] using (Filter.tendsto_atTop_add_const_right _ 2
+      tendsto_natCast_atTop_atTop).inv_tendsto_atTop
   set U : ℕ → H01 (ball (0 : EuclideanSpace ℝ (Fin d)) 1) :=
     fun n => sharpElt d (hl0 n) (hl1 n) with hUdef
   set b : Fin d → ℝ := fun i => (eLpNorm (partialD i (⇑(sharpBump d))) 2 volume).toReal with hbdef
   have hzero : ∀ n, ‖((U n : H01 (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) :
-      H1amb (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) 0‖ = 1 / ((n : ℝ) + 2) * a := by
-    intro n
+      H1amb (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) 0‖ = 1 / ((n : ℝ) + 2) * a := fun n => by
     rw [Lp.norm_def, hUdef, eLpNorm_sharpElt_zero, eLpNorm_sharpFamily_two (hl0 n),
       ENNReal.toReal_mul, ENNReal.toReal_ofReal (hl0 n).le]
   have hsucc : ∀ n i, ‖((U n : H01 (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) :
-      H1amb (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) i.succ‖ = b i := by
-    intro n i
+      H1amb (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) i.succ‖ = b i := fun n i => by
     rw [Lp.norm_def, hUdef, eLpNorm_sharpElt_succ, eLpNorm_partialD_sharpFamily_two (hl0 n)]
-  -- A bound on the family, uniform in `n`.
+  -- The family is bounded in `H₀¹`, and its renormalisation `W` lies in the unit ball.
   set B : ℝ := Real.sqrt (a ^ 2 + ∑ i, (b i) ^ 2) with hBdef
-  have hB0 : 0 < B := by
-    rw [hBdef]
-    refine Real.sqrt_pos.mpr ?_
-    have hnn : 0 ≤ ∑ i, (b i) ^ 2 := Finset.sum_nonneg fun _ _ => sq_nonneg _
-    have ha2 : 0 < a ^ 2 := by positivity
-    linarith
-  have hUbound : ∀ n, ‖U n‖ ≤ B := by
-    intro n
-    have hsq : ‖(U n : H1amb (ball (0 : EuclideanSpace ℝ (Fin d)) 1))‖ ^ 2
-        ≤ a ^ 2 + ∑ i, (b i) ^ 2 := by
-      rw [PiLp.norm_sq_eq_of_L2 (fun _ : Fin (d + 1) => L2D (ball (0 : EuclideanSpace ℝ (Fin d)) 1))
-        (U n : H1amb (ball (0 : EuclideanSpace ℝ (Fin d)) 1)), Fin.sum_univ_succ]
-      have h0' : ‖((U n : H01 (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) :
-          H1amb (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) 0‖ ^ 2 ≤ a ^ 2 := by
-        rw [hzero n]
-        have hla : 1 / ((n : ℝ) + 2) * a ≤ a := by
-          have := hl1 n
-          nlinarith [ha0.le, (hl0 n).le]
-        have hla0 : 0 ≤ 1 / ((n : ℝ) + 2) * a := mul_nonneg (hl0 n).le ha0.le
-        nlinarith [hla, hla0]
-      have hi' : ∀ i : Fin d, ‖((U n : H01 (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) :
-          H1amb (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) i.succ‖ ^ 2 = (b i) ^ 2 := fun i => by
-        rw [hsucc n i]
-      rw [Finset.sum_congr rfl (fun i _ => hi' i)]
-      linarith
-    have hsr := Real.sqrt_le_sqrt hsq
-    rwa [Real.sqrt_sq (norm_nonneg _), ← hBdef] at hsr
-  -- The renormalised family sits in the closed unit ball.
+  have hB0 : 0 < B := Real.sqrt_pos.mpr (add_pos_of_pos_of_nonneg (by positivity)
+    (Finset.sum_nonneg fun _ _ => sq_nonneg _))
+  have hUbound : ∀ n, ‖U n‖ ≤ B := fun n =>
+    norm_H1amb_le (Ω := ball (0 : EuclideanSpace ℝ (Fin d)) 1)
+      ((U n : H01 (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) :
+        H1amb (ball (0 : EuclideanSpace ℝ (Fin d)) 1))
+      (by rw [hzero n]; nlinarith [(hl0 n).le, hl1 n]) (fun i => (hsucc n i).le)
   set W : ℕ → H01 (ball (0 : EuclideanSpace ℝ (Fin d)) 1) := fun n => B⁻¹ • U n with hWdef
-  have hWball : ∀ n, W n ∈ closedBall (0 : H01 (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) 1 := by
-    intro n
-    rw [mem_closedBall, dist_zero_right, hWdef, norm_smul, Real.norm_eq_abs,
-      abs_of_pos (inv_pos.mpr hB0)]
-    calc B⁻¹ * ‖U n‖
-        ≤ B⁻¹ * B := mul_le_mul_of_nonneg_left (hUbound n) (inv_pos.mpr hB0).le
+  have hWball : ∀ n, ‖W n‖ ≤ 1 := fun n => by
+    rw [hWdef, norm_smul, Real.norm_eq_abs, abs_of_pos (inv_pos.mpr hB0)]
+    calc B⁻¹ * ‖U n‖ ≤ B⁻¹ * B := mul_le_mul_of_nonneg_left (hUbound n) (inv_pos.mpr hB0).le
       _ = 1 := inv_mul_cancel₀ hB0.ne'
-  -- The images keep a fixed positive norm and lose their `L²` seminorm.
-  have himg : ∀ n, ‖critEmb d hdpos hp' (W n)‖ = B⁻¹ * c := by
-    intro n
-    rw [hWdef, map_smul, norm_smul, Real.norm_eq_abs, abs_of_pos (inv_pos.mpr hB0)]
-    congr 1
-    rw [norm_critEmb, hUdef, eLpNorm_sharpElt_zero,
-      eLpNorm_sharpFamily_crit hp'0 hp' hdpos (hl0 n)]
-  have hL2 : ∀ n, eLpNorm (⇑(critEmb d hdpos hp' (W n))) 2
-      (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) 1))
-      = ENNReal.ofReal (B⁻¹ * (1 / ((n : ℝ) + 2) * a)) := by
-    intro n
-    rw [hWdef, map_smul, eLpNorm_congr_ae (Lp.coeFn_smul _ _), eLpNorm_const_smul,
-      eLpNorm_critEmb, hUdef, eLpNorm_sharpElt_zero, eLpNorm_sharpFamily_two (hl0 n),
-      Real.enorm_eq_ofReal_abs, abs_of_pos (inv_pos.mpr hB0),
-      show eLpNorm (⇑(sharpBump d)) 2 volume = ENNReal.ofReal a from
-        (ENNReal.ofReal_toReal (hfin 2)).symm,
-      ← ENNReal.ofReal_mul (hl0 n).le, ← ENNReal.ofReal_mul (inv_pos.mpr hB0).le]
-  -- Compactness would give a convergent subsequence.
-  have hcptL : IsCompactOperator ((critEmb d hdpos hp').toLinearMap) := hcpt
-  have hcptC := (isCompactOperator_iff_isCompact_closure_image_closedBall
-    (critEmb d hdpos hp').toLinearMap one_pos).mp hcptL
-  have hmemcl : ∀ n, critEmb d hdpos hp' (W n) ∈ closure (⇑(critEmb d hdpos hp').toLinearMap ''
-      closedBall (0 : H01 (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) 1) :=
-    fun n => subset_closure ⟨W n, hWball n, rfl⟩
-  obtain ⟨v, -, ψ, hψ, hψtend⟩ := hcptC.tendsto_subseq hmemcl
-  have hvnorm : ‖v‖ = B⁻¹ * c := by
-    refine tendsto_nhds_unique ((continuous_norm.tendsto v).comp hψtend) ?_
-    simp [Function.comp_def, himg]
-  -- The limit has vanishing `L²` seminorm, hence is zero.
-  have hp'2R : (2 : ℝ) ≤ (p' : ℝ) := by
-    have hp2 : (p' : ℝ)⁻¹ = 2⁻¹ - (d : ℝ)⁻¹ := by simpa using hp'
-    have hdR : (2 : ℝ) < (d : ℝ) := by exact_mod_cast hd
-    have hdinv : (0 : ℝ) < (d : ℝ)⁻¹ := by positivity
-    have hdlt : (d : ℝ)⁻¹ < (2 : ℝ)⁻¹ := by
-      rw [inv_lt_inv₀ (by linarith) (by norm_num)]
-      exact hdR
-    have hppos : (0 : ℝ) < (p' : ℝ)⁻¹ := by rw [hp2]; linarith
-    have hp'pos : (0 : ℝ) < (p' : ℝ) := by
-      rcases (NNReal.coe_nonneg p').lt_or_eq with h | h
-      · exact h
-      · rw [← h] at hppos; simp at hppos
-    have h1 : (p' : ℝ)⁻¹ ≤ (2 : ℝ)⁻¹ := by rw [hp2]; linarith
-    exact (inv_le_inv₀ hp'pos (by norm_num)).mp h1
-  have h2p' : (2 : ℝ≥0∞) ≤ (p' : ℝ≥0∞) := by exact_mod_cast hp'2R
-  set e : ℝ := 1 / (2 : ℝ≥0∞).toReal - 1 / ((p' : ℝ≥0∞)).toReal with hedef
-  set mv : ℝ≥0∞ := (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) Set.univ with hmvdef
-  have hbnd : ∀ k, eLpNorm (⇑v) 2 (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) 1))
-      ≤ ‖v - critEmb d hdpos hp' (W (ψ k))‖ₑ * mv ^ e
-        + ENNReal.ofReal (B⁻¹ * (1 / ((ψ k : ℝ) + 2) * a)) := by
-    intro k
-    have hfirst : eLpNorm (⇑v - ⇑(critEmb d hdpos hp' (W (ψ k)))) 2
-        (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) 1))
-        ≤ ‖v - critEmb d hdpos hp' (W (ψ k))‖ₑ * mv ^ e := by
-      refine le_trans (eLpNorm_le_eLpNorm_mul_rpow_measure_univ h2p'
-        ((Lp.aestronglyMeasurable v).sub (Lp.aestronglyMeasurable _))) ?_
-      refine mul_le_mul' (le_of_eq ?_) le_rfl
-      rw [Lp.enorm_def]
-      exact eLpNorm_congr_ae (Lp.coeFn_sub _ _).symm
-    have hsplit : eLpNorm (⇑v) 2 (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) 1))
-        ≤ eLpNorm (⇑v - ⇑(critEmb d hdpos hp' (W (ψ k)))) 2
-            (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) 1))
-          + eLpNorm (⇑(critEmb d hdpos hp' (W (ψ k)))) 2
-            (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) := by
-      have hfun : (⇑v : EuclideanSpace ℝ (Fin d) → ℝ)
-          = (⇑v - ⇑(critEmb d hdpos hp' (W (ψ k)))) + ⇑(critEmb d hdpos hp' (W (ψ k))) := by
-        funext x; simp
-      conv_lhs => rw [hfun]
-      exact eLpNorm_add_le one_le_two
-    refine hsplit.trans ?_
-    rw [hL2 (ψ k)]
-    exact add_le_add hfirst le_rfl
-  have htend0 : Filter.Tendsto
-      (fun k => ‖v - critEmb d hdpos hp' (W (ψ k))‖ₑ * mv ^ e
-        + ENNReal.ofReal (B⁻¹ * (1 / ((ψ k : ℝ) + 2) * a))) Filter.atTop (nhds 0) := by
-    have h1 : Filter.Tendsto (fun k => ‖v - critEmb d hdpos hp' (W (ψ k))‖ₑ)
-        Filter.atTop (nhds 0) := by
-      have hreal : Filter.Tendsto (fun k => ‖v - critEmb d hdpos hp' (W (ψ k))‖)
-          Filter.atTop (nhds 0) := by
-        have hsub := (hψtend.const_sub v).norm
-        simpa [Function.comp_def] using hsub
-      have := ENNReal.tendsto_ofReal hreal
-      simpa [ofReal_norm] using this
-    have h2 : Filter.Tendsto (fun k => ENNReal.ofReal (B⁻¹ * (1 / ((ψ k : ℝ) + 2) * a)))
-        Filter.atTop (nhds 0) := by
-      have hreal : Filter.Tendsto (fun k => B⁻¹ * (1 / ((ψ k : ℝ) + 2) * a))
-          Filter.atTop (nhds 0) := by
-        have hcomp := (hltend.comp hψ.tendsto_atTop).mul_const a
-        have := hcomp.const_mul B⁻¹
-        simpa [Function.comp_def] using this
-      simpa using ENNReal.tendsto_ofReal hreal
-    have hmvne : mv ^ e ≠ ⊤ := by
-      rw [hmvdef, Measure.restrict_apply_univ]
-      refine ENNReal.rpow_ne_top_of_nonneg ?_ measure_ball_lt_top.ne
-      rw [hedef]
-      have h2R : (2 : ℝ≥0∞).toReal = 2 := by simp
-      have hp'R : ((p' : ℝ≥0∞)).toReal = (p' : ℝ) := by simp
-      rw [h2R, hp'R, sub_nonneg]
-      exact one_div_le_one_div_of_le (by norm_num) hp'2R
-    have hsum := (ENNReal.Tendsto.mul_const h1 (Or.inr hmvne)).add h2
-    simpa using hsum
-  have hzeroL2 : eLpNorm (⇑v) 2
-      (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) = 0 :=
-    le_antisymm (ge_of_tendsto htend0 (Filter.Eventually.of_forall hbnd)) (by simp)
-  have hvzero : ‖v‖ = 0 := by
-    rw [Lp.norm_def, eLpNorm_congr_ae
-      ((eLpNorm_eq_zero_iff two_ne_zero).mp hzeroL2)]
-    simp
-  rw [hvnorm] at hvzero
-  have hpos : (0 : ℝ) < B⁻¹ * c := mul_pos (inv_pos.mpr hB0) hc0
-  linarith
+  -- The images keep the fixed norm `B⁻¹ c` and lose their `L²` norm.
+  have himg : ∀ n, ‖critEmb d hdpos hp' (W n)‖ = B⁻¹ * c := fun n => by
+    rw [hWdef, map_smul, norm_smul, Real.norm_eq_abs, abs_of_pos (inv_pos.mpr hB0),
+      norm_critEmb, hUdef, eLpNorm_sharpElt_zero, eLpNorm_sharpFamily_crit hp'0 hp' hdpos (hl0 n)]
+  have h2p' : (2 : ℝ≥0∞) ≤ (p' : ℝ≥0∞) := by exact_mod_cast two_le_of_sobolevConj hp'0 hp'
+  have hlim : Filter.Tendsto (fun n => lpInclusion (volume.restrict (ball
+      (0 : EuclideanSpace ℝ (Fin d)) 1)) h2p' (critEmb d hdpos hp' (W n))) Filter.atTop
+      (nhds 0) := by
+    refine tendsto_zero_iff_norm_tendsto_zero.mpr ?_
+    have hnorm : ∀ n, ‖lpInclusion (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) 1))
+        h2p' (critEmb d hdpos hp' (W n))‖ = B⁻¹ * (1 / ((n : ℝ) + 2) * a) := fun n => by
+      rw [hWdef, map_smul, map_smul, norm_smul, Real.norm_eq_abs, abs_of_pos (inv_pos.mpr hB0),
+        Lp.norm_def, eLpNorm_congr_ae (coeFn_lpInclusion _ _ _), eLpNorm_critEmb, ← Lp.norm_def,
+        hzero n]
+    simpa [hnorm] using (hltend.mul_const a).const_mul B⁻¹
+  exact not_isCompactOperator_of_tendsto_zero (critEmb d hdpos hp') _
+    (lpInclusion_injective _ h2p') hWball (mul_pos (inv_pos.mpr hB0) hc0) himg hlim
 
 end EllipticPdes.Embedding

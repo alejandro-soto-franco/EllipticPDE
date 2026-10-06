@@ -83,9 +83,11 @@ def sobolevConstOfLe (Ω : Set (EuclideanSpace ℝ (Fin d))) (q : ℝ≥0) : ℝ
 
 /-! ### The estimate on a test function -/
 
-/-- A function supported in `Ω` has the same `Lᵖ` seminorm over `Ω` as over the whole space. -/
-lemma eLpNorm_restrict_eq_of_tsupport_subset (hΩm : MeasurableSet Ω)
-    {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : tsupport f ⊆ Ω) (p : ℝ≥0∞) :
+/-- A function supported in `Ω` has the same `Lᵖ` seminorm over `Ω` as over the whole space,
+for functions into any normed group. -/
+lemma eLpNorm_restrict_eq_of_tsupport_subset (hΩm : MeasurableSet Ω) {F : Type*}
+    [NormedAddCommGroup F] {f : EuclideanSpace ℝ (Fin d) → F} (hf : tsupport f ⊆ Ω)
+    (p : ℝ≥0∞) :
     eLpNorm f p (volume.restrict Ω) = eLpNorm f p volume := by
   rw [← eLpNorm_indicator_eq_eLpNorm_restrict hΩm]
   refine eLpNorm_congr_ae (EventuallyEq.of_eq (funext fun x => ?_))
@@ -101,18 +103,11 @@ lemma eLpNorm_fderiv_le_sum (hΩm : MeasurableSet Ω)
   have hmeas : ∀ i : Fin d, AEStronglyMeasurable (partialD i φ) volume := fun i =>
     (h.continuous_partialD i).aestronglyMeasurable
   calc eLpNorm (fderiv ℝ φ) 2 volume
-      ≤ eLpNorm (fun x => ∑ k : Fin d, ‖partialD k φ x‖) 2 volume := by
-        refine eLpNorm_mono (h.1.continuous_fderiv (by simp)).aestronglyMeasurable (fun x => ?_)
-        rw [Real.norm_eq_abs, abs_of_nonneg (Finset.sum_nonneg fun _ _ => norm_nonneg _)]
-        exact norm_fderiv_le_sum_partialD φ x
-    _ = eLpNorm (∑ k : Fin d, fun x => ‖partialD k φ x‖) 2 volume := by
-        refine eLpNorm_congr_ae (EventuallyEq.of_eq (funext fun x => ?_))
-        rw [Finset.sum_apply]
-    _ ≤ ∑ k : Fin d, eLpNorm (fun x => ‖partialD k φ x‖) 2 volume :=
-        eLpNorm_sum_le one_le_two
+      ≤ ∑ k : Fin d, eLpNorm (partialD k φ) 2 volume :=
+        eLpNorm_fderiv_le_sum_partialD (h.1.continuous_fderiv (by simp)) one_le_two hmeas
     _ = ∑ i : Fin d, ‖h.testGraph i.succ‖ₑ := by
         refine Finset.sum_congr rfl (fun i _ => ?_)
-        rw [eLpNorm_norm _ (hmeas i), ← eLpNorm_restrict_eq_of_tsupport_subset hΩm
+        rw [← eLpNorm_restrict_eq_of_tsupport_subset hΩm
           ((tsupport_partialD_subset i φ).trans h.2.2) 2,
           IsTestFn.testGraph_succ, Lp.enorm_def, IsTestFn.partialCls]
         exact (eLpNorm_congr_ae (h.memLp_partialD i).coeFn_toLp).symm
@@ -174,12 +169,7 @@ theorem eLpNorm_testGraph_le_of_isBounded (hΩm : MeasurableSet Ω)
 /-! ### The transfer to `H₀¹(Ω)` -/
 
 /-- Each coordinate of the graph is bounded by the ambient `H¹` norm. -/
-lemma norm_apply_le (U : H1amb Ω) (j : Fin (d + 1)) : ‖U j‖ ≤ ‖U‖ := by
-  rw [← Real.sqrt_sq (norm_nonneg (U j)), ← Real.sqrt_sq (norm_nonneg U)]
-  apply Real.sqrt_le_sqrt
-  rw [PiLp.norm_sq_eq_of_L2 (fun _ : Fin (d + 1) => L2D Ω) U]
-  exact Finset.single_le_sum (f := fun i : Fin (d + 1) => ‖U i‖ ^ 2)
-    (fun _ _ => sq_nonneg _) (Finset.mem_univ j)
+lemma norm_apply_le (U : H1amb Ω) (j : Fin (d + 1)) : ‖U j‖ ≤ ‖U‖ := PiLp.norm_apply_le U j
 
 /-- **Transfer principle.** An estimate of the function coordinate by the gradient
 coordinates, valid on every test graph, is valid on all of `H₀¹(Ω)`.
@@ -288,40 +278,24 @@ themselves. -/
 def sobolevEmbL (hbound : ∀ U : H1amb Ω, U ∈ H01 Ω →
       eLpNorm (U 0) q (volume.restrict Ω) ≤ C * ∑ i : Fin d, ‖U i.succ‖ₑ) :
     H01 Ω →L[ℝ] Lp ℝ q (volume.restrict Ω) :=
-  LinearMap.mkContinuous
-    { toFun := fun U => (memLp_of_mem_H01 (hbound (U : H1amb Ω) U.2)).toLp ((U : H1amb Ω) 0)
-      map_add' := fun U V => by
-        rw [MemLp.toLp_congr _ ((memLp_of_mem_H01 (hbound (U : H1amb Ω) U.2)).add
-              (memLp_of_mem_H01 (hbound (V : H1amb Ω) V.2)))
-            (show ⇑(((U + V : H01 Ω) : H1amb Ω) 0)
-              =ᵐ[volume.restrict Ω] ⇑((U : H1amb Ω) 0) + ⇑((V : H1amb Ω) 0) from
-              Lp.coeFn_add _ _),
-          MemLp.toLp_add]
-      map_smul' := fun c U => by
-        rw [MemLp.toLp_congr _ ((memLp_of_mem_H01 (hbound (U : H1amb Ω) U.2)).const_smul c)
-            (show ⇑(((c • U : H01 Ω) : H1amb Ω) 0)
-              =ᵐ[volume.restrict Ω] c • ⇑((U : H1amb Ω) 0) from Lp.coeFn_smul _ _),
-          MemLp.toLp_const_smul]
-        rfl }
-    (C * d) (fun U => by
-      change ‖(memLp_of_mem_H01 (hbound (U : H1amb Ω) U.2)).toLp ((U : H1amb Ω) 0)‖
-          ≤ (C * d) * ‖U‖
-      rw [Lp.norm_toLp]
-      refine ENNReal.toReal_le_of_le_ofReal (by positivity) ?_
-      calc eLpNorm ((U : H1amb Ω) 0) q (volume.restrict Ω)
-          ≤ C * ∑ i : Fin d, ‖(U : H1amb Ω) i.succ‖ₑ := hbound (U : H1amb Ω) U.2
-        _ ≤ (C : ℝ≥0∞) * ENNReal.ofReal (d * ‖U‖) := by
+  lpCLM (fun U => ⇑((U : H1amb Ω) 0)) (fun U => memLp_of_mem_H01 (hbound (U : H1amb Ω) U.2))
+    (fun _ _ => Lp.coeFn_add _ _) (fun _ _ => Lp.coeFn_smul _ _) (C * d) fun U =>
+    (hbound (U : H1amb Ω) U.2).trans (by
+      calc (C : ℝ≥0∞) * ∑ i : Fin d, ‖(U : H1amb Ω) i.succ‖ₑ
+          ≤ (C : ℝ≥0∞) * ENNReal.ofReal (d * ‖U‖) := by
             gcongr
             exact sum_enorm_succ_le U
-        _ = ENNReal.ofReal (C * d * ‖U‖) := by
-            rw [← ENNReal.ofReal_coe_nnreal, ← ENNReal.ofReal_mul (by positivity), mul_assoc])
+        _ = ((C * d : ℝ≥0) : ℝ≥0∞) * ‖U‖ₑ := by
+            rw [ENNReal.ofReal_mul (Nat.cast_nonneg d), ENNReal.ofReal_natCast, ofReal_norm]
+            push_cast
+            ring)
 
 /-- `sobolevEmbL hbound U` agrees almost everywhere on `Ω` with the function coordinate of `U`. -/
 @[simp] lemma coeFn_sobolevEmbL
     (hbound : ∀ U : H1amb Ω, U ∈ H01 Ω →
       eLpNorm (U 0) q (volume.restrict Ω) ≤ C * ∑ i : Fin d, ‖U i.succ‖ₑ) (U : H01 Ω) :
     ⇑(sobolevEmbL hbound U) =ᵐ[volume.restrict Ω] ⇑((U : H1amb Ω) 0) :=
-  MemLp.coeFn_toLp (memLp_of_mem_H01 (hbound (U : H1amb Ω) U.2))
+  coeFn_lpCLM U
 
 /-- The embedding is bounded by the gradient coordinates alone, with no Poincaré inequality and
 no bound on the domain. -/
