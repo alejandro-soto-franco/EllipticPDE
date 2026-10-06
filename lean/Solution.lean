@@ -305,27 +305,13 @@ theorem solvable_iff_orthogonal_transpose (Op : EllipticOperator d)
       ↔ ∀ w : H01 Ω, (∀ v : H01 Ω, weakForm Op Ω v w = 0) → f w = 0 := by
   have hK := (toFullEllipticOp Op).opK_isCompact Ω
     (EllipticPdes.Sobolev.embL2_isCompact hΩo.measurableSet hΩb)
-  have hmem : ∀ w : EllipticPdes.Sobolev.H01 Ω,
-      w ∈ (toFullEllipticOp Op).solSpaceStar Ω
-        ↔ ∀ v : EllipticPdes.Sobolev.H01 Ω, (toFullEllipticOp Op).fullBilin Ω v w = 0 := by
-    intro w
-    rw [EllipticPdes.Sobolev.FullEllipticOp.solSpaceStar, LinearMap.mem_ker,
-      ContinuousLinearMap.coe_coe]
-    constructor
-    · intro hw v
-      rw [← (toFullEllipticOp Op).inner_opA Ω v w, ← ContinuousLinearMap.adjoint_inner_right,
-        hw, inner_zero_right]
-    · intro hw
-      refine ext_inner_right ℝ (fun v => ?_)
-      rw [ContinuousLinearMap.adjoint_inner_left, inner_zero_left, real_inner_comm,
-        (toFullEllipticOp Op).inner_opA Ω v w, hw v]
   have hiff := (toFullEllipticOp Op).solvable_iff_orthogonal_solSpaceStar Ω hK f
   simp only [weakForm_eq]
   constructor
   · intro h w hw
-    exact hiff.mp h w ((hmem w).mpr hw)
+    exact hiff.mp h w (((toFullEllipticOp Op).mem_solSpaceStar_iff Ω w).mpr hw)
   · intro h
-    exact hiff.mpr (fun w hw => h w ((hmem w).mp hw))
+    exact hiff.mpr (fun w hw => h w (((toFullEllipticOp Op).mem_solSpaceStar_iff Ω w).mp hw))
 
 /-! ### Discrete set of exceptional shifts -/
 
