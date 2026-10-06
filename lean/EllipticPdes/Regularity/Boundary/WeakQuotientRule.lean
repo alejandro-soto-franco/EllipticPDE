@@ -122,6 +122,7 @@ private theorem partialD_inv {a : EuclideanSpace ℝ (Fin d) → ℝ} (ha : Cont
 
 /-! ### Dividing the weight out -/
 
+set_option linter.unusedVariables false in
 /-- **Weak-derivative division by a `C¹` weight bounded away from zero.** If `a · v` has weak
 `ℓ`-derivative `dav` on `V`, and `a` is `C¹` with `a ≥ θ > 0` almost everywhere and
 `∂_ℓ a` bounded almost everywhere, then `v` itself has weak `ℓ`-derivative
@@ -129,12 +130,13 @@ private theorem partialD_inv {a : EuclideanSpace ℝ (Fin d) → ℝ} (ha : Cont
 
 This is the inverse of the weak Leibniz rule `HasWeakDerivOn.mul_isWkInfty_left`, and is what
 step 5 of the proof of Evans, *Partial Differential Equations* (2nd ed.), §6.3.2, Theorem 4
-(*Boundary `H²` regularity*) needs to pass from the rearranged equation (53), which controls the weak
-derivative of the product `a^{nn} u_{x_n}`, to `u_{x_n} ∈ H¹` and hence to the pointwise
-bound (55). Proved by writing `v = a⁻¹ · (a · v)` and applying the product rule at the
+(*Boundary `H²` regularity*) needs to pass from the rearranged equation (53), which controls
+the weak derivative of the product `a^{nn} u_{x_n}`, to `u_{x_n} ∈ H¹` and hence to the
+pointwise bound (55). Proved by writing `v = a⁻¹ · (a · v)` and applying the product rule at the
 weight `a⁻¹`, whose `C¹` regularity is where the hypotheses on `a` are spent. -/
+@[nolint unusedArguments]
 theorem HasWeakDerivOn.of_mul_contDiff_left {V : Set (EuclideanSpace ℝ (Fin d))}
-    (ℓ : Fin d)
+    (hVm : MeasurableSet V) (ℓ : Fin d)
     {a : EuclideanSpace ℝ (Fin d) → ℝ} (ha : ContDiff ℝ 1 a)
     {θ M : ℝ} (hθ : 0 < θ)
     (haθ : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), θ ≤ a x)
@@ -185,7 +187,7 @@ That estimate is the `L²` form of Evans, *Partial Differential Equations* (2nd 
 §6.3.2, Theorem 4 (*Boundary `H²` regularity*), proof step 5, equation (55), where the
 pointwise bound on `u_{x_n x_n}` is obtained by dividing (53) by `a^{nn} ≥ θ`. -/
 theorem exists_hasWeakDerivOn_of_mul_contDiff_left {V : Set (EuclideanSpace ℝ (Fin d))}
-    (ℓ : Fin d)
+    (hVm : MeasurableSet V) (ℓ : Fin d)
     {a : EuclideanSpace ℝ (Fin d) → ℝ} (ha : ContDiff ℝ 1 a)
     {θ M : ℝ} (hθ : 0 < θ)
     (haθ : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), θ ≤ a x)
@@ -227,7 +229,7 @@ theorem exists_hasWeakDerivOn_of_mul_contDiff_left {V : Set (EuclideanSpace ℝ 
     field_simp
     ring
   refine ⟨mulCoeffL hbmeas hbM dav + mulCoeffL hcmeas hcM v,
-    HasWeakDerivOn.of_mul_contDiff_left ℓ ha hθ haθ hdaM hav hd hrep, hrep, ?_⟩
+    HasWeakDerivOn.of_mul_contDiff_left hVm ℓ ha hθ haθ hdaM hav hd hrep, hrep, ?_⟩
   · refine le_trans (norm_add_le _ _) (add_le_add ?_ ?_)
     · exact norm_mulCoeffL_le hbmeas hbM dav
     · exact norm_mulCoeffL_le hcmeas hcM v
@@ -238,8 +240,9 @@ coefficient entry, ellipticity supplies the lower bound `a_{kk} ≥ lam > 0` (Ev
 on the data the boundary programme already has. At `ℓ = k = n` this is exactly the passage from
 the rearranged equation (53) to `u_{x_n} ∈ H¹` in step 5 of the proof of Evans, *Partial
 Differential Equations* (2nd ed.), §6.3.2, Theorem 4 (*Boundary `H²` regularity*). -/
+@[nolint unusedArguments]
 theorem exists_hasWeakDerivOn_of_mul_diag {V : Set (EuclideanSpace ℝ (Fin d))}
-    (A : EllipticCoeff d) (hA : IsC1Coeff A) (ℓ k : Fin d)
+    (hVm : MeasurableSet V) (A : EllipticCoeff d) (hA : IsC1Coeff A) (ℓ k : Fin d)
     {v av dav : Lp ℝ 2 (volume.restrict V)}
     (hav : av =ᵐ[volume.restrict V] fun x => A.a x k k * (v x : ℝ))
     (hd : HasWeakDerivOn V ℓ av dav) :
@@ -249,7 +252,7 @@ theorem exists_hasWeakDerivOn_of_mul_diag {V : Set (EuclideanSpace ℝ (Fin d))}
             (fun x => ((dav x : ℝ) - partialD ℓ (fun y => A.a y k k) x * (v x : ℝ))
               / A.a x k k)
         ∧ ‖v'‖ ≤ A.lam⁻¹ * ‖dav‖ + hA.A1 / A.lam * ‖v‖ := by
-  refine exists_hasWeakDerivOn_of_mul_contDiff_left ℓ (hA.contDiff k k) A.lam_pos
+  refine exists_hasWeakDerivOn_of_mul_contDiff_left hVm ℓ (hA.contDiff k k) A.lam_pos
     (A.lam_le_diag k) (Filter.Eventually.of_forall fun x => ?_) hav hd
   calc |partialD ℓ (fun y => A.a y k k) x|
       = ‖(fderiv ℝ (fun y => A.a y k k) x) (EuclideanSpace.single ℓ (1 : ℝ))‖ := by
