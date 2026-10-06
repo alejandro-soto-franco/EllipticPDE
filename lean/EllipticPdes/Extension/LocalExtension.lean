@@ -71,23 +71,6 @@ variable {d : ℕ}
 
 /-! ### Two seminorm estimates the chain threads -/
 
-/-- **Seminorm of a coordinate combination.** A combination of finitely many classes whose
-coefficients are at most one in absolute value has seminorm at most the sum of theirs. This is
-what the rigid motion of a chart contributes, the coordinates of the image of a unit direction
-being at most one. -/
-theorem eLpNorm_sum_coord_le {p : ℝ≥0∞} (hp : 1 ≤ p)
-    {μ : Measure (EuclideanSpace ℝ (Fin d))} {a : Fin d → ℝ} (ha : ∀ i, |a i| ≤ 1)
-    {w : Fin d → EuclideanSpace ℝ (Fin d) → ℝ} (hw : ∀ i, AEStronglyMeasurable (w i) μ) :
-    eLpNorm (fun y => ∑ i, a i * w i y) p μ ≤ ∑ i, eLpNorm (w i) p μ := by
-  have hfun : (fun y => ∑ i, a i * w i y) = ∑ i, fun y => a i * w i y := by
-    funext y
-    rw [Finset.sum_apply]
-  rw [hfun]
-  refine le_trans (eLpNorm_sum_le hp) (Finset.sum_le_sum fun i _ => ?_)
-  refine eLpNorm_mono_ae ((hw i).const_mul _) (Filter.Eventually.of_forall fun y => ?_)
-  rw [norm_mul, Real.norm_eq_abs (a i)]
-  exact mul_le_of_le_one_left (norm_nonneg _) (ha i)
-
 /-- **Seminorm of a class cut off inside a neighbourhood.** The cutoff vanishes off `W`, and on
 `S ∩ W` the class is read on `T`, so the product over `S` is bounded by the supremum of the
 cutoff against the seminorm over `T`. This is what lets an estimate taken over the region above
@@ -307,8 +290,7 @@ theorem localExtension_bound (c : C1Chart d) {Ω : Set (EuclideanSpace ℝ (Fin 
   have hcoordS : ∀ (k : Fin d) (i : Fin d),
       |c.motion.symm (EuclideanSpace.single k (1 : ℝ)) i| ≤ 1 := by
     intro k i
-    refine (abs_coord_le_norm _ i).trans ?_
-    rw [c.motion.symm.norm_map, PiLp.norm_single, norm_one]
+    simpa using PiLp.norm_apply_le (c.motion.symm (EuclideanSpace.single k (1 : ℝ))) i
   -- the constant
   set Kre : ℝ≥0∞ := 2 * ENNReal.ofReal B
       + (d : ℝ≥0∞) * (2 + 4 * ENNReal.ofReal M) * (ENNReal.ofReal B * ((d : ℝ≥0∞) + 1))
@@ -442,7 +424,7 @@ theorem localExtension_bound (c : C1Chart d) {Ω : Set (EuclideanSpace ℝ (Fin 
     have hmeasA : ∀ i : Fin d, AEStronglyMeasurable
         (fun y => (fun z => ξ z * g i z + partialD i ξ z * u z) (c.motion.symm y))
         (volume.restrict A) := fun i => (htrans _ (hIg i)).1
-    have hstep := eLpNorm_sum_coord_le (p := p) hp (hcoordS k) hmeasA
+    have hstep := eLpNorm_sum_mul_le hp (hcoordS k) hmeasA
     refine hstep.trans ?_
     have htr : ∀ i : Fin d,
         eLpNorm ((fun z => ξ z * g i z + partialD i ξ z * u z) ∘

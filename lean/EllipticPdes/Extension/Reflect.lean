@@ -6,25 +6,19 @@ Authors: Alejandro Soto Franco
 
 module
 
-public import EllipticPdes.Embedding.WeakGradient
+public import EllipticPdes.Extension.Basic
 public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
 
 /-!
 # Reflection in a coordinate hyperplane
 
 Reflecting the `j`-th coordinate is the first step of the extension operator: a function on a
-half-ball is continued across the flat piece of its boundary by composing with the reflection,
-and the higher-order reflection that matches the normal derivative is a combination of two such
-composites.
+half-ball is continued across the flat piece of its boundary by composing with the reflection.
 
-This file records what the reflection does to the three things the weak formulation sees. It is
-a linear isometry, so it preserves Lebesgue measure and is a measurable embedding; it sends the
-`k`-th partial derivative to `±` the `k`-th partial derivative of the composite, with the sign
-negative exactly at `k = j`; and it therefore sends a weak gradient on a set to a weak gradient
-on the preimage of that set, with the same signs.
-
-Nothing here asks anything of the set, which is what makes it usable both on a half-ball and on
-the image of one under a boundary chart.
+The reflection is a linear isometry, so it preserves Lebesgue measure and is a measurable
+embedding. It sends the `k`-th partial derivative to `±` the `k`-th partial derivative of the
+composite, with the sign negative exactly at `k = j`, and therefore sends a weak gradient on a set
+to a weak gradient on the preimage of that set.
 
 ## Main declarations
 
@@ -105,30 +99,24 @@ lemma measurableEmbedding_reflectLI (j : Fin d) :
 
 /-! ### Derivatives and supports -/
 
+/-- The reflection sends the `k`-th standard direction to `reflectSign j k` times itself. -/
+lemma reflectLI_single (j k : Fin d) :
+    reflectLI j (EuclideanSpace.single k (1 : ℝ))
+      = reflectSign j k • EuclideanSpace.single k (1 : ℝ) := by
+  ext m
+  rw [reflectLI_apply]
+  by_cases hm : m = k
+  · subst hm; simp
+  · simp [hm]
+
 /-- **Partial derivatives of a reflected function.** -/
 theorem partialD_comp_reflect {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφ : Differentiable ℝ φ)
     (j k : Fin d) (x : EuclideanSpace ℝ (Fin d)) :
     partialD k (fun y => φ (reflectLI j y)) x
       = reflectSign j k * partialD k φ (reflectLI j x) := by
-  have hsingle : (reflectLI j) (EuclideanSpace.single k (1 : ℝ))
-      = reflectSign j k • EuclideanSpace.single k (1 : ℝ) := by
-    ext m
-    rw [reflectLI_apply]
-    by_cases hm : m = k
-    · subst hm; simp
-    · simp [hm]
-  have hcomp : HasFDerivAt (φ ∘ (reflectLI j))
-      ((fderiv ℝ φ (reflectLI j x)).comp
-        ((reflectLI j).toContinuousLinearEquiv :
-          EuclideanSpace ℝ (Fin d) →L[ℝ] EuclideanSpace ℝ (Fin d))) x :=
-    (hφ (reflectLI j x)).hasFDerivAt.comp x
-      (reflectLI j).toContinuousLinearEquiv.hasFDerivAt
-  have hfun : (fun y => φ (reflectLI j y)) = φ ∘ (reflectLI j) := rfl
-  rw [hfun, partialD, hcomp.fderiv, ContinuousLinearMap.coe_comp, Function.comp_apply]
-  rw [show ((reflectLI j).toContinuousLinearEquiv :
-      EuclideanSpace ℝ (Fin d) →L[ℝ] EuclideanSpace ℝ (Fin d))
-      (EuclideanSpace.single k (1 : ℝ)) = reflectLI j (EuclideanSpace.single k (1 : ℝ)) from rfl,
-    hsingle, map_smul, smul_eq_mul, partialD]
+  have := partialD_comp (f := reflectLI j) (hφ _)
+    (reflectLI j).toContinuousLinearEquiv.hasFDerivAt (x := x) k
+  simpa [partialD, reflectLI_single] using this
 
 /-- Composition with `reflectLI j` preserves smoothness. -/
 lemma contDiff_comp_reflect {φ : EuclideanSpace ℝ (Fin d) → ℝ}
@@ -142,73 +130,20 @@ lemma hasCompactSupport_comp_reflect {φ : EuclideanSpace ℝ (Fin d) → ℝ}
     HasCompactSupport (fun y => φ (reflectLI j y)) :=
   hφ.comp_homeomorph (reflectLI j).toHomeomorph
 
-/-- If `tsupport φ` lies in the preimage of `B` under `reflectLI j`, then the reflected function has
-topological support in `B`. -/
-lemma tsupport_comp_reflect_subset {φ : EuclideanSpace ℝ (Fin d) → ℝ}
-    {B : Set (EuclideanSpace ℝ (Fin d))} (j : Fin d)
-    (h : tsupport φ ⊆ reflectLI j ⁻¹' B) :
-    tsupport (fun y => φ (reflectLI j y)) ⊆ B := by
-  have hsub : tsupport (fun y => φ (reflectLI j y)) ⊆ reflectLI j ⁻¹' tsupport φ := by
-    refine closure_minimal (fun y hy => ?_)
-      (IsClosed.preimage (reflectLI j).continuous isClosed_closure)
-    exact Set.mem_preimage.mpr (subset_closure hy)
-  refine hsub.trans ?_
-  intro y hy
-  have := h (Set.mem_preimage.mp hy)
-  simpa only [Set.mem_preimage, reflectLI_involutive] using this
-
 /-! ### The weak gradient of a reflected function -/
 
 /-- **Reflection of a weak gradient.** If `u` has weak gradient `g` on `B`, then `u ∘ Rⱼ` has weak
-gradient `k ↦ ±(gₖ ∘ Rⱼ)` on the preimage of `B`, with the sign negative exactly at `k = j`.
-
-The proof is the change of variables under a measure-preserving involution, twice: once to move
-the test function onto `B`, where the hypothesis applies, and once to move the conclusion back. -/
+gradient `k ↦ ±(gₖ ∘ Rⱼ)` on the preimage of `B`, with the sign negative exactly at `k = j`. -/
 theorem hasWeakGradOn_comp_reflect {B : Set (EuclideanSpace ℝ (Fin d))}
     {u : EuclideanSpace ℝ (Fin d) → ℝ} {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
     (h : HasWeakGradOn B u g) (j : Fin d) :
     HasWeakGradOn (reflectLI j ⁻¹' B) (fun y => u (reflectLI j y))
       (fun k y => reflectSign j k * g k (reflectLI j y)) := by
-  intro φ hφ hφc hφs k
-  have hφd : Differentiable ℝ φ := hφ.differentiable (by simp)
-  have hψs : tsupport (fun y => φ (reflectLI j y)) ⊆ B := tsupport_comp_reflect_subset j hφs
-  have hkey := h (fun y => φ (reflectLI j y)) (contDiff_comp_reflect hφ j)
-    (hasCompactSupport_comp_reflect hφc j) hψs k
-  -- The test function's derivative, moved across the reflection.
-  have hpd : ∀ y, partialD k φ (reflectLI j y)
-      = reflectSign j k * partialD k (fun z => φ (reflectLI j z)) y := by
-    intro y
-    rw [partialD_comp_reflect hφd j k y, ← mul_assoc, reflectSign_mul_self, one_mul]
-  -- Both sides move by the same change of variables.
-  have hleft : ∫ x in reflectLI j ⁻¹' B, u (reflectLI j x) * partialD k φ x
-      = ∫ y in B, u y * partialD k φ (reflectLI j y) := by
-    have := (measurePreserving_reflectLI j).setIntegral_preimage_emb
-      (measurableEmbedding_reflectLI j)
-      (fun y => u y * partialD k φ (reflectLI j y)) B
-    simpa only [reflectLI_involutive] using this
-  have hright : ∫ x in reflectLI j ⁻¹' B, g k (reflectLI j x) * φ x
-      = ∫ y in B, g k y * φ (reflectLI j y) := by
-    have := (measurePreserving_reflectLI j).setIntegral_preimage_emb
-      (measurableEmbedding_reflectLI j)
-      (fun y => g k y * φ (reflectLI j y)) B
-    simpa only [reflectLI_involutive] using this
-  have hmid : ∫ y in B, u y * partialD k φ (reflectLI j y)
-      = reflectSign j k * ∫ y in B, u y * partialD k (fun z => φ (reflectLI j z)) y := by
-    rw [← integral_const_mul]
-    refine integral_congr_ae (Filter.Eventually.of_forall (fun y => ?_))
-    change u y * partialD k φ (reflectLI j y)
-      = reflectSign j k * (u y * partialD k (fun z => φ (reflectLI j z)) y)
-    rw [hpd y]; ring
-  have hfin : ∫ x in reflectLI j ⁻¹' B,
-        reflectSign j k * g k (reflectLI j x) * φ x
-      = reflectSign j k * ∫ x in reflectLI j ⁻¹' B, g k (reflectLI j x) * φ x := by
-    rw [← integral_const_mul]
-    refine integral_congr_ae (Filter.Eventually.of_forall (fun x => ?_))
-    change reflectSign j k * g k (reflectLI j x) * φ x
-      = reflectSign j k * (g k (reflectLI j x) * φ x)
-    ring
-  rw [hleft, hmid, hkey, hfin, hright]
-  ring
+  rw [hasWeakGradOn_iff] at h ⊢
+  intro k
+  have h1 := (h k).smul (reflectSign j k)
+  rw [← reflectLI_single] at h1
+  exact h1.comp_linear (reflectLI j).toContinuousLinearEquiv (measurePreserving_reflectLI j)
 
 /-- **Reflection preserves every `Lᵖ` seminorm**, the reflection being measure preserving. This
 is what makes the bound on an extension by reflection a bound with no loss. -/
