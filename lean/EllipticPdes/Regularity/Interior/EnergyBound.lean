@@ -573,6 +573,21 @@ private lemma sq_dataNorm_le (Op : FullEllipticOp d) (u : H01 Ω) (f : L2D Ω)
         linarith only [h4]
     _ = _ := by ring
 
+/-- The transport and zeroth-order pairings against a vector `w` are bounded by the first-order
+data: `-∑ᵢ ⟪bᵢ ∂ᵢu, w⟫ - ⟪c u₀, w⟫ ≤ (B ∑ᵢ ‖∂ᵢu‖ + C ‖u₀‖) ‖w‖`. -/
+private lemma neg_lowerOrder_le (Op : FullEllipticOp d) (U : H1amb Ω) (w : L2D Ω) :
+    -∑ i : Fin d, ⟪Op.bAct i (U i.succ), w⟫ - ⟪Op.cAct (U 0), w⟫
+      ≤ (Op.Bsup * ∑ i : Fin d, ‖U i.succ‖ + Op.Csup * ‖U 0‖) * ‖w‖ := by
+  have hb : -∑ i : Fin d, ⟪Op.bAct i (U i.succ), w⟫
+      ≤ Op.Bsup * (∑ i : Fin d, ‖U i.succ‖) * ‖w‖ := by
+    rw [← Finset.sum_neg_distrib, Finset.mul_sum, Finset.sum_mul]
+    exact Finset.sum_le_sum fun i _ => (neg_real_inner_le_mul_norm _ _).trans
+      (mul_le_mul_of_nonneg_right (Op.norm_bAct_le i _) (norm_nonneg _))
+  have hc : -⟪Op.cAct (U 0), w⟫ ≤ Op.Csup * ‖U 0‖ * ‖w‖ :=
+    (neg_real_inner_le_mul_norm _ _).trans
+      (mul_le_mul_of_nonneg_right (Op.norm_cAct_le _) (norm_nonneg _))
+  linarith only [hb, hc]
+
 /-- **Master interior difference-quotient energy estimate.** For a `W^{1,∞}`-coefficient
 weak solution `u ∈ H₀¹(Ω)` of `L u = f`, an inner cutoff `ξ` and an
 outer cutoff `θ ≡ 1` on the shift-reachable part of `tsupport ξ²`, the cutoff-weighted energy
@@ -643,16 +658,7 @@ theorem interior_diffQuot_energy_bound (Op : FullEllipticOp d) (hΩm : Measurabl
       linarith)
   have hv0 := (norm_evansTest_zero_le hΩm hξ hθ hS u).trans (add_le_add
     (mul_le_mul_of_nonneg_left (hev k) hX) (mul_le_mul_of_nonneg_left hδ hW))
-  have hTb : -∑ i : Fin d, ⟪Op.bAct i ((u : H1amb Ω) i.succ),
-        (evansTest hΩm hξ hθ hS u : H1amb Ω) 0⟫
-      ≤ Op.Bsup * Sg * ‖(evansTest hΩm hξ hθ hS u : H1amb Ω) 0‖ := by
-    rw [← Finset.sum_neg_distrib, hSg, Finset.mul_sum, Finset.sum_mul]
-    refine Finset.sum_le_sum fun i _ => (neg_real_inner_le_mul_norm _ _).trans ?_
-    exact mul_le_mul_of_nonneg_right (Op.norm_bAct_le i _) (norm_nonneg _)
-  have hTc : -⟪Op.cAct ((u : H1amb Ω) 0), (evansTest hΩm hξ hθ hS u : H1amb Ω) 0⟫
-      ≤ Op.Csup * r * ‖(evansTest hΩm hξ hθ hS u : H1amb Ω) 0‖ :=
-    (neg_real_inner_le_mul_norm _ _).trans
-      (mul_le_mul_of_nonneg_right (Op.norm_cAct_le _) (norm_nonneg _))
+  have hTl := neg_lowerOrder_le Op (u : H1amb Ω) ((evansTest hΩm hξ hθ hS u : H1amb Ω) 0)
   have hTx : -∑ i : Fin d, ∑ j : Fin d, 2 * ⟪(A.translate (hshift k h)).actL i j
         (mulTest hξ (evansDg hΩm k h u i)), mulTestPartial hξ j (evansD0 hΩm k h u)⟫
       ≤ 2 * A.Λ * ‖evansD0 hΩm k h u‖ * ((∑ i : Fin d, ‖mulTest hξ (evansDg hΩm k h u i)‖)
@@ -687,7 +693,7 @@ theorem interior_diffQuot_energy_bound (Op : FullEllipticOp d) (hΩm : Measurabl
       (mul_nonneg hA1 hN0)
   have hkey : A.lam * Real.sqrt E ^ 2 ≤ K₁ * N * Real.sqrt E + K₂ * N ^ 2 := by
     rw [Real.sq_sqrt hE0, hK₁, hK₂, hM]
-    nlinarith only [hlow, hTf, hTb, hTc, hTx, hTr, h1, h2, h3]
+    nlinarith only [hlow, hTf, hTl, hTx, hTr, h1, h2, h3]
   have habs := absorb_energy hlam hkey
   have hdata : N ^ 2 ≤ κ * (‖f‖ ^ 2 + r ^ 2) := sq_dataNorm_le Op u f hu
   have hnorm : ∑ i : Fin d, ‖extendL2 hΩm (mulTest hξ (diffQuotD k h hΩm

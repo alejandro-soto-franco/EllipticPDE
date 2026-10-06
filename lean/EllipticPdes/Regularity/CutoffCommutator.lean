@@ -207,40 +207,27 @@ theorem setIntegral_principal_entry_coeff (Op : FullEllipticOp d)
     rw [hx]
     ring
   -- The last integral is three pairings.
-  have hi1 : Integrable (fun x => (Op.toEllipticCoeff.actL i j p x : ℝ)
-      * (partialD j (partialD i ξ) x * v x)) (volume.restrict N) :=
-    integrable_mul_testFn _ ((contDiff_partialD (contDiff_partialD hξN.1 i) j).mul hvc)
-      ((hξN.hasCompactSupport_partialD i).fderiv_apply (𝕜 := ℝ)
-        (EuclideanSpace.single j 1)).mul_right
-  have hi2 : Integrable (fun x => (mulL2 ((hA.entry i j).measurable_D_singleton j)
-        ((hA.entry i j).ae_abs_D_singleton_le j) p x : ℝ) * (partialD i ξ x * v x))
-      (volume.restrict N) :=
-    integrable_mul_testFn _ ((contDiff_partialD hξN.1 i).mul hvc)
-      (hξN.hasCompactSupport_partialD i).mul_right
-  have hi3 : Integrable (fun x => (Op.toEllipticCoeff.actL i j (D2 j) x : ℝ)
-      * (partialD i ξ x * v x)) (volume.restrict N) :=
-    integrable_mul_testFn _ ((contDiff_partialD hξN.1 i).mul hvc)
-      (hξN.hasCompactSupport_partialD i).mul_right
+  have hdd := (contDiff_partialD (contDiff_partialD hξN.1 i) j).mul hvc
+  have hddcs : HasCompactSupport (fun x => partialD j (partialD i ξ) x * v x) :=
+    ((hξN.hasCompactSupport_partialD i).fderiv_apply (𝕜 := ℝ)
+      (EuclideanSpace.single j 1)).mul_right
+  have hd := (contDiff_partialD hξN.1 i).mul hvc
+  have hdcs : HasCompactSupport (fun x => partialD i ξ x * v x) :=
+    (hξN.hasCompactSupport_partialD i).mul_right
   have hi1' : Integrable
       (fun x => partialD j (partialD i ξ) x * (Op.a x i j * (p x : ℝ)) * v x)
-      (volume.restrict N) := by
-    refine hi1.congr ?_
-    filter_upwards [hAip] with x hx
-    rw [hx]
-    ring
+      (volume.restrict N) :=
+    (integrable_coeff_mul_testFn (Op.toEllipticCoeff.measurable i j) ⟨_, Op.toEllipticCoeff.bdd i j⟩
+      p hdd hddcs).congr (Filter.Eventually.of_forall fun x => by simp only; ring)
   have hi2' : Integrable
-      (fun x => partialD i ξ x * (hA.D [j] i j x * (p x : ℝ)) * v x)
-      (volume.restrict N) := by
-    refine hi2.congr ?_
-    filter_upwards [hmul] with x hx
-    rw [hx]
-    ring
+      (fun x => partialD i ξ x * (hA.D [j] i j x * (p x : ℝ)) * v x) (volume.restrict N) :=
+    (integrable_coeff_mul_testFn (hA.measurable_D_singleton j i j)
+      ⟨_, hA.ae_abs_D_singleton_le j i j⟩ p hd hdcs).congr
+      (Filter.Eventually.of_forall fun x => by simp only; ring)
   have hi3' : Integrable
-      (fun x => partialD i ξ x * (Op.a x i j * (D2 j x : ℝ)) * v x) (volume.restrict N) := by
-    refine hi3.congr ?_
-    filter_upwards [hAjd] with x hx
-    rw [hx]
-    ring
+      (fun x => partialD i ξ x * (Op.a x i j * (D2 j x : ℝ)) * v x) (volume.restrict N) :=
+    (integrable_coeff_mul_testFn (Op.toEllipticCoeff.measurable i j) ⟨_, Op.toEllipticCoeff.bdd i j⟩
+      (D2 j) hd hdcs).congr (Filter.Eventually.of_forall fun x => by simp only; ring)
   have e3 : (∫ x in N, (partialD j (partialD i ξ) x * (Op.toEllipticCoeff.actL i j p x : ℝ)
         + partialD i ξ x * ((mulL2 ((hA.entry i j).measurable_D_singleton j)
             ((hA.entry i j).ae_abs_D_singleton_le j) p

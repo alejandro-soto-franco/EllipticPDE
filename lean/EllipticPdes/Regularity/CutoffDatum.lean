@@ -96,58 +96,37 @@ theorem exists_cutoffDatum (Op : FullEllipticOp (n + 1))
   have hξD : ∀ i : Fin (n + 1), IsTestFn N (partialD i ξ) := fun i => isTestFn_partialD hξ i
   have hξDD : ∀ i j : Fin (n + 1), IsTestFn N (partialD j (partialD i ξ)) :=
     fun i j => isTestFn_partialD (hξD i) j
+  have P := fun {ι : Type} [Fintype ι] {χ a : ι → EuclideanSpace ℝ (Fin (n + 1)) → ℝ}
+    (hχ : ∀ t, IsTestFn N (χ t)) (ha : ∀ t, IsWkInfty (a t) k) =>
+    exists_datum_of_pieces (Ω := Ω) hNm hNΩ k hχ ha
+  have hb : ∀ i : Fin (n + 1), IsWkInfty (fun x => Op.b x i) k :=
+    fun i => (hbc.bReg i).mono (by omega)
+  have ha : ∀ t : Fin (n + 1) × Fin (n + 1), IsWkInfty (fun x => Op.a x t.1 t.2) k :=
+    fun t => (hA.entry t.1 t.2).mono (by omega)
   -- The shapes whose coefficient does not depend on the direction of differentiation.
-  obtain ⟨K1, hK1, hP1⟩ := exists_datum_of_pieces (Ω := Ω) hNm hNΩ k (ι := Unit)
-    (χ := fun _ => ξ) (fun _ => hξ)
-    (a := fun _ => fun _ => (1 : ℝ)) (fun _ => IsWkInfty.const 1 k)
-  obtain ⟨K3, hK3, hP3⟩ := exists_datum_of_pieces (Ω := Ω) hNm hNΩ k (ι := Fin (n + 1))
-    (χ := fun _ => ξ) (fun _ => hξ) (a := fun i => fun x => Op.b x i)
-    fun i => (hbc.bReg i).mono (by omega)
-  obtain ⟨K7, hK7, hP7⟩ := exists_datum_of_pieces (Ω := Ω) hNm hNΩ k
-    (ι := Fin (n + 1) × Fin (n + 1))
-    (χ := fun t => partialD t.2 ξ) (fun t => hξD t.2)
-    (a := fun t => fun x => Op.a x t.1 t.2)
-    (fun t => (hA.entry t.1 t.2).mono (by omega))
-  obtain ⟨K8, hK8, hP8⟩ := exists_datum_of_pieces (Ω := Ω) hNm hNΩ k
-    (ι := Fin (n + 1) × Fin (n + 1))
-    (χ := fun t => partialD t.2 (partialD t.1 ξ)) (fun t => hξDD t.1 t.2)
-    (a := fun t => fun x => Op.a x t.1 t.2)
-    (fun t => (hA.entry t.1 t.2).mono (by omega))
-  obtain ⟨K9, hK9, hP9⟩ := exists_datum_of_pieces (Ω := Ω) hNm hNΩ k
-    (ι := Fin (n + 1) × Fin (n + 1))
-    (χ := fun t => partialD t.1 ξ) (fun t => hξD t.1)
-    (a := fun t => hA.D [t.2] t.1 t.2)
-    (fun t => ((hA.entry t.1 t.2).deriv t.2).mono (by omega))
-  obtain ⟨K10, hK10, hP10⟩ := exists_datum_of_pieces (Ω := Ω) hNm hNΩ k
-    (ι := Fin (n + 1) × Fin (n + 1))
-    (χ := fun t => partialD t.1 ξ) (fun t => hξD t.1)
-    (a := fun t => fun x => Op.a x t.1 t.2)
-    (fun t => (hA.entry t.1 t.2).mono (by omega))
-  obtain ⟨K11, hK11, hP11⟩ := exists_datum_of_pieces (Ω := Ω) hNm hNΩ k (ι := Fin (n + 1))
-    (χ := fun i => partialD i ξ) hξD (a := fun i => fun x => Op.b x i)
-    fun i => (hbc.bReg i).mono (by omega)
+  obtain ⟨K1, hK1, hP1⟩ := P (ι := Unit) (χ := fun _ => ξ) (a := fun _ _ => (1 : ℝ))
+    (fun _ => hξ) fun _ => IsWkInfty.const 1 k
+  obtain ⟨K3, hK3, hP3⟩ := P (χ := fun _ : Fin (n + 1) => ξ) (fun _ => hξ) hb
+  obtain ⟨K7, hK7, hP7⟩ := P (fun t : Fin (n + 1) × Fin (n + 1) => hξD t.2) ha
+  obtain ⟨K8, hK8, hP8⟩ := P (fun t : Fin (n + 1) × Fin (n + 1) => hξDD t.1 t.2) ha
+  obtain ⟨K9, hK9, hP9⟩ := P (a := fun t : Fin (n + 1) × Fin (n + 1) => hA.D [t.2] t.1 t.2)
+    (fun t => hξD t.1) (fun t => ((hA.entry t.1 t.2).deriv t.2).mono (by omega))
+  obtain ⟨K10, hK10, hP10⟩ := P (fun t : Fin (n + 1) × Fin (n + 1) => hξD t.1) ha
+  obtain ⟨K11, hK11, hP11⟩ := P hξD hb
   -- The shapes that differentiate a coefficient in the direction the equation is
   -- differentiated, collected over that direction.
   choose K2 hK2 hP2 using fun m : Fin (n + 1) =>
-    exists_datum_of_pieces (Ω := Ω) hNm hNΩ k (ι := Fin (n + 1))
-      (χ := fun _ => ξ) (fun _ => hξ)
-      (a := fun i => (hbc.bReg i).D [m])
+    P (χ := fun _ : Fin (n + 1) => ξ) (a := fun i => (hbc.bReg i).D [m]) (fun _ => hξ)
       (fun i => ((hbc.bReg i).deriv m).mono (by omega))
   choose K4 hK4 hP4 using fun m : Fin (n + 1) =>
-    exists_datum_of_pieces (Ω := Ω) hNm hNΩ k (ι := Unit)
-      (χ := fun _ => ξ) (fun _ => hξ)
-      (a := fun _ => hbc.cReg.D [m])
+    P (χ := fun _ : Unit => ξ) (a := fun _ => hbc.cReg.D [m]) (fun _ => hξ)
       (fun _ => (hbc.cReg.deriv m).mono (by omega))
   choose K5 hK5 hP5 using fun m : Fin (n + 1) =>
-    exists_datum_of_pieces (Ω := Ω) hNm hNΩ k (ι := Fin (n + 1) × Fin (n + 1))
-      (χ := fun _ => ξ) (fun _ => hξ)
-      (a := fun t => hA.D [t.2, m] t.1 t.2)
-      (fun t => (((hA.entry t.1 t.2).deriv m).deriv t.2).mono (by omega))
+    P (χ := fun _ : Fin (n + 1) × Fin (n + 1) => ξ) (a := fun t => hA.D [t.2, m] t.1 t.2)
+      (fun _ => hξ) (fun t => (((hA.entry t.1 t.2).deriv m).deriv t.2).mono (by omega))
   choose K6 hK6 hP6 using fun m : Fin (n + 1) =>
-    exists_datum_of_pieces (Ω := Ω) hNm hNΩ k (ι := Fin (n + 1) × Fin (n + 1))
-      (χ := fun _ => ξ) (fun _ => hξ)
-      (a := fun t => hA.D [m] t.1 t.2)
-      (fun t => ((hA.entry t.1 t.2).deriv m).mono (by omega))
+    P (χ := fun _ : Fin (n + 1) × Fin (n + 1) => ξ) (a := fun t => hA.D [m] t.1 t.2)
+      (fun _ => hξ) (fun t => ((hA.entry t.1 t.2).deriv m).mono (by omega))
   refine ⟨K1 + (∑ m, K2 m) + 2 * K3 + (∑ m, K4 m) + (∑ m, K5 m) + (∑ m, K6 m)
       + K7 + K8 + K9 + K10 + K11, ?_, ?_⟩
   · have h2 : (0 : ℝ) ≤ ∑ m, K2 m := Finset.sum_nonneg fun m _ => hK2 m
