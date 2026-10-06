@@ -143,6 +143,53 @@ end Constants
 
 /-! ### The inequality -/
 
+/-- **A limit of elements with vanishing gradient is constant.** If `V k ∈ W12 Ω` have gradient
+coordinates bounded by `γ k → 0` and a subsequence of their function coordinates converges in
+`L²(Ω)` to `v`, then `v` is a constant class on a connected open set: the limit graph
+`(v, 0, …, 0)` lies in the closed subspace `W12 Ω`, so `v` has zero weak gradient. -/
+theorem exists_eq_constL2_of_tendsto_zero_gradient (hΩopen : IsOpen Ω)
+    (hΩb : Bornology.IsBounded Ω) (hconn : IsPreconnected Ω) {V : ℕ → W12 Ω} {φ : ℕ → ℕ}
+    (hφ : StrictMono φ) {v : L2D Ω} (hlim : Tendsto (fun j => embW12 Ω (V (φ j))) atTop (𝓝 v))
+    {γ : ℕ → ℝ} (hγ : Tendsto γ atTop (𝓝 0))
+    (hle : ∀ k (j : Fin d), ‖((V k : W12 Ω) : H1amb Ω) j.succ‖ ≤ γ k) :
+    ∃ c : ℝ, v = constL2 hΩb c := by
+  have := isFiniteMeasure_restrict_of_isBounded hΩb
+  -- the limit in the graph space
+  set Vlim : H1amb Ω := WithLp.toLp 2 (Fin.cons v fun _ => 0) with hVlim
+  have hVlim0 : Vlim 0 = v := by rw [hVlim, PiLp.toLp_apply, Fin.cons_zero]
+  have hVlimsucc : ∀ j : Fin d, Vlim j.succ = 0 := fun j => by
+    rw [hVlim, PiLp.toLp_apply, Fin.cons_succ]
+  have htend : Tendsto (fun j => ((V (φ j) : W12 Ω) : H1amb Ω)) atTop (𝓝 Vlim) := by
+    have hcoord : Tendsto (fun j => WithLp.toLp 2 fun i => ((V (φ j) : W12 Ω) : H1amb Ω) i)
+        atTop (𝓝 (WithLp.toLp 2 (Fin.cons v fun _ => 0))) := by
+      refine ((PiLp.continuous_toLp 2 _).tendsto _).comp (tendsto_pi_nhds.mpr ?_)
+      intro i
+      refine Fin.cases ?_ (fun j => ?_) i
+      · simp only [Fin.cons_zero]
+        have : (fun j => ((V (φ j) : W12 Ω) : H1amb Ω) 0) = fun j => embW12 Ω (V (φ j)) := by
+          funext j; rw [embW12_apply]
+        rw [this]
+        exact hlim
+      · simp only [Fin.cons_succ]
+        rw [tendsto_zero_iff_norm_tendsto_zero]
+        refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds
+          (hγ.comp hφ.tendsto_atTop) (fun k => norm_nonneg _) fun k => ?_
+        exact hle (φ k) j
+    simpa only [WithLp.toLp_ofLp] using hcoord
+  have hclosed : IsClosed ((W12 Ω : Submodule ℝ (H1amb Ω)) : Set (H1amb Ω)) :=
+    Submodule.isClosed_orthogonal _
+  have hVlimW : Vlim ∈ W12 Ω :=
+    hclosed.mem_of_tendsto htend (Eventually.of_forall fun j => (V (φ j)).2)
+  -- the limit has zero weak gradient, so it is constant
+  have hwg : HasWeakGradOn Ω (fun x => (v : EuclideanSpace ℝ (Fin d) → ℝ) x) fun _ _ => 0 := by
+    have h := hasWeakGradOn_of_mem_W12 hVlimW
+    rw [hVlim0] at h
+    simp only [hVlimsucc] at h
+    exact h.congr_ae EventuallyEq.rfl fun _ => Lp.coeFn_zero ℝ 2 _
+  obtain ⟨c, hc⟩ := ae_const_of_hasWeakGradOn_zero hΩopen hconn
+    ((Lp.memLp v).integrable one_le_two) hwg
+  exact ⟨c, Lp.ext (hc.trans (coeFn_constL2 hΩb c).symm)⟩
+
 /-- **Poincaré's inequality with the mean subtracted** (Evans §5.8.1 Theorem 1 at `p = 2`).
 On a bounded, connected, open domain with `C¹` boundary, one constant bounds the `L²`
 distance of every element of `H¹(Ω)` from its mean by the `L²` norm of its gradient. -/
@@ -218,41 +265,9 @@ theorem poincare_wirtinger (hd : 0 < d) (hΩopen : IsOpen Ω) (hΩb : Bornology.
   have hmem : ∀ k, embW12 Ω (V k) ∈ closure (embW12 Ω '' closedBall (0 : W12 Ω) 2) :=
     fun k => subset_closure ⟨V k, mem_closedBall_zero_iff.mpr (hVbdd k), rfl⟩
   obtain ⟨v, -, φ, hφ, hlim⟩ := hcpt.tendsto_subseq hmem
-  -- the limit in the graph space
-  set Vlim : H1amb Ω := WithLp.toLp 2 (Fin.cons v fun _ => 0) with hVlim
-  have hVlim0 : Vlim 0 = v := by rw [hVlim, PiLp.toLp_apply, Fin.cons_zero]
-  have hVlimsucc : ∀ j : Fin d, Vlim j.succ = 0 := fun j => by
-    rw [hVlim, PiLp.toLp_apply, Fin.cons_succ]
-  have htend : Tendsto (fun j => ((V (φ j) : W12 Ω) : H1amb Ω)) atTop (𝓝 Vlim) := by
-    have hcoord : Tendsto (fun j => WithLp.toLp 2 fun i => ((V (φ j) : W12 Ω) : H1amb Ω) i)
-        atTop (𝓝 (WithLp.toLp 2 (Fin.cons v fun _ => 0))) := by
-      refine ((PiLp.continuous_toLp 2 _).tendsto _).comp (tendsto_pi_nhds.mpr ?_)
-      intro i
-      refine Fin.cases ?_ (fun j => ?_) i
-      · simp only [Fin.cons_zero]
-        have : (fun j => ((V (φ j) : W12 Ω) : H1amb Ω) 0) = fun j => embW12 Ω (V (φ j)) := by
-          funext j; rw [embW12_apply]
-        rw [this]
-        exact hlim
-      · simp only [Fin.cons_succ]
-        rw [tendsto_zero_iff_norm_tendsto_zero]
-        refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds
-          (hgV_tend.comp hφ.tendsto_atTop) (fun k => norm_nonneg _) fun k => ?_
-        exact hVsucc_le (φ k) j
-    simpa only [WithLp.toLp_ofLp] using hcoord
-  have hclosed : IsClosed ((W12 Ω : Submodule ℝ (H1amb Ω)) : Set (H1amb Ω)) :=
-    Submodule.isClosed_orthogonal _
-  have hVlimW : Vlim ∈ W12 Ω :=
-    hclosed.mem_of_tendsto htend (Eventually.of_forall fun j => (V (φ j)).2)
   -- the limit has zero weak gradient, so it is constant
-  have hwg : HasWeakGradOn Ω (fun x => (v : EuclideanSpace ℝ (Fin d) → ℝ) x) fun _ _ => 0 := by
-    have h := hasWeakGradOn_of_mem_W12 hVlimW
-    rw [hVlim0] at h
-    simp only [hVlimsucc] at h
-    exact h.congr_ae EventuallyEq.rfl fun _ => Lp.coeFn_zero ℝ 2 _
-  obtain ⟨c, hc⟩ := ae_const_of_hasWeakGradOn_zero hΩopen hconn
-    ((Lp.memLp v).integrable one_le_two) hwg
-  have hvc : v = constL2 hΩb c := Lp.ext (hc.trans (coeFn_constL2 hΩb c).symm)
+  obtain ⟨c, hvc⟩ := exists_eq_constL2_of_tendsto_zero_gradient hΩopen hΩb hconn hφ hlim
+    hgV_tend hVsucc_le
   -- its mean is zero, so the constant is zero
   have hmean : meanL2 hΩb v = 0 := by
     have h1 : Tendsto (fun j => meanL2 hΩb (embW12 Ω (V (φ j)))) atTop (𝓝 (meanL2 hΩb v)) :=
