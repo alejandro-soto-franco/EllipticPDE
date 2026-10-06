@@ -528,40 +528,41 @@ theorem tendsto_diffQuot_partialD (k : Fin d) {φ : EuclideanSpace ℝ (Fin d) �
 
 /-! ### Weak sequential compactness and the converse -/
 
-/-- **Weak sequential compactness of bounded sequences in `L²`.** A sequence bounded by `M` in
-the separable Hilbert space `EucL2 d` has a subsequence converging weakly to a limit `g'` with
+/-- **Weak sequential compactness of bounded sequences.** A sequence bounded by `M` in a
+separable real Hilbert space has a subsequence converging weakly to a limit `g'` with
 `‖g'‖ ≤ M`. Assembled from the sequential Banach-Alaoglu theorem on the weak dual
 (`WeakDual.isSeqCompact_closedBall`), the Riesz self-duality of the Hilbert space
 (`InnerProductSpace.toDual`), and the closed-ball membership of the weak-\* limit. -/
-theorem exists_weak_limit_of_bounded {x : ℕ → EucL2 d} {M : ℝ} (hx : ∀ m, ‖x m‖ ≤ M) :
-    ∃ (g' : EucL2 d) (σ : ℕ → ℕ), StrictMono σ ∧ ‖g'‖ ≤ M ∧
-      ∀ y : EucL2 d, Filter.Tendsto (fun m => ⟪x (σ m), y⟫) Filter.atTop (nhds ⟪g', y⟫) := by
-  have : Fact ((2 : ENNReal) ≠ ⊤) := ⟨by norm_num⟩
-  set F : ℕ → WeakDual ℝ (EucL2 d) :=
-    fun m => WeakDual.toStrongDual.symm (InnerProductSpace.toDual ℝ (EucL2 d) (x m)) with hFdef
-  have hFtoS : ∀ m, WeakDual.toStrongDual (F m) = InnerProductSpace.toDual ℝ (EucL2 d) (x m) :=
+theorem exists_weak_limit_of_bounded_hilbert {E : Type*} [NormedAddCommGroup E]
+    [InnerProductSpace ℝ E] [CompleteSpace E] [TopologicalSpace.SeparableSpace E]
+    {x : ℕ → E} {M : ℝ} (hx : ∀ m, ‖x m‖ ≤ M) :
+    ∃ (g' : E) (σ : ℕ → ℕ), StrictMono σ ∧ ‖g'‖ ≤ M ∧
+      ∀ y : E, Filter.Tendsto (fun m => ⟪x (σ m), y⟫) Filter.atTop (nhds ⟪g', y⟫) := by
+  set F : ℕ → WeakDual ℝ E :=
+    fun m => WeakDual.toStrongDual.symm (InnerProductSpace.toDual ℝ E (x m)) with hFdef
+  have hFtoS : ∀ m, WeakDual.toStrongDual (F m) = InnerProductSpace.toDual ℝ E (x m) :=
     fun m => WeakDual.toStrongDual.apply_symm_apply _
   have hFmem : ∀ m, F m ∈ WeakDual.toStrongDual ⁻¹' Metric.closedBall
-      (0 : StrongDual ℝ (EucL2 d)) M := by
+      (0 : StrongDual ℝ E) M := by
     intro m
     simp only [Set.mem_preimage, hFtoS m, Metric.mem_closedBall, dist_zero_right]
-    rw [(InnerProductSpace.toDual ℝ (EucL2 d)).norm_map]
+    rw [(InnerProductSpace.toDual ℝ E).norm_map]
     exact hx m
   obtain ⟨L, hLmem, σ, hσmono, hLtend⟩ :=
-    WeakDual.isSeqCompact_closedBall ℝ (EucL2 d) 0 M hFmem
-  refine ⟨(InnerProductSpace.toDual ℝ (EucL2 d)).symm (WeakDual.toStrongDual L), σ, hσmono, ?_, ?_⟩
-  · rw [(InnerProductSpace.toDual ℝ (EucL2 d)).symm.norm_map]
+    WeakDual.isSeqCompact_closedBall ℝ E 0 M hFmem
+  refine ⟨(InnerProductSpace.toDual ℝ E).symm (WeakDual.toStrongDual L), σ, hσmono, ?_, ?_⟩
+  · rw [(InnerProductSpace.toDual ℝ E).symm.norm_map]
     simpa only [Set.mem_preimage, Metric.mem_closedBall, dist_zero_right] using hLmem
   · intro y
     have heval := (tendsto_iff_forall_eval_tendsto_topDualPairing.mp hLtend) y
-    have hL1 : ∀ m, topDualPairing ℝ (EucL2 d) (F (σ m)) y = ⟪x (σ m), y⟫ := by
+    have hL1 : ∀ m, topDualPairing ℝ E (F (σ m)) y = ⟪x (σ m), y⟫ := by
       intro m
       change (F (σ m)) y = ⟪x (σ m), y⟫
-      rw [show (F (σ m)) y = (InnerProductSpace.toDual ℝ (EucL2 d) (x (σ m))) y from rfl,
+      rw [show (F (σ m)) y = (InnerProductSpace.toDual ℝ E (x (σ m))) y from rfl,
         InnerProductSpace.toDual_apply_apply]
-    have hL2 : topDualPairing ℝ (EucL2 d) L y
-        = ⟪(InnerProductSpace.toDual ℝ (EucL2 d)).symm (WeakDual.toStrongDual L), y⟫ := by
-      change L y = ⟪(InnerProductSpace.toDual ℝ (EucL2 d)).symm (WeakDual.toStrongDual L), y⟫
+    have hL2 : topDualPairing ℝ E L y
+        = ⟪(InnerProductSpace.toDual ℝ E).symm (WeakDual.toStrongDual L), y⟫ := by
+      change L y = ⟪(InnerProductSpace.toDual ℝ E).symm (WeakDual.toStrongDual L), y⟫
       rw [InnerProductSpace.toDual_symm_apply]
       exact (WeakDual.toStrongDual_apply L y).symm
     rw [hL2] at heval
@@ -578,13 +579,14 @@ Equations* (2nd ed.), §5.8.2, Theorem 3). -/
 theorem weakDeriv_of_diffQuot_bounded (k : Fin d) (g : EucL2 d) (M : ℝ)
     (hb : ∀ h : ℝ, h ≠ 0 → ‖diffQuot k h g‖ ≤ M) :
     ∃ g' : EucL2 d, HasWeakDeriv k g g' ∧ ‖g'‖ ≤ M := by
+  have : Fact ((2 : ENNReal) ≠ ⊤) := ⟨by norm_num⟩
   set hseq : ℕ → ℝ := fun m => 1 / (m + 1) with hhseq
   have hseq_ne : ∀ m, hseq m ≠ 0 := fun m => by positivity
   have hseq_lim : Filter.Tendsto hseq Filter.atTop (nhds 0) :=
     tendsto_one_div_add_atTop_nhds_zero_nat
   set X : ℕ → EucL2 d := fun m => diffQuot k (hseq m) g with hX
   have hXb : ∀ m, ‖X m‖ ≤ M := fun m => hb (hseq m) (hseq_ne m)
-  obtain ⟨g', σ, hσmono, hg'norm, hg'weak⟩ := exists_weak_limit_of_bounded hXb
+  obtain ⟨g', σ, hσmono, hg'norm, hg'weak⟩ := exists_weak_limit_of_bounded_hilbert hXb
   refine ⟨g', ?_, hg'norm⟩
   intro ζ hζc hζcs
   -- `L²` classes of the test function and its `k`-th derivative.
