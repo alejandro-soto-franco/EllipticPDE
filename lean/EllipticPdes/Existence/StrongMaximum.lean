@@ -214,6 +214,53 @@ theorem nondivOp_barrier (a : EuclideanSpace ℝ (Fin d) → Fin d → Fin d →
   rw [hdiag, hbsum]
   ring
 
+/-- **Lower bound on a transport sum.** If `|bᵢ| ≤ B` then
+`-(B (n + ∑ vᵢ²) / 2) ≤ ∑ bᵢ vᵢ`, since `|v| ≤ (1 + v²) / 2`. -/
+theorem neg_le_sum_mul_of_abs_le {n : ℕ} {b v : Fin n → ℝ} {B : ℝ} (hb : ∀ i, |b i| ≤ B) :
+    -(B * (n + ∑ i, v i ^ 2) / 2) ≤ ∑ i, b i * v i := by
+  have hterm : ∀ i, -(B * (1 + v i ^ 2) / 2) ≤ b i * v i := by
+    intro i
+    have h1 : |b i * v i| ≤ B * |v i| := by
+      rw [abs_mul]
+      exact mul_le_mul_of_nonneg_right (hb i) (abs_nonneg _)
+    have h2 : |v i| ≤ (1 + v i ^ 2) / 2 := by nlinarith [sq_nonneg (|v i| - 1), sq_abs (v i)]
+    have h3 := neg_abs_le (b i * v i)
+    have hB0 : 0 ≤ B := (abs_nonneg _).trans (hb i)
+    nlinarith
+  have hsum : ∑ i, -(B * (1 + v i ^ 2) / 2) = -(B * (n + ∑ i, v i ^ 2) / 2) := by
+    simp only [Finset.sum_neg_distrib, ← Finset.sum_div, ← Finset.mul_sum,
+      Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ, Fintype.card_fin,
+      nsmul_eq_mul, mul_one]
+  rw [← hsum]
+  exact Finset.sum_le_sum fun i _ => hterm i
+
+/-- **Choice of the barrier constant.** For `λ ≥ (2 d A + B (d + r²) + C) / (θ r²) + 1` and
+`r²/4 ≤ q ≤ r²`, `λ (2 d A + B (d + q)) + C ≤ 4 λ² θ q`. -/
+theorem barrier_coefficient_le {d : ℕ} {θ A B C r q lam : ℝ} (hθ : 0 < θ) (hr : 0 < r)
+    (hA0 : 0 ≤ A) (hB0 : 0 ≤ B) (hC0 : 0 ≤ C) (hq1 : r ^ 2 / 4 ≤ q) (hq2 : q ≤ r ^ 2)
+    (hlam : (2 * d * A + B * (d + r ^ 2) + C) / (θ * r ^ 2) + 1 ≤ lam) :
+    lam * (2 * d * A + B * (d + q)) + C - 4 * lam ^ 2 * θ * q ≤ 0 := by
+  have hθr : 0 < θ * r ^ 2 := by positivity
+  have hlam0 : 0 ≤ (2 * d * A + B * (d + r ^ 2) + C) / (θ * r ^ 2) :=
+    div_nonneg (add_nonneg (add_nonneg (mul_nonneg (by positivity) hA0)
+      (mul_nonneg hB0 (by positivity))) hC0) hθr.le
+  have hlam_pos : 0 < lam := by linarith
+  have hkey : (2 * d * A + B * (d + r ^ 2) + C) / (θ * r ^ 2) * (θ * r ^ 2)
+      = 2 * d * A + B * (d + r ^ 2) + C := div_mul_cancel₀ _ hθr.ne'
+  have h1 : lam * θ * r ^ 2 ≥ 2 * d * A + B * (d + r ^ 2) + C + θ * r ^ 2 := by
+    have := mul_le_mul_of_nonneg_right hlam hθr.le
+    nlinarith
+  have h2 : 4 * lam * θ * q ≥ lam * θ * r ^ 2 := by
+    have := mul_le_mul_of_nonneg_left hq1 (by positivity : 0 ≤ 4 * lam * θ)
+    nlinarith
+  have h3 : B * (d + q) ≤ B * (d + r ^ 2) := mul_le_mul_of_nonneg_left (by linarith) hB0
+  have h4 : lam * (4 * lam * θ * q) ≥ lam * (lam * θ * r ^ 2) :=
+    mul_le_mul_of_nonneg_left h2 hlam_pos.le
+  have h5 : lam * (lam * θ * r ^ 2) ≥ lam * (2 * d * A + B * (d + r ^ 2) + C + θ * r ^ 2) :=
+    mul_le_mul_of_nonneg_left h1 hlam_pos.le
+  have h6 : lam * C ≥ C := by nlinarith
+  nlinarith
+
 /-- **Barrier as a subsolution on the annulus** for `λ` large: with the bounds on the
 coefficients and `r²/4 ≤ |x - y|² ≤ r²`. -/
 theorem nondivOp_barrier_nonpos (hd : 0 < d)
@@ -240,22 +287,8 @@ theorem nondivOp_barrier_nonpos (hd : 0 < d)
   have hS2 : θ * sqDist y x ≤ ∑ i, ∑ j, a x i j * (x i - y i) * (x j - y j) := by
     have := hell fun i => x i - y i
     simpa [sqDist] using this
-  have hS3 : -(B * (d + sqDist y x) / 2) ≤ ∑ i, b x i * (x i - y i) := by
-    have hterm : ∀ i, -(B * (1 + (x i - y i) ^ 2) / 2) ≤ b x i * (x i - y i) := by
-      intro i
-      have h1 : |b x i * (x i - y i)| ≤ B * |x i - y i| := by
-        rw [abs_mul]
-        exact mul_le_mul_of_nonneg_right (hb i) (abs_nonneg _)
-      have h2 : |x i - y i| ≤ (1 + (x i - y i) ^ 2) / 2 := by
-        nlinarith [sq_nonneg (|x i - y i| - 1), sq_abs (x i - y i)]
-      have h3 := neg_abs_le (b x i * (x i - y i))
-      nlinarith
-    have hsum : ∑ i, -(B * (1 + (x i - y i) ^ 2) / 2) = -(B * (d + sqDist y x) / 2) := by
-      simp only [sqDist, Finset.sum_neg_distrib, ← Finset.sum_div, ← Finset.mul_sum,
-        Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ, Fintype.card_fin,
-        nsmul_eq_mul, mul_one]
-    rw [← hsum]
-    exact Finset.sum_le_sum fun i _ => hterm i
+  have hS3 : -(B * (d + sqDist y x) / 2) ≤ ∑ i, b x i * (x i - y i) :=
+    neg_le_sum_mul_of_abs_le (b := fun i => b x i) (v := fun i => x i - y i) hb
   -- the choice of `λ`
   have hθr : 0 < θ * r ^ 2 := by positivity
   have hlam0 : 0 ≤ (2 * d * A + B * (d + r ^ 2) + C) / (θ * r ^ 2) :=
@@ -263,23 +296,8 @@ theorem nondivOp_barrier_nonpos (hd : 0 < d)
       (mul_nonneg hB0 (by positivity))) hC0) hθr.le
   have hlam1 : 1 ≤ lam := by linarith
   have hlam_pos : 0 < lam := by linarith
-  have hkey : (2 * d * A + B * (d + r ^ 2) + C) / (θ * r ^ 2) * (θ * r ^ 2)
-      = 2 * d * A + B * (d + r ^ 2) + C := div_mul_cancel₀ _ hθr.ne'
-  have hbr : lam * (2 * d * A + B * (d + sqDist y x)) + C - 4 * lam ^ 2 * θ * sqDist y x ≤ 0 := by
-    have h1 : lam * θ * r ^ 2 ≥ 2 * d * A + B * (d + r ^ 2) + C + θ * r ^ 2 := by
-      have := mul_le_mul_of_nonneg_right hlam hθr.le
-      nlinarith
-    have h2 : 4 * lam * θ * sqDist y x ≥ lam * θ * r ^ 2 := by
-      have := mul_le_mul_of_nonneg_left hq1 (by positivity : 0 ≤ 4 * lam * θ)
-      nlinarith
-    have h3 : B * (d + sqDist y x) ≤ B * (d + r ^ 2) := by
-      exact mul_le_mul_of_nonneg_left (by linarith) hB0
-    have h4 : lam * (4 * lam * θ * sqDist y x) ≥ lam * (lam * θ * r ^ 2) :=
-      mul_le_mul_of_nonneg_left h2 hlam_pos.le
-    have h5 : lam * (lam * θ * r ^ 2) ≥ lam * (2 * d * A + B * (d + r ^ 2) + C + θ * r ^ 2) :=
-      mul_le_mul_of_nonneg_left h1 hlam_pos.le
-    have h6 : lam * C ≥ C := by nlinarith
-    nlinarith
+  have hbr : lam * (2 * d * A + B * (d + sqDist y x)) + C - 4 * lam ^ 2 * θ * sqDist y x ≤ 0 :=
+    barrier_coefficient_le hθ hr hA0 hB0 hC0 hq1 hq2 hlam
   -- the zeroth-order term is at most `C` times the exponential part
   have hbar_nonneg : 0 ≤ barrier lam r y x := by
     simp only [barrier, barrierExp, sub_nonneg]
