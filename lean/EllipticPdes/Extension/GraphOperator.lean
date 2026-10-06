@@ -55,7 +55,7 @@ namespace EllipticPdes.Extension
 
 open EllipticPdes.Sobolev
 open EllipticPdes.Embedding (HasWeakGradOn hasWeakGradOn_zero hasWeakGradOn_unique_ae
-  isFiniteMeasure_restrict_of_isBounded norm_apply_le)
+  isFiniteMeasure_restrict_of_isBounded)
 
 variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))}
 

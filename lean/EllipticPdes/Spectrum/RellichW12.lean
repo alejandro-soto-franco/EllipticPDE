@@ -57,8 +57,7 @@ noncomputable section
 namespace EllipticPdes.Sobolev
 
 open EllipticPdes.Embedding (HasWeakGradOn partialD_convolution_eq_of_hasWeakGradOn
-  tendsto_eLpNorm_convolution_sub eLpNorm_convolution_le isFiniteMeasure_restrict_of_isBounded
-  norm_apply_le)
+  tendsto_eLpNorm_convolution_sub eLpNorm_convolution_le isFiniteMeasure_restrict_of_isBounded)
 open EllipticPdes.Extension (HasC1Boundary exists_extLinear SobolevPair hasWeakGradOn_of_mem_W12
   hasC1Boundary_ball)
 
@@ -253,7 +252,8 @@ theorem embW12_isCompact (hd : 0 < d) (hΩopen : IsOpen Ω) (hΩb : Bornology.Is
     calc ‖(U : H1amb Ω) 0‖ + ∑ k : Fin d, ‖(U : H1amb Ω) k.succ‖
         ≤ ‖U‖ + ∑ _k : Fin d, ‖U‖ := by
           rw [hU]
-          exact add_le_add (norm_apply_le _ _) (Finset.sum_le_sum fun k _ => norm_apply_le _ _)
+          exact add_le_add (PiLp.norm_apply_le _ _)
+            (Finset.sum_le_sum fun k _ => PiLp.norm_apply_le _ _)
       _ = (d + 1) * ‖U‖ := by
           rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]; ring
   have hKfin : ∀ U : W12 Ω, (K : ℝ≥0∞) * (eLpNorm (w U).1 2 (volume.restrict Ω)

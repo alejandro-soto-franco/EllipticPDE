@@ -168,8 +168,6 @@ theorem eLpNorm_testGraph_le_of_isBounded (hΩm : MeasurableSet Ω)
 
 /-! ### The transfer to `H₀¹(Ω)` -/
 
-/-- Each coordinate of the graph is bounded by the ambient `H¹` norm. -/
-lemma norm_apply_le (U : H1amb Ω) (j : Fin (d + 1)) : ‖U j‖ ≤ ‖U‖ := PiLp.norm_apply_le U j
 
 /-- **Transfer principle.** An estimate of the function coordinate by the gradient
 coordinates, valid on every test graph, is valid on all of `H₀¹(Ω)`.
@@ -205,7 +203,7 @@ theorem eLpNorm_le_of_mem_H01_of_forall_testFn {q : ℝ≥0∞} {C : ℝ≥0}
     intro j
     refine tendsto_iff_norm_sub_tendsto_zero.mpr (squeeze_zero (fun _ => norm_nonneg _)
       (fun n => ?_) (tendsto_iff_norm_sub_tendsto_zero.mp hVtend))
-    have := norm_apply_le (V n - U) j
+    have := PiLp.norm_apply_le (V n - U) j
     simpa using this
   have hmeasure : TendstoInMeasure (volume.restrict Ω) (fun n => (V n 0 : _ → ℝ)) atTop (U 0) :=
     tendstoInMeasure_of_tendsto_Lp (hconv 0)
@@ -263,7 +261,7 @@ lemma sum_enorm_succ_le (U : H01 Ω) :
       ≤ ∑ _i : Fin d, ENNReal.ofReal ‖(U : H1amb Ω)‖ := by
         refine Finset.sum_le_sum (fun i _ => ?_)
         rw [← ofReal_norm]
-        exact ENNReal.ofReal_le_ofReal (norm_apply_le _ _)
+        exact ENNReal.ofReal_le_ofReal (PiLp.norm_apply_le _ _)
     _ = ENNReal.ofReal (d * ‖U‖) := by
         rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul,
           ← ENNReal.ofReal_natCast d, ← ENNReal.ofReal_mul (Nat.cast_nonneg d), hnorm]
