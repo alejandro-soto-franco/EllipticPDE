@@ -513,64 +513,34 @@ theorem norm_fderiv_le_sum_partialD (u : EuclideanSpace ℝ (Fin d) → ℝ)
     _ = (∑ k, ‖partialD k u y‖) * ‖x‖ := by
         rw [Finset.sum_mul]; exact Finset.sum_congr rfl fun k _ => mul_comm _ _
 
-/-- **Morrey on a ball in the smooth case.** A smooth `u` with gradient components `gₖ = ∂ₖu`
-in `Lᵖ(ball c r)` (`p > d`) is Hölder-`(1−d/p)` on the ball, with constant linear in
-`∑ₖ ‖gₖ‖_{Lᵖ(ball c r)}`. This lifts `exists_holder_smooth` to the coordinate-partial form
-consumed by the weak-gradient statement, by dominating the operator-norm `Lᵖ` seminorm of the
-derivative by the sum of the coordinate-partial `Lᵖ` seminorms. -/
-theorem morrey_ball_contDiff (hd : 0 < d) {p : ℝ} (hp : (d : ℝ) < p)
-    (c : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr : 0 < r) :
-    ∃ C : ℝ≥0, ∀ (u : EuclideanSpace ℝ (Fin d) → ℝ), ContDiff ℝ (⊤ : ℕ∞) u →
-      (∀ k, MemLp (fun y => partialD k u y) (ENNReal.ofReal p)
-          (volume.restrict (Metric.ball c r))) →
-        HolderOnWith
-          (C * ∑ k, (eLpNorm (fun y => partialD k u y) (ENNReal.ofReal p)
-                      (volume.restrict (Metric.ball c r))).toNNReal)
-          (morreyExponent d p) u (Metric.ball c r) := by
-  have h1d : (1 : ℝ) ≤ (d : ℝ) := by exact_mod_cast Nat.one_le_iff_ne_zero.mpr hd.ne'
-  have hp1 : (1 : ℝ) ≤ p := le_of_lt (lt_of_le_of_lt h1d hp)
-  have hpge1 : (1 : ℝ≥0∞) ≤ ENNReal.ofReal p := by
-    rw [show (1 : ℝ≥0∞) = ENNReal.ofReal 1 from by simp]; exact ENNReal.ofReal_le_ofReal hp1
-  obtain ⟨C, hC⟩ := exists_holder_smooth hd hp
-  refine ⟨C, fun u hu hmem => ?_⟩
-  set μ := volume.restrict (Metric.ball c r) with hμ_def
-  -- The coordinate-partial `Lᵖ` seminorms are all finite.
-  have hfin : ∀ k, eLpNorm (fun y => partialD k u y) (ENNReal.ofReal p) μ ≠ ⊤ :=
-    fun k => (hmem k).eLpNorm_lt_top.ne
-  -- Bound the operator-norm seminorm by the sum of coordinate-partial seminorms.
-  have hstep : eLpNorm (fun y => ‖fderiv ℝ u y‖) (ENNReal.ofReal p) μ
-      ≤ ∑ k, eLpNorm (fun y => partialD k u y) (ENNReal.ofReal p) μ := by
-    have h1 : eLpNorm (fun y => ‖fderiv ℝ u y‖) (ENNReal.ofReal p) μ
-        ≤ eLpNorm (fun y => ∑ k, ‖partialD k u y‖) (ENNReal.ofReal p) μ := by
-      refine eLpNorm_mono (hu.continuous_fderiv (by simp)).norm.aestronglyMeasurable
-        fun y => ?_
-      rw [Real.norm_eq_abs, abs_of_nonneg (norm_nonneg _), Real.norm_eq_abs,
-        abs_of_nonneg (Finset.sum_nonneg fun k _ => norm_nonneg _)]
-      exact norm_fderiv_le_sum_partialD u y
-    have h2 : eLpNorm (fun y => ∑ k, ‖partialD k u y‖) (ENNReal.ofReal p) μ
-        ≤ ∑ k, eLpNorm (fun y => partialD k u y) (ENNReal.ofReal p) μ := by
-      rw [show (fun y => ∑ k, ‖partialD k u y‖)
-          = ∑ k, (fun y => ‖partialD k u y‖) from by funext y; rw [Finset.sum_apply]]
-      refine (eLpNorm_sum_le hpge1).trans_eq ?_
-      exact Finset.sum_congr rfl fun k _ => eLpNorm_norm _ (hmem k).aestronglyMeasurable
-    exact h1.trans h2
-  -- Transfer to `toNNReal` and to the two-argument `HolderOnWith` constant.
-  have hsum_fin : (∑ k, eLpNorm (fun y => partialD k u y) (ENNReal.ofReal p) μ) ≠ ⊤ :=
-    ENNReal.sum_ne_top.mpr fun k _ => hfin k
-  have htoNN : (eLpNorm (fun y => ‖fderiv ℝ u y‖) (ENNReal.ofReal p) μ).toNNReal
-      ≤ ∑ k, (eLpNorm (fun y => partialD k u y) (ENNReal.ofReal p) μ).toNNReal := by
-    calc (eLpNorm (fun y => ‖fderiv ℝ u y‖) (ENNReal.ofReal p) μ).toNNReal
-        ≤ (∑ k, eLpNorm (fun y => partialD k u y) (ENNReal.ofReal p) μ).toNNReal :=
-          ENNReal.toNNReal_mono hsum_fin hstep
-      _ = ∑ k, (eLpNorm (fun y => partialD k u y) (ENNReal.ofReal p) μ).toNNReal :=
-          ENNReal.toNNReal_sum fun k _ => hfin k
-  have hconst : C * (eLpNorm (fun y => ‖fderiv ℝ u y‖) (ENNReal.ofReal p) μ).toNNReal
-      ≤ C * ∑ k, (eLpNorm (fun y => partialD k u y) (ENNReal.ofReal p) μ).toNNReal :=
-    mul_le_mul_right htoNN C
-  -- Apply the smooth Hölder estimate and enlarge the constant.
-  intro x hx y hy
-  exact (hC u hu c hr x hx y hy).trans
-    (mul_le_mul_left (ENNReal.coe_le_coe.mpr hconst) _)
+/-- **`Lᵖ` seminorm of a derivative by its coordinate partials.** For a function with continuous
+derivative, the `Lᵖ` seminorm of `fderiv ℝ u` is at most the sum of the `Lᵖ` seminorms of the
+coordinate partials, for `1 ≤ p`. -/
+theorem eLpNorm_fderiv_le_sum_partialD {u : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hu : Continuous (fderiv ℝ u)) {p : ℝ≥0∞} (hp : 1 ≤ p)
+    {μ : Measure (EuclideanSpace ℝ (Fin d))} (hmeas : ∀ k, AEStronglyMeasurable (partialD k u) μ) :
+    eLpNorm (fderiv ℝ u) p μ ≤ ∑ k, eLpNorm (partialD k u) p μ := by
+  calc eLpNorm (fderiv ℝ u) p μ
+      ≤ eLpNorm (fun y => ∑ k, ‖partialD k u y‖) p μ :=
+        eLpNorm_mono_real hu.aestronglyMeasurable (norm_fderiv_le_sum_partialD u)
+    _ = eLpNorm (∑ k, fun y => ‖partialD k u y‖) p μ := by
+        refine eLpNorm_congr_ae (Filter.EventuallyEq.of_eq (funext fun y => ?_))
+        rw [Finset.sum_apply]
+    _ ≤ ∑ k, eLpNorm (fun y => ‖partialD k u y‖) p μ := eLpNorm_sum_le hp
+    _ = ∑ k, eLpNorm (partialD k u) p μ :=
+        Finset.sum_congr rfl fun k _ => eLpNorm_norm _ (hmeas k)
+
+/-- The `toNNReal` form of `eLpNorm_fderiv_le_sum_partialD`, for the operator-norm gradient and
+partials in `Lᵖ`. -/
+theorem toNNReal_eLpNorm_norm_fderiv_le {u : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hu : Continuous (fderiv ℝ u)) {p : ℝ≥0∞} (hp : 1 ≤ p)
+    {μ : Measure (EuclideanSpace ℝ (Fin d))} (hmem : ∀ k, MemLp (partialD k u) p μ) :
+    (eLpNorm (fun y => ‖fderiv ℝ u y‖) p μ).toNNReal
+      ≤ ∑ k, (eLpNorm (partialD k u) p μ).toNNReal := by
+  rw [eLpNorm_norm _ hu.aestronglyMeasurable]
+  exact (ENNReal.toNNReal_mono (ENNReal.sum_ne_top.mpr fun k _ => (hmem k).eLpNorm_lt_top.ne)
+    (eLpNorm_fderiv_le_sum_partialD hu hp fun k => (hmem k).aestronglyMeasurable)).trans_eq
+    (ENNReal.toNNReal_sum fun k _ => (hmem k).eLpNorm_lt_top.ne)
 
 /-- **Gradient-convolution bridge.** If `g` is the weak gradient of `u` on a measurable
 set `B` and `ρ` is a normalised bump of outer radius `ε` centred at `0`, then at every interior
@@ -765,11 +735,11 @@ private theorem exists_holderOnWith_of_ae_tendsto
   · filter_upwards [hae, ae_restrict_mem hB.measurableSet] with x hxtend hxB
     exact tendsto_nhds_unique (hu'lim x hxB) hxtend
 
-/-- **Uniform-constant coordinate-partial Morrey estimate.** Identical to
-`morrey_ball_contDiff`, but with a single constant valid for every centre and radius, obtained
-by keeping the ball inside the quantifier of `exists_holder_smooth`. This uniformity is what
-lets the exhaustion of a ball by interior sub-balls have a fixed Hölder constant. -/
-private theorem exists_holder_smooth_partialD (hd : 0 < d) {p : ℝ} (hp : (d : ℝ) < p) :
+/-- **Morrey on a ball in the smooth case, coordinate-partial form.** For `p > d` there is one
+constant `C` such that every smooth `v` with coordinate partials in `Lᵖ(ball c r)` is
+Hölder-`(1 - d/p)` on the ball with constant `C · ∑ₖ ‖∂ₖ v‖_{Lᵖ(ball c r)}`, whatever the centre
+and the radius. -/
+theorem exists_holder_smooth_partialD (hd : 0 < d) {p : ℝ} (hp : (d : ℝ) < p) :
     ∃ C : ℝ≥0, ∀ (v : EuclideanSpace ℝ (Fin d) → ℝ), ContDiff ℝ (⊤ : ℕ∞) v →
       ∀ (c : EuclideanSpace ℝ (Fin d)) {r : ℝ}, 0 < r →
         (∀ k, MemLp (fun y => partialD k v y) (ENNReal.ofReal p)
@@ -778,46 +748,29 @@ private theorem exists_holder_smooth_partialD (hd : 0 < d) {p : ℝ} (hp : (d : 
             (C * ∑ k, (eLpNorm (fun y => partialD k v y) (ENNReal.ofReal p)
                         (volume.restrict (Metric.ball c r))).toNNReal)
             (morreyExponent d p) v (Metric.ball c r) := by
-  have h1d : (1 : ℝ) ≤ (d : ℝ) := by exact_mod_cast Nat.one_le_iff_ne_zero.mpr hd.ne'
-  have hpge1 : (1 : ℝ≥0∞) ≤ ENNReal.ofReal p := by
-    rw [show (1 : ℝ≥0∞) = ENNReal.ofReal 1 from by simp]
-    exact ENNReal.ofReal_le_ofReal (le_of_lt (lt_of_le_of_lt h1d hp))
+  have hp1 : (1 : ℝ≥0∞) ≤ ENNReal.ofReal p :=
+    ENNReal.one_le_ofReal.mpr (by
+      have : (1 : ℝ) ≤ d := by exact_mod_cast hd
+      linarith)
   obtain ⟨C, hC⟩ := exists_holder_smooth hd hp
-  refine ⟨C, fun v hv c r hr hmem => ?_⟩
-  set μ := volume.restrict (Metric.ball c r) with hμ_def
-  have hfin : ∀ k, eLpNorm (fun y => partialD k v y) (ENNReal.ofReal p) μ ≠ ⊤ :=
-    fun k => (hmem k).eLpNorm_lt_top.ne
-  have hstep : eLpNorm (fun y => ‖fderiv ℝ v y‖) (ENNReal.ofReal p) μ
-      ≤ ∑ k, eLpNorm (fun y => partialD k v y) (ENNReal.ofReal p) μ := by
-    have h1 : eLpNorm (fun y => ‖fderiv ℝ v y‖) (ENNReal.ofReal p) μ
-        ≤ eLpNorm (fun y => ∑ k, ‖partialD k v y‖) (ENNReal.ofReal p) μ := by
-      refine eLpNorm_mono (hv.continuous_fderiv (by simp)).norm.aestronglyMeasurable
-        fun y => ?_
-      rw [Real.norm_eq_abs, abs_of_nonneg (norm_nonneg _), Real.norm_eq_abs,
-        abs_of_nonneg (Finset.sum_nonneg fun k _ => norm_nonneg _)]
-      exact norm_fderiv_le_sum_partialD v y
-    have h2 : eLpNorm (fun y => ∑ k, ‖partialD k v y‖) (ENNReal.ofReal p) μ
-        ≤ ∑ k, eLpNorm (fun y => partialD k v y) (ENNReal.ofReal p) μ := by
-      rw [show (fun y => ∑ k, ‖partialD k v y‖)
-          = ∑ k, (fun y => ‖partialD k v y‖) from by funext y; rw [Finset.sum_apply]]
-      refine (eLpNorm_sum_le hpge1).trans_eq ?_
-      exact Finset.sum_congr rfl fun k _ => eLpNorm_norm _ (hmem k).aestronglyMeasurable
-    exact h1.trans h2
-  have hsum_fin : (∑ k, eLpNorm (fun y => partialD k v y) (ENNReal.ofReal p) μ) ≠ ⊤ :=
-    ENNReal.sum_ne_top.mpr fun k _ => hfin k
-  have htoNN : (eLpNorm (fun y => ‖fderiv ℝ v y‖) (ENNReal.ofReal p) μ).toNNReal
-      ≤ ∑ k, (eLpNorm (fun y => partialD k v y) (ENNReal.ofReal p) μ).toNNReal := by
-    calc (eLpNorm (fun y => ‖fderiv ℝ v y‖) (ENNReal.ofReal p) μ).toNNReal
-        ≤ (∑ k, eLpNorm (fun y => partialD k v y) (ENNReal.ofReal p) μ).toNNReal :=
-          ENNReal.toNNReal_mono hsum_fin hstep
-      _ = ∑ k, (eLpNorm (fun y => partialD k v y) (ENNReal.ofReal p) μ).toNNReal :=
-          ENNReal.toNNReal_sum fun k _ => hfin k
-  have hconst : C * (eLpNorm (fun y => ‖fderiv ℝ v y‖) (ENNReal.ofReal p) μ).toNNReal
-      ≤ C * ∑ k, (eLpNorm (fun y => partialD k v y) (ENNReal.ofReal p) μ).toNNReal :=
-    mul_le_mul_right htoNN C
-  intro x hx y hy
-  exact (hC v hv c hr x hx y hy).trans
-    (mul_le_mul_left (ENNReal.coe_le_coe.mpr hconst) _)
+  refine ⟨C, fun v hv c r hr hmem x hx y hy => (hC v hv c hr x hx y hy).trans
+    (mul_le_mul_left (ENNReal.coe_le_coe.mpr (mul_le_mul_right ?_ C)) _)⟩
+  exact toNNReal_eLpNorm_norm_fderiv_le (hv.continuous_fderiv (by simp)) hp1 hmem
+
+/-- **Morrey on a ball in the smooth case.** A smooth `u` with gradient components `gₖ = ∂ₖu`
+in `Lᵖ(ball c r)` (`p > d`) is Hölder-`(1−d/p)` on the ball, with constant linear in
+`∑ₖ ‖gₖ‖_{Lᵖ(ball c r)}`. -/
+theorem morrey_ball_contDiff (hd : 0 < d) {p : ℝ} (hp : (d : ℝ) < p)
+    (c : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr : 0 < r) :
+    ∃ C : ℝ≥0, ∀ (u : EuclideanSpace ℝ (Fin d) → ℝ), ContDiff ℝ (⊤ : ℕ∞) u →
+      (∀ k, MemLp (fun y => partialD k u y) (ENNReal.ofReal p)
+          (volume.restrict (Metric.ball c r))) →
+        HolderOnWith
+          (C * ∑ k, (eLpNorm (fun y => partialD k u y) (ENNReal.ofReal p)
+                      (volume.restrict (Metric.ball c r))).toNNReal)
+          (morreyExponent d p) u (Metric.ball c r) := by
+  obtain ⟨C, hC⟩ := exists_holder_smooth_partialD hd hp
+  exact ⟨C, fun u hu hmem => hC u hu c hr hmem⟩
 
 /-- **Morrey embedding on a ball (weak-gradient form).** For `p > d`, a function `u` that is
 integrable on `Metric.ball c r` with an `Lᵖ` weak gradient `g` there has a continuous

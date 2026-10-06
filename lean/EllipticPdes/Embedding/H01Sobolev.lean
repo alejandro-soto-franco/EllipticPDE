@@ -101,18 +101,11 @@ lemma eLpNorm_fderiv_le_sum (hΩm : MeasurableSet Ω)
   have hmeas : ∀ i : Fin d, AEStronglyMeasurable (partialD i φ) volume := fun i =>
     (h.continuous_partialD i).aestronglyMeasurable
   calc eLpNorm (fderiv ℝ φ) 2 volume
-      ≤ eLpNorm (fun x => ∑ k : Fin d, ‖partialD k φ x‖) 2 volume := by
-        refine eLpNorm_mono (h.1.continuous_fderiv (by simp)).aestronglyMeasurable (fun x => ?_)
-        rw [Real.norm_eq_abs, abs_of_nonneg (Finset.sum_nonneg fun _ _ => norm_nonneg _)]
-        exact norm_fderiv_le_sum_partialD φ x
-    _ = eLpNorm (∑ k : Fin d, fun x => ‖partialD k φ x‖) 2 volume := by
-        refine eLpNorm_congr_ae (EventuallyEq.of_eq (funext fun x => ?_))
-        rw [Finset.sum_apply]
-    _ ≤ ∑ k : Fin d, eLpNorm (fun x => ‖partialD k φ x‖) 2 volume :=
-        eLpNorm_sum_le one_le_two
+      ≤ ∑ k : Fin d, eLpNorm (partialD k φ) 2 volume :=
+        eLpNorm_fderiv_le_sum_partialD (h.1.continuous_fderiv (by simp)) one_le_two hmeas
     _ = ∑ i : Fin d, ‖h.testGraph i.succ‖ₑ := by
         refine Finset.sum_congr rfl (fun i _ => ?_)
-        rw [eLpNorm_norm _ (hmeas i), ← eLpNorm_restrict_eq_of_tsupport_subset hΩm
+        rw [← eLpNorm_restrict_eq_of_tsupport_subset hΩm
           ((tsupport_partialD_subset i φ).trans h.2.2) 2,
           IsTestFn.testGraph_succ, Lp.enorm_def, IsTestFn.partialCls]
         exact (eLpNorm_congr_ae (h.memLp_partialD i).coeFn_toLp).symm

@@ -86,19 +86,6 @@ theorem oscillation_eq_average_ray_set
       exact ⟨hpos, htop⟩)
   rw [hk, one_smul]
 
-/-- **Ray-FTC average identity (Morrey rung 4a).** The ball specialisation of
-`oscillation_eq_average_ray_set`: for smooth `φ`, the oscillation of the ball-average of `φ`
-about `φ x` equals the average over the ball of the gradient line integral from `x`. -/
-theorem oscillation_eq_average_ray
-    {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφ : ContDiff ℝ (⊤ : ℕ∞) φ)
-    (c x : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr : 0 < r) :
-    (⨍ y in ball c r, φ y) - φ x
-      = ⨍ y in ball c r, ∫ t in (0 : ℝ)..1, (fderiv ℝ φ (x + t • (y - x))) (y - x) :=
-  oscillation_eq_average_ray_set hφ x measurableSet_ball (measure_ball_pos volume c hr).ne'
-    measure_ball_lt_top.ne
-    ((hφ.continuous.locallyIntegrable.integrableOn_isCompact
-        (isCompact_closedBall c r)).mono_set ball_subset_closedBall)
-
 /-- **Region fact (convex form).** If `y` lies in `ball x D` and `0 < t`, then the segment point
 `x + t • (y - x)` is within distance `D t` of `x`. This is the geometric input feeding the
 Riesz-kernel tail bound: after the affine change of variables the transformed region
@@ -503,143 +490,11 @@ theorem riesz_potential_integrableOn {φ : EuclideanSpace ℝ (Fin d) → ℝ}
       rwa [sub_add_cancel] at this
     linarith)
 
-/-- **Morrey potential estimate for smooth functions.** For a smooth `φ` and any point `x` of a
-ball, the oscillation of `φ` about its ball average is controlled by the Riesz potential of the
-gradient, with a dimensional constant `Cd = 2^d / (d ω_d)`. This is the analytic heart of the
-Morrey embedding, assembled from the ray-FTC average identity, the kernel bound, and the
-integrability of the Riesz potential. -/
-theorem exists_potential_bound (hd : 0 < d) :
-    ∃ Cd : ℝ≥0, ∀ (φ : EuclideanSpace ℝ (Fin d) → ℝ), ContDiff ℝ (⊤ : ℕ∞) φ →
-      ∀ (c : EuclideanSpace ℝ (Fin d)) {r : ℝ}, 0 < r → ∀ x ∈ Metric.ball c r,
-        |φ x - ⨍ y in Metric.ball c r, φ y|
-          ≤ (Cd : ℝ) * ∫ y in Metric.ball c r,
-              ‖fderiv ℝ φ y‖ / dist x y ^ (d - 1) := by
-  have : Nontrivial (EuclideanSpace ℝ (Fin d)) :=
-    Module.nontrivial_of_finrank_pos (R := ℝ) (by rw [finrank_euclideanSpace_fin]; exact hd)
-  set ω : ℝ := volume.real (ball (0 : EuclideanSpace ℝ (Fin d)) 1) with hω_def
-  have hω_pos : 0 < ω := by
-    rw [hω_def, measureReal_def, ENNReal.toReal_pos_iff]
-    exact ⟨measure_ball_pos volume 0 one_pos, measure_ball_lt_top⟩
-  refine ⟨⟨2 ^ d / (d * ω), by positivity⟩, ?_⟩
-  intro φ hφ c r hr x hx
-  have hB : MeasurableSet (ball c r) := measurableSet_ball
-  have hfd : Continuous (fun z : EuclideanSpace ℝ (Fin d) => fderiv ℝ φ z) :=
-    hφ.continuous_fderiv (by simp)
-  have hvolpos : 0 < volume.real (ball c r) := by
-    rw [measureReal_def, ENNReal.toReal_pos_iff]
-    exact ⟨measure_ball_pos volume c hr, measure_ball_lt_top⟩
-  have hvol_eq : volume.real (ball c r) = r ^ d * ω := by
-    rw [hω_def, measureReal_def, Measure.addHaar_ball_of_pos volume c hr, ENNReal.toReal_mul,
-      ENNReal.toReal_ofReal (by positivity), finrank_euclideanSpace_fin, measureReal_def]
-  -- Abbreviations for the ray integral `I`, the gradient integrand `g`, and its Riesz `lintegral`.
-  set I : EuclideanSpace ℝ (Fin d) → ℝ :=
-    fun y => ∫ t in (0 : ℝ)..1, (fderiv ℝ φ (x + t • (y - x))) (y - x) with hI_def
-  set g : EuclideanSpace ℝ (Fin d) → ℝ := fun z => ‖fderiv ℝ φ z‖ / dist x z ^ (d - 1) with hg_def
-  set Rl : ℝ≥0∞ := ∫⁻ z in ball c r, ‖fderiv ℝ φ z‖ₑ / ‖z - x‖ₑ ^ (d - 1) ∂volume with hRl_def
-  have hg_nn : ∀ z, 0 ≤ g z := fun z => by rw [hg_def]; positivity
-  have hnex : ∀ᵐ z ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), z ≠ x := by
-    rw [ae_iff, show {z : EuclideanSpace ℝ (Fin d) | ¬ z ≠ x} = {x} from by ext z; simp]
-    exact measure_singleton x
-  -- `Rl` rewrites as an `enorm` integral, hence is finite and its `toReal` is `∫ g`.
-  have hRl_enorm : Rl = ∫⁻ z in ball c r, ‖g z‖ₑ ∂volume := by
-    rw [hRl_def]
-    refine lintegral_congr_ae ?_
-    filter_upwards [ae_restrict_of_ae hnex] with z hz
-    have hzx : 0 < ‖z - x‖ := by rw [norm_pos_iff]; exact sub_ne_zero.mpr hz
-    have hdist : dist x z = ‖z - x‖ := by rw [dist_eq_norm, ← neg_sub z x, norm_neg]
-    rw [Real.enorm_eq_ofReal (hg_nn z)]
-    simp only [hg_def, hdist]
-    rw [← ofReal_norm (fderiv ℝ φ z), ← ofReal_norm (z - x),
-      ← ENNReal.ofReal_pow (norm_nonneg _), ← ENNReal.ofReal_div_of_pos (by positivity)]
-  have hgint : IntegrableOn g (ball c r) volume := riesz_potential_integrableOn hφ hd c x hr hx
-  have hRl_lt : Rl < ⊤ := by
-    rw [hRl_enorm]; exact hasFiniteIntegral_iff_enorm.mp hgint.2
-  have hReq : Rl.toReal = ∫ y in ball c r, g y ∂volume := by
-    rw [hRl_enorm, integral_eq_lintegral_of_nonneg_ae (ae_of_all _ hg_nn) hgint.1]
-    congr 1
-    refine lintegral_congr fun z => ?_
-    rw [Real.enorm_eq_ofReal (hg_nn z)]
-  -- Continuity of the ray integral in `y`.
-  have hIcont : Continuous I := by
-    rw [hI_def]
-    apply intervalIntegral.continuous_parametric_intervalIntegral_of_continuous'
-    exact (hfd.comp (by fun_prop)).clm_apply (by fun_prop)
-  -- Per-point domination of `I` by the gradient line integral.
-  have hper_y : ∀ y, ENNReal.ofReal |I y| ≤
-      ∫⁻ t in Ioc (0 : ℝ) 1, ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂volume := by
-    intro y
-    have hJc : Continuous (fun t : ℝ => (fderiv ℝ φ (x + t • (y - x))) (y - x)) :=
-      (hfd.comp (by fun_prop)).clm_apply continuous_const
-    calc ENNReal.ofReal |I y|
-        ≤ ENNReal.ofReal (∫ t in Ioc (0 : ℝ) 1,
-            |(fderiv ℝ φ (x + t • (y - x))) (y - x)|) := by
-          apply ENNReal.ofReal_le_ofReal
-          rw [hI_def, ← intervalIntegral.integral_of_le (by norm_num : (0 : ℝ) ≤ 1)]
-          exact intervalIntegral.abs_integral_le_integral_abs (by norm_num)
-      _ = ∫⁻ t in Ioc (0 : ℝ) 1,
-            ENNReal.ofReal |(fderiv ℝ φ (x + t • (y - x))) (y - x)| ∂volume := by
-          rw [ofReal_integral_eq_lintegral_ofReal
-            ((hJc.abs.continuousOn.integrableOn_Icc).mono_set Ioc_subset_Icc_self)
-            (ae_of_all _ (fun t => abs_nonneg _))]
-      _ ≤ ∫⁻ t in Ioc (0 : ℝ) 1,
-            ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂volume := by
-          refine lintegral_mono fun t => ?_
-          calc ENNReal.ofReal |(fderiv ℝ φ (x + t • (y - x))) (y - x)|
-              ≤ ENNReal.ofReal (‖fderiv ℝ φ (x + t • (y - x))‖ * ‖y - x‖) := by
-                apply ENNReal.ofReal_le_ofReal
-                rw [← Real.norm_eq_abs]
-                exact (fderiv ℝ φ (x + t • (y - x))).le_opNorm (y - x)
-            _ = ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ := by
-                rw [ENNReal.ofReal_mul (norm_nonneg _), ofReal_norm, ofReal_norm]
-  -- The kernel bound and its finiteness.
-  have hWsub : ball c r ⊆ ball x (2 * r) := by
-    intro y hy
-    rw [mem_ball, dist_eq_norm] at hy ⊢
-    have h1 : ‖y - c‖ < r := by rwa [← dist_eq_norm]
-    have h2 : ‖c - x‖ < r := by rw [← dist_eq_norm, dist_comm]; rwa [← mem_ball]
-    calc ‖y - x‖ = ‖(y - c) + (c - x)‖ := by rw [sub_add_sub_cancel]
-      _ ≤ ‖y - c‖ + ‖c - x‖ := norm_add_le _ _
-      _ < 2 * r := by linarith
-  have hker := kernel_bound_convex hφ hd x (by positivity) measurableSet_ball
-    (convex_ball c r) hx hWsub
-  rw [← hRl_def] at hker
-  have hDl_lt : (∫⁻ y in ball c r, ∫⁻ t in Ioc (0 : ℝ) 1,
-      ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂volume ∂volume) < ⊤ :=
-    lt_of_le_of_lt hker (ENNReal.mul_lt_top ENNReal.ofReal_lt_top hRl_lt)
-  -- Assemble.
-  rw [abs_sub_comm, oscillation_eq_average_ray hφ c x hr, setAverage_eq, smul_eq_mul, abs_mul,
-    abs_of_nonneg (by positivity : (0 : ℝ) ≤ (volume.real (ball c r))⁻¹)]
-  have hmain : |∫ y in ball c r, I y ∂volume|
-      ≤ (2 * r) ^ d / d * ∫ y in ball c r, g y ∂volume := by
-    calc |∫ y in ball c r, I y ∂volume|
-        ≤ ∫ y in ball c r, |I y| ∂volume := abs_integral_le_integral_abs
-      _ = (∫⁻ y in ball c r, ENNReal.ofReal |I y| ∂volume).toReal := by
-          rw [integral_eq_lintegral_of_nonneg_ae (ae_of_all _ (fun y => abs_nonneg _))
-            hIcont.abs.aestronglyMeasurable]
-      _ ≤ (∫⁻ y in ball c r, ∫⁻ t in Ioc (0 : ℝ) 1,
-            ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂volume ∂volume).toReal :=
-          ENNReal.toReal_mono hDl_lt.ne (lintegral_mono hper_y)
-      _ ≤ (ENNReal.ofReal ((2 * r) ^ d / d) * Rl).toReal :=
-          ENNReal.toReal_mono (ENNReal.mul_lt_top ENNReal.ofReal_lt_top hRl_lt).ne hker
-      _ = (2 * r) ^ d / d * ∫ y in ball c r, g y ∂volume := by
-          rw [ENNReal.toReal_mul, ENNReal.toReal_ofReal (by positivity), hReq]
-  calc (volume.real (ball c r))⁻¹ * |∫ y in ball c r, I y ∂volume|
-      ≤ (volume.real (ball c r))⁻¹ * ((2 * r) ^ d / d * ∫ y in ball c r, g y ∂volume) :=
-        mul_le_mul_of_nonneg_left hmain (by positivity)
-    _ = ((⟨2 ^ d / (d * ω), by positivity⟩ : ℝ≥0) : ℝ) * ∫ y in ball c r, g y ∂volume := by
-        rw [← mul_assoc]
-        congr 1
-        rw [hvol_eq, show ((⟨2 ^ d / (d * ω), by positivity⟩ : ℝ≥0) : ℝ) = 2 ^ d / (d * ω) from rfl,
-          mul_pow]
-        have hrd : (r : ℝ) ^ d ≠ 0 := by positivity
-        field_simp
-
 /-- **Potential estimate over a convex averaging domain.** For smooth `φ`, a bounded convex
 measurable set `W` of positive finite measure containing the base point `a`, with `W ⊆ ball a R`,
 the oscillation of `φ` about its `W`-average is controlled by the Riesz potential of the gradient
-over `W`, with the explicit factor `R^d/(d · |W|)`. This is the convex-lens analogue of
-`exists_potential_bound`; combined with the subset Riesz-kernel bound it yields the two-point
-Hölder estimate. -/
+over `W`, with the explicit factor `R^d/(d · |W|)`. Combined with the subset Riesz-kernel bound
+it yields the two-point Hölder estimate. -/
 theorem oscillation_le_potential_convex [Nontrivial (EuclideanSpace ℝ (Fin d))]
     {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (hd : 0 < d)
     (a : EuclideanSpace ℝ (Fin d)) {W : Set (EuclideanSpace ℝ (Fin d))}

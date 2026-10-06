@@ -318,22 +318,9 @@ theorem exists_eLpNorm_sobolevConj_le_compactSupport (hd : 0 < d)
         (by rw [finrank_euclideanSpace_fin]; exact hpp')
       simpa [hKgdef] using h
     have hfd : eLpNorm (fderiv ℝ (W n)) p volume
-        ≤ ∑ k, eLpNorm (partialD k (W n)) p volume := by
-      have hfm : AEStronglyMeasurable (fderiv ℝ (W n)) volume :=
-        ((hWsmooth n).continuous_fderiv (by simp)).aestronglyMeasurable
-      calc eLpNorm (fderiv ℝ (W n)) p volume
-          = eLpNorm (fun y => ‖fderiv ℝ (W n) y‖) p volume := (eLpNorm_norm _ hfm).symm
-        _ ≤ eLpNorm (fun y => ∑ k, ‖partialD k (W n) y‖) p volume := by
-            refine eLpNorm_mono hfm.norm fun y => ?_
-            rw [Real.norm_eq_abs, abs_of_nonneg (norm_nonneg _), Real.norm_eq_abs,
-              abs_of_nonneg (Finset.sum_nonneg fun k _ => norm_nonneg _)]
-            exact norm_fderiv_le_sum_partialD (W n) y
-        _ ≤ ∑ k, eLpNorm (partialD k (W n)) p volume := by
-            rw [show (fun y => ∑ k, ‖partialD k (W n) y‖)
-                = ∑ k, (fun y => ‖partialD k (W n) y‖) from by funext y; rw [Finset.sum_apply]]
-            refine (eLpNorm_sum_le hp1).trans_eq ?_
-            exact Finset.sum_congr rfl fun k _ =>
-              eLpNorm_norm _ (hWpartialCont n k).aestronglyMeasurable
+        ≤ ∑ k, eLpNorm (partialD k (W n)) p volume :=
+      eLpNorm_fderiv_le_sum_partialD ((hWsmooth n).continuous_fderiv (by simp)) hp1
+        fun k => (hWpartialCont n k).aestronglyMeasurable
     have hyoung : ∀ k, eLpNorm (partialD k (W n)) p volume ≤ eLpNorm (G k) p volume := by
       intro k
       rw [hpartial n k]
