@@ -6,12 +6,19 @@ Authors: Alejandro Soto Franco
 
 module
 
-public import EllipticPdes.Spectrum.BallSpectrum
+public import EllipticPdes.Spectrum.EigenFamily
 public import EllipticPdes.Spectrum.Multiplicity
+public import EllipticPdes.Embedding.DirectMethod
 public import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
 
 /-!
-# Infinite dimensionality of `H₀¹` of the unit ball
+# Dirichlet spectrum of the unit ball
+
+Every eigenvalue statement of the chapter asks that `H₀¹(Ω)` have an element of nonzero `L²`
+class, which is false for a domain of measure zero and so cannot be dropped in general. On the
+unit ball a bump has nonzero `L²` class (`exists_embL2_ne_zero_ball`), and
+`dirichlet_principal_eigenpair_ball` is the principal eigenvalue theorem with no hypotheses
+beyond `2 < d`.
 
 `EllipticPdes.Sobolev.exists_eigen_family` recurses on a vector of nonzero `L²` class
 orthogonal to the family built so far, which is the infinite dimensionality of `H₀¹(Ω)`. This
@@ -30,6 +37,10 @@ to all `m` vectors, and orthogonality of the bumps makes that combination nonzer
 ## Main declarations
 
 * `EllipticPdes.Sobolev.ballBump`: a bump at a centre, with its support a ball of given radius.
+* `EllipticPdes.Sobolev.exists_embL2_ne_zero_ball`: the unit ball supports a function of nonzero
+  `L²` class in `H₀¹`.
+* `EllipticPdes.Sobolev.dirichlet_principal_eigenpair_ball`: the principal Dirichlet eigenvalue
+  of the unit ball, attained and positive.
 * `EllipticPdes.Sobolev.orth_family_nonempty_ball`: the hypothesis of `exists_eigen_family`.
 * `EllipticPdes.Sobolev.dirichlet_eigen_family_ball`: the Dirichlet eigenvalue sequence of the
   unit ball, with `2 < d` the only hypothesis.
@@ -38,7 +49,7 @@ to all `m` vectors, and orthogonality of the bumps makes that combination nonzer
 
 ## References
 
-L. C. Evans, *Partial Differential Equations* (2nd ed.), §6.5.1, Theorem 1.
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §6.5.1, Theorems 1 and 2.
 -/
 
 @[expose] public section
@@ -280,6 +291,15 @@ lemma embL2_bumpElt_ne_zero (i : Fin d) {n : ℕ} (k : Fin n) :
   exact eLpNorm_ballBump_ne_zero (bumpCentre i n k) (bumpRadius_pos k.pos)
     (by norm_num : (2 : ℝ≥0∞) ≠ 0) hz
 
+/-- **Function of nonzero `L²` class on the unit ball**, a bump at the origin, in every
+positive dimension. -/
+theorem exists_embL2_ne_zero_ball_of_pos (hd : 0 < d) : ∃ V : H01 B1, embL2 B1 V ≠ 0 :=
+  ⟨bumpElt ⟨0, hd⟩ 1 0, embL2_bumpElt_ne_zero _ _⟩
+
+/-- **Function of nonzero `L²` class on the unit ball.** -/
+theorem exists_embL2_ne_zero_ball (hd : 2 < d) : ∃ V : H01 B1, embL2 B1 V ≠ 0 :=
+  exists_embL2_ne_zero_ball_of_pos (by omega)
+
 /-! ### The hypothesis of the eigenvalue recursion -/
 
 /-- **`H₀¹` of the unit ball is infinite dimensional**, in the form the eigenvalue recursion
@@ -366,8 +386,21 @@ hypothesis beyond the eigenpair. -/
 theorem dirichlet_eigenvalue_pos_ball (hd : 2 < d) {lam : ℝ} {U : H01 B1} (hU : U ≠ 0)
     (heig : ∀ V : H01 B1, laplaceBilin B1 U V = lam * ⟪embL2 B1 U, embL2 B1 V⟫) :
     0 < lam := by
-  have hne := exists_embL2_ne_zero_ball hd
+  have hne := exists_embL2_ne_zero_ball_of_pos (d := d) (by omega)
   obtain ⟨p, rfl⟩ : ∃ p, d = p + 1 := ⟨d - 1, by omega⟩
   exact dirichlet_eigenvalue_pos_of_bounded _ isBounded_ball hne hU heig
+
+/-- **Principal Dirichlet eigenvalue of the unit ball**, with `2 < d` the only hypothesis:
+there is a `U` of unit `L²` norm attaining the infimum of the Rayleigh quotient, the infimum is
+positive, and `U` solves the weak eigenvalue problem. -/
+theorem dirichlet_principal_eigenpair_ball (hd : 2 < d) :
+    ∃ U : H01 B1, ‖embL2 B1 U‖ = 1 ∧
+      laplaceBilin B1 U U = principalEigenvalue (laplaceBilin B1) ∧
+      0 < principalEigenvalue (laplaceBilin B1) ∧
+      ∀ V : H01 B1, laplaceBilin B1 U V
+        = principalEigenvalue (laplaceBilin B1) * ⟪embL2 B1 U, embL2 B1 V⟫ := by
+  have hne := exists_embL2_ne_zero_ball_of_pos (d := d) (by omega)
+  obtain ⟨n, rfl⟩ : ∃ n, d = n + 1 := ⟨d - 1, by omega⟩
+  exact dirichlet_principal_eigenpair_of_bounded _ measurableSet_ball isBounded_ball hne
 
 end EllipticPdes.Sobolev

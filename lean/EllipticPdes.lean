@@ -159,7 +159,6 @@ public import EllipticPdes.Spectrum.Variational
 public import EllipticPdes.Spectrum.HigherEigenvalues
 public import EllipticPdes.Spectrum.EigenFamily
 public import EllipticPdes.Spectrum.Multiplicity
-public import EllipticPdes.Spectrum.BallSpectrum
 public import EllipticPdes.Spectrum.BallDimension
 public import EllipticPdes.Embedding.ConstOfGradZero
 public import EllipticPdes.Spectrum.RellichW12
