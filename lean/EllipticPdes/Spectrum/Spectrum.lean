@@ -96,12 +96,13 @@ lemma solOp_isCompact (hco : IsCoercive B) (hRellich : IsCompactOperator (embL2 
 and `ι`, `ι†` are mutual adjoints. -/
 lemma solOp_inner_symm (hco : IsCoercive B) (hsymm : ∀ U V, B U V = B V U) (f g : L2D Ω) :
     ⟪solOp B hco f, g⟫ = ⟪f, solOp B hco g⟫ := by
-  rw [solOp_apply, solOp_apply,
-    ← ContinuousLinearMap.adjoint_inner_right (embL2 Ω)
-        (hco.continuousLinearEquivOfBilin.symm ((embL2 Ω).adjoint f)) g,
-    ← ContinuousLinearMap.adjoint_inner_left (embL2 Ω)
-        (hco.continuousLinearEquivOfBilin.symm ((embL2 Ω).adjoint g)) f]
-  exact clEquivSymm_symm_form hco hsymm ((embL2 Ω).adjoint f) ((embL2 Ω).adjoint g)
+  have e1 := ContinuousLinearMap.adjoint_inner_right (embL2 Ω)
+    (hco.continuousLinearEquivOfBilin.symm ((embL2 Ω).adjoint f)) g
+  have e2 := ContinuousLinearMap.adjoint_inner_left (embL2 Ω)
+    (hco.continuousLinearEquivOfBilin.symm ((embL2 Ω).adjoint g)) f
+  rw [solOp_apply, solOp_apply]
+  exact e1.symm.trans
+    ((clEquivSymm_symm_form hco hsymm ((embL2 Ω).adjoint f) ((embL2 Ω).adjoint g)).trans e2)
 
 /-- The solution operator is **positive**: `0 ≤ ⟪G f, f⟫`, from coercivity of `B`. -/
 lemma solOp_inner_self_nonneg (hco : IsCoercive B) (f : L2D Ω) :

@@ -136,7 +136,7 @@ private theorem integrable_uncurry_segment {φ : EuclideanSpace ℝ (Fin d) → 
           _ ≤ R + ‖v‖ := by linarith
       simpa [mem_closedBall, dist_eq_norm] using hxle
     simp only [hg, Function.uncurry_apply_pair,
-      image_eq_zero_of_notMem_tsupport hxt, ContinuousLinearMap.zero_apply]
+      image_eq_zero_of_notMem_tsupport hxt, _root_.zero_apply]
     norm_num
   -- Almost everywhere `t ∈ Ioc 0 1`, so `g =ᵐ[ρ] C.indicator g`.
   have htioc : ∀ᵐ p ∂ρ, p.2 ∈ Ioc (0 : ℝ) 1 := by
@@ -174,7 +174,7 @@ theorem norm_diffQuot_le_of_contDiff (k : Fin d) (h : ℝ) (φ : EuclideanSpace 
     (hL2 : MemLp φ 2 volume) (hL2' : MemLp (partialD k φ) 2 volume) :
     ‖diffQuot k h (hL2.toLp φ)‖ ≤ ‖hL2'.toLp (partialD k φ)‖ := by
   rcases eq_or_ne h 0 with rfl | hh
-  · rw [diffQuot_zero, ContinuousLinearMap.zero_apply, norm_zero]
+  · rw [diffQuot_zero, _root_.zero_apply, norm_zero]
     exact norm_nonneg _
   set v : EuclideanSpace ℝ (Fin d) := hshift k h with hv
   have h01 : (0 : ℝ) ≤ 1 := by norm_num
@@ -216,7 +216,7 @@ theorem norm_diffQuot_le_of_contDiff (k : Fin d) (h : ℝ) (φ : EuclideanSpace 
   have hqmp : MeasureTheory.Measure.QuasiMeasurePreserving (· + v) volume volume :=
     (measurePreserving_add_right volume v).quasiMeasurePreserving
   have hshiftAE : (fun x => (hL2.toLp φ) (x + v)) =ᵐ[volume] (fun x => φ (x + v)) :=
-    hqmp.ae_eq hL2.coeFn_toLp
+    hqmp.ae_eq_comp hL2.coeFn_toLp
   have hcombine : (diffQuot k h (hL2.toLp φ) : EuclideanSpace ℝ (Fin d) → ℝ)
       =ᵐ[volume] fun x => (φ (x + v) - φ x) / h := by
     filter_upwards [coeFn_diffQuot k h (hL2.toLp φ), hL2.coeFn_toLp, hshiftAE]
@@ -409,7 +409,7 @@ private theorem sq_norm_diffQuot_sub_le (k : Fin d) {φ : EuclideanSpace ℝ (Fi
     exact ((hcs.comp_homeomorph (Homeomorph.addRight v)).sub hcs).mul_right
   have hHcs : HasCompactSupport (fun x => (φ (x + v) - φ x) / h - ψ x) := hcs1.sub hψcs
   have hLHS_int : Integrable (fun x => ((φ (x + v) - φ x) / h - ψ x) ^ 2) :=
-    (hHcont.pow 2).integrable_of_hasCompactSupport
+    (hHcont.fun_pow 2).integrable_of_hasCompactSupport
       (hHcs.comp_left (g := fun r : ℝ => r ^ 2) (by norm_num))
   have hRHS_int : Integrable (fun x => ∫ t in (0 : ℝ)..1, (ψ (x + t • v) - ψ x) ^ 2) := by
     simp_rw [intervalIntegral.integral_of_le h01]
@@ -431,7 +431,7 @@ private theorem sq_norm_diffQuot_sub_le (k : Fin d) {φ : EuclideanSpace ℝ (Fi
     have hqmp : MeasureTheory.Measure.QuasiMeasurePreserving (· + t • v) volume volume :=
       (measurePreserving_add_right volume (t • v)).quasiMeasurePreserving
     have hshiftAE : (fun x => ψLp (x + t • v)) =ᵐ[volume] fun x => ψ (x + t • v) :=
-      hqmp.ae_eq hL2p.coeFn_toLp
+      hqmp.ae_eq_comp hL2p.coeFn_toLp
     filter_upwards [hL2p.coeFn_toLp, hshiftAE] with x hx1 hx2
     rw [hx2, hx1]
   -- Assemble.
@@ -441,7 +441,7 @@ private theorem sq_norm_diffQuot_sub_le (k : Fin d) {φ : EuclideanSpace ℝ (Fi
     have hqmp : MeasureTheory.Measure.QuasiMeasurePreserving (· + v) volume volume :=
       (measurePreserving_add_right volume v).quasiMeasurePreserving
     have hshiftAE : (fun x => φLp (x + v)) =ᵐ[volume] fun x => φ (x + v) :=
-      hqmp.ae_eq hL2φ.coeFn_toLp
+      hqmp.ae_eq_comp hL2φ.coeFn_toLp
     filter_upwards [Lp.coeFn_sub (diffQuot k h φLp) ψLp, coeFn_diffQuot k h φLp,
       hL2φ.coeFn_toLp, hshiftAE, hL2p.coeFn_toLp] with x hx0 hx1 hx2 hx3 hx4
     rw [hx0, Pi.sub_apply, hx1, hx2, hx3, hx4]
@@ -467,7 +467,7 @@ theorem tendsto_diffQuot_partialD (k : Fin d) {φ : EuclideanSpace ℝ (Fin d) �
     (hφ.continuous_fderiv (by simp)).clm_apply continuous_const
   have hψcs : HasCompactSupport (partialD k φ) :=
     hcs.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single k (1 : ℝ))
-  haveI hfin : IsFiniteMeasure (volume.restrict (Ioc (0 : ℝ) 1)) :=
+  have hfin : IsFiniteMeasure (volume.restrict (Ioc (0 : ℝ) 1)) :=
     ⟨by rw [Measure.restrict_apply_univ, Real.volume_Ioc]; exact ENNReal.ofReal_lt_top⟩
   -- Dominated convergence: the integrated squared translation defects tend to `0`.
   set F : ℕ → ℝ → ℝ := fun m t => ‖transL2 (t • hshift k (η m)) ψLp - ψLp‖ ^ 2 with hF
@@ -526,7 +526,7 @@ the separable Hilbert space `EucL2 d` has a subsequence converging weakly to a l
 theorem exists_weak_limit_of_bounded {x : ℕ → EucL2 d} {M : ℝ} (hx : ∀ m, ‖x m‖ ≤ M) :
     ∃ (g' : EucL2 d) (σ : ℕ → ℕ), StrictMono σ ∧ ‖g'‖ ≤ M ∧
       ∀ y : EucL2 d, Filter.Tendsto (fun m => ⟪x (σ m), y⟫) Filter.atTop (nhds ⟪g', y⟫) := by
-  haveI : Fact ((2 : ENNReal) ≠ ⊤) := ⟨by norm_num⟩
+  have : Fact ((2 : ENNReal) ≠ ⊤) := ⟨by norm_num⟩
   set F : ℕ → WeakDual ℝ (EucL2 d) :=
     fun m => WeakDual.toStrongDual.symm (InnerProductSpace.toDual ℝ (EucL2 d) (x m)) with hFdef
   have hFtoS : ∀ m, WeakDual.toStrongDual (F m) = InnerProductSpace.toDual ℝ (EucL2 d) (x m) :=
@@ -635,7 +635,7 @@ private theorem integrable_uncurry_weak (g : EucL2 d) {ψ : EuclideanSpace ℝ (
   obtain ⟨M, hM⟩ := hψc.bounded_above_of_compact_support hψcs
   obtain ⟨R, hR⟩ := hψcs.isCompact.isBounded.subset_closedBall 0
   set B : Set (EuclideanSpace ℝ (Fin d)) := closedBall 0 (R + ‖v‖) with hB
-  haveI hBfin : IsFiniteMeasure (volume.restrict B) :=
+  have hBfin : IsFiniteMeasure (volume.restrict B) :=
     isFiniteMeasure_restrict.mpr measure_closedBall_lt_top.ne
   -- The `L²` factor is integrable on the ball.
   have hgB : Integrable (fun x => ‖g x‖) (volume.restrict B) := by
@@ -732,7 +732,7 @@ private theorem inner_diffQuot_eq_integral_smooth (k : Fin d) (g g' : EucL2 d)
     have hqmp : MeasureTheory.Measure.QuasiMeasurePreserving (· + hshift k (-h)) volume volume :=
       (measurePreserving_add_right volume _).quasiMeasurePreserving
     have hshiftAE : (fun x => ζLp (x + hshift k (-h))) =ᵐ[volume]
-        fun x => ζ (x + hshift k (-h)) := hqmp.ae_eq hζ.coeFn_toLp
+        fun x => ζ (x + hshift k (-h)) := hqmp.ae_eq_comp hζ.coeFn_toLp
     filter_upwards [coeFn_diffQuot k (-h) ζLp, hζ.coeFn_toLp, hshiftAE] with x hx1 hx2 hx3
     rw [RCLike.inner_apply, conj_trivial, hx1, hx2, hx3, hshkneg, hFTC x]; ring
   -- Tonelli swap.
@@ -771,7 +771,7 @@ private theorem inner_diffQuot_eq_integral_smooth (k : Fin d) (g g' : EucL2 d)
           (· + (-(t • v))) volume volume :=
         (measurePreserving_add_right volume _).quasiMeasurePreserving
       have hae : (fun x => ζLp (x + (-(t • v)))) =ᵐ[volume]
-          fun x => ζ (x + (-(t • v))) := hqmp.ae_eq hζ.coeFn_toLp
+          fun x => ζ (x + (-(t • v))) := hqmp.ae_eq_comp hζ.coeFn_toLp
       filter_upwards [coeFn_transL2 (-(t • v)) ζLp, hae] with x hx1 hx2
       rw [RCLike.inner_apply, conj_trivial, hx1, hx2, sub_eq_add_neg]; ring
     calc ∫ x, g x * partialD k ζ (x - t • v)
@@ -820,7 +820,7 @@ supported functions (dense in `L²`), where the segment-integral representation 
 theorem norm_diffQuot_le_of_hasWeakDeriv (k : Fin d) (g g' : EucL2 d)
     (hg : HasWeakDeriv k g g') (h : ℝ) : ‖diffQuot k h g‖ ≤ ‖g'‖ := by
   rcases eq_or_ne h 0 with rfl | hh
-  · rw [diffQuot_zero, ContinuousLinearMap.zero_apply, norm_zero]
+  · rw [diffQuot_zero, _root_.zero_apply, norm_zero]
     exact norm_nonneg _
   -- Smooth compactly supported functions are dense in `L²`.
   set S : Set (EucL2 d) := {f : EucL2 d | ∃ ρ : EuclideanSpace ℝ (Fin d) → ℝ,

@@ -281,7 +281,7 @@ theorem differentiated_weakForm_div_wkInfty {V : Set (EuclideanSpace ℝ (Fin d)
                           + Op.b x i * (D2 ℓ i x : ℝ)) * φ x)
       - (∫ x in V, (hbc.cReg.D [ℓ] x * (u_V x : ℝ) + Op.c x * (Du ℓ x : ℝ)) * φ x) := by
   classical
-  haveI : ENNReal.HolderTriple (2 : ENNReal) 2 1 := ⟨by rw [ENNReal.inv_two_add_inv_two, inv_one]⟩
+  have : ENNReal.HolderTriple (2 : ENNReal) 2 1 := ⟨by rw [ENNReal.inv_two_add_inv_two, inv_one]⟩
   -- The order-one members of the three bundles, with their measurability and bounds.
   have hwm : ∀ i j, Measurable (hA.D [ℓ] i j) := fun i j => hA.measurable_D_singleton ℓ i j
   have hwM : ∀ i j, ∀ᵐ x ∂(volume.restrict V), |hA.D [ℓ] i j x| ≤ hA.bound 1 :=

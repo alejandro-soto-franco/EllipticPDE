@@ -124,7 +124,7 @@ theorem partialD_comp_reflect {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφ : D
     (hφ (reflectLI j x)).hasFDerivAt.comp x
       (reflectLI j).toContinuousLinearEquiv.hasFDerivAt
   have hfun : (fun y => φ (reflectLI j y)) = φ ∘ (reflectLI j) := rfl
-  rw [hfun, partialD, hcomp.fderiv, ContinuousLinearMap.coe_comp', Function.comp_apply]
+  rw [hfun, partialD, hcomp.fderiv, ContinuousLinearMap.coe_comp, Function.comp_apply]
   rw [show ((reflectLI j).toContinuousLinearEquiv :
       EuclideanSpace ℝ (Fin d) →L[ℝ] EuclideanSpace ℝ (Fin d))
       (EuclideanSpace.single k (1 : ℝ)) = reflectLI j (EuclideanSpace.single k (1 : ℝ)) from rfl,

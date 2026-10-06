@@ -138,8 +138,11 @@ theorem eLpNorm_convolution_le
         _ = ∫⁻ t, ‖h t‖ₑ ^ p * ‖ρ (x - t)‖ₑ ∂volume := by
             rw [← ENNReal.rpow_mul, one_div, inv_mul_cancel₀ hp0.ne', ENNReal.rpow_one]
   -- reduce the seminorm inequality to the `lintegral` inequality
-  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hP0 hPtop,
-    eLpNorm_eq_lintegral_rpow_enorm_toReal hP0 hPtop, hPreal]
+  have hconvm : AEStronglyMeasurable (h ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ρ) volume :=
+    (AEStronglyMeasurable.convolution_integrand (ContinuousLinearMap.lsmul ℝ ℝ)
+      hh.aestronglyMeasurable hρm).integral_prod_right'
+  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hP0 hPtop hconvm,
+    eLpNorm_eq_lintegral_rpow_enorm_toReal hP0 hPtop hh.aestronglyMeasurable, hPreal]
   refine ENNReal.rpow_le_rpow ?_ (one_div_nonneg.mpr hp0.le)
   calc ∫⁻ x, ‖(h ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ρ) x‖ₑ ^ p ∂volume
       ≤ ∫⁻ x, ∫⁻ t, ‖h t‖ₑ ^ p * ‖ρ (x - t)‖ₑ ∂volume ∂volume := lintegral_mono key
@@ -254,15 +257,21 @@ private theorem tendsto_eLpNorm_bump_convolution_sub {p : ℝ} (hp : 1 ≤ p)
     have hcx : (((φ i).normed volume) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] w) x = 0 :=
       Function.notMem_support.mp fun hxs => hxS1 (hsuppconv hxs)
     rw [Pi.sub_apply, hwx, hcx, sub_zero]
+  have hdm : AEStronglyMeasurable ((((φ i).normed volume)
+      ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] w) - w) volume := by
+    rw [← hcomm]
+    exact ((HasCompactSupport.continuous_convolution_right
+      (L := ContinuousLinearMap.lsmul ℝ ℝ) (φ i).hasCompactSupport_normed hwc.locallyIntegrable
+      ((φ i).contDiff_normed (n := 1)).continuous).sub hwc).aestronglyMeasurable
   -- assemble the `Lᵖ` bound
   rw [hcomm]
   calc eLpNorm ((((φ i).normed volume) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] w) - w)
         (ENNReal.ofReal p) volume
       = eLpNorm ((((φ i).normed volume) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] w) - w)
           (ENNReal.ofReal p) (volume.restrict S1) :=
-        (eLpNorm_restrict_eq_of_support_subset hsupp).symm
+        (eLpNorm_restrict_eq_of_support_subset hdm hsupp).symm
     _ ≤ (volume.restrict S1) Set.univ ^ ((ENNReal.ofReal p).toReal⁻¹) * ENNReal.ofReal ε :=
-        eLpNorm_le_of_ae_bound (Filter.Eventually.of_forall fun x => by
+        eLpNorm_le_of_ae_bound hdm.restrict (Filter.Eventually.of_forall fun x => by
           rw [Pi.sub_apply, ← dist_eq_norm]; exact hpt x)
     _ = volume S1 ^ p⁻¹ * ENNReal.ofReal ε := by
         rw [Measure.restrict_apply_univ, ENNReal.toReal_ofReal hp0.le]
@@ -364,13 +373,13 @@ theorem tendsto_eLpNorm_convolution_sub {p : ℝ} (hp : 1 ≤ p)
           (ENNReal.ofReal p) volume
         + eLpNorm ((w ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ i).normed volume) - w)
             + (w - h)) (ENNReal.ofReal p) volume :=
-        eLpNorm_add_le ha1m (ha2m.add ha3m) hq1
+        eLpNorm_add_le hq1
     _ ≤ eLpNorm ((h - w) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ i).normed volume))
           (ENNReal.ofReal p) volume
         + (eLpNorm (w ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ i).normed volume) - w)
             (ENNReal.ofReal p) volume + eLpNorm (w - h) (ENNReal.ofReal p) volume) := by
         gcongr
-        exact eLpNorm_add_le ha2m ha3m hq1
+        exact eLpNorm_add_le hq1
     _ ≤ ENNReal.ofReal δ + (ENNReal.ofReal δ + ENNReal.ofReal δ) := by
         gcongr
     _ = η := by

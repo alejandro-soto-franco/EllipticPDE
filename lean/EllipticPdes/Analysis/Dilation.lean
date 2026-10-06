@@ -49,8 +49,10 @@ theorem eLpNorm_comp_smul {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : Measura
       = ENNReal.ofReal |(r ^ d)⁻¹| ^ (1 / p.toReal) * eLpNorm f p volume := by
   have hmeas : Measurable fun y : EuclideanSpace ℝ (Fin d) => ‖f y‖ₑ ^ p.toReal :=
     (hf.enorm.pow_const _)
-  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hpt,
-    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hpt,
+  have hfr : AEStronglyMeasurable (fun x : EuclideanSpace ℝ (Fin d) => f (r • x)) volume :=
+    (hf.comp (measurable_const_smul r)).aestronglyMeasurable
+  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hpt hfr,
+    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hpt hf.aestronglyMeasurable,
     show (∫⁻ x, ‖f (r • x)‖ₑ ^ p.toReal ∂(volume : Measure (EuclideanSpace ℝ (Fin d))))
         = ∫⁻ y, ‖f y‖ₑ ^ p.toReal ∂(Measure.map (r • ·) volume) from
       (lintegral_map hmeas (measurable_const_smul r)).symm,
@@ -68,8 +70,8 @@ theorem partialD_comp_smul {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : Differ
   have hcomp : HasFDerivAt (fun x => f (r • x))
       ((fderiv ℝ f (r • x)).comp (r • (ContinuousLinearMap.id ℝ (EuclideanSpace ℝ (Fin d))))) x :=
     (hf (r • x)).hasFDerivAt.comp x hL
-  simp only [partialD, hcomp.fderiv, ContinuousLinearMap.coe_comp', Function.comp_apply,
-    ContinuousLinearMap.coe_smul', Pi.smul_apply, ContinuousLinearMap.coe_id', id_eq,
+  simp only [partialD, hcomp.fderiv, ContinuousLinearMap.coe_comp, Function.comp_apply,
+    FunLike.coe_smul, Pi.smul_apply, ContinuousLinearMap.coe_id', id_eq,
     map_smul, smul_eq_mul]
 
 /-- **Support of a dilate.** For `1 ≤ r`, a function supported in the unit ball dilates to one

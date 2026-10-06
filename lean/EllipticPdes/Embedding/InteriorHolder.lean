@@ -132,7 +132,7 @@ theorem interior_holder_estimate_one (Op : FullEllipticOp 1)
           HolderOnWith (C * Real.toNNReal (‖f‖ + ‖(u : H1amb Ω) 0‖)) (1 / 2 : ℝ≥0) u'
             (Metric.ball c r) := by
   classical
-  haveI : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
+  have : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
   have h2 : ENNReal.ofReal (2 : ℝ) = 2 := by simp
   set dcoef : ℝ := Real.sqrt ((1 + 4 * Op.gardingγ) / (2 * Op.lam)) with hdcoefdef
@@ -212,7 +212,7 @@ theorem interior_holder_estimate_two (Op : FullEllipticOp 2)
           HolderOnWith (C * Real.toNNReal (‖f‖ + ‖(u : H1amb Ω) 0‖)) (1 / 2 : ℝ≥0) u'
             (Metric.ball c r) := by
   classical
-  haveI : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
+  have : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
   have h4 : ENNReal.ofReal (4 : ℝ) = 4 := by simp
   set dcoef : ℝ := Real.sqrt ((1 + 4 * Op.gardingγ) / (2 * Op.lam)) with hdcoefdef
@@ -296,11 +296,12 @@ theorem interior_holder_estimate_two (Op : FullEllipticOp 2)
         + ∑ k, eLpNorm ((W k i : EuclideanSpace ℝ (Fin 2) → ℝ)) 2
             (volume.restrict (Metric.ball c R)))) ≠ ⊤ :=
       (ENNReal.mul_lt_top ENNReal.coe_lt_top (ENNReal.add_lt_top.mpr
-        ⟨(hXL2 i).2, ENNReal.sum_lt_top.mpr fun k _ => (hWL2 k i).2⟩)).ne
+        ⟨(hXL2 i).eLpNorm_lt_top, ENNReal.sum_lt_top.mpr fun k _ => (hWL2 k i).eLpNorm_lt_top⟩)).ne
     refine (ENNReal.toNNReal_mono hfin (hfour i).2).trans ?_
     rw [ENNReal.toNNReal_mul, ENNReal.toNNReal_coe,
-      ENNReal.toNNReal_add (hXL2 i).2.ne (ENNReal.sum_lt_top.mpr fun k _ => (hWL2 k i).2).ne,
-      ENNReal.toNNReal_sum fun k _ => (hWL2 k i).2.ne]
+      ENNReal.toNNReal_add (hXL2 i).eLpNorm_lt_top.ne
+        (ENNReal.sum_lt_top.mpr fun k _ => (hWL2 k i).eLpNorm_lt_top).ne,
+      ENNReal.toNNReal_sum fun k _ => (hWL2 k i).eLpNorm_lt_top.ne]
     refine le_trans (mul_le_mul' le_rfl
       (add_le_add (hXbd i) (Finset.sum_le_sum fun k _ => hWbd k i))) (le_of_eq ?_)
     rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
@@ -346,7 +347,7 @@ theorem interior_holder_estimate (Op : FullEllipticOp 3)
           HolderOnWith (C * Real.toNNReal (‖f‖ + ‖(u : H1amb Ω) 0‖)) (1 / 2 : ℝ≥0) u'
             (Metric.ball c r) := by
   classical
-  haveI : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
+  have : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
   have h6 : ENNReal.ofReal (6 : ℝ) = 6 := by simp
   set dcoef : ℝ := Real.sqrt ((1 + 4 * Op.gardingγ) / (2 * Op.lam)) with hdcoefdef
@@ -430,11 +431,12 @@ theorem interior_holder_estimate (Op : FullEllipticOp 3)
         + ∑ k, eLpNorm ((W k i : EuclideanSpace ℝ (Fin 3) → ℝ)) 2
             (volume.restrict (Metric.ball c R)))) ≠ ⊤ :=
       (ENNReal.mul_lt_top ENNReal.coe_lt_top (ENNReal.add_lt_top.mpr
-        ⟨(hXL2 i).2, ENNReal.sum_lt_top.mpr fun k _ => (hWL2 k i).2⟩)).ne
+        ⟨(hXL2 i).eLpNorm_lt_top, ENNReal.sum_lt_top.mpr fun k _ => (hWL2 k i).eLpNorm_lt_top⟩)).ne
     refine (ENNReal.toNNReal_mono hfin (hsix i).2).trans ?_
     rw [ENNReal.toNNReal_mul, ENNReal.toNNReal_coe,
-      ENNReal.toNNReal_add (hXL2 i).2.ne (ENNReal.sum_lt_top.mpr fun k _ => (hWL2 k i).2).ne,
-      ENNReal.toNNReal_sum fun k _ => (hWL2 k i).2.ne]
+      ENNReal.toNNReal_add (hXL2 i).eLpNorm_lt_top.ne
+        (ENNReal.sum_lt_top.mpr fun k _ => (hWL2 k i).eLpNorm_lt_top).ne,
+      ENNReal.toNNReal_sum fun k _ => (hWL2 k i).eLpNorm_lt_top.ne]
     refine le_trans (mul_le_mul' le_rfl
       (add_le_add (hXbd i) (Finset.sum_le_sum fun k _ => hWbd k i))) (le_of_eq ?_)
     rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]

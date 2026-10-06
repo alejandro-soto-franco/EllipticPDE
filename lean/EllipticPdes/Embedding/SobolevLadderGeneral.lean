@@ -104,7 +104,7 @@ theorem memLp_of_gradClosed_general (hd : 1 < d) (c : EuclideanSpace ℝ (Fin d)
       rw [← NNReal.coe_le_coe]
       refine le_of_inv_le_inv_gen hp₀0 hq0 ?_
       simpa using hqs
-    haveI : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
+    have : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
       ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
     have hqE : (q : ℝ≥0∞) ≤ (p₀ : ℝ≥0∞) := by exact_mod_cast hqp
     exact ((hmem i (by omega)).mono_measure
@@ -213,7 +213,7 @@ theorem memLp_of_gradClosed_general (hd : 1 < d) (c : EuclideanSpace ℝ (Fin d)
         rw [hPinv, ht₁_def]
         have hs0 : 0 ≤ (s : ℝ) * (d : ℝ)⁻¹ := by positivity
         linarith
-      haveI : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
+      have : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
         ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
       exact hPmem.mono_exponent (by exact_mod_cast hqP)
 

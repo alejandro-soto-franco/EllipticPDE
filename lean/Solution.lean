@@ -223,9 +223,11 @@ integral of the triple product. -/
 lemma weakForm_eq (Op : EllipticOperator d) (Ω : Set (EuclideanSpace ℝ (Fin d)))
     (U V : H01 Ω) :
     weakForm Op Ω U V = (toFullEllipticOp Op).fullBilin Ω U V := by
-  rw [EllipticPdes.Sobolev.FullEllipticOp.fullBilin_apply,
-    EllipticPdes.Sobolev.EllipticCoeff.bilin_apply,
-    EllipticPdes.Sobolev.FullEllipticOp.lowerBilin_apply, weakForm, ← add_assoc]
+  have e1 := EllipticPdes.Sobolev.FullEllipticOp.fullBilin_apply (toFullEllipticOp Op) Ω U V
+  have e2 := EllipticPdes.Sobolev.EllipticCoeff.bilin_apply
+    (toFullEllipticOp Op).toEllipticCoeff Ω U V
+  have e3 := EllipticPdes.Sobolev.FullEllipticOp.lowerBilin_apply (toFullEllipticOp Op) Ω U V
+  rw [e1, e2, e3, weakForm, ← add_assoc]
   simp only [EllipticPdes.Sobolev.EllipticCoeff.actL,
     EllipticPdes.Sobolev.FullEllipticOp.bAct, EllipticPdes.Sobolev.FullEllipticOp.cAct,
     EllipticPdes.Sobolev.inner_mulCoeffL_eq]
@@ -234,7 +236,8 @@ lemma weakForm_eq (Op : EllipticOperator d) (Ω : Set (EuclideanSpace ℝ (Fin d
 /-- The `L²` pairing of the function coordinates is the library's zeroth-order form. -/
 lemma zerothPairing_eq (Ω : Set (EuclideanSpace ℝ (Fin d))) (U V : H01 Ω) :
     zerothPairing Ω U V = EllipticPdes.Sobolev.FullEllipticOp.zerothForm Ω U V := by
-  rw [EllipticPdes.Sobolev.FullEllipticOp.zerothForm_apply, zerothPairing, L2.inner_def]
+  have e1 := EllipticPdes.Sobolev.FullEllipticOp.zerothForm_apply Ω U V
+  rw [e1, zerothPairing, L2.inner_def]
   simp only [Real.inner_apply]
 
 /-- The pairing of an `L²` datum against the function coordinate is the library's. -/
@@ -256,8 +259,10 @@ theorem garding (Op : EllipticOperator d) (Ω : Set (EuclideanSpace ℝ (Fin d))
 
 /-! ### Existence and uniqueness for a nonnegative zeroth-order coefficient -/
 
+-- `hΩo` belongs to the compared statement, which asks for an open `Ω`; this proof does not read it.
 set_option linter.unusedVariables false in
 /-- **First Existence Theorem for weak solutions** (Evans, §6.2.2, Theorem 3, p. 319). -/
+@[nolint unusedArguments]
 theorem weak_solution_of_nonneg_zeroth {n : ℕ} (Op : EllipticOperator (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩo : IsOpen Ω)
     (hΩb : Bornology.IsBounded Ω)
@@ -357,8 +362,7 @@ theorem resolvent_bound (Op : EllipticOperator d)
   obtain ⟨C, hC, hbound⟩ :=
     (toFullEllipticOp Op).resolvent_bound_of_bounded Ω hΩo.measurableSet hΩb hnot
   refine ⟨C, hC, fun f u hu => hbound f u ?_⟩
-  simp only [weakForm_eq, zerothPairing_eq, datumPairing_eq,
-    EllipticPdes.Sobolev.FullEllipticOp.zerothForm_apply] at hu
+  simp only [weakForm_eq, zerothPairing_eq, datumPairing_eq] at hu
   exact hu
 
 -- The proofs rest on the three axioms of classical Lean and on nothing else.

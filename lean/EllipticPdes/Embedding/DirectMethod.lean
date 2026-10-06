@@ -140,7 +140,7 @@ theorem exists_minimiser_of_lt (hΩb : IsBounded (ball (0 : EuclideanSpace ℝ (
       exact tendsto_const_nhds
     exact tendsto_nhds_unique h1 h2
   -- It is the function coordinate of the weak limit.
-  haveI : IsFiniteMeasure (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) :=
+  have : IsFiniteMeasure (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
   have h2q : (2 : ℝ≥0∞) ≤ (q : ℝ≥0∞) := by exact_mod_cast hq2
   have hz2 : MemLp (⇑z) 2 (volume.restrict B1) := (Lp.memLp z).mono_exponent h2q
@@ -170,7 +170,7 @@ theorem exists_minimiser_of_lt (hΩb : IsBounded (ball (0 : EuclideanSpace ℝ (
             rw [h2R, hqR, sub_nonneg]
             exact one_div_le_one_div_of_le (by norm_num) hq2R)
             (by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top.ne))
-          (Lp.memLp _).2.ne
+          (Lp.memLp _).eLpNorm_lt_top.ne
       · rw [mul_comm]
         exact eLpNorm_le_eLpNorm_mul_rpow_measure_univ h2q (Lp.aestronglyMeasurable _)
     have hto : Tendsto (fun j => ‖T (U (φ (ψ j))) - z‖) atTop (𝓝 0) := by
@@ -225,7 +225,7 @@ theorem exists_norm_rellichEmbL_eq_one
   set V0 : H01 B1 := sharpElt d (show (0 : ℝ) < 1 / 2 by norm_num) le_rfl with hV0
   have hfin : eLpNorm (⇑(sharpBump d)) (q : ℝ≥0∞) volume ≠ ⊤ :=
     ((sharpBump d).continuous.memLp_of_hasCompactSupport
-      (μ := volume) (p := (q : ℝ≥0∞)) (sharpBump d).hasCompactSupport).2.ne
+      (μ := volume) (p := (q : ℝ≥0∞)) (sharpBump d).hasCompactSupport).eLpNorm_lt_top.ne
   have hne : eLpNorm (⇑(sharpBump d)) (q : ℝ≥0∞) volume ≠ 0 :=
     eLpNorm_sharpBump_ne_zero (by simpa using hq0)
   have hnorm : ‖rellichEmbL measurableSet_ball hΩb hd hq V0‖

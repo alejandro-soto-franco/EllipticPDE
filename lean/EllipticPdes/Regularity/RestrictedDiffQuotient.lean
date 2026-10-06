@@ -121,7 +121,7 @@ theorem coeFn_diffQuotD (k : Fin d) (h : ℝ) (hΩm : MeasurableSet Ω) (g : L2D
     rw [hx1, hx2]
   have hval : diffQuotD k h hΩm g
       = h⁻¹ • (restrictL2 (transL2 (hshift k h) (extendL2 hΩm g)) - g) := by
-    simp [diffQuotD, ContinuousLinearMap.smul_apply, ContinuousLinearMap.sub_apply,
+    simp [diffQuotD, _root_.smul_apply, _root_.sub_apply,
       ContinuousLinearMap.comp_apply, LinearIsometry.coe_toContinuousLinearMap]
   rw [hval]
   filter_upwards [Lp.coeFn_smul h⁻¹ (restrictL2 (transL2 (hshift k h) (extendL2 hΩm g)) - g),

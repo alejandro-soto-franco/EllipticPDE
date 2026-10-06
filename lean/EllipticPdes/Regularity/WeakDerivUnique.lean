@@ -76,7 +76,7 @@ same class coincide: their difference is orthogonal to every smooth compactly su
 class, hence zero by `annihilates_of_forall_testCls`. -/
 theorem HasWeakDeriv.unique {k : Fin d} {g w₁ w₂ : EucL2 d}
     (h₁ : HasWeakDeriv k g w₁) (h₂ : HasWeakDeriv k g w₂) : w₁ = w₂ := by
-  haveI : ENNReal.HolderTriple (2 : ℝ≥0∞) 2 1 := ⟨by rw [ENNReal.inv_two_add_inv_two, inv_one]⟩
+  have : ENNReal.HolderTriple (2 : ℝ≥0∞) 2 1 := ⟨by rw [ENNReal.inv_two_add_inv_two, inv_one]⟩
   have hzero : w₁ - w₂ = 0 := by
     refine annihilates_of_forall_testCls (fun ρ hρcd hρcs => ?_)
     have hsplit : ∫ x, ((w₁ - w₂) x : ℝ) * ρ x

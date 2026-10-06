@@ -98,9 +98,7 @@ theorem tendsto_eLpNorm_translate_convolution_sub {p : ℝ} (hp : 1 ≤ p)
     exact ((φ i).hasCompactSupport_normed).continuous_convolution_right
       (ContinuousLinearMap.lsmul ℝ ℝ) hloc (φ i).continuous_normed
   have hgf : AEStronglyMeasurable (fun y => g y - f y) volume :=
-    hgc.aestronglyMeasurable.sub hf.1
-  have hft : AEStronglyMeasurable (fun y => f (y + hv i) - f y) volume :=
-    (hf.1.comp_measurePreserving (measurePreserving_translate (hv i))).sub hf.1
+    hgc.aestronglyMeasurable.sub hf.aestronglyMeasurable
   -- The shifted mollification error is the shift of the mollification error.
   have hshift : ((fun y => f (y + hv i)) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ρ)
       = fun y => g (y + hv i) := by
@@ -122,13 +120,6 @@ theorem tendsto_eLpNorm_translate_convolution_sub {p : ℝ} (hp : 1 ≤ p)
     funext y
     simp only [Pi.add_apply, Pi.sub_apply]
     ring
-  have hmeas1 : AEStronglyMeasurable
-      (fun y => ((fun y => f (y + hv i)) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ρ) y
-        - f (y + hv i)) volume := by
-    rw [show (fun y => ((fun y => f (y + hv i)) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ρ) y
-          - f (y + hv i)) = fun y => (fun z => g z - f z) (y + hv i) from by
-        funext y; rw [hshift]]
-    exact hgf.comp_measurePreserving (measurePreserving_translate (hv i))
   calc eLpNorm ((fun y => f (y + hv i)) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ρ - f)
         (ENNReal.ofReal p) volume
       ≤ eLpNorm (fun y => ((fun y => f (y + hv i))
@@ -136,7 +127,7 @@ theorem tendsto_eLpNorm_translate_convolution_sub {p : ℝ} (hp : 1 ≤ p)
           (ENNReal.ofReal p) volume
         + eLpNorm (fun y => f (y + hv i) - f y) (ENNReal.ofReal p) volume := by
         rw [hsplit]
-        exact eLpNorm_add_le hmeas1 hft hp1
+        exact eLpNorm_add_le hp1
     _ = eLpNorm (fun y => g y - f y) (ENNReal.ofReal p) volume
         + eLpNorm (fun y => f (y + hv i) - f y) (ENNReal.ofReal p) volume := by rw [hfirst]
     _ ≤ ε / 2 + ε / 2 := by

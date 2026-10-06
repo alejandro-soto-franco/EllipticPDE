@@ -69,7 +69,7 @@ theorem measurableSet_truncSupport {u : EuclideanSpace ℝ (Fin d) → ℝ}
     (k : ℝ) : MeasurableSet (truncSupport u g k) := by
   have : truncSupport u g k = {x | k < u x} ∩ ⋃ i, {x | g i x = 0}ᶜ := by
     ext x
-    simp only [truncSupport, mem_setOf_eq, mem_inter_iff, mem_iUnion, mem_compl_iff]
+    simp only [truncSupport, mem_ofPred_eq, mem_inter_iff, mem_iUnion, mem_compl_iff]
   rw [this]
   exact (measurableSet_lt measurable_const hu).inter
     (MeasurableSet.iUnion fun i => (measurableSet_eq_fun (hg i) measurable_const).compl)
@@ -111,7 +111,7 @@ theorem measure_superlevel_eq_zero {μ : Measure (EuclideanSpace ℝ (Fin d))} [
         exact lt_of_le_of_lt (Nat.cast_le.mpr hmn) hx') ⟨0, measure_ne_top _ _⟩
   have hempty : (⋂ n : ℕ, {x | (n : ℝ) < u x}) = ∅ := by
     ext x
-    simp only [mem_iInter, mem_setOf_eq, mem_empty_iff_false, iff_false, not_forall, not_lt]
+    simp only [mem_iInter, mem_ofPred_eq, mem_empty_iff_false, iff_false, not_forall, not_lt]
     obtain ⟨n, hn⟩ := exists_nat_gt (u x)
     exact ⟨n, hn.le⟩
   rw [hempty, measure_empty] at hshrink
@@ -137,7 +137,7 @@ theorem measure_superlevel_eq_zero {μ : Measure (EuclideanSpace ℝ (Fin d))} [
   have hTnull : μ {x | T < u x} = 0 := by
     have hcover : {x | T < u x} = ⋃ n : ℕ, {x | T + 1 / (n + 1 : ℝ) < u x} := by
       ext x
-      simp only [mem_setOf_eq, mem_iUnion]
+      simp only [mem_ofPred_eq, mem_iUnion]
       constructor
       · intro hx
         obtain ⟨n, hn⟩ := exists_nat_one_div_lt (sub_pos.mpr hx)
@@ -156,7 +156,7 @@ theorem measure_superlevel_eq_zero {μ : Measure (EuclideanSpace ℝ (Fin d))} [
   have hlevelnull : μ ({x | u x = T} ∩ {x | ∃ i, g i x ≠ 0}) = 0 := by
     have : {x | u x = T} ∩ {x | ∃ i, g i x ≠ 0} = ⋃ i, {x | ¬(u x = T → g i x = 0)} := by
       ext x
-      simp only [mem_inter_iff, mem_setOf_eq, mem_iUnion, Classical.not_imp]
+      simp only [mem_inter_iff, mem_ofPred_eq, mem_iUnion, Classical.not_imp]
       exact ⟨fun ⟨h1, i, hi⟩ => ⟨i, h1, hi⟩, fun ⟨i, h1, hi⟩ => ⟨h1, i, hi⟩⟩
     rw [this]
     exact measure_iUnion_null fun i => ae_iff.mp (hlevel T i)
@@ -237,11 +237,11 @@ theorem ite_lt_max_sub {k₀ k : ℝ} (hk : k₀ ≤ k) (a b : ℝ) :
   · have h1 : max (a - k₀) 0 = a - k₀ := max_eq_left (by linarith)
     have h2 : k - k₀ < max (a - k₀) 0 := by rw [h1]; linarith
     have h3 : k₀ < a := by linarith
-    rw [if_pos h2, if_pos h3, if_pos h]
+    rw [ite_eq_left h2, ite_eq_left h3, ite_eq_left h]
   · have h2 : ¬ k - k₀ < max (a - k₀) 0 := by
       rw [not_lt]
       exact max_le (by linarith) (by linarith)
-    rw [if_neg h2, if_neg (not_lt.mpr h)]
+    rw [ite_eq_right h2, ite_eq_right (not_lt.mpr h)]
 
 /-- **Truncations at every level above the boundary value in `H₀¹`.** If `(u - k₀)⁺` is
 the function coordinate of an element of `H₀¹(Ω)`, then for every `k ≥ k₀` there is an element
@@ -257,7 +257,7 @@ theorem exists_truncation_mem_H01 (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBoun
         =ᵐ[volume.restrict Ω] fun x => max ((U 0 x : ℝ) - k) 0) ∧
       ∀ i : Fin d, ((V : H1amb Ω) i.succ : EuclideanSpace ℝ (Fin d) → ℝ)
         =ᵐ[volume.restrict Ω] fun x => if k < (U 0 x : ℝ) then (U i.succ x : ℝ) else 0 := by
-  haveI : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
+  have : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
   -- the gradient coordinates of `V₀`
   have hwg := hasWeakGradOn_of_mem_W12 hU
   have huint : IntegrableOn (fun x => (U 0 x : ℝ)) Ω volume :=
@@ -272,7 +272,7 @@ theorem exists_truncation_mem_H01 (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBoun
     have : (fun x => if k₀ < (U 0 x : ℝ) then (U i.succ x : ℝ) else 0)
         = {x | k₀ < (U 0 x : ℝ)}.indicator fun x => (U i.succ x : ℝ) := by
       funext x
-      simp only [Set.indicator_apply, Set.mem_setOf_eq]
+      simp only [Set.indicator_apply, Set.mem_ofPred_eq]
     rw [this]
     exact (hgint i).indicator (measurableSet_lt measurable_const hum)
   have hwgV' : HasWeakGradOn Ω (fun x => max ((U 0 x : ℝ) - k₀) 0)
@@ -379,9 +379,9 @@ theorem energy_le_transport (Op : FullEllipticOp d)
     set A : L2D Ω := (Lp.memLp ((V : H1amb Ω) i.succ)).norm.toLp _ with hAdef
     set B : L2D Ω := hvΓm.norm.toLp _ with hBdef
     have hA : ‖A‖ = ‖(V : H1amb Ω) i.succ‖ := by
-      rw [hAdef, Lp.norm_toLp, eLpNorm_norm, Lp.norm_def]
+      rw [hAdef, Lp.norm_toLp, eLpNorm_norm _ (Lp.aestronglyMeasurable _), Lp.norm_def]
     have hB : ‖B‖ = (eLpNorm ((V : H1amb Ω) 0) 2 (μ.restrict Γ)).toReal := by
-      rw [hBdef, Lp.norm_toLp, eLpNorm_norm, hnormΓ]
+      rw [hBdef, Lp.norm_toLp, eLpNorm_norm _ hvΓm.aestronglyMeasurable, hnormΓ]
     have hAB : ⟪A, B⟫ = ∫ x, ‖((V : H1amb Ω) i.succ x : ℝ)‖ * ‖vΓ x‖ ∂μ := by
       rw [hAdef, hBdef, inner_toLp_eq]
     have hint1 : Integrable (fun x => Op.b x i * (U i.succ x : ℝ) * ((V : H1amb Ω) 0 x : ℝ)) μ :=
@@ -400,17 +400,17 @@ theorem energy_le_transport (Op : FullEllipticOp d)
           = ((V : H1amb Ω) i.succ x : ℝ) * vΓ x := by
         rw [hxi', hvΓdef, Set.indicator_apply, hx0]
         by_cases hxk : k < u x
-        · rw [if_pos hxk]
+        · rw [ite_eq_left hxk]
           by_cases hxΓ : x ∈ Γ
-          · rw [if_pos hxΓ]
+          · rw [ite_eq_left hxΓ]
           · have h0 : g i x = 0 := by
               by_contra hne
               exact hxΓ ⟨hxk, i, hne⟩
-            rw [if_neg hxΓ]
+            rw [ite_eq_right hxΓ]
             simp only [hgdef] at h0
             rw [h0, zero_mul, mul_zero]
         · have hle : u x ≤ k := not_lt.mp hxk
-          rw [if_neg hxk, max_eq_right (by linarith), mul_zero, zero_mul]
+          rw [ite_eq_right hxk, max_eq_right (by linarith), mul_zero, zero_mul]
       rw [mul_assoc, hprod, ← mul_assoc]
       have habs : |Op.b x i * ((V : H1amb Ω) i.succ x : ℝ) * vΓ x|
           ≤ Op.Bsup * (‖((V : H1amb Ω) i.succ x : ℝ)‖ * ‖vΓ x‖) := by
@@ -464,7 +464,7 @@ theorem exists_measure_truncSupport_ge_of_sobolev (hΩb : Bornology.IsBounded Ω
               ((volume.restrict Ω).restrict (truncSupport u g k))).toReal →
       c ≤ ((volume.restrict Ω) (truncSupport u g k)).toReal := by
   classical
-  haveI : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
+  have : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
   set μ : Measure (EuclideanSpace ℝ (Fin d)) := volume.restrict Ω with hμdef
   have hq2r : (2 : ℝ) < q := by exact_mod_cast hq2
   set θ : ℝ := 1 / 2 - 1 / (q : ℝ) with hθdef
@@ -494,7 +494,7 @@ theorem exists_measure_truncSupport_ge_of_sobolev (hΩb : Bornology.IsBounded Ω
   -- the Sobolev inequality on `H₀¹`
   have hsob := hsobolev V
   set N : ℝ := (eLpNorm ((V : H1amb Ω) 0) q μ).toReal with hNdef
-  have hNfin : eLpNorm ((V : H1amb Ω) 0) q μ ≠ ⊤ := (memLp_of_mem_H01 hsob).2.ne
+  have hNfin : eLpNorm ((V : H1amb Ω) 0) q μ ≠ ⊤ := (memLp_of_mem_H01 hsob).eLpNorm_lt_top.ne
   have hN : N ≤ (C : ℝ) * ∑ i : Fin d, ‖(V : H1amb Ω) i.succ‖ := by
     have := ENNReal.toReal_mono (ENNReal.mul_ne_top ENNReal.coe_ne_top
       (ENNReal.sum_ne_top.mpr fun i _ => by rw [enorm_eq_nnnorm]; exact ENNReal.coe_ne_top)) hsob
@@ -555,7 +555,7 @@ theorem exists_measure_truncSupport_ge_of_sobolev (hΩb : Bornology.IsBounded Ω
         rcases (ENNReal.toReal_eq_zero_iff _).mp h.symm with h0 | htop
         · exact h0
         · exact absurd htop hNfin
-      have hae := (eLpNorm_eq_zero_iff (Lp.aestronglyMeasurable _) hq0).mp hzero
+      have hae := (eLpNorm_eq_zero_iff hq0).mp hzero
       have hle : ∀ᵐ x ∂μ, u x ≤ k := by
         filter_upwards [hae, hV0] with x hx hx0
         simp only [Pi.zero_apply] at hx
@@ -687,7 +687,7 @@ theorem weak_maximum_principle_transport (hd : 2 ≤ d) (hΩopen : IsOpen Ω)
       =ᵐ[volume.restrict Ω] fun x => max ((U 0 x : ℝ) - k) 0) :
     ∀ᵐ x ∂(volume.restrict Ω), (U 0 x : ℝ) ≤ k := by
   classical
-  haveI : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
+  have : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
   obtain ⟨V₀, hV₀⟩ := hbd
   set u : EuclideanSpace ℝ (Fin d) → ℝ := fun x => (U 0 x : ℝ) with hudef
   set g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ := fun i x => (U i.succ x : ℝ) with hgdef

@@ -130,7 +130,7 @@ private theorem setIntegral_sub_mul_testFn_symm {V : Set (EuclideanSpace ℝ (Fi
     (hφcs : HasCompactSupport φ) :
     (∫ x in V, ((w₁ - w₂) x : ℝ) * φ x)
       = (∫ x in V, (w₁ x : ℝ) * φ x) - ∫ x in V, (w₂ x : ℝ) * φ x := by
-  haveI : ENNReal.HolderTriple (2 : ENNReal) 2 1 := ⟨by rw [ENNReal.inv_two_add_inv_two, inv_one]⟩
+  have : ENNReal.HolderTriple (2 : ENNReal) 2 1 := ⟨by rw [ENNReal.inv_two_add_inv_two, inv_one]⟩
   have hφL : MemLp φ 2 (volume.restrict V) :=
     (hφc.continuous.memLp_of_hasCompactSupport (p := 2) (μ := volume) hφcs).restrict V
   have hi1 : Integrable (fun x => (w₁ x : ℝ) * φ x) (volume.restrict V) :=
@@ -181,7 +181,7 @@ theorem mulTest_mixed_weakDeriv_comm {V : Set (EuclideanSpace ℝ (Fin d))}
     (hui : HasWeakDerivOn V i u ui) (hul : HasWeakDerivOn V ℓ u ul)
     (huli : HasWeakDerivOn V ℓ ui uli) (huil : HasWeakDerivOn V i ul uil) :
     mulTest hχ uli = mulTest hχ uil := by
-  haveI : ENNReal.HolderTriple (2 : ENNReal) 2 1 := ⟨by rw [ENNReal.inv_two_add_inv_two, inv_one]⟩
+  have : ENNReal.HolderTriple (2 : ENNReal) 2 1 := ⟨by rw [ENNReal.inv_two_add_inv_two, inv_one]⟩
   have hkey : ∀ φ : EuclideanSpace ℝ (Fin d) → ℝ, ContDiff ℝ (⊤ : ℕ∞) φ → HasCompactSupport φ →
       tsupport φ ⊆ V → ∫ x in V, ((uli - uil) x : ℝ) * φ x = 0 := by
     intro φ hφc hφcs hφV

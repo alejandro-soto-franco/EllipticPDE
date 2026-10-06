@@ -71,7 +71,7 @@ lemma rayleighSphere_inter_nonempty {K : Submodule ℝ (H01 Ω)}
   obtain ⟨U, hUK, hU⟩ := h
   have hpos : 0 < ‖embL2 Ω U‖ := norm_pos_iff.mpr hU
   refine ⟨‖embL2 Ω U‖⁻¹ • U, ?_, K.smul_mem _ hUK⟩
-  simp only [rayleighSphere, Set.mem_setOf_eq, map_smul, norm_smul, Real.norm_eq_abs,
+  simp only [rayleighSphere, Set.mem_ofPred_eq, map_smul, norm_smul, Real.norm_eq_abs,
     abs_of_pos (inv_pos.mpr hpos)]
   exact inv_mul_cancel₀ hpos.ne'
 

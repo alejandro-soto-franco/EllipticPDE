@@ -182,7 +182,7 @@ theorem ae_const_on_ball_of_hasWeakGradOn_zero {Ω : Set (EuclideanSpace ℝ (Fi
           filter_upwards [hue] with y hy
           simp only [Pi.sub_apply, hy]
       _ ≤ eLpNorm (v n - uΩ) 1 volume := eLpNorm_mono_measure _ Measure.restrict_le_self
-  haveI : IsFiniteMeasure (volume.restrict (ball x r)) :=
+  have : IsFiniteMeasure (volume.restrict (ball x r)) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
   refine ae_const_of_tendsto_ae_const (c := fun n => v n x) inferInstance
     (memLp_one_iff_integrable.mpr (hu.mono_set hball)) (fun n => ?_) htend

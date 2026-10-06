@@ -169,8 +169,9 @@ theorem memLp_two_restrict_mul_of_ae_bound {V : Set (EuclideanSpace ℝ (Fin d))
   have hbase : MemLp (fun x => max M 0 * η x) 2 (volume : Measure (EuclideanSpace ℝ (Fin d))) :=
     (continuous_const.mul hηc).memLp_of_hasCompactSupport (μ := volume) hηcs.mul_left
   have hfull : MemLp (fun x => c x * η x) 2 (volume : Measure (EuclideanSpace ℝ (Fin d))) := by
-    refine ⟨hcm.aestronglyMeasurable.mul hηc.aestronglyMeasurable, ?_⟩
-    refine lt_of_le_of_lt (eLpNorm_mono_ae (g := fun x => max M 0 * η x) ?_) hbase.2
+    rw [memLp_iff]
+    refine lt_of_le_of_lt (eLpNorm_mono_ae (g := fun x => max M 0 * η x)
+      (hcm.aestronglyMeasurable.mul hηc.aestronglyMeasurable) ?_) hbase.eLpNorm_lt_top
     filter_upwards [hcM'] with x hx
     rw [Real.norm_eq_abs, Real.norm_eq_abs, abs_mul, abs_mul, abs_of_nonneg hM0]
     exact mul_le_mul_of_nonneg_right hx (abs_nonneg _)
@@ -218,9 +219,9 @@ theorem tendsto_setIntegral_mul_convolution_of_measurable
     HasCompactSupport.intro (isCompact_closedBall 0 (R + 1)) fun x hx =>
       Set.indicator_of_notMem hx c
   have hctLp : MemLp ct 2 (volume : Measure (EuclideanSpace ℝ (Fin d))) := by
-    refine ⟨hctm.aestronglyMeasurable, ?_⟩
-    rw [hctdef, eLpNorm_indicator_eq_eLpNorm_restrict hBm]
-    refine lt_of_le_of_lt (eLpNorm_le_of_ae_bound (C := max Mc 0) ?_) ?_
+    rw [memLp_iff, hctdef, eLpNorm_indicator_eq_eLpNorm_restrict hBm]
+    refine lt_of_le_of_lt
+      (eLpNorm_le_of_ae_bound (C := max Mc 0) hcm.aestronglyMeasurable ?_) ?_
     · filter_upwards [ae_restrict_of_ae hcM'] with x hx
       simpa [Real.norm_eq_abs] using hx
     · rw [Measure.restrict_apply_univ]
@@ -304,7 +305,8 @@ theorem tendsto_setIntegral_mul_convolution_of_measurable
     have hstep : eLpNorm (Gn n) 2 (volume : Measure (EuclideanSpace ℝ (Fin d)))
         ≤ eLpNorm (C • (ct ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ n).normed volume) - ct))
             2 volume := by
-      refine eLpNorm_mono_ae (Filter.Eventually.of_forall fun x => ?_)
+      refine eLpNorm_mono_ae ((hdiffLp n).aestronglyMeasurable.mul hηc.aestronglyMeasurable)
+        (Filter.Eventually.of_forall fun x => ?_)
       have hb : |(ct ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ n).normed volume)) x - ct x|
             * ‖η x‖
           ≤ |(ct ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ n).normed volume)) x - ct x| * C :=
@@ -324,9 +326,9 @@ theorem tendsto_setIntegral_mul_convolution_of_measurable
     exact mul_le_mul_of_nonneg_right (le_of_eq (Real.enorm_eq_ofReal hC0)) (by simp)
   have hGLp : ∀ n, MemLp (Gn n) 2 (volume : Measure (EuclideanSpace ℝ (Fin d))) := by
     intro n
-    refine ⟨((hdiffLp n).1.mul hηc.aestronglyMeasurable), ?_⟩
+    rw [memLp_iff]
     exact lt_of_le_of_lt (hGvol n)
-      (ENNReal.mul_lt_top ENNReal.ofReal_lt_top (hdiffLp n).2)
+      (ENNReal.mul_lt_top ENNReal.ofReal_lt_top (hdiffLp n).eLpNorm_lt_top)
   -- The two integrands, both `L¹(V)`.
   have hIntc : ∀ n, Integrable (fun x => (h x : ℝ)
       * ((c ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ((φ n).normed volume)) x * η x))
@@ -361,7 +363,7 @@ theorem tendsto_setIntegral_mul_convolution_of_measurable
     refine mul_le_mul_of_nonneg_left ?_ (norm_nonneg _)
     have hfin : ENNReal.ofReal C * eLpNorm (ct ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume]
         ((φ n).normed volume) - ct) 2 volume ≠ ⊤ :=
-      (ENNReal.mul_lt_top ENNReal.ofReal_lt_top (hdiffLp n).2).ne
+      (ENNReal.mul_lt_top ENNReal.ofReal_lt_top (hdiffLp n).eLpNorm_lt_top).ne
     calc (eLpNorm (Gn n) 2 (volume.restrict V)).toReal
         ≤ (ENNReal.ofReal C * eLpNorm (ct ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume]
             ((φ n).normed volume) - ct) 2 volume).toReal :=

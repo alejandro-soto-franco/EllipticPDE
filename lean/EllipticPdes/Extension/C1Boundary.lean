@@ -98,9 +98,9 @@ theorem norm_tangential_le (j : Fin d) (y : EuclideanSpace ℝ (Fin d)) :
   refine Real.sqrt_le_sqrt (Finset.sum_le_sum fun i _ => ?_)
   rw [tangential_coord]
   by_cases h : i = j
-  · rw [if_pos h, norm_zero, zero_pow (by norm_num)]
+  · rw [ite_eq_left h, norm_zero, zero_pow (by norm_num)]
     positivity
-  · rw [if_neg h]
+  · rw [ite_eq_right h]
 
 /-- A function independent of the `j`-th coordinate factors through the projection. -/
 theorem apply_tangential {j : Fin d} {f : EuclideanSpace ℝ (Fin d) → ℝ} (hind : IndepCoord j f)
@@ -220,7 +220,7 @@ theorem exists_bounded_graph {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → �
           ((norm_partialD_le_fderiv k y).trans (by simpa using hB y hy)) (norm_nonneg _) hC0
       exact (norm_add_le _ _).trans (add_le_add h1 h2)
   · ext y
-    simp only [Set.mem_inter_iff, aboveGraph, Set.mem_setOf_eq, and_congr_left_iff]
+    simp only [Set.mem_inter_iff, aboveGraph, Set.mem_ofPred_eq, and_congr_left_iff]
     intro hy
     rw [hζone y hy]
     constructor <;> intro h <;> linarith [h]
@@ -358,7 +358,7 @@ theorem exists_finite_chart_cover (hd : 0 < d) {Ω : Set (EuclideanSpace ℝ (Fi
   have hcfits : ∀ x (hx : x ∈ frontier Ω), (c x).Fits Ω x := by
     intro x hx
     rw [hcdef]
-    simp only [dif_pos hx]
+    simp only [dite_eq_left hx]
     exact hC x hx
   have hcover : frontier Ω ⊆ ⋃ x ∈ frontier Ω, ball x (c x).radius := fun x hx =>
     Set.mem_biUnion hx (mem_ball_self (c x).radius_pos)

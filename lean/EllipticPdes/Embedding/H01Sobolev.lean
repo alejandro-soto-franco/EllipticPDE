@@ -102,17 +102,17 @@ lemma eLpNorm_fderiv_le_sum (hΩm : MeasurableSet Ω)
     (h.continuous_partialD i).aestronglyMeasurable
   calc eLpNorm (fderiv ℝ φ) 2 volume
       ≤ eLpNorm (fun x => ∑ k : Fin d, ‖partialD k φ x‖) 2 volume := by
-        refine eLpNorm_mono (fun x => ?_)
+        refine eLpNorm_mono (h.1.continuous_fderiv (by simp)).aestronglyMeasurable (fun x => ?_)
         rw [Real.norm_eq_abs, abs_of_nonneg (Finset.sum_nonneg fun _ _ => norm_nonneg _)]
         exact norm_fderiv_le_sum_partialD φ x
     _ = eLpNorm (∑ k : Fin d, fun x => ‖partialD k φ x‖) 2 volume := by
         refine eLpNorm_congr_ae (EventuallyEq.of_eq (funext fun x => ?_))
         rw [Finset.sum_apply]
     _ ≤ ∑ k : Fin d, eLpNorm (fun x => ‖partialD k φ x‖) 2 volume :=
-        eLpNorm_sum_le (fun k _ => (hmeas k).norm) one_le_two
+        eLpNorm_sum_le one_le_two
     _ = ∑ i : Fin d, ‖h.testGraph i.succ‖ₑ := by
         refine Finset.sum_congr rfl (fun i _ => ?_)
-        rw [eLpNorm_norm, ← eLpNorm_restrict_eq_of_tsupport_subset hΩm
+        rw [eLpNorm_norm _ (hmeas i), ← eLpNorm_restrict_eq_of_tsupport_subset hΩm
           ((tsupport_partialD_subset i φ).trans h.2.2) 2,
           IsTestFn.testGraph_succ, Lp.enorm_def, IsTestFn.partialCls]
         exact (eLpNorm_congr_ae (h.memLp_partialD i).coeFn_toLp).symm
@@ -251,11 +251,12 @@ theorem eLpNorm_le_of_mem_H01_of_isBounded (hΩm : MeasurableSet Ω)
 theorem memLp_of_mem_H01 {q : ℝ≥0∞} {C : ℝ≥0} {U : H1amb Ω}
     (hbound : eLpNorm (U 0) q (volume.restrict Ω) ≤ C * ∑ i : Fin d, ‖U i.succ‖ₑ) :
     MemLp (U 0) q (volume.restrict Ω) := by
-  refine ⟨Lp.aestronglyMeasurable _, lt_of_le_of_lt hbound ?_⟩
+  rw [memLp_iff]
+  refine lt_of_le_of_lt hbound ?_
   refine ENNReal.mul_lt_top ENNReal.coe_lt_top ?_
   refine ENNReal.sum_lt_top.mpr (fun i _ => ?_)
   rw [Lp.enorm_def]
-  exact (Lp.memLp (U i.succ)).2
+  exact (Lp.memLp (U i.succ)).eLpNorm_lt_top
 
 /-! ### The embedding as a continuous linear map -/
 

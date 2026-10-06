@@ -108,7 +108,7 @@ private lemma partialD_diffQuotFn (hφ : Differentiable ℝ φ) (i k : Fin d) (h
     rw [heq]; exact hsub.const_mul (h⁻¹ : ℝ)
   simp only [partialD]
   rw [hval.fderiv]
-  simp only [ContinuousLinearMap.smul_apply, ContinuousLinearMap.sub_apply, smul_eq_mul]
+  simp only [_root_.smul_apply, _root_.sub_apply, smul_eq_mul]
   ring
 
 /-! ### Extension by zero of a test-function class is the test function -/

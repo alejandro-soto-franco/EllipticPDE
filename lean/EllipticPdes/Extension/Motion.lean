@@ -77,7 +77,7 @@ theorem partialD_comp_linearIsometry {φ : EuclideanSpace ℝ (Fin d) → ℝ}
       ((fderiv ℝ φ (e y)).comp (e.toContinuousLinearEquiv :
         EuclideanSpace ℝ (Fin d) →L[ℝ] EuclideanSpace ℝ (Fin d))) y :=
     (hφ (e y)).hasFDerivAt.comp y e.toContinuousLinearEquiv.hasFDerivAt
-  rw [partialD, hcomp.fderiv, ContinuousLinearMap.coe_comp', Function.comp_apply]
+  rw [partialD, hcomp.fderiv, ContinuousLinearMap.coe_comp, Function.comp_apply]
   exact clm_apply_eq_sum (fderiv ℝ φ (e y)) _
 
 /-- **Weak gradient through a linear isometry.** The isometry is its own derivative, so the
@@ -216,7 +216,8 @@ theorem eLpNorm_grad_comp_linearIsometry_le {p : ℝ≥0∞} (hp : 1 ≤ p)
     intro i
     have h1 : eLpNorm (fun y => e (EuclideanSpace.single k (1 : ℝ)) i * g i (e y)) p volume
         ≤ eLpNorm (fun y => g i (e y)) p volume := by
-      refine eLpNorm_mono_ae (Filter.Eventually.of_forall fun y => ?_)
+      refine eLpNorm_mono_ae
+        (((hgm i).comp_measurePreserving hmp).const_mul _) (Filter.Eventually.of_forall fun y => ?_)
       rw [norm_mul, Real.norm_eq_abs (e (EuclideanSpace.single k (1 : ℝ)) i)]
       exact mul_le_of_le_one_left (norm_nonneg _) (hcoord i)
     exact h1.trans (le_of_eq (eLpNorm_comp_measurePreserving (hgm i) hmp))
@@ -225,7 +226,6 @@ theorem eLpNorm_grad_comp_linearIsometry_le {p : ℝ≥0∞} (hp : 1 ≤ p)
     funext y
     rw [Finset.sum_apply]
   rw [hfun]
-  refine le_trans (eLpNorm_sum_le ?_ hp) (Finset.sum_le_sum fun i _ => hstep i)
-  exact fun i _ => ((hgm i).comp_measurePreserving hmp).const_mul _
+  exact le_trans (eLpNorm_sum_le hp) (Finset.sum_le_sum fun i _ => hstep i)
 
 end EllipticPdes.Extension

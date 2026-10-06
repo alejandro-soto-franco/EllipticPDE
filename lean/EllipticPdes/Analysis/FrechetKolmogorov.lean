@@ -75,7 +75,7 @@ theorem totallyBounded_of_finiteDimensional_bounded {E : Type*} [NormedAddCommGr
     (hTV : T ⊆ (V : Set E)) (hT : Bornology.IsBounded T) : TotallyBounded T := by
   have hrange : T ⊆ Set.range V.subtypeₗᵢ := fun t ht => ⟨⟨t, hTV ht⟩, rfl⟩
   have hpre : Bornology.IsBounded (V.subtypeₗᵢ ⁻¹' T) :=
-    V.subtypeₗᵢ.isometry.antilipschitz.isBounded_preimage hT
+    V.subtypeₗᵢ.isometry.antilipschitzWith.isBounded_preimage hT
   have htb : TotallyBounded (V.subtypeₗᵢ ⁻¹' T) :=
     hpre.isCompact_closure.totallyBounded.subset subset_closure
   have himg : V.subtypeₗᵢ '' (V.subtypeₗᵢ ⁻¹' T) = T := by
@@ -350,7 +350,7 @@ theorem stepFun_eq_on_cube {η : ℝ} (hη : 0 < η) {K : Finset (Fin n → ℤ)
 /-- On any cube the squared deviation of `g` from a constant is integrable. -/
 theorem integrableOn_cube_sq_sub (η : ℝ) (k : Fin n → ℤ) (g : EucL2 n) (c : ℝ) :
     IntegrableOn (fun y => (g y - c) ^ 2) (cube η k) volume := by
-  haveI : IsFiniteMeasure (volume.restrict (cube η k)) :=
+  have : IsFiniteMeasure (volume.restrict (cube η k)) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact (volume_cube_ne_top η k).lt_top⟩
   have hg2 : MemLp (fun y => (g : EuclideanSpace ℝ (Fin n) → ℝ) y) 2
       (volume.restrict (cube η k)) := (Lp.memLp g).restrict (cube η k)
@@ -398,9 +398,9 @@ theorem integrableOn_prod_sq_sub (g : EucL2 n) {s t : Set (EuclideanSpace ℝ (F
     (hμs : volume s ≠ ⊤) (hμt : volume t ≠ ⊤) :
     IntegrableOn (fun p : EuclideanSpace ℝ (Fin n) × EuclideanSpace ℝ (Fin n) =>
       (g p.1 - g p.2) ^ 2) (s ×ˢ t) (volume.prod volume) := by
-  haveI : IsFiniteMeasure (volume.restrict s) :=
+  have : IsFiniteMeasure (volume.restrict s) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact hμs.lt_top⟩
-  haveI : IsFiniteMeasure (volume.restrict t) :=
+  have : IsFiniteMeasure (volume.restrict t) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact hμt.lt_top⟩
   rw [IntegrableOn, ← Measure.prod_restrict]
   have hgs : AEStronglyMeasurable (g : EuclideanSpace ℝ (Fin n) → ℝ) (volume.restrict s) :=
@@ -431,7 +431,7 @@ theorem integrable_prod_displacement (g : EucL2 n) {D : Set (EuclideanSpace ℝ 
     (hμD : volume D ≠ ⊤) :
     Integrable (fun p : EuclideanSpace ℝ (Fin n) × EuclideanSpace ℝ (Fin n) =>
       (g p.1 - g (p.1 + p.2)) ^ 2) (volume.prod (volume.restrict D)) := by
-  haveI : IsFiniteMeasure (volume.restrict D) :=
+  have : IsFiniteMeasure (volume.restrict D) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact hμD.lt_top⟩
   have hshear : MeasurePreserving
       (fun p : EuclideanSpace ℝ (Fin n) × EuclideanSpace ℝ (Fin n) => (p.1, p.1 + p.2))
@@ -497,7 +497,7 @@ theorem integrable_prod_displacement (g : EucL2 n) {D : Set (EuclideanSpace ℝ 
 /-- The squared difference of `g` at `x` and `x + w` is integrable over the displacement box. -/
 theorem integrableOn_dbox_sq_sub_translate {η : ℝ} (g : EucL2 n) (x : EuclideanSpace ℝ (Fin n)) :
     IntegrableOn (fun w => (g x - g (x + w)) ^ 2) (dbox η) volume := by
-  haveI : IsFiniteMeasure (volume.restrict (dbox η : Set (EuclideanSpace ℝ (Fin n)))) :=
+  have : IsFiniteMeasure (volume.restrict (dbox η : Set (EuclideanSpace ℝ (Fin n)))) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact (volume_dbox_ne_top (n := n) η).lt_top⟩
   have hmp : MeasurePreserving (fun w => x + w)
       (volume : Measure (EuclideanSpace ℝ (Fin n))) volume :=
@@ -789,7 +789,7 @@ theorem totallyBounded_of_lipschitz_translation (S : Set (EucL2 n)) {R M Λ : �
     have hlt : ‖g - avg η K g‖ ^ 2 < ε ^ 2 := lt_of_le_of_lt hb hDη
     exact lt_of_pow_lt_pow_left₀ 2 hε.le hlt
   refine ⟨avg η K '' S, ?_, ?_⟩
-  · haveI : FiniteDimensional ℝ (Submodule.span ℝ (cubeIndicator η '' (K : Set (Fin n → ℤ)))) :=
+  · have : FiniteDimensional ℝ (Submodule.span ℝ (cubeIndicator η '' (K : Set (Fin n → ℤ)))) :=
       FiniteDimensional.span_of_finite ℝ (K.finite_toSet.image _)
     refine totallyBounded_of_finiteDimensional_bounded
       (Submodule.span ℝ (cubeIndicator η '' (K : Set (Fin n → ℤ)))) ?_ ?_

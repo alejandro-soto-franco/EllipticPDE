@@ -87,7 +87,7 @@ theorem closure_halfBall (d : ℕ) {r : ℝ} (hr : 0 < r) :
   apply subset_antisymm
   · apply closure_minimal _ hclosed
     intro x hx
-    simp only [Set.mem_inter_iff, Set.mem_setOf_eq, Metric.mem_closedBall] at hx ⊢
+    simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, Metric.mem_closedBall] at hx ⊢
     exact ⟨le_of_lt hx.1, le_of_lt hx.2⟩
   rintro x ⟨hxr, hx0⟩
   set p₀ : EuclideanSpace ℝ (Fin (d + 1)) := EuclideanSpace.single (0 : Fin (d + 1)) (r / 2)

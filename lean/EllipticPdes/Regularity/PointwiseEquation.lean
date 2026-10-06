@@ -180,7 +180,7 @@ theorem weakSolution_ae_eq_of_contDiffOn (Op : FullEllipticOp d)
     refine hasWeakGradOn_unique_ae isOpen_ball measurableSet_ball ?_ ?_ (hweak.mono hball)
       (hclass.mono hball) i
     · intro k
-      haveI : IsFiniteMeasure (volume.restrict (ball x r)) :=
+      have : IsFiniteMeasure (volume.restrict (ball x r)) :=
         ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
       exact ((Lp.memLp ((u : H1amb Ω) k.succ)).mono_measure
         (Measure.restrict_mono (hball.trans hWΩ) le_rfl)).integrable one_le_two
@@ -198,7 +198,7 @@ theorem weakSolution_ae_eq_of_contDiffOn (Op : FullEllipticOp d)
   have hfK : ∀ K : Set (EuclideanSpace ℝ (Fin d)), K ⊆ W → IsCompact K →
       IntegrableOn (f : EuclideanSpace ℝ (Fin d) → ℝ) K volume := by
     intro K hKW hK
-    haveI : IsFiniteMeasure (volume.restrict K) :=
+    have : IsFiniteMeasure (volume.restrict K) :=
       ⟨by rw [Measure.restrict_apply_univ]; exact hK.measure_lt_top⟩
     exact ((Lp.memLp f).mono_measure (Measure.restrict_mono (hKW.trans hWΩ) le_rfl)).integrable
       one_le_two
@@ -264,7 +264,7 @@ theorem weakSolution_ae_eq_of_contDiffOn (Op : FullEllipticOp d)
       Integrable.bdd_mul hint_u hcm hcb
     obtain ⟨M, hM⟩ := hφcs.exists_bound_of_continuous hφcont
     have hint_f : Integrable (fun x => (f x : ℝ) * φ x) (volume.restrict W) := by
-      refine IntegrableOn.of_forall_diff_eq_zero
+      refine IntegrableOn.of_forall_sdiff_eq_zero
         (integrableOn_mul_bounded (hfK _ hφW hφcs.isCompact) hφcont hM) hWm fun x hx => ?_
       exact hoff' _ x hx.2
     -- the localised weak formulation, read against the representative

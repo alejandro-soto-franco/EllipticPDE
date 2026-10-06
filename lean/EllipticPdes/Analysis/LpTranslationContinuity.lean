@@ -56,9 +56,8 @@ preserving. -/
 lemma memLp_comp_translate {p : ℝ≥0∞} {f : EuclideanSpace ℝ (Fin d) → ℝ}
     (hf : MemLp f p volume) (h : EuclideanSpace ℝ (Fin d)) :
     MemLp (fun y => f (y + h)) p volume := by
-  refine ⟨hf.1.comp_measurePreserving (measurePreserving_translate h), ?_⟩
-  rw [eLpNorm_comp_translate hf.1 h p]
-  exact hf.2
+  rw [memLp_iff, eLpNorm_comp_translate hf.aestronglyMeasurable h p]
+  exact hf.eLpNorm_lt_top
 
 /-- **Compactly supported case.** For a continuous `g` with compact support, the `Lᵖ`
 distance to its translates tends to zero: uniform continuity bounds the difference uniformly,
@@ -118,7 +117,9 @@ theorem tendsto_eLpNorm_translate_sub_of_hasCompactSupport {p : ℝ≥0∞}
         (EllipticPdes.Embedding.eLpNorm_restrict_eq_of_tsupport_subset hKm
           (hsupp h hh1) p).symm
     _ ≤ (volume.restrict K) Set.univ ^ p.toReal⁻¹ * ENNReal.ofReal c :=
-        eLpNorm_le_of_ae_bound (Filter.Eventually.of_forall hbound)
+        eLpNorm_le_of_ae_bound
+          (show Continuous (fun y : EuclideanSpace ℝ (Fin d) => g (y + h) - g y) by
+            fun_prop).aestronglyMeasurable (Filter.Eventually.of_forall hbound)
     _ = C * ENNReal.ofReal c := by rw [Measure.restrict_apply_univ]
     _ ≤ ε := hCc
 
@@ -137,16 +138,9 @@ theorem tendsto_eLpNorm_translate_sub {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hptop : 
   have hq0 : ε / 2 / 2 ≠ 0 := by
     refine ENNReal.div_ne_zero.mpr ⟨ENNReal.div_ne_zero.mpr ⟨hε.ne', by norm_num⟩, by norm_num⟩
   obtain ⟨g, hgs, hfg, hgc, hgm⟩ := hf.exists_hasCompactSupport_eLpNorm_sub_le hptop hq0
-  -- The three pieces, and their measurability.
-  have hfgm : AEStronglyMeasurable (fun y => f y - g y) volume := hf.1.sub hgc.aestronglyMeasurable
-  have hgfm : AEStronglyMeasurable (fun y => g y - f y) volume := hgc.aestronglyMeasurable.sub hf.1
-  have htrans : ∀ h : EuclideanSpace ℝ (Fin d),
-      AEStronglyMeasurable (fun y => f (y + h) - g (y + h)) volume := fun h =>
-    hfgm.comp_measurePreserving (measurePreserving_translate h)
-  have hgt : ∀ h : EuclideanSpace ℝ (Fin d),
-      AEStronglyMeasurable (fun y => g (y + h) - g y) volume := fun h =>
-    ((hgc.aestronglyMeasurable.comp_measurePreserving
-      (measurePreserving_translate h))).sub hgc.aestronglyMeasurable
+  -- The first piece, and its measurability.
+  have hfgm : AEStronglyMeasurable (fun y => f y - g y) volume :=
+    hf.aestronglyMeasurable.sub hgc.aestronglyMeasurable
   -- The translated approximation is as close as the approximation.
   have hfirst : ∀ h : EuclideanSpace ℝ (Fin d),
       eLpNorm (fun y => f (y + h) - g (y + h)) p volume ≤ ε / 2 / 2 := by
@@ -175,11 +169,11 @@ theorem tendsto_eLpNorm_translate_sub {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hptop : 
           + (fun y => g y - f y)) p volume := by rw [hsplit]
     _ ≤ eLpNorm ((fun y => f (y + h) - g (y + h)) + (fun y => g (y + h) - g y)) p volume
           + eLpNorm (fun y => g y - f y) p volume :=
-        eLpNorm_add_le ((htrans h).add (hgt h)) hgfm hp1
+        eLpNorm_add_le hp1
     _ ≤ (eLpNorm (fun y => f (y + h) - g (y + h)) p volume
           + eLpNorm (fun y => g (y + h) - g y) p volume)
           + eLpNorm (fun y => g y - f y) p volume :=
-        add_le_add (eLpNorm_add_le (htrans h) (hgt h) hp1) le_rfl
+        add_le_add (eLpNorm_add_le hp1) le_rfl
     _ ≤ (ε / 2 / 2 + ε / 2) + ε / 2 / 2 :=
         add_le_add (add_le_add (hfirst h) hh) hthird
     _ = ε := by

@@ -37,7 +37,7 @@ SOURCE_TYPES = {"paper", "book", "web discussion", "folklore", "original-proof",
 RELATIONSHIPS = {"formalizes", "adapts", "independently-proves", "background", "other"}
 ARTEFACTS = (".olean", ".ilean", ".a", ".bc", ".dll", ".dylib", ".o", ".obj", ".so",
              ".trace")
-TOOLCHAIN_MINIMUM = (4, 28, 0)
+TOOLCHAIN_MINIMUM = (4, 35, 0, 2)  # v4.35.0-rc2; a release sorts after its candidates
 
 results: list[tuple[bool, str, str]] = []
 
@@ -51,9 +51,11 @@ def git(*args: str) -> str:
                           capture_output=True, text=True).stdout.strip()
 
 
-def parse_version(toolchain: str) -> tuple[int, int, int] | None:
-    m = re.fullmatch(r"leanprover/lean4:v(\d+)\.(\d+)\.(\d+)(-rc\d+)?", toolchain.strip())
-    return (int(m[1]), int(m[2]), int(m[3])) if m else None
+def parse_version(toolchain: str) -> tuple[int, int, int, int] | None:
+    m = re.fullmatch(r"leanprover/lean4:v(\d+)\.(\d+)\.(\d+)(?:-rc(\d+))?", toolchain.strip())
+    if not m:
+        return None
+    return (int(m[1]), int(m[2]), int(m[3]), int(m[4]) if m[4] else 10**6)
 
 
 def check_repository() -> None:

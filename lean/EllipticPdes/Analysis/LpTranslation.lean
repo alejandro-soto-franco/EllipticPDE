@@ -151,7 +151,7 @@ private theorem integrable_uncurry_segment (hf : ContDiff ℝ 1 f)
           _ ≤ R + ‖h‖ := by linarith
       simpa [mem_closedBall, dist_eq_norm] using hxle
     simp only [hg, Function.uncurry_apply_pair,
-      image_eq_zero_of_notMem_tsupport hxt, ContinuousLinearMap.zero_apply]
+      image_eq_zero_of_notMem_tsupport hxt, _root_.zero_apply]
     norm_num
   -- Almost everywhere `t ∈ Ioc 0 1`, so `g =ᵐ[ρ] C.indicator g`.
   have htioc : ∀ᵐ p ∂ρ, p.2 ∈ Ioc (0 : ℝ) 1 := by

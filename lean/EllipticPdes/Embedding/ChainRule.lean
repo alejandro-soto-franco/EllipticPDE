@@ -175,10 +175,10 @@ theorem hasWeakGradOn_sub_const {u : EuclideanSpace ℝ (Fin d) → ℝ}
     have hI2 : Integrable φ volume := hφc.continuous.integrable_of_hasCompactSupport hφcs
     have key := integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable (μ := volume)
       (f := fun _ => (1 : ℝ)) (g := φ) (v := EuclideanSpace.single k (1 : ℝ))
-      (by simp only [h0, ContinuousLinearMap.zero_apply, zero_mul]; exact integrable_zero _ _ _)
+      (by simp only [h0, _root_.zero_apply, zero_mul]; exact integrable_zero _ _ _)
       (by simpa using hI1) (by simpa using hI2)
       (fun x _ => differentiableAt_const _) (fun x _ => (hφc.differentiable (by simp)) x)
-    simp only [one_mul, h0, ContinuousLinearMap.zero_apply, zero_mul, integral_zero,
+    simp only [one_mul, h0, _root_.zero_apply, zero_mul, integral_zero,
       neg_zero] at key
     simpa [partialD] using key
   have hzeroΩ : ∫ x in Ω, partialD k φ x = 0 := by
@@ -346,8 +346,7 @@ theorem hasWeakGradOn_comp (hΩ : IsOpen Ω) {u : EuclideanSpace ℝ (Fin d) →
     simpa using this
   -- a subsequence converging almost everywhere
   have hmeas : TendstoInMeasure volume v atTop U :=
-    tendstoInMeasure_of_tendsto_eLpNorm one_ne_zero (fun n => (hvc n).aestronglyMeasurable)
-      hUint.1 hconvU
+    tendstoInMeasure_of_tendsto_eLpNorm one_ne_zero hconvU
   obtain ⟨ns, hns, hae⟩ := hmeas.exists_seq_tendsto_ae
   -- the classical identity for every mollification
   have hclassical : ∀ n, ∫ x, f (v n x) * partialD k φ x
@@ -361,7 +360,7 @@ theorem hasWeakGradOn_comp (hΩ : IsOpen Ω) {u : EuclideanSpace ℝ (Fin d) →
       intro x
       have h := (hfd (v n x)).hasDerivAt.comp_hasFDerivAt x
         (hv1.differentiable one_ne_zero x).hasFDerivAt
-      rw [h.fderiv, ContinuousLinearMap.smul_apply, smul_eq_mul]
+      rw [h.fderiv, _root_.smul_apply, smul_eq_mul]
       rfl
     have hcont1 : Continuous fun x =>
         fderiv ℝ (f ∘ v n) x (EuclideanSpace.single k (1 : ℝ)) :=
@@ -403,7 +402,10 @@ theorem hasWeakGradOn_comp (hΩ : IsOpen Ω) {u : EuclideanSpace ℝ (Fin d) →
           ≤ ((M : ℝ) * ‖v n x - U x‖) * Cp := by gcongr; exact hCp x
         _ = (M : ℝ) * Cp * ‖v n x - U x‖ := by ring
     · rw [integral_const_mul, integral_norm_eq_lintegral_enorm ((hvc n).aestronglyMeasurable.sub
-        hUint.1), eLpNorm_one_eq_lintegral_enorm]
+        hUint.1),
+      eLpNorm_one_eq_lintegral_enorm
+        (show AEStronglyMeasurable (v n - U) volume from
+          (hvc n).aestronglyMeasurable.sub hUint.1)]
   -- limit of the gradient side along the subsequence
   have hintG : Integrable (fun x => deriv f (U x) * G x * φ x) volume :=
     integrable_bdd_mul_mul_bdd (hf'c.comp_aestronglyMeasurable hUint.1) (fun x => hMr _)
@@ -438,7 +440,10 @@ theorem hasWeakGradOn_comp (hΩ : IsOpen Ω) {u : EuclideanSpace ℝ (Fin d) →
               · exact hCφ x
           _ = (M : ℝ) * Cφ * ‖w (ns i) x - G x‖ := by ring
       · rw [integral_const_mul, integral_norm_eq_lintegral_enorm
-          ((hwc _).aestronglyMeasurable.sub hGint.1), eLpNorm_one_eq_lintegral_enorm]
+          ((hwc _).aestronglyMeasurable.sub hGint.1),
+        eLpNorm_one_eq_lintegral_enorm
+          (show AEStronglyMeasurable (w (ns i) - G) volume from
+            (hwc _).aestronglyMeasurable.sub hGint.1)]
     have hpiece2 : Tendsto (fun i => ∫ x, deriv f (v (ns i) x) * G x * φ x) atTop
         (𝓝 (∫ x, deriv f (U x) * G x * φ x)) := by
       refine tendsto_integral_of_dominated_convergence (fun x => (M : ℝ) * Cφ * ‖G x‖)

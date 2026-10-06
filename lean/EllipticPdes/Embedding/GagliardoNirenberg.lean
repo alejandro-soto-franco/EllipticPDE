@@ -126,7 +126,7 @@ theorem partialD_mul {η φ : EuclideanSpace ℝ (Fin d) → ℝ} (k : Fin d)
   have hfd : HasFDerivAt (fun x => η x * φ x)
       (η y • fderiv ℝ φ y + φ y • fderiv ℝ η y) y := hη.hasFDerivAt.mul hφ.hasFDerivAt
   rw [partialD, hfd.fderiv]
-  simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.coe_smul', Pi.smul_apply,
+  simp only [_root_.add_apply, FunLike.coe_smul, Pi.smul_apply,
     smul_eq_mul, partialD]
   ring
 
@@ -319,19 +319,21 @@ theorem exists_eLpNorm_sobolevConj_le_compactSupport (hd : 0 < d)
       simpa [hKgdef] using h
     have hfd : eLpNorm (fderiv ℝ (W n)) p volume
         ≤ ∑ k, eLpNorm (partialD k (W n)) p volume := by
+      have hfm : AEStronglyMeasurable (fderiv ℝ (W n)) volume :=
+        ((hWsmooth n).continuous_fderiv (by simp)).aestronglyMeasurable
       calc eLpNorm (fderiv ℝ (W n)) p volume
-          = eLpNorm (fun y => ‖fderiv ℝ (W n) y‖) p volume := (eLpNorm_norm _).symm
+          = eLpNorm (fun y => ‖fderiv ℝ (W n) y‖) p volume := (eLpNorm_norm _ hfm).symm
         _ ≤ eLpNorm (fun y => ∑ k, ‖partialD k (W n) y‖) p volume := by
-            refine eLpNorm_mono fun y => ?_
+            refine eLpNorm_mono hfm.norm fun y => ?_
             rw [Real.norm_eq_abs, abs_of_nonneg (norm_nonneg _), Real.norm_eq_abs,
               abs_of_nonneg (Finset.sum_nonneg fun k _ => norm_nonneg _)]
             exact norm_fderiv_le_sum_partialD (W n) y
         _ ≤ ∑ k, eLpNorm (partialD k (W n)) p volume := by
             rw [show (fun y => ∑ k, ‖partialD k (W n) y‖)
                 = ∑ k, (fun y => ‖partialD k (W n) y‖) from by funext y; rw [Finset.sum_apply]]
-            refine (eLpNorm_sum_le (fun k _ => ?_) hp1).trans_eq ?_
-            · exact (hWpartialCont n k).aestronglyMeasurable.norm
-            · exact Finset.sum_congr rfl fun k _ => eLpNorm_norm _
+            refine (eLpNorm_sum_le hp1).trans_eq ?_
+            exact Finset.sum_congr rfl fun k _ =>
+              eLpNorm_norm _ (hWpartialCont n k).aestronglyMeasurable
     have hyoung : ∀ k, eLpNorm (partialD k (W n)) p volume ≤ eLpNorm (G k) p volume := by
       intro k
       rw [hpartial n k]
@@ -353,10 +355,10 @@ theorem exists_eLpNorm_sobolevConj_le_compactSupport (hd : 0 < d)
     exact hx.congr fun n => congrFun (hflip n) x
   have hwsix : eLpNorm w p' volume ≤ (Kg : ℝ≥0∞) * ∑ k, eLpNorm (G k) p volume :=
     MeasureTheory.Lp.eLpNorm_le_of_ae_tendsto (Filter.Eventually.of_forall hbound)
-      (fun n => (hWsmooth n).continuous.aestronglyMeasurable) hae
-  refine ⟨⟨hwL.1, ?_⟩, hwsix⟩
+      (fun n => (hWsmooth n).continuous.aestronglyMeasurable) hwL.aestronglyMeasurable hae
+  refine ⟨?_, hwsix⟩
   exact lt_of_le_of_lt hwsix (ENNReal.mul_lt_top ENNReal.coe_lt_top
-    (ENNReal.sum_lt_top.mpr fun k _ => (hGL k).2))
+    (ENNReal.sum_lt_top.mpr fun k _ => (hGL k).eLpNorm_lt_top))
 
 
 /-- **From `Lᵖ` to the Sobolev conjugate `Lᵖ'` (Evans, *Partial Differential Equations*
@@ -394,7 +396,7 @@ theorem exists_eLpNorm_sobolevConj_le (hd : 0 < d) (c : EuclideanSpace ℝ (Fin 
   set B : Set (EuclideanSpace ℝ (Fin d)) := Metric.ball c R with hBdef
   have hBm : MeasurableSet B := measurableSet_ball
   have hR : 0 < R := hr.trans hrR
-  haveI : IsFiniteMeasure (volume.restrict B) :=
+  have : IsFiniteMeasure (volume.restrict B) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
   -- The cutoff, equal to `1` on the inner ball and supported in the outer one.
   obtain ⟨η, hηtest, hη1, hηIcc⟩ := exists_isTestFn_one_nhdsSet_of_isCompact
@@ -432,24 +434,27 @@ theorem exists_eLpNorm_sobolevConj_le (hd : 0 < d) (c : EuclideanSpace ℝ (Fin 
   have hwmeas : AEStronglyMeasurable w volume :=
     hηc.continuous.aestronglyMeasurable.mul hvB.aestronglyMeasurable
   have hwL2 : MemLp w p volume := by
-    refine ⟨hwmeas, lt_of_le_of_lt (eLpNorm_mono (g := B.indicator v) fun x => ?_) hvB.2⟩
+    rw [memLp_iff]
+    refine lt_of_le_of_lt (eLpNorm_mono (g := B.indicator v) hwmeas fun x => ?_)
+      hvB.eLpNorm_lt_top
     rw [hwdef, norm_mul]
     exact mul_le_of_le_one_left (norm_nonneg _) (hηnorm x)
   have hwcs : HasCompactSupport w := hηcs.mul_right
   have hwint : Integrable w volume :=
     (hvint.integrable_indicator hBm).bdd_mul hηc.continuous.aestronglyMeasurable
       (Filter.Eventually.of_forall hηnorm)
-  have hGmeas : ∀ k, AEStronglyMeasurable (G k) volume := fun k =>
-    (hηc.continuous.aestronglyMeasurable.mul (hgB k).aestronglyMeasurable).add
-      (((hηc.continuous_fderiv (by simp)).clm_apply
-        continuous_const).aestronglyMeasurable.mul hvB.aestronglyMeasurable)
+  have hGm1 : ∀ k, AEStronglyMeasurable (fun x => η x * B.indicator (g k) x) volume := fun k =>
+    hηc.continuous.aestronglyMeasurable.mul (hgB k).aestronglyMeasurable
+  have hGm2 : ∀ k, AEStronglyMeasurable (fun x => partialD k η x * B.indicator v x) volume :=
+    fun k => ((hηc.continuous_fderiv (by simp)).clm_apply
+        continuous_const).aestronglyMeasurable.mul hvB.aestronglyMeasurable
   have hGbound : ∀ k, eLpNorm (G k) p volume
       ≤ eLpNorm (g k) p (volume.restrict B)
         + ENNReal.ofReal M * eLpNorm v p (volume.restrict B) := by
     intro k
     have h1 : eLpNorm (fun x => η x * B.indicator (g k) x) p volume
         ≤ eLpNorm (g k) p (volume.restrict B) := by
-      refine (eLpNorm_mono (g := B.indicator (g k)) fun x => ?_).trans_eq
+      refine (eLpNorm_mono (g := B.indicator (g k)) (hGm1 k) fun x => ?_).trans_eq
         (eLpNorm_indicator_eq_eLpNorm_restrict hBm)
       rw [norm_mul]
       exact mul_le_of_le_one_left (norm_nonneg _) (hηnorm x)
@@ -457,7 +462,7 @@ theorem exists_eLpNorm_sobolevConj_le (hd : 0 < d) (c : EuclideanSpace ℝ (Fin 
         ≤ ENNReal.ofReal M * eLpNorm v p (volume.restrict B) := by
       have hstep : eLpNorm (fun x => partialD k η x * B.indicator v x) p volume
           ≤ eLpNorm (fun x => M * B.indicator v x) p volume := by
-        refine eLpNorm_mono fun x => ?_
+        refine eLpNorm_mono (hGm2 k) fun x => ?_
         rw [norm_mul, norm_mul, Real.norm_eq_abs M, abs_of_nonneg hM0]
         exact mul_le_mul_of_nonneg_right (hMk k x) (norm_nonneg _)
       refine hstep.trans (le_of_eq ?_)
@@ -465,15 +470,13 @@ theorem exists_eLpNorm_sobolevConj_le (hd : 0 < d) (c : EuclideanSpace ℝ (Fin 
         eLpNorm_const_smul, eLpNorm_indicator_eq_eLpNorm_restrict hBm]
       congr 1
       rw [Real.enorm_eq_ofReal hM0]
-    refine (eLpNorm_add_le (hηc.continuous.aestronglyMeasurable.mul (hgB k).aestronglyMeasurable)
-      (((hηc.continuous_fderiv (by simp)).clm_apply
-        continuous_const).aestronglyMeasurable.mul hvB.aestronglyMeasurable)
-      hp1).trans (add_le_add h1 h2)
+    exact (eLpNorm_add_le hp1).trans (add_le_add h1 h2)
   have hGLp : ∀ k, MemLp (G k) p volume := by
     intro k
-    refine ⟨hGmeas k, ?_⟩
+    rw [memLp_iff]
     refine lt_of_le_of_lt (hGbound k) ?_
-    exact ENNReal.add_lt_top.mpr ⟨(hg k).2, ENNReal.mul_lt_top ENNReal.ofReal_lt_top hv.2⟩
+    exact ENNReal.add_lt_top.mpr ⟨(hg k).eLpNorm_lt_top,
+      ENNReal.mul_lt_top ENNReal.ofReal_lt_top hv.eLpNorm_lt_top⟩
   -- The whole-space inequality, applied to the cut-off function.
   have hwsix : eLpNorm w p' volume ≤ (Kg : ℝ≥0∞) * ∑ k, eLpNorm (G k) p volume :=
     (hKg w G hwcs hwint hwL2 hGLp hwg').2
@@ -520,10 +523,11 @@ theorem exists_eLpNorm_sobolevConj_le (hd : 0 < d) (c : EuclideanSpace ℝ (Fin 
     rw [hcongr, ENNReal.coe_mul, mul_assoc]
     exact (eLpNorm_mono_measure _ Measure.restrict_le_self).trans
       (hwsix.trans (mul_le_mul' le_rfl hsum))
-  refine ⟨⟨?_, ?_⟩, hfinal⟩
-  · exact hv.1.mono_measure (Measure.restrict_mono (Metric.ball_subset_ball hrR.le) le_rfl)
-  · refine lt_of_le_of_lt hfinal (ENNReal.mul_lt_top ENNReal.coe_lt_top ?_)
-    exact ENNReal.add_lt_top.mpr ⟨hv.2, ENNReal.sum_lt_top.mpr fun k _ => (hg k).2⟩
+  refine ⟨?_, hfinal⟩
+  rw [memLp_iff]
+  refine lt_of_le_of_lt hfinal (ENNReal.mul_lt_top ENNReal.coe_lt_top ?_)
+  exact ENNReal.add_lt_top.mpr ⟨hv.eLpNorm_lt_top,
+    ENNReal.sum_lt_top.mpr fun k _ => (hg k).eLpNorm_lt_top⟩
 
 /-- **Bootstrap fed by a higher exponent.** The ball has finite measure, so `Lq` data with
 `p ≤ q` is `Lᵖ` data, at the price of a factor `|B|^{1/p - 1/q}` which the constant absorbs.
@@ -545,7 +549,7 @@ theorem exists_eLpNorm_sobolevConj_le_of_le (hd : 0 < d) (c : EuclideanSpace ℝ
   classical
   have hR : 0 < R := hr.trans hrR
   set B : Set (EuclideanSpace ℝ (Fin d)) := Metric.ball c R with hBdef
-  haveI : IsFiniteMeasure (volume.restrict B) :=
+  have : IsFiniteMeasure (volume.restrict B) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
   have hpqE : (p : ℝ≥0∞) ≤ (q : ℝ≥0∞) := by exact_mod_cast hpq
   obtain ⟨K₀, hK₀⟩ := exists_eLpNorm_sobolevConj_le hd c hp hpp' hr hrR
@@ -571,8 +575,8 @@ theorem exists_eLpNorm_sobolevConj_le_of_le (hd : 0 < d) (c : EuclideanSpace ℝ
           + ∑ k, eLpNorm (g k) p (volume.restrict B)) := hbd
     _ ≤ (K₀ : ℝ≥0∞) * (eLpNorm v q (volume.restrict B) * A
           + ∑ k, eLpNorm (g k) q (volume.restrict B) * A) :=
-        mul_le_mul' le_rfl (add_le_add (hcmp v hv.1)
-          (Finset.sum_le_sum fun k _ => hcmp (g k) (hg k).1))
+        mul_le_mul' le_rfl (add_le_add (hcmp v hv.aestronglyMeasurable)
+          (Finset.sum_le_sum fun k _ => hcmp (g k) (hg k).aestronglyMeasurable))
     _ = ((K₀ * A.toNNReal : ℝ≥0) : ℝ≥0∞) * (eLpNorm v q (volume.restrict B)
           + ∑ k, eLpNorm (g k) q (volume.restrict B)) := by
         rw [ENNReal.coe_mul, ENNReal.coe_toNNReal hAne, ← Finset.sum_mul, ← add_mul]

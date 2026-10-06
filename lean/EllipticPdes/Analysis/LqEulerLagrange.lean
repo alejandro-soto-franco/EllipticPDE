@@ -60,7 +60,7 @@ namespace EllipticPdes.Analysis
 variable {α : Type*} [MeasurableSpace α] {μ : Measure α}
 
 /-- **`L^q` norm to the `q`-th power as an integral.** -/
-theorem norm_lp_rpow_eq_integral {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp0 : p ≠ 0) (hptop : p ≠ ∞)
+theorem norm_lp_rpow_eq_integral {p : ℝ≥0∞} (hp0 : p ≠ 0) (hptop : p ≠ ∞)
     (f : Lp ℝ p μ) :
     ‖f‖ ^ p.toReal = ∫ x, ‖f x‖ ^ p.toReal ∂μ := by
   have hr : 0 < p.toReal := ENNReal.toReal_pos hp0 hptop
@@ -187,11 +187,11 @@ theorem euler_lagrange_of_bilin_min {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp0 : p �
     B U V = B U U * ∫ x, |(T U) x| ^ (p.toReal - 2) * (T U) x * (T V) x ∂μ := by
   refine euler_lagrange_of_quadratic_min hp0 hptop hp1 T (Q := fun W => B W W) hpsd
     (fun c W => by
-      simp only [map_smul, ContinuousLinearMap.smul_apply, smul_eq_mul]
+      simp only [map_smul, _root_.smul_apply, smul_eq_mul]
       ring)
     (L := B U V) (S := B V V) (fun t => ?_) hU hmin
   have h1 : B (U + t • V) = B U + t • B V := by rw [map_add, map_smul]
-  simp only [h1, ContinuousLinearMap.add_apply, ContinuousLinearMap.smul_apply, map_add, map_smul,
+  simp only [h1, _root_.add_apply, _root_.smul_apply, map_add, map_smul,
     smul_eq_mul]
   rw [hsymm V U]
   ring

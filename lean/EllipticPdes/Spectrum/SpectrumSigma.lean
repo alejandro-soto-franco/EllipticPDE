@@ -122,7 +122,7 @@ theorem finite_setOf_hasEigenvalue_abs_ge (hK : IsCompactOperator K)
   -- unit vectors in `Espan (n+1)` orthogonal to `Espan n`
   have hunit : ∀ n : ℕ, ∃ u : E, u ∈ Espan (n + 1) ∧ u ∈ (Espan n)ᗮ ∧ ‖u‖ = 1 := by
     intro n
-    haveI : FiniteDimensional ℝ (Espan n) :=
+    have : FiniteDimensional ℝ (Espan n) :=
       FiniteDimensional.span_of_finite ℝ ((Set.finite_Iio n).image e)
     set w : E := e n - (Espan n).starProjection (e n) with hwdef
     have hw_orth : w ∈ (Espan n)ᗮ := (Espan n).sub_starProjection_mem_orthogonal (e n)
@@ -237,7 +237,7 @@ theorem spectrum_diff_eq_eigenvalues (hK : IsCompactOperator K) :
     spectrum ℝ K \ {0}
       = {μ : ℝ | Module.End.HasEigenvalue (K.toLinearMap) μ} \ {0} := by
   ext μ
-  simp only [Set.mem_diff, Set.mem_singleton_iff, Set.mem_setOf_eq]
+  simp only [Set.mem_sdiff, Set.mem_singleton_iff, Set.mem_ofPred_eq]
   constructor
   · rintro ⟨hmem, h0⟩
     exact ⟨(hK.hasEigenvalue_iff_mem_spectrum h0).mpr hmem, h0⟩
@@ -312,7 +312,7 @@ lemma opK_eigenvalue_pos {μ : ℝ}
   -- `opE (opK x) = γ • opT x`
   have hEK : (Op.opE Ω) (Op.opK Ω x) = Op.gardingγ • opT Ω x := by
     rw [opK]
-    simp only [ContinuousLinearMap.smul_apply, ContinuousLinearMap.comp_apply,
+    simp only [_root_.smul_apply, ContinuousLinearMap.comp_apply,
       ContinuousLinearEquiv.coe_coe, map_smul, ContinuousLinearEquiv.apply_symm_apply]
   -- pair against `x`
   have hinner : μ * Op.shiftedBilin Ω Op.gardingγ x x
@@ -351,7 +351,7 @@ def opAlam (lam : ℝ) : H01 Ω →L[ℝ] H01 Ω :=
 /-- Riesz identity: `⟪Op.opAlam Ω lam u, v⟫ = B[u, v] - lam · zerothForm Ω u v`. -/
 lemma inner_opAlam (lam : ℝ) (u v : H01 Ω) :
     ⟪Op.opAlam Ω lam u, v⟫ = Op.fullBilin Ω u v - lam * zerothForm Ω u v := by
-  rw [opAlam, ContinuousLinearMap.sub_apply, ContinuousLinearMap.smul_apply,
+  rw [opAlam, _root_.sub_apply, _root_.smul_apply,
     inner_sub_left, real_inner_smul_left, ContinuousLinearEquiv.coe_coe, Op.inner_opE Ω,
     inner_opT Ω, Op.shiftedBilin_apply, zerothForm_apply]
   ring
@@ -363,8 +363,8 @@ lemma opAlam_factor (lam : ℝ) :
         - ((Op.gardingγ + lam) / Op.gardingγ) • Op.opK Ω) := by
   have hγ := Op.gardingγ_pos
   refine ContinuousLinearMap.ext (fun u => ?_)
-  simp only [opAlam, ContinuousLinearMap.sub_apply, ContinuousLinearMap.smul_apply,
-    ContinuousLinearMap.comp_apply, ContinuousLinearMap.one_apply, map_sub, map_smul, opK,
+  simp only [opAlam, _root_.sub_apply, _root_.smul_apply,
+    ContinuousLinearMap.comp_apply, one_apply_eq_self, map_sub, map_smul, opK,
     ContinuousLinearEquiv.coe_coe, ContinuousLinearEquiv.apply_symm_apply]
   rw [smul_smul, div_mul_cancel₀ _ hγ.ne']
 
@@ -445,8 +445,8 @@ lemma not_unique_of_mem_sigmaSet {lam : ℝ} (hlam : lam ∈ Op.sigmaSet Ω) :
     rw [Op.opAlam_factor Ω lam, ContinuousLinearMap.comp_apply]
     have h0 : ((1 : H01 Ω →L[ℝ] H01 Ω)
         - ((Op.gardingγ + lam) / Op.gardingγ) • Op.opK Ω) x = 0 := by
-      rw [ContinuousLinearMap.sub_apply, ContinuousLinearMap.one_apply,
-        ContinuousLinearMap.smul_apply, hKx, smul_smul]
+      rw [_root_.sub_apply, one_apply_eq_self,
+        _root_.smul_apply, hKx, smul_smul]
       rw [show (Op.gardingγ + lam) / Op.gardingγ * (Op.gardingγ / (Op.gardingγ + lam))
           = 1 by field_simp]
       rw [one_smul, sub_self]
@@ -607,7 +607,7 @@ theorem resolvent_bound (hK : IsCompactOperator (Op.opK Ω)) {lam : ℝ}
       rw [hBdef, ← hw]
       exact w.inv_mul
     calc B (Op.opAlam Ω lam y) = (B * Op.opAlam Ω lam) y :=
-        (ContinuousLinearMap.mul_apply _ _ _).symm
+        (mul_apply_eq_comp _ _ _).symm
       _ = (1 : H01 Ω →L[ℝ] H01 Ω) y := by rw [h1]
       _ = y := rfl
   refine ⟨‖B‖ + 1, by positivity, ?_⟩
@@ -627,7 +627,6 @@ theorem resolvent_bound (hK : IsCompactOperator (Op.opK Ω)) {lam : ℝ}
           rw [hAu]
       _ = ‖B‖ * ‖l2Functional Ω f‖ := by
           rw [LinearIsometryEquiv.norm_map]
-          rfl
       _ ≤ ‖B‖ * ‖f‖ :=
           mul_le_mul_of_nonneg_left (norm_l2Functional_le Ω f) (norm_nonneg B)
   calc ‖(u : H1amb Ω) 0‖ ≤ ‖u‖ := PiLp.norm_apply_le _ _

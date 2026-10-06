@@ -83,7 +83,7 @@ lemma inner_opE (u v : H01 Ω) :
 lemma opA_eq :
     Op.opA Ω = (Op.opE Ω : H01 Ω →L[ℝ] H01 Ω) - Op.gardingγ • opT Ω := by
   refine ContinuousLinearMap.ext (fun u => ext_inner_right (𝕜 := ℝ) (fun v => ?_))
-  rw [ContinuousLinearMap.sub_apply, ContinuousLinearMap.smul_apply, inner_sub_left,
+  rw [_root_.sub_apply, _root_.smul_apply, inner_sub_left,
     real_inner_smul_left, ContinuousLinearEquiv.coe_coe, Op.inner_opA Ω, Op.inner_opE Ω,
     inner_opT Ω, Op.shiftedBilin_apply, zerothForm_apply]
   ring
@@ -98,8 +98,8 @@ lemma opA_factor :
   have hcomp : (Op.opE Ω : H01 Ω →L[ℝ] H01 Ω).comp (1 - Op.opK Ω)
       = (Op.opE Ω : H01 Ω →L[ℝ] H01 Ω) - Op.gardingγ • opT Ω := by
     refine ContinuousLinearMap.ext (fun u => ?_)
-    simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.sub_apply,
-      ContinuousLinearMap.one_apply, ContinuousLinearMap.smul_apply, opK,
+    simp only [ContinuousLinearMap.comp_apply, _root_.sub_apply,
+      one_apply_eq_self, _root_.smul_apply, opK,
       ContinuousLinearEquiv.coe_coe, map_sub, map_smul,
       ContinuousLinearEquiv.apply_symm_apply]
   rw [Op.opA_eq Ω, hcomp]
@@ -123,7 +123,7 @@ theorem fredholm_alternative (hK : IsCompactOperator (Op.opK Ω)) :
     have hAx : Op.opA Ω x = 0 := by
       rw [Op.opA_factor Ω, ContinuousLinearMap.comp_apply]
       have h0 : (1 - Op.opK Ω) x = 0 := by
-        rw [ContinuousLinearMap.sub_apply, ContinuousLinearMap.one_apply, hKx, sub_self]
+        rw [_root_.sub_apply, one_apply_eq_self, hKx, sub_self]
       rw [h0, map_zero]
     refine ⟨x, hx_ne, fun v => ?_⟩
     have hv := Op.inner_opA Ω x v

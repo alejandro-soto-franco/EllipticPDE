@@ -253,7 +253,7 @@ theorem neumann_unique (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))}
     obtain ⟨hud, hvd, z, r, hr, hball, hdist, hfd⟩ := hν y hy
     refine ⟨hud.sub hvd, z, r, hr, hball, hdist, ?_⟩
     have : fderiv ℝ w y = fderiv ℝ u y - fderiv ℝ v y := fderiv_sub hud hvd
-    rw [this, ContinuousLinearMap.sub_apply, hfd, sub_self]
+    rw [this, _root_.sub_apply, hfd, sub_self]
   have hcl : IsCompact (closure U) := hUb.isCompact_closure
   have hclne : (closure U).Nonempty := hUne.closure
   obtain ⟨p, hp, hpmax⟩ := hcl.exists_isMaxOn hclne hwc
@@ -275,7 +275,7 @@ theorem neumann_unique (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))}
       obtain ⟨hd', z, r, hr, hball, hdist, hfz⟩ := hwν y hy
       refine ⟨hd'.neg, z, r, hr, hball, hdist, ?_⟩
       have e : fderiv ℝ (fun y => -w y) y = -fderiv ℝ w y := fderiv_neg
-      rw [e, ContinuousLinearMap.neg_apply, hfz, neg_zero]
+      rw [e, _root_.neg_apply, hfz, neg_zero]
     have hqmax : ∀ x ∈ closure U, (fun y => -w y) x ≤ (fun y => -w y) q := fun x hx => by
       have h1 : w q ≤ w x := hqmin hx
       simp only

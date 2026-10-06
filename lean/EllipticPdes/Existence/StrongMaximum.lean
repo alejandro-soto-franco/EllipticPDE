@@ -103,7 +103,7 @@ theorem fderiv_barrierExp_apply (lam : ℝ) (y x ξ : EuclideanSpace ℝ (Fin d)
     fderiv ℝ (barrierExp lam y) x ξ
       = barrierExp lam y x * (-lam * ∑ i, 2 * (x i - y i) * ξ i) := by
   rw [(hasFDerivAt_barrierExp lam y x).fderiv]
-  simp only [ContinuousLinearMap.smul_apply, ContinuousLinearMap.sum_apply, smul_eq_mul,
+  simp only [_root_.smul_apply, _root_.sum_apply, smul_eq_mul,
     proj_apply', Finset.mul_sum]
 
 /-- The first partials of the exponential part. -/
@@ -113,7 +113,7 @@ theorem partialD_barrierExp (lam : ℝ) (y : EuclideanSpace ℝ (Fin d)) (i : Fi
   simp only [partialD, fderiv_barrierExp_apply, PiLp.single_apply]
   classical
   rw [Finset.sum_eq_single i]
-  · simp only [if_true]
+  · simp only [ite_true]
     ring
   · intro j _ hj
     simp [hj]
@@ -145,11 +145,11 @@ theorem partialD_partialD_barrierExp (lam : ℝ) (y : EuclideanSpace ℝ (Fin d)
         + barrierExp lam y x • (EuclideanSpace.proj j : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ))) x :=
     (h1.mul (hasFDerivAt_barrierExp lam y x)).const_mul (-2 * lam)
   rw [h2.fderiv]
-  simp only [ContinuousLinearMap.smul_apply, ContinuousLinearMap.add_apply, smul_eq_mul,
-    proj_apply', ContinuousLinearMap.sum_apply, PiLp.single_apply]
+  simp only [_root_.smul_apply, _root_.add_apply, smul_eq_mul,
+    proj_apply', _root_.sum_apply, PiLp.single_apply]
   classical
   rw [Finset.sum_eq_single i]
-  · simp only [if_true]
+  · simp only [ite_true]
     ring
   · intro k _ hk
     simp [hk]
@@ -205,7 +205,7 @@ theorem nondivOp_barrier (a : EuclideanSpace ℝ (Fin d) → Fin d → Fin d →
       + 4 * lam ^ 2 * (x j - y j) * (x i - y i)) * w)
       = -2 * lam * w * ∑ i, a x i i
         + 4 * lam ^ 2 * w * ∑ i, ∑ j, a x i j * (x i - y i) * (x j - y j) := by
-    simp only [hterm, Finset.sum_add_distrib, Finset.sum_ite_eq', Finset.mem_univ, if_true,
+    simp only [hterm, Finset.sum_add_distrib, Finset.sum_ite_eq', Finset.mem_univ, ite_true,
       Finset.mul_sum]
   have hbsum : ∑ i, b x i * (-2 * lam * (x i - y i) * w)
       = -2 * lam * w * ∑ i, b x i * (x i - y i) := by
@@ -352,8 +352,8 @@ theorem hopf_lemma_ball (hd : 0 < d) {y : EuclideanSpace ℝ (Fin d)} {r : ℝ} 
   -- the annulus
   set R : Set (EuclideanSpace ℝ (Fin d)) := ball y r \ closedBall y (r / 2) with hRdef
   have hRo : IsOpen R := isOpen_ball.sdiff isClosed_closedBall
-  have hRb : Bornology.IsBounded R := isBounded_ball.subset diff_subset
-  have hRsub : R ⊆ ball y r := diff_subset
+  have hRb : Bornology.IsBounded R := isBounded_ball.subset sdiff_subset
+  have hRsub : R ⊆ ball y r := sdiff_subset
   have hnorm : ∀ c : ℝ, 0 < c → dist (y + c • e i₀) y = c := by
     intro c hc
     rw [dist_eq_norm, add_sub_cancel_left, norm_smul, PiLp.norm_single, norm_one, mul_one,

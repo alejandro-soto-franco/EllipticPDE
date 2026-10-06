@@ -83,7 +83,7 @@ lemma integral_grad_norm_sq_eq {Ω : Set (EuclideanSpace ℝ (Fin d))}
   have hpt : (fun x => ‖fderiv ℝ φ x‖ ^ 2) = fun x => ∑ i, (partialD i φ x) ^ 2 := by
     funext x; rw [norm_sq_clm_eq_sum_apply_single (fderiv ℝ φ x)]; rfl
   have hint : ∀ i : Fin d, Integrable (fun x => (partialD i φ x) ^ 2) volume := fun i =>
-    ((h.continuous_partialD i).pow 2).integrable_of_hasCompactSupport
+    ((h.continuous_partialD i).fun_pow 2).integrable_of_hasCompactSupport
       ((h.hasCompactSupport_partialD i).comp_left (g := fun y : ℝ => y ^ 2) (by norm_num))
   rw [hpt, integral_finsetSum Finset.univ (fun i _ => hint i)]
   refine Finset.sum_congr rfl (fun i _ => ?_)

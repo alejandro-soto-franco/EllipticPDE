@@ -118,7 +118,7 @@ private theorem partialD_inv {a : EuclideanSpace ℝ (Fin d) → ℝ} (ha : Cont
     partialD ℓ (fun y => (a y)⁻¹) x = -(a x ^ 2)⁻¹ * partialD ℓ a x := by
   have hfd : HasFDerivAt (fun y => (a y)⁻¹) ((-(a x ^ 2)⁻¹) • fderiv ℝ a x) x :=
     (hasDerivAt_inv (hne x)).comp_hasFDerivAt x (ha.differentiable_one x).hasFDerivAt
-  simp only [partialD, hfd.fderiv, ContinuousLinearMap.smul_apply, smul_eq_mul]
+  simp only [partialD, hfd.fderiv, _root_.smul_apply, smul_eq_mul]
 
 /-! ### Dividing the weight out -/
 

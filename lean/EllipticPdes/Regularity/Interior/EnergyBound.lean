@@ -575,7 +575,7 @@ private lemma sq_norm_diffQuotD_u0_le (hΩm : MeasurableSet Ω) (k : Fin d) (h :
   exact le_trans key2 hsum
 
 
-set_option maxHeartbeats 500000 in
+set_option maxHeartbeats 600000 in
 -- The final Young-absorption assembly chains the full toolkit (bilinear identity,
 -- ellipticity lower bound, five Cauchy-Schwarz/Peter-Paul term families) in one term, whose
 -- elaboration exceeds the default `maxHeartbeats`.

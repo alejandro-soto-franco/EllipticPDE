@@ -266,7 +266,7 @@ theorem interior_diffQuot_norm_bound (Op : FullEllipticOp d) (hΩm : MeasurableS
               (x + hshift k h))
           =ᵐ[volume] fun x => T.ζ (x + hshift k h)
               * (extendL2 hΩm di : EuclideanSpace ℝ (Fin d) → ℝ) (x + hshift k h) :=
-        hqmp.ae_eq hζext
+        hqmp.ae_eq_comp hζext
       -- The localisation `ζ(x + h eₖ) = 0 ∨ ξ x = 1`.
       have hloc : ∀ x, T.ζ (x + hshift k h) = 0 ∨ T.ξ x = 1 := by
         intro x
@@ -333,7 +333,7 @@ theorem interior_diffQuot_norm_bound (Op : FullEllipticOp d) (hΩm : MeasurableS
       have hge : δ₀ ≤ |h| := not_lt.mp hsmall
       have hval : diffQuot k h (extendL2 hΩm gζ)
           = h⁻¹ • (transL2 (hshift k h) (extendL2 hΩm gζ) - extendL2 hΩm gζ) := by
-        simp only [diffQuot, ContinuousLinearMap.smul_apply, ContinuousLinearMap.sub_apply,
+        simp only [diffQuot, _root_.smul_apply, _root_.sub_apply,
           ContinuousLinearMap.id_apply, LinearIsometry.coe_toContinuousLinearMap]
       have hti : ‖transL2 (hshift k h) (extendL2 hΩm gζ) - extendL2 hΩm gζ‖
           ≤ 2 * ‖extendL2 hΩm gζ‖ := by

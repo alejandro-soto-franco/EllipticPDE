@@ -134,7 +134,7 @@ lemma partialD_coord_comp {ψ : ℝ → ℝ} (hψ : Differentiable ℝ ψ)
   rw [hfd]
   simp only [ContinuousLinearMap.comp_apply]
   have hone : (EuclideanSpace.proj (𝕜 := ℝ) (0 : Fin 1)) (EuclideanSpace.single 0 (1 : ℝ)) = 1 := by
-    simp [EuclideanSpace.proj, PiLp.proj]
+    simp [PiLp.proj_apply]
   rw [hone]
   rfl
 
@@ -459,7 +459,8 @@ private lemma eLpNorm_two_sq_eq_ofReal_integral_sq {f : ℝ → ℝ} {μ : Measu
       ENNReal.ofReal_rpow_of_nonneg (abs_nonneg (f x)) (by norm_num : (0 : ℝ) ≤ (2 : ℝ))]
     congr 1
     rw [show (2 : ℝ) = ((2 : ℕ) : ℝ) from by norm_num, Real.rpow_natCast, sq_abs]
-  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal (p := 2) (by norm_num) (by norm_num),
+  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal (p := 2) (by norm_num) (by norm_num)
+    hf.aestronglyMeasurable,
     show (2 : ℝ≥0∞).toReal = 2 from by norm_num]
   simp_rw [hstep]
   rw [← ofReal_integral_eq_lintegral_ofReal hf.integrable_sq
@@ -504,7 +505,7 @@ theorem morrey_ball_oneDim (c : EuclideanSpace ℝ (Fin 1)) {r : ℝ} (hr : 0 < 
     exact hg.comp_measurePreserving hmpr
   have hIooFinite : volume (Set.Ioo a b) ≠ ⊤ := by
     rw [Real.volume_Ioo]; exact ENNReal.ofReal_ne_top
-  haveI : IsFiniteMeasure (volume.restrict (Set.Ioo a b)) :=
+  have : IsFiniteMeasure (volume.restrict (Set.Ioo a b)) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact hIooFinite.lt_top⟩
   have hg'Integrable : Integrable g' (volume.restrict (Set.Ioo a b)) :=
     hg'MemLp.integrable (by norm_num)
@@ -613,7 +614,7 @@ theorem morrey_ball_oneDim (c : EuclideanSpace ℝ (Fin 1)) {r : ℝ} (hr : 0 < 
     have heLp : eLpNorm g' 2 (volume.restrict (Set.Ioo a b))
         = eLpNorm g 2 (volume.restrict (Metric.ball c r)) := by
       rw [hg'def, hcoordsymm]
-      exact eLpNorm_comp_measurePreserving hg.1 hmpr
+      exact eLpNorm_comp_measurePreserving hg.aestronglyMeasurable hmpr
     -- `M² = ∫_{Ioo a b} (g')²`.
     have hM2 : M ^ 2 = ∫ t in Set.Ioo a b, (g' t) ^ 2 := by
       rw [hMdef, ← heLp, ← ENNReal.toReal_pow, eLpNorm_two_sq_eq_ofReal_integral_sq hg'MemLp,
@@ -659,7 +660,7 @@ theorem morrey_ball_oneDim (c : EuclideanSpace ℝ (Fin 1)) {r : ℝ} (hr : 0 < 
         change (∫ t in a..q₀, g' t) - (∫ t in a..p₀, g' t) = _
         exact intervalIntegral.integral_interval_sub_left hII_aq hII_ap
       -- Finite-measure instance on the sub-interval.
-      haveI : IsFiniteMeasure (volume.restrict (Set.uIoc p₀ q₀)) :=
+      have : IsFiniteMeasure (volume.restrict (Set.uIoc p₀ q₀)) :=
         ⟨by rw [Measure.restrict_apply_univ, Real.volume_uIoc]; exact ENNReal.ofReal_lt_top⟩
       -- Cauchy-Schwarz: `∫_{Ι} ‖g'‖ ≤ (∫_{Ι} (g')²)^½ · |q₀ - p₀|^½`.
       have hg'memΙ : MemLp g' (ENNReal.ofReal 2) (volume.restrict (Set.uIoc p₀ q₀)) := by

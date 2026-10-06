@@ -95,7 +95,7 @@ theorem sum_mul_nonpos_of_posSemidef {A H : Matrix (Fin d) (Fin d) ℝ} (hA : A.
     have h := hH.1
     rw [IsHermitian, conjTranspose_eq_transpose_of_trivial] at h
     have := congrFun (congrFun h i) j
-    simp only [transpose_apply, neg_apply] at this
+    simp only [transpose_apply, Matrix.neg_apply] at this
     linarith
   -- the sum as a trace
   have htr : ∑ i, ∑ j, A i j * H i j = trace (A * H) := by
@@ -127,7 +127,7 @@ theorem sum_mul_nonpos_of_posSemidef {A H : Matrix (Fin d) (Fin d) ℝ} (hA : A.
     intro k
     have h1 := hconj.diag_nonneg (i := k)
     have h2 : (star U * (-H) * U) k k = -((star U * H * U) k k) := by
-      rw [Matrix.mul_neg, Matrix.neg_mul, neg_apply]
+      rw [Matrix.mul_neg, Matrix.neg_mul, Matrix.neg_apply]
     rw [h2] at h1
     linarith
   simp only [trace, diag_apply, diagonal_mul]
@@ -262,8 +262,8 @@ theorem sndFDeriv_apply_eq_sum (L : EuclideanSpace ℝ (Fin d) →L[ℝ] Euclide
   have h := sum_coord_smul_e ξ
   calc L ξ ξ = L (∑ i, ξ i • e i) (∑ j, ξ j • e j) := by rw [h]
     _ = ∑ i, ∑ j, ξ i * ξ j * L (e i) (e j) := by
-        simp only [map_sum, map_smul, ContinuousLinearMap.sum_apply,
-          ContinuousLinearMap.smul_apply, smul_eq_mul, Finset.mul_sum]
+        simp only [map_sum, map_smul, _root_.sum_apply,
+          _root_.smul_apply, smul_eq_mul, Finset.mul_sum]
         rw [Finset.sum_comm]
         refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
         ring
@@ -336,7 +336,7 @@ theorem le_nondivOp_of_isLocalMax {a : EuclideanSpace ℝ (Fin d) → Fin d → 
     {u : EuclideanSpace ℝ (Fin d) → ℝ} (hu : ContDiffAt ℝ 2 u x₀) (hmax : IsLocalMax u x₀) :
     c x₀ * u x₀ ≤ nondivOp a b c u x₀ := by
   have hgrad : ∀ i, partialD i u x₀ = 0 := fun i => by
-    simp only [partialD, hmax.fderiv_eq_zero, ContinuousLinearMap.zero_apply]
+    simp only [partialD, hmax.fderiv_eq_zero, _root_.zero_apply]
   have hb : ∑ i, b x₀ i * partialD i u x₀ = 0 := by simp [hgrad]
   have hH := sum_coeff_sndPartial_nonpos hsymm hpsd hu hmax
   unfold nondivOp
@@ -374,7 +374,7 @@ theorem proj_apply' (i : Fin d) (y : EuclideanSpace ℝ (Fin d)) :
 /-- The first partials of the perturbation. -/
 theorem partialD_expFn (lam : ℝ) (i₀ i : Fin d) (x : EuclideanSpace ℝ (Fin d)) :
     partialD i (expFn lam i₀) x = lam * (if i₀ = i then 1 else 0) * expFn lam i₀ x := by
-  simp only [partialD, (hasFDerivAt_expFn lam i₀ x).fderiv, ContinuousLinearMap.smul_apply,
+  simp only [partialD, (hasFDerivAt_expFn lam i₀ x).fderiv, _root_.smul_apply,
     smul_eq_mul, proj_apply', PiLp.single_apply]
   ring
 
@@ -408,7 +408,7 @@ theorem nondivOp_expFn (a : EuclideanSpace ℝ (Fin d) → Fin d → Fin d → �
       = a x i₀ i₀ * lam ^ 2 * expFn lam i₀ x := by
     rw [Finset.sum_eq_single i₀]
     · rw [Finset.sum_eq_single i₀]
-      · simp only [if_true]
+      · simp only [ite_true]
         ring
       · intro j _ hj
         simp [Ne.symm hj]
@@ -421,7 +421,7 @@ theorem nondivOp_expFn (a : EuclideanSpace ℝ (Fin d) → Fin d → Fin d → �
   have hsum1 : ∑ i, b x i * (lam * (if i₀ = i then 1 else 0) * expFn lam i₀ x)
       = b x i₀ * lam * expFn lam i₀ x := by
     rw [Finset.sum_eq_single i₀]
-    · simp only [if_true]
+    · simp only [ite_true]
       ring
     · intro i _ hi
       simp [Ne.symm hi]
@@ -459,7 +459,7 @@ theorem nondivOp_add_smul {U : Set (EuclideanSpace ℝ (Fin d))} (hU : IsOpen U)
     intro i y hy
     simp only [partialD]
     rw [fderiv_fun_add (hud y hy) ((hvd y hy).const_mul ε), fderiv_const_mul (hvd y hy) ε,
-      ContinuousLinearMap.add_apply, ContinuousLinearMap.smul_apply, smul_eq_mul]
+      _root_.add_apply, _root_.smul_apply, smul_eq_mul]
   -- second partials
   have h2 : ∀ i j, partialD i (partialD j (fun y => u y + ε * v y)) x
       = partialD i (partialD j u) x + ε * partialD i (partialD j v) x := by
@@ -476,7 +476,7 @@ theorem nondivOp_add_smul {U : Set (EuclideanSpace ℝ (Fin d))} (hU : IsOpen U)
       exact (hvd2 x hx).clm_apply (differentiableAt_const _)
     simp only [partialD]
     rw [hev.fderiv_eq, fderiv_fun_add hdu (hdv.const_mul ε), fderiv_const_mul hdv ε,
-      ContinuousLinearMap.add_apply, ContinuousLinearMap.smul_apply, smul_eq_mul]
+      _root_.add_apply, _root_.smul_apply, smul_eq_mul]
   have hA : ∑ i, ∑ j, a x i j * (partialD i (partialD j u) x + ε * partialD i (partialD j v) x)
       = ∑ i, ∑ j, a x i j * partialD i (partialD j u) x
         + ε * ∑ i, ∑ j, a x i j * partialD i (partialD j v) x := by

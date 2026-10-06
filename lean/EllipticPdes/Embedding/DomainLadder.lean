@@ -76,7 +76,7 @@ private theorem exists_const_eLpNorm_mono_exponent_domain
     ∃ A : ℝ≥0, ∀ f : EuclideanSpace ℝ (Fin d) → ℝ,
       AEStronglyMeasurable f (volume.restrict Ω) →
       eLpNorm f a (volume.restrict Ω) ≤ eLpNorm f b (volume.restrict Ω) * (A : ℝ≥0∞) := by
-  haveI : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
+  have : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
   have habR : (a : ℝ) ≤ (b : ℝ) := by exact_mod_cast hab
   have habE : (a : ℝ≥0∞) ≤ (b : ℝ≥0∞) := by exact_mod_cast hab
   have he : (0 : ℝ) ≤ 1 / (a : ℝ≥0∞).toReal - 1 / (b : ℝ≥0∞).toReal := by
@@ -113,7 +113,7 @@ theorem exists_const_memLp_of_gradClosed_domain (hd : 1 < d)
           MemLp (F i) q (volume.restrict Ω) ∧
             eLpNorm (F i) q (volume.restrict Ω) ≤ (K : ℝ≥0∞) * M := by
   classical
-  haveI : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
+  have : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
   have hd0 : 0 < d := by omega
   have hdpos : (0 : ℝ) < (d : ℝ) := by positivity
   have hd1 : (1 : ℝ) < (d : ℝ) := by exact_mod_cast hd
@@ -140,7 +140,8 @@ theorem exists_const_memLp_of_gradClosed_domain (hd : 1 < d)
       (hmem i (by omega)).mono_exponent hqE
     refine ⟨hmemq, ?_⟩
     calc eLpNorm (F i) q (volume.restrict Ω)
-        ≤ eLpNorm (F i) p₀ (volume.restrict Ω) * (A : ℝ≥0∞) := hA _ (hmem i (by omega)).1
+        ≤ eLpNorm (F i) p₀ (volume.restrict Ω) * (A : ℝ≥0∞) :=
+          hA _ (hmem i (by omega)).aestronglyMeasurable
       _ ≤ M * (A : ℝ≥0∞) := mul_le_mul_left (hM i (by omega)) _
       _ = (A : ℝ≥0∞) * M := mul_comm _ _
   | succ s ih =>
@@ -255,7 +256,7 @@ theorem exists_const_memLp_of_gradClosed_domain (hd : 1 < d)
       have hqE : (q : ℝ≥0∞) ≤ (P : ℝ≥0∞) := by exact_mod_cast hqP
       refine ⟨hPmem.mono_exponent hqE, ?_⟩
       calc eLpNorm (F i) q (volume.restrict Ω)
-          ≤ eLpNorm (F i) P (volume.restrict Ω) * (A : ℝ≥0∞) := hA _ hPmem.1
+          ≤ eLpNorm (F i) P (volume.restrict Ω) * (A : ℝ≥0∞) := hA _ hPmem.aestronglyMeasurable
         _ ≤ (K₁ : ℝ≥0∞) * (eLpNorm (F i) p₀ (volume.restrict Ω)
               + ∑ k, eLpNorm (F (nxt i k)) p₀ (volume.restrict Ω)) * (A : ℝ≥0∞) :=
             mul_le_mul_left hPbd _

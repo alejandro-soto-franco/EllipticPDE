@@ -233,7 +233,7 @@ theorem hasFDerivAt_of_continuousOn_hasWeakGradOn
         ‖(gradCLM g y - fderiv ℝ (U n) y) (EuclideanSpace.single k (1 : ℝ))‖
           ≤ ε / (d + 1) := by
       intro k
-      rw [ContinuousLinearMap.sub_apply, gradCLM_apply_single]
+      rw [_root_.sub_apply, gradCLM_apply_single]
       have hrw : (fderiv ℝ (U n) y) (EuclideanSpace.single k (1 : ℝ)) = partialD k (U n) y := rfl
       rw [hrw, hpartial n k y hy, ← dist_eq_norm]
       exact (hn k y hy).le

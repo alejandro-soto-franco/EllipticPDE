@@ -128,7 +128,7 @@ lemma sharpBump_zero : (sharpBump d) 0 = 1 :=
 /-- The bump has positive `Lᵖ` seminorm, being continuous and nonzero at the origin. -/
 lemma eLpNorm_sharpBump_ne_zero {p : ℝ≥0∞} (hp0 : p ≠ 0) :
     eLpNorm (⇑(sharpBump d)) p volume ≠ 0 := by
-  rw [Ne, eLpNorm_eq_zero_iff (sharpBump d).continuous.aestronglyMeasurable hp0]
+  rw [Ne, eLpNorm_eq_zero_iff hp0]
   intro hae
   have hzero : (⇑(sharpBump d) : EuclideanSpace ℝ (Fin d) → ℝ) = 0 :=
     (sharpBump d).continuous.ae_eq_iff_eq volume continuous_const |>.mp hae
@@ -322,7 +322,7 @@ theorem not_isCompactOperator_critEmb (hd : 2 < d) (hdpos : 0 < d) {p' : ℝ≥0
   -- The bump's two seminorms, both positive and finite.
   have hfin : ∀ q : ℝ≥0∞, eLpNorm (⇑(sharpBump d)) q volume ≠ ⊤ := fun q =>
     ((sharpBump d).continuous.memLp_of_hasCompactSupport
-      (μ := volume) (p := q) (sharpBump d).hasCompactSupport).2.ne
+      (μ := volume) (p := q) (sharpBump d).hasCompactSupport).eLpNorm_lt_top.ne
   set a : ℝ := (eLpNorm (⇑(sharpBump d)) 2 volume).toReal with hadef
   set c : ℝ := (eLpNorm (⇑(sharpBump d)) (p' : ℝ≥0∞) volume).toReal with hcdef
   have ha0 : 0 < a := by
@@ -462,8 +462,7 @@ theorem not_isCompactOperator_critEmb (hd : 2 < d) (hdpos : 0 < d) {p' : ℝ≥0
           = (⇑v - ⇑(critEmb d hdpos hp' (W (ψ k)))) + ⇑(critEmb d hdpos hp' (W (ψ k))) := by
         funext x; simp
       conv_lhs => rw [hfun]
-      exact eLpNorm_add_le ((Lp.aestronglyMeasurable v).sub (Lp.aestronglyMeasurable _))
-        (Lp.aestronglyMeasurable _) one_le_two
+      exact eLpNorm_add_le one_le_two
     refine hsplit.trans ?_
     rw [hL2 (ψ k)]
     exact add_le_add hfirst le_rfl
@@ -501,7 +500,7 @@ theorem not_isCompactOperator_critEmb (hd : 2 < d) (hdpos : 0 < d) {p' : ℝ≥0
     le_antisymm (ge_of_tendsto htend0 (Filter.Eventually.of_forall hbnd)) (by simp)
   have hvzero : ‖v‖ = 0 := by
     rw [Lp.norm_def, eLpNorm_congr_ae
-      ((eLpNorm_eq_zero_iff (Lp.aestronglyMeasurable v) two_ne_zero).mp hzeroL2)]
+      ((eLpNorm_eq_zero_iff two_ne_zero).mp hzeroL2)]
     simp
   rw [hvnorm] at hvzero
   have hpos : (0 : ℝ) < B⁻¹ * c := mul_pos (inv_pos.mpr hB0) hc0

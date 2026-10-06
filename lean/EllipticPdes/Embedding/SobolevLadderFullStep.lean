@@ -114,7 +114,7 @@ theorem memLp_of_gradClosed_fullStep (hd : 0 < d) (c : EuclideanSpace ℝ (Fin d
       rw [← NNReal.coe_le_coe, NNReal.coe_ofNat]
       refine le_of_inv_le_inv_fullStep (by norm_num) hq0 ?_
       simpa using hqs
-    haveI : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
+    have : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
       ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
     have hqE : (q : ℝ≥0∞) ≤ 2 := by exact_mod_cast hq2'
     exact ((hmem i (by omega)).mono_measure
@@ -282,7 +282,7 @@ theorem exists_const_eLpNorm_le_of_gradClosed_fullStep (hd : 0 < d)
       ENNReal.coe_toNNReal (ENNReal.rpow_ne_top_of_nonneg he hVfin)
     have hmeas : AEStronglyMeasurable (F i) (volume.restrict (Metric.ball c r)) :=
       ((hmem i (by omega)).mono_measure
-        (Measure.restrict_mono (Metric.ball_subset_ball hrR.le) le_rfl)).1
+        (Measure.restrict_mono (Metric.ball_subset_ball hrR.le) le_rfl)).aestronglyMeasurable
     have h2r : eLpNorm (F i) 2 (volume.restrict (Metric.ball c r)) ≤ M := by
       refine le_trans (eLpNorm_mono_measure _
         (Measure.restrict_mono (Metric.ball_subset_ball hrR.le) le_rfl)) ?_

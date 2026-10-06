@@ -827,7 +827,7 @@ operator.
 ## Layout
 
 - `lean/` the formalisation. A standalone lake project pinned to Lean
-  `v4.31.0-rc1`.
+  `v4.35.0-rc3`.
 - `lean/AxiomAudit.lean` pins the axiom set of each headline result with
   `#print axioms` under `#guard_msgs`, built as a target of its own.
 - `lean/Challenge.lean` and `lean/Solution.lean` are the Palomar submission pair
@@ -886,7 +886,7 @@ reaching any of them fails the build.
 
 ## Toolchain
 
-Lean `v4.31.0-rc1` with Mathlib.
+Lean `v4.35.0-rc3` with Mathlib `v4.35.0-rc3`.
 
 ## Licence
 

@@ -45,14 +45,14 @@ theorem slice_bound_of_subset_euclBox {a b : Fin (n + 1) → ℝ} (hab : ∀ k, 
   have hbox : IsTestFn (euclBox a b) φ := h.mono hsub
   -- Both box integrals restrict to `Ω`: the integrands vanish on `euclBox \ Ω`.
   have hφeq : ∫ x in euclBox a b, (φ x) ^ 2 = ∫ x in Ω, (φ x) ^ 2 :=
-    setIntegral_eq_of_subset_of_forall_diff_eq_zero
+    setIntegral_eq_of_subset_of_forall_sdiff_eq_zero
       (isOpen_euclBox a b).measurableSet hsub
       (fun x hx => by
         rw [image_eq_zero_of_notMem_tsupport (fun hm => hx.2 (h.2.2 hm))]
         ring)
   have hdeq : ∫ x in euclBox a b, (partialD i φ x) ^ 2
       = ∫ x in Ω, (partialD i φ x) ^ 2 :=
-    setIntegral_eq_of_subset_of_forall_diff_eq_zero
+    setIntegral_eq_of_subset_of_forall_sdiff_eq_zero
       (isOpen_euclBox a b).measurableSet hsub
       (fun x hx => by
         rw [image_eq_zero_of_notMem_tsupport

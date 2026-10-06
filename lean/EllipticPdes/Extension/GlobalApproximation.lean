@@ -76,7 +76,7 @@ theorem exists_smooth_tendsto_of_hasWeakGradOn (hd : 0 < d) (hΩopen : IsOpen Ω
       ∀ k, Tendsto (fun n => eLpNorm (partialD k (v n) - g k) (ENNReal.ofReal p)
         (volume.restrict Ω)) atTop (𝓝 0) := by
   classical
-  haveI : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
+  have : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
   have hp1 : (1 : ℝ≥0∞) ≤ ENNReal.ofReal p := by
     rw [← ENNReal.ofReal_one]; exact ENNReal.ofReal_le_ofReal hp
   -- an open ball containing the closure of the domain, to put the extension's support in
@@ -92,11 +92,12 @@ theorem exists_smooth_tendsto_of_hasWeakGradOn (hd : 0 < d) (hΩopen : IsOpen Ω
     + ∑ k, eLpNorm (g k) (ENNReal.ofReal p) (volume.restrict Ω) with hNdef
   have hNfin : N < ⊤ := by
     rw [hNdef]
-    exact ENNReal.add_lt_top.mpr ⟨hmu.2, ENNReal.sum_lt_top.mpr fun k _ => (hmg k).2⟩
+    exact ENNReal.add_lt_top.mpr ⟨hmu.eLpNorm_lt_top,
+      ENNReal.sum_lt_top.mpr fun k _ => (hmg k).eLpNorm_lt_top⟩
   have hbnd : (K₀ : ℝ≥0∞) * N < ⊤ := ENNReal.mul_lt_top ENNReal.coe_lt_top hNfin
-  have hMU : MemLp U (ENNReal.ofReal p) volume := ⟨hUint.1, lt_of_le_of_lt hUb hbnd⟩
+  have hMU : MemLp U (ENNReal.ofReal p) volume := lt_of_le_of_lt hUb hbnd
   have hMG : ∀ k, MemLp (G k) (ENNReal.ofReal p) volume :=
-    fun k => ⟨(hGint k).1, lt_of_le_of_lt (hGb k) hbnd⟩
+    fun k => lt_of_le_of_lt (hGb k) hbnd
   -- the extension agrees with the class on the domain, and so does its gradient
   have hue : u =ᵐ[volume.restrict Ω] U :=
     (ae_restrict_iff' hΩopen.measurableSet).mpr

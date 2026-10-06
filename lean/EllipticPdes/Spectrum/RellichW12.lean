@@ -164,7 +164,7 @@ theorem transL2_toLp_sub_le_of_hasWeakGradOn_univ {F : EuclideanSpace ℝ (Fin d
         have hcs : HasCompactSupport (partialD k (v n)) :=
           (hvcs n).fderiv (𝕜 := ℝ) |>.comp_left (g := fun T : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ =>
             T (EuclideanSpace.single k 1)) (by simp)
-        exact (hc.pow 2).integrable_of_hasCompactSupport
+        exact (hc.fun_pow 2).integrable_of_hasCompactSupport
           (hcs.comp_left (g := fun y : ℝ => y ^ 2) (by norm_num))
       rw [hpt, integral_finsetSum Finset.univ (fun k _ => hint k)]
       refine le_trans (Finset.sum_le_sum fun k _ => ?_)
@@ -185,7 +185,7 @@ theorem transL2_toLp_sub_le_of_hasWeakGradOn_univ {F : EuclideanSpace ℝ (Fin d
         rwa [h2] at this
       have hnorm : ‖hmemk.toLp (partialD k (v n))‖ ≤ (eLpNorm (G k) 2 volume).toReal := by
         rw [Lp.norm_def]
-        refine ENNReal.toReal_mono (hG k).2.ne ?_
+        refine ENNReal.toReal_mono (hG k).eLpNorm_lt_top.ne ?_
         calc eLpNorm (hmemk.toLp (partialD k (v n))) 2 volume
             = eLpNorm (partialD k (v n)) 2 volume := eLpNorm_congr_ae hmemk.coeFn_toLp
           _ ≤ eLpNorm (G k) 2 volume := hle
@@ -216,7 +216,7 @@ IV.2.10). On a bounded open domain with `C¹` boundary, the embedding of the gra
 theorem embW12_isCompact (hd : 0 < d) (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBounded Ω)
     (hC1 : HasC1Boundary Ω) : IsCompactOperator (embW12 Ω) := by
   classical
-  haveI : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
+  have : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
   obtain ⟨R₀, hR₀⟩ := hΩb.subset_closedBall (0 : EuclideanSpace ℝ (Fin d))
   have hsub : closure Ω ⊆ ball (0 : EuclideanSpace ℝ (Fin d)) (R₀ + 1) :=
     (closure_minimal hR₀ isClosed_closedBall).trans (closedBall_subset_ball (by linarith))
@@ -260,9 +260,9 @@ theorem embW12_isCompact (hd : 0 < d) (hΩopen : IsOpen Ω) (hΩb : Bornology.Is
       + ∑ i, eLpNorm ((w U).2 i) 2 (volume.restrict Ω)) < ⊤ := fun U =>
     ENNReal.mul_lt_top ENNReal.coe_lt_top (lt_of_le_of_lt (hN U) ENNReal.ofReal_lt_top)
   have hMF : ∀ U : W12 Ω, MemLp (T (w U)).1 2 volume := fun U =>
-    ⟨(hw U).2.2.2.1.1, lt_of_le_of_lt (hw U).2.2.2.2.2.2.1 (hKfin U)⟩
+    lt_of_le_of_lt (hw U).2.2.2.2.2.2.1 (hKfin U)
   have hMG : ∀ U : W12 Ω, ∀ k, MemLp ((T (w U)).2 k) 2 volume := fun U k =>
-    ⟨((hw U).2.2.2.2.1 k).1, lt_of_le_of_lt ((hw U).2.2.2.2.2.2.2 k) (hKfin U)⟩
+    lt_of_le_of_lt ((hw U).2.2.2.2.2.2.2 k) (hKfin U)
   -- the real bounds on the extension and its gradient
   have hFb : ∀ U : W12 Ω, (eLpNorm (T (w U)).1 2 volume).toReal ≤ K * ((d + 1) * ‖U‖) := by
     intro U

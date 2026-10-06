@@ -83,7 +83,7 @@ private lemma partialD_shiftDiffQuotFn {n : ℕ} {φ : EuclideanSpace ℝ (Fin n
     rw [heq]; exact hsub.const_mul (h⁻¹ : ℝ)
   simp only [partialD]
   rw [hval.fderiv]
-  simp only [ContinuousLinearMap.smul_apply, ContinuousLinearMap.sub_apply, smul_eq_mul]
+  simp only [_root_.smul_apply, _root_.sub_apply, smul_eq_mul]
   ring
 
 /-! ### Discrete graph identity -/

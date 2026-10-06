@@ -176,7 +176,7 @@ def fullBilin (Ω : Set (EuclideanSpace ℝ (Fin d))) :
 /-- `fullBilin = B_A + lowerBilin`: principal part plus transport and zeroth-order. -/
 lemma fullBilin_apply (Ω : Set (EuclideanSpace ℝ (Fin d))) (U V : H01 Ω) :
     Op.fullBilin Ω U V = Op.toEllipticCoeff.bilin Ω U V + Op.lowerBilin Ω U V := by
-  simp only [FullEllipticOp.fullBilin, ContinuousLinearMap.add_apply]
+  simp only [FullEllipticOp.fullBilin, _root_.add_apply]
 
 /-! ### Gårding inequality -/
 
@@ -282,8 +282,8 @@ def shiftedBilin (Ω : Set (EuclideanSpace ℝ (Fin d))) (μ : ℝ) :
 /-- `shiftedBilin Ω μ U V = fullBilin Ω U V + μ · ⟪u₀, v₀⟫`. -/
 lemma shiftedBilin_apply (Ω : Set (EuclideanSpace ℝ (Fin d))) (μ : ℝ) (U V : H01 Ω) :
     Op.shiftedBilin Ω μ U V = Op.fullBilin Ω U V + μ * ⟪(U : H1amb Ω) 0, ((V : H1amb Ω) 0)⟫ := by
-  simp only [FullEllipticOp.shiftedBilin, ContinuousLinearMap.add_apply,
-    ContinuousLinearMap.smul_apply, zerothForm_apply, smul_eq_mul]
+  simp only [FullEllipticOp.shiftedBilin, _root_.add_apply,
+    _root_.smul_apply, zerothForm_apply, smul_eq_mul]
 
 /-- **Shifted coercivity** (Evans §6.2.2, Theorem 3). For any shift `μ ≥ γ`, the shifted
 form `B_μ` is

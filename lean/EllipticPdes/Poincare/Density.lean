@@ -53,7 +53,7 @@ theorem poincare_H01 {Ω : Set (EuclideanSpace ℝ (Fin d))} (C : ℝ)
       ⊆ {V | 0 ≤ Φ V} := by
     rw [span_testGraphSet]
     rintro U ⟨φ, h, rfl⟩
-    simp only [Set.mem_setOf_eq, hΦ, sub_nonneg]
+    simp only [Set.mem_ofPred_eq, hΦ, sub_nonneg]
     exact hbase h
   -- `H₀¹` is the closure of that span, so the closed estimate passes to all of it.
   have hsub : (H01 Ω : Set (H1amb Ω)) ⊆ {V | 0 ≤ Φ V} := by

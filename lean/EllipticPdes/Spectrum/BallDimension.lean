@@ -86,7 +86,7 @@ lemma isTestFn_ballBump {Ω : Set (EuclideanSpace ℝ (Fin d))}
 /-- A bump has positive `Lᵖ` seminorm, being continuous and one at its centre. -/
 lemma eLpNorm_ballBump_ne_zero (c : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr : 0 < r)
     {p : ℝ≥0∞} (hp0 : p ≠ 0) : eLpNorm (⇑(ballBump c hr)) p volume ≠ 0 := by
-  rw [Ne, eLpNorm_eq_zero_iff (ballBump c hr).continuous.aestronglyMeasurable hp0]
+  rw [Ne, eLpNorm_eq_zero_iff hp0]
   intro hae
   have hzero : (⇑(ballBump c hr) : EuclideanSpace ℝ (Fin d) → ℝ) = 0 :=
     ((ballBump c hr).continuous.ae_eq_iff_eq volume continuous_const).mp hae

@@ -60,7 +60,7 @@ theorem exists_embL2_ne_zero_ball (hd : 2 < d) : ∃ V : H01 B1, embL2 B1 V ≠ 
   have hq : ((2 : ℝ≥0) : ℝ)⁻¹ - (d : ℝ)⁻¹ ≤ ((2 : ℝ≥0) : ℝ)⁻¹ := by
     have : (0 : ℝ) < (d : ℝ)⁻¹ := by positivity
     linarith
-  haveI : Fact (1 ≤ (((2 : ℝ≥0)) : ℝ≥0∞)) := ⟨by
+  have : Fact (1 ≤ (((2 : ℝ≥0)) : ℝ≥0∞)) := ⟨by
     rw [show (((2 : ℝ≥0)) : ℝ≥0∞) = (2 : ℝ≥0∞) by norm_cast]
     norm_num⟩
   obtain ⟨V, hV⟩ :=

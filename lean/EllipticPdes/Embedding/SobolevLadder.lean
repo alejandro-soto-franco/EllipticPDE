@@ -114,7 +114,7 @@ theorem memLp_of_gradClosed (hd : 0 < d) (c : EuclideanSpace ℝ (Fin d))
       rw [← NNReal.coe_le_coe, NNReal.coe_ofNat]
       refine le_of_inv_le_inv_aux (by norm_num) hq0 ?_
       simpa using hqs
-    haveI : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
+    have : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
       ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
     have hqE : (q : ℝ≥0∞) ≤ 2 := by exact_mod_cast hq2'
     exact ((hmem i).mono_measure

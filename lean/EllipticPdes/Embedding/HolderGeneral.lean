@@ -68,7 +68,7 @@ theorem exists_holderOnWith_of_gradClosed_general (hd : 1 < d) (c : EuclideanSpa
     ∃ w : EuclideanSpace ℝ (Fin d) → ℝ,
       w =ᵐ[volume.restrict (Metric.ball c r)] F i ∧
         ∃ M : ℝ≥0, HolderOnWith M (morreyExponent d (P : ℝ)) w (Metric.ball c r) := by
-  haveI : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
+  have : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
   have hd0 : 0 < d := by omega
   have hp₀E : (1 : ℝ≥0∞) ≤ (p₀ : ℝ≥0∞) := by exact_mod_cast hp₀

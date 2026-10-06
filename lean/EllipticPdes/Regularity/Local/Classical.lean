@@ -73,7 +73,7 @@ theorem exists_ae_abs_le_of_memLp_top {U : Set (EuclideanSpace ℝ (Fin d))}
     ∃ B : ℝ, ∀ᵐ x ∂(volume.restrict U), |g x| ≤ B := by
   refine ⟨(eLpNorm g ⊤ (volume.restrict U)).toReal, ?_⟩
   filter_upwards [ae_le_eLpNormEssSup (f := g) (μ := volume.restrict U)] with x hx
-  rw [← eLpNorm_exponent_top] at hx
+  rw [← eLpNorm_exponent_top hg.aestronglyMeasurable] at hx
   have h := ENNReal.toReal_mono hg.eLpNorm_ne_top hx
   rwa [Real.enorm_eq_ofReal_abs, ENNReal.toReal_ofReal (abs_nonneg _)] at h
 
@@ -166,8 +166,8 @@ def C1OpOn.ofMemLp {U : Set (EuclideanSpace ℝ (Fin d))}
   c := c
   Bsup := ∑ i, max (Classical.choose (exists_ae_abs_le_of_memLp_top (hb i))) 0
   Csup := Classical.choose (exists_ae_abs_le_of_memLp_top hc)
-  b_aesm i := (hb i).1
-  c_aesm := hc.1
+  b_aesm i := (hb i).aestronglyMeasurable
+  c_aesm := hc.aestronglyMeasurable
   b_bdd i := by
     filter_upwards [Classical.choose_spec (exists_ae_abs_le_of_memLp_top (hb i))] with x hx
     exact (hx.trans (le_max_left _ 0)).trans (Finset.single_le_sum

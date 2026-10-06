@@ -77,7 +77,7 @@ theorem weak_maximum_principle (hd : 0 < d) (hΩopen : IsOpen Ω)
     ∀ᵐ x ∂(volume.restrict Ω), (U 0 x : ℝ) ≤ k := by
   classical
   obtain ⟨n, rfl⟩ : ∃ n, d = n + 1 := ⟨d - 1, by omega⟩
-  haveI : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
+  have : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
   obtain ⟨V, hV0⟩ := hbd
   -- the class and its weak gradient
   set u : EuclideanSpace ℝ (Fin (n + 1)) → ℝ := fun x => (U 0 x : ℝ) with hudef
@@ -99,7 +99,7 @@ theorem weak_maximum_principle (hd : 0 < d) (hΩopen : IsOpen Ω)
   have hhint : ∀ i, IntegrableOn (h i) Ω volume := fun i => by
     have : h i = {x | k < u x}.indicator (g i) := by
       funext x
-      simp only [hhdef, Set.indicator_apply, Set.mem_setOf_eq]
+      simp only [hhdef, Set.indicator_apply, Set.mem_ofPred_eq]
     rw [this]
     exact (hgint i).indicator hS
   -- `V` is the truncation together with its gradient

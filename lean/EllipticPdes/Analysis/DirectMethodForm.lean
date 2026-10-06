@@ -73,7 +73,7 @@ omit [CompleteSpace H] in
 lemma bilin_sub_self (hsymm : ∀ U V : H, B U V = B V U) (U V : H) :
     B (U - V) (U - V) = B U U - 2 * B U V + B V V := by
   have h1 : B (U - V) = B U - B V := by rw [map_sub]
-  simp only [h1, ContinuousLinearMap.sub_apply, map_sub]
+  simp only [h1, _root_.sub_apply, map_sub]
   rw [hsymm V U]
   ring
 

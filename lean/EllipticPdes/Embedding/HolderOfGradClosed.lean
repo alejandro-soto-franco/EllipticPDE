@@ -101,7 +101,7 @@ theorem contDiffOn_holder_of_gradClosed (hd : 0 < d) (c : EuclideanSpace ℝ (Fi
       (∀ i, dep i + 2 + d / 2 ≤ m → ∀ y ∈ Metric.ball c r,
         HasFDerivAt (v i) (gradCLM (fun k => v (nxt i k)) y) y) := by
   classical
-  haveI : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
+  have : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
   have hdR : (0 : ℝ) < (d : ℝ) := by exact_mod_cast hd
   have hp : (d : ℝ) < 2 * (d : ℝ) := by linarith
@@ -197,7 +197,7 @@ theorem exists_holderOnWith_of_gradClosed (hd : 0 < d) (c : EuclideanSpace ℝ (
     ∃ w : EuclideanSpace ℝ (Fin d) → ℝ,
       w =ᵐ[volume.restrict (Metric.ball c r)] F i ∧
         ∃ M : ℝ≥0, HolderOnWith M (morreyExponent d (P : ℝ)) w (Metric.ball c r) := by
-  haveI : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
+  have : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
   have hcast : ((P : ℝ≥0) : ℝ≥0∞) = ENNReal.ofReal (P : ℝ) := by
     rw [ENNReal.ofReal_coe_nnreal]
@@ -296,7 +296,7 @@ theorem exists_const_holderOnWith_of_gradClosed (hd : 0 < d) (c : EuclideanSpace
               (C * ∑ k, (eLpNorm (F (nxt i k)) (ENNReal.ofReal (P : ℝ))
                           (volume.restrict (Metric.ball c r))).toNNReal)
               (morreyExponent d (P : ℝ)) w (Metric.ball c r) := by
-  haveI : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
+  have : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
   have hcast : ((P : ℝ≥0) : ℝ≥0∞) = ENNReal.ofReal (P : ℝ) := by
     rw [ENNReal.ofReal_coe_nnreal]

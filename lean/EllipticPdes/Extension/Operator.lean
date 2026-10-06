@@ -252,28 +252,22 @@ theorem extension_bound {Ω : Set (EuclideanSpace ℝ (Fin d))}
       · rw [hcoe]
         calc eLpNorm (fun y => P.part none y * Ω.indicator u y) p volume
             ≤ ENNReal.ofReal C * eLpNorm (Ω.indicator u) p volume :=
-              eLpNorm_bounded_mul_le hC0 hCb
+              eLpNorm_bounded_mul_le hC0 hCb hpc.aestronglyMeasurable
           _ ≤ ENNReal.ofReal C * (eLpNorm u p (volume.restrict Ω)
               + ∑ j, eLpNorm (g j) p (volume.restrict Ω)) := by
               rw [hind]
               exact mul_le_mul_right le_self_add _
       · intro k
         rw [hcoe]
-        have hm1 : AEStronglyMeasurable
-            (fun y => P.part none y * Ω.indicator (g k) y) volume :=
-          (integrableOn_univ.mp (intMul (hig k) hcs hpc)).1
-        have hm2 : AEStronglyMeasurable
-            (fun y => partialD k (P.part none) y * Ω.indicator u y) volume :=
-          (integrableOn_univ.mp (intMul hiu (hpdcs k) (hpd k))).1
         calc eLpNorm (fun y => P.part none y * Ω.indicator (g k) y
                 + partialD k (P.part none) y * Ω.indicator u y) p volume
             ≤ eLpNorm (fun y => P.part none y * Ω.indicator (g k) y) p volume
               + eLpNorm (fun y => partialD k (P.part none) y * Ω.indicator u y) p volume :=
-              eLpNorm_add_le hm1 hm2 hp
+              eLpNorm_add_le hp
           _ ≤ ENNReal.ofReal C * eLpNorm (Ω.indicator (g k)) p volume
               + ENNReal.ofReal C * eLpNorm (Ω.indicator u) p volume :=
-              add_le_add (eLpNorm_bounded_mul_le hC0 hCb)
-                (eLpNorm_bounded_mul_le hC0 (hCd k))
+              add_le_add (eLpNorm_bounded_mul_le hC0 hCb hpc.aestronglyMeasurable)
+                (eLpNorm_bounded_mul_le hC0 (hCd k) (hpd k).aestronglyMeasurable)
           _ ≤ ENNReal.ofReal C * (eLpNorm u p (volume.restrict Ω)
               + ∑ j, eLpNorm (g j) p (volume.restrict Ω)) := by
               have hgk : eLpNorm (g k) p (volume.restrict Ω)
@@ -340,20 +334,14 @@ theorem extension_bound {Ω : Set (EuclideanSpace ℝ (Fin d))}
         · rw [Set.indicator_of_notMem hyb,
             image_eq_zero_of_notMem_tsupport (fun hc => hyb (hrsub hc)), zero_mul, zero_mul]
       · rw [hcoe, mul_assoc]
-        refine le_trans (eLpNorm_bounded_mul_le hC0 hCb) ?_
+        refine le_trans (eLpNorm_bounded_mul_le hC0 hCb hpc.aestronglyMeasurable) ?_
         refine le_trans (mul_le_mul_right ((hind Ux).trans hUxb) (ENNReal.ofReal C)) ?_
         exact mul_le_mul_left le_self_add _
       · intro k
         rw [hcoe, mul_assoc]
-        have hm1 : AEStronglyMeasurable (fun y => P.part (some x) y
-            * (ball (x : EuclideanSpace ℝ (Fin d)) r).indicator (Gx k) y) volume :=
-          (integrableOn_univ.mp (intMul (hig k) hcs hpc)).1
-        have hm2 : AEStronglyMeasurable (fun y => partialD k (P.part (some x)) y
-            * (ball (x : EuclideanSpace ℝ (Fin d)) r).indicator Ux y) volume :=
-          (integrableOn_univ.mp (intMul hiu (hpdcs k) (hpd k))).1
-        refine le_trans (eLpNorm_add_le hm1 hm2 hp) ?_
-        refine le_trans (add_le_add (eLpNorm_bounded_mul_le hC0 hCb)
-          (eLpNorm_bounded_mul_le hC0 (hCd k))) ?_
+        refine le_trans (eLpNorm_add_le hp) ?_
+        refine le_trans (add_le_add (eLpNorm_bounded_mul_le hC0 hCb hpc.aestronglyMeasurable)
+          (eLpNorm_bounded_mul_le hC0 (hCd k) (hpd k).aestronglyMeasurable)) ?_
         refine le_trans (add_le_add (mul_le_mul_right ((hind (Gx k)).trans (hGxb k)) _)
           (mul_le_mul_right ((hind Ux).trans hUxb) _)) ?_
         rw [add_mul]
@@ -380,17 +368,16 @@ theorem extension_bound {Ω : Set (EuclideanSpace ℝ (Fin d))}
     funext y
     rw [Finset.sum_apply]
   have hbound : ∀ w : Option {x // x ∈ P.centres} → EuclideanSpace ℝ (Fin d) → ℝ,
-      (∀ i, AEStronglyMeasurable (w i) volume) →
       (∀ i, eLpNorm (w i) p volume ≤ (Ki i : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
         + ∑ j, eLpNorm (g j) p (volume.restrict Ω))) →
       eLpNorm (fun y => ∑ i, w i y) p volume
         ≤ ((∑ i, Ki i : ℝ≥0) : ℝ≥0∞) * (eLpNorm u p (volume.restrict Ω)
           + ∑ j, eLpNorm (g j) p (volume.restrict Ω)) := by
-    intro w hwm hwb
+    intro w hwb
     rw [hsumfun w]
-    refine le_trans (eLpNorm_sum_le (fun i _ => hwm i) hp) ?_
+    refine le_trans (eLpNorm_sum_le hp) ?_
     refine le_trans (Finset.sum_le_sum fun i _ => hwb i) ?_
-    rw [← Finset.sum_mul, ENNReal.coe_finsetSum]
+    rw [← Finset.sum_mul, ENNReal.ofNNReal_finsetSum]
   simp only [extFun]
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
   · exact hasWeakGradOn_finsetSum Finset.univ (fun i _ => (hint i).integrableOn)
@@ -402,9 +389,9 @@ theorem extension_bound {Ω : Set (EuclideanSpace ℝ (Fin d))}
           Finset.sum_congr rfl fun i _ => hag i y hy
       _ = (∑ i, P.part i y) * u y := (Finset.sum_mul _ _ _).symm
       _ = u y := by rw [P.part_sum y (subset_closure hy), one_mul]
-  · exact hbound (fun i => extPiece P i u) (fun i => (hint i).1) hUb
+  · exact hbound (fun i => extPiece P i u) hUb
   · exact fun k => hbound (fun i => extPieceGrad P i u g k)
-      (fun i => (hgint i k).1) (fun i => hGb i k)
+      (fun i => hGb i k)
 
 /-- **Guo's third step with its constant**, with the partition and the extension quantified
 away. This is the form the support clause and the embedding consume. -/
@@ -553,18 +540,14 @@ theorem extension_subset_bound {Ω Ω' : Set (EuclideanSpace ℝ (Fin d))}
   · intro y hy
     rw [hχ1 y (subset_closure hy), one_mul, hag0 y hy]
   · rw [hcoe, mul_assoc]
-    refine le_trans (eLpNorm_bounded_mul_le hC0 hCb) ?_
+    refine le_trans (eLpNorm_bounded_mul_le hC0 hCb hχc.continuous.aestronglyMeasurable) ?_
     refine le_trans (mul_le_mul_right hUb0 (ENNReal.ofReal C)) ?_
     exact mul_le_mul_left le_self_add _
   · intro k
     rw [hcoe, mul_assoc]
-    have hm1 : AEStronglyMeasurable (fun y => χ y * G₀ k y) volume :=
-      (hprod _ _ (hgint0 k) hχcs hχc.continuous).1
-    have hm2 : AEStronglyMeasurable (fun y => partialD k χ y * U₀ y) volume :=
-      (hprod _ _ hint0 (hχpcs k) (hχpc k)).1
-    refine le_trans (eLpNorm_add_le hm1 hm2 hp) ?_
-    refine le_trans (add_le_add (eLpNorm_bounded_mul_le hC0 hCb)
-      (eLpNorm_bounded_mul_le hC0 (hCd k))) ?_
+    refine le_trans (eLpNorm_add_le hp) ?_
+    refine le_trans (add_le_add (eLpNorm_bounded_mul_le hC0 hCb hχc.continuous.aestronglyMeasurable)
+      (eLpNorm_bounded_mul_le hC0 (hCd k) (hχpc k).aestronglyMeasurable)) ?_
     refine le_trans (add_le_add (mul_le_mul_right (hGb0 k) _)
       (mul_le_mul_right hUb0 _)) ?_
     rw [add_mul]

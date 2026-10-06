@@ -80,7 +80,7 @@ theorem aboveGraph_eq_preimage {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → 
   ext y
   have hc : (shear j (fun z => -γ z) y) j = y j - γ y := by
     rw [shear_coord]; ring
-  simp only [aboveGraph, Set.mem_preimage, halfSpace, Set.mem_setOf_eq, hc]
+  simp only [aboveGraph, Set.mem_preimage, halfSpace, Set.mem_ofPred_eq, hc]
   constructor <;> intro h <;> linarith
 
 /-- **Pull-back of the region above the graph through the shear.** -/
@@ -88,7 +88,7 @@ theorem preimage_shear_aboveGraph {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) �
     (hind : IndepCoord j γ) : shear j γ ⁻¹' aboveGraph j γ = halfSpace j := by
   ext x
   have hγS : γ (shear j γ x) = γ x := hind x (γ x)
-  simp only [Set.mem_preimage, aboveGraph, halfSpace, Set.mem_setOf_eq, shear_coord, hγS]
+  simp only [Set.mem_preimage, aboveGraph, halfSpace, Set.mem_ofPred_eq, shear_coord, hγS]
   constructor <;> intro h <;> linarith
 
 /-! ### The extension -/
@@ -116,7 +116,7 @@ def chartExtGrad (j : Fin d) (γ : EuclideanSpace ℝ (Fin d) → ℝ)
 /-- The partial derivative of a negated chart. -/
 theorem partialD_neg {γ : EuclideanSpace ℝ (Fin d) → ℝ} (k : Fin d)
     (y : EuclideanSpace ℝ (Fin d)) : partialD k (fun z => -γ z) y = -partialD k γ y := by
-  simp only [partialD, fderiv_fun_neg, ContinuousLinearMap.neg_apply]
+  simp only [partialD, fderiv_fun_neg, _root_.neg_apply]
 
 /-- **Weak gradient of the extension across a `C¹` boundary chart**, on the whole space. The
 class travels through the shear onto the half space, the reflection extends it across the
@@ -184,7 +184,7 @@ theorem chartExt_eq_of_mem {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ}
     exact hy
   have h0 : (0 : ℝ) ≤ (shear j (fun z => -γ z) y) j := le_of_lt hmem
   simp only [chartExt, evenExt]
-  rw [if_pos h0, shear_neg_shear hind y]
+  rw [ite_eq_left h0, shear_neg_shear hind y]
 
 /-- **Bound on the extension in every `Lᵖ` seminorm.** Both shears preserve measure and the
 reflection doubles, so the extension over the whole space is bounded by twice the seminorm over
@@ -245,15 +245,29 @@ theorem shearGrad_normal {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ}
 /-- **Scaling of an `Lᵖ` seminorm by a bounded factor.** -/
 theorem eLpNorm_mul_bounded_le {μ : Measure (EuclideanSpace ℝ (Fin d))}
     {f h : EuclideanSpace ℝ (Fin d) → ℝ} {C : ℝ} (hC0 : 0 ≤ C) (hC : ∀ x, ‖h x‖ ≤ C)
+    (hh : AEStronglyMeasurable h μ)
     {p : ℝ≥0∞} : eLpNorm (fun x => f x * h x) p μ ≤ ENNReal.ofReal C * eLpNorm f p μ := by
   have hnorm : ‖C‖ₑ = ENNReal.ofReal C := by
     rw [← ofReal_norm, Real.norm_eq_abs, abs_of_nonneg hC0]
   have h1 : eLpNorm (fun x => f x * h x) p μ ≤ eLpNorm (C • f) p μ := by
-    refine eLpNorm_mono_ae (Filter.Eventually.of_forall fun x => ?_)
-    have hs : ‖(C • f) x‖ = C * ‖f x‖ := by
-      simp [Pi.smul_apply, smul_eq_mul, Real.norm_eq_abs, abs_of_nonneg hC0]
-    rw [norm_mul, hs, mul_comm]
-    exact mul_le_mul_of_nonneg_right (hC x) (norm_nonneg _)
+    have hpt : ∀ x, ‖f x * h x‖ ≤ ‖(C • f) x‖ := fun x => by
+      have hs : ‖(C • f) x‖ = C * ‖f x‖ := by
+        simp [Pi.smul_apply, smul_eq_mul, Real.norm_eq_abs, abs_of_nonneg hC0]
+      rw [norm_mul, hs, mul_comm]
+      exact mul_le_mul_of_nonneg_right (hC x) (norm_nonneg _)
+    by_cases hf : AEStronglyMeasurable f μ
+    · exact eLpNorm_mono_ae (hf.mul hh) (Filter.Eventually.of_forall hpt)
+    · rcases hC0.eq_or_lt with hC0' | hCpos
+      · have hzero : (fun x => f x * h x) = 0 := by
+          funext x
+          have hhx : h x = 0 := norm_le_zero_iff.mp (hC x |>.trans hC0'.symm.le)
+          simp [hhx]
+        rw [hzero, eLpNorm_zero]
+        exact zero_le
+      · have hnm : ¬ AEStronglyMeasurable (C • f) μ := fun hm => hf (by
+          simpa [smul_smul, hCpos.ne'] using hm.const_smul C⁻¹)
+        rw [eLpNorm_of_not_aestronglyMeasurable hnm]
+        exact le_top
   refine h1.trans (le_of_eq ?_)
   rw [eLpNorm_const_smul, hnorm]
 
@@ -271,8 +285,6 @@ theorem eLpNorm_shearGrad_le {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → �
   have hres := measurePreserving_shear_halfSpace hγd hind
   have hckc : Continuous (partialD k γ) :=
     (hγ.continuous_fderiv one_ne_zero).clm_apply continuous_const
-  have hcomp : ∀ i, AEStronglyMeasurable (fun x => g i (shear j γ x))
-      (volume.restrict (halfSpace j)) := fun i => (hgm i).comp_measurePreserving hres
   have heq : ∀ i, eLpNorm (fun x => g i (shear j γ x)) p (volume.restrict (halfSpace j))
       = eLpNorm (g i) p (volume.restrict (aboveGraph j γ)) := fun i =>
     eLpNorm_comp_measurePreserving (hgm i) hres
@@ -280,11 +292,11 @@ theorem eLpNorm_shearGrad_le {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → �
       ≤ eLpNorm (fun x => g k (shear j γ x)) p (volume.restrict (halfSpace j))
         + eLpNorm (fun x => g j (shear j γ x) * partialD k γ x) p
             (volume.restrict (halfSpace j)) :=
-        eLpNorm_add_le (hcomp k) ((hcomp j).mul hckc.aestronglyMeasurable) hp
+        eLpNorm_add_le hp
     _ ≤ eLpNorm (g k) p (volume.restrict (aboveGraph j γ))
         + ENNReal.ofReal M * eLpNorm (g j) p (volume.restrict (aboveGraph j γ)) := by
         rw [heq k, ← heq j]
-        exact add_le_add le_rfl (eLpNorm_mul_bounded_le hM0 (hγb k))
+        exact add_le_add le_rfl (eLpNorm_mul_bounded_le hM0 (hγb k) hckc.aestronglyMeasurable)
 
 /-- **Bound on the gradient of the extension across a `C¹` boundary chart.** Each of the three
 maps plays its part: the shear contributes the chart's bound against the normal component, the
@@ -322,9 +334,6 @@ theorem eLpNorm_chartExtGrad_le {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) →
   have hback : ∀ i, eLpNorm (evenExtGrad j (shearGrad j γ g) i ∘ shear j fun z => -γ z)
       p volume = eLpNorm (evenExtGrad j (shearGrad j γ g) i) p volume := fun i =>
     eLpNorm_comp_measurePreserving (hHm i) hmpT
-  have hTm : ∀ i, AEStronglyMeasurable
-      (evenExtGrad j (shearGrad j γ g) i ∘ shear j fun z => -γ z) volume := fun i =>
-    (hHm i).comp_measurePreserving hmpT
   -- the normal component travels untouched, so its bound has no chart factor
   have hjbound : eLpNorm (shearGrad j γ g j) p (volume.restrict (halfSpace j))
       = eLpNorm (g j) p (volume.restrict (aboveGraph j γ)) := by
@@ -341,14 +350,14 @@ theorem eLpNorm_chartExtGrad_le {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) →
       ≤ eLpNorm (evenExtGrad j (shearGrad j γ g) k ∘ shear j fun z => -γ z) p volume
         + eLpNorm (fun y => (evenExtGrad j (shearGrad j γ g) j ∘ shear j fun z => -γ z) y
             * partialD k γ y) p volume :=
-        eLpNorm_sub_le (hTm k) ((hTm j).mul hckc.aestronglyMeasurable) hp
+        eLpNorm_sub_le hp
     _ ≤ 2 * (eLpNorm (g k) p (volume.restrict (aboveGraph j γ))
           + ENNReal.ofReal M * eLpNorm (g j) p (volume.restrict (aboveGraph j γ)))
         + ENNReal.ofReal M * (2 * eLpNorm (g j) p (volume.restrict (aboveGraph j γ))) := by
         refine add_le_add ?_ ?_
         · refine ((hback k).le.trans (hH k)).trans ?_
           exact mul_le_mul_right (eLpNorm_shearGrad_le hγ hind hM0 hγb hp hgm k) 2
-        · refine (eLpNorm_mul_bounded_le hM0 (hγb k)).trans ?_
+        · refine (eLpNorm_mul_bounded_le hM0 (hγb k) hckc.aestronglyMeasurable).trans ?_
           refine mul_le_mul_right (((hback j).le.trans (hH j)).trans ?_) _
           exact le_of_eq (by rw [hjbound])
     _ = 2 * eLpNorm (g k) p (volume.restrict (aboveGraph j γ))

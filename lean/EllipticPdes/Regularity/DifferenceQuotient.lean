@@ -50,7 +50,7 @@ theorem coeFn_diffQuot (k : Fin d) (h : ℝ) (u : EucL2 d) :
   have htrans : (transL2 (hshift k h) u : EuclideanSpace ℝ (Fin d) → ℝ)
       =ᵐ[volume] fun x => u (x + hshift k h) := coeFn_transL2 (hshift k h) u
   have hval : diffQuot k h u = h⁻¹ • (transL2 (hshift k h) u - u) := by
-    simp [diffQuot, ContinuousLinearMap.smul_apply, ContinuousLinearMap.sub_apply,
+    simp [diffQuot,
       LinearIsometry.coe_toContinuousLinearMap]
   rw [hval]
   filter_upwards [Lp.coeFn_smul h⁻¹ (transL2 (hshift k h) u - u),
@@ -93,10 +93,10 @@ estimate (Evans, *Partial Differential Equations* (2nd ed.), §5.8.2, proof of T
 theorem diffQuot_inner_adjoint (k : Fin d) (h : ℝ) (u w : EucL2 d) :
     ⟪diffQuot k h u, w⟫ = -⟪u, diffQuot k (-h) w⟫ := by
   have hu : diffQuot k h u = h⁻¹ • (transL2 (hshift k h) u - u) := by
-    simp [diffQuot, ContinuousLinearMap.smul_apply, ContinuousLinearMap.sub_apply,
+    simp [diffQuot,
       LinearIsometry.coe_toContinuousLinearMap]
   have hw : diffQuot k (-h) w = (-h)⁻¹ • (transL2 (hshift k (-h)) w - w) := by
-    simp [diffQuot, ContinuousLinearMap.smul_apply, ContinuousLinearMap.sub_apply,
+    simp [diffQuot,
       LinearIsometry.coe_toContinuousLinearMap]
   rw [hu, hw, real_inner_smul_left, real_inner_smul_right,
     inner_sub_left, inner_sub_right, transL2_inner_adjoint (hshift k h) u w,

@@ -143,13 +143,13 @@ theorem partialD_slabCut {j : Fin d} {ε : ℝ} (_hε : 0 < ε) (k : Fin d)
   have hval : (EuclideanSpace.proj j : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ)
       (EuclideanSpace.single k (1 : ℝ)) = if j = k then (1 : ℝ) else 0 := by
     simp [PiLp.single_apply]
-  simp only [ContinuousLinearMap.smul_apply, smul_eq_mul, hval]
+  simp only [_root_.smul_apply, smul_eq_mul, hval]
   ring
 
 /-- **Constancy of the cutoff along the interface.** -/
 theorem partialD_slabCut_of_ne {j : Fin d} {ε : ℝ} (hε : 0 < ε) {k : Fin d} (hk : k ≠ j)
     (x : EuclideanSpace ℝ (Fin d)) : partialD k (slabCut j ε) x = 0 := by
-  rw [partialD_slabCut hε k x, if_neg (Ne.symm hk)]
+  rw [partialD_slabCut hε k x, ite_eq_right (Ne.symm hk)]
   simp
 
 /-- **Bound `C/ε` on the remaining partial derivative.** -/
@@ -182,7 +182,7 @@ theorem tsupport_mul_slabCut_subset {j : Fin d} {ε : ℝ} (hε : 0 < ε)
       ⊆ {x : EuclideanSpace ℝ (Fin d) | ε ≤ x j} := by
     intro x hx
     by_contra hcon
-    simp only [Set.mem_setOf_eq, not_le] at hcon
+    simp only [Set.mem_ofPred_eq, not_le] at hcon
     refine hx ?_
     change slabCut j ε x * ψ x = 0
     rw [slabCut_eq_zero hε hcon.le, zero_mul]

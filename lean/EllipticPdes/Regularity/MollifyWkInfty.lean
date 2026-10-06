@@ -151,7 +151,7 @@ theorem partialD_reflect {ρ : EuclideanSpace ℝ (Fin d) → ℝ} (hρcd : Cont
     (hρdiff (x - t)).hasFDerivAt.comp t ((hasFDerivAt_id t).const_sub x)
   simp only [partialD]
   rw [hfd.fderiv]
-  simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.neg_apply,
+  simp only [ContinuousLinearMap.comp_apply, _root_.neg_apply,
     ContinuousLinearMap.id_apply, map_neg]
 
 /-- **Derivative of a mollified `W^{1,∞}` weight is the mollification of its weak

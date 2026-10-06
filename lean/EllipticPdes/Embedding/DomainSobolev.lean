@@ -86,7 +86,7 @@ theorem exists_eLpNorm_sobolevConj_le_domain (hd : 0 < d)
     rw [mem_ball, hrdef]
     have hle : R₀ ≤ |R₀| := le_abs_self R₀
     linarith
-  haveI : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
+  have : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
   obtain ⟨K₀, hK₀⟩ := exists_extension_bound hd hΩopen hΩb hC1 (p := (p : ℝ≥0∞)) hp1
   obtain ⟨K₁, hK₁⟩ :=
     exists_eLpNorm_sobolevConj_le hd (0 : EuclideanSpace ℝ (Fin d)) hp hpp' hr hrR
@@ -101,14 +101,15 @@ theorem exists_eLpNorm_sobolevConj_le_domain (hd : 0 < d)
     + ∑ k, eLpNorm (g k) (p : ℝ≥0∞) (volume.restrict Ω) with hNdef
   have hNfin : N < ⊤ := by
     rw [hNdef]
-    exact ENNReal.add_lt_top.mpr ⟨hmu.2, ENNReal.sum_lt_top.mpr fun k _ => (hmg k).2⟩
+    exact ENNReal.add_lt_top.mpr ⟨hmu.eLpNorm_lt_top,
+      ENNReal.sum_lt_top.mpr fun k _ => (hmg k).eLpNorm_lt_top⟩
   -- the class, extended to the whole space with its bound
   obtain ⟨U, G, hwgU, hUint, hGint, hag, hUb, hGb⟩ :=
     hK₀ u g (hmu.integrable hp1) (fun k => (hmg k).integrable hp1) hwg
   have hbnd : (K₀ : ℝ≥0∞) * N < ⊤ := ENNReal.mul_lt_top ENNReal.coe_lt_top hNfin
-  have hMU : MemLp U (p : ℝ≥0∞) volume := ⟨hUint.1, lt_of_le_of_lt hUb hbnd⟩
+  have hMU : MemLp U (p : ℝ≥0∞) volume := lt_of_le_of_lt hUb hbnd
   have hMG : ∀ k, MemLp (G k) (p : ℝ≥0∞) volume :=
-    fun k => ⟨(hGint k).1, lt_of_le_of_lt (hGb k) hbnd⟩
+    fun k => lt_of_le_of_lt (hGb k) hbnd
   obtain ⟨-, hbdU⟩ := hK₁ U G (hMU.restrict _) (fun k => (hMG k).restrict _)
     (hwgU.mono (Set.subset_univ _))
   have hMemU : MemLp U (p' : ℝ≥0∞) (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) r)) :=
@@ -163,7 +164,7 @@ theorem exists_eLpNorm_sobolevConj_le_domain_of_le (hd : 0 < d)
         eLpNorm u p' (volume.restrict Ω) ≤ (K : ℝ≥0∞) * (eLpNorm u q (volume.restrict Ω)
           + ∑ k, eLpNorm (g k) q (volume.restrict Ω)) := by
   classical
-  haveI : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
+  have : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
   have hp1 : (1 : ℝ) ≤ (p : ℝ) := by exact_mod_cast hp
   have hp0 : (0 : ℝ) < (p : ℝ) := by linarith
   have hpqR : (p : ℝ) ≤ (q : ℝ) := by exact_mod_cast hpq
@@ -191,8 +192,8 @@ theorem exists_eLpNorm_sobolevConj_le_domain_of_le (hd : 0 < d)
           + ∑ k, eLpNorm (g k) (p : ℝ≥0∞) (volume.restrict Ω)) := hbd
     _ ≤ (K₀ : ℝ≥0∞) * (eLpNorm u (q : ℝ≥0∞) (volume.restrict Ω) * A
           + ∑ k, eLpNorm (g k) (q : ℝ≥0∞) (volume.restrict Ω) * A) :=
-        mul_le_mul' le_rfl (add_le_add (hcmp u hu.1)
-          (Finset.sum_le_sum fun k _ => hcmp (g k) (hg k).1))
+        mul_le_mul' le_rfl (add_le_add (hcmp u hu.aestronglyMeasurable)
+          (Finset.sum_le_sum fun k _ => hcmp (g k) (hg k).aestronglyMeasurable))
     _ = ((K₀ * A.toNNReal : ℝ≥0) : ℝ≥0∞) * (eLpNorm u (q : ℝ≥0∞) (volume.restrict Ω)
           + ∑ k, eLpNorm (g k) (q : ℝ≥0∞) (volume.restrict Ω)) := by
         rw [ENNReal.coe_mul, ENNReal.coe_toNNReal hAne, ← Finset.sum_mul, ← add_mul]

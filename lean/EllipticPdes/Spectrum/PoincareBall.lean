@@ -119,7 +119,7 @@ theorem eLpNorm_comp_affineBall (x : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr :
     eLpNorm (f ∘ affineBall x r) 2 (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) 1))
       = ballScale d r ^ (1 / (2 : ℝ≥0∞)).toReal * eLpNorm f 2 (volume.restrict (ball x r)) := by
   rw [eLpNorm_comp_measurePreserving (hf.smul_measure _) (measurePreserving_affineBall x hr),
-    eLpNorm_smul_measure_of_ne_top (by norm_num), smul_eq_mul]
+    eLpNorm_smul_measure_of_ne_top (by norm_num) _ _ hf, smul_eq_mul]
 
 /-- The mean over the ball is the mean over the unit ball of the transported function. -/
 theorem average_comp_affineBall (x : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr : 0 < r)
@@ -265,7 +265,7 @@ theorem poincare_ball (hd : 0 < d) :
       rw [h1, Pi.sub_apply, h2, h3]
       rfl
     have hasm : AEStronglyMeasurable (fun y => u y - m) (volume.restrict (ball x r)) :=
-      hu.1.sub aestronglyMeasurable_const
+      hu.aestronglyMeasurable.sub aestronglyMeasurable_const
     rw [eLpNorm_congr_ae hae, eLpNorm_comp_affineBall x hr hasm, ENNReal.toReal_mul]
   -- the right side
   have hR : ∀ k : Fin d, ‖((⟨V, hVW⟩ : W12 B₁) : H1amb B₁) k.succ‖
@@ -275,9 +275,9 @@ theorem poincare_ball (hd : 0 < d) :
     rw [hVk, Lp.norm_toLp]
     have : (fun y => r * g k (affineBall x r y)) = r • (g k ∘ affineBall x r) := by
       funext y; simp [Pi.smul_apply, smul_eq_mul]
-    rw [this, eLpNorm_const_smul, eLpNorm_comp_affineBall x hr (hg k).1, ENNReal.toReal_mul,
-      ENNReal.toReal_mul, Real.enorm_eq_ofReal_abs, ENNReal.toReal_ofReal (abs_nonneg _),
-      abs_of_pos hr]
+    rw [this, eLpNorm_const_smul, eLpNorm_comp_affineBall x hr (hg k).aestronglyMeasurable,
+      ENNReal.toReal_mul, ENNReal.toReal_mul, Real.enorm_eq_ofReal_abs,
+      ENNReal.toReal_ofReal (abs_nonneg _), abs_of_pos hr]
     ring
   rw [hL] at hineq
   simp only [hR] at hineq

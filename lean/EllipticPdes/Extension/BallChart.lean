@@ -60,12 +60,12 @@ theorem norm_sq_eq_tangential_add_sq (j : Fin d) (y : EuclideanSpace ℝ (Fin d)
   rw [EuclideanSpace.norm_sq_eq, EuclideanSpace.norm_sq_eq,
     Fintype.sum_eq_add_sum_compl j (fun i => ‖y i‖ ^ 2),
     Fintype.sum_eq_add_sum_compl j (fun i => ‖tangential j y i‖ ^ 2),
-    tangential_coord, if_pos rfl, norm_zero, zero_pow two_ne_zero, zero_add, Real.norm_eq_abs,
+    tangential_coord, ite_eq_left rfl, norm_zero, zero_pow two_ne_zero, zero_add, Real.norm_eq_abs,
     sq_abs, add_comm]
   congr 1
   refine Finset.sum_congr rfl fun i hi => ?_
   have hij : i ≠ j := by simpa using hi
-  rw [tangential_coord, if_neg hij]
+  rw [tangential_coord, ite_eq_right hij]
 
 /-- The south pole has no tangential part. -/
 theorem tangential_neg_single (j : Fin d) :
@@ -166,7 +166,7 @@ theorem ballChart_fits (hd : 0 < d) {x : EuclideanSpace ℝ (Fin d)} (hx : ‖x�
     = aboveGraph j (ballGraph j) ∩ ball p (1 / 2)
   rw [LinearIsometryEquiv.image_ball, LinearIsometryEquiv.map_zero]
   ext y
-  simp only [mem_inter_iff, aboveGraph, mem_setOf_eq, and_congr_left_iff]
+  simp only [mem_inter_iff, aboveGraph, mem_ofPred_eq, and_congr_left_iff]
   intro hy
   rw [mem_ball, dist_eq_norm] at hy
   -- the tangential part and the coordinate on the small ball

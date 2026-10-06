@@ -134,7 +134,7 @@ theorem quad_aT (x : EuclideanSpace ℝ (Fin d)) (ξ : Fin d → ℝ) :
         + χ x * (∑ i, ∑ j, P.a x i j * ξ i * ξ j - P.lam * ∑ i, ξ i ^ 2) := by
   simp only [aT, gA, δ, add_mul, mul_sub, sub_mul, Finset.sum_add_distrib,
     Finset.sum_sub_distrib, Finset.mul_sum, mul_ite, mul_one, mul_zero, ite_mul, zero_mul,
-    Finset.sum_ite_eq, Finset.mem_univ, if_true]
+    Finset.sum_ite_eq, Finset.mem_univ, ite_true]
   ring_nf
 
 omit hU in

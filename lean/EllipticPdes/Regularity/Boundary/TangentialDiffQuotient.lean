@@ -130,7 +130,7 @@ theorem cutoffMulOn_apply_succ (hη : IsTestFn Ω' η) (U : H1amb Ω) (i : Fin n
   simp only [cutoffMulOn, ContinuousLinearMap.comp_apply,
     ContinuousLinearEquiv.coe_coe, PiLp.coe_symm_continuousLinearEquiv,
     PiLp.coe_continuousLinearEquiv, PiLp.toLp_apply, ContinuousLinearMap.pi_apply,
-    Fin.cons_succ, ContinuousLinearMap.add_apply, ContinuousLinearMap.proj_apply]
+    Fin.cons_succ, _root_.add_apply, ContinuousLinearMap.proj_apply]
 
 end Multipliers
 

@@ -101,7 +101,7 @@ theorem eigenvalueOn_mul_norm_sq_le (hco : IsCoercive B) (K : Submodule ℝ (H01
     have hmemK : (‖embL2 Ω U‖⁻¹ • U) ∈ (K : Set (H01 Ω)) := K.smul_mem _ hUK
     have hval : B (‖embL2 Ω U‖⁻¹ • U) (‖embL2 Ω U‖⁻¹ • U)
         = ‖embL2 Ω U‖⁻¹ * (‖embL2 Ω U‖⁻¹ * B U U) := by
-      simp only [map_smul, ContinuousLinearMap.smul_apply, smul_eq_mul]
+      simp only [map_smul, _root_.smul_apply, smul_eq_mul]
     have hle := eigenvalueOn_le hco hsphere hmemK
     rw [hval] at hle
     have hs2 : (0 : ℝ) < ‖embL2 Ω U‖ ^ 2 := by positivity
@@ -126,7 +126,7 @@ theorem rayleigh_euler_lagrange_on (hco : IsCoercive B) (hsymm : ∀ U V : H01 �
     have hBexp : B (U + t • V) (U + t • V) = B U U + 2 * t * B U V + t ^ 2 * B V V := by
       have h1 : B (U + t • V) = B U + t • B V := by rw [map_add, map_smul]
       rw [h1]
-      simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.smul_apply, map_add, map_smul,
+      simp only [_root_.add_apply, _root_.smul_apply, map_add, map_smul,
         smul_eq_mul]
       rw [hsymm V U]
       ring
@@ -162,7 +162,7 @@ theorem euler_lagrange_of_orthogonal_eigen (hco : IsCoercive B)
         * ⟪embL2 Ω U, embL2 Ω V⟫ := by
   set K : Submodule ℝ (H01 Ω) := orthSubmodule w with hKdef
   set lamK := eigenvalueOn B (K : Set (H01 Ω)) with hlamK
-  set c : Fin n → ℝ := fun i => ⟪embL2 Ω V, embL2 Ω (w i)⟫ with hcdef
+  obtain ⟨c, hcdef⟩ : ∃ c : Fin n → ℝ, c = fun i => ⟪embL2 Ω V, embL2 Ω (w i)⟫ := ⟨_, rfl⟩
   set V' : H01 Ω := V - ∑ i, c i • w i with hV'def
   -- The `L²` class of the correction.
   have hsum : embL2 Ω (∑ i, c i • w i) = ∑ i, c i • embL2 Ω (w i) := by

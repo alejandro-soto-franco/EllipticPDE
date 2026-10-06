@@ -72,7 +72,7 @@ lemma partialD_add {φ ψ : EuclideanSpace ℝ (Fin d) → ℝ}
     partialD i (φ + ψ) = partialD i φ + partialD i ψ := by
   funext x
   simp only [partialD, Pi.add_apply]
-  rw [fderiv_add (hφ x) (hψ x), ContinuousLinearMap.add_apply]
+  rw [fderiv_add (hφ x) (hψ x), _root_.add_apply]
 
 /-- `partialD` commutes with scalar multiplication on differentiable functions. -/
 lemma partialD_const_smul {φ : EuclideanSpace ℝ (Fin d) → ℝ}
@@ -80,7 +80,7 @@ lemma partialD_const_smul {φ : EuclideanSpace ℝ (Fin d) → ℝ}
     partialD i (c • φ) = c • partialD i φ := by
   funext x
   simp only [partialD, Pi.smul_apply]
-  rw [fderiv_const_smul (hφ x) c, ContinuousLinearMap.smul_apply]
+  rw [fderiv_const_smul (hφ x) c, _root_.smul_apply]
 
 /-- The classical partial of the zero function is zero. -/
 lemma partialD_zero (i : Fin d) :

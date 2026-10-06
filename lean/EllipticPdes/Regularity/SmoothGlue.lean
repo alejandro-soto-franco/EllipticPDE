@@ -104,7 +104,7 @@ theorem exists_contDiffOn_of_locally_ae {U : Set (EuclideanSpace ℝ (Fin d))} (
         ((hvc y hy).continuousOn.mono Set.inter_subset_right)
         ((hmono x hxU Set.inter_subset_left).trans
           (hmono y hy Set.inter_subset_right).symm)
-    simp only [dif_pos hxU]
+    simp only [dite_eq_left hxU]
     exact hagree ⟨hxB x hxU, hxB'⟩
   refine ⟨fun x => if hx : x ∈ U then v x hx x else 0, ?_, ?_⟩
   · -- Almost everywhere on `U`, through a countable subcover.

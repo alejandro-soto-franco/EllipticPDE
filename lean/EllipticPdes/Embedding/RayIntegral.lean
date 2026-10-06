@@ -61,7 +61,7 @@ of positive finite measure on which `φ` is integrable, the oscillation of the `
 about the value `φ x` equals the average over `W` of the ray integral of the directional
 derivative from `x` towards the running point `y`. This is the mechanical half of the potential
 estimate over a general averaging domain. -/
-theorem oscillation_eq_average_ray_set [Nontrivial (EuclideanSpace ℝ (Fin d))]
+theorem oscillation_eq_average_ray_set
     {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφ : ContDiff ℝ (⊤ : ℕ∞) φ)
     (x : EuclideanSpace ℝ (Fin d)) {W : Set (EuclideanSpace ℝ (Fin d))}
     (hWmeas : MeasurableSet W) (hpos : volume W ≠ 0) (htop : volume W ≠ ⊤)
@@ -89,7 +89,7 @@ theorem oscillation_eq_average_ray_set [Nontrivial (EuclideanSpace ℝ (Fin d))]
 /-- **Ray-FTC average identity (Morrey rung 4a).** The ball specialisation of
 `oscillation_eq_average_ray_set`: for smooth `φ`, the oscillation of the ball-average of `φ`
 about `φ x` equals the average over the ball of the gradient line integral from `x`. -/
-theorem oscillation_eq_average_ray [Nontrivial (EuclideanSpace ℝ (Fin d))]
+theorem oscillation_eq_average_ray
     {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφ : ContDiff ℝ (⊤ : ℕ∞) φ)
     (c x : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr : 0 < r) :
     (⨍ y in ball c r, φ y) - φ x
@@ -151,8 +151,9 @@ private theorem map_affine_dilation (x : EuclideanSpace ℝ (Fin d)) {t : ℝ} (
       funext y; rw [sub_eq_add_neg]
     rw [hrw, map_add_right_eq_self]
   rw [hmapC, Measure.map_addHaar_smul volume ht.ne', Measure.map_smul, map_add_left_eq_self]
-  congr 1
-  rw [finrank_euclideanSpace_fin, abs_of_nonneg (by positivity)]
+  · congr 1
+    rw [finrank_euclideanSpace_fin, abs_of_nonneg (by positivity)]
+  · exact hA.aemeasurable
 
 /-- **Affine change of variables (the crux).** For `0 < t`, the singular line integrand over
 the ball transforms, under `z = x + t • (y - x)`, into the same integrand over the contracted
@@ -178,12 +179,12 @@ private theorem potential_inner_cov {φ : EuclideanSpace ℝ (Fin d) → ℝ}
       rw [hrw]; exact measurableEmbedding_addRight (-x)
     exact (h1.comp h2).comp h3
   have hhmeas : Measurable h := by
-    refine Measurable.mul ?_ ?_
+    refine Measurable.fun_mul ?_ ?_
     · exact ((hφ.continuous_fderiv (by simp)).enorm).measurable
     · exact ((continuous_id.sub continuous_const).enorm).measurable
   have hGmeas : Measurable
       (fun y : EuclideanSpace ℝ (Fin d) => ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ) := by
-    refine Measurable.mul ?_ ?_
+    refine Measurable.fun_mul ?_ ?_
     · exact (((hφ.continuous_fderiv (by simp)).comp (by fun_prop)).enorm).measurable
     · exact ((continuous_id.sub continuous_const).enorm).measurable
   have huimg : MeasurableSet (e '' s) := hemb.measurableSet_image.mpr hs
@@ -258,7 +259,7 @@ private theorem inner_t_bound (hd : 0 < d) {D w : ℝ} (hD : 0 < D) (hw : 0 < w)
   have ha : 0 < a := by rw [ha_def]; positivity
   have hset : {p : ℝ | w < D * p} = Ioi a := by
     ext p
-    rw [Set.mem_setOf_eq, Set.mem_Ioi, ha_def, div_lt_iff₀ hD, mul_comm p D]
+    rw [Set.mem_ofPred_eq, Set.mem_Ioi, ha_def, div_lt_iff₀ hD, mul_comm p D]
   rw [hset, ← lintegral_indicator measurableSet_Ioc]
   simp only [Set.indicator_indicator]
   rw [show Ioc (0 : ℝ) 1 ∩ Ioi a = Ioc a 1 by rw [Set.Ioc_inter_Ioi, max_eq_right ha.le],
@@ -306,7 +307,7 @@ theorem kernel_bound_convex {φ : EuclideanSpace ℝ (Fin d) → ℝ}
         ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂volume ∂volume from by
     apply lintegral_lintegral_swap
     apply Measurable.aemeasurable
-    apply Measurable.mul
+    apply Measurable.fun_mul
     · exact ((hfd.comp (by fun_prop)).enorm).measurable
     · exact ((show Continuous (fun p : EuclideanSpace ℝ (Fin d) × ℝ => p.1 - x) by
         fun_prop).enorm).measurable]
@@ -405,7 +406,7 @@ theorem kernel_bound_convex {φ : EuclideanSpace ℝ (Fin d) → ℝ}
           ∂volume ∂volume := by
         apply lintegral_lintegral_swap
         apply Measurable.aemeasurable
-        apply Measurable.mul
+        apply Measurable.fun_mul
         · exact (ENNReal.continuous_ofReal.measurable.comp hzpow_meas).comp measurable_fst
         · have hrw : (fun p : ℝ × EuclideanSpace ℝ (Fin d) =>
               (ball x (D * p.1)).indicator h p.2)
@@ -452,7 +453,7 @@ theorem riesz_potential_integrableOn {φ : EuclideanSpace ℝ (Fin d) → ℝ}
   have hMbound : ∀ z ∈ closedBall c (3 * r), ‖fderiv ℝ φ z‖ ≤ M :=
     fun z hz => hM ⟨z, hz, rfl⟩
   -- The translated integrand `f w = ‖∇φ (x + w)‖ / ‖w‖^{d-1}` is integrable on `ball 0 (2 r)`.
-  haveI : Nontrivial (EuclideanSpace ℝ (Fin d)) :=
+  have : Nontrivial (EuclideanSpace ℝ (Fin d)) :=
     Module.nontrivial_of_finrank_pos (R := ℝ) (by rw [finrank_euclideanSpace_fin]; exact hd)
   have hne0 : ∀ᵐ w ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), w ≠ 0 := by
     rw [ae_iff, show {w : EuclideanSpace ℝ (Fin d) | ¬ w ≠ 0} = {0} from by ext w; simp]
@@ -513,7 +514,7 @@ theorem exists_potential_bound (hd : 0 < d) :
         |φ x - ⨍ y in Metric.ball c r, φ y|
           ≤ (Cd : ℝ) * ∫ y in Metric.ball c r,
               ‖fderiv ℝ φ y‖ / dist x y ^ (d - 1) := by
-  haveI : Nontrivial (EuclideanSpace ℝ (Fin d)) :=
+  have : Nontrivial (EuclideanSpace ℝ (Fin d)) :=
     Module.nontrivial_of_finrank_pos (R := ℝ) (by rw [finrank_euclideanSpace_fin]; exact hd)
   set ω : ℝ := volume.real (ball (0 : EuclideanSpace ℝ (Fin d)) 1) with hω_def
   have hω_pos : 0 < ω := by

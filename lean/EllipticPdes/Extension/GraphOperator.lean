@@ -108,7 +108,7 @@ theorem exists_extW12 (hd : 0 < d) (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBou
           EuclideanSpace ℝ (Fin d) → ℝ) y = 0) ∧
       ∀ U : W12 Ω, ‖E U‖ ≤ C * ‖U‖ := by
   classical
-  haveI : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
+  have : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
   obtain ⟨T, K, hT⟩ := exists_extLinear hd hΩopen hΩb hC1 hΩ'open hsub (p := 2) one_le_two
   -- the pair an element of the graph space presents to the operator
   let w : W12 Ω → SobolevPair d := fun U =>
@@ -145,9 +145,9 @@ theorem exists_extW12 (hd : 0 < d) (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBou
     ENNReal.mul_lt_top ENNReal.coe_lt_top (lt_of_le_of_lt (hN U) ENNReal.ofReal_lt_top)
   have hspec := fun U : W12 Ω => hT (w U) (hwi U) (hwgi U) (hwg U)
   have hMF : ∀ U : W12 Ω, MemLp (T (w U)).1 2 volume := fun U =>
-    ⟨(hspec U).2.2.2.1.1, lt_of_le_of_lt (hspec U).2.2.2.2.2.2.1 (hKfin U)⟩
+    lt_of_le_of_lt (hspec U).2.2.2.2.2.2.1 (hKfin U)
   have hMG : ∀ U : W12 Ω, ∀ k, MemLp ((T (w U)).2 k) 2 volume := fun U k =>
-    ⟨((hspec U).2.2.2.2.1 k).1, lt_of_le_of_lt ((hspec U).2.2.2.2.2.2.2 k) (hKfin U)⟩
+    lt_of_le_of_lt ((hspec U).2.2.2.2.2.2.2 k) (hKfin U)
   -- a pair of seminorm zero on the domain has an image of seminorm zero
   have hcongr : ∀ (p q : SobolevPair d), IntegrableOn p.1 Ω volume →
       (∀ k, IntegrableOn (p.2 k) Ω volume) → HasWeakGradOn Ω p.1 p.2 →
@@ -165,7 +165,7 @@ theorem exists_extW12 (hd : 0 < d) (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBou
       simp only [Prod.snd_sub, Pi.sub_apply, hx, sub_self, Pi.zero_apply]
     have hdw : HasWeakGradOn Ω (p - q).1 (p - q).2 :=
       hasWeakGradOn_zero.congr_ae hd1.symm fun k => (hd2 k).symm
-    obtain ⟨-, -, -, hint, hgint, -, hb1, hb2⟩ :=
+    obtain ⟨-, -, -, -, -, -, hb1, hb2⟩ :=
       hT (p - q) (hp1.sub hq1) (fun k => (hp2 k).sub (hq2 k)) hdw
     have hzero : eLpNorm (p - q).1 2 (volume.restrict Ω)
         + ∑ i, eLpNorm ((p - q).2 i) 2 (volume.restrict Ω) = 0 := by
@@ -178,11 +178,11 @@ theorem exists_extW12 (hd : 0 < d) (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBou
     have e1 : (T (p - q)).1 = (T p).1 - (T q).1 := by rw [map_sub]; rfl
     have e2 : ∀ k, (T (p - q)).2 k = (T p).2 k - (T q).2 k := fun k => by rw [map_sub]; rfl
     refine ⟨?_, fun k => ?_⟩
-    · have h := (eLpNorm_eq_zero_iff hint.1 two_ne_zero).mp hb1
+    · have h := (eLpNorm_eq_zero_iff two_ne_zero).mp hb1
       rw [e1] at h
       filter_upwards [h] with x hx
       simpa [sub_eq_zero] using hx
-    · have h := (eLpNorm_eq_zero_iff (hgint k).1 two_ne_zero).mp (hb2' k)
+    · have h := (eLpNorm_eq_zero_iff two_ne_zero).mp (hb2' k)
       rw [e2 k] at h
       filter_upwards [h] with x hx
       simpa [sub_eq_zero] using hx

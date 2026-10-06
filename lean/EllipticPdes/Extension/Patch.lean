@@ -62,7 +62,7 @@ theorem integrableOn_of_vanishing_off {B W : Set (EuclideanSpace ℝ (Fin d))}
     refine (integrableOn_zero (μ := volume) (s := B \ W)).congr_fun ?_ (hB.diff hW)
     intro x hx
     exact (hoff x hx.2).symm
-  exact Set.inter_union_diff B W ▸ hf.union hdiff
+  exact Set.inter_union_sdiff B W ▸ hf.union hdiff
 
 /-- **Weak gradient of a class cut off inside a neighbourhood.** If `u` has weak gradient `g` on
 `B ∩ W` and `η` is smooth with `tsupport η ⊆ W`, then `η u` has weak gradient
@@ -139,12 +139,12 @@ theorem hasWeakGradOn_mul_cutoff_inter {B W : Set (EuclideanSpace ℝ (Fin d))}
   -- both sides of the goal see only the neighbourhood
   have hLrestrict : ∫ x in B, η x * u x * partialD k φ x
       = ∫ x in B ∩ W, η x * u x * partialD k φ x := by
-    refine setIntegral_eq_of_subset_of_forall_diff_eq_zero hB Set.inter_subset_left ?_
+    refine setIntegral_eq_of_subset_of_forall_sdiff_eq_zero hB Set.inter_subset_left ?_
     intro x hx
     rw [(hoff x fun hc => hx.2 ⟨hx.1, hc⟩).1, zero_mul, zero_mul]
   have hRrestrict : ∫ x in B, (η x * g k x + partialD k η x * u x) * φ x
       = ∫ x in B ∩ W, (η x * g k x + partialD k η x * u x) * φ x := by
-    refine setIntegral_eq_of_subset_of_forall_diff_eq_zero hB Set.inter_subset_left ?_
+    refine setIntegral_eq_of_subset_of_forall_sdiff_eq_zero hB Set.inter_subset_left ?_
     intro x hx
     obtain ⟨h1, h2⟩ := hoff x fun hc => hx.2 ⟨hx.1, hc⟩
     rw [h1, h2, zero_mul, zero_mul, add_zero, zero_mul]

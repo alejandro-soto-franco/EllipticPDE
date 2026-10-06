@@ -39,9 +39,8 @@ variable {α : Type*} [MeasurableSpace α] {μ : Measure α} {p : ℝ≥0∞} {s
 /-- The indicator of a class on the restricted measure is `p`-integrable for the full measure. -/
 theorem memLp_indicator_extend (hs : MeasurableSet s) (f : Lp ℝ p (μ.restrict s)) :
     MemLp (s.indicator (f : α → ℝ)) p μ := by
-  refine ⟨(aestronglyMeasurable_indicator_iff hs).mpr (Lp.aestronglyMeasurable f), ?_⟩
-  rw [eLpNorm_indicator_eq_eLpNorm_restrict hs]
-  exact (Lp.memLp f).2
+  rw [memLp_iff, eLpNorm_indicator_eq_eLpNorm_restrict hs]
+  exact Lp.memLp f
 
 variable [Fact (1 ≤ p)]
 

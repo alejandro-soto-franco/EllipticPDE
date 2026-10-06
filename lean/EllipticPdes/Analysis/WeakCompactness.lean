@@ -132,7 +132,7 @@ theorem exists_weakLimit {u : ℕ → H} {M : ℝ} (hM : ∀ n, ‖u n‖ ≤ M)
   have hTtop : ∀ v : H, ∃ l : ℝ, Tendsto (fun k => ⟪u (φ k), v⟫) atTop (𝓝 l) := by
     intro v
     set K := (Submodule.span ℝ (Set.range u)).topologicalClosure with hKdef
-    haveI : CompleteSpace K :=
+    have : CompleteSpace K :=
       (Submodule.isClosed_topologicalClosure _).completeSpace_coe
     have h1 : (K.starProjection v) ∈ T := hspan (K.starProjection_apply_mem v)
     have h2 : (v - K.starProjection v) ∈ T := by
@@ -191,7 +191,7 @@ theorem norm_weakLimit_le {M : ℝ} (hM : ∀ k, ‖u k‖ ≤ M)
 theorem mem_of_weakLimit {K : Submodule ℝ H} (hK : IsClosed (K : Set H)) (hu : ∀ k, u k ∈ K)
     (hw : ∀ v : H, Tendsto (fun k => ⟪u k, v⟫) atTop (𝓝 ⟪w, v⟫)) :
     w ∈ K := by
-  haveI : CompleteSpace K := hK.completeSpace_coe
+  have : CompleteSpace K := hK.completeSpace_coe
   have hperp : w ∈ Kᗮᗮ := by
     intro v hv
     have hzero : ∀ k, ⟪u k, v⟫ = 0 := fun k => hv _ (hu k)

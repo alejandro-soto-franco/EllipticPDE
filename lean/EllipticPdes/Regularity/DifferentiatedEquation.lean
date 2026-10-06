@@ -173,7 +173,7 @@ private lemma partialD_convolution_eq
         (-ContinuousLinearMap.id ℝ (EuclideanSpace ℝ (Fin d)))) t :=
       (hρdiff (x - t)).hasFDerivAt.comp t ((hasFDerivAt_id t).const_sub x)
     rw [hfd.fderiv]
-    simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.neg_apply,
+    simp only [ContinuousLinearMap.comp_apply, _root_.neg_apply,
       ContinuousLinearMap.id_apply, map_neg, partialD]
   -- integrability of the three integrands feeding the by-parts identity
   have hint_f'g : Integrable (fun t => fderiv ℝ a t (EuclideanSpace.single ℓ 1) * G t) volume :=
@@ -228,7 +228,7 @@ private lemma tendsto_setIntegral_mul_convolution
       Filter.atTop
       (𝓝 (∫ x in V, (w x : ℝ) * (h x * χ x))) := by
   classical
-  haveI : ENNReal.HolderTriple (2 : ℝ≥0∞) 2 1 := ⟨by rw [ENNReal.inv_two_add_inv_two, inv_one]⟩
+  have : ENNReal.HolderTriple (2 : ℝ≥0∞) 2 1 := ⟨by rw [ENNReal.inv_two_add_inv_two, inv_one]⟩
   have hLflip : (ContinuousLinearMap.lsmul ℝ ℝ).flip = ContinuousLinearMap.lsmul ℝ ℝ := by
     refine ContinuousLinearMap.ext fun p => ContinuousLinearMap.ext fun q => ?_
     simp only [ContinuousLinearMap.flip_apply, ContinuousLinearMap.lsmul_apply, smul_eq_mul]
@@ -300,7 +300,7 @@ theorem HasWeakDerivOn.mul_contDiff_left {V : Set (EuclideanSpace ℝ (Fin d))}
               fun x => partialD ℓ a x * (g x : ℝ) + a x * (g' x : ℝ)) :
     HasWeakDerivOn V ℓ ag dag := by
   classical
-  haveI : ENNReal.HolderTriple (2 : ℝ≥0∞) 2 1 := ⟨by rw [ENNReal.inv_two_add_inv_two, inv_one]⟩
+  have : ENNReal.HolderTriple (2 : ℝ≥0∞) 2 1 := ⟨by rw [ENNReal.inv_two_add_inv_two, inv_one]⟩
   have hdacont : Continuous (partialD ℓ a) := by
     have hcf : Continuous (fun x => fderiv ℝ a x) := ha.continuous_fderiv one_ne_zero
     exact hcf.clm_apply continuous_const
@@ -597,7 +597,7 @@ theorem differentiated_weakForm_div {V : Set (EuclideanSpace ℝ (Fin d))}
                           + Op.b x i * (D2 ℓ i x : ℝ)) * φ x)
       - (∫ x in V, (partialD ℓ Op.c x * (u_V x : ℝ) + Op.c x * (Du ℓ x : ℝ)) * φ x) := by
   classical
-  haveI : ENNReal.HolderTriple (2 : ℝ≥0∞) 2 1 := ⟨by rw [ENNReal.inv_two_add_inv_two, inv_one]⟩
+  have : ENNReal.HolderTriple (2 : ℝ≥0∞) 2 1 := ⟨by rw [ENNReal.inv_two_add_inv_two, inv_one]⟩
   set A := Op.toEllipticCoeff with hAeq
   -- continuity and pointwise bounds for the coefficient derivatives
   have hda_cont : ∀ i j, Continuous (partialD ℓ (fun y => A.a y i j)) :=
@@ -783,7 +783,7 @@ theorem commutator_move {V : Set (EuclideanSpace ℝ (Fin d))} (hVm : Measurable
       = - ∫ x in V, (partialD j (partialD ℓ (fun y => A.a y i j)) x * (Du_i x : ℝ)
               + partialD ℓ (fun y => A.a y i j) x * (D2_ji x : ℝ)) * φ x := by
   classical
-  haveI : ENNReal.HolderTriple (2 : ℝ≥0∞) 2 1 := ⟨by rw [ENNReal.inv_two_add_inv_two, inv_one]⟩
+  have : ENNReal.HolderTriple (2 : ℝ≥0∞) 2 1 := ⟨by rw [ENNReal.inv_two_add_inv_two, inv_one]⟩
   -- the coefficient gradient is a `C¹` weight, with a continuous second partial
   have hwc : ContDiff ℝ 1 (partialD ℓ (fun y => A.a y i j)) := hA.contDiff_partialD_coeff i j ℓ
   have hw_cont : Continuous (partialD ℓ (fun y => A.a y i j)) := hwc.continuous

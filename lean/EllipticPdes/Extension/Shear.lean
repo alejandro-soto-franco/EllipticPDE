@@ -250,8 +250,8 @@ theorem partialD_comp_shear {j : Fin d} {γ φ : EuclideanSpace ℝ (Fin d) → 
       ((fderiv ℝ φ (shear j γ y)).comp (shearDeriv j γ y)) y :=
     (hφ (shear j γ y)).hasFDerivAt.comp y (hasFDerivAt_shear hγ y)
   rw [partialD, hcomp.fderiv]
-  simp only [ContinuousLinearMap.coe_comp', Function.comp_apply, shearDeriv,
-    ContinuousLinearMap.add_apply, ContinuousLinearMap.coe_id', id_eq,
+  simp only [ContinuousLinearMap.coe_comp, Function.comp_apply, shearDeriv,
+    _root_.add_apply, ContinuousLinearMap.coe_id', id_eq,
     ContinuousLinearMap.smulRight_apply, map_add, map_smul, smul_eq_mul, partialD]
   ring
 

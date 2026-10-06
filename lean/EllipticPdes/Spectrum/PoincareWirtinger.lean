@@ -90,7 +90,7 @@ def constGraph (c : ℝ) : H1amb Ω :=
 /-- **Membership of a constant in the graph space**, with zero weak gradient: a test
 function's partial derivative integrates to zero. -/
 theorem constGraph_mem_W12 (c : ℝ) : constGraph hΩb c ∈ W12 Ω := by
-  haveI := isFiniteMeasure_restrict_of_isBounded hΩb
+  have := isFiniteMeasure_restrict_of_isBounded hΩb
   rw [mem_W12_iff]
   intro ψ g i
   rw [constGraph_zero, constGraph_succ, inner_zero_right, add_zero]
@@ -109,7 +109,7 @@ theorem constGraph_mem_W12 (c : ℝ) : constGraph hΩb c ∈ W12 Ω := by
     ((continuous_const.mul g.continuous).integrable_of_hasCompactSupport g.2.1.mul_left)
     (fun x _ => differentiableAt_const _)
     (fun x _ => (g.1.differentiable (by simp)).differentiableAt)
-  simp only [fderiv_fun_const, Pi.zero_apply, ContinuousLinearMap.zero_apply, zero_mul,
+  simp only [fderiv_fun_const, Pi.zero_apply, _root_.zero_apply, zero_mul,
     integral_zero, neg_zero] at hib
   rw [← hib]
   exact integral_congr_ae (Eventually.of_forall fun x => mul_comm _ _)
@@ -122,7 +122,7 @@ def meanL2 : L2D Ω →L[ℝ] ℝ :=
 /-- `meanL2 hΩb f` is the integral of `f` over `Ω` divided by the volume of `Ω`. -/
 theorem meanL2_apply (f : L2D Ω) :
     meanL2 hΩb f = ((volume Ω).toReal)⁻¹ * ∫ x in Ω, f x := by
-  simp only [meanL2, ContinuousLinearMap.smul_apply, innerSL_apply_apply, smul_eq_mul]
+  simp only [meanL2, _root_.smul_apply, innerSL_apply_apply, smul_eq_mul]
   congr 1
   rw [inner_L2D_eq_integral]
   refine integral_congr_ae ?_
@@ -131,7 +131,7 @@ theorem meanL2_apply (f : L2D Ω) :
 
 /-- `meanL2 hΩb` takes the constant `c` to `c` when `Ω` has nonzero volume. -/
 theorem meanL2_constL2 (hΩ0 : volume Ω ≠ 0) (c : ℝ) : meanL2 hΩb (constL2 hΩb c) = c := by
-  haveI := isFiniteMeasure_restrict_of_isBounded hΩb
+  have := isFiniteMeasure_restrict_of_isBounded hΩb
   rw [meanL2_apply, integral_congr_ae (coeFn_constL2 hΩb c), setIntegral_const, smul_eq_mul,
     measureReal_def]
   have htop : volume Ω ≠ ⊤ := by
@@ -152,7 +152,7 @@ theorem poincare_wirtinger (hd : 0 < d) (hΩopen : IsOpen Ω) (hΩb : Bornology.
       ‖embW12 Ω U - constL2 hΩb (meanL2 hΩb (embW12 Ω U))‖
         ≤ C * Real.sqrt (∑ k : Fin d, ‖(U : H1amb Ω) k.succ‖ ^ 2) := by
   classical
-  haveI := isFiniteMeasure_restrict_of_isBounded hΩb
+  have := isFiniteMeasure_restrict_of_isBounded hΩb
   have hΩ0 : volume Ω ≠ 0 := (hΩopen.measure_pos volume hne).ne'
   set g : W12 Ω → ℝ := fun U => Real.sqrt (∑ k : Fin d, ‖(U : H1amb Ω) k.succ‖ ^ 2) with hg
   set P : W12 Ω → L2D Ω :=

@@ -243,7 +243,7 @@ def lqOfL2 [IsFiniteMeasure (volume.restrict Ω)] (hq2 : (q : ℝ≥0∞) ≤ 2)
       have hfin : eLpNorm (f : EuclideanSpace ℝ (Fin d) → ℝ) 2 (volume.restrict Ω)
           * (volume.restrict Ω) Set.univ ^ (1 / (q : ℝ≥0∞).toReal - 1 / (2 : ℝ≥0∞).toReal)
           ≠ ⊤ :=
-        ENNReal.mul_ne_top (Lp.memLp f).2.ne
+        ENNReal.mul_ne_top (Lp.memLp f).eLpNorm_lt_top.ne
           (ENNReal.rpow_ne_top_of_nonneg he (measure_ne_top _ _))
       calc (eLpNorm (f : EuclideanSpace ℝ (Fin d) → ℝ) (q : ℝ≥0∞) (volume.restrict Ω)).toReal
           ≤ (eLpNorm (f : EuclideanSpace ℝ (Fin d) → ℝ) 2 (volume.restrict Ω)
@@ -261,7 +261,7 @@ than interpolated. Together with `rellichEmbL_isCompact` this covers Guo's range
 theorem rellichEmbL_isCompact_of_le (hΩm : MeasurableSet Ω) (hΩb : IsBounded Ω) (hd : 2 < d)
     (hq : ((2 : ℝ≥0) : ℝ)⁻¹ - (d : ℝ)⁻¹ ≤ (q : ℝ)⁻¹) (hq2 : (q : ℝ≥0∞) ≤ 2) :
     IsCompactOperator (rellichEmbL hΩm hΩb hd hq) := by
-  haveI : IsFiniteMeasure (volume.restrict Ω) := by
+  have : IsFiniteMeasure (volume.restrict Ω) := by
     refine ⟨?_⟩
     rw [Measure.restrict_apply_univ]
     exact hΩb.measure_lt_top

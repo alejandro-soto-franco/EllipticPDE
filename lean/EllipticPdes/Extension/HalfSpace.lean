@@ -84,8 +84,8 @@ theorem preimage_reflectLI_halfSpace (j : Fin d) :
     reflectLI j ⁻¹' halfSpace j = {x : EuclideanSpace ℝ (Fin d) | x j < 0} := by
   ext x
   have h : reflectLI j x j = -(x j) := by
-    rw [reflectLI_apply, reflectSign, if_pos rfl]; ring
-  simp only [Set.mem_preimage, halfSpace, Set.mem_setOf_eq, h, neg_pos]
+    rw [reflectLI_apply, reflectSign, ite_eq_left rfl]; ring
+  simp only [Set.mem_preimage, halfSpace, Set.mem_ofPred_eq, h, neg_pos]
 
 /-! ### No boundary term -/
 

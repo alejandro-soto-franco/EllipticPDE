@@ -83,9 +83,8 @@ theorem eLpNorm_sum_coord_le {p : ℝ≥0∞} (hp : 1 ≤ p)
     funext y
     rw [Finset.sum_apply]
   rw [hfun]
-  refine le_trans (eLpNorm_sum_le (fun i _ => (hw i).const_mul _) hp)
-    (Finset.sum_le_sum fun i _ => ?_)
-  refine eLpNorm_mono_ae (Filter.Eventually.of_forall fun y => ?_)
+  refine le_trans (eLpNorm_sum_le hp) (Finset.sum_le_sum fun i _ => ?_)
+  refine eLpNorm_mono_ae ((hw i).const_mul _) (Filter.Eventually.of_forall fun y => ?_)
   rw [norm_mul, Real.norm_eq_abs (a i)]
   exact mul_le_of_le_one_left (norm_nonneg _) (ha i)
 
@@ -96,21 +95,21 @@ a chart's graph be stated against the domain. -/
 theorem eLpNorm_mul_cutoff_le {S W T : Set (EuclideanSpace ℝ (Fin d))}
     (hS : MeasurableSet S) (hT : MeasurableSet T)
     {ξ v : EuclideanSpace ℝ (Fin d) → ℝ} {C : ℝ} (hC0 : 0 ≤ C) (hC : ∀ y, ‖ξ y‖ ≤ C)
+    (hξm : AEStronglyMeasurable ξ (volume.restrict S))
     (hoff : ∀ y, y ∉ W → ξ y = 0) (hSW : S ∩ W ⊆ T) {p : ℝ≥0∞} :
     eLpNorm (fun y => ξ y * v y) p (volume.restrict S)
       ≤ ENNReal.ofReal C * eLpNorm v p (volume.restrict T) := by
-  have hptwise : ∀ y, y ∈ S → ‖ξ y * v y‖ ≤ ‖T.indicator v y * ξ y‖ := by
+  have hptwise : ∀ y, y ∈ S → ξ y * v y = T.indicator v y * ξ y := by
     intro y hy
     by_cases hyW : y ∈ W
     · have hyT : y ∈ T := hSW ⟨hy, hyW⟩
       rw [Set.indicator_of_mem hyT, mul_comm (v y) (ξ y)]
-    · rw [hoff y hyW, zero_mul, norm_zero]
-      exact norm_nonneg _
+    · rw [hoff y hyW, zero_mul, mul_zero]
   calc eLpNorm (fun y => ξ y * v y) p (volume.restrict S)
-      ≤ eLpNorm (fun y => T.indicator v y * ξ y) p (volume.restrict S) :=
-        eLpNorm_mono_ae ((ae_restrict_iff' hS).mpr (Filter.Eventually.of_forall hptwise))
+      = eLpNorm (fun y => T.indicator v y * ξ y) p (volume.restrict S) :=
+        eLpNorm_congr_ae ((ae_restrict_iff' hS).mpr (Filter.Eventually.of_forall hptwise))
     _ ≤ ENNReal.ofReal C * eLpNorm (T.indicator v) p (volume.restrict S) :=
-        eLpNorm_mul_bounded_le hC0 hC
+        eLpNorm_mul_bounded_le hC0 hC hξm
     _ ≤ ENNReal.ofReal C * eLpNorm (T.indicator v) p volume :=
         mul_le_mul_right (eLpNorm_mono_measure _ Measure.restrict_le_self) _
     _ = ENNReal.ofReal C * eLpNorm v p (volume.restrict T) := by
@@ -119,10 +118,11 @@ theorem eLpNorm_mul_cutoff_le {S W T : Set (EuclideanSpace ℝ (Fin d))}
 /-- **Seminorm of a class scaled by a bounded factor**, the factor written first. -/
 theorem eLpNorm_bounded_mul_le {μ : Measure (EuclideanSpace ℝ (Fin d))}
     {h v : EuclideanSpace ℝ (Fin d) → ℝ} {C : ℝ} (hC0 : 0 ≤ C) (hC : ∀ y, ‖h y‖ ≤ C)
+    (hh : AEStronglyMeasurable h μ)
     {p : ℝ≥0∞} : eLpNorm (fun y => h y * v y) p μ ≤ ENNReal.ofReal C * eLpNorm v p μ := by
-  refine le_trans (eLpNorm_mono_ae (Filter.Eventually.of_forall fun y => ?_))
-    (eLpNorm_mul_bounded_le (f := v) (h := h) hC0 hC)
-  rw [mul_comm (h y) (v y)]
+  refine le_trans (le_of_eq (eLpNorm_congr_ae (Filter.Eventually.of_forall fun y => ?_)))
+    (eLpNorm_mul_bounded_le (f := v) (h := h) hC0 hC hh)
+  exact mul_comm (h y) (v y)
 
 /-! ### The local extension -/
 
@@ -422,17 +422,19 @@ theorem localExtension_bound (c : C1Chart d) {Ω : Set (EuclideanSpace ℝ (Fin 
     calc eLpNorm V p (volume.restrict A)
         = eLpNorm (fun y => ξ y * u y) p (volume.restrict A') := htr
       _ ≤ ENNReal.ofReal B * eLpNorm u p (volume.restrict Ω) :=
-          eLpNorm_mul_cutoff_le hA'open.measurableSet hΩm hB0 hξB hξ0 hsub
+          eLpNorm_mul_cutoff_le hA'open.measurableSet hΩm hB0 hξB
+            hξC1.continuous.aestronglyMeasurable hξ0 hsub
   -- the cut-off gradient over the region, against the class and its gradient
   have hWA : ∀ i : Fin d,
       eLpNorm (fun y => ξ y * g i y + partialD i ξ y * u y) p (volume.restrict A')
         ≤ ENNReal.ofReal B * eLpNorm (g i) p (volume.restrict Ω)
           + ENNReal.ofReal B * eLpNorm u p (volume.restrict Ω) := by
     intro i
-    refine le_trans (eLpNorm_add_le (hIg1 i).1 (hIg2 i).1 hp) (add_le_add ?_ ?_)
-    · exact eLpNorm_mul_cutoff_le hA'open.measurableSet hΩm hB0 hξB hξ0 hsub
+    refine le_trans (eLpNorm_add_le hp) (add_le_add ?_ ?_)
+    · exact eLpNorm_mul_cutoff_le hA'open.measurableSet hΩm hB0 hξB
+            hξC1.continuous.aestronglyMeasurable hξ0 hsub
     · exact eLpNorm_mul_cutoff_le hA'open.measurableSet hΩm hB0 (hdB i)
-        (fun y hy => hξd0 i y hy) hsub
+        (hξpc i).aestronglyMeasurable (fun y hy => hξd0 i y hy) hsub
   -- the same, moved into the chart's coordinates and summed over what the motion mixes
   have hHA : ∀ k : Fin d,
       eLpNorm (H k) p (volume.restrict A) ≤ ENNReal.ofReal B * ((d : ℝ≥0∞) + 1) * N := by

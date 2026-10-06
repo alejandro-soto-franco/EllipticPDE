@@ -77,7 +77,7 @@ theorem mem_H01_of_hasCompactSupport (hΩ : IsOpen Ω) {w : EuclideanSpace ℝ (
   set L := ContinuousLinearMap.lsmul ℝ ℝ (E := ℝ) with hL
   -- integrability of `w` on the whole space, from its compact support
   have hwint : Integrable w volume := by
-    haveI : IsFiniteMeasure (volume.restrict (tsupport w)) :=
+    have : IsFiniteMeasure (volume.restrict (tsupport w)) :=
       isFiniteMeasure_restrict.2 hwcs.measure_lt_top.ne
     have : IntegrableOn w (tsupport w) volume :=
       (hw.mono_measure Measure.restrict_le_self).integrable one_le_two
@@ -220,8 +220,7 @@ theorem exists_mem_H01_posPart_sub_const (hΩ : IsOpen Ω) {V : H1amb Ω} (hV : 
     simp only [IsTestFn.partialCls, Pi.sub_apply, hgdef, hx]
   -- a subsequence converging almost everywhere
   have hmeas : TendstoInMeasure (volume.restrict Ω) φ atTop v :=
-    tendstoInMeasure_of_tendsto_eLpNorm two_ne_zero
-      (fun n => (hφ n).continuous.aestronglyMeasurable) hvm.1 hX0
+    tendstoInMeasure_of_tendsto_eLpNorm two_ne_zero hX0
   obtain ⟨ns, hns, hae⟩ := hmeas.exists_seq_tendsto_ae
   -- the weak gradient of `V` vanishes on the level set
   have hvloc : LocallyIntegrableOn v Ω volume :=
@@ -268,12 +267,14 @@ theorem exists_mem_H01_posPart_sub_const (hΩ : IsOpen Ω) {V : H1amb Ω} (hV : 
   -- the limit
   have hwlim : MemLp (fun x => max (v x - k) 0) 2 (volume.restrict Ω) := by
     refine hvm.of_le (((continuous_id.sub continuous_const).max
-      continuous_const).comp_aestronglyMeasurable hvm.1) (Eventually.of_forall fun x => ?_)
+      continuous_const).comp_aestronglyMeasurable hvm.aestronglyMeasurable)
+      (Eventually.of_forall fun x => ?_)
     simp only [Real.norm_eq_abs]
     rw [abs_of_nonneg (le_max_right _ _)]
     exact max_le (by linarith [le_abs_self (v x)]) (abs_nonneg _)
   have hhlim : ∀ i, MemLp (fun x => if k < v x then g i x else 0) 2 (volume.restrict Ω) :=
-    fun i => (hgm i).of_le (aestronglyMeasurable_ite_lt hvm.1 (hgm i).1 k)
+    fun i => (hgm i).of_le (aestronglyMeasurable_ite_lt hvm.aestronglyMeasurable
+      (hgm i).aestronglyMeasurable k)
       (Eventually.of_forall fun x => by split_ifs <;> simp)
   refine ⟨WithLp.toLp 2 (Fin.cons (hwlim.toLp _) fun i => (hhlim i).toLp _), ?_, ?_, ?_⟩
   · -- membership: `H₀¹` is closed and the truncations converge to the limit
@@ -287,7 +288,9 @@ theorem exists_mem_H01_posPart_sub_const (hΩ : IsOpen Ω) {V : H1amb Ω} (hV : 
       refine (Lp.tendsto_Lp_iff_tendsto_eLpNorm'' _ _ _ _).mpr ?_
       refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds
         (hX0.comp hns.tendsto_atTop) (fun _ => zero_le) fun i => ?_
-      refine eLpNorm_mono fun x => ?_
+      refine eLpNorm_mono ?_ fun x => ?_
+      · exact ((((hψc i).sub continuous_const).max continuous_const).aestronglyMeasurable).sub
+          hwlim.aestronglyMeasurable
       simp only [Pi.sub_apply, Real.norm_eq_abs]
       exact abs_max_sub_le _ _ _
     | succ j =>
@@ -306,20 +309,21 @@ theorem exists_mem_H01_posPart_sub_const (hΩ : IsOpen Ω) {V : H1amb Ω} (hV : 
         split_ifs <;> ring
       have hAm : ∀ i, AEStronglyMeasurable (A i) (volume.restrict Ω) := fun i =>
         aestronglyMeasurable_ite_lt (hψc i).aestronglyMeasurable
-          (((hψ i).continuous_partialD j).aestronglyMeasurable.sub (hgm j).1) k
+          (((hψ i).continuous_partialD j).aestronglyMeasurable.sub (hgm j).aestronglyMeasurable) k
       have hBm : ∀ i, AEStronglyMeasurable (B i) (volume.restrict Ω) := fun i =>
-        (aestronglyMeasurable_ite_lt (hψc i).aestronglyMeasurable (hgm j).1 k).sub
-          (aestronglyMeasurable_ite_lt hvm.1 (hgm j).1 k)
+        (aestronglyMeasurable_ite_lt (hψc i).aestronglyMeasurable
+          (hgm j).aestronglyMeasurable k).sub
+          (aestronglyMeasurable_ite_lt hvm.aestronglyMeasurable (hgm j).aestronglyMeasurable k)
       have hA : Tendsto (fun i => eLpNorm (A i) 2 (volume.restrict Ω)) atTop (𝓝 0) := by
         refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds
           ((hXi j).comp hns.tendsto_atTop) (fun _ => zero_le) fun i => ?_
-        refine eLpNorm_mono fun x => ?_
+        refine eLpNorm_mono (hAm i) fun x => ?_
         simp only [hAdef, Pi.sub_apply, hψdef]
         split_ifs <;> simp
       have hB : Tendsto (fun i => eLpNorm (B i) 2 (volume.restrict Ω)) atTop (𝓝 0) := by
         have hrepr : ∀ i, eLpNorm (B i) 2 (volume.restrict Ω)
             = (∫⁻ x, ‖B i x‖ₑ ^ (2 : ℝ) ∂(volume.restrict Ω)) ^ (1 / (2 : ℝ)) := fun i => by
-          rw [eLpNorm_eq_lintegral_rpow_enorm_toReal two_ne_zero ENNReal.ofNat_ne_top,
+          rw [eLpNorm_eq_lintegral_rpow_enorm_toReal two_ne_zero ENNReal.ofNat_ne_top (hBm i),
             ENNReal.toReal_ofNat]
         simp only [hrepr]
         have hlim : Tendsto (fun i => ∫⁻ x, ‖B i x‖ₑ ^ (2 : ℝ) ∂(volume.restrict Ω)) atTop
@@ -333,21 +337,21 @@ theorem exists_mem_H01_posPart_sub_const (hΩ : IsOpen Ω) {V : H1amb Ω} (hV : 
             simp only [hBdef]
             split_ifs <;> simp
           · exact (lintegral_rpow_enorm_lt_top_of_eLpNorm_lt_top two_ne_zero ENNReal.ofNat_ne_top
-              (hgm j).2).ne
+              (hgm j).eLpNorm_lt_top).ne
           · filter_upwards [hae, hlevel j] with x hx hxl
             have hBzero : ∀ᶠ i in atTop, B i x = 0 := by
               rcases lt_trichotomy (v x) k with hlt | heq | hgt
               · filter_upwards [hx.eventually (gt_mem_nhds hlt)] with i hi
                 have hi' : φ (ns i) x < k := hi
                 simp only [hBdef, hψdef]
-                rw [if_neg (not_lt.mpr hi'.le), if_neg (not_lt.mpr hlt.le), sub_zero]
+                rw [ite_eq_right (not_lt.mpr hi'.le), ite_eq_right (not_lt.mpr hlt.le), sub_zero]
               · refine Eventually.of_forall fun i => ?_
                 simp only [hBdef, hxl heq]
                 split_ifs <;> simp
               · filter_upwards [hx.eventually (lt_mem_nhds hgt)] with i hi
                 have hi' : k < φ (ns i) x := hi
                 simp only [hBdef, hψdef]
-                rw [if_pos hi', if_pos hgt, sub_self]
+                rw [ite_eq_left hi', ite_eq_left hgt, sub_self]
             refine tendsto_const_nhds.congr' ?_
             filter_upwards [hBzero] with i hi
             rw [hi, enorm_zero, ENNReal.zero_rpow_of_pos (by norm_num)]
@@ -360,7 +364,7 @@ theorem exists_mem_H01_posPart_sub_const (hΩ : IsOpen Ω) {V : H1amb Ω} (hV : 
       refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds hsum
         (fun _ => zero_le) fun i => ?_
       rw [hsplit i]
-      exact eLpNorm_add_le (hAm i) (hBm i) one_le_two
+      exact eLpNorm_add_le one_le_two
   · simp only [Fin.cons_zero]
     exact hwlim.coeFn_toLp
   · intro i
@@ -397,11 +401,11 @@ theorem eq_zero_of_weakSolution_H01 (hd : 0 < d) (hΩopen : IsOpen Ω)
     (hΩb : Bornology.IsBounded Ω) (Op : FullEllipticOp d) (hb : ∀ x i, Op.b x i = 0)
     (hc : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), 0 ≤ Op.c x) (U : H01 Ω)
     (hsol : ∀ V : H01 Ω, Op.fullBilin Ω U V = 0) : U = 0 := by
-  haveI : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
+  have : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
   -- the function coordinate vanishes, by the principle applied to `U` and to `-U`
   have hle := weak_maximum_principle_H01 hd hΩopen hΩb Op hb hc U fun V _ => (hsol V).le
   have hge := weak_maximum_principle_H01 hd hΩopen hΩb Op hb hc (-U) fun V _ => by
-    rw [map_neg, ContinuousLinearMap.neg_apply, hsol V, neg_zero]
+    rw [map_neg, _root_.neg_apply, hsol V, neg_zero]
   have h0 : ((U : H1amb Ω) 0 : EuclideanSpace ℝ (Fin d) → ℝ) =ᵐ[volume.restrict Ω] 0 := by
     have hneg : ((-U : H01 Ω) : H1amb Ω) 0 = -((U : H1amb Ω) 0) := rfl
     rw [hneg] at hge

@@ -72,7 +72,7 @@ theorem eLpNorm_le_rpow_mul_rpow {r s q : ℝ≥0∞} (hr : r ≠ 0) (hr' : r �
     rw [hea, ← ENNReal.ofReal_inv_of_pos (by positivity), inv_div]
   have hbinv : eb⁻¹ = ENNReal.ofReal (q.toReal * (1 - θ) / s.toReal) := by
     rw [heb, ← ENNReal.ofReal_inv_of_pos (by positivity), inv_div]
-  haveI : ENNReal.HolderTriple ea eb 1 := by
+  have : ENNReal.HolderTriple ea eb 1 := by
     refine ⟨?_⟩
     rw [hainv, hbinv, ← ENNReal.ofReal_add (by positivity) (by positivity), inv_one]
     rw [show q.toReal * θ / r.toReal + q.toReal * (1 - θ) / s.toReal = 1 by
@@ -92,7 +92,7 @@ theorem eLpNorm_le_rpow_mul_rpow {r s q : ℝ≥0∞} (hr : r ≠ 0) (hr' : r �
   -- Hölder against that pair.
   have hHolder := eLpNorm_le_eLpNorm_mul_eLpNorm_of_nnnorm (μ := μ) (p := ea) (q := eb) (r := 1)
     (f := fun x => ‖f x‖ ^ (q.toReal * θ)) (g := fun x => ‖f x‖ ^ (q.toReal * (1 - θ)))
-    hg hh (fun u v => u * v) 1
+    (fun u v => u * v) 1 continuous_mul hg hh
     (Filter.Eventually.of_forall (fun x => by
       simp only [nnnorm_mul, one_mul]
       exact le_rfl))
@@ -100,13 +100,13 @@ theorem eLpNorm_le_rpow_mul_rpow {r s q : ℝ≥0∞} (hr : r ≠ 0) (hr' : r �
   have hLHS : eLpNorm (fun x => ‖f x‖ ^ (q.toReal * θ) * ‖f x‖ ^ (q.toReal * (1 - θ))) 1 μ
       = eLpNorm f q μ ^ q.toReal := by
     rw [eLpNorm_congr_ae (Filter.EventuallyEq.of_eq (funext fun x => (hsplit x).symm)),
-      eLpNorm_norm_rpow f hQ, one_mul, ENNReal.ofReal_toReal hq']
+      eLpNorm_norm_rpow f hf hQ, one_mul, ENNReal.ofReal_toReal hq']
   have hA : eLpNorm (fun x => ‖f x‖ ^ (q.toReal * θ)) ea μ = eLpNorm f r μ ^ (q.toReal * θ) := by
-    rw [eLpNorm_norm_rpow f hQθ, hea, ← ENNReal.ofReal_mul (by positivity),
+    rw [eLpNorm_norm_rpow f hf hQθ, hea, ← ENNReal.ofReal_mul (by positivity),
       div_mul_cancel₀ _ (ne_of_gt hQθ), ENNReal.ofReal_toReal hr']
   have hB : eLpNorm (fun x => ‖f x‖ ^ (q.toReal * (1 - θ))) eb μ
       = eLpNorm f s μ ^ (q.toReal * (1 - θ)) := by
-    rw [eLpNorm_norm_rpow f hQθ', heb, ← ENNReal.ofReal_mul (by positivity),
+    rw [eLpNorm_norm_rpow f hf hQθ', heb, ← ENNReal.ofReal_mul (by positivity),
       div_mul_cancel₀ _ (ne_of_gt hQθ'), ENNReal.ofReal_toReal hs']
   rw [hLHS, hA, hB, ENNReal.coe_one, one_mul] at hHolder
   -- Take the `q`-th root.

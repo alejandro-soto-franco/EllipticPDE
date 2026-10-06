@@ -67,7 +67,7 @@ theorem partialD_comp_translate {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφ :
   have hcomp : HasFDerivAt (fun y => φ (y + h))
       ((fderiv ℝ φ (x + h)).comp (ContinuousLinearMap.id ℝ (EuclideanSpace ℝ (Fin d)))) x :=
     (hφ (x + h)).hasFDerivAt.comp x h1
-  rw [partialD, hcomp.fderiv, ContinuousLinearMap.coe_comp', Function.comp_apply,
+  rw [partialD, hcomp.fderiv, ContinuousLinearMap.coe_comp, Function.comp_apply,
     ContinuousLinearMap.coe_id', id_eq, partialD]
 
 /-- Composition with a translation preserves smoothness. -/

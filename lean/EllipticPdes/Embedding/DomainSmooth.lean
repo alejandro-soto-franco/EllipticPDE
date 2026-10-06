@@ -78,7 +78,7 @@ theorem exists_const_contDiffOn_holderOnWith_of_gradClosed_domain (hd : 1 < d)
   refine ⟨C, ?_⟩
   intro F nxt dep m hdep hgrad hmem M hM
   have hd0 : 0 < d := by omega
-  haveI : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
+  have : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
   have hp₀E : (1 : ℝ≥0∞) ≤ (p₀ : ℝ≥0∞) := by exact_mod_cast hp₀
   have hP0 : (0 : ℝ) < (P : ℝ) := lt_of_le_of_lt (by positivity) hPd
   have hγpos : 0 < morreyExponent d (P : ℝ) := by

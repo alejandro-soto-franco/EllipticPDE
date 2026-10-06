@@ -118,7 +118,7 @@ lemma cutoffMul_apply_succ {Ω : Set (EuclideanSpace ℝ (Fin d))}
   simp only [cutoffMul, ContinuousLinearMap.comp_apply,
     ContinuousLinearEquiv.coe_coe, PiLp.coe_symm_continuousLinearEquiv,
     PiLp.coe_continuousLinearEquiv, PiLp.toLp_apply, ContinuousLinearMap.pi_apply,
-    Fin.cons_succ, ContinuousLinearMap.add_apply, ContinuousLinearMap.proj_apply]
+    Fin.cons_succ, _root_.add_apply, ContinuousLinearMap.proj_apply]
 
 /-! ### Leibniz product rule and stability of test functions under products -/
 
@@ -131,7 +131,7 @@ lemma partialD_mul {η φ : EuclideanSpace ℝ (Fin d) → ℝ}
   funext x
   simp only [partialD]
   rw [fderiv_fun_mul (hη x) (hφ x)]
-  simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.smul_apply, smul_eq_mul]
+  simp only [_root_.add_apply, _root_.smul_apply, smul_eq_mul]
   ring
 
 /-- The pointwise product of two test functions is a test function: smoothness is

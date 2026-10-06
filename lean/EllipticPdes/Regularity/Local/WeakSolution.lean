@@ -212,7 +212,7 @@ theorem pairL_apply (Op : FullEllipticOp d) (U W : H1amb Ω) :
     pairL Op Ω U W
       = (∑ i : Fin d, ∑ j : Fin d, ⟪Op.toEllipticCoeff.actL i j (U i.succ), W j.succ⟫)
         + (∑ i : Fin d, ⟪Op.bAct i (U i.succ), W 0⟫) + ⟪Op.cAct (U 0), W 0⟫ := by
-  simp [pairL, ContinuousLinearMap.sum_apply]
+  simp [pairL, _root_.sum_apply]
 
 /-- `fullBilin` is the ambient pairing on `H₀¹ × H₀¹`. -/
 theorem fullBilin_eq_pairL (Op : FullEllipticOp d) (u w : H01 Ω) :
@@ -292,7 +292,7 @@ theorem IsLocalWeakSolution.weakForm {Op : FullEllipticOp d} {U : H1amb Ω} {f :
       ⊆ {V | pairL Op Ω U V = D V} := by
     rw [span_testGraphSet]
     rintro _ ⟨φ, hφ, rfl⟩
-    simp only [Set.mem_setOf_eq]
+    simp only [Set.mem_ofPred_eq]
     rw [hsol.2 φ hφ, hDapp]
     refine integral_congr_ae ?_
     rw [IsTestFn.testGraph_zero]
@@ -302,7 +302,7 @@ theorem IsLocalWeakSolution.weakForm {Op : FullEllipticOp d} {U : H1amb Ω} {f :
     rw [H01, Submodule.topologicalClosure_coe]
     exact closure_minimal hspan hclosed
   have := hsub hW
-  simp only [Set.mem_setOf_eq] at this
+  simp only [Set.mem_ofPred_eq] at this
   rw [this, hDapp]
 
 /-! ### Plain representatives -/

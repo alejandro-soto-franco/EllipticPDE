@@ -55,7 +55,7 @@ private theorem setIntegral_ball_dist_rpow (hd : 0 < d) (x : EuclideanSpace ℝ 
     ∫ y in ball x R, dist x y ^ s ∂volume
       = (d : ℝ) * volume.real (ball (0 : EuclideanSpace ℝ (Fin d)) 1)
           * (R ^ (s + (d : ℝ)) / (s + (d : ℝ))) := by
-  haveI : Nontrivial (EuclideanSpace ℝ (Fin d)) :=
+  have : Nontrivial (EuclideanSpace ℝ (Fin d)) :=
     Module.nontrivial_of_finrank_pos (R := ℝ) (by rw [finrank_euclideanSpace_fin]; exact hd)
   -- Translate the integral to the origin.
   have hmp : MeasurePreserving (fun w : EuclideanSpace ℝ (Fin d) => x + w) volume volume :=
@@ -118,7 +118,7 @@ theorem exists_kernel_bound (hd : 0 < d) {p : ℝ} (hp : (d : ℝ) < p) :
         ∫ y in Metric.ball x R, ‖g y‖ / dist x y ^ (d - 1)
           ≤ (Cdp : ℝ) * R ^ (1 - (d : ℝ) / p)
               * (eLpNorm g (ENNReal.ofReal p) (volume.restrict (Metric.ball x R))).toReal := by
-  haveI : Nontrivial (EuclideanSpace ℝ (Fin d)) :=
+  have : Nontrivial (EuclideanSpace ℝ (Fin d)) :=
     Module.nontrivial_of_finrank_pos (R := ℝ) (by rw [finrank_euclideanSpace_fin]; exact hd)
   have h1d : (1 : ℝ) ≤ (d : ℝ) := by exact_mod_cast hd
   have hp1 : (1 : ℝ) < p := lt_of_le_of_lt h1d hp
@@ -197,9 +197,11 @@ theorem exists_kernel_bound (hd : 0 < d) {p : ℝ} (hp : (d : ℝ) < p) :
       abs_of_nonneg (Real.rpow_nonneg ha q), ENNReal.ofReal_rpow_of_nonneg ha hq0.le]
   have hKmem : MemLp (fun y => (dist x y ^ n)⁻¹) (ENNReal.ofReal q)
       (volume.restrict (ball x R)) := by
-    refine ⟨(((continuous_const.dist continuous_id).pow n).measurable.inv).aestronglyMeasurable, ?_⟩
-    rw [eLpNorm_lt_top_iff_lintegral_rpow_enorm_lt_top
-        (by rw [Ne, ENNReal.ofReal_eq_zero, not_le]; exact hq0) ENNReal.ofReal_ne_top,
+    have hKm : AEStronglyMeasurable (fun y => (dist x y ^ n)⁻¹)
+        (volume.restrict (ball x R)) :=
+      (((continuous_const.dist continuous_id).pow n).measurable.inv).aestronglyMeasurable
+    rw [memLp_iff, eLpNorm_lt_top_iff_lintegral_rpow_enorm_lt_top
+        (by rw [Ne, ENNReal.ofReal_eq_zero, not_le]; exact hq0) ENNReal.ofReal_ne_top hKm,
       ENNReal.toReal_ofReal hq0.le, lintegral_congr hpe]
     exact hasFiniteIntegral_iff_enorm.mp hKint.2
   -- Hölder's inequality at the Bochner level.
@@ -245,7 +247,7 @@ restricted ball. This is the `MemLp` witness fed to `exists_kernel_bound`. -/
 private theorem memLp_norm_fderiv {φ : EuclideanSpace ℝ (Fin d) → ℝ}
     (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) {p : ℝ} (z : EuclideanSpace ℝ (Fin d)) {r : ℝ} (_hr : 0 < r) :
     MemLp (fun y => ‖fderiv ℝ φ y‖) (ENNReal.ofReal p) (volume.restrict (Metric.ball z r)) := by
-  haveI : IsFiniteMeasure (volume.restrict (Metric.ball z r)) :=
+  have : IsFiniteMeasure (volume.restrict (Metric.ball z r)) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
   have hcont : Continuous (fun y : EuclideanSpace ℝ (Fin d) => ‖fderiv ℝ φ y‖) :=
     (hφ.continuous_fderiv (by simp)).norm
@@ -378,7 +380,7 @@ theorem exists_holder_smooth (hd : 0 < d) {p : ℝ} (hp : (d : ℝ) < p) :
           (C * (eLpNorm (fun y => ‖fderiv ℝ φ y‖) (ENNReal.ofReal p)
                   (volume.restrict (Metric.ball c r))).toNNReal)
           (morreyExponent d p) φ (Metric.ball c r) := by
-  haveI : Nontrivial (EuclideanSpace ℝ (Fin d)) :=
+  have : Nontrivial (EuclideanSpace ℝ (Fin d)) :=
     Module.nontrivial_of_finrank_pos (R := ℝ) (by rw [finrank_euclideanSpace_fin]; exact hd)
   have hdR : (0 : ℝ) < d := by exact_mod_cast hd
   have hp0 : (0 : ℝ) < p := lt_trans hdR hp
@@ -392,7 +394,7 @@ theorem exists_holder_smooth (hd : 0 < d) {p : ℝ} (hp : (d : ℝ) < p) :
   intro φ hφ c r hr
   set E := eLpNorm (fun y => ‖fderiv ℝ φ y‖) (ENNReal.ofReal p) (volume.restrict (ball c r))
     with hE_def
-  have hE_ne_top : E ≠ ⊤ := (memLp_norm_fderiv (p := p) hφ c hr).2.ne
+  have hE_ne_top : E ≠ ⊤ := (memLp_norm_fderiv (p := p) hφ c hr).eLpNorm_lt_top.ne
   intro x hx x' hx'
   by_cases hxx : x = x'
   · subst hxx; simp
@@ -534,13 +536,14 @@ theorem morrey_ball_contDiff (hd : 0 < d) {p : ℝ} (hp : (d : ℝ) < p)
   set μ := volume.restrict (Metric.ball c r) with hμ_def
   -- The coordinate-partial `Lᵖ` seminorms are all finite.
   have hfin : ∀ k, eLpNorm (fun y => partialD k u y) (ENNReal.ofReal p) μ ≠ ⊤ :=
-    fun k => (hmem k).2.ne
+    fun k => (hmem k).eLpNorm_lt_top.ne
   -- Bound the operator-norm seminorm by the sum of coordinate-partial seminorms.
   have hstep : eLpNorm (fun y => ‖fderiv ℝ u y‖) (ENNReal.ofReal p) μ
       ≤ ∑ k, eLpNorm (fun y => partialD k u y) (ENNReal.ofReal p) μ := by
     have h1 : eLpNorm (fun y => ‖fderiv ℝ u y‖) (ENNReal.ofReal p) μ
         ≤ eLpNorm (fun y => ∑ k, ‖partialD k u y‖) (ENNReal.ofReal p) μ := by
-      refine eLpNorm_mono fun y => ?_
+      refine eLpNorm_mono (hu.continuous_fderiv (by simp)).norm.aestronglyMeasurable
+        fun y => ?_
       rw [Real.norm_eq_abs, abs_of_nonneg (norm_nonneg _), Real.norm_eq_abs,
         abs_of_nonneg (Finset.sum_nonneg fun k _ => norm_nonneg _)]
       exact norm_fderiv_le_sum_partialD u y
@@ -548,9 +551,8 @@ theorem morrey_ball_contDiff (hd : 0 < d) {p : ℝ} (hp : (d : ℝ) < p)
         ≤ ∑ k, eLpNorm (fun y => partialD k u y) (ENNReal.ofReal p) μ := by
       rw [show (fun y => ∑ k, ‖partialD k u y‖)
           = ∑ k, (fun y => ‖partialD k u y‖) from by funext y; rw [Finset.sum_apply]]
-      refine (eLpNorm_sum_le (fun k _ => ?_) hpge1).trans_eq ?_
-      · exact ((hmem k).1.norm)
-      · exact Finset.sum_congr rfl fun k _ => eLpNorm_norm _
+      refine (eLpNorm_sum_le hpge1).trans_eq ?_
+      exact Finset.sum_congr rfl fun k _ => eLpNorm_norm _ (hmem k).aestronglyMeasurable
     exact h1.trans h2
   -- Transfer to `toNNReal` and to the two-argument `HolderOnWith` constant.
   have hsum_fin : (∑ k, eLpNorm (fun y => partialD k u y) (ENNReal.ofReal p) μ) ≠ ⊤ :=
@@ -663,7 +665,7 @@ theorem partialD_convolution_eq_of_hasWeakGradOn
       exact (hρ_diff (x - y)).hasFDerivAt.comp y h1
     have heval : partialD k ψ y = (fderiv ℝ ψ y) (EuclideanSpace.single k 1) := rfl
     rw [heval, hfd.fderiv]
-    simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.neg_apply,
+    simp only [ContinuousLinearMap.comp_apply, _root_.neg_apply,
       ContinuousLinearMap.id_apply, map_neg, partialD]
   -- Step 4: integrate by parts against `ψ` and cancel the signs.
   have hibp := hg ψ hψ_cd hψ_cs htsup k
@@ -707,7 +709,7 @@ private theorem exists_holderOnWith_of_ae_tendsto
         (fun z hz => ⟨hz.2, hAB hz.1⟩) hbad
     have hAG : 0 < volume (A ∩ G) := by
       have hle : volume A ≤ volume (A ∩ G) + volume (A \ G) := by
-        conv_lhs => rw [← Set.inter_union_diff A G]
+        conv_lhs => rw [← Set.inter_union_sdiff A G]
         exact measure_union_le _ _
       rw [hnull, add_zero] at hle
       exact lt_of_lt_of_le hpos hle
@@ -727,7 +729,7 @@ private theorem exists_holderOnWith_of_ae_tendsto
     set W : Set (EuclideanSpace ℝ (Fin d)) := {y | f y < ε / 3} ∩ B with hW_def
     have hWopen : IsOpen W := (isOpen_lt hfcont continuous_const).inter hB
     have hxW : x ∈ W :=
-      ⟨by rw [Set.mem_setOf_eq, hfval, dist_self, Real.zero_rpow hγR.ne', mul_zero]
+      ⟨by rw [Set.mem_ofPred_eq, hfval, dist_self, Real.zero_rpow hγR.ne', mul_zero]
           exact div_pos hε (by norm_num), hxB⟩
     obtain ⟨p, hpW, hpG⟩ := hdense W hWopen Set.inter_subset_right x hxW
     have hpB : p ∈ B := hpW.2
@@ -784,12 +786,13 @@ private theorem exists_holder_smooth_partialD (hd : 0 < d) {p : ℝ} (hp : (d : 
   refine ⟨C, fun v hv c r hr hmem => ?_⟩
   set μ := volume.restrict (Metric.ball c r) with hμ_def
   have hfin : ∀ k, eLpNorm (fun y => partialD k v y) (ENNReal.ofReal p) μ ≠ ⊤ :=
-    fun k => (hmem k).2.ne
+    fun k => (hmem k).eLpNorm_lt_top.ne
   have hstep : eLpNorm (fun y => ‖fderiv ℝ v y‖) (ENNReal.ofReal p) μ
       ≤ ∑ k, eLpNorm (fun y => partialD k v y) (ENNReal.ofReal p) μ := by
     have h1 : eLpNorm (fun y => ‖fderiv ℝ v y‖) (ENNReal.ofReal p) μ
         ≤ eLpNorm (fun y => ∑ k, ‖partialD k v y‖) (ENNReal.ofReal p) μ := by
-      refine eLpNorm_mono fun y => ?_
+      refine eLpNorm_mono (hv.continuous_fderiv (by simp)).norm.aestronglyMeasurable
+        fun y => ?_
       rw [Real.norm_eq_abs, abs_of_nonneg (norm_nonneg _), Real.norm_eq_abs,
         abs_of_nonneg (Finset.sum_nonneg fun k _ => norm_nonneg _)]
       exact norm_fderiv_le_sum_partialD v y
@@ -797,9 +800,8 @@ private theorem exists_holder_smooth_partialD (hd : 0 < d) {p : ℝ} (hp : (d : 
         ≤ ∑ k, eLpNorm (fun y => partialD k v y) (ENNReal.ofReal p) μ := by
       rw [show (fun y => ∑ k, ‖partialD k v y‖)
           = ∑ k, (fun y => ‖partialD k v y‖) from by funext y; rw [Finset.sum_apply]]
-      refine (eLpNorm_sum_le (fun k _ => ?_) hpge1).trans_eq ?_
-      · exact ((hmem k).1.norm)
-      · exact Finset.sum_congr rfl fun k _ => eLpNorm_norm _
+      refine (eLpNorm_sum_le hpge1).trans_eq ?_
+      exact Finset.sum_congr rfl fun k _ => eLpNorm_norm _ (hmem k).aestronglyMeasurable
     exact h1.trans h2
   have hsum_fin : (∑ k, eLpNorm (fun y => partialD k v y) (ENNReal.ofReal p) μ) ≠ ⊤ :=
     ENNReal.sum_ne_top.mpr fun k _ => hfin k
@@ -919,14 +921,13 @@ theorem morrey_ball (hd : 0 < d) {p : ℝ} (hp : (d : ℝ) < p)
           (φ n).contDiff_normed
       have hconvMemLp : MemLp ((Metric.ball c r).indicator (g k)
           ⋆[L, volume] (φ n).normed volume) (ENNReal.ofReal p) volume :=
-        ⟨hsmoothConv.continuous.aestronglyMeasurable,
-          lt_of_le_of_lt (eLpNorm_convolution_le hp1 hρ0 hρm hρ1 (hgBk k)) (hgBk k).2⟩
+        lt_of_le_of_lt (eLpNorm_convolution_le hp1 hρ0 hρm hρ1 (hgBk k)) (hgBk k).eLpNorm_lt_top
       exact (memLp_congr_ae (hcongr k)).mpr (hconvMemLp.restrict (Metric.ball c r'))
     have hsum : (∑ k, (eLpNorm (fun y => partialD k (U n) y) (ENNReal.ofReal p)
           (volume.restrict (Metric.ball c r'))).toNNReal)
         ≤ ∑ k, (eLpNorm (g k) (ENNReal.ofReal p)
           (volume.restrict (Metric.ball c r))).toNNReal := by
-      refine Finset.sum_le_sum fun k _ => ENNReal.toNNReal_mono (hmemg k).2.ne ?_
+      refine Finset.sum_le_sum fun k _ => ENNReal.toNNReal_mono (hmemg k).eLpNorm_lt_top.ne ?_
       rw [eLpNorm_congr_ae (hcongr k)]
       calc eLpNorm (fun y => ((Metric.ball c r).indicator (g k)
               ⋆[L, volume] (φ n).normed volume) y) (ENNReal.ofReal p)

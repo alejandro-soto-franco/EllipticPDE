@@ -49,7 +49,7 @@ and the continuous compactly supported factor in `L²`. -/
 theorem integrable_mul_testFn (F : L2D V) {φ : EuclideanSpace ℝ (Fin d) → ℝ}
     (hφc : ContDiff ℝ (⊤ : ℕ∞) φ) (hφcs : HasCompactSupport φ) :
     Integrable (fun x => (F x : ℝ) * φ x) (volume.restrict V) := by
-  haveI : ENNReal.HolderTriple (2 : ENNReal) 2 1 := ⟨by rw [ENNReal.inv_two_add_inv_two, inv_one]⟩
+  have : ENNReal.HolderTriple (2 : ENNReal) 2 1 := ⟨by rw [ENNReal.inv_two_add_inv_two, inv_one]⟩
   exact (Lp.memLp F).integrable_mul
     ((hφc.continuous.memLp_of_hasCompactSupport (p := 2) (μ := volume) hφcs).restrict V)
 

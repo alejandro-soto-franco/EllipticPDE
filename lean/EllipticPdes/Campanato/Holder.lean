@@ -53,13 +53,13 @@ variable {Ω : Set (EuclideanSpace ℝ (Fin d))} {u : EuclideanSpace ℝ (Fin d)
 Lebesgue null in positive dimension. -/
 theorem closedBall_ae_eq_ball (hd : 0 < d) (x : EuclideanSpace ℝ (Fin d)) (r : ℝ) :
     Metric.closedBall x r =ᵐ[volume] Metric.ball x r := by
-  haveI : Nontrivial (EuclideanSpace ℝ (Fin d)) :=
+  have : Nontrivial (EuclideanSpace ℝ (Fin d)) :=
     Module.nontrivial_of_finrank_pos (R := ℝ) (by rw [finrank_euclideanSpace_fin]; exact hd)
   rw [ae_eq_set]
   refine ⟨?_, ?_⟩
-  · rw [Metric.closedBall_diff_ball]
+  · rw [Metric.closedBall_sdiff_ball]
     exact Measure.addHaar_sphere volume x r
-  · rw [Set.diff_eq_empty.mpr Metric.ball_subset_closedBall]
+  · rw [Set.sdiff_eq_empty.mpr Metric.ball_subset_closedBall]
     exact measure_empty
 
 /-- **Campanato limit as a representative of `u`.** By the Lebesgue differentiation theorem the
@@ -68,7 +68,7 @@ converge to `campanatoLimit u` everywhere on the open set, so the two agree almo
 theorem campanatoLimit_ae_eq (hd : 0 < d) (hα : 0 < α) (hM : 0 ≤ M) (hΩ : IsOpen Ω)
     (hΩfin : volume Ω ≠ ⊤) (hu : MemLp u 2 (volume.restrict Ω)) (hcamp : CampanatoOn Ω u α M) :
     campanatoLimit u =ᵐ[volume.restrict Ω] u := by
-  haveI : IsFiniteMeasure (volume.restrict Ω) :=
+  have : IsFiniteMeasure (volume.restrict Ω) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact lt_top_iff_ne_top.mpr hΩfin⟩
   have huint : IntegrableOn u Ω volume := hu.integrable (by norm_num)
   have hind : Integrable (Ω.indicator u) volume :=

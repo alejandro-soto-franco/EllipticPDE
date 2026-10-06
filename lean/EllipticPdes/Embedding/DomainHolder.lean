@@ -80,7 +80,7 @@ theorem exists_const_holderOnWith_of_gradClosed_domain (hd : 1 < d)
             HolderOnWith (C * M) (morreyExponent d (P : ℝ)) w (closure Ω) := by
   classical
   have hd0 : 0 < d := by omega
-  haveI : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
+  have : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
   have hP1 : (1 : ℝ≥0) ≤ P := le_trans hp₀ hp₀P
   have hP1E : (1 : ℝ≥0∞) ≤ (P : ℝ≥0∞) := by exact_mod_cast hP1
   have hcast : ((P : ℝ≥0) : ℝ≥0∞) = ENNReal.ofReal (P : ℝ) := by rw [ENNReal.ofReal_coe_nnreal]
@@ -165,7 +165,7 @@ theorem exists_const_holderOnWith_of_gradClosed_domain (hd : 1 < d)
       (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) rb')) := by
     intro k
     have hm : MemLp (G k) (P : ℝ≥0∞) volume :=
-      ⟨(hGint k).1, lt_of_le_of_lt (hGtot k) ENNReal.coe_lt_top⟩
+      lt_of_le_of_lt (hGtot k) ENNReal.coe_lt_top
     have := hm.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) rb')
     rwa [hcast] at this
   -- Morrey on the outer ball
@@ -201,7 +201,7 @@ theorem exists_const_holderOnWith_of_gradClosed_domain (hd : 1 < d)
   set V : Set (EuclideanSpace ℝ (Fin d)) :=
     ball (0 : EuclideanSpace ℝ (Fin d)) rb' \ tsupport U with hVdef
   have hVopen : IsOpen V := Metric.isOpen_ball.sdiff (isClosed_tsupport U)
-  have hVsub : V ⊆ ball (0 : EuclideanSpace ℝ (Fin d)) rb' := Set.diff_subset
+  have hVsub : V ⊆ ball (0 : EuclideanSpace ℝ (Fin d)) rb' := Set.sdiff_subset
   have hzV : z ∈ V := ⟨hzin, fun hc => hzout (hsuppU hc)⟩
   have hVpos : 0 < volume V := hVopen.measure_pos volume ⟨z, hzV⟩
   have hVne : volume.restrict V ≠ 0 := by
@@ -209,7 +209,7 @@ theorem exists_const_holderOnWith_of_gradClosed_domain (hd : 1 < d)
     have huniv : (volume.restrict V) Set.univ = 0 := by rw [h]; rfl
     rw [Measure.restrict_apply_univ] at huniv
     exact hVpos.ne' huniv
-  haveI : (ae (volume.restrict V)).NeBot := ae_neBot.mpr hVne
+  have : (ae (volume.restrict V)).NeBot := ae_neBot.mpr hVne
   have hwV : ∀ᵐ x ∂(volume.restrict V), x ∈ V ∧ w x = 0 := by
     have hres : w =ᵐ[volume.restrict V] U :=
       ae_restrict_of_ae_restrict_of_subset hVsub hwae

@@ -276,7 +276,7 @@ theorem exists_mem_H01_mulTest_gradient (Op : FullEllipticOp d)
       = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) (ℓ : Fin d) :
     ∃ W : H1amb Ω, W ∈ H01 Ω ∧ W 0 = mulTest T.hξ ((u : H1amb Ω) ℓ.succ) := by
   classical
-  haveI : Fact ((2 : ℝ≥0∞) ≠ ⊤) := ⟨by norm_num⟩
+  have : Fact ((2 : ℝ≥0∞) ≠ ⊤) := ⟨by norm_num⟩
   have htξθ : tsupport T.ξ ⊆ tsupport T.θ := fun x hx =>
     subset_tsupport T.θ (by rw [Function.mem_support, T.theta_eqOn_one hx]; exact one_ne_zero)
   obtain ⟨δ, hδpos, M, hM⟩ := exists_cutoffMul_diffQuotG_norm_bound Op hΩm hA T u f hu ℓ

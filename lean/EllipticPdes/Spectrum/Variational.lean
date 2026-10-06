@@ -92,7 +92,7 @@ lemma rayleighSphere_nonempty (hne : ∃ V : H01 Ω, embL2 Ω V ≠ 0) :
   obtain ⟨V, hV⟩ := hne
   have hpos : 0 < ‖embL2 Ω V‖ := norm_pos_iff.mpr hV
   refine ⟨‖embL2 Ω V‖⁻¹ • V, ?_⟩
-  simp only [rayleighSphere, Set.mem_setOf_eq, map_smul, norm_smul, Real.norm_eq_abs,
+  simp only [rayleighSphere, Set.mem_ofPred_eq, map_smul, norm_smul, Real.norm_eq_abs,
     abs_of_pos (inv_pos.mpr hpos)]
   exact inv_mul_cancel₀ hpos.ne'
 
@@ -118,7 +118,7 @@ theorem principalEigenvalue_mul_norm_sq_le (hco : IsCoercive B) (U : H01 Ω) :
       exact inv_mul_cancel₀ hpos.ne'
     have hval : B (‖embL2 Ω U‖⁻¹ • U) (‖embL2 Ω U‖⁻¹ • U)
         = ‖embL2 Ω U‖⁻¹ * (‖embL2 Ω U‖⁻¹ * B U U) := by
-      simp only [map_smul, ContinuousLinearMap.smul_apply, smul_eq_mul]
+      simp only [map_smul, _root_.smul_apply, smul_eq_mul]
     have hle := principalEigenvalue_le hco hsphere
     rw [hval] at hle
     have hs2 : (0 : ℝ) < ‖embL2 Ω U‖ ^ 2 := by positivity
@@ -175,7 +175,7 @@ theorem rayleigh_euler_lagrange (hco : IsCoercive B) (hsymm : ∀ U V : H01 Ω, 
     have hBexp : B (U + t • V) (U + t • V) = B U U + 2 * t * B U V + t ^ 2 * B V V := by
       have h1 : B (U + t • V) = B U + t • B V := by rw [map_add, map_smul]
       rw [h1]
-      simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.smul_apply, map_add, map_smul,
+      simp only [_root_.add_apply, _root_.smul_apply, map_add, map_smul,
         smul_eq_mul]
       rw [hsymm V U]
       ring

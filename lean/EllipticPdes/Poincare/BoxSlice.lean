@@ -81,7 +81,7 @@ lemma toLp_insertNth_eq (i : Fin (n + 1)) (y : Fin n → ℝ) (s : ℝ) :
     rw [Fin.insertNth_apply_same, Fin.insertNth_apply_same]; simp
   · obtain ⟨j, rfl⟩ := Fin.exists_succAbove_eq hk
     rw [Fin.insertNth_apply_succAbove, Fin.insertNth_apply_succAbove,
-      if_neg (Fin.succAbove_ne i j)]; ring
+      ite_eq_right (Fin.succAbove_ne i j)]; ring
 
 /-- The slice of a test function along coordinate `i`, reconstructed through `toLp`, is
 differentiable with derivative the `i`-th classical partial `partialD i φ`. -/
@@ -119,7 +119,7 @@ theorem slice_bound_euclBox (a b : Fin (n + 1) → ℝ) (hab : ∀ k, a k ≤ b 
     rw [e.image_eq_preimage_symm]
     ext x
     simp only [hP, Set.mem_preimage, Set.mem_pi, Set.mem_univ,
-      true_implies, euclBox, Set.mem_setOf_eq]
+      true_implies, euclBox, Set.mem_ofPred_eq]
     rfl
   -- Transport any box integral from `EuclideanSpace` to the pi-box.
   have htr : ∀ g : EuclideanSpace ℝ (Fin (n + 1)) → ℝ,
@@ -129,11 +129,11 @@ theorem slice_bound_euclBox (a b : Fin (n + 1) → ℝ) (hab : ∀ k, a k ≤ b 
     exact hmp.setIntegral_image_emb hme g P
   -- Whole-space integrability of the relevant squares (continuous, compact support).
   have hφ2 : Integrable (fun z => (φ z) ^ 2) (volume : Measure (EuclideanSpace ℝ (Fin (n + 1)))) :=
-    (h.continuous.pow 2).integrable_of_hasCompactSupport
+    (h.continuous.fun_pow 2).integrable_of_hasCompactSupport
       (h.2.1.comp_left (g := fun y : ℝ => y ^ 2) (by norm_num))
   have hpd2 : Integrable (fun z => (partialD i φ z) ^ 2)
       (volume : Measure (EuclideanSpace ℝ (Fin (n + 1)))) :=
-    ((h.continuous_partialD i).pow 2).integrable_of_hasCompactSupport
+    ((h.continuous_partialD i).fun_pow 2).integrable_of_hasCompactSupport
       ((h.hasCompactSupport_partialD i).comp_left (g := fun y : ℝ => y ^ 2) (by norm_num))
   -- Integrability of the pulled-back squares on the pi-box.
   have hu2 : IntegrableOn (fun x => (φ (WithLp.toLp 2 x)) ^ 2) P volume := by

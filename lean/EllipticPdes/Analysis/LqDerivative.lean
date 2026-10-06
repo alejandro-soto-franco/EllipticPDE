@@ -79,14 +79,12 @@ theorem integrable_abs_rpow_sub_one_mul {p : ℝ≥0∞} (hptop : p ≠ ∞) (hp
   have hprod : p' * ENNReal.ofReal (r - 1) = p := by
     rw [hp'def, ← ENNReal.ofReal_mul (by positivity), div_mul_cancel₀ _ (by linarith), hpeq]
   have hmem : MemLp (fun x => (‖u x‖ + ‖v x‖) ^ (r - 1)) p' μ := by
-    refine ⟨(hw.1.norm.aemeasurable.pow_const (r - 1)).aestronglyMeasurable.congr ?_, ?_⟩
-    · exact Eventually.of_forall (fun x => by simp only [hwnn])
-    · have hcongr : eLpNorm (fun x => (‖u x‖ + ‖v x‖) ^ (r - 1)) p' μ
-          = eLpNorm (fun x => ‖(‖u x‖ + ‖v x‖)‖ ^ (r - 1)) p' μ :=
-        eLpNorm_congr_ae (Eventually.of_forall (fun x => by simp only [hwnn]))
-      rw [hcongr, eLpNorm_norm_rpow _ (by linarith), hprod]
-      exact ENNReal.rpow_lt_top_of_nonneg (by linarith) hw.2.ne
-  haveI : ENNReal.HolderTriple p' p 1 := by
+    have hcongr : eLpNorm (fun x => (‖u x‖ + ‖v x‖) ^ (r - 1)) p' μ
+        = eLpNorm (fun x => ‖(‖u x‖ + ‖v x‖)‖ ^ (r - 1)) p' μ :=
+      eLpNorm_congr_ae (Eventually.of_forall (fun x => by simp only [hwnn]))
+    rw [memLp_iff, hcongr, eLpNorm_norm_rpow _ hw.aestronglyMeasurable (by linarith), hprod]
+    exact ENNReal.rpow_lt_top_of_nonneg (by linarith) hw.eLpNorm_lt_top.ne
+  have : ENNReal.HolderTriple p' p 1 := by
     refine ⟨?_⟩
     rw [hp'def, ← ENNReal.ofReal_inv_of_pos (by positivity), inv_div, hpeq,
       ← ENNReal.ofReal_inv_of_pos hr0, ← ENNReal.ofReal_add (by positivity) (by positivity),
@@ -111,7 +109,7 @@ theorem hasDerivAt_integral_abs_rpow {p : ℝ≥0∞} (hp0 : p ≠ 0) (hptop : p
   set bound : α → ℝ := fun x => r * ((‖u x‖ + ‖v x‖) ^ (r - 1) * ‖v x‖) with hbdef
   -- The line through `u` in the direction `v` is measurable at each time.
   have hline : ∀ t : ℝ, AEStronglyMeasurable (fun x => u x + t * v x) μ := fun t =>
-    hu.1.add (aestronglyMeasurable_const.mul hv.1)
+    hu.aestronglyMeasurable.add (aestronglyMeasurable_const.mul hv.aestronglyMeasurable)
   have hFmeas : ∀ᶠ t in 𝓝 (0 : ℝ), AEStronglyMeasurable (F t) μ :=
     Eventually.of_forall (fun t =>
       ((hline t).norm.aemeasurable.pow_const r).aestronglyMeasurable)
@@ -120,7 +118,7 @@ theorem hasDerivAt_integral_abs_rpow {p : ℝ≥0∞} (hp0 : p ≠ 0) (hptop : p
     simpa [hFdef] using this
   have hF'meas : AEStronglyMeasurable (F' 0) μ :=
     ((((hline 0).norm.aemeasurable.pow_const (r - 2)).aestronglyMeasurable.const_mul r).mul
-      (hline 0)).mul hv.1
+      (hline 0)).mul hv.aestronglyMeasurable
   have hbound_int : Integrable bound μ :=
     (integrable_abs_rpow_sub_one_mul hptop hp1 hu hv).const_mul r
   -- The derivative is dominated on `|t| < 1`.

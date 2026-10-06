@@ -60,7 +60,7 @@ theorem exists_gradClosed_of_hasIteratedWeakDerivOn {V : Set (EuclideanSpace ℝ
       (∀ α, MemLp (F α) 2 (volume.restrict (Metric.ball c R))) ∧
       F [] = (u : EuclideanSpace ℝ (Fin d) → ℝ) := by
   classical
-  haveI : IsFiniteMeasure (volume.restrict (Metric.ball c R)) :=
+  have : IsFiniteMeasure (volume.restrict (Metric.ball c R)) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
   set H : ∀ k : ℕ, HasIteratedWeakDerivOn V k u := fun k => (h k).some with hH_def
   have hmemball : ∀ X : L2D V,

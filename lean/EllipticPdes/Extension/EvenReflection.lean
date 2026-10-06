@@ -77,8 +77,8 @@ theorem univ_ae_eq_union (j : Fin d) :
   have hdiff : (Set.univ : Set (EuclideanSpace ℝ (Fin d))) \ (halfSpace j ∪ halfSpaceNeg j)
       = {x : EuclideanSpace ℝ (Fin d) | x j = 0} := by
     ext x
-    simp only [Set.mem_diff, Set.mem_univ, true_and, Set.mem_union, halfSpace, halfSpaceNeg,
-      Set.mem_setOf_eq, not_or, not_lt]
+    simp only [Set.mem_sdiff, Set.mem_univ, true_and, Set.mem_union, halfSpace, halfSpaceNeg,
+      Set.mem_ofPred_eq, not_or, not_lt]
     constructor
     · rintro ⟨h1, h2⟩; linarith
     · rintro h; exact ⟨by linarith, by linarith⟩
@@ -113,8 +113,8 @@ theorem preimage_reflectLI_halfSpaceNeg (j : Fin d) :
     reflectLI j ⁻¹' halfSpaceNeg j = halfSpace j := by
   ext x
   have h : reflectLI j x j = -(x j) := by
-    rw [reflectLI_apply, reflectSign, if_pos rfl]; ring
-  simp only [Set.mem_preimage, halfSpaceNeg, halfSpace, Set.mem_setOf_eq, h, neg_lt_zero]
+    rw [reflectLI_apply, reflectSign, ite_eq_left rfl]; ring
+  simp only [Set.mem_preimage, halfSpaceNeg, halfSpace, Set.mem_ofPred_eq, h, neg_lt_zero]
 
 /-- **Integral over the lower half space as the reflected integral over the upper one.** -/
 theorem setIntegral_halfSpaceNeg (j : Fin d) (f : EuclideanSpace ℝ (Fin d) → ℝ) :
@@ -148,8 +148,8 @@ theorem reflectLI_eq_self_of_interface {j : Fin d} {x : EuclideanSpace ℝ (Fin 
   ext m
   rw [reflectLI_apply, reflectSign]
   by_cases hm : m = j
-  · subst hm; rw [if_pos rfl, hx]; ring
-  · rw [if_neg hm]; ring
+  · subst hm; rw [ite_eq_left rfl, hx]; ring
+  · rw [ite_eq_right hm]; ring
 
 /-- **Weak gradient of the reflected extension on the whole space.** Splitting the integral
 at the interface and reflecting the lower half tests the class against `φ + s (φ ∘ R)`, which in
@@ -185,30 +185,30 @@ theorem hasWeakGradOn_evenExt {j : Fin d} {u : EuclideanSpace ℝ (Fin d) → �
     intro x hx
     have hx0 : (0 : ℝ) ≤ x j := le_of_lt hx
     change (if 0 ≤ x j then u x else u (reflectLI j x)) = u x
-    rw [if_pos hx0]
+    rw [ite_eq_left hx0]
   have hExtNeg : ∀ y ∈ halfSpace j, evenExt j u (reflectLI j y) = u y := by
     intro y hy
     have hyj : 0 < y j := hy
     have hRy : reflectLI j y j = -(y j) := by
-      rw [reflectLI_apply, reflectSign, if_pos rfl]; ring
+      rw [reflectLI_apply, reflectSign, ite_eq_left rfl]; ring
     have hneg : ¬ (0 : ℝ) ≤ reflectLI j y j := by rw [hRy]; linarith
     change (if 0 ≤ reflectLI j y j then u (reflectLI j y)
       else u (reflectLI j (reflectLI j y))) = u y
-    rw [if_neg hneg, reflectLI_involutive]
+    rw [ite_eq_right hneg, reflectLI_involutive]
   have hGradPos : ∀ x ∈ halfSpace j, evenExtGrad j g k x = g k x := by
     intro x hx
     have hx0 : (0 : ℝ) ≤ x j := le_of_lt hx
     change (if 0 ≤ x j then g k x else reflectSign j k * g k (reflectLI j x)) = g k x
-    rw [if_pos hx0]
+    rw [ite_eq_left hx0]
   have hGradNeg : ∀ y ∈ halfSpace j, evenExtGrad j g k (reflectLI j y) = s * g k y := by
     intro y hy
     have hyj : 0 < y j := hy
     have hRy : reflectLI j y j = -(y j) := by
-      rw [reflectLI_apply, reflectSign, if_pos rfl]; ring
+      rw [reflectLI_apply, reflectSign, ite_eq_left rfl]; ring
     have hneg : ¬ (0 : ℝ) ≤ reflectLI j y j := by rw [hRy]; linarith
     change (if 0 ≤ reflectLI j y j then g k (reflectLI j y)
       else reflectSign j k * g k (reflectLI j (reflectLI j y))) = s * g k y
-    rw [if_neg hneg, reflectLI_involutive, hs]
+    rw [ite_eq_right hneg, reflectLI_involutive, hs]
   -- Bounds, for the integrability side conditions.
   obtain ⟨N, hN⟩ := (hφcs.fderiv ℝ).comp_left
     (g := fun T : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ => T (EuclideanSpace.single k (1 : ℝ)))
@@ -297,7 +297,7 @@ theorem hasWeakGradOn_evenExt {j : Fin d} {u : EuclideanSpace ℝ (Fin d) → �
     refine integral_partialD_of_eq hu (hg k) hwg hψsmooth hψcs (fun z hz => ?_)
     rw [hψdef]
     simp only
-    rw [reflectLI_eq_self_of_interface hz, hs, reflectSign, if_pos rfl]
+    rw [reflectLI_eq_self_of_interface hz, hs, reflectSign, ite_eq_left rfl]
     ring
   · exact integral_partialD_of_ne hk hu (hg k) hwg hψsmooth hψcs
 
@@ -311,7 +311,7 @@ theorem evenExt_ae_eq (j : Fin d) (u : EuclideanSpace ℝ (Fin d) → ℝ) :
   have hnull : volume {x : EuclideanSpace ℝ (Fin d) | x j = 0} = 0 := volume_interface j
   refine (MeasureTheory.ae_iff).mpr (measure_mono_null ?_ hnull)
   intro x hx
-  simp only [Set.mem_setOf_eq]
+  simp only [Set.mem_ofPred_eq]
   by_contra hne
   refine hx ?_
   rcases lt_trichotomy (x j) 0 with h | h | h
@@ -322,7 +322,7 @@ theorem evenExt_ae_eq (j : Fin d) (u : EuclideanSpace ℝ (Fin d) → ℝ) :
     change (if 0 ≤ x j then u x else u (reflectLI j x))
       = (halfSpace j).indicator u x + (halfSpaceNeg j).indicator (fun y => u (reflectLI j y)) x
     have hmemNeg : x ∈ halfSpaceNeg j := h
-    rw [if_neg h1, Set.indicator_of_notMem h2, Set.indicator_of_mem hmemNeg, zero_add]
+    rw [ite_eq_right h1, Set.indicator_of_notMem h2, Set.indicator_of_mem hmemNeg, zero_add]
   · exact absurd h hne
   · have h2 : x ∉ halfSpaceNeg j := by
       intro hmem
@@ -330,7 +330,7 @@ theorem evenExt_ae_eq (j : Fin d) (u : EuclideanSpace ℝ (Fin d) → ℝ) :
     change (if 0 ≤ x j then u x else u (reflectLI j x))
       = (halfSpace j).indicator u x + (halfSpaceNeg j).indicator (fun y => u (reflectLI j y)) x
     have hmemPos : x ∈ halfSpace j := h
-    rw [if_pos h.le, Set.indicator_of_notMem h2, Set.indicator_of_mem hmemPos, add_zero]
+    rw [ite_eq_left h.le, Set.indicator_of_notMem h2, Set.indicator_of_mem hmemPos, add_zero]
 
 /-- **Reflection of the lower half space onto the upper one**, preserving measure. -/
 theorem measurePreserving_reflectLI_halfSpaceNeg (j : Fin d) :
@@ -350,18 +350,13 @@ theorem eLpNorm_evenExt_le {j : Fin d} {u : EuclideanSpace ℝ (Fin d) → ℝ} 
       (volume.restrict (halfSpace j)) := measurePreserving_reflectLI_halfSpaceNeg j
   have hu' : AEStronglyMeasurable (fun y => u (reflectLI j y))
       (volume.restrict (halfSpaceNeg j)) := hu.comp_measurePreserving hmp
-  have h1 : AEStronglyMeasurable ((halfSpace j).indicator u) volume :=
-    (aestronglyMeasurable_indicator_iff (measurableSet_halfSpace j)).mpr hu
-  have h2 : AEStronglyMeasurable
-      ((halfSpaceNeg j).indicator (fun y => u (reflectLI j y))) volume :=
-    (aestronglyMeasurable_indicator_iff (measurableSet_halfSpaceNeg j)).mpr hu'
   calc eLpNorm (evenExt j u) p volume
       = eLpNorm (fun x => (halfSpace j).indicator u x
           + (halfSpaceNeg j).indicator (fun y => u (reflectLI j y)) x) p volume :=
         eLpNorm_congr_ae (evenExt_ae_eq j u)
     _ ≤ eLpNorm ((halfSpace j).indicator u) p volume
         + eLpNorm ((halfSpaceNeg j).indicator (fun y => u (reflectLI j y))) p volume :=
-        eLpNorm_add_le h1 h2 hp
+        eLpNorm_add_le hp
     _ = eLpNorm u p (volume.restrict (halfSpace j))
         + eLpNorm u p (volume.restrict (halfSpace j)) := by
         have hcomp : eLpNorm (fun y => u (reflectLI j y)) p (volume.restrict (halfSpaceNeg j))
@@ -382,7 +377,7 @@ theorem evenExtGrad_ae_eq (j : Fin d) (g : Fin d → EuclideanSpace ℝ (Fin d) 
   have hnull : volume {x : EuclideanSpace ℝ (Fin d) | x j = 0} = 0 := volume_interface j
   refine (MeasureTheory.ae_iff).mpr (measure_mono_null ?_ hnull)
   intro x hx
-  simp only [Set.mem_setOf_eq]
+  simp only [Set.mem_ofPred_eq]
   by_contra hne
   refine hx ?_
   rcases lt_trichotomy (x j) 0 with h | h | h
@@ -394,7 +389,7 @@ theorem evenExtGrad_ae_eq (j : Fin d) (g : Fin d → EuclideanSpace ℝ (Fin d) 
     change (if 0 ≤ x j then g k x else reflectSign j k * g k (reflectLI j x))
       = (halfSpace j).indicator (g k) x
         + (halfSpaceNeg j).indicator (fun y => reflectSign j k * g k (reflectLI j y)) x
-    rw [if_neg h1, Set.indicator_of_notMem h2, Set.indicator_of_mem hmemNeg, zero_add]
+    rw [ite_eq_right h1, Set.indicator_of_notMem h2, Set.indicator_of_mem hmemNeg, zero_add]
   · exact absurd h hne
   · have h2 : x ∉ halfSpaceNeg j := by
       intro hmem
@@ -403,7 +398,7 @@ theorem evenExtGrad_ae_eq (j : Fin d) (g : Fin d → EuclideanSpace ℝ (Fin d) 
     change (if 0 ≤ x j then g k x else reflectSign j k * g k (reflectLI j x))
       = (halfSpace j).indicator (g k) x
         + (halfSpaceNeg j).indicator (fun y => reflectSign j k * g k (reflectLI j y)) x
-    rw [if_pos h.le, Set.indicator_of_notMem h2, Set.indicator_of_mem hmemPos, add_zero]
+    rw [ite_eq_left h.le, Set.indicator_of_notMem h2, Set.indicator_of_mem hmemPos, add_zero]
 
 /-- **Measurability of the reflected extension**, from the description of it as a sum of two
 indicators. -/
@@ -480,16 +475,11 @@ theorem eLpNorm_evenExtGrad_le {j : Fin d} {g : Fin d → EuclideanSpace ℝ (Fi
   have hmp := measurePreserving_reflectLI_halfSpaceNeg j
   have hg' : AEStronglyMeasurable (fun y => g k (reflectLI j y))
       (volume.restrict (halfSpaceNeg j)) := hg.comp_measurePreserving hmp
-  have h1 : AEStronglyMeasurable ((halfSpace j).indicator (g k)) volume :=
-    (aestronglyMeasurable_indicator_iff (measurableSet_halfSpace j)).mpr hg
-  have h2 : AEStronglyMeasurable ((halfSpaceNeg j).indicator
-      fun y => reflectSign j k * g k (reflectLI j y)) volume :=
-    (aestronglyMeasurable_indicator_iff (measurableSet_halfSpaceNeg j)).mpr
-      (hg'.const_mul (reflectSign j k))
   have hsign : eLpNorm (fun y => reflectSign j k * g k (reflectLI j y)) p
       (volume.restrict (halfSpaceNeg j))
       ≤ eLpNorm (fun y => g k (reflectLI j y)) p (volume.restrict (halfSpaceNeg j)) := by
-    refine eLpNorm_mono_ae (Filter.Eventually.of_forall fun y => ?_)
+    refine eLpNorm_mono_ae (hg'.const_mul (reflectSign j k))
+      (Filter.Eventually.of_forall fun y => ?_)
     rw [norm_mul, Real.norm_eq_abs (reflectSign j k), abs_reflectSign, one_mul]
   calc eLpNorm (evenExtGrad j g k) p volume
       = eLpNorm (fun x => (halfSpace j).indicator (g k) x
@@ -497,7 +487,7 @@ theorem eLpNorm_evenExtGrad_le {j : Fin d} {g : Fin d → EuclideanSpace ℝ (Fi
           p volume := eLpNorm_congr_ae (evenExtGrad_ae_eq j g k)
     _ ≤ eLpNorm ((halfSpace j).indicator (g k)) p volume
         + eLpNorm ((halfSpaceNeg j).indicator
-            fun y => reflectSign j k * g k (reflectLI j y)) p volume := eLpNorm_add_le h1 h2 hp
+            fun y => reflectSign j k * g k (reflectLI j y)) p volume := eLpNorm_add_le hp
     _ ≤ eLpNorm (g k) p (volume.restrict (halfSpace j))
         + eLpNorm (g k) p (volume.restrict (halfSpace j)) := by
         rw [eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_halfSpace j),

@@ -59,7 +59,7 @@ theorem contDiffOn_of_gradClosed (hd : 0 < d) (c : EuclideanSpace ℝ (Fin d)) {
       (∀ i, ContDiffOn ℝ (⊤ : ℕ∞) (v i) (Metric.ball c r)) ∧
         ∀ i, v i =ᵐ[volume.restrict (Metric.ball c r)] F i := by
   classical
-  haveI : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
+  have : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
   have hdR : (0 : ℝ) < (d : ℝ) := by exact_mod_cast hd
   have hp : (d : ℝ) < 2 * (d : ℝ) := by linarith

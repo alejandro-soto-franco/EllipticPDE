@@ -66,7 +66,7 @@ theorem idCoeff_symm (i j : Fin d) : idCoeff i j = idCoeff j i := by
   by_cases h : i = j
   · subst h
     rfl
-  · rw [if_neg h, if_neg (Ne.symm h)]
+  · rw [ite_eq_right h, ite_eq_right (Ne.symm h)]
 
 /-- The identity matrix is elliptic with constant one. -/
 theorem idCoeff_ell (ξ : Fin d → ℝ) :
@@ -79,8 +79,8 @@ theorem idCoeff_ell (ξ : Fin d → ℝ) :
 theorem idCoeff_bdd (i j : Fin d) : |idCoeff i j| ≤ 1 := by
   unfold idCoeff
   by_cases h : i = j
-  · rw [if_pos h, abs_one]
-  · rw [if_neg h, abs_zero]
+  · rw [ite_eq_left h, abs_one]
+  · rw [ite_eq_right h, abs_zero]
     exact zero_le_one
 
 /-- The Laplacian of a negative. -/
