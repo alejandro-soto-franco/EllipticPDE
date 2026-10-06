@@ -68,19 +68,14 @@ theorem exists_holderOnWith_of_gradClosed_general (hd : 1 < d) (c : EuclideanSpa
     ∃ w : EuclideanSpace ℝ (Fin d) → ℝ,
       w =ᵐ[volume.restrict (Metric.ball c r)] F i ∧
         ∃ M : ℝ≥0, HolderOnWith M (morreyExponent d (P : ℝ)) w (Metric.ball c r) := by
-  have : IsFiniteMeasure (volume.restrict (Metric.ball c r)) :=
-    ⟨by rw [Measure.restrict_apply_univ]; exact measure_ball_lt_top⟩
   have hd0 : 0 < d := by omega
   have hp₀E : (1 : ℝ≥0∞) ≤ (p₀ : ℝ≥0∞) := by exact_mod_cast hp₀
-  have hcast : ((P : ℝ≥0) : ℝ≥0∞) = ENNReal.ofReal (P : ℝ) := by
-    rw [ENNReal.ofReal_coe_nnreal]
   -- The gradient coordinates reach `L^P` on the inner ball.
   have hgradP : ∀ k, MemLp (F (nxt i k)) (ENNReal.ofReal (P : ℝ))
-      (volume.restrict (Metric.ball c r)) := by
-    intro k
-    have h := memLp_of_gradClosed_general hd c hp₀ hdep s hsd hp₀P hPs hr hrR hgrad hmem
+      (volume.restrict (Metric.ball c r)) := fun k => by
+    rw [ENNReal.ofReal_coe_nnreal]
+    exact memLp_of_gradClosed_general hd c hp₀ hdep s hsd hp₀P hPs hr hrR hgrad hmem
       (nxt i k) (by have := hdep i k; omega)
-    rwa [hcast] at h
   -- The member itself is integrable there.
   have hFint : IntegrableOn (F i) (Metric.ball c r) volume :=
     ((hmem i (by omega)).mono_measure
@@ -108,5 +103,52 @@ theorem morreyExponent_eq_ladder (hd : 0 < d) {p₀ P : ℝ≥0} {s : ℕ}
     field_simp
     ring
   rw [morreyExponent, Real.coe_toNNReal _ hnn, hval]
+
+/-- **An exponent with a prescribed Morrey exponent.** For `γ ∈ (0, 1)` the exponent
+`P = d/(1 - γ)` exceeds `d` and has Morrey exponent `γ`. -/
+theorem exists_nnreal_morreyExponent_eq (hd : 0 < d) {γ : ℝ≥0} (hγ0 : 0 < γ) (hγ1 : γ < 1) :
+    ∃ P : ℝ≥0, (d : ℝ) < (P : ℝ) ∧ morreyExponent d (P : ℝ) = γ := by
+  have hdR : (0 : ℝ) < (d : ℝ) := by exact_mod_cast hd
+  have hγ1R : ((γ : ℝ≥0) : ℝ) < 1 := by exact_mod_cast hγ1
+  have hγ0R : (0 : ℝ) < ((γ : ℝ≥0) : ℝ) := by exact_mod_cast hγ0
+  have hden : (0 : ℝ) < 1 - (γ : ℝ) := by linarith
+  have hPcoe : (((d : ℝ) / (1 - (γ : ℝ))).toNNReal : ℝ) = (d : ℝ) / (1 - (γ : ℝ)) :=
+    Real.coe_toNNReal _ (by positivity)
+  have hPd : (d : ℝ) < ((d : ℝ) / (1 - (γ : ℝ))).toNNReal := by
+    rw [hPcoe, lt_div_iff₀ hden]
+    nlinarith
+  refine ⟨_, hPd, NNReal.coe_injective ?_⟩
+  rw [coe_morreyExponent hPd hd, hPcoe]
+  field_simp
+  ring
+
+/-- **Guo's free Hölder exponent in even dimension.** When `d/2` is an integer, which at `p = 2`
+is Guo's case `n/p ∈ ℕ`, the ladder reaches every finite exponent, so the Hölder exponent may be
+any value in `(0,1)`. In odd dimension the reciprocal `1/2 - ⌊d/2⌋/d = 1/(2d)` caps the exponent
+at `2d` and the Hölder exponent at `1/2`, which is Guo's other case. -/
+theorem exists_holderOnWith_of_gradClosed_even (hd : 0 < d) (hdeven : 2 * (d / 2) = d)
+    (c : EuclideanSpace ℝ (Fin d)) {r R : ℝ} (hr : 0 < r) (hrR : r < R)
+    {ι : Type*} {F : ι → EuclideanSpace ℝ (Fin d) → ℝ} {nxt : ι → Fin d → ι}
+    {dep : ι → ℕ} {m : ℕ} (hdep : ∀ i k, dep (nxt i k) ≤ dep i + 1)
+    (hgrad : ∀ i, dep i < m → HasWeakGradOn (Metric.ball c R) (F i) (fun k => F (nxt i k)))
+    (hmem : ∀ i, dep i ≤ m → MemLp (F i) 2 (volume.restrict (Metric.ball c R)))
+    {γ : ℝ≥0} (hγ0 : 0 < γ) (hγ1 : γ < 1)
+    (i : ι) (hi : dep i + 1 + d / 2 ≤ m) :
+    ∃ w : EuclideanSpace ℝ (Fin d) → ℝ,
+      w =ᵐ[volume.restrict (Metric.ball c r)] F i ∧
+        ∃ M : ℝ≥0, HolderOnWith M γ w (Metric.ball c r) := by
+  obtain ⟨P, hPd, hγP⟩ := exists_nnreal_morreyExponent_eq hd hγ0 hγ1
+  have hd2 : (2 : ℝ) ≤ d := by exact_mod_cast (by omega : 2 ≤ d)
+  have hdR : (0 : ℝ) < d := by linarith
+  have hhalf : ((d / 2 : ℕ) : ℝ) * (d : ℝ)⁻¹ = 2⁻¹ := by
+    have hn : ((d / 2 : ℕ) : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (by omega)
+    have hR : (d : ℝ) = 2 * ((d / 2 : ℕ) : ℝ) := by exact_mod_cast hdeven.symm
+    rw [hR, mul_inv]
+    field_simp
+  obtain ⟨w, hwae, M, hwhol⟩ := exists_holderOnWith_of_gradClosed_general (by omega) c hr hrR
+    (p₀ := 2) one_le_two hdep hgrad hmem (s := d / 2) (P := P)
+    (by push_cast; exact_mod_cast hdeven.le) (by rw [← NNReal.coe_le_coe]; push_cast; linarith) hPd
+    (by rw [NNReal.coe_ofNat, hhalf, sub_self]; positivity) i hi
+  exact ⟨w, hwae, M, hγP ▸ hwhol⟩
 
 end EllipticPdes.Embedding

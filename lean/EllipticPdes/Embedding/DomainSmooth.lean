@@ -7,6 +7,7 @@ Authors: Alejandro Soto Franco
 module
 
 public import EllipticPdes.Embedding.DomainHolder
+public import EllipticPdes.Embedding.SmoothOfGradClosed
 public import EllipticPdes.Embedding.ClassicalDeriv
 
 /-!
@@ -72,70 +73,22 @@ theorem exists_const_contDiffOn_holderOnWith_of_gradClosed_domain (hd : 1 < d)
         (∀ (n : ℕ) (i : ι), dep i + n + 1 + s ≤ m → ContDiffOn ℝ (n : ℕ) (v i) Ω) ∧
         (∀ i, dep i + 2 + s ≤ m → ∀ y ∈ Ω,
           HasFDerivAt (v i) (gradCLM (fun k => v (nxt i k)) y) y) := by
-  classical
   obtain ⟨C, hC⟩ :=
     exists_const_holderOnWith_of_gradClosed_domain hd hΩopen hΩb hC1 ι hp₀ hsd hp₀P hPd hPs
-  refine ⟨C, ?_⟩
-  intro F nxt dep m hdep hgrad hmem M hM
-  have hd0 : 0 < d := by omega
-  have : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
-  have hp₀E : (1 : ℝ≥0∞) ≤ (p₀ : ℝ≥0∞) := by exact_mod_cast hp₀
-  have hP0 : (0 : ℝ) < (P : ℝ) := lt_of_le_of_lt (by positivity) hPd
+  refine ⟨C, fun {F nxt dep m} hdep hgrad hmem M hM => ?_⟩
+  have := isFiniteMeasure_restrict_of_isBounded hΩb
   have hγpos : 0 < morreyExponent d (P : ℝ) := by
-    rw [← NNReal.coe_pos, coe_morreyExponent hPd hd0, sub_pos, div_lt_one hP0]
+    rw [← NNReal.coe_pos, coe_morreyExponent hPd (by omega), sub_pos,
+      div_lt_one (lt_of_le_of_lt (by positivity) hPd)]
     exact hPd
-  have hFint : ∀ i, dep i ≤ m → IntegrableOn (F i) Ω volume := fun i hi =>
-    (hmem i hi).integrable hp₀E
-  -- The representatives, chosen once. Indices the clause does not reach keep `F` itself.
-  have hqual : ∀ i, ∃ w : EuclideanSpace ℝ (Fin d) → ℝ, dep i + 1 + s ≤ m →
-      w =ᵐ[volume.restrict Ω] F i ∧ (∀ y ∈ closure Ω, ‖w y‖ ≤ ((C * M : ℝ≥0) : ℝ)) ∧
-        HolderOnWith (C * M) (morreyExponent d (P : ℝ)) w (closure Ω) := by
-    intro i
-    by_cases hi : dep i + 1 + s ≤ m
-    · obtain ⟨w, hwae, hwsup, hwhol⟩ := hC hdep hgrad hmem M hM i hi
-      exact ⟨w, fun _ => ⟨hwae, hwsup, hwhol⟩⟩
-    · exact ⟨F i, fun h => absurd h hi⟩
-  choose v hv using hqual
-  have hvae : ∀ i, dep i + 1 + s ≤ m → v i =ᵐ[volume.restrict Ω] F i := fun i hi => (hv i hi).1
-  have hvsup : ∀ i, dep i + 1 + s ≤ m → ∀ y ∈ closure Ω, ‖v i y‖ ≤ ((C * M : ℝ≥0) : ℝ) :=
-    fun i hi => (hv i hi).2.1
-  have hvhol : ∀ i, dep i + 1 + s ≤ m →
-      HolderOnWith (C * M) (morreyExponent d (P : ℝ)) (v i) (closure Ω) := fun i hi =>
-    (hv i hi).2.2
-  have hvc : ∀ i, dep i + 1 + s ≤ m → ContinuousOn (v i) Ω := fun i hi =>
-    ((hvhol i hi).continuousOn hγpos).mono subset_closure
-  have hvint : ∀ i, dep i + 1 + s ≤ m → IntegrableOn (v i) Ω volume := fun i hi =>
-    (hFint i (by omega)).congr (hvae i hi).symm
-  have hvgrad : ∀ i, dep i + 2 + s ≤ m →
-      HasWeakGradOn Ω (v i) (fun k => v (nxt i k)) := fun i hi =>
-    (hgrad i (by omega)).congr_ae (hvae i (by omega)).symm
-      fun k => (hvae (nxt i k) (by have := hdep i k; omega)).symm
-  -- The classical derivative of a representative is the representative of the derivative.
-  have hfd : ∀ i, dep i + 2 + s ≤ m → ∀ y ∈ Ω,
-      HasFDerivAt (v i) (gradCLM (fun k => v (nxt i k)) y) y := by
-    intro i hi y hy
-    exact hasFDerivAt_of_continuousOn_hasWeakGradOn hΩopen.measurableSet hΩopen
-      (hvint i (by omega)) (fun k => hvint (nxt i k) (by have := hdep i k; omega))
-      (hvc i (by omega)) (fun k => hvc (nxt i k) (by have := hdep i k; omega)) (hvgrad i hi) hy
-  -- Every order the supply pays for, by induction.
-  have hcn : ∀ (n : ℕ) (i : ι), dep i + n + 1 + s ≤ m →
-      ContDiffOn ℝ (n : ℕ) (v i) Ω := by
-    intro n
-    induction n with
-    | zero => intro i hi; simpa using hvc i (by omega)
-    | succ n ih =>
-      intro i hi
-      rw [show ((n + 1 : ℕ) : WithTop ℕ∞) = (n : WithTop ℕ∞) + 1 by push_cast; ring,
-        contDiffOn_succ_iff_fderiv_of_isOpen hΩopen]
-      refine ⟨fun y hy =>
-        ((hfd i (by omega) y hy).differentiableAt).differentiableWithinAt, by simp, ?_⟩
-      have hsum : ContDiffOn ℝ (n : ℕ) (fun y => gradCLM (fun k => v (nxt i k)) y) Ω := by
-        change ContDiffOn ℝ (n : ℕ)
-          (fun y => ∑ k, v (nxt i k) y •
-            (EuclideanSpace.proj k : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ)) Ω
-        exact ContDiffOn.sum fun k _ =>
-          (ih (nxt i k) (by have := hdep i k; omega)).smul contDiffOn_const
-      exact hsum.congr fun y hy => (hfd i (by omega) y hy).fderiv
-  exact ⟨v, hvae, hvsup, hvhol, hcn, hfd⟩
+  -- The representatives, chosen once.
+  choose! v hvae hvsup hvhol using fun i (hi : dep i + 1 + s ≤ m) => hC hdep hgrad hmem M hM i hi
+  obtain ⟨hfd, hcn⟩ := contDiffOn_of_ae_eq_family (F := F) (v := v) hΩopen
+    (fun n i => dep i + n + 1 + s ≤ m) (fun n i k hi => by have := hdep i k; omega)
+    (fun n i hi => hvae i (by omega))
+    (fun n i hi => (hmem i (by omega)).integrable (by exact_mod_cast hp₀))
+    (fun n i hi => hgrad i (by omega))
+    (fun n i hi => ((hvhol i (by omega)).continuousOn hγpos).mono subset_closure)
+  exact ⟨v, hvae, hvsup, hvhol, hcn, fun i hi => hfd 0 i (by omega)⟩
 
 end EllipticPdes.Embedding

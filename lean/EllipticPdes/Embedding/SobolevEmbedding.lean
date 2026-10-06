@@ -132,38 +132,21 @@ private theorem exists_landing_free (hd0 : 0 < d) {p₀ : ℝ≥0} (hp₀0 : (0 
     ∃ P : ℝ≥0, p₀ ≤ P ∧ (d : ℝ) < (P : ℝ) ∧
       (p₀ : ℝ)⁻¹ - (s : ℝ) * (d : ℝ)⁻¹ ≤ (P : ℝ)⁻¹ ∧ morreyExponent d (P : ℝ) = γ := by
   have hdpos : (0 : ℝ) < (d : ℝ) := by exact_mod_cast hd0
-  have hγ1R : ((γ : ℝ≥0) : ℝ) < 1 := by exact_mod_cast hγ1
-  have hγ0R : (0 : ℝ) < ((γ : ℝ≥0) : ℝ) := by exact_mod_cast hγ0
-  have hden : (0 : ℝ) < 1 - (γ : ℝ) := by linarith
-  set P : ℝ≥0 := Real.toNNReal ((d : ℝ) / (1 - (γ : ℝ))) with hP_def
-  have hPcoe : ((P : ℝ≥0) : ℝ) = (d : ℝ) / (1 - (γ : ℝ)) := by
-    rw [hP_def, Real.coe_toNNReal _ (by positivity)]
-  have hPd : (d : ℝ) < (P : ℝ) := by
-    rw [hPcoe, lt_div_iff₀ hden]
-    nlinarith
+  obtain ⟨P, hPd, hγP⟩ := exists_nnreal_morreyExponent_eq hd0 hγ0 hγ1
   -- the base exponent is at most the dimension, the rung count being at least one
   have hp₀d : (p₀ : ℝ) ≤ (d : ℝ) := by
     rcases Nat.eq_zero_or_pos s with rfl | hs
     · simp at hsd; linarith
     · have hs1 : (1 : ℝ) ≤ (s : ℝ) := by exact_mod_cast hs
       nlinarith
-  have hp₀P : p₀ ≤ P := by
-    rw [← NNReal.coe_le_coe]
+  refine ⟨P, ?_, hPd, ?_, hγP⟩
+  · rw [← NNReal.coe_le_coe]
     linarith [hPd, hp₀d]
-  have hPs : (p₀ : ℝ)⁻¹ - (s : ℝ) * (d : ℝ)⁻¹ ≤ (P : ℝ)⁻¹ := by
-    have hzero : (p₀ : ℝ)⁻¹ - (s : ℝ) * (d : ℝ)⁻¹ = 0 := by
+  · have hzero : (p₀ : ℝ)⁻¹ - (s : ℝ) * (d : ℝ)⁻¹ = 0 := by
       field_simp
       linarith [hsd]
     rw [hzero]
     positivity
-  refine ⟨P, hp₀P, hPd, hPs, ?_⟩
-  have hdne : (d : ℝ) ≠ 0 := ne_of_gt hdpos
-  have hdenne : (1 : ℝ) - (γ : ℝ) ≠ 0 := ne_of_gt hden
-  have h1 : (d : ℝ) / ((d : ℝ) / (1 - (γ : ℝ))) = 1 - (γ : ℝ) := by
-    field_simp
-  refine NNReal.coe_injective ?_
-  rw [coe_morreyExponent hPd hd0, hPcoe, h1]
-  ring
 
 /-! ### Clause (ii) -/
 

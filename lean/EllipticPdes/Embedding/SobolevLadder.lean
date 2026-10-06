@@ -275,6 +275,22 @@ theorem exists_const_ladder (ι : Type*) {X : Type*} (D : X → Set (EuclideanSp
     exact FamilyBound.mono_exponent (hp₀0.trans_le hpq) hqP (FamilyBound.mono_supply
       (s' := s + 1) (by omega) (hK.rung (hsub _ (hV x hx)) hKr))
 
+/-- The exponent `2d` of the ladder, as an extended real, in the two forms the Morrey
+statement and the ladder use. -/
+theorem ofReal_two_mul_natCast (d : ℕ) :
+    ENNReal.ofReal (2 * (d : ℝ)) = 2 * ((d : ℝ≥0) : ℝ≥0∞) := by
+  rw [ENNReal.ofReal_mul zero_le_two]
+  simp
+
+/-- The sum of `d` seminorms, each at most `B`, is at most `d * B`, read in `ℝ≥0`. -/
+theorem sum_toNNReal_eLpNorm_le {α : Type*} {m : MeasurableSpace α} {μ : Measure α}
+    {g : Fin d → α → ℝ} {p : ℝ≥0∞} {B : ℝ≥0} (h : ∀ k, eLpNorm (g k) p μ ≤ B) :
+    ∑ k, (eLpNorm (g k) p μ).toNNReal ≤ d * B := by
+  calc ∑ k, (eLpNorm (g k) p μ).toNNReal ≤ ∑ _k : Fin d, B :=
+        Finset.sum_le_sum fun k _ =>
+          (ENNReal.toNNReal_mono ENNReal.coe_ne_top (h k)).trans_eq (ENNReal.toNNReal_coe B)
+    _ = d * B := by simp
+
 /-! ### The ladder on balls -/
 
 /-- **The ladder with its constant on concentric balls.** On `Metric.ball c R` the family is given;
