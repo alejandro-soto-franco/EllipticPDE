@@ -76,12 +76,7 @@ private lemma exists_abs_diffQuot_bound {η : EuclideanSpace ℝ (Fin d) → ℝ
     ∃ L : ℝ, 0 ≤ L ∧ ∀ (k : Fin d) (h : ℝ), h ≠ 0 → ∀ x,
       |(η (x + hshift k h) - η x) / h| ≤ L := by
   obtain ⟨K, hK⟩ := ContDiff.lipschitzWith_of_hasCompactSupport hη.2.1 hη.1 (by simp)
-  refine ⟨K, K.2, fun k h hh x => ?_⟩
-  have hn : ‖hshift k h‖ = |h| := by simp [hshift, norm_smul]
-  have := hK.dist_le_mul (x + hshift k h) x
-  rw [Real.dist_eq, dist_eq_norm, show x + hshift k h - x = hshift k h by abel, hn] at this
-  rw [abs_div, div_le_iff₀ (abs_pos.mpr hh)]
-  exact this
+  exact ⟨K, K.2, fun k h hh x => abs_diffQuot_le_of_lipschitzWith hK k hh x⟩
 
 /-- **Operator bound for the difference quotient.** `‖Dₖʰ g‖ ≤ 2‖g‖/|h|`. -/
 private lemma norm_diffQuot_le_two_div (k : Fin d) (h : ℝ) (g : EucL2 d) :

@@ -30,7 +30,6 @@ the integration by parts formula for Lipschitz functions,
 
 ## Main declarations
 
-* `IsLipCoeff.lipschitzWith`: the estimate as a `LipschitzWith` statement.
 * `coeffDa`: the chosen representative of `∂_l a_{ij}`.
 * `measurable_coeffDa`, `IsLipCoeff.abs_da_le`: its measurability and its bound.
 * `IsLipCoeff.hasWeakPartial`: it is the weak partial derivative of the entry.
@@ -49,15 +48,6 @@ namespace EllipticPdes.Regularity
 open EllipticPdes.Sobolev
 
 variable {d : ℕ} {A : EllipticCoeff d}
-
-/-- The Lipschitz estimate of `IsLipCoeff` as a `LipschitzWith` statement, which is what
-Rademacher's theorem and the bound on the derivative are stated for. -/
-theorem IsLipCoeff.lipschitzWith (hA : IsLipCoeff A) (i j : Fin d) :
-    LipschitzWith (Real.toNNReal hA.A1) (fun y => A.a y i j) := by
-  refine LipschitzWith.of_dist_le_mul fun x y => ?_
-  have h := hA.lip i j x y
-  rw [Real.dist_eq, Real.coe_toNNReal _ hA.A1_nonneg, ← dist_eq_norm] at *
-  exact h
 
 /-- The chosen representative of the weak partial `∂_l a_{ij}`: the total `fderiv` applied to
 the `l`-th basis vector, which is the classical partial wherever the entry is differentiable

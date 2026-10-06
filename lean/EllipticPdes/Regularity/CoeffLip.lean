@@ -40,6 +40,7 @@ Mathlib, so `interior_smooth` asks `IsLipCoeff` beside its `W^{k,∞}` bundles.
 @[expose] public section
 
 open MeasureTheory
+open scoped NNReal
 
 noncomputable section
 
@@ -60,6 +61,15 @@ structure IsLipCoeff (A : EllipticCoeff d) where
   /-- Every entry is Lipschitz with constant `A1`. -/
   lip : ∀ i j, ∀ x y : EuclideanSpace ℝ (Fin d), |A.a x i j - A.a y i j| ≤ A1 * ‖x - y‖
 
+/-- The Lipschitz estimate of `IsLipCoeff` as a `LipschitzWith` statement, which is what
+Rademacher's theorem and the bound on the derivative are stated for. -/
+theorem IsLipCoeff.lipschitzWith {A : EllipticCoeff d} (hA : IsLipCoeff A) (i j : Fin d) :
+    LipschitzWith (Real.toNNReal hA.A1) (fun y => A.a y i j) := by
+  refine LipschitzWith.of_dist_le_mul fun x y => ?_
+  have h := hA.lip i j x y
+  rw [Real.dist_eq, Real.coe_toNNReal _ hA.A1_nonneg, ← dist_eq_norm] at *
+  exact h
+
 /-- The coefficient difference quotient is uniformly bounded: for the `(i, j)` coefficient
 entry, `|Dₖʰ aᵢⱼ(x)| ≤ A₁` for every `x` and every `h ≠ 0`. This is the pointwise
 commutator bound used in the master interior estimate to control the coefficient-
@@ -69,15 +79,8 @@ principal coefficients beyond their bounds. -/
 theorem IsLipCoeff.abs_diffQuot_coeff_le {A : EllipticCoeff d} (hA : IsLipCoeff A)
     (i j k : Fin d) {h : ℝ} (hh : h ≠ 0) (x : EuclideanSpace ℝ (Fin d)) :
     |(A.a (x + hshift k h) i j - A.a x i j) / h| ≤ hA.A1 := by
-  have hnorm : ‖(x + hshift k h) - x‖ = |h| := by
-    have hsub : (x + hshift k h) - x = hshift k h := by abel
-    rw [hsub, hshift, norm_smul]
-    simp
-  have hlip : |A.a (x + hshift k h) i j - A.a x i j| ≤ hA.A1 * |h| := by
-    have := hA.lip i j (x + hshift k h) x
-    rwa [hnorm] at this
-  rw [abs_div, div_le_iff₀ (abs_pos.mpr hh)]
-  simpa [Real.norm_eq_abs] using hlip
+  simpa [Real.coe_toNNReal _ hA.A1_nonneg] using
+    abs_diffQuot_le_of_lipschitzWith (hA.lipschitzWith i j) k hh x
 
 /-- **A `C¹` bundle is a `W^{1,∞}` bundle.** The segment mean value inequality turns the
 pointwise bound on the first derivatives into the Lipschitz estimate with the same constant,
