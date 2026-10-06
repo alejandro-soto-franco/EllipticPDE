@@ -99,6 +99,12 @@ theorem continuousOn_gradCLM {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
     ContinuousOn (gradCLM g) B :=
   continuousOn_finsetSum _ fun k _ => (hg k).smul continuousOn_const
 
+/-- `gradCLM g` is `Cⁿ` on a set where every component of `g` is. -/
+theorem contDiffOn_gradCLM {n : WithTop ℕ∞} {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
+    {B : Set (EuclideanSpace ℝ (Fin d))} (hg : ∀ k, ContDiffOn ℝ n (g k) B) :
+    ContDiffOn ℝ n (gradCLM g) B :=
+  ContDiffOn.sum fun k _ => (hg k).smul contDiffOn_const
+
 /-- **Scalar multiple of a weak gradient.** A constant multiple of a class with a weak gradient
 has the same multiple of the gradient. -/
 theorem HasWeakGradOn.const_mul {B : Set (EuclideanSpace ℝ (Fin d))}
