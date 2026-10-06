@@ -12,7 +12,7 @@ public import EllipticPdes.Embedding.SobolevLadder
 /-!
 # Hölder continuity at a general base exponent
 
-`EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed` runs the ladder from `L²` and reads
+`EllipticPdes.Embedding.contDiffOn_holder_of_gradClosed` runs the ladder from `L²` and reads
 the Hölder exponent off Morrey's inequality at the exponent the ladder reaches. Morrey is already
 stated for every exponent above the dimension, and the rung count and the landing exponent are
 already free there, so the base exponent is the only thing left at `2`. This file frees it, which
@@ -33,6 +33,10 @@ the other case those statements separate out.
   general base exponent.
 * `EllipticPdes.Embedding.morreyExponent_eq_ladder`: the exponent it lands on is the one the
   cited statements name.
+* `EllipticPdes.Embedding.exists_nnreal_morreyExponent_eq`: every Hölder exponent in `(0, 1)` is
+  a Morrey exponent.
+* `EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed_even`: the free Hölder exponent in
+  even dimension.
 
 ## References
 

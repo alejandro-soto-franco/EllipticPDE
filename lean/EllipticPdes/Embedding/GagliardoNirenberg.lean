@@ -132,9 +132,10 @@ theorem partialD_mul {η φ : EuclideanSpace ℝ (Fin d) → ℝ} (k : Fin d)
 
 /-- A function integrable on a set stays integrable after multiplication by a continuous
 function of compact support. -/
-theorem integrableOn_mul_of_hasCompactSupport {B : Set (EuclideanSpace ℝ (Fin d))}
-    {f ψ : EuclideanSpace ℝ (Fin d) → ℝ} (hf : IntegrableOn f B volume) (hψ : Continuous ψ)
-    (hψs : HasCompactSupport ψ) : IntegrableOn (fun x => f x * ψ x) B volume := by
+theorem integrableOn_mul_of_hasCompactSupport {α : Type*} [TopologicalSpace α]
+    {m : MeasurableSpace α} [OpensMeasurableSpace α] {μ : Measure α} {B : Set α} {f ψ : α → ℝ}
+    (hf : IntegrableOn f B μ) (hψ : Continuous ψ) (hψs : HasCompactSupport ψ) :
+    IntegrableOn (fun x => f x * ψ x) B μ := by
   obtain ⟨C, hC⟩ := hψs.exists_bound_of_continuous hψ
   exact hf.mul_bdd hψ.aestronglyMeasurable (Filter.Eventually.of_forall hC)
 
@@ -340,13 +341,14 @@ theorem exists_cutoff_with_bound (c : EuclideanSpace ℝ (Fin d)) {r R : ℝ} (h
       _ ≤ M.toNNReal := Real.le_coe_toNNReal M
 
 /-- The extension by zero of a function in `Lᵖ(B)`, cut off by a function bounded by one, has
-`Lᵖ(ℝᵈ)` seminorm at most that of the function over `B`. -/
-theorem eLpNorm_cutoff_mul_le {B : Set (EuclideanSpace ℝ (Fin d))} (hB : MeasurableSet B)
-    {η f : EuclideanSpace ℝ (Fin d) → ℝ} (hη : Continuous η) (hη1 : ∀ x, ‖η x‖ ≤ 1) {p : ℝ≥0∞}
-    (hf : AEStronglyMeasurable f (volume.restrict B)) :
-    eLpNorm (fun x => η x * B.indicator f x) p volume ≤ eLpNorm f p (volume.restrict B) :=
+`Lᵖ` seminorm at most that of the function over `B`. -/
+theorem eLpNorm_cutoff_mul_le {α : Type*} [TopologicalSpace α] {m : MeasurableSpace α}
+    [OpensMeasurableSpace α] {μ : Measure α} {B : Set α} (hB : MeasurableSet B)
+    {η f : α → ℝ} (hη : Continuous η)
+    (hη1 : ∀ x, ‖η x‖ ≤ 1) {p : ℝ≥0∞} (hf : AEStronglyMeasurable f (μ.restrict B)) :
+    eLpNorm (fun x => η x * B.indicator f x) p μ ≤ eLpNorm f p (μ.restrict B) :=
   (eLpNorm_mono (g := B.indicator f)
-    (show AEStronglyMeasurable (fun x => η x * B.indicator f x) volume from
+    (show AEStronglyMeasurable (fun x => η x * B.indicator f x) μ from
       hη.aestronglyMeasurable.mul ((aestronglyMeasurable_indicator_iff hB).mpr hf))
     fun x => by
       rw [norm_mul]

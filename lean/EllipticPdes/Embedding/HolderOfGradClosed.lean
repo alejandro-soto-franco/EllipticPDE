@@ -37,10 +37,11 @@ reached and `2d` is the one this file fixes.
 
 ## Main declarations
 
-* `EllipticPdes.Embedding.morreyExponent_two_mul`: the landing exponent is `1/2`.
 * `EllipticPdes.Embedding.contDiffOn_holder_of_gradClosed`: representatives of class
   `C^{n, 1/2}`, for every order the supply pays for, together with the identification of the
   family's entries as their classical partial derivatives.
+* `EllipticPdes.Embedding.exists_const_holderOnWith_of_gradClosed_of_bound`: the Hölder
+  seminorm of a member bounded by a uniform `L²` bound on the family.
 
 ## References
 
