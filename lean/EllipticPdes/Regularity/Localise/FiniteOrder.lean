@@ -14,10 +14,10 @@ public import EllipticPdes.Regularity.Localise.Datum
 Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 1 (p. 327) assumes
 `a^{ij} ∈ C¹(U)` and `b^i, c ∈ L^∞(U)`, and Theorem 2 (p. 332) assumes
 `a^{ij}, b^i, c ∈ C^{m+1}(U)`. Neither asks a bound on `a^{ij}` over `U`, and neither asks anything
-of a coefficient off `U`. `Localise/LocalOp.lean` blends a principal part of class `C^m` on `U` into a
-`FullEllipticOp` (`PrincipalOn`, `blendOp`); this file supplies the lower-order coefficients at
-finite order, including coefficients that are only essentially bounded and almost everywhere
-strongly measurable on `U`.
+of a coefficient off `U`. `Localise/LocalOp.lean` blends a principal part of class `C^m` on `U` into a `FullEllipticOp`
+(`PrincipalOn`, `blendOp`); this file supplies the lower-order coefficients at finite order,
+including coefficients that are only essentially bounded and almost everywhere strongly
+measurable on `U`.
 
 ## Blend
 
