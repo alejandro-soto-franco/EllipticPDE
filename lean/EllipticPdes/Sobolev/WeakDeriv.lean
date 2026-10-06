@@ -77,11 +77,6 @@ theorem lineDerivOp_ofFun_apply (hu : LocallyIntegrableOn u Ω μ) (φ : 𝓓(Ω
   have hd := (φ.contDiff.differentiable (by simp) x).lineDeriv_eq_fderiv (v := v)
   simp [TestFunction.lineDerivOp_eq_lineDerivCLM ℝ, hd]
 
-/-- The test function on `Ω` defined by a smooth function with compact support in `Ω`. -/
-def _root_.ContDiff.toTestFunction {φ : E → ℝ} (hφ : ContDiff ℝ (⊤ : ℕ∞) φ)
-    (hc : HasCompactSupport φ) (hs : tsupport φ ⊆ Ω) : 𝓓(Ω, ℝ) :=
-  ⟨φ, hφ, hc, hs⟩
-
 /-- **Weak derivative as integration by parts.** `g` is the weak derivative of `u` along `v` on
 `Ω` if and only if both are locally integrable on `Ω` and `∫ ∂_{v} φ • u = -∫ φ • g` for every
 smooth function `φ` with compact support in `Ω`. -/
@@ -93,7 +88,7 @@ theorem hasWeakLineDerivOn_iff : HasWeakLineDerivOn Ω v u g μ ↔
   have key : ∀ φ : 𝓓(Ω, ℝ), (∂_{v} (Distribution.ofFun Ω u μ ⊤) φ =
       Distribution.ofFun Ω g μ ⊤ φ ↔ ∫ x, fderiv ℝ φ x v • u x ∂μ = -∫ x, φ x • g x ∂μ) :=
     fun φ => by rw [lineDerivOp_ofFun_apply hu, Distribution.ofFun_apply hg, neg_eq_iff_eq_neg]
-  refine ⟨fun h φ hφ hc hs => (key (hφ.toTestFunction hc hs)).1 congr($h _), fun h => ?_⟩
+  refine ⟨fun h φ hφ hc hs => (key ⟨φ, hφ, hc, hs⟩).1 congr($h _), fun h => ?_⟩
   ext φ
   exact (key φ).2 (h φ φ.contDiff φ.hasCompactSupport φ.tsupport_subset)
 
@@ -311,12 +306,6 @@ theorem _root_.MeasureTheory.LocallyIntegrableOn.integrable_smul_of_tsupport_sub
     ((hu.integrableOn_compact_subset hs hc).continuousOn_smul hφ.continuousOn hc)
   exact subset_tsupport φ fun h0 => hx (by simp [h0])
 
-omit [NormedSpace ℝ F] [BorelSpace E] in
-/-- A function continuous on `Ω` is locally integrable on `Ω` for a locally finite measure. -/
-theorem _root_.ContinuousOn.locallyIntegrableOn_opens [IsLocallyFiniteMeasure μ]
-    (hu : ContinuousOn u Ω) : LocallyIntegrableOn u Ω μ :=
-  hu.locallyIntegrableOn Ω.isOpen.measurableSet
-
 omit [BorelSpace E] in
 /-- **Product of a weak derivative with a smooth function.** If `g` is the weak derivative of
 `u` along `v` on `Ω` and `ψ` is smooth, then `ψ • u` has weak derivative
@@ -379,10 +368,10 @@ theorem hasWeakFDerivOn_fderiv (hu : ContDiffOn ℝ 1 u Ω) :
   intro v
   have hd : ∀ x ∈ Ω, HasFDerivAt u (fderiv ℝ u x) x := fun x hx =>
     ((hu.differentiableOn one_ne_zero x hx).differentiableAt (Ω.isOpen.mem_nhds hx)).hasFDerivAt
-  have hui : LocallyIntegrableOn u Ω μ := hu.continuousOn.locallyIntegrableOn_opens
+  have hui : LocallyIntegrableOn u Ω μ := hu.continuousOn.locallyIntegrableOn Ω.isOpen.measurableSet
   have hgi : LocallyIntegrableOn (fun x => fderiv ℝ u x v) Ω μ :=
     ((hu.continuousOn_fderiv_of_isOpen Ω.isOpen le_rfl).clm_apply
-      continuousOn_const).locallyIntegrableOn_opens
+      continuousOn_const).locallyIntegrableOn Ω.isOpen.measurableSet
   refine hasWeakLineDerivOn_iff.2 ⟨hui, hgi, fun φ hφ hc hs => ?_⟩
   have hφd : Continuous fun x => fderiv ℝ φ x v :=
     (hφ.continuous_fderiv (by simp)).clm_apply continuous_const

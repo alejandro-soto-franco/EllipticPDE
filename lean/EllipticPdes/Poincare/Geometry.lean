@@ -67,8 +67,8 @@ lemma norm_testGraph_succ_sq_eq {Ω : Set (EuclideanSpace ℝ (Fin d))}
 /-- **Test-function Poincaré bound from box geometry.** If on the box `Ω` every test
 function obeys the per-direction slice bound `∫_Ω φ² ≤ C ∫_Ω (∂ᵢφ)²` (the slab Poincaré
 inequality `integral_sq_le_of_tsupport_subset_slab`), then it obeys the graph-coordinate bound
-`hbase` with Poincaré constant `C_P = C / d`. This is `poincare_domain` (averaging the `d` directions) re-expressed
-through the `L²` self-inner products. -/
+`hbase` with Poincaré constant `C_P = C / d`. This is `poincare_domain` (averaging the `d`
+directions) re-expressed through the `L²` self-inner products. -/
 theorem poincare_testfn {Ω : Set (EuclideanSpace ℝ (Fin d))} (hd : 0 < d) (C : ℝ)
     (hslice : ∀ {φ : EuclideanSpace ℝ (Fin d) → ℝ} (_h : IsTestFn Ω φ) (i : Fin d),
       ∫ x in Ω, (φ x) ^ 2 ≤ C * ∫ x in Ω, (partialD i φ x) ^ 2)

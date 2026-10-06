@@ -188,7 +188,8 @@ theorem HasWeakFDerivOn.hasFDerivAt (hw : HasWeakFDerivOn Ω u G μ) (hu : Conti
     (tendsto_rOut_bumpSeq hr)).congr_right fun y hy => indicator_of_mem (hthick
       (self_subset_cthickening _ hy)) G
   exact hasFDerivAt_of_tendstoUniformlyOn isOpen_ball hders
-    (fun n y hy => hw.hasFDerivAt_convolution hG.locallyIntegrableOn_opens hK hKΩ _ (hsub n y hy))
+    (fun n y hy => hw.hasFDerivAt_convolution (hG.locallyIntegrableOn Ω.isOpen.measurableSet) hK
+      hKΩ _ (hsub n y hy))
     (fun y hy => hvals.tendsto_at hy) (mem_ball_self hr)
 
 end EllipticPdes
