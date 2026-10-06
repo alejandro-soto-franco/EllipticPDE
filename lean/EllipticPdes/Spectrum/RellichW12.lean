@@ -200,6 +200,7 @@ theorem transL2_toLp_sub_le_of_hasWeakGradOn_univ {F : EuclideanSpace ℝ (Fin d
 def embW12 (Ω : Set (EuclideanSpace ℝ (Fin d))) : W12 Ω →L[ℝ] L2D Ω :=
   (PiLp.proj (𝕜 := ℝ) 2 (fun _ : Fin (d + 1) => L2D Ω) (0 : Fin (d + 1))).comp (W12 Ω).subtypeL
 
+/-- `embW12 Ω U` is the function coordinate of `U`. -/
 @[simp] lemma embW12_apply (Ω : Set (EuclideanSpace ℝ (Fin d))) (U : W12 Ω) :
     embW12 Ω U = (U : H1amb Ω) 0 := by
   simp only [embW12, ContinuousLinearMap.comp_apply, Submodule.subtypeL_apply, PiLp.proj_apply]

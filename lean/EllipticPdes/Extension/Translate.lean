@@ -40,10 +40,12 @@ variable {d : ℕ}
 
 /-! ### The translation -/
 
+/-- Translation by `h` preserves Lebesgue measure. -/
 lemma measurePreserving_translate (h : EuclideanSpace ℝ (Fin d)) :
     MeasurePreserving (fun y : EuclideanSpace ℝ (Fin d) => y + h) volume volume :=
   measurePreserving_add_right volume h
 
+/-- Translation by `h` is a measurable embedding. -/
 lemma measurableEmbedding_translate (h : EuclideanSpace ℝ (Fin d)) :
     MeasurableEmbedding (fun y : EuclideanSpace ℝ (Fin d) => y + h) :=
   (Homeomorph.addRight h).measurableEmbedding
@@ -63,16 +65,20 @@ theorem partialD_comp_translate {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφ :
   rw [partialD, hcomp.fderiv, ContinuousLinearMap.coe_comp', Function.comp_apply,
     ContinuousLinearMap.coe_id', id_eq, partialD]
 
+/-- Composition with a translation preserves smoothness. -/
 lemma contDiff_comp_translate {φ : EuclideanSpace ℝ (Fin d) → ℝ}
     (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (h : EuclideanSpace ℝ (Fin d)) :
     ContDiff ℝ (⊤ : ℕ∞) (fun y => φ (y + h)) :=
   hφ.comp (contDiff_id.add contDiff_const)
 
+/-- Composition with a translation preserves compact support. -/
 lemma hasCompactSupport_comp_translate {φ : EuclideanSpace ℝ (Fin d) → ℝ}
     (hφ : HasCompactSupport φ) (h : EuclideanSpace ℝ (Fin d)) :
     HasCompactSupport (fun y => φ (y + h)) :=
   hφ.comp_homeomorph (Homeomorph.addRight h)
 
+/-- If `tsupport φ` lies in the preimage of `B` under translation by `h`, then `y ↦ φ (y - h)` has
+topological support in `B`. -/
 lemma tsupport_comp_translate_subset {φ : EuclideanSpace ℝ (Fin d) → ℝ}
     {B : Set (EuclideanSpace ℝ (Fin d))} (h : EuclideanSpace ℝ (Fin d))
     (hs : tsupport φ ⊆ (fun y : EuclideanSpace ℝ (Fin d) => y + h) ⁻¹' B) :

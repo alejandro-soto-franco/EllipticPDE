@@ -49,9 +49,11 @@ variable {d : ℕ}
 /-- **Open half space above the interface `{xⱼ = 0}`.** -/
 def halfSpace (j : Fin d) : Set (EuclideanSpace ℝ (Fin d)) := {x | 0 < x j}
 
+/-- `halfSpace j` is open. -/
 theorem isOpen_halfSpace (j : Fin d) : IsOpen (halfSpace j) :=
   isOpen_lt continuous_const (EuclideanSpace.proj j).continuous
 
+/-- `halfSpace j` is measurable. -/
 theorem measurableSet_halfSpace (j : Fin d) : MeasurableSet (halfSpace j) :=
   (isOpen_halfSpace j).measurableSet
 

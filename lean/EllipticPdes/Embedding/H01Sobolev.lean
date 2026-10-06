@@ -310,6 +310,7 @@ def sobolevEmbL (hbound : ∀ U : H1amb Ω, U ∈ H01 Ω →
         _ = ENNReal.ofReal (C * d * ‖U‖) := by
             rw [← ENNReal.ofReal_coe_nnreal, ← ENNReal.ofReal_mul (by positivity), mul_assoc])
 
+/-- `sobolevEmbL hbound U` agrees almost everywhere on `Ω` with the function coordinate of `U`. -/
 @[simp] lemma coeFn_sobolevEmbL
     (hbound : ∀ U : H1amb Ω, U ∈ H01 Ω →
       eLpNorm (U 0) q (volume.restrict Ω) ≤ C * ∑ i : Fin d, ‖U i.succ‖ₑ) (U : H01 Ω) :

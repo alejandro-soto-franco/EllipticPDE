@@ -95,15 +95,18 @@ theorem eLpNorm_partialD_dilate {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφ :
 def sharpBump (d : ℕ) : ContDiffBump (0 : EuclideanSpace ℝ (Fin d)) :=
   ⟨1 / 4, 1 / 2, by norm_num, by norm_num⟩
 
+/-- `sharpBump d` has topological support the closed ball of radius `1 / 2` about the origin. -/
 @[simp] lemma tsupport_sharpBump :
     tsupport (⇑(sharpBump d)) = closedBall (0 : EuclideanSpace ℝ (Fin d)) (1 / 2) :=
   (sharpBump d).tsupport_eq
 
+/-- `sharpBump d` has topological support inside the closed unit ball. -/
 lemma tsupport_sharpBump_subset :
     tsupport (⇑(sharpBump d)) ⊆ closedBall (0 : EuclideanSpace ℝ (Fin d)) 1 := by
   rw [tsupport_sharpBump]
   exact closedBall_subset_closedBall (by norm_num)
 
+/-- `sharpBump d` is a test function on the open unit ball. -/
 lemma isTestFn_sharpBump : IsTestFn (ball (0 : EuclideanSpace ℝ (Fin d)) 1) (⇑(sharpBump d)) := by
   refine ⟨(sharpBump d).contDiff, (sharpBump d).hasCompactSupport, ?_⟩
   rw [tsupport_sharpBump]
@@ -112,6 +115,7 @@ lemma isTestFn_sharpBump : IsTestFn (ball (0 : EuclideanSpace ℝ (Fin d)) 1) (�
   rw [mem_ball, dist_zero_right]
   linarith
 
+/-- `sharpBump d` takes the value `1` at the origin. -/
 lemma sharpBump_zero : (sharpBump d) 0 = 1 :=
   (sharpBump d).one_of_mem_closedBall (mem_closedBall_self (sharpBump d).rIn_pos.le)
 
@@ -152,6 +156,7 @@ lemma eLpNorm_testGraph_succ_eq (hΩm : MeasurableSet Ω) {ψ : EuclideanSpace �
 def sharpFamily (d : ℕ) (lam : ℝ) : EuclideanSpace ℝ (Fin d) → ℝ :=
   (lam ^ (1 - (d : ℝ) / 2)) • fun x => (sharpBump d) (lam⁻¹ • x)
 
+/-- `sharpFamily d lam` is a test function on the open unit ball for `0 < lam ≤ 1 / 2`. -/
 lemma isTestFn_sharpFamily {lam : ℝ} (h0 : 0 < lam) (h1 : lam ≤ 1 / 2) :
     IsTestFn (ball (0 : EuclideanSpace ℝ (Fin d)) 1) (sharpFamily d lam) :=
   (isTestFn_dilate isTestFn_sharpBump tsupport_sharpBump_subset h0 h1).const_smul _
@@ -209,6 +214,8 @@ def sharpElt (d : ℕ) {lam : ℝ} (h0 : 0 < lam) (h1 : lam ≤ 1 / 2) :
 
 variable {lam : ℝ}
 
+/-- The function coordinate of `sharpElt d h0 h1` has the same `eLpNorm` on the unit ball as
+`sharpFamily d lam` has on the whole space. -/
 lemma eLpNorm_sharpElt_zero (h0 : 0 < lam) (h1 : lam ≤ 1 / 2) {p : ℝ≥0∞} :
     eLpNorm (((sharpElt d h0 h1 : H01 (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) :
         H1amb (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) 0) p
@@ -216,6 +223,8 @@ lemma eLpNorm_sharpElt_zero (h0 : 0 < lam) (h1 : lam ≤ 1 / 2) {p : ℝ≥0∞}
       = eLpNorm (sharpFamily d lam) p volume :=
   eLpNorm_testGraph_zero_eq measurableSet_ball (isTestFn_sharpFamily h0 h1) p
 
+/-- The `i`-th gradient coordinate of `sharpElt d h0 h1` has the same `eLpNorm` on the unit ball as
+`partialD i (sharpFamily d lam)` has on the whole space. -/
 lemma eLpNorm_sharpElt_succ (h0 : 0 < lam) (h1 : lam ≤ 1 / 2) {p : ℝ≥0∞} (i : Fin d) :
     eLpNorm (((sharpElt d h0 h1 : H01 (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) :
         H1amb (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) i.succ) p
@@ -271,6 +280,7 @@ def critEmb (d : ℕ) (hd : 0 < d) (hp' : (p' : ℝ)⁻¹ = ((2 : ℝ≥0) : ℝ
       Lp ℝ (p' : ℝ≥0∞) (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) :=
   sobolevEmbL (fun _U hU => eLpNorm_le_of_mem_H01 measurableSet_ball hd hp' hU)
 
+/-- `critEmb d hd hp' U` has the same `eLpNorm` as the function coordinate of `U`. -/
 lemma eLpNorm_critEmb (hd : 0 < d) (hp' : (p' : ℝ)⁻¹ = ((2 : ℝ≥0) : ℝ)⁻¹ - (d : ℝ)⁻¹)
     (U : H01 (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) (q : ℝ≥0∞) :
     eLpNorm (⇑(critEmb d hd hp' U)) q (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) 1))
@@ -278,6 +288,8 @@ lemma eLpNorm_critEmb (hd : 0 < d) (hp' : (p' : ℝ)⁻¹ = ((2 : ℝ≥0) : ℝ
           (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) :=
   eLpNorm_congr_ae (coeFn_sobolevEmbL _ U)
 
+/-- `‖critEmb d hd hp' U‖` is the real `eLpNorm` of the function coordinate of `U` at
+exponent `p'`. -/
 lemma norm_critEmb (hd : 0 < d) (hp' : (p' : ℝ)⁻¹ = ((2 : ℝ≥0) : ℝ)⁻¹ - (d : ℝ)⁻¹)
     (U : H01 (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) :
     ‖critEmb d hd hp' U‖

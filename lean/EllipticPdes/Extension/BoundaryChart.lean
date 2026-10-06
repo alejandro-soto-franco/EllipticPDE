@@ -59,6 +59,7 @@ variable {d : ℕ}
 def aboveGraph (j : Fin d) (γ : EuclideanSpace ℝ (Fin d) → ℝ) :
     Set (EuclideanSpace ℝ (Fin d)) := {y | γ y < y j}
 
+/-- `aboveGraph j γ` is open for continuous `γ`. -/
 theorem isOpen_aboveGraph {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ} (hγ : Continuous γ) :
     IsOpen (aboveGraph j γ) :=
   isOpen_lt hγ (EuclideanSpace.proj j : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ).continuous

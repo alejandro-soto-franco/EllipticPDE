@@ -53,9 +53,11 @@ variable {d : ℕ}
 /-- The open half space below the interface. -/
 def halfSpaceNeg (j : Fin d) : Set (EuclideanSpace ℝ (Fin d)) := {x | x j < 0}
 
+/-- `halfSpaceNeg j` is measurable. -/
 theorem measurableSet_halfSpaceNeg (j : Fin d) : MeasurableSet (halfSpaceNeg j) :=
   (isOpen_lt (EuclideanSpace.proj j).continuous continuous_const).measurableSet
 
+/-- `halfSpace j` and `halfSpaceNeg j` are disjoint. -/
 theorem disjoint_halfSpace (j : Fin d) : Disjoint (halfSpace j) (halfSpaceNeg j) := by
   rw [Set.disjoint_left]
   intro x hx hx'
@@ -101,6 +103,7 @@ def evenExtGrad (j : Fin d) (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (
     EuclideanSpace ℝ (Fin d) → ℝ :=
   fun x => if 0 ≤ x j then g k x else reflectSign j k * g k (reflectLI j x)
 
+/-- Reflection in the `j`-th coordinate maps `halfSpace j` onto `halfSpaceNeg j` under preimage. -/
 theorem preimage_reflectLI_halfSpaceNeg (j : Fin d) :
     reflectLI j ⁻¹' halfSpaceNeg j = halfSpace j := by
   ext x

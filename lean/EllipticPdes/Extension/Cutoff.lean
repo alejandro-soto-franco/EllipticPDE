@@ -41,17 +41,22 @@ variable {d : ℕ}
 /-- The one-sided profile: `0` for `t ≤ 1`, `1` for `t ≥ 2`, smooth, with values in `[0, 1]`. -/
 def stepProfile : ℝ → ℝ := fun t => Real.smoothTransition (t - 1)
 
+/-- `stepProfile` is smooth. -/
 theorem contDiff_stepProfile : ContDiff ℝ (⊤ : ℕ∞) stepProfile :=
   Real.smoothTransition.contDiff.comp (contDiff_id.sub contDiff_const)
 
+/-- `stepProfile t = 0` for `t ≤ 1`. -/
 theorem stepProfile_eq_zero {t : ℝ} (ht : t ≤ 1) : stepProfile t = 0 :=
   Real.smoothTransition.zero_of_nonpos (by linarith)
 
+/-- `stepProfile t = 1` for `2 ≤ t`. -/
 theorem stepProfile_eq_one {t : ℝ} (ht : 2 ≤ t) : stepProfile t = 1 :=
   Real.smoothTransition.one_of_one_le (by linarith)
 
+/-- `stepProfile` is nonnegative. -/
 theorem stepProfile_nonneg (t : ℝ) : 0 ≤ stepProfile t := Real.smoothTransition.nonneg _
 
+/-- `stepProfile` is at most `1`. -/
 theorem stepProfile_le_one (t : ℝ) : stepProfile t ≤ 1 := Real.smoothTransition.le_one _
 
 /-- The profile is constant below the slab, so its derivative vanishes there. -/
@@ -86,14 +91,17 @@ theorem exists_bound_deriv_stepProfile : ∃ C : ℝ, 0 ≤ C ∧ ∀ t, |deriv 
 /-- **Cutoff excluding the slab `xⱼ ≤ ε`.** It depends on the `j`-th coordinate alone. -/
 def slabCut (j : Fin d) (ε : ℝ) (x : EuclideanSpace ℝ (Fin d)) : ℝ := stepProfile (x j / ε)
 
+/-- `slabCut j ε` is smooth. -/
 theorem contDiff_slabCut (j : Fin d) (ε : ℝ) : ContDiff ℝ (⊤ : ℕ∞) (slabCut j ε) := by
   have h : ContDiff ℝ (⊤ : ℕ∞) (fun x : EuclideanSpace ℝ (Fin d) => x j / ε) :=
     ((EuclideanSpace.proj j : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ).contDiff).div_const ε
   exact contDiff_stepProfile.comp h
 
+/-- `slabCut j ε` is nonnegative. -/
 theorem slabCut_nonneg (j : Fin d) (ε : ℝ) (x : EuclideanSpace ℝ (Fin d)) :
     0 ≤ slabCut j ε x := stepProfile_nonneg _
 
+/-- `slabCut j ε` is at most `1`. -/
 theorem slabCut_le_one (j : Fin d) (ε : ℝ) (x : EuclideanSpace ℝ (Fin d)) :
     slabCut j ε x ≤ 1 := stepProfile_le_one _
 

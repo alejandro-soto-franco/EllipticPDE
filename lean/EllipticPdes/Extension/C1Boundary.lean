@@ -65,9 +65,11 @@ def tangential (j : Fin d) :
     - (EuclideanSpace.proj j : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ).smulRight
         (EuclideanSpace.single j (1 : ℝ))
 
+/-- `tangential j y` is `y` minus its `j`-th component times the `j`-th basis vector. -/
 theorem tangential_apply (j : Fin d) (y : EuclideanSpace ℝ (Fin d)) :
     tangential j y = y - y j • EuclideanSpace.single j (1 : ℝ) := rfl
 
+/-- The `i`-th coordinate of `tangential j y` is `0` for `i = j` and `y i` otherwise. -/
 theorem tangential_coord (j : Fin d) (y : EuclideanSpace ℝ (Fin d)) (i : Fin d) :
     tangential j y i = if i = j then 0 else y i := by
   rw [tangential_apply]
@@ -75,6 +77,7 @@ theorem tangential_coord (j : Fin d) (y : EuclideanSpace ℝ (Fin d)) (i : Fin d
   · subst h; simp
   · simp [h]
 
+/-- `tangential j` is unchanged by adding a multiple of the `j`-th basis vector. -/
 theorem tangential_add_smul (j : Fin d) (y : EuclideanSpace ℝ (Fin d)) (t : ℝ) :
     tangential j (y + t • EuclideanSpace.single j (1 : ℝ)) = tangential j y := by
   ext i

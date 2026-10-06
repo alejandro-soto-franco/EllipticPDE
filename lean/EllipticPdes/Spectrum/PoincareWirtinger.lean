@@ -60,11 +60,13 @@ def constL2 (c : ℝ) : L2D Ω :=
   haveI := isFiniteMeasure_restrict_of_isBounded hΩb
   (memLp_const c).toLp _
 
+/-- `constL2 hΩb c` is almost everywhere equal to the constant `c` on `Ω`. -/
 theorem coeFn_constL2 (c : ℝ) :
     (constL2 hΩb c : EuclideanSpace ℝ (Fin d) → ℝ) =ᵐ[volume.restrict Ω] fun _ => c :=
   haveI := isFiniteMeasure_restrict_of_isBounded hΩb
   (memLp_const c).coeFn_toLp
 
+/-- `constL2 hΩb 0` is zero. -/
 theorem constL2_zero : constL2 hΩb 0 = 0 :=
   Lp.ext ((coeFn_constL2 hΩb 0).trans (Lp.coeFn_zero ℝ 2 _).symm)
 
@@ -72,9 +74,11 @@ theorem constL2_zero : constL2 hΩb 0 = 0 :=
 def constGraph (c : ℝ) : H1amb Ω :=
   WithLp.toLp 2 (Fin.cons (constL2 hΩb c) fun _ => 0)
 
+/-- The function coordinate of `constGraph hΩb c` is `constL2 hΩb c`. -/
 @[simp] theorem constGraph_zero (c : ℝ) : constGraph hΩb c 0 = constL2 hΩb c := by
   rw [constGraph, PiLp.toLp_apply, Fin.cons_zero]
 
+/-- Every gradient coordinate of `constGraph hΩb c` is zero. -/
 @[simp] theorem constGraph_succ (c : ℝ) (k : Fin d) : constGraph hΩb c k.succ = 0 := by
   rw [constGraph, PiLp.toLp_apply, Fin.cons_succ]
 
@@ -110,6 +114,7 @@ product against the constant one over the measure of the domain. -/
 def meanL2 : L2D Ω →L[ℝ] ℝ :=
   ((volume Ω).toReal)⁻¹ • innerSL ℝ (constL2 hΩb 1)
 
+/-- `meanL2 hΩb f` is the integral of `f` over `Ω` divided by the volume of `Ω`. -/
 theorem meanL2_apply (f : L2D Ω) :
     meanL2 hΩb f = ((volume Ω).toReal)⁻¹ * ∫ x in Ω, f x := by
   simp only [meanL2, ContinuousLinearMap.smul_apply, innerSL_apply_apply, smul_eq_mul]
@@ -119,6 +124,7 @@ theorem meanL2_apply (f : L2D Ω) :
   filter_upwards [coeFn_constL2 hΩb 1] with x hx
   rw [hx, one_mul]
 
+/-- `meanL2 hΩb` takes the constant `c` to `c` when `Ω` has nonzero volume. -/
 theorem meanL2_constL2 (hΩ0 : volume Ω ≠ 0) (c : ℝ) : meanL2 hΩb (constL2 hΩb c) = c := by
   haveI := isFiniteMeasure_restrict_of_isBounded hΩb
   rw [meanL2_apply, integral_congr_ae (coeFn_constL2 hΩb c), setIntegral_const, smul_eq_mul,

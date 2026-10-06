@@ -18,7 +18,7 @@ are only essentially bounded and almost everywhere strongly measurable on `U`.
 ## Blend
 
 For a test function `χ` of `U` valued in `[0, 1]`, the principal part is
-`ã = λ I + χ (a − λ I)`, as in `localOp`. At order `m` the product `χ (a − λ I)` is `C^m` on the
+`a_χ = λ I + χ (a − λ I)`, as in `localOp`. At order `m` the product `χ (a − λ I)` is `C^m` on the
 whole space with compact support, so every derivative up to order `m` is bounded
 (`exists_iteratedFDeriv_bound_of_le`), which is `IsCkCoeff` at order `m`. The lower-order
 coefficients are supplied already cut off. For `L^∞(U)` coefficients the cutoff multiplies a
@@ -123,16 +123,19 @@ def gA (χ : EuclideanSpace ℝ (Fin d) → ℝ) (i j : Fin d) (x : EuclideanSpa
 def aT (χ : EuclideanSpace ℝ (Fin d) → ℝ) (x : EuclideanSpace ℝ (Fin d)) (i j : Fin d) : ℝ :=
   P.lam * SmoothOpOn.δ i j + P.gA χ i j x
 
+/-- `PrincipalOn.gA` is `C^m` for a test function `χ` on an open set. -/
 theorem gA_contDiff (hU : IsOpen U) {χ : EuclideanSpace ℝ (Fin d) → ℝ} (hχ : IsTestFn U χ)
     (i j : Fin d) :
     ContDiff ℝ m (P.gA χ i j) :=
   contDiff_mul_of_contDiffOn_of_le hU hχ (n := (m : ℕ∞))
     ((P.contDiffOn i j).sub contDiffOn_const)
 
+/-- `PrincipalOn.gA` has compact support for a test function `χ`. -/
 theorem gA_hasCompactSupport {χ : EuclideanSpace ℝ (Fin d) → ℝ} (hχ : IsTestFn U χ) (i j : Fin d) :
     HasCompactSupport (P.gA χ i j) :=
   hasCompactSupport_mul hχ
 
+/-- `PrincipalOn.gA` is continuous for a test function `χ` on an open set. -/
 theorem gA_continuous (hU : IsOpen U) {χ : EuclideanSpace ℝ (Fin d) → ℝ} (hχ : IsTestFn U χ)
     (i j : Fin d) :
     Continuous (P.gA χ i j) :=

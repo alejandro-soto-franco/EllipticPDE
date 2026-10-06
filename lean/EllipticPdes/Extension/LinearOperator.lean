@@ -228,10 +228,12 @@ def extLinear (P : BoundaryPartition d Ω) (χ : EuclideanSpace ℝ (Fin d) → 
     · funext k
       exact extSubsetGrad_smul P a χ w.1 w.2 k
 
+/-- The first component of `extLinear P χ w` is `extSubsetFun P χ w.1`. -/
 @[simp] theorem extLinear_fst (P : BoundaryPartition d Ω)
     (χ : EuclideanSpace ℝ (Fin d) → ℝ) (w : SobolevPair d) :
     (extLinear P χ w).1 = extSubsetFun P χ w.1 := rfl
 
+/-- The `k`-th gradient component of `extLinear P χ w` is `extSubsetGrad P χ w.1 w.2 k`. -/
 @[simp] theorem extLinear_snd (P : BoundaryPartition d Ω)
     (χ : EuclideanSpace ℝ (Fin d) → ℝ) (w : SobolevPair d) (k : Fin d) :
     (extLinear P χ w).2 k = extSubsetGrad P χ w.1 w.2 k := rfl

@@ -54,6 +54,7 @@ def gradCLM (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ) (y : EuclideanSpa
     EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ :=
   ∑ k, g k y • (EuclideanSpace.proj k : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ)
 
+/-- `gradCLM g y` evaluated on the `j`-th basis vector is `g j y`. -/
 @[simp]
 theorem gradCLM_apply_single (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ)
     (y : EuclideanSpace ℝ (Fin d)) (j : Fin d) :

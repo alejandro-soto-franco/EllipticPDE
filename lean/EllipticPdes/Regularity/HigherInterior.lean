@@ -437,11 +437,11 @@ the solution and the datum.
 The coefficient hypotheses are `W^{k+1,∞}` for `a_{ij}` and `W^{k,∞}` for `b_i, c`, with
 `a_{ij}` also `W^{1,∞}` in the pointwise form of `IsLipCoeff` for the base case, which at
 `k = 0` is the whole of what the proof reads: `interiorRegularityAt_zero` takes `hA1` alone
-and the order-one bundle passed with it goes unused. The step to order `k + 1` differentiates the equation
-once: its datum pairs second derivatives of each `a_{ij}` and first derivatives of `b_i, c`
-against derivatives of `u` of order at most two, so an `H^k` datum asks `a_{ij} ∈ W^{k+2,∞}`
-and `b_i, c ∈ W^{k+1,∞}` (`exists_cutoffDatum`), and the induction hypothesis at order `k`
-asks no more. -/
+and the order-one bundle passed with it goes unused. The step to order `k + 1` differentiates
+the equation once: its datum pairs second derivatives of each `a_{ij}` and first derivatives of
+`b_i, c` against derivatives of `u` of order at most two, so an `H^k` datum asks
+`a_{ij} ∈ W^{k+2,∞}` and `b_i, c ∈ W^{k+1,∞}` (`exists_cutoffDatum`), and the induction
+hypothesis at order `k` asks no more. -/
 theorem higher_interior_regularity (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
     (hA1 : IsLipCoeff Op.toEllipticCoeff) (k : ℕ)

@@ -59,6 +59,7 @@ def orthSubmodule {n : ℕ} (w : Fin n → H01 Ω) : Submodule ℝ (H01 Ω) wher
     intro c a ha i
     rw [map_smul, real_inner_smul_left, ha i, mul_zero]
 
+/-- `U ∈ orthSubmodule w` iff `U` is `L²`-orthogonal to every `w i`. -/
 @[simp] lemma mem_orthSubmodule {n : ℕ} {w : Fin n → H01 Ω} {U : H01 Ω} :
     U ∈ orthSubmodule w ↔ ∀ i, ⟪embL2 Ω U, embL2 Ω (w i)⟫ = 0 := Iff.rfl
 

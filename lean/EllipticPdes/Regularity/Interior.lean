@@ -148,7 +148,8 @@ set_option maxHeartbeats 600000 in
 /-- **Interior H² estimate (Evans, *Partial Differential Equations* (2nd ed.), §6.3.1;
 Gilbarg-Trudinger, *Elliptic Partial Differential Equations of Second Order*, Theorem 8.8).**
 For a weak solution `u ∈ H₀¹(Ω)` of `L u = f` with `W^{1,∞}` principal coefficients,
-in the pointwise form of `IsLipCoeff`, and bounded transport and zeroth-order coefficients, and for any compact `V ⋐ Ω`,
+in the pointwise form of `IsLipCoeff`, and bounded transport and zeroth-order coefficients,
+and for any compact `V ⋐ Ω`,
 the second weak derivatives exist in `L²(V)` and are bounded by the data: for every direction
 pair `(k, i)` there is a weak `k`-derivative `wki` of `∂ᵢu` on `V` (that is, `∂ₖ∂ᵢu ∈ L²(V)`)
 with `‖∂ₖ∂ᵢu‖_{L²(V)} + ‖∂ᵢu‖_{L²(V)} + ‖u‖_{L²(V)} ≤ C (‖f‖ + ‖u‖)`. The constant is

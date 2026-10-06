@@ -58,10 +58,12 @@ def dirVec : (α : List (Fin d)) → Fin α.length → EuclideanSpace ℝ (Fin d
   | [] => Fin.elim0
   | l :: α => Fin.cons (EuclideanSpace.single l 1) (dirVec α)
 
+/-- The first entry of `dirVec (l :: α)` is the `l`-th basis vector. -/
 @[simp]
 theorem dirVec_cons_zero (l : Fin d) (α : List (Fin d)) :
     dirVec (l :: α) 0 = EuclideanSpace.single l 1 := rfl
 
+/-- The tail of `dirVec (l :: α)` is `dirVec α`. -/
 @[simp]
 theorem dirVec_cons_tail (l : Fin d) (α : List (Fin d)) :
     Fin.tail (dirVec (l :: α)) = dirVec α := rfl
@@ -86,9 +88,11 @@ def iterPartial (f : EuclideanSpace ℝ (Fin d) → ℝ) :
   | [] => f
   | l :: α => partialD l (iterPartial f α)
 
+/-- `iterPartial f []` is `f`. -/
 @[simp]
 theorem iterPartial_nil (f : EuclideanSpace ℝ (Fin d) → ℝ) : iterPartial f [] = f := rfl
 
+/-- `iterPartial f (l :: α)` is `partialD l (iterPartial f α)`. -/
 @[simp]
 theorem iterPartial_cons (f : EuclideanSpace ℝ (Fin d) → ℝ) (l : Fin d) (α : List (Fin d)) :
     iterPartial f (l :: α) = partialD l (iterPartial f α) := rfl

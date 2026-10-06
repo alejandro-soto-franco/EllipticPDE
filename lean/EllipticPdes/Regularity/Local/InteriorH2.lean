@@ -39,6 +39,8 @@ open EllipticPdes.Sobolev EllipticPdes.Embedding EllipticPdes.Extension
 
 variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))}
 
+/-- A double sum of `L²` elements bounded termwise by `K i j * N` has norm at most `(∑ i, ∑ j, K i
+j) * N`. -/
 theorem norm_double_sum_le {m : ℕ} (T : Fin m → Fin m → L2D Ω) (K : Fin m → Fin m → ℝ) (N : ℝ)
     (h : ∀ i j, ‖T i j‖ ≤ K i j * N) :
     ‖∑ i, ∑ j, T i j‖ ≤ (∑ i, ∑ j, K i j) * N := by
@@ -48,6 +50,7 @@ theorem norm_double_sum_le {m : ℕ} (T : Fin m → Fin m → L2D Ω) (K : Fin m
         Finset.sum_le_sum fun i _ => Finset.sum_le_sum fun j _ => h i j
     _ = (∑ i, ∑ j, K i j) * N := by simp only [Finset.sum_mul]
 
+/-- A sum of `L²` elements bounded termwise by `K i * N` has norm at most `(∑ i, K i) * N`. -/
 theorem norm_single_sum_le {m : ℕ} (T : Fin m → L2D Ω) (K : Fin m → ℝ) (N : ℝ)
     (h : ∀ i, ‖T i‖ ≤ K i * N) :
     ‖∑ i, T i‖ ≤ (∑ i, K i) * N := by
@@ -55,6 +58,7 @@ theorem norm_single_sum_le {m : ℕ} (T : Fin m → L2D Ω) (K : Fin m → ℝ) 
     _ ≤ ∑ i, K i * N := Finset.sum_le_sum fun i _ => h i
     _ = (∑ i, K i) * N := by simp only [Finset.sum_mul]
 
+/-- The norm of `a - b - c - e - g + h` is at most the sum of the six norms. -/
 theorem norm_six_le (a b c e g h : L2D Ω) :
     ‖a - b - c - e - g + h‖ ≤ ‖a‖ + ‖b‖ + ‖c‖ + ‖e‖ + ‖g‖ + ‖h‖ := by
   have h1 := norm_add_le (a - b - c - e - g) h

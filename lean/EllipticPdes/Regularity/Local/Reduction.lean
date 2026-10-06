@@ -284,12 +284,15 @@ def weightL (Ω : Set (EuclideanSpace ℝ (Fin d))) {c ψ : EuclideanSpace ℝ (
       exact mul_le_mul (le_max_of_le_left hx) (by simpa [Real.norm_eq_abs] using hK x)
         (abs_nonneg _) (le_max_right _ _)))
 
+/-- The operator-norm bound `max M 0 * (hψcs.exists_bound_of_continuous hψ).choose` for `weightL` is
+nonnegative. -/
 theorem weightL_bound_nonneg {ψ : EuclideanSpace ℝ (Fin d) → ℝ} (hψ : Continuous ψ)
     (hψcs : HasCompactSupport ψ) {M : ℝ} :
     0 ≤ max M 0 * (hψcs.exists_bound_of_continuous hψ).choose :=
   mul_nonneg (le_max_right _ _)
     (le_trans (norm_nonneg _) ((hψcs.exists_bound_of_continuous hψ).choose_spec 0))
 
+/-- `weightL` has operator norm at most `max M 0 * (hψcs.exists_bound_of_continuous hψ).choose`. -/
 theorem norm_weightL_le {c ψ : EuclideanSpace ℝ (Fin d) → ℝ}
     (hcm : Measurable c) {M : ℝ}
     (hc : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |c x| ≤ M)
@@ -298,6 +301,8 @@ theorem norm_weightL_le {c ψ : EuclideanSpace ℝ (Fin d) → ℝ}
       ≤ (max M 0 * (hψcs.exists_bound_of_continuous hψ).choose) * ‖g‖ :=
   norm_mulCoeffL_le _ _ g
 
+/-- The inner product of `weightL Ω hcm hc hψ hψcs g` with `hv.testCls` is `∫ x in Ω, c x * g x * (ψ
+x * v x)`. -/
 theorem inner_weightL_testCls {c ψ : EuclideanSpace ℝ (Fin d) → ℝ}
     (hcm : Measurable c) {M : ℝ}
     (hc : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |c x| ≤ M)
@@ -309,6 +314,7 @@ theorem inner_weightL_testCls {c ψ : EuclideanSpace ℝ (Fin d) → ℝ}
   filter_upwards [hv.mem_lp.coeFn_toLp] with x hx
   rw [IsTestFn.testCls, hx]; ring
 
+/-- The inner product of `g` with `hv.testCls` is `∫ x in Ω, g x * v x`. -/
 theorem inner_testCls_eq {g : L2D Ω} {v : EuclideanSpace ℝ (Fin d) → ℝ} (hv : IsTestFn Ω v) :
     ⟪g, hv.testCls⟫ = ∫ x in Ω, (g x : ℝ) * v x := by
   rw [L2.inner_def]

@@ -65,6 +65,8 @@ theorem fderiv_eq_of_indepCoord {j : Fin d} {γ : EuclideanSpace ℝ (Fin d) →
   rw [hfun] at h1
   exact h1.fderiv.symm
 
+/-- The partial derivative `partialD k γ` of a differentiable `γ` independent of the `j`-th
+coordinate is again independent of it. -/
 theorem indepCoord_partialD {j k : Fin d} {γ : EuclideanSpace ℝ (Fin d) → ℝ}
     (hγ : Differentiable ℝ γ) (hind : IndepCoord j γ) : IndepCoord j (partialD k γ) := by
   intro y t

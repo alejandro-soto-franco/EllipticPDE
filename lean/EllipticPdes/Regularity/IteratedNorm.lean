@@ -46,6 +46,7 @@ most `k`. -/
 def iteratedNorm (H : HasIteratedWeakDerivOn V k u) : ℝ :=
   Real.sqrt (∑ m ∈ Finset.range (k + 1), ∑ α : Fin m → Fin d, ‖H.D (List.ofFn α)‖ ^ 2)
 
+/-- `iteratedNorm H` is nonnegative. -/
 theorem iteratedNorm_nonneg (H : HasIteratedWeakDerivOn V k u) : 0 ≤ iteratedNorm H :=
   Real.sqrt_nonneg _
 
@@ -70,6 +71,7 @@ theorem iteratedL2Bound_iteratedNorm (H : HasIteratedWeakDerivOn V k u) :
 /-- The number of lists of directions of length at most `k`, as a real number. -/
 def listCount (d k : ℕ) : ℝ := ∑ m ∈ Finset.range (k + 1), (d : ℝ) ^ m
 
+/-- `listCount d k` is nonnegative. -/
 theorem listCount_nonneg (d k : ℕ) : 0 ≤ listCount d k :=
   Finset.sum_nonneg fun _ _ => pow_nonneg (Nat.cast_nonneg d) _
 

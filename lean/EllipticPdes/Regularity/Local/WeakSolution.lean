@@ -202,6 +202,7 @@ def pairL (Op : FullEllipticOp d) (Ω : Set (EuclideanSpace ℝ (Fin d))) (U : H
       (PiLp.proj (𝕜 := ℝ) 2 (fun _ : Fin (d + 1) => L2D Ω) 0))
     + (innerSL ℝ (Op.cAct (U 0))).comp (PiLp.proj (𝕜 := ℝ) 2 (fun _ : Fin (d + 1) => L2D Ω) 0)
 
+/-- `pairL Op Ω U W` is the sum of the principal, transport and zeroth-order inner products. -/
 theorem pairL_apply (Op : FullEllipticOp d) (U W : H1amb Ω) :
     pairL Op Ω U W
       = (∑ i : Fin d, ∑ j : Fin d, ⟪Op.toEllipticCoeff.actL i j (U i.succ), W j.succ⟫)

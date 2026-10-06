@@ -20,9 +20,9 @@ build a `FullEllipticOp` agreeing with the given coefficients wherever the cutof
 
 For a test function `χ` of `U`, valued in `[0, 1]`,
 
-* `ã = λ I + χ (a − λ I) = χ a + (1 − χ) λ I`,
-* `b̃ = χ b`,
-* `c̃ = χ c`.
+* `a_χ = λ I + χ (a − λ I) = χ a + (1 − χ) λ I`,
+* `b_χ = χ b`,
+* `c_χ = χ c`.
 
 Wherever `χ = 1` the blend agrees with `P.a`, `P.b`, `P.c`; wherever `χ = 0` it reduces to the
 constant-coefficient Laplacian at level `λ`, which is trivially uniformly elliptic, bounded and
@@ -85,7 +85,7 @@ def δ (i j : Fin d) : ℝ := if i = j then 1 else 0
 def gA (χ : EuclideanSpace ℝ (Fin d) → ℝ) (i j : Fin d) (x : EuclideanSpace ℝ (Fin d)) : ℝ :=
   χ x * (P.a x i j - P.lam * δ i j)
 
-/-- The blended principal part `ã = λ I + χ (a − λ I) = χ a + (1 − χ) λ I`. -/
+/-- The blended principal part `a_χ = λ I + χ (a − λ I) = χ a + (1 − χ) λ I`. -/
 def aT (χ : EuclideanSpace ℝ (Fin d) → ℝ) (x : EuclideanSpace ℝ (Fin d)) (i j : Fin d) : ℝ :=
   P.lam * δ i j + P.gA χ i j x
 
@@ -99,19 +99,24 @@ def cT (χ : EuclideanSpace ℝ (Fin d) → ℝ) (x : EuclideanSpace ℝ (Fin d)
 variable (hU : IsOpen U) {χ : EuclideanSpace ℝ (Fin d) → ℝ} (hχ : IsTestFn U χ)
 include hU hχ
 
+/-- `SmoothOpOn.gA` is smooth for a test function `χ` on an open set. -/
 theorem gA_contDiff (i j : Fin d) : ContDiff ℝ (⊤ : ℕ∞) (P.gA χ i j) :=
   contDiff_mul_of_contDiffOn hU hχ ((P.a_smooth i j).sub contDiffOn_const)
 
 omit hU in
+/-- `SmoothOpOn.gA` has compact support for a test function `χ`. -/
 theorem gA_hasCompactSupport (i j : Fin d) : HasCompactSupport (P.gA χ i j) :=
   hasCompactSupport_mul hχ
 
+/-- `SmoothOpOn.aT` is smooth in `x` for each pair of indices. -/
 theorem aT_contDiff (i j : Fin d) : ContDiff ℝ (⊤ : ℕ∞) (fun x => P.aT χ x i j) :=
   contDiff_const.add (P.gA_contDiff hU hχ i j)
 
+/-- `SmoothOpOn.bT` is smooth in `x` for each index. -/
 theorem bT_contDiff (i : Fin d) : ContDiff ℝ (⊤ : ℕ∞) (fun x => P.bT χ x i) :=
   contDiff_mul_of_contDiffOn hU hχ (P.b_smooth i)
 
+/-- `SmoothOpOn.cT` is smooth. -/
 theorem cT_contDiff : ContDiff ℝ (⊤ : ℕ∞) (P.cT χ) :=
   contDiff_mul_of_contDiffOn hU hχ P.c_smooth
 
@@ -269,18 +274,21 @@ theorem nonempty_isWkInftyLower (k : ℕ) :
 
 /-! ### Agreement on the region where the cutoff is one -/
 
+/-- The localised operator has the same `a` as `P` on any set where `χ = 1`. -/
 theorem eqOn_a {W : Set (EuclideanSpace ℝ (Fin d))} (hW : ∀ x ∈ W, χ x = 1) :
     ∀ x ∈ W, (localOp P hU hχ hχ01).a x = P.a x := by
   intro x hx
   funext i j
   simp [localOp, aT, gA, hW x hx]
 
+/-- The localised operator has the same `b` as `P` on any set where `χ = 1`. -/
 theorem eqOn_b {W : Set (EuclideanSpace ℝ (Fin d))} (hW : ∀ x ∈ W, χ x = 1) :
     ∀ x ∈ W, (localOp P hU hχ hχ01).b x = P.b x := by
   intro x hx
   funext i
   simp [localOp, bT, hW x hx]
 
+/-- The localised operator has the same `c` as `P` on any set where `χ = 1`. -/
 theorem eqOn_c {W : Set (EuclideanSpace ℝ (Fin d))} (hW : ∀ x ∈ W, χ x = 1) :
     ∀ x ∈ W, (localOp P hU hχ hχ01).c x = P.c x := by
   intro x hx

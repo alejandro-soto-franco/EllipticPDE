@@ -55,18 +55,23 @@ variable {d : ℕ}
 def ballBump (c : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr : 0 < r) : ContDiffBump c :=
   ⟨r / 2, r, by positivity, by linarith⟩
 
+/-- `ballBump c hr` has topological support the closed ball of radius `r` about `c`. -/
 lemma tsupport_ballBump (c : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr : 0 < r) :
     tsupport (⇑(ballBump c hr)) = closedBall c r :=
   (ballBump c hr).tsupport_eq
 
+/-- `ballBump c hr` has support the open ball of radius `r` about `c`. -/
 lemma support_ballBump (c : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr : 0 < r) :
     Function.support (⇑(ballBump c hr)) = ball c r :=
   (ballBump c hr).support_eq
 
+/-- `ballBump c hr` takes the value `1` at `c`. -/
 lemma ballBump_centre (c : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr : 0 < r) :
     (ballBump c hr) c = 1 :=
   (ballBump c hr).one_of_mem_closedBall (mem_closedBall_self (ballBump c hr).rIn_pos.le)
 
+/-- `ballBump c hr` is a test function on any `Ω` containing the closed ball of radius `r` about
+`c`. -/
 lemma isTestFn_ballBump {Ω : Set (EuclideanSpace ℝ (Fin d))}
     (c : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr : 0 < r) (hsub : closedBall c r ⊆ Ω) :
     IsTestFn Ω (⇑(ballBump c hr)) :=
@@ -96,17 +101,20 @@ def bumpRadius (n : ℕ) : ℝ := 1 / (2 * n)
 def bumpCentre (i : Fin d) (n : ℕ) (k : Fin n) : EuclideanSpace ℝ (Fin d) :=
   PiLp.single 2 i (bumpCoord n k)
 
+/-- `bumpRadius n` is positive for `0 < n`. -/
 lemma bumpRadius_pos {n : ℕ} (hn : 0 < n) : 0 < bumpRadius n := by
   have : (0 : ℝ) < (n : ℝ) := by exact_mod_cast hn
   rw [bumpRadius]
   positivity
 
+/-- `bumpRadius n` is at most `1 / 2` for `0 < n`. -/
 lemma bumpRadius_le {n : ℕ} (hn : 0 < n) : bumpRadius n ≤ 1 / 2 := by
   have h1 : (1 : ℝ) ≤ (n : ℝ) := by exact_mod_cast hn
   rw [bumpRadius]
   refine one_div_le_one_div_of_le (by norm_num) ?_
   linarith
 
+/-- `bumpCoord n k` has absolute value less than `1 / 2`. -/
 lemma bumpCoord_abs_lt {n : ℕ} (k : Fin n) : |bumpCoord n k| < 1 / 2 := by
   have hn : (0 : ℝ) < (n : ℝ) := by
     have : 0 < n := k.pos
@@ -122,6 +130,7 @@ lemma bumpCoord_abs_lt {n : ℕ} (k : Fin n) : |bumpCoord n k| < 1 / 2 := by
   rw [bumpCoord, abs_lt]
   constructor <;> linarith
 
+/-- `bumpCoord n j - bumpCoord n k` is `(j - k) / n`. -/
 lemma bumpCoord_sub {n : ℕ} (j k : Fin n) :
     bumpCoord n j - bumpCoord n k = ((j : ℝ) - (k : ℝ)) / (n : ℝ) := by
   have hn : (0 : ℝ) < (n : ℝ) := by
@@ -131,6 +140,7 @@ lemma bumpCoord_sub {n : ℕ} (j k : Fin n) :
   field_simp
   ring
 
+/-- Distinct natural numbers differ by at least `1` as reals. -/
 lemma one_le_abs_sub_of_ne {j k : ℕ} (h : j ≠ k) : (1 : ℝ) ≤ |(j : ℝ) - (k : ℝ)| := by
   rcases lt_or_gt_of_ne h with hlt | hgt
   · have : (j : ℝ) + 1 ≤ (k : ℝ) := by exact_mod_cast hlt
@@ -140,6 +150,7 @@ lemma one_le_abs_sub_of_ne {j k : ℕ} (h : j ≠ k) : (1 : ℝ) ≤ |(j : ℝ) 
     rw [abs_of_nonneg (by linarith)]
     linarith
 
+/-- Distinct coordinates `bumpCoord n j` and `bumpCoord n k` are at least `1 / n` apart. -/
 lemma bumpCoord_dist {n : ℕ} {j k : Fin n} (h : j ≠ k) :
     1 / (n : ℝ) ≤ |bumpCoord n j - bumpCoord n k| := by
   have hn : (0 : ℝ) < (n : ℝ) := by
@@ -149,6 +160,7 @@ lemma bumpCoord_dist {n : ℕ} {j k : Fin n} (h : j ≠ k) :
   rw [bumpCoord_sub, abs_div, abs_of_pos hn, div_le_div_iff_of_pos_right hn]
   exact one_le_abs_sub_of_ne hjk
 
+/-- Distinct centres `bumpCentre i n j` and `bumpCentre i n k` are at least `1 / n` apart. -/
 lemma dist_bumpCentre (i : Fin d) {n : ℕ} {j k : Fin n} (h : j ≠ k) :
     1 / (n : ℝ) ≤ dist (bumpCentre i n j) (bumpCentre i n k) := by
   have hd : dist (bumpCentre i n j) (bumpCentre i n k) = |bumpCoord n j - bumpCoord n k| := by
@@ -157,6 +169,7 @@ lemma dist_bumpCentre (i : Fin d) {n : ℕ} {j k : Fin n} (h : j ≠ k) :
   rw [hd]
   exact bumpCoord_dist h
 
+/-- The closed ball of radius `bumpRadius n` about `bumpCentre i n k` lies in the open unit ball. -/
 lemma closedBall_bumpCentre_subset (i : Fin d) {n : ℕ} (k : Fin n) :
     closedBall (bumpCentre i n k) (bumpRadius n) ⊆ ball (0 : EuclideanSpace ℝ (Fin d)) 1 := by
   have hn : 0 < n := k.pos
@@ -174,6 +187,8 @@ lemma closedBall_bumpCentre_subset (i : Fin d) {n : ℕ} (k : Fin n) :
   rw [hc] at h1
   linarith
 
+/-- Bumps about distinct centres `bumpCentre i n j` and `bumpCentre i n k` are not both nonzero at
+any point. -/
 lemma disjoint_support_ballBump (i : Fin d) {n : ℕ} {j k : Fin n} (h : j ≠ k) (x)
     (hj : (ballBump (bumpCentre i n j) (bumpRadius_pos j.pos)) x ≠ 0)
     (hk : (ballBump (bumpCentre i n k) (bumpRadius_pos k.pos)) x ≠ 0) : False := by
@@ -209,6 +224,7 @@ local notation "B1" => ball (0 : EuclideanSpace ℝ (Fin d)) 1
 def bumpFn (i : Fin d) (n : ℕ) (k : Fin n) : EuclideanSpace ℝ (Fin d) → ℝ :=
   ⇑(ballBump (bumpCentre i n k) (bumpRadius_pos k.pos))
 
+/-- `bumpFn i n k` is a test function on the open unit ball. -/
 lemma isTestFn_bumpFn (i : Fin d) {n : ℕ} (k : Fin n) : IsTestFn B1 (bumpFn i n k) :=
   isTestFn_ballBump _ _ (closedBall_bumpCentre_subset i k)
 
@@ -227,6 +243,7 @@ def bumpElt (i : Fin d) (n : ℕ) (k : Fin n) : H01 B1 :=
     (Submodule.le_topologicalClosure _)
       (Submodule.subset_span ⟨bumpFn i n k, isTestFn_bumpFn i k, rfl⟩)⟩
 
+/-- `embL2 B1 (bumpElt i n k)` agrees almost everywhere on `B1` with `bumpFn i n k`. -/
 lemma coeFn_embL2_bumpElt (i : Fin d) {n : ℕ} (k : Fin n) :
     ⇑(embL2 B1 (bumpElt i n k)) =ᵐ[volume.restrict B1] bumpFn i n k := by
   rw [embL2_apply]

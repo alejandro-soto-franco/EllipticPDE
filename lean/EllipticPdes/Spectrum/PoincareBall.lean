@@ -56,6 +56,7 @@ variable {d : ℕ}
 def affineBall (x : EuclideanSpace ℝ (Fin d)) (r : ℝ) (y : EuclideanSpace ℝ (Fin d)) :
     EuclideanSpace ℝ (Fin d) := r • y + x
 
+/-- The preimage of `ball x r` under `affineBall x r` is the open unit ball. -/
 theorem affineBall_preimage_ball (x : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr : 0 < r) :
     affineBall x r ⁻¹' ball x r = ball (0 : EuclideanSpace ℝ (Fin d)) 1 := by
   ext y
@@ -63,6 +64,7 @@ theorem affineBall_preimage_ball (x : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr 
     Real.norm_eq_abs, abs_of_pos hr, sub_zero]
   constructor <;> intro h <;> nlinarith [norm_nonneg y]
 
+/-- `affineBall x r` is a measurable embedding for `r ≠ 0`. -/
 theorem measurableEmbedding_affineBall (x : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr : r ≠ 0) :
     MeasurableEmbedding (affineBall x r) :=
   (measurableEmbedding_translate x).comp (MeasurableEquiv.smul₀ r hr).measurableEmbedding
@@ -70,12 +72,15 @@ theorem measurableEmbedding_affineBall (x : EuclideanSpace ℝ (Fin d)) {r : ℝ
 /-- The factor by which Lebesgue measure scales under the map, as a measure multiplier. -/
 def ballScale (d : ℕ) (r : ℝ) : ℝ≥0∞ := ENNReal.ofReal |(r ^ d)⁻¹|
 
+/-- `ballScale d r` is nonzero for `0 < r`. -/
 theorem ballScale_ne_zero {r : ℝ} (hr : 0 < r) : ballScale d r ≠ 0 := by
   rw [ballScale, ne_eq, ENNReal.ofReal_eq_zero, not_le]
   positivity
 
+/-- `ballScale d r` is finite. -/
 theorem ballScale_ne_top (r : ℝ) : ballScale d r ≠ ⊤ := ENNReal.ofReal_ne_top
 
+/-- `ballScale d r` has real value `(r ^ d)⁻¹` for `0 < r`. -/
 theorem ballScale_toReal {r : ℝ} (hr : 0 < r) : (ballScale d r).toReal = (r ^ d)⁻¹ := by
   rw [ballScale, ENNReal.toReal_ofReal (abs_nonneg _), abs_of_pos (by positivity)]
 
