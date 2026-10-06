@@ -92,7 +92,6 @@ public import EllipticPdes.Regularity.OuterCutoffTower
 public import EllipticPdes.Regularity.LocalWeakForm
 public import EllipticPdes.Embedding.WeakGradient
 public import EllipticPdes.Embedding.Convolution
-public import EllipticPdes.Embedding.MorreyOneDim
 public import EllipticPdes.Embedding.RayIntegral
 public import EllipticPdes.Embedding.Morrey
 public import EllipticPdes.Embedding.WeakDerivBridge
