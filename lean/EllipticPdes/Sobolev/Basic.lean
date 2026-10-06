@@ -322,6 +322,7 @@ def toTestFunction {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩ : IsOpen Ω)
     (h : IsTestFn Ω φ) : 𝓓((⟨Ω, hΩ⟩ : TopologicalSpace.Opens (EuclideanSpace ℝ (Fin d))), ℝ) :=
   ⟨φ, h.contDiff, h.hasCompactSupport, h.tsupport_subset⟩
 
+/-- The function of `toTestFunction` is the test function itself. -/
 @[simp] lemma coe_toTestFunction {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩ : IsOpen Ω)
     (h : IsTestFn Ω φ) : ⇑(h.toTestFunction hΩ) = φ := rfl
 
