@@ -45,6 +45,13 @@ open EllipticPdes.Sobolev (partialD)
 
 variable {d : ℕ}
 
+/-- The restriction of a measure that is finite on compact sets to a ball is a finite
+measure. -/
+instance {X : Type*} [PseudoMetricSpace X] [ProperSpace X] {m : MeasurableSpace X}
+    (μ : Measure X) [IsFiniteMeasureOnCompacts μ] (c : X) (r : ℝ) :
+    IsFiniteMeasure (μ.restrict (Metric.ball c r)) :=
+  isFiniteMeasure_restrict.2 measure_ball_lt_top.ne
+
 /-- **Radial power integral over a ball centred at the singularity.** For `s > -d`, the integral
 of `dist x ·^s` over the ball `B(x, R)` has the closed form `d · ω_d · R^{s+d}/(s+d)`, where
 `ω_d` is the volume of the unit ball. Proof: translate to the origin, then apply the polar

@@ -7,7 +7,7 @@ Authors: Alejandro Soto Franco
 module
 
 public import EllipticPdes.Embedding.HolderOfGradClosed
-public import EllipticPdes.Embedding.SobolevLadderGeneral
+public import EllipticPdes.Embedding.SobolevLadder
 
 /-!
 # Hölder continuity at a general base exponent

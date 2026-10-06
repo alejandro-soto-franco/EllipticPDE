@@ -103,8 +103,6 @@ public import EllipticPdes.Campanato.Converse
 public import EllipticPdes.Embedding.GagliardoNirenberg
 public import EllipticPdes.Embedding.SobolevLadder
 public import EllipticPdes.Embedding.SobolevLadderCompactSupport
-public import EllipticPdes.Embedding.SobolevLadderFullStep
-public import EllipticPdes.Embedding.SobolevLadderGeneral
 public import EllipticPdes.Embedding.HolderGeneral
 public import EllipticPdes.Extension.C1Test
 public import EllipticPdes.Extension.Cutoff

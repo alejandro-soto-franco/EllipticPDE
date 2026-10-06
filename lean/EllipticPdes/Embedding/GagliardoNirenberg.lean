@@ -607,6 +607,28 @@ theorem exists_eLpNorm_four_le (c : EuclideanSpace ℝ (Fin 2)) {r R : ℝ} (hr 
     (by rw [← NNReal.coe_le_coe]; push_cast; norm_num) (by push_cast; norm_num) hr hrR
   simpa using h
 
+/-- **Lowering an exponent on a finite measure space costs a constant.** For `0 < p ≤ q` there
+is `A` with `‖f‖_{Lᵖ} ≤ A ‖f‖_{Lq}`, namely `μ(univ)^{1/p - 1/q}`. -/
+theorem exists_const_eLpNorm_le_of_le {α E : Type*} {m : MeasurableSpace α} {μ : Measure α}
+    [IsFiniteMeasure μ] [NormedAddCommGroup E] {p q : ℝ≥0∞} (hp : p ≠ 0) (hpq : p ≤ q) :
+    ∃ A : ℝ≥0, ∀ f : α → E, AEStronglyMeasurable f μ → eLpNorm f p μ ≤ A * eLpNorm f q μ := by
+  have he : 0 ≤ 1 / p.toReal - 1 / q.toReal := by
+    rcases eq_or_ne q ⊤ with rfl | hq
+    · simp
+    · rw [sub_nonneg]
+      exact one_div_le_one_div_of_le (ENNReal.toReal_pos hp (ne_top_of_le_ne_top hq hpq))
+        (ENNReal.toReal_mono hq hpq)
+  refine ⟨(μ univ ^ (1 / p.toReal - 1 / q.toReal)).toNNReal, fun f hf => ?_⟩
+  rw [ENNReal.coe_toNNReal (ENNReal.rpow_ne_top_of_nonneg he (measure_ne_top μ _)), mul_comm]
+  exact eLpNorm_le_eLpNorm_mul_rpow_measure_univ hpq hf
+
+/-- A function bounded by `B` together with its `d` partial derivatives, each bounded by `B`,
+has total `a + ∑ k, b k` at most `(d + 1) B`. -/
+theorem add_sum_le_of_le {d : ℕ} {a B : ℝ≥0∞} {b : Fin d → ℝ≥0∞} (ha : a ≤ B)
+    (hb : ∀ k, b k ≤ B) : a + ∑ k, b k ≤ (d + 1) * B := by
+  calc a + ∑ k, b k ≤ B + ∑ _k : Fin d, B := add_le_add ha (Finset.sum_le_sum fun k _ => hb k)
+    _ = (d + 1) * B := by simp [add_mul, add_comm]
+
 end Bootstrap
 
 end EllipticPdes.Embedding

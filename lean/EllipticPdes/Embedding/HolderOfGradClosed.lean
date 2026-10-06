@@ -6,7 +6,7 @@ Authors: Alejandro Soto Franco
 
 module
 
-public import EllipticPdes.Embedding.SobolevLadderFullStep
+public import EllipticPdes.Embedding.SobolevLadder
 public import EllipticPdes.Embedding.ClassicalDeriv
 
 /-!
