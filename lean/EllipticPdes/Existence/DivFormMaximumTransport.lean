@@ -160,7 +160,7 @@ theorem measure_superlevel_eq_zero_of_forall_add_inv {μ : Measure α} {u : α �
   rw [hcover]
   exact measure_iUnion_null h
 
-omit [BorelSpace F] in
+omit [MeasurableSpace F] [BorelSpace F] in
 /-- If the superlevel set of `T` is null and `g` vanishes almost everywhere on the level set of
 `T`, then `g` is zero almost everywhere on `{T ≤ u}`. -/
 theorem measure_superlevel_inter_eq_zero {μ : Measure α} {u : α → ℝ} {g : α → F} {T : ℝ}
