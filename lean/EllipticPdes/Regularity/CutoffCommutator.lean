@@ -144,6 +144,56 @@ theorem setIntegral_principal_entry {Ω W : Set (EuclideanSpace ℝ (Fin d))}
     setIntegral_mul_cutoff_partialD_split Aig hξW.1 hξW.2.1 hvc j]
   ring
 
+/-- **The three pairings of the cutoff-derivative term.** If `Z` is the weak `j`-derivative of
+the coefficient-weighted class, given by the Leibniz formula, the integral of
+`(∂ⱼ∂ᵢξ · (a p) + ∂ᵢξ · Z) v` splits into three integrals, one for each term of the Leibniz
+formula. -/
+theorem setIntegral_derivative_pairings_split (Op : FullEllipticOp d)
+    {N : Set (EuclideanSpace ℝ (Fin d))} {ξ : EuclideanSpace ℝ (Fin d) → ℝ} (hξN : IsTestFn N ξ)
+    {k : ℕ} (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 1)) (i j : Fin d) (p D2j Z : L2D N)
+    (hZ : Z =ᵐ[volume.restrict N] fun x => hA.D [j] i j x * (p x : ℝ) + Op.a x i j * (D2j x : ℝ))
+    {v : EuclideanSpace ℝ (Fin d) → ℝ} (hvc : ContDiff ℝ (⊤ : ℕ∞) v) :
+    (∫ x in N, (partialD j (partialD i ξ) x * (Op.toEllipticCoeff.actL i j p x : ℝ)
+        + partialD i ξ x * (Z x : ℝ)) * v x)
+      = (∫ x in N, partialD j (partialD i ξ) x * (Op.a x i j * (p x : ℝ)) * v x)
+        + (∫ x in N, partialD i ξ x * (hA.D [j] i j x * (p x : ℝ)) * v x)
+        + ∫ x in N, partialD i ξ x * (Op.a x i j * (D2j x : ℝ)) * v x := by
+  have hAip := Op.toEllipticCoeff.actL_coeFn (Ω := N) i j p
+  have hdd := (contDiff_partialD (contDiff_partialD hξN.1 i) j).mul hvc
+  have hddcs : HasCompactSupport (fun x => partialD j (partialD i ξ) x * v x) :=
+    ((hξN.hasCompactSupport_partialD i).fderiv_apply (𝕜 := ℝ)
+      (EuclideanSpace.single j 1)).mul_right
+  have hd := (contDiff_partialD hξN.1 i).mul hvc
+  have hdcs : HasCompactSupport (fun x => partialD i ξ x * v x) :=
+    (hξN.hasCompactSupport_partialD i).mul_right
+  have hi1 : Integrable
+      (fun x => partialD j (partialD i ξ) x * (Op.a x i j * (p x : ℝ)) * v x)
+      (volume.restrict N) :=
+    (integrable_coeff_mul_testFn (Op.toEllipticCoeff.measurable i j) ⟨_, Op.toEllipticCoeff.bdd i j⟩
+      p hdd hddcs).congr (Filter.Eventually.of_forall fun x => by simp only; ring)
+  have hi2 : Integrable
+      (fun x => partialD i ξ x * (hA.D [j] i j x * (p x : ℝ)) * v x) (volume.restrict N) :=
+    (integrable_coeff_mul_testFn (hA.measurable_D_singleton j i j)
+      ⟨_, hA.ae_abs_D_singleton_le j i j⟩ p hd hdcs).congr
+      (Filter.Eventually.of_forall fun x => by simp only; ring)
+  have hi3 : Integrable
+      (fun x => partialD i ξ x * (Op.a x i j * (D2j x : ℝ)) * v x) (volume.restrict N) :=
+    (integrable_coeff_mul_testFn (Op.toEllipticCoeff.measurable i j) ⟨_, Op.toEllipticCoeff.bdd i j⟩
+      D2j hd hdcs).congr (Filter.Eventually.of_forall fun x => by simp only; ring)
+  have hcong : (fun x => (partialD j (partialD i ξ) x * (Op.toEllipticCoeff.actL i j p x : ℝ)
+        + partialD i ξ x * (Z x : ℝ)) * v x)
+      =ᵐ[volume.restrict N] fun x =>
+        (partialD j (partialD i ξ) x * (Op.a x i j * (p x : ℝ)) * v x
+          + partialD i ξ x * (hA.D [j] i j x * (p x : ℝ)) * v x)
+          + partialD i ξ x * (Op.a x i j * (D2j x : ℝ)) * v x := by
+    filter_upwards [hAip, hZ] with x h1 h2
+    rw [h1, h2]
+    ring
+  have hi12 : Integrable
+      (fun x => partialD j (partialD i ξ) x * (Op.a x i j * (p x : ℝ)) * v x
+        + partialD i ξ x * (hA.D [j] i j x * (p x : ℝ)) * v x) (volume.restrict N) := hi1.add hi2
+  rw [integral_congr_ae hcong, integral_add hi12 hi3, integral_add hi1 hi2]
+
 /-- **One entry of the principal block in the shape the datum pairs against.** The general
 entry is instantiated at the operator's coefficient, its weak derivative is supplied by the
 `W^{k,∞}` bundle through the Leibniz rule, and the three integrals it returns are split into the
@@ -207,51 +257,9 @@ theorem setIntegral_principal_entry_coeff (Op : FullEllipticOp d)
     rw [hx]
     ring
   -- The last integral is three pairings.
-  have hdd := (contDiff_partialD (contDiff_partialD hξN.1 i) j).mul hvc
-  have hddcs : HasCompactSupport (fun x => partialD j (partialD i ξ) x * v x) :=
-    ((hξN.hasCompactSupport_partialD i).fderiv_apply (𝕜 := ℝ)
-      (EuclideanSpace.single j 1)).mul_right
-  have hd := (contDiff_partialD hξN.1 i).mul hvc
-  have hdcs : HasCompactSupport (fun x => partialD i ξ x * v x) :=
-    (hξN.hasCompactSupport_partialD i).mul_right
-  have hi1' : Integrable
-      (fun x => partialD j (partialD i ξ) x * (Op.a x i j * (p x : ℝ)) * v x)
-      (volume.restrict N) :=
-    (integrable_coeff_mul_testFn (Op.toEllipticCoeff.measurable i j) ⟨_, Op.toEllipticCoeff.bdd i j⟩
-      p hdd hddcs).congr (Filter.Eventually.of_forall fun x => by simp only; ring)
-  have hi2' : Integrable
-      (fun x => partialD i ξ x * (hA.D [j] i j x * (p x : ℝ)) * v x) (volume.restrict N) :=
-    (integrable_coeff_mul_testFn (hA.measurable_D_singleton j i j)
-      ⟨_, hA.ae_abs_D_singleton_le j i j⟩ p hd hdcs).congr
-      (Filter.Eventually.of_forall fun x => by simp only; ring)
-  have hi3' : Integrable
-      (fun x => partialD i ξ x * (Op.a x i j * (D2 j x : ℝ)) * v x) (volume.restrict N) :=
-    (integrable_coeff_mul_testFn (Op.toEllipticCoeff.measurable i j) ⟨_, Op.toEllipticCoeff.bdd i j⟩
-      (D2 j) hd hdcs).congr (Filter.Eventually.of_forall fun x => by simp only; ring)
-  have e3 : (∫ x in N, (partialD j (partialD i ξ) x * (Op.toEllipticCoeff.actL i j p x : ℝ)
-        + partialD i ξ x * ((mulL2 ((hA.entry i j).measurable_D_singleton j)
-            ((hA.entry i j).ae_abs_D_singleton_le j) p
-          + Op.toEllipticCoeff.actL i j (D2 j)) x : ℝ)) * v x)
-      = (∫ x in N, partialD j (partialD i ξ) x * (Op.a x i j * (p x : ℝ)) * v x)
-        + (∫ x in N, partialD i ξ x * (hA.D [j] i j x * (p x : ℝ)) * v x)
-        + ∫ x in N, partialD i ξ x * (Op.a x i j * (D2 j x : ℝ)) * v x := by
-    have hcong : (fun x => (partialD j (partialD i ξ) x
-          * (Op.toEllipticCoeff.actL i j p x : ℝ)
-          + partialD i ξ x * ((mulL2 ((hA.entry i j).measurable_D_singleton j)
-              ((hA.entry i j).ae_abs_D_singleton_le j) p
-            + Op.toEllipticCoeff.actL i j (D2 j)) x : ℝ)) * v x)
-        =ᵐ[volume.restrict N] fun x =>
-          (partialD j (partialD i ξ) x * (Op.a x i j * (p x : ℝ)) * v x
-            + partialD i ξ x * (hA.D [j] i j x * (p x : ℝ)) * v x)
-            + partialD i ξ x * (Op.a x i j * (D2 j x : ℝ)) * v x := by
-      filter_upwards [hAip, hdag] with x h1 h2
-      rw [h1, h2]
-      ring
-    have hi12 : Integrable
-        (fun x => partialD j (partialD i ξ) x * (Op.a x i j * (p x : ℝ)) * v x
-          + partialD i ξ x * (hA.D [j] i j x * (p x : ℝ)) * v x)
-        (volume.restrict N) := hi1'.add hi2'
-    rw [integral_congr_ae hcong, integral_add hi12 hi3', integral_add hi1' hi2']
+  have e3 := setIntegral_derivative_pairings_split Op hξN hA i j p (D2 j)
+    (mulL2 ((hA.entry i j).measurable_D_singleton j) ((hA.entry i j).ae_abs_D_singleton_le j) p
+      + Op.toEllipticCoeff.actL i j (D2 j)) hdag hvc
   rw [e1, e2, e3]
   ring
 

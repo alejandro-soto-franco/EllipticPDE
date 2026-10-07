@@ -73,6 +73,80 @@ theorem norm_toLp_sq_eq_integral_sq {F : EuclideanSpace ℝ (Fin d) → ℝ}
   filter_upwards [hF.coeFn_toLp] with x hx
   rw [hx]
 
+/-- A bound `‖f‖₂ ≤ K X` with `X ≤ ofReal n` gives the real bound `‖f‖₂ ≤ K n`. -/
+theorem toReal_eLpNorm_le_of_le {α : Type*} {mα : MeasurableSpace α} {μ : Measure α}
+    {f : α → ℝ} {K : ℝ≥0} {n : ℝ} {X : ℝ≥0∞} (hn : 0 ≤ n) (h : eLpNorm f 2 μ ≤ (K : ℝ≥0∞) * X)
+    (hX : X ≤ ENNReal.ofReal n) : (eLpNorm f 2 μ).toReal ≤ K * n := by
+  have := h.trans (by gcongr : (K : ℝ≥0∞) * X ≤ K * ENNReal.ofReal n)
+  rw [← ENNReal.ofReal_coe_nnreal, ← ENNReal.ofReal_mul K.coe_nonneg] at this
+  exact ENNReal.toReal_le_of_le_ofReal (by positivity) this
+
+/-- A smooth compactly supported function has square-integrable partial derivatives. -/
+theorem memLp_partialD_of_contDiff {v : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hv : ContDiff ℝ (⊤ : ℕ∞) v) (hvcs : HasCompactSupport v) (k : Fin d) :
+    MemLp (partialD k v) 2 volume := by
+  have hc : Continuous (partialD k v) :=
+    (hv.continuous_fderiv (by simp)).clm_apply continuous_const
+  have hcs : HasCompactSupport (partialD k v) :=
+    hvcs.fderiv (𝕜 := ℝ) |>.comp_left (g := fun T : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ =>
+      T (EuclideanSpace.single k 1)) (by simp)
+  exact hc.memLp_of_hasCompactSupport hcs
+
+/-- **Gradient energy of a mollification.** If the partial derivatives of a smooth compactly
+supported `v` are the convolutions of `L²` functions `G k` with a nonnegative mollifier of
+integral one, then `∫ ‖∇v‖² ≤ (∑ ‖G k‖_{L²})²`. -/
+theorem integral_norm_fderiv_sq_le_of_partialD_eq_convolution
+    {v ρ : EuclideanSpace ℝ (Fin d) → ℝ} {G : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
+    (hv : ContDiff ℝ (⊤ : ℕ∞) v) (hvcs : HasCompactSupport v) (hρ0 : 0 ≤ ρ)
+    (hρm : AEStronglyMeasurable ρ volume) (hρ1 : ∫ y, ρ y ∂volume = 1)
+    (hG : ∀ k, MemLp (G k) 2 volume)
+    (hpartial : ∀ k, partialD k v = (G k ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] ρ)) :
+    ∫ x, ‖fderiv ℝ v x‖ ^ 2 ≤ (∑ k, (eLpNorm (G k) 2 volume).toReal) ^ 2 := by
+  have h2 : ENNReal.ofReal (2 : ℝ) = 2 := by norm_num
+  have hpt : (fun x => ‖fderiv ℝ v x‖ ^ 2) = fun x => ∑ k, (partialD k v x) ^ 2 := by
+    funext x
+    rw [norm_sq_clm_eq_sum_apply_single (fderiv ℝ v x)]
+    rfl
+  rw [hpt, integral_finsetSum Finset.univ
+    (fun k _ => (memLp_partialD_of_contDiff hv hvcs k).integrable_sq)]
+  refine le_trans (Finset.sum_le_sum fun k _ => ?_)
+    (Finset.sum_sq_le_sq_sum_of_nonneg fun k _ => ENNReal.toReal_nonneg)
+  have hmemk := memLp_partialD_of_contDiff hv hvcs k
+  rw [← norm_toLp_sq_eq_integral_sq hmemk]
+  have hle : eLpNorm (partialD k v) 2 volume ≤ eLpNorm (G k) 2 volume := by
+    rw [hpartial k]
+    have := eLpNorm_convolution_le one_le_two hρ0 hρm hρ1 (h := G k) (by rw [h2]; exact hG k)
+    rwa [h2] at this
+  refine pow_le_pow_left₀ (norm_nonneg _) ?_ 2
+  rw [Lp.norm_def]
+  refine ENNReal.toReal_mono (hG k).eLpNorm_lt_top.ne ?_
+  exact (eLpNorm_congr_ae hmemk.coeFn_toLp).trans_le hle
+
+/-- **Translation modulus of a smooth compactly supported class.** If the gradient energy of a
+smooth compactly supported `v` is at most `S²`, its class in `L²` moves under translation by `h`
+by at most `S ‖h‖`. -/
+theorem norm_transL2_sub_le_of_contDiff {v : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hv : ContDiff ℝ (⊤ : ℕ∞) v) (hvcs : HasCompactSupport v) (hvmem : MemLp v 2 volume) {S : ℝ}
+    (hS : 0 ≤ S) (hgrad : ∫ x, ‖fderiv ℝ v x‖ ^ 2 ≤ S ^ 2) (h : EuclideanSpace ℝ (Fin d)) :
+    ‖transL2 h (hvmem.toLp v) - hvmem.toLp v‖ ≤ S * ‖h‖ := by
+  refine le_of_sq_le_sq ?_ (mul_nonneg hS (norm_nonneg _))
+  rw [norm_sq_transL2_sub]
+  have hcomp : ∀ᵐ x ∂volume,
+      (hvmem.toLp v : EuclideanSpace ℝ (Fin d) → ℝ) (x + h) = v (x + h) :=
+    ((measurePreserving_add_right volume h).quasiMeasurePreserving.tendsto_ae).eventually
+      hvmem.coeFn_toLp
+  have hae : (fun x => (((hvmem.toLp v : EuclideanSpace ℝ (Fin d) → ℝ) (x + h)
+      - (hvmem.toLp v : EuclideanSpace ℝ (Fin d) → ℝ) x) ^ 2))
+      =ᵐ[volume] fun x => (v (x + h) - v x) ^ 2 := by
+    filter_upwards [hcomp, hvmem.coeFn_toLp] with x h1 h2
+    rw [h1, h2]
+  rw [integral_congr_ae hae]
+  calc ∫ x, (v (x + h) - v x) ^ 2
+      ≤ ‖h‖ ^ 2 * ∫ x, ‖fderiv ℝ v x‖ ^ 2 :=
+        integral_sq_sub_translation_le (hv.of_le (by exact_mod_cast le_top)) hvcs h
+    _ ≤ ‖h‖ ^ 2 * S ^ 2 := mul_le_mul_of_nonneg_left hgrad (sq_nonneg _)
+    _ = (S * ‖h‖) ^ 2 := by ring
+
 /-- **Translation modulus of a whole-space class with a weak gradient.** A compactly supported
 class on `ℝᵈ` with an `L²` weak gradient moves under translation by at most the length of the
 translation times the sum of the `L²` norms of its gradient components. The class is
@@ -92,12 +166,10 @@ theorem transL2_toLp_sub_le_of_hasWeakGradOn_univ {F : EuclideanSpace ℝ (Fin d
       rOut := 1 / (n + 1 : ℝ)
       rIn_pos := half_pos (by positivity)
       rIn_lt_rOut := half_lt_self (by positivity) }
-  have hrOut : ∀ n : ℕ, (φb n).rOut = 1 / (n + 1 : ℝ) := fun _ => rfl
-  have hrIn : ∀ n : ℕ, (φb n).rIn = 1 / (n + 1 : ℝ) / 2 := fun _ => rfl
-  have hφrOut : Tendsto (fun n => (φb n).rOut) atTop (𝓝 0) := by
-    simp only [hrOut]; exact tendsto_one_div_add_atTop_nhds_zero_nat
+  have hφrOut : Tendsto (fun n => (φb n).rOut) atTop (𝓝 0) :=
+    tendsto_one_div_add_atTop_nhds_zero_nat
   have hφratio : ∀ᶠ n in atTop, (φb n).rOut ≤ 2 * (φb n).rIn :=
-    Eventually.of_forall fun n => le_of_eq (by rw [hrOut, hrIn]; ring)
+    Eventually.of_forall fun n => le_of_eq (by simp [φb]; ring)
   set v : ℕ → EuclideanSpace ℝ (Fin d) → ℝ :=
     fun n => F ⋆[L, volume] (φb n).normed volume with hvdef
   have hFli : LocallyIntegrable F volume := hFint.locallyIntegrable
@@ -107,96 +179,25 @@ theorem transL2_toLp_sub_le_of_hasWeakGradOn_univ {F : EuclideanSpace ℝ (Fin d
   have hvcs : ∀ n, HasCompactSupport (v n) := fun n =>
     HasCompactSupport.convolution (L := L) hFcs (φb n).hasCompactSupport_normed
   have hpartial : ∀ (n : ℕ) (k : Fin d),
-      partialD k (v n) = (G k ⋆[L, volume] (φb n).normed volume) := by
-    intro n k
+      partialD k (v n) = (G k ⋆[L, volume] (φb n).normed volume) := fun n k => by
     funext x
-    have h := partialD_convolution_eq_of_hasWeakGradOn MeasurableSet.univ
-      hFint.integrableOn hwg (φb n) k (x := x) (subset_univ _)
-    simpa only [indicator_univ] using h
-  have hρ0 : ∀ n, (0 : EuclideanSpace ℝ (Fin d) → ℝ) ≤ (φb n).normed volume :=
-    fun n x => (φb n).nonneg_normed x
-  have hρm : ∀ n, AEStronglyMeasurable ((φb n).normed volume) volume := fun n =>
-    ((φb n).contDiff_normed : ContDiff ℝ (⊤ : ℕ∞) _).continuous.aestronglyMeasurable
-  have hρ1 : ∀ n, ∫ y, (φb n).normed volume y ∂volume = 1 := fun n => (φb n).integral_normed
-  have h2 : ENNReal.ofReal (2 : ℝ) = 2 := by norm_num
-  -- the mollifications are in `L²` and converge to the class
+    simpa only [indicator_univ] using partialD_convolution_eq_of_hasWeakGradOn
+      MeasurableSet.univ hFint.integrableOn hwg (φb n) k (x := x) (subset_univ _)
   have hvmem : ∀ n, MemLp (v n) 2 volume := fun n =>
-    ((hvsmooth n).continuous.memLp_of_hasCompactSupport (hvcs n))
-  have hconv := tendsto_eLpNorm_convolution_sub one_le_two (h := F) (by rw [h2]; exact hF)
-    hφrOut hφratio
-  rw [h2] at hconv
+    (hvsmooth n).continuous.memLp_of_hasCompactSupport (hvcs n)
+  -- the mollifications are in `L²` and converge to the class
+  have hconv := tendsto_eLpNorm_convolution_sub one_le_two (h := F)
+    (by rw [show ENNReal.ofReal (2 : ℝ) = 2 by norm_num]; exact hF) hφrOut hφratio
+  rw [show ENNReal.ofReal (2 : ℝ) = 2 by norm_num] at hconv
   have htend : Tendsto (fun n => (hvmem n).toLp (v n)) atTop (𝓝 (hF.toLp F)) := by
     rw [tendsto_iff_edist_tendsto_0]
-    refine hconv.congr fun n => ?_
-    rw [Lp.edist_toLp_toLp]
-  -- the modulus of each mollification
-  have hmod : ∀ n, ∀ h : EuclideanSpace ℝ (Fin d),
-      ‖transL2 h ((hvmem n).toLp (v n)) - (hvmem n).toLp (v n)‖
-        ≤ (∑ k, (eLpNorm (G k) 2 volume).toReal) * ‖h‖ := by
-    intro n h
-    have hsum0 : 0 ≤ ∑ k, (eLpNorm (G k) 2 volume).toReal :=
-      Finset.sum_nonneg fun k _ => ENNReal.toReal_nonneg
-    refine le_of_sq_le_sq ?_ (mul_nonneg hsum0 (norm_nonneg _))
-    rw [norm_sq_transL2_sub]
-    have hae : (fun x => (((hvmem n).toLp (v n) : EuclideanSpace ℝ (Fin d) → ℝ) (x + h)
-        - ((hvmem n).toLp (v n) : EuclideanSpace ℝ (Fin d) → ℝ) x) ^ 2)
-        =ᵐ[volume] fun x => (v n (x + h) - v n x) ^ 2 := by
-      have hcomp : ∀ᵐ x ∂volume,
-          ((hvmem n).toLp (v n) : EuclideanSpace ℝ (Fin d) → ℝ) (x + h) = v n (x + h) :=
-        ((measurePreserving_add_right volume h).quasiMeasurePreserving.tendsto_ae).eventually
-          (hvmem n).coeFn_toLp
-      filter_upwards [hcomp, (hvmem n).coeFn_toLp] with x h1 h2
-      rw [h1, h2]
-    rw [integral_congr_ae hae]
-    -- the gradient energy of the mollification is bounded by that of the weak gradient
-    have hgrad : ∫ x, ‖fderiv ℝ (v n) x‖ ^ 2
-        ≤ (∑ k, (eLpNorm (G k) 2 volume).toReal) ^ 2 := by
-      have hpt : (fun x => ‖fderiv ℝ (v n) x‖ ^ 2)
-          = fun x => ∑ k, (partialD k (v n) x) ^ 2 := by
-        funext x
-        rw [norm_sq_clm_eq_sum_apply_single (fderiv ℝ (v n) x)]
-        rfl
-      have hint : ∀ k : Fin d, Integrable (fun x => (partialD k (v n) x) ^ 2) volume := by
-        intro k
-        have hc : Continuous (partialD k (v n)) :=
-          ((hvsmooth n).continuous_fderiv (by simp)).clm_apply continuous_const
-        have hcs : HasCompactSupport (partialD k (v n)) :=
-          (hvcs n).fderiv (𝕜 := ℝ) |>.comp_left (g := fun T : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ =>
-            T (EuclideanSpace.single k 1)) (by simp)
-        exact (hc.fun_pow 2).integrable_of_hasCompactSupport
-          (hcs.comp_left (g := fun y : ℝ => y ^ 2) (by norm_num))
-      rw [hpt, integral_finsetSum Finset.univ (fun k _ => hint k)]
-      refine le_trans (Finset.sum_le_sum fun k _ => ?_)
-        (Finset.sum_sq_le_sq_sum_of_nonneg fun k _ => ENNReal.toReal_nonneg)
-      -- one component: the mollified gradient is bounded by the gradient in `L²`
-      have hmemk : MemLp (partialD k (v n)) 2 volume := by
-        have hc : Continuous (partialD k (v n)) :=
-          ((hvsmooth n).continuous_fderiv (by simp)).clm_apply continuous_const
-        have hcs : HasCompactSupport (partialD k (v n)) :=
-          (hvcs n).fderiv (𝕜 := ℝ) |>.comp_left (g := fun T : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ =>
-            T (EuclideanSpace.single k 1)) (by simp)
-        exact hc.memLp_of_hasCompactSupport hcs
-      rw [← norm_toLp_sq_eq_integral_sq hmemk]
-      have hle : eLpNorm (partialD k (v n)) 2 volume ≤ eLpNorm (G k) 2 volume := by
-        rw [hpartial n k]
-        have := eLpNorm_convolution_le one_le_two (hρ0 n) (hρm n) (hρ1 n)
-          (h := G k) (by rw [h2]; exact hG k)
-        rwa [h2] at this
-      have hnorm : ‖hmemk.toLp (partialD k (v n))‖ ≤ (eLpNorm (G k) 2 volume).toReal := by
-        rw [Lp.norm_def]
-        refine ENNReal.toReal_mono (hG k).eLpNorm_lt_top.ne ?_
-        calc eLpNorm (hmemk.toLp (partialD k (v n))) 2 volume
-            = eLpNorm (partialD k (v n)) 2 volume := eLpNorm_congr_ae hmemk.coeFn_toLp
-          _ ≤ eLpNorm (G k) 2 volume := hle
-      exact pow_le_pow_left₀ (norm_nonneg _) hnorm 2
-    calc ∫ x, (v n (x + h) - v n x) ^ 2
-        ≤ ‖h‖ ^ 2 * ∫ x, ‖fderiv ℝ (v n) x‖ ^ 2 :=
-          integral_sq_sub_translation_le
-            ((hvsmooth n).of_le (by exact_mod_cast le_top)) (hvcs n) h
-      _ ≤ ‖h‖ ^ 2 * (∑ k, (eLpNorm (G k) 2 volume).toReal) ^ 2 :=
-          mul_le_mul_of_nonneg_left hgrad (sq_nonneg _)
-      _ = ((∑ k, (eLpNorm (G k) 2 volume).toReal) * ‖h‖) ^ 2 := by ring
-  exact transL2_sub_le_of_tendsto htend hmod h
+    exact hconv.congr fun n => by rw [Lp.edist_toLp_toLp]
+  exact transL2_sub_le_of_tendsto htend (fun n h => norm_transL2_sub_le_of_contDiff (hvsmooth n)
+    (hvcs n) (hvmem n) (Finset.sum_nonneg fun k _ => ENNReal.toReal_nonneg)
+    (integral_norm_fderiv_sq_le_of_partialD_eq_convolution (hvsmooth n) (hvcs n)
+      (fun x => (φb n).nonneg_normed x)
+      ((φb n).contDiff_normed : ContDiff ℝ (⊤ : ℕ∞) _).continuous.aestronglyMeasurable
+      (φb n).integral_normed hG (hpartial n)) h) h
 
 /-! ### The embedding of the graph space -/
 
@@ -209,6 +210,37 @@ def embW12 (Ω : Set (EuclideanSpace ℝ (Fin d))) : W12 Ω →L[ℝ] L2D Ω :=
     embW12 Ω U = (U : H1amb Ω) 0 := by
   simp only [embW12, ContinuousLinearMap.comp_apply, Submodule.subtypeL_apply, PiLp.proj_apply]
 
+/-- The pair of a function and its gradient components that an element of the graph space
+presents to the extension operator. -/
+def graphPair (U : W12 Ω) : SobolevPair d :=
+  (fun x => ((U : H1amb Ω) 0 : L2D Ω) x, fun (k : Fin d) x => ((U : H1amb Ω) k.succ : L2D Ω) x)
+
+/-- The seminorms of the pair of an element of the graph space are bounded by its norm. -/
+theorem eLpNorm_graphPair_le (U : W12 Ω) :
+    eLpNorm (graphPair U).1 2 (volume.restrict Ω)
+      + ∑ i, eLpNorm ((graphPair U).2 i) 2 (volume.restrict Ω)
+      ≤ ENNReal.ofReal ((d + 1) * ‖U‖) := by
+  have h0 : eLpNorm (graphPair U).1 2 (volume.restrict Ω) = ENNReal.ofReal ‖(U : H1amb Ω) 0‖ := by
+    rw [Lp.norm_def, ENNReal.ofReal_toReal (Lp.eLpNorm_lt_top _).ne]
+    rfl
+  have hk : ∀ k : Fin d, eLpNorm ((graphPair U).2 k) 2 (volume.restrict Ω)
+      = ENNReal.ofReal ‖(U : H1amb Ω) k.succ‖ := fun k => by
+    rw [Lp.norm_def, ENNReal.ofReal_toReal (Lp.eLpNorm_lt_top _).ne]
+    rfl
+  rw [h0]
+  simp_rw [hk]
+  rw [← ENNReal.ofReal_sum_of_nonneg (fun _ _ => norm_nonneg _),
+    ← ENNReal.ofReal_add (norm_nonneg _) (Finset.sum_nonneg fun _ _ => norm_nonneg _)]
+  refine ENNReal.ofReal_le_ofReal ?_
+  have hU : ‖U‖ = ‖(U : H1amb Ω)‖ := rfl
+  calc ‖(U : H1amb Ω) 0‖ + ∑ k : Fin d, ‖(U : H1amb Ω) k.succ‖
+      ≤ ‖U‖ + ∑ _k : Fin d, ‖U‖ := by
+        rw [hU]
+        exact add_le_add (PiLp.norm_apply_le _ _)
+          (Finset.sum_le_sum fun k _ => PiLp.norm_apply_le _ _)
+    _ = (d + 1) * ‖U‖ := by
+        rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]; ring
+
 /-- **Rellich-Kondrachov on `H¹(Ω)`** (Evans §5.7 Theorem 1 at `p = q = 2`, Guo Theorem
 IV.2.10). On a bounded open domain with `C¹` boundary, the embedding of the graph space
 `W12 Ω` into `L²(Ω)` is a compact operator. -/
@@ -220,9 +252,7 @@ theorem embW12_isCompact (hd : 0 < d) (hΩopen : IsOpen Ω) (hΩb : Bornology.Is
   have hsub : closure Ω ⊆ ball (0 : EuclideanSpace ℝ (Fin d)) (R₀ + 1) :=
     (closure_minimal hR₀ isClosed_closedBall).trans (closedBall_subset_ball (by linarith))
   obtain ⟨T, K, hT⟩ := exists_extLinear hd hΩopen hΩb hC1 isOpen_ball hsub (p := 2) one_le_two
-  -- the pair an element of the graph space presents to the extension operator
-  let w : W12 Ω → SobolevPair d := fun U =>
-    (fun x => ((U : H1amb Ω) 0 : L2D Ω) x, fun (k : Fin d) x => ((U : H1amb Ω) k.succ : L2D Ω) x)
+  let w : W12 Ω → SobolevPair d := graphPair
   have hw : ∀ U : W12 Ω,
       HasWeakGradOn Set.univ (T (w U)).1 (T (w U)).2 ∧ HasCompactSupport (T (w U)).1 ∧
         tsupport (T (w U)).1 ⊆ ball 0 (R₀ + 1) ∧ Integrable (T (w U)).1 volume ∧
@@ -234,28 +264,9 @@ theorem embW12_isCompact (hd : 0 < d) (hΩopen : IsOpen Ω) (hΩb : Bornology.Is
           (volume.restrict Ω) + ∑ i, eLpNorm ((w U).2 i) 2 (volume.restrict Ω)) := fun U =>
     hT (w U) ((Lp.memLp _).integrable one_le_two) (fun k => (Lp.memLp _).integrable one_le_two)
       (hasWeakGradOn_of_mem_W12 U.2)
-  -- the seminorms of the pair are bounded by the norm of the element
   have hN : ∀ U : W12 Ω, eLpNorm (w U).1 2 (volume.restrict Ω)
-      + ∑ i, eLpNorm ((w U).2 i) 2 (volume.restrict Ω) ≤ ENNReal.ofReal ((d + 1) * ‖U‖) := by
-    intro U
-    have h0 : eLpNorm (w U).1 2 (volume.restrict Ω) = ENNReal.ofReal ‖(U : H1amb Ω) 0‖ := by
-      rw [Lp.norm_def, ENNReal.ofReal_toReal (Lp.eLpNorm_lt_top _).ne]
-    have hk : ∀ k : Fin d, eLpNorm ((w U).2 k) 2 (volume.restrict Ω)
-        = ENNReal.ofReal ‖(U : H1amb Ω) k.succ‖ := fun k => by
-      rw [Lp.norm_def, ENNReal.ofReal_toReal (Lp.eLpNorm_lt_top _).ne]
-    rw [h0]
-    simp_rw [hk]
-    rw [← ENNReal.ofReal_sum_of_nonneg (fun _ _ => norm_nonneg _),
-      ← ENNReal.ofReal_add (norm_nonneg _) (Finset.sum_nonneg fun _ _ => norm_nonneg _)]
-    refine ENNReal.ofReal_le_ofReal ?_
-    have hU : ‖U‖ = ‖(U : H1amb Ω)‖ := rfl
-    calc ‖(U : H1amb Ω) 0‖ + ∑ k : Fin d, ‖(U : H1amb Ω) k.succ‖
-        ≤ ‖U‖ + ∑ _k : Fin d, ‖U‖ := by
-          rw [hU]
-          exact add_le_add (PiLp.norm_apply_le _ _)
-            (Finset.sum_le_sum fun k _ => PiLp.norm_apply_le _ _)
-      _ = (d + 1) * ‖U‖ := by
-          rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]; ring
+      + ∑ i, eLpNorm ((w U).2 i) 2 (volume.restrict Ω) ≤ ENNReal.ofReal ((d + 1) * ‖U‖) :=
+    eLpNorm_graphPair_le
   have hKfin : ∀ U : W12 Ω, (K : ℝ≥0∞) * (eLpNorm (w U).1 2 (volume.restrict Ω)
       + ∑ i, eLpNorm ((w U).2 i) 2 (volume.restrict Ω)) < ⊤ := fun U =>
     ENNReal.mul_lt_top ENNReal.coe_lt_top (lt_of_le_of_lt (hN U) ENNReal.ofReal_lt_top)
@@ -264,19 +275,11 @@ theorem embW12_isCompact (hd : 0 < d) (hΩopen : IsOpen Ω) (hΩb : Bornology.Is
   have hMG : ∀ U : W12 Ω, ∀ k, MemLp ((T (w U)).2 k) 2 volume := fun U k =>
     lt_of_le_of_lt ((hw U).2.2.2.2.2.2.2 k) (hKfin U)
   -- the real bounds on the extension and its gradient
-  have hFb : ∀ U : W12 Ω, (eLpNorm (T (w U)).1 2 volume).toReal ≤ K * ((d + 1) * ‖U‖) := by
-    intro U
-    have : eLpNorm (T (w U)).1 2 volume ≤ (K : ℝ≥0∞) * ENNReal.ofReal ((d + 1) * ‖U‖) :=
-      (hw U).2.2.2.2.2.2.1.trans (by gcongr; exact hN U)
-    rw [← ENNReal.ofReal_coe_nnreal, ← ENNReal.ofReal_mul (by positivity)] at this
-    exact (ENNReal.toReal_le_of_le_ofReal (by positivity) this)
+  have hFb : ∀ U : W12 Ω, (eLpNorm (T (w U)).1 2 volume).toReal ≤ K * ((d + 1) * ‖U‖) := fun U =>
+    toReal_eLpNorm_le_of_le (by positivity) (hw U).2.2.2.2.2.2.1 (hN U)
   have hGb : ∀ U : W12 Ω, ∀ k, (eLpNorm ((T (w U)).2 k) 2 volume).toReal
-      ≤ K * ((d + 1) * ‖U‖) := by
-    intro U k
-    have : eLpNorm ((T (w U)).2 k) 2 volume ≤ (K : ℝ≥0∞) * ENNReal.ofReal ((d + 1) * ‖U‖) :=
-      ((hw U).2.2.2.2.2.2.2 k).trans (by gcongr; exact hN U)
-    rw [← ENNReal.ofReal_coe_nnreal, ← ENNReal.ofReal_mul (by positivity)] at this
-    exact (ENNReal.toReal_le_of_le_ofReal (by positivity) this)
+      ≤ K * ((d + 1) * ‖U‖) := fun U k =>
+    toReal_eLpNorm_le_of_le (by positivity) ((hw U).2.2.2.2.2.2.2 k) (hN U)
   -- the extensions of the unit ball, as a family in `L²(ℝᵈ)`
   set Φ : W12 Ω → EucL2 d := fun U => (hMF U).toLp (T (w U)).1 with hΦ
   set S : Set (EucL2 d) := Φ '' closedBall 0 1 with hS

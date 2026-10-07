@@ -147,6 +147,20 @@ theorem interiorRegularityAt_zero (Op : FullEllipticOp (n + 1))
         linarith
       · simp at hα
 
+/-- Under the cutoff `ϑ` the mixed second derivatives of the family commute. -/
+private lemma cutoffDeriv_mixed_comm {N : Set (EuclideanSpace ℝ (Fin (n + 1)))} {k : ℕ}
+    (hNm : MeasurableSet N) {ϑ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ} (hϑ : IsTestFn N ϑ)
+    {g : L2D N} (HuN : HasIteratedWeakDerivOn N (k + 2) g) (ℓ i : Fin (n + 1)) :
+    (fun x => ϑ x * (HuN.D [i, ℓ] x : ℝ))
+      =ᵐ[volume.restrict N] fun x => ϑ x * (HuN.D [ℓ, i] x : ℝ) := by
+  have h := mulTest_mixed_weakDeriv_comm hNm hϑ
+    (HuN.D_step i [] (Nat.succ_pos _)) (HuN.D_step ℓ [] (Nat.succ_pos _))
+    (HuN.D_step ℓ [i] (Nat.succ_lt_succ (Nat.succ_pos k)))
+    (HuN.D_step i [ℓ] (Nat.succ_lt_succ (Nat.succ_pos k)))
+  filter_upwards [mulCutoff_coeFn hϑ (HuN.D [ℓ, i]), mulCutoff_coeFn hϑ (HuN.D [i, ℓ])]
+    with x h1 h2
+  rw [← h2, ← h, h1]
+
 /-- **Weak formulation of the cut-off derivative against a test function.** Let `U` be the
 cut-off derivative `ξ · ∂_ℓ u`, with gradient given in closed form by `hgrad`, and let `HuN` be
 the family of derivatives of `u` on the collar `N`. Then `B[U, v]` is the datum
@@ -182,17 +196,7 @@ private lemma cutoffDeriv_pairing_eq (Op : FullEllipticOp (n + 1))
       (D2 := fun i => HuN.D [i, ℓ]) hgrad hU0N hD2 hv.1).trans ?_)
   unfold cutoffDatumPairing
   -- The mixed second derivative, swapped into the order the equation names.
-  have hsymm : ∀ i : Fin (n + 1),
-      (fun x => ϑ x * (HuN.D [i, ℓ] x : ℝ))
-        =ᵐ[volume.restrict N] fun x => ϑ x * (HuN.D [ℓ, i] x : ℝ) := by
-    intro i
-    have h := mulTest_mixed_weakDeriv_comm hNm hϑ
-      (HuN.D_step i [] (Nat.succ_pos _)) (HuN.D_step ℓ [] (Nat.succ_pos _))
-      (HuN.D_step ℓ [i] (Nat.succ_lt_succ (Nat.succ_pos k)))
-      (HuN.D_step i [ℓ] (Nat.succ_lt_succ (Nat.succ_pos k)))
-    filter_upwards [mulCutoff_coeFn hϑ (HuN.D [ℓ, i]), mulCutoff_coeFn hϑ (HuN.D [i, ℓ])]
-      with x h1 h2
-    rw [← h2, ← h, h1]
+  have hsymm := cutoffDeriv_mixed_comm hNm hϑ HuN ℓ
   have hψ : ∀ j : Fin (n + 1), ∀ x, ϑ x * partialD j (fun y => ξ y * v y) x
       = partialD j (fun y => ξ y * v y) x := fun j =>
     mul_eq_self_of_eqOn_one hϑ_eqOn
