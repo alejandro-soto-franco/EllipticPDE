@@ -143,31 +143,31 @@ theorem principal_leibniz (Op : FullEllipticOp d) (D : CoeffWeakGrad Op.toEllipt
     (Op.toEllipticCoeff.actL_coeFn i j (U 0)) dag hdagae
   have key := hwd _ hψ.1 hψ.2.1 hψ.2.2
   rw [partialD_mul (hdi.1.differentiable (by simp)) (hv.1.differentiable (by simp)) j] at key
-  have hdiv : Continuous (partialD i η) := hη.continuous_partialD i
-  have hdjv : Continuous (partialD j v) := hv.continuous_partialD j
-  have hdji : Continuous (partialD j (partialD i η)) := hdi.continuous_partialD j
-  have i1 := integrable_weight_L2D_mul (g := U 0)
-    (ψ := fun x => partialD i η x * partialD j v x) (Op.measurable i j) (Op.bdd i j)
-    (hdiv.mul hdjv) (hv.hasCompactSupport_partialD j).mul_left
-  have i2 := integrable_weight_L2D_mul (g := U 0)
-    (ψ := fun x => partialD j (partialD i η) x * v x) (Op.measurable i j) (Op.bdd i j)
-    (hdji.mul hv.continuous) hv.2.1.mul_left
-  have i3 := integrable_weight_L2D_mul (g := U 0) (ψ := fun x => partialD i η x * v x)
-    (D.measurable j i j) (D.ae_abs_le j i j) (hdiv.mul hv.continuous) hv.2.1.mul_left
-  have i4 := integrable_weight_L2D_mul (g := U j.succ) (ψ := fun x => partialD i η x * v x)
-    (Op.measurable i j) (Op.bdd i j) (hdiv.mul hv.continuous) hv.2.1.mul_left
   have hL : ∫ x in Ω, (Op.toEllipticCoeff.actL i j (U 0) x : ℝ)
         * (partialD i η x * partialD j v x + partialD j (partialD i η) x * v x)
       = (∫ x in Ω, Op.a x i j * (U 0 x : ℝ) * (partialD i η x * partialD j v x))
         + ∫ x in Ω, Op.a x i j * (U 0 x : ℝ) * (partialD j (partialD i η) x * v x) := by
-    rw [← integral_add i1 i2]
+    rw [← integral_add
+      (integrable_weight_L2D_mul (g := U 0) (ψ := fun x => partialD i η x * partialD j v x)
+        (Op.measurable i j) (Op.bdd i j)
+        ((hη.continuous_partialD i).mul (hv.continuous_partialD j))
+        (hv.hasCompactSupport_partialD j).mul_left)
+      (integrable_weight_L2D_mul (g := U 0)
+        (ψ := fun x => partialD j (partialD i η) x * v x) (Op.measurable i j) (Op.bdd i j)
+        ((hdi.continuous_partialD j).mul hv.continuous) hv.2.1.mul_left)]
     refine integral_congr_ae ?_
     filter_upwards [Op.toEllipticCoeff.actL_coeFn i j (U 0)] with x hx
     rw [hx]; ring
   have hR : ∫ x in Ω, (dag x : ℝ) * (partialD i η x * v x)
       = (∫ x in Ω, D.da j i j x * (U 0 x : ℝ) * (partialD i η x * v x))
         + ∫ x in Ω, Op.a x i j * (U j.succ x : ℝ) * (partialD i η x * v x) := by
-    rw [← integral_add i3 i4]
+    rw [← integral_add
+      (integrable_weight_L2D_mul (g := U 0) (ψ := fun x => partialD i η x * v x)
+        (D.measurable j i j) (D.ae_abs_le j i j)
+        ((hη.continuous_partialD i).mul hv.continuous) hv.2.1.mul_left)
+      (integrable_weight_L2D_mul (g := U j.succ) (ψ := fun x => partialD i η x * v x)
+        (Op.measurable i j) (Op.bdd i j) ((hη.continuous_partialD i).mul hv.continuous)
+        hv.2.1.mul_left)]
     refine integral_congr_ae ?_
     filter_upwards [hdagae] with x hx
     rw [hx]; ring

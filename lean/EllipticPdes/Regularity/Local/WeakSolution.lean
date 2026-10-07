@@ -131,15 +131,6 @@ theorem hasWeakGradOn_univ_cutoffMul (hΩm : MeasurableSet Ω) {η : EuclideanSp
   rw [partialD_mul (hη.1.differentiable (by simp)) (hφc.differentiable (by simp)) k] at key
   have hdφc : Continuous (partialD k φ) :=
     (hφc.continuous_fderiv (by simp)).clm_apply continuous_const
-  have i1 := integrable_L2D_mul (g := U 0) (ψ := fun x => η x * partialD k φ x)
-    (hη.continuous.mul hdφc) (hφcs.fderiv_apply (𝕜 := ℝ) _).mul_left
-  have i2 := integrable_L2D_mul (g := U 0) (ψ := fun x => partialD k η x * φ x)
-    ((hη.continuous_partialD k).mul hφc.continuous) hφcs.mul_left
-  have I1 := integrable_eucL2_mul (g := extendL2 hΩm (U k.succ)) (ψ := fun x => η x * φ x)
-    (hη.continuous.mul hφc.continuous) hφcs.mul_left
-  have I2 := integrable_eucL2_mul (g := extendL2 hΩm (U 0))
-    (ψ := fun x => partialD k η x * φ x)
-    ((hη.continuous_partialD k).mul hφc.continuous) hφcs.mul_left
   have e1 := integral_extendL2_mul_eq (g := U k.succ) hΩm (ψ := fun x => η x * φ x)
     (fun x hx => by simp only [hηoff x hx, zero_mul])
   have e2 := integral_extendL2_mul_eq (g := U 0) hΩm (ψ := fun x => partialD k η x * φ x)
@@ -153,13 +144,21 @@ theorem hasWeakGradOn_univ_cutoffMul (hΩm : MeasurableSet Ω) {η : EuclideanSp
         + partialD k η x * (extendL2 hΩm (U 0) x : ℝ)) * φ x
       = (∫ x, (extendL2 hΩm (U k.succ) x : ℝ) * (η x * φ x))
         + ∫ x, (extendL2 hΩm (U 0) x : ℝ) * (partialD k η x * φ x) := by
-    rw [← integral_add I1 I2]
+    rw [← integral_add
+      (integrable_eucL2_mul (g := extendL2 hΩm (U k.succ)) (ψ := fun x => η x * φ x)
+        (hη.continuous.mul hφc.continuous) hφcs.mul_left)
+      (integrable_eucL2_mul (g := extendL2 hΩm (U 0)) (ψ := fun x => partialD k η x * φ x)
+        ((hη.continuous_partialD k).mul hφc.continuous) hφcs.mul_left)]
     exact integral_congr_ae (Eventually.of_forall fun x => by ring)
   have hsplit : ∫ x in Ω, ((U 0 : L2D Ω) x : ℝ)
         * (η x * partialD k φ x + partialD k η x * φ x)
       = (∫ x in Ω, ((U 0 : L2D Ω) x : ℝ) * (η x * partialD k φ x))
         + ∫ x in Ω, ((U 0 : L2D Ω) x : ℝ) * (partialD k η x * φ x) := by
-    rw [← integral_add i1 i2]
+    rw [← integral_add
+      (integrable_L2D_mul (g := U 0) (ψ := fun x => η x * partialD k φ x)
+        (hη.continuous.mul hdφc) (hφcs.fderiv_apply (𝕜 := ℝ) _).mul_left)
+      (integrable_L2D_mul (g := U 0) (ψ := fun x => partialD k η x * φ x)
+        ((hη.continuous_partialD k).mul hφc.continuous) hφcs.mul_left)]
     exact integral_congr_ae (Eventually.of_forall fun x => by ring)
   rw [hL, hR, e1, e2, e3]
   linarith [key, hsplit]
