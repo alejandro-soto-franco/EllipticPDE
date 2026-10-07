@@ -145,13 +145,11 @@ theorem exists_reductionDatum (Op : FullEllipticOp (n + 1))
       fun _ => hHU 0)).add
     (hP6 (fun _ => restrictL2 (Ω := N) (extendL2 hΩm (U 0))) (fun _ => HU 0) fun _ => hHU 0)
   refine (h.mono (le_of_eq (by ring))).congr fun v _ _ => ?_
-  have hηt : ∀ i : Fin (n + 1), tsupport (partialD i η) ⊆ N := fun i => (hηD i).2.2
-  have hηtt : ∀ i j : Fin (n + 1), tsupport (partialD j (partialD i η)) ⊆ N :=
-    fun i j => (hηDD i j).2.2
   have h1 : ∫ x in Ω, η x * ((1 : ℝ) * (f x : ℝ)) * v x = ∫ x in Ω, (f x : ℝ) * (η x * v x) :=
     integral_congr_ae (Eventually.of_forall fun x => by ring)
   simp only [Fintype.sum_prod_type, Finset.univ_unique, Finset.sum_singleton, h1,
-    setIntegral_cutoff_restrict_eq hΩm (hηt _), setIntegral_cutoff_restrict_eq hΩm (hηtt _ _)]
+    setIntegral_cutoff_restrict_eq hΩm (hηD _).2.2,
+    setIntegral_cutoff_restrict_eq hΩm (hηDD _ _).2.2]
   rfl
 
 end Datum

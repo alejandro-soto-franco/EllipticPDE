@@ -123,55 +123,16 @@ theorem exists_eigen_family (hco : IsCoercive B) (hsymm : ∀ U W : V, B U W = B
           Set V) :=
       eigenvalueOn_mono emb hco (orthSubmodule_snoc_subset emb w U)
         (rayleighSphere_inter_nonempty emb (hdim (n + 1) (Fin.snoc w U)))
-    refine ⟨Fin.snoc w U, Fin.snoc lam μ, ?_, ?_, ?_, ?_, ?_⟩
-    · refine Fin.lastCases ?_ ?_
-      · rw [Fin.snoc_last]
-        exact hUnorm
-      · intro i
-        rw [Fin.snoc_castSucc]
-        exact h1 i
-    · refine Fin.lastCases ?_ ?_
-      · refine Fin.lastCases ?_ ?_
-        · intro hij
-          exact absurd rfl hij
-        · intro j _
-          rw [Fin.snoc_last, Fin.snoc_castSucc]
-          exact hUmem j
-      · intro i
-        refine Fin.lastCases ?_ ?_
-        · intro _
-          rw [Fin.snoc_castSucc, Fin.snoc_last, real_inner_comm]
-          exact hUmem i
-        · intro j hij
-          rw [Fin.snoc_castSucc, Fin.snoc_castSucc]
-          exact h2 i j (fun h => hij (by rw [h]))
-    · refine Fin.lastCases ?_ ?_
-      · intro W
-        rw [Fin.snoc_last, Fin.snoc_last]
-        exact hUeq W
-      · intro i W
-        rw [Fin.snoc_castSucc, Fin.snoc_castSucc]
-        exact h3 i W
-    · refine Fin.lastCases ?_ ?_
-      · refine Fin.lastCases ?_ ?_
-        · intro _
-          exact le_rfl
-        · intro j hji
-          exact absurd (Fin.castSucc_lt_last j) (not_lt.mpr hji)
-      · intro i
-        refine Fin.lastCases ?_ ?_
-        · intro _
-          rw [Fin.snoc_castSucc, Fin.snoc_last]
-          exact h5 i
-        · intro j hij
-          rw [Fin.snoc_castSucc, Fin.snoc_castSucc]
-          exact h4 i j (by simpa using hij)
-    · refine Fin.lastCases ?_ ?_
-      · rw [Fin.snoc_last]
-        exact hmuv
-      · intro i
-        rw [Fin.snoc_castSucc]
-        exact (h5 i).trans hmuv
+    refine ⟨Fin.snoc w U, Fin.snoc lam μ, ?_, ?_, ?_, ?_, ?_⟩ <;>
+      simp only [Fin.forall_fin_succ', Fin.snoc_castSucc, Fin.snoc_last]
+    · exact ⟨h1, hUnorm⟩
+    · exact ⟨fun i => ⟨fun j hij => h2 i j fun h => hij (congrArg Fin.castSucc h),
+        fun _ => (real_inner_comm _ _).trans (hUmem i)⟩, fun i _ => hUmem i,
+        fun h => absurd rfl h⟩
+    · exact ⟨h3, hUeq⟩
+    · exact ⟨fun i => ⟨fun j hij => h4 i j (Fin.castSucc_le_castSucc_iff.mp hij), fun _ => h5 i⟩,
+        fun i hi => absurd (Fin.castSucc_lt_last i) (not_lt.mpr hi), fun _ => le_rfl⟩
+    · exact ⟨fun i => (h5 i).trans hmuv, hmuv⟩
 
 omit [CompleteSpace V] [CompleteSpace L] in
 /-- **Every eigenvalue of an orthonormal family is at least the principal one.** A member of the
