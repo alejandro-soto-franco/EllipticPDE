@@ -204,20 +204,21 @@ theorem hasWeakGradOn_comp_affineBall (x : EuclideanSpace ℝ (Fin d)) {r : ℝ}
 /-- The unit ball, as a local abbreviation for the proof below. -/
 local notation "B₁" => Metric.ball (0 : EuclideanSpace ℝ (Fin d)) 1
 
-/-- **Poincaré's inequality on a ball** (Evans §5.8.1 Theorem 2 at `p = 2`). One constant,
-depending on the dimension alone, bounds the `L²` distance of a class on any ball from its
-mean over the ball by the radius times the `L²` norm of its gradient. -/
-theorem poincare_ball (hd : 0 < d) :
-    ∃ C : ℝ, ∀ (x : EuclideanSpace ℝ (Fin d)) (r : ℝ), 0 < r →
-      ∀ (u : EuclideanSpace ℝ (Fin d) → ℝ) (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
-        MemLp u 2 (volume.restrict (ball x r)) →
-        (∀ k, MemLp (g k) 2 (volume.restrict (ball x r))) →
-        HasWeakGradOn (ball x r) u g →
-        (eLpNorm (fun y => u y - ⨍ z in ball x r, u z) 2 (volume.restrict (ball x r))).toReal
-          ≤ C * r * Real.sqrt (∑ k, (eLpNorm (g k) 2 (volume.restrict (ball x r))).toReal ^ 2) := by
+/-- **Transport of a class on a ball to the unit ball.** For a class `u` on `ball x r` with an `L²`
+weak gradient `g`, pulling back along the affine map from the unit ball gives an element of
+`W12` of the unit ball whose distance from its mean is a constant `s` times that of `u`, and
+whose gradient coordinates are `r s` times those of `g`. -/
+theorem exists_W12_transport_ball (x : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr : 0 < r)
+    {u : EuclideanSpace ℝ (Fin d) → ℝ} {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
+    (hu : MemLp u 2 (volume.restrict (ball x r)))
+    (hg : ∀ k, MemLp (g k) 2 (volume.restrict (ball x r))) (hw : HasWeakGradOn (ball x r) u g) :
+    ∃ s : ℝ, 0 < s ∧ ∃ U : W12 (ball (0 : EuclideanSpace ℝ (Fin d)) 1),
+      ‖embW12 _ U - constL2 isBounded_ball (meanL2 isBounded_ball (embW12 _ U))‖
+        = s * (eLpNorm (fun y => u y - ⨍ z in ball x r, u z) 2
+          (volume.restrict (ball x r))).toReal ∧
+      ∀ k : Fin d, ‖(U : H1amb (ball (0 : EuclideanSpace ℝ (Fin d)) 1)) k.succ‖
+        = r * s * (eLpNorm (g k) 2 (volume.restrict (ball x r))).toReal := by
   classical
-  obtain ⟨C, hC⟩ := poincare_wirtinger_ball hd
-  refine ⟨C, fun x r hr u g hu hg hw => ?_⟩
   set s : ℝ≥0∞ := ballScale d r ^ (1 / (2 : ℝ≥0∞)).toReal with hs
   have hs0 : s ≠ 0 := by
     rw [hs, ne_eq, ENNReal.rpow_eq_zero_iff]
@@ -238,7 +239,6 @@ theorem poincare_ball (hd : 0 < d) :
   have hV0 : V 0 = hv.toLp _ := by rw [hV, PiLp.toLp_apply, Fin.cons_zero]
   have hVk : ∀ k : Fin d, V k.succ = (hh k).toLp _ := fun k => by
     rw [hV, PiLp.toLp_apply, Fin.cons_succ]
-  have hineq := hC ⟨V, hVW⟩
   -- the mean of the transported class is the mean over the ball
   set m : ℝ := ⨍ z in ball x r, u z with hm
   have hmean : meanL2 isBounded_ball (embW12 B₁ ⟨V, hVW⟩) = m := by
@@ -277,24 +277,33 @@ theorem poincare_ball (hd : 0 < d) :
       ENNReal.toReal_mul, ENNReal.toReal_mul, Real.enorm_eq_ofReal_abs,
       ENNReal.toReal_ofReal (abs_nonneg _), abs_of_pos hr]
     ring
+  refine ⟨s.toReal, hspos, ⟨V, hVW⟩, hL, hR⟩
+
+/-- **Poincaré's inequality on a ball** (Evans §5.8.1 Theorem 2 at `p = 2`). One constant,
+depending on the dimension alone, bounds the `L²` distance of a class on any ball from its
+mean over the ball by the radius times the `L²` norm of its gradient. -/
+theorem poincare_ball (hd : 0 < d) :
+    ∃ C : ℝ, ∀ (x : EuclideanSpace ℝ (Fin d)) (r : ℝ), 0 < r →
+      ∀ (u : EuclideanSpace ℝ (Fin d) → ℝ) (g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ),
+        MemLp u 2 (volume.restrict (ball x r)) →
+        (∀ k, MemLp (g k) 2 (volume.restrict (ball x r))) →
+        HasWeakGradOn (ball x r) u g →
+        (eLpNorm (fun y => u y - ⨍ z in ball x r, u z) 2 (volume.restrict (ball x r))).toReal
+          ≤ C * r * Real.sqrt (∑ k, (eLpNorm (g k) 2 (volume.restrict (ball x r))).toReal ^ 2) := by
+  obtain ⟨C, hC⟩ := poincare_wirtinger_ball hd
+  refine ⟨C, fun x r hr u g hu hg hw => ?_⟩
+  obtain ⟨s, hs, U, hL, hR⟩ := exists_W12_transport_ball x hr hu hg hw
+  have hineq := hC U
   rw [hL] at hineq
   simp only [hR] at hineq
   -- divide by the common factor
   have hsum : Real.sqrt (∑ k : Fin d,
-      (r * s.toReal * (eLpNorm (g k) 2 (volume.restrict (ball x r))).toReal) ^ 2)
-      = r * s.toReal
-        * Real.sqrt (∑ k, (eLpNorm (g k) 2 (volume.restrict (ball x r))).toReal ^ 2) := by
-    have h : ∀ k : Fin d,
-        (r * s.toReal * (eLpNorm (g k) 2 (volume.restrict (ball x r))).toReal) ^ 2
-        = (r * s.toReal) ^ 2 * (eLpNorm (g k) 2 (volume.restrict (ball x r))).toReal ^ 2 :=
-      fun k => by ring
-    simp_rw [h]
+      (r * s * (eLpNorm (g k) 2 (volume.restrict (ball x r))).toReal) ^ 2)
+      = r * s * Real.sqrt (∑ k, (eLpNorm (g k) 2 (volume.restrict (ball x r))).toReal ^ 2) := by
+    simp_rw [mul_pow (r * s)]
     rw [← Finset.mul_sum, Real.sqrt_mul (by positivity), Real.sqrt_sq (by positivity)]
   rw [hsum] at hineq
-  have hfinal : s.toReal * (eLpNorm (fun y => u y - m) 2 (volume.restrict (ball x r))).toReal
-      ≤ s.toReal * (C * r * Real.sqrt (∑ k, (eLpNorm (g k) 2
-        (volume.restrict (ball x r))).toReal ^ 2)) := by
-    linarith [hineq]
-  exact le_of_mul_le_mul_left hfinal hspos
+  refine le_of_mul_le_mul_left ?_ hs
+  linarith [hineq]
 
 end EllipticPdes.Sobolev
