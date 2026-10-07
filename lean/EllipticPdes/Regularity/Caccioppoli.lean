@@ -100,6 +100,13 @@ lemma IsTestFn.partialSupNorm_nonneg {Ω : Set (EuclideanSpace ℝ (Fin d))}
     0 ≤ h.partialSupNorm i :=
   (h.hasCompactSupport_partialD i).iSup_abs_nonneg (h.continuous_partialD i)
 
+/-- The sum of the supremum norms of the partial derivatives of a test function is
+nonnegative. -/
+lemma IsTestFn.sum_partialSupNorm_nonneg {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    {φ : EuclideanSpace ℝ (Fin d) → ℝ} (h : IsTestFn Ω φ) :
+    0 ≤ ∑ i : Fin d, h.partialSupNorm i :=
+  Finset.sum_nonneg fun i _ => h.partialSupNorm_nonneg i
+
 end EllipticPdes.Sobolev
 
 namespace EllipticPdes.Regularity

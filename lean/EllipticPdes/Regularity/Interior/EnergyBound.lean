@@ -604,6 +604,19 @@ private def energyK₂ (Op : FullEllipticOp d) (hA : IsLipCoeff Op.toEllipticCoe
   (1 + Op.Bsup + Op.Csup) * (isTestFn_mul hξ hξ).partialSupNorm k
     + hA.A1 * ∑ j : Fin d, (isTestFn_mul hξ hξ).partialSupNorm j
 
+/-- A component of a finite family is bounded by the root of the sum of squared norms. -/
+private lemma norm_le_sqrt_sum_sq {ι E : Type*} [Fintype ι] [SeminormedAddCommGroup E]
+    (a : ι → E) (i : ι) : ‖a i‖ ≤ Real.sqrt (∑ j, ‖a j‖ ^ 2) :=
+  Real.le_sqrt_of_sq_le (Finset.single_le_sum (f := fun j => ‖a j‖ ^ 2)
+    (fun _ _ => sq_nonneg _) (Finset.mem_univ i))
+
+/-- The lower-order coefficient bound: with `N = F + r + S` the data norm,
+`F + B S + C r ≤ (1 + B + C) N`. -/
+private lemma lowerOrder_coeff_le {F r S B C : ℝ} (hF : 0 ≤ F) (hr : 0 ≤ r) (hS : 0 ≤ S)
+    (hB : 0 ≤ B) (hC : 0 ≤ C) : F + B * S + C * r ≤ (1 + B + C) * (F + r + S) := by
+  nlinarith only [hF, hr, hS, mul_nonneg hB hF, mul_nonneg hB hr, mul_nonneg hC hF,
+    mul_nonneg hC hS]
+
 /-- **Energy inequality of the interior difference quotient.** With `E` the cutoff-weighted
 energy of the difference quotient of the gradient and `N` the data norm,
 `λ E ≤ K₁ N √E + K₂ N²`. -/
@@ -620,41 +633,32 @@ private theorem diffQuot_energy_key (Op : FullEllipticOp d) (hΩm : MeasurableSe
         + energyK₂ Op hA hξ k
           * (‖f‖ + ‖(u : H1amb Ω) 0‖ + ∑ i : Fin d, ‖(u : H1amb Ω) i.succ‖) ^ 2 := by
   classical
-  have hlam := Op.toEllipticCoeff.lam_pos
-  have hX := hξ.supNorm_nonneg
-  have hW := (isTestFn_mul hξ hξ).partialSupNorm_nonneg k
-  have hSW : 0 ≤ ∑ j : Fin d, hξ.partialSupNorm j :=
-    Finset.sum_nonneg fun j _ => hξ.partialSupNorm_nonneg j
-  have hSW2 : 0 ≤ ∑ j : Fin d, (isTestFn_mul hξ hξ).partialSupNorm j :=
-    Finset.sum_nonneg fun j _ => (isTestFn_mul hξ hξ).partialSupNorm_nonneg j
-  have hA1 := hA.A1_nonneg
-  have hΛ := Op.toEllipticCoeff.Λ_nonneg
   have hB := Op.Bsup_nonneg
   have hCs := Op.Csup_nonneg
+  have hΛ := Op.toEllipticCoeff.Λ_nonneg
   set M : ℝ := 1 + Op.Bsup + Op.Csup with hM
   have hlow := evans_lower_bound Op hΩm hξ hθ hS u f hu
-  have hr0 : 0 ≤ ‖(u : H1amb Ω) 0‖ := norm_nonneg _
-  have hf0 : 0 ≤ ‖f‖ := norm_nonneg _
+  have hr0 := norm_nonneg ((u : H1amb Ω) 0)
+  have hf0 := norm_nonneg f
   set r : ℝ := ‖(u : H1amb Ω) 0‖ with hr
   set Sg : ℝ := ∑ i : Fin d, ‖(u : H1amb Ω) i.succ‖ with hSg
   set N : ℝ := ‖f‖ + r + Sg with hN
   set E : ℝ := ∑ i : Fin d, ‖mulTest hξ (evansDg hΩm k h u i)‖ ^ 2 with hE
   have hSg0 : 0 ≤ Sg := Finset.sum_nonneg fun i _ => norm_nonneg _
   have hE0 : 0 ≤ E := Finset.sum_nonneg fun i _ => sq_nonneg _
-  have hev : ∀ i, ‖mulTest hξ (evansDg hΩm k h u i)‖ ≤ Real.sqrt E := fun i =>
-    Real.le_sqrt_of_sq_le (Finset.single_le_sum (f := fun i =>
-      ‖mulTest hξ (evansDg hΩm k h u i)‖ ^ 2) (fun i _ => sq_nonneg _) (Finset.mem_univ i))
   have hSe : ∑ i : Fin d, ‖mulTest hξ (evansDg hΩm k h u i)‖ ≤ Real.sqrt d * Real.sqrt E :=
     sum_le_sqrt_card_mul_sqrt_sum_sq _
   have hSe0 : 0 ≤ ∑ i : Fin d, ‖mulTest hξ (evansDg hΩm k h u i)‖ :=
     Finset.sum_nonneg fun i _ => norm_nonneg _
-  have hδ : ‖evansD0 hΩm k h u‖ ≤ N :=
-    (norm_diffQuotD_le_grad hΩm k u h).trans (by
-      have := Finset.single_le_sum (f := fun i : Fin d => ‖(u : H1amb Ω) i.succ‖)
-        (fun i _ => norm_nonneg _) (Finset.mem_univ k)
-      linarith)
-  have hv0 := (norm_evansTest_zero_le hΩm hξ hθ hS u).trans (add_le_add
-    (mul_le_mul_of_nonneg_left (hev k) hX) (mul_le_mul_of_nonneg_left hδ hW))
+  have hk := Finset.single_le_sum (f := fun i : Fin d => ‖(u : H1amb Ω) i.succ‖)
+    (fun i _ => norm_nonneg _) (Finset.mem_univ k)
+  have hδ : ‖evansD0 hΩm k h u‖ ≤ N := (norm_diffQuotD_le_grad hΩm k u h).trans (by linarith)
+  have hv0 : ‖(evansTest hΩm hξ hθ hS u : H1amb Ω) 0‖
+      ≤ hξ.supNorm * Real.sqrt E + (isTestFn_mul hξ hξ).partialSupNorm k * N :=
+    (norm_evansTest_zero_le hΩm hξ hθ hS u).trans (add_le_add
+    (mul_le_mul_of_nonneg_left (norm_le_sqrt_sum_sq (fun i => mulTest hξ (evansDg hΩm k h u i)) k)
+      hξ.supNorm_nonneg)
+    (mul_le_mul_of_nonneg_left hδ ((isTestFn_mul hξ hξ).partialSupNorm_nonneg k)))
   have hTl := neg_lowerOrder_le Op (u : H1amb Ω) ((evansTest hΩm hξ hθ hS u : H1amb Ω) 0)
   have hTx : -∑ i : Fin d, ∑ j : Fin d, 2 * ⟪(Op.toEllipticCoeff.translate (hshift k h)).actL i j
         (mulTest hξ (evansDg hΩm k h u i)), mulTestPartial hξ j (evansD0 hΩm k h u)⟫
@@ -667,50 +671,33 @@ private theorem diffQuot_energy_key (Op : FullEllipticOp d) (hΩm : MeasurableSe
     (evansComm Op.toEllipticCoeff hΩm k h u) (c := hA.A1) (fun i => ‖(u : H1amb Ω) i.succ‖)
     (fun i j => norm_diffQuotD_actL_sub_le hA hΩm i j k hh _)
   have hTf := real_inner_le_norm f ((evansTest hΩm hξ hθ hS u : H1amb Ω) 0)
-  have hfN : ‖f‖ ≤ N := by linarith
-  have hrN : r ≤ N := by linarith
-  have hSgN : Sg ≤ N := by linarith
-  have hcoef : ‖f‖ + Op.Bsup * Sg + Op.Csup * r ≤ M * N := by
-    rw [hM]
-    nlinarith only [mul_le_mul_of_nonneg_left hSgN hB, mul_le_mul_of_nonneg_left hrN hCs, hfN]
-  have hM0 : 0 ≤ M := by rw [hM]; linarith
+  have hcoef : ‖f‖ + Op.Bsup * Sg + Op.Csup * r ≤ M * N :=
+    lowerOrder_coeff_le hf0 hr0 hSg0 hB hCs
   have hN0 : 0 ≤ N := by rw [hN]; linarith
-  have h1 := mul_le_mul hcoef hv0 (norm_nonneg _) (mul_nonneg hM0 hN0)
-  have h2 : 2 * Op.toEllipticCoeff.Λ * ‖evansD0 hΩm k h u‖
-        * ((∑ i : Fin d, ‖mulTest hξ (evansDg hΩm k h u i)‖) * ∑ j : Fin d, hξ.partialSupNorm j)
-      ≤ 2 * Op.toEllipticCoeff.Λ * N
-        * (Real.sqrt d * Real.sqrt E * ∑ j : Fin d, hξ.partialSupNorm j) :=
-    mul_le_mul (mul_le_mul_of_nonneg_left hδ (mul_nonneg zero_le_two hΛ))
-      (mul_le_mul_of_nonneg_right hSe hSW) (mul_nonneg hSe0 hSW)
-      (mul_nonneg (mul_nonneg zero_le_two hΛ) hN0)
-  have h3 : hA.A1 * Sg * (hξ.supNorm * ∑ i : Fin d, ‖mulTest hξ (evansDg hΩm k h u i)‖
-        + (∑ j : Fin d, (isTestFn_mul hξ hξ).partialSupNorm j) * ‖evansD0 hΩm k h u‖)
-      ≤ hA.A1 * N * (hξ.supNorm * (Real.sqrt d * Real.sqrt E)
-        + (∑ j : Fin d, (isTestFn_mul hξ hξ).partialSupNorm j) * N) :=
-    mul_le_mul (mul_le_mul_of_nonneg_left hSgN hA1)
-      (add_le_add (mul_le_mul_of_nonneg_left hSe hX) (mul_le_mul_of_nonneg_left hδ hSW2))
-      (add_nonneg (mul_nonneg hX hSe0) (mul_nonneg hSW2 (norm_nonneg _)))
-      (mul_nonneg hA1 hN0)
   rw [energyK₁, energyK₂, ← hM]
   change Op.toEllipticCoeff.lam * Real.sqrt E ^ 2 ≤ _
   rw [Real.sq_sqrt hE0]
-  nlinarith only [hlow, hTf, hTl, hTx, hTr, h1, h2, h3]
+  nlinarith only [hlow, hTf, hTl, hTx, hTr,
+    mul_le_mul hcoef hv0 (norm_nonneg _) (mul_nonneg (by rw [hM]; linarith) hN0),
+    mul_le_mul (mul_le_mul_of_nonneg_left hδ (mul_nonneg zero_le_two hΛ))
+      (mul_le_mul_of_nonneg_right hSe hξ.sum_partialSupNorm_nonneg)
+      (mul_nonneg hSe0 hξ.sum_partialSupNorm_nonneg) (mul_nonneg (mul_nonneg zero_le_two hΛ) hN0),
+    mul_le_mul (mul_le_mul_of_nonneg_left (by linarith : Sg ≤ N) hA.A1_nonneg)
+      (add_le_add (mul_le_mul_of_nonneg_left hSe hξ.supNorm_nonneg)
+        (mul_le_mul_of_nonneg_left hδ (isTestFn_mul hξ hξ).sum_partialSupNorm_nonneg))
+      (add_nonneg (mul_nonneg hξ.supNorm_nonneg hSe0)
+        (mul_nonneg (isTestFn_mul hξ hξ).sum_partialSupNorm_nonneg (norm_nonneg _)))
+      (mul_nonneg hA.A1_nonneg hN0)]
 
 /-- **Master interior difference-quotient energy estimate.** For a `W^{1,∞}`-coefficient
-weak solution `u ∈ H₀¹(Ω)` of `L u = f`, an inner cutoff `ξ` and an
-outer cutoff `θ ≡ 1` on the shift-reachable part of `tsupport ξ²`, the cutoff-weighted energy
-of the interior difference quotient of the gradient is bounded by the data, uniformly in the
-step `h`: `(λ/2) ∑ᵢ ‖ξ · Dₖ^h ∂ᵢu‖² ≤ C (‖f‖² + ‖u₀‖²)`. The constant is quantified before
-the solution and the datum, so it depends only on
-`λ, Λ, A₁, d, γ, ‖b‖∞, ‖c‖∞, ‖ξ‖∞, ‖∂ξ‖∞`, and on none of `u`, `f`, `h`. Testing the weak
-formulation with the admissible Evans element `v_h = -Dₖ^{-h}(ξ² Dₖ^h u)`, discrete integration by
-parts (`evansTest_bilin_L2D`) moves the outer difference quotient onto the coefficient action;
-the discrete Leibniz split (`norm_diffQuotD_actL_sub_le`) exposes the translated-coefficient
-leading term, controlled from below by ellipticity (`energy_ge`); Cauchy-Schwarz bounds the
-remaining terms by `K₁ N e + K₂ N²` with `e² = ∑ᵢ ‖ξ Dₖ^h ∂ᵢu‖²` and `N` the data norm, and
-absorption (`absorb_energy`) removes `e` from the right-hand side (Evans, *Partial
-Differential Equations* (2nd ed.), §6.3.1; Gilbarg-Trudinger, *Elliptic PDE of Second Order*,
-Theorem 8.8). -/
+weak solution `u ∈ H₀¹(Ω)` of `L u = f`, an inner cutoff `ξ` and an outer cutoff `θ ≡ 1` on the
+shift-reachable part of `tsupport ξ²`, the cutoff-weighted energy of the interior difference
+quotient of the gradient is bounded by the data, uniformly in the step `h`:
+`(λ/2) ∑ᵢ ‖ξ · Dₖ^h ∂ᵢu‖² ≤ C (‖f‖² + ‖u₀‖²)`. The constant is quantified before the solution
+and the datum. Testing the weak formulation with the Evans element `v_h = -Dₖ^{-h}(ξ² Dₖ^h u)`
+bounds the energy by `K₁ N e + K₂ N²` with `e² = ∑ᵢ ‖ξ Dₖ^h ∂ᵢu‖²` and `N` the data norm, and
+absorption (`absorb_energy`) removes `e` (Evans, *Partial Differential Equations* (2nd ed.),
+§6.3.1; Gilbarg-Trudinger, *Elliptic PDE of Second Order*, Theorem 8.8). -/
 theorem interior_diffQuot_energy_bound (Op : FullEllipticOp d) (hΩm : MeasurableSet Ω)
     (hA : IsLipCoeff Op.toEllipticCoeff)
     (hξ : IsTestFn Ω ξ) (hθ : IsTestFn Ω θ) (k : Fin d) :
