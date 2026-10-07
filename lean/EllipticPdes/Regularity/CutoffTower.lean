@@ -94,6 +94,14 @@ theorem exists_isTestFn_one_nhdsSet_of_isCompact {K U : Set (EuclideanSpace ℝ 
 
 /-! ### Positive shift margin on a compact-in-open pair -/
 
+/-- A compact subset of an open set has a test function on the open set that equals one on the
+compact set. -/
+theorem exists_isTestFn_eqOn_one_of_isCompact {K U : Set (EuclideanSpace ℝ (Fin d))}
+    (hK : IsCompact K) (hU : IsOpen U) (hKU : K ⊆ U) :
+    ∃ ζ : EuclideanSpace ℝ (Fin d) → ℝ, IsTestFn U ζ ∧ Set.EqOn ζ 1 K := by
+  obtain ⟨ζ, hζ, hone, -⟩ := exists_isTestFn_one_nhdsSet_of_isCompact hK hU hKU
+  exact ⟨ζ, hζ, fun x hx => hone.self_of_nhdsSet x hx⟩
+
 /-- **Positive margin.** For `K` compact inside an open `Ω`, there is `δ > 0` such that every
 point of `K` stays inside `Ω` after any coordinate shift `h eₖ` with `|h| < δ`. This is the
 finite-margin fact that lets the interior difference-quotient method translate a cutoff's

@@ -273,6 +273,18 @@ private lemma cutoffDeriv_pairing_eq (Op : FullEllipticOp (n + 1))
   simp only [cutoffDatumPairing, cutoffDatumPairingGrad] at hexp ⊢
   linarith only [hexp]
 
+/-- The norm of a cut-off class on `Ω` is at most the supremum of the cutoff times the norm of
+the restriction of the class to the collar `N` where the cutoff lives. -/
+private lemma norm_mulTest_le_supNorm_restrict
+    {Ω N : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω)
+    (hNm : MeasurableSet N) (hNΩ : N ⊆ Ω) {ξ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ}
+    (hξΩ : IsTestFn Ω ξ) (hξN : IsTestFn N ξ) (g : L2D Ω) {p : L2D N}
+    (hp : p = restrictL2 (Ω := N) (extendL2 hΩm g)) :
+    ‖mulTest hξΩ g‖ ≤ hξN.supNorm * ‖p‖ := by
+  calc ‖mulTest hξΩ g‖ = ‖mulTest hξN p‖ := by
+        rw [← norm_extendL2 hΩm, extendL2_mulTest_eq hΩm hNm hNΩ hξΩ hξN g, norm_extendL2, hp]
+    _ ≤ hξN.supNorm * ‖p‖ := norm_mulTest_le_supNorm hξN _
+
 /-- The two real estimates that control the cut-off derivative: the datum's constant against
 the inductive bound, and the supremum of the cutoff against the bound on `∂_ℓ u`. -/
 private lemma cutoffDeriv_constant_le {KD C₁ Cξ M X : ℝ} (hKD : 0 ≤ KD) (hC₁ : 0 ≤ C₁)
@@ -359,12 +371,8 @@ theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
   have hNΩ : N ⊆ Ω := hNW.trans hWΩ
   have hξNt : IsTestFn N T.ξ := ⟨T.hξ.1, T.hξ.2.1, hξN⟩
   have hθWt : IsTestFn (tsupport T.θ) T.θ := ⟨T.hθ.1, T.hθ.2.1, subset_rfl⟩
-  -- A fourth cutoff, identically one near the middle cutoff and supported in the collar. The
-  -- symmetry of the mixed second derivatives is only available after a cutoff, and this is the
-  -- one that is invisible against everything the datum pairs with.
-  obtain ⟨ϑ, hϑ, hϑ_one, _hϑ_Icc⟩ :=
-    exists_isTestFn_one_nhdsSet_of_isCompact T.hξ.2.1 hNo hξN
-  have hϑ_eqOn : Set.EqOn ϑ 1 (tsupport T.ξ) := fun x hx => hϑ_one.self_of_nhdsSet x hx
+  -- A fourth cutoff, one on the middle cutoff's support and supported in the collar.
+  obtain ⟨ϑ, hϑ, hϑ_eqOn⟩ := exists_isTestFn_eqOn_one_of_isCompact T.hξ.2.1 hNo hξN
   -- The datum, and the inductive hypothesis at the outer support of the tower.
   obtain ⟨KD, hKD0, hDat⟩ := exists_cutoffDatum Op hNm hNΩ hA hbc hξNt
   obtain ⟨C₁, hC₁0, hIH⟩ := hk T.hθ.2.1 hWΩ
@@ -373,7 +381,6 @@ theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
     add_nonneg (mul_nonneg hKD0 (add_nonneg hC₁0 zero_le_one)) (mul_nonneg hCξ0 hC₁0),
     fun u f M hfk hM hu ℓ => ?_⟩
   have hM0 : (0 : ℝ) ≤ M := le_trans (norm_nonneg f) hM.norm_le
-  have hu00 : (0 : ℝ) ≤ ‖(u : H1amb Ω) 0‖ := norm_nonneg _
   -- The solution's derivatives to order `k + 2` on the outer support, then on the collar.
   obtain ⟨HuW, hHuW⟩ :=
     hIH u f M (hfk.mono (Nat.le_succ k)) (hM.mono_order (Nat.le_succ k)) hu
@@ -381,30 +388,24 @@ theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
     (fun i => hasWeakDeriv_extendL2_of_mem_H01 hΩm i u.2) HuW hHuW
   -- The cut-off derivative, and the closed form of its gradient.
   obtain ⟨Uamb, hUmem, hU0, hUgrad⟩ := interior_cutoffGrad_mem_H01 Op hΩm hA1 T u f hu ℓ
-  have hDgℓ : ∀ i : Fin (n + 1),
-      HasWeakDerivOn N i (restrictL2 (Ω := N) (extendL2 hΩm ((u : H1amb Ω) ℓ.succ)))
-        (HuN.D [i, ℓ]) := by
-    intro i
-    have h := HuN.D_step i [ℓ] (Nat.succ_lt_succ (Nat.succ_pos k))
-    rwa [hDu ℓ] at h
   have hgrad : ∀ i : Fin (n + 1), extendL2 hΩm (Uamb i.succ)
       = extendL2 hNm (mulTest (isTestFn_partialD hξNt i)
           (restrictL2 (Ω := N) (extendL2 hΩm ((u : H1amb Ω) ℓ.succ)))
         + mulTest hξNt (HuN.D [i, ℓ])) :=
-    fun i => extendL2_cutoffGrad_eq hΩm hNm hNΩ T.hξ hξNt ((u : H1amb Ω) ℓ.succ) hUgrad hDgℓ i
+    extendL2_cutoffGrad_eq hΩm hNm hNΩ T.hξ hξNt ((u : H1amb Ω) ℓ.succ) hUgrad
+      (fun i => by
+        simpa only [hDu ℓ] using HuN.D_step i [ℓ] (Nat.succ_lt_succ (Nat.succ_pos k)))
   -- The datum's own derivative, cut down to the collar.
   obtain ⟨HDfN, hDfNbd⟩ := exists_restrictFamily hΩm hNm hNΩ (hfk.deriv ℓ) (hM.deriv ℓ)
   -- One bound serving the solution's derivatives and the datum's alike.
-  have hMu : (0 : ℝ) ≤ M + ‖(u : H1amb Ω) 0‖ := add_nonneg hM0 hu00
+  have hMu : (0 : ℝ) ≤ M + ‖(u : H1amb Ω) 0‖ := add_nonneg hM0 (norm_nonneg _)
   have hC₁Mu : (0 : ℝ) ≤ C₁ * (M + ‖(u : H1amb Ω) 0‖) := mul_nonneg hC₁0 hMu
-  have hle1 : C₁ * (M + ‖(u : H1amb Ω) 0‖) ≤ C₁ * (M + ‖(u : H1amb Ω) 0‖) + M :=
-    le_add_of_nonneg_right hM0
-  have hle2 : M ≤ C₁ * (M + ‖(u : H1amb Ω) 0‖) + M := le_add_of_nonneg_left hC₁Mu
   obtain ⟨F, HF, hFbd, hFpair⟩ := hDat ℓ _ _ HuN HDfN
-    (C₁ * (M + ‖(u : H1amb Ω) 0‖) + M) (hHuNbd.mono_const hle1) (hDfNbd.mono_const hle2)
+    (C₁ * (M + ‖(u : H1amb Ω) 0‖) + M) (hHuNbd.mono_const (le_add_of_nonneg_right hM0))
+    (hDfNbd.mono_const (le_add_of_nonneg_left hC₁Mu))
   have hVm : MeasurableSet V := hVc.isClosed.measurableSet
-  have hDℓnorm : ‖HuN.D [ℓ]‖ ≤ C₁ * (M + ‖(u : H1amb Ω) 0‖) :=
-    hHuNbd [ℓ] (Nat.succ_le_succ (Nat.zero_le _))
+  have hcon := cutoffDeriv_constant_le (M := M) hKD0 hC₁0 hCξ0 hMu
+    (le_add_of_nonneg_right (norm_nonneg ((u : H1amb Ω) 0)))
   refine ⟨⟨⟨Uamb, hUmem⟩, F, HF, ?_, ?_, ?_, ?_⟩⟩
   · -- The cutoff is invisible on the base set, so nothing is lost there.
     change restrictL2 (Ω := V) (extendL2 hΩm (Uamb 0)) = _
@@ -419,19 +420,13 @@ theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
     rw [hU0, hDu ℓ]
     exact extendL2_mulTest_eq hΩm hNm hNΩ T.hξ hξNt ((u : H1amb Ω) ℓ.succ)
   · -- The datum's bound, in the data.
-    refine hFbd.mono_const ?_
-    exact (cutoffDeriv_constant_le (M := M) hKD0 hC₁0 hCξ0 hMu (by linarith only [hu00])).1
+    exact hFbd.mono_const hcon.1
   · -- The cut-off derivative's norm, read on the collar where the cutoff lives.
     change ‖Uamb 0‖ ≤ _
     rw [hU0]
-    calc ‖mulTest T.hξ ((u : H1amb Ω) ℓ.succ)‖
-        = ‖mulTest hξNt (HuN.D [ℓ])‖ := by
-          rw [← norm_extendL2 hΩm, extendL2_mulTest_eq hΩm hNm hNΩ T.hξ hξNt, norm_extendL2,
-            hDu ℓ]
-      _ ≤ hξNt.supNorm * ‖HuN.D [ℓ]‖ := norm_mulTest_le_supNorm hξNt _
-      _ ≤ hξNt.supNorm * (C₁ * (M + ‖(u : H1amb Ω) 0‖)) :=
-          mul_le_mul_of_nonneg_left hDℓnorm hCξ0
-      _ ≤ _ := (cutoffDeriv_constant_le (M := M) hKD0 hC₁0 hCξ0 hMu (by linarith only [hu00])).2
+    exact ((norm_mulTest_le_supNorm_restrict hΩm hNm hNΩ T.hξ hξNt _ (hDu ℓ)).trans
+      (mul_le_mul_of_nonneg_left (hHuNbd [ℓ] (Nat.succ_le_succ (Nat.zero_le _))) hCξ0)).trans
+      hcon.2
 
 /-- **Induction step.** Differentiating the equation once raises the order-`k` conclusion to
 order `k + 1`, under one more order of regularity on every coefficient.
