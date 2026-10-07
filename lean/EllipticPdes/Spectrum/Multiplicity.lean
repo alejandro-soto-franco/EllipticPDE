@@ -16,15 +16,15 @@ The spectral theorem `EllipticPdes.Sobolev.solOp_spectral` produces the eigenspa
 nothing about where the eigenvalues sit or how large the eigenspaces are. Both follow from what
 is already at hand.
 
-Positivity is the Rayleigh bound: `principalEigenvalue_le_of_weak_eigen` places every weak
+Positivity is the Rayleigh bound: `principalEigenvalue_le_of_weak_eigenvector` places every weak
 eigenvalue above `λ₁`, and `principalEigenvalue_pos` places `λ₁` above the coercivity constant.
 Finite multiplicity is the compactness of the solution operator, through Mathlib's
 `ContinuousLinearMap.finite_dimensional_eigenspace`, which the Rellich embedding supplies.
 
 ## Main declarations
 
-* `EllipticPdes.Sobolev.weak_eigenvalue_pos`: every weak Dirichlet eigenvalue is positive.
-* `EllipticPdes.Sobolev.solOp_finiteDimensional_eigenspace`: each eigenspace at a nonzero
+* `EllipticPdes.Variational.weak_eigenvalue_pos`: every weak Dirichlet eigenvalue is positive.
+* `EllipticPdes.Variational.solOp_finiteDimensional_eigenspace`: each eigenspace at a nonzero
   eigenvalue of the solution operator is finite dimensional.
 * `EllipticPdes.Sobolev.dirichlet_eigenvalue_pos_of_bounded` and
   `EllipticPdes.Sobolev.dirichlet_finiteDimensional_eigenspace_of_bounded`: the two at `-Δ` on a
@@ -42,6 +42,32 @@ open scoped RealInnerProductSpace
 
 noncomputable section
 
+namespace EllipticPdes.Variational
+
+open EllipticPdes.Analysis
+
+variable {V L : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [CompleteSpace V]
+  [NormedAddCommGroup L] [InnerProductSpace ℝ L] [CompleteSpace L] (emb : V →L[ℝ] L)
+  {B : V →L[ℝ] V →L[ℝ] ℝ}
+
+omit [CompleteSpace V] [CompleteSpace L] in
+/-- **Every weak eigenvalue is positive.** A nonzero weak eigenvector has eigenvalue at least
+the principal eigenvalue, which exceeds the coercivity constant over `‖emb‖ ^ 2`. -/
+theorem weak_eigenvalue_pos (hco : IsCoercive B) (hne : ∃ W : V, emb W ≠ 0)
+    {lam : ℝ} {U : V} (hU : U ≠ 0)
+    (heig : ∀ W : V, B U W = lam * ⟪emb U, emb W⟫) : 0 < lam :=
+  lt_of_lt_of_le (principalEigenvalue_pos emb hco hne)
+    (principalEigenvalue_le_of_weak_eigenvector emb hco hU heig)
+
+/-- **Finite multiplicity of the eigenvalues.** The eigenspace of the solution operator at a
+nonzero eigenvalue is finite dimensional, the operator being compact. -/
+theorem solOp_finiteDimensional_eigenspace (hco : IsCoercive B) (hemb : IsCompactOperator emb)
+    {μ : ℝ} (hμ : μ ≠ 0) :
+    FiniteDimensional ℝ (Module.End.eigenspace (solOp emb B hco : Module.End ℝ L) μ) :=
+  ContinuousLinearMap.finite_dimensional_eigenspace (solOp_isCompact hco hemb) μ hμ
+
+end EllipticPdes.Variational
+
 namespace EllipticPdes.Sobolev
 
 open EllipticPdes.Analysis
@@ -53,15 +79,14 @@ at least `λ₁`, and `λ₁` exceeds the coercivity constant. -/
 theorem weak_eigenvalue_pos (hco : IsCoercive B) (hne : ∃ V : H01 Ω, embL2 Ω V ≠ 0)
     {lam : ℝ} {U : H01 Ω} (hU : U ≠ 0)
     (heig : ∀ V : H01 Ω, B U V = lam * ⟪embL2 Ω U, embL2 Ω V⟫) : 0 < lam :=
-  lt_of_lt_of_le (principalEigenvalue_pos hco hne)
-    (principalEigenvalue_le_of_weak_eigen hco hU heig)
+  Variational.weak_eigenvalue_pos (embL2 Ω) hco hne hU heig
 
 /-- **Finite multiplicity of the eigenvalues.** The eigenspace of the solution operator at a
 nonzero eigenvalue is finite dimensional, the operator being compact. -/
 theorem solOp_finiteDimensional_eigenspace (hco : IsCoercive B)
     (hRellich : IsCompactOperator (embL2 Ω)) {μ : ℝ} (hμ : μ ≠ 0) :
     FiniteDimensional ℝ (Module.End.eigenspace (solOp B hco : Module.End ℝ (L2D Ω)) μ) :=
-  ContinuousLinearMap.finite_dimensional_eigenspace (solOp_isCompact hco hRellich) μ hμ
+  Variational.solOp_finiteDimensional_eigenspace (embL2 Ω) hco hRellich hμ
 
 /-- **Positivity at `-Δ` on a bounded domain**, with the Poincaré inequality supplying
 coercivity. -/
