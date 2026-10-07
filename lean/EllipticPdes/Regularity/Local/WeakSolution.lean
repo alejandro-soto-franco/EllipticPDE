@@ -88,86 +88,87 @@ theorem integral_extendL2_mul_eq {g : L2D Ω} (hΩm : MeasurableSet Ω)
   filter_upwards [ae_restrict_of_ae (coeFn_extendL2 hΩm g), ae_restrict_mem hΩm] with x h1 h2
   rw [h1, Set.indicator_of_mem h2]
 
+/-- A whole-space `L²` class times a continuous compactly supported function is integrable. -/
+theorem integrable_eucL2_mul {g : EucL2 d} {ψ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hc : Continuous ψ) (hcs : HasCompactSupport ψ) :
+    Integrable (fun x => (g x : ℝ) * ψ x) :=
+  (Lp.memLp g).integrable_mul (hc.memLp_of_hasCompactSupport (p := 2) (μ := volume) hcs)
+
+/-- **Whole-space weak gradient of a cutoff times an element of `W12 Ω`.** For a test function
+`η` of `Ω` and `U ∈ W12 Ω`, the extension by zero of `η U₀` has weak gradient
+`η U_{k+1} + ∂_k η U₀`, read off the `W12` constraint against the test function `η φ`. -/
+theorem hasWeakGradOn_univ_cutoffMul (hΩm : MeasurableSet Ω) {η : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hη : IsTestFn Ω η) {U : H1amb Ω} (hU : U ∈ W12 Ω) :
+    HasWeakGradOn Set.univ (fun x => η x * (extendL2 hΩm (U 0) x : ℝ))
+      fun k x => η x * (extendL2 hΩm (U k.succ) x : ℝ)
+        + partialD k η x * (extendL2 hΩm (U 0) x : ℝ) := by
+  have hηoff : ∀ x, x ∉ Ω → η x = 0 := fun x hx =>
+    image_eq_zero_of_notMem_tsupport (fun hc => hx (hη.2.2 hc))
+  have hdηoff : ∀ k x, x ∉ Ω → partialD k η x = 0 := fun k x hx =>
+    image_eq_zero_of_notMem_tsupport (fun hc => hx (hη.2.2 (tsupport_partialD_subset k η hc)))
+  intro φ hφc hφcs _ k
+  simp only [Measure.restrict_univ]
+  have hηφ : IsTestFn Ω (fun x => η x * φ x) :=
+    ⟨hη.1.mul hφc, hφcs.mul_left, tsupport_mul_subset_left.trans hη.2.2⟩
+  have key := hasWeakDerivOn_of_mem_W12 hU k _ hηφ.1 hηφ.2.1 hηφ.2.2
+  rw [partialD_mul (hη.1.differentiable (by simp)) (hφc.differentiable (by simp)) k] at key
+  have hdφc : Continuous (partialD k φ) :=
+    (hφc.continuous_fderiv (by simp)).clm_apply continuous_const
+  have i1 := integrable_L2D_mul (g := U 0) (ψ := fun x => η x * partialD k φ x)
+    (hη.continuous.mul hdφc) (hφcs.fderiv_apply (𝕜 := ℝ) _).mul_left
+  have i2 := integrable_L2D_mul (g := U 0) (ψ := fun x => partialD k η x * φ x)
+    ((hη.continuous_partialD k).mul hφc.continuous) hφcs.mul_left
+  have I1 := integrable_eucL2_mul (g := extendL2 hΩm (U k.succ)) (ψ := fun x => η x * φ x)
+    (hη.continuous.mul hφc.continuous) hφcs.mul_left
+  have I2 := integrable_eucL2_mul (g := extendL2 hΩm (U 0))
+    (ψ := fun x => partialD k η x * φ x)
+    ((hη.continuous_partialD k).mul hφc.continuous) hφcs.mul_left
+  have e1 := integral_extendL2_mul_eq (g := U k.succ) hΩm (ψ := fun x => η x * φ x)
+    (fun x hx => by simp only [hηoff x hx, zero_mul])
+  have e2 := integral_extendL2_mul_eq (g := U 0) hΩm (ψ := fun x => partialD k η x * φ x)
+    (fun x hx => by simp only [hdηoff k x hx, zero_mul])
+  have e3 := integral_extendL2_mul_eq (g := U 0) hΩm (ψ := fun x => η x * partialD k φ x)
+    (fun x hx => by simp only [hηoff x hx, zero_mul])
+  have hL : ∫ x, η x * (extendL2 hΩm (U 0) x : ℝ) * partialD k φ x
+      = ∫ x, (extendL2 hΩm (U 0) x : ℝ) * (η x * partialD k φ x) :=
+    integral_congr_ae (Eventually.of_forall fun x => by ring)
+  have hR : ∫ x, (η x * (extendL2 hΩm (U k.succ) x : ℝ)
+        + partialD k η x * (extendL2 hΩm (U 0) x : ℝ)) * φ x
+      = (∫ x, (extendL2 hΩm (U k.succ) x : ℝ) * (η x * φ x))
+        + ∫ x, (extendL2 hΩm (U 0) x : ℝ) * (partialD k η x * φ x) := by
+    rw [← integral_add I1 I2]
+    exact integral_congr_ae (Eventually.of_forall fun x => by ring)
+  have hsplit : ∫ x in Ω, ((U 0 : L2D Ω) x : ℝ)
+        * (η x * partialD k φ x + partialD k η x * φ x)
+      = (∫ x in Ω, ((U 0 : L2D Ω) x : ℝ) * (η x * partialD k φ x))
+        + ∫ x in Ω, ((U 0 : L2D Ω) x : ℝ) * (partialD k η x * φ x) := by
+    rw [← integral_add i1 i2]
+    exact integral_congr_ae (Eventually.of_forall fun x => by ring)
+  rw [hL, hR, e1, e2, e3]
+  linarith [key, hsplit]
+
 /-- **Cutoff of an element of `W12 Ω` lies in `H₀¹(Ω)`.** For a test function `η` of an open
 `Ω`, the product `η U` of the cutoff-multiplication operator is in `H₀¹(Ω)` whenever `U` is in
 `W12 Ω`, with no boundary condition on `U`.
 
 The closure argument of `cutoffMul_mem_H01` needs `U` to be a limit of test graphs. Here the
-whole-space weak gradient of `η U₀` is `η U_{k+1} + ∂_k η U₀`, read off
-the `W12` constraint against the test function `η φ`, and the mollification density
-`mem_H01_of_hasCompactSupport` places a compactly supported element with a whole-space weak
-gradient in `H₀¹(Ω)`. -/
+whole-space weak gradient of `η U₀` is `η U_{k+1} + ∂_k η U₀`
+(`hasWeakGradOn_univ_cutoffMul`), and the mollification density `mem_H01_of_hasCompactSupport`
+places a compactly supported element with a whole-space weak gradient in `H₀¹(Ω)`. -/
 theorem cutoffMul_mem_H01_of_mem_W12 (hΩo : IsOpen Ω) {η : EuclideanSpace ℝ (Fin d) → ℝ}
     (hη : IsTestFn Ω η) {U : H1amb Ω} (hU : U ∈ W12 Ω) :
     cutoffMul hη U ∈ H01 Ω := by
   classical
   have hΩm : MeasurableSet Ω := hΩo.measurableSet
   have hM := hη.abs_le_supNorm
-  set g0 : EucL2 d := extendL2 hΩm (U 0) with hg0
-  set gk : Fin d → EucL2 d := fun k => extendL2 hΩm (U k.succ) with hgk
-  set w : EuclideanSpace ℝ (Fin d) → ℝ := fun x => η x * (g0 x : ℝ) with hw
-  set h : Fin d → EuclideanSpace ℝ (Fin d) → ℝ :=
-    fun k x => η x * (gk k x : ℝ) + partialD k η x * (g0 x : ℝ) with hh
-  have hwL : MemLp w 2 volume := memLp_weight_mul hη.continuous hM
-  have hhL : ∀ k, MemLp (h k) 2 volume := fun k => by
-    exact (memLp_weight_mul hη.continuous hM).add
+  have hwL : MemLp (fun x => η x * (extendL2 hΩm (U 0) x : ℝ)) 2 volume :=
+    memLp_weight_mul hη.continuous hM
+  have hhL : ∀ k : Fin d, MemLp (fun x => η x * (extendL2 hΩm (U k.succ) x : ℝ)
+      + partialD k η x * (extendL2 hΩm (U 0) x : ℝ)) 2 volume := fun k =>
+    (memLp_weight_mul hη.continuous hM).add
       (memLp_weight_mul (hη.continuous_partialD k) (hη.abs_partialD_le k))
-  have hηoff : ∀ x, x ∉ Ω → η x = 0 := fun x hx =>
-    image_eq_zero_of_notMem_tsupport (fun hc => hx (hη.2.2 hc))
-  have hdηoff : ∀ k x, x ∉ Ω → partialD k η x = 0 := fun k x hx =>
-    image_eq_zero_of_notMem_tsupport (fun hc => hx (hη.2.2 (tsupport_partialD_subset k η hc)))
-  -- The whole-space weak gradient.
-  have hwg : HasWeakGradOn Set.univ w h := by
-    intro φ hφc hφcs _ k
-    simp only [Measure.restrict_univ]
-    have hηφ : IsTestFn Ω (fun x => η x * φ x) :=
-      ⟨hη.1.mul hφc, hφcs.mul_left, tsupport_mul_subset_left.trans hη.2.2⟩
-    have key := hasWeakDerivOn_of_mem_W12 hU k _ hηφ.1 hηφ.2.1 hηφ.2.2
-    rw [partialD_mul (hη.1.differentiable (by simp)) (hφc.differentiable (by simp)) k] at key
-    have hdφc : Continuous (partialD k φ) :=
-      (hφc.continuous_fderiv (by simp)).clm_apply continuous_const
-    have hdφcs : HasCompactSupport (partialD k φ) := hφcs.fderiv_apply (𝕜 := ℝ) _
-    have i1 : Integrable (fun x => ((U 0 : L2D Ω) x : ℝ) * (η x * partialD k φ x))
-        (volume.restrict Ω) :=
-      integrable_L2D_mul (hη.continuous.mul hdφc) hdφcs.mul_left
-    have i2 : Integrable (fun x => ((U 0 : L2D Ω) x : ℝ) * (partialD k η x * φ x))
-        (volume.restrict Ω) :=
-      integrable_L2D_mul ((hη.continuous_partialD k).mul hφc.continuous) hφcs.mul_left
-    have hsplit : ∫ x in Ω, ((U 0 : L2D Ω) x : ℝ)
-          * (η x * partialD k φ x + partialD k η x * φ x)
-        = (∫ x in Ω, ((U 0 : L2D Ω) x : ℝ) * (η x * partialD k φ x))
-          + ∫ x in Ω, ((U 0 : L2D Ω) x : ℝ) * (partialD k η x * φ x) := by
-      rw [← integral_add i1 i2]; congr 1; funext x; ring
-    have hL : ∫ x, w x * partialD k φ x
-        = ∫ x in Ω, ((U 0 : L2D Ω) x : ℝ) * (η x * partialD k φ x) := by
-      rw [← integral_extendL2_mul_eq hΩm (fun x hx => by
-        simp only [hηoff x hx, zero_mul])]
-      congr 1; funext x; simp only [hw]; ring
-    have hR : ∫ x, h k x * φ x
-        = (∫ x in Ω, ((U k.succ : L2D Ω) x : ℝ) * (η x * φ x))
-          + ∫ x in Ω, ((U 0 : L2D Ω) x : ℝ) * (partialD k η x * φ x) := by
-      have e1 : ∫ x, (extendL2 hΩm (U k.succ) x : ℝ) * (η x * φ x)
-          = ∫ x in Ω, ((U k.succ : L2D Ω) x : ℝ) * (η x * φ x) :=
-        integral_extendL2_mul_eq hΩm (fun x hx => by simp only [hηoff x hx, zero_mul])
-      have e2 : ∫ x, (extendL2 hΩm (U 0) x : ℝ) * (partialD k η x * φ x)
-          = ∫ x in Ω, ((U 0 : L2D Ω) x : ℝ) * (partialD k η x * φ x) :=
-        integral_extendL2_mul_eq hΩm (fun x hx => by simp only [hdηoff k x hx, zero_mul])
-      have m1 : MemLp (fun x => η x * φ x) 2 volume :=
-        (hη.continuous.mul hφc.continuous).memLp_of_hasCompactSupport hφcs.mul_left
-      have m2 : MemLp (fun x => partialD k η x * φ x) 2 volume :=
-        ((hη.continuous_partialD k).mul hφc.continuous).memLp_of_hasCompactSupport
-          hφcs.mul_left
-      have I1 : Integrable (fun x => (extendL2 hΩm (U k.succ) x : ℝ) * (η x * φ x)) volume :=
-        (Lp.memLp (extendL2 hΩm (U k.succ))).integrable_mul m1
-      have I2 : Integrable (fun x => (extendL2 hΩm (U 0) x : ℝ) * (partialD k η x * φ x))
-          volume :=
-        (Lp.memLp (extendL2 hΩm (U 0))).integrable_mul m2
-      rw [← e1, ← e2, ← integral_add I1 I2]
-      congr 1; funext x; simp only [hh, hgk, hg0]; ring
-    rw [hL, hR]
-    linarith [key, hsplit]
-  have hmem := mem_H01_of_hasCompactSupport hΩo hwg hwL hhL hη.2.1.mul_right
-    (tsupport_mul_subset_left.trans hη.2.2)
+  have hmem := mem_H01_of_hasCompactSupport hΩo (hasWeakGradOn_univ_cutoffMul hΩm hη hU) hwL
+    hhL hη.2.1.mul_right (tsupport_mul_subset_left.trans hη.2.2)
   convert hmem using 1
   apply PiLp.ext
   intro j
@@ -178,9 +179,7 @@ theorem cutoffMul_mem_H01_of_mem_W12 (hΩo : IsOpen Ω) {η : EuclideanSpace ℝ
     filter_upwards [mulCutoff_coeFn hη (U 0),
       MemLp.coeFn_toLp (hwL.mono_measure Measure.restrict_le_self),
       ae_restrict_of_ae (coeFn_extendL2 hΩm (U 0)), ae_restrict_mem hΩm] with x h1 h2 h3 h4
-    rw [h1, h2]
-    simp only [hw, hg0]
-    rw [h3, Set.indicator_of_mem h4]
+    rw [h1, h2, h3, Set.indicator_of_mem h4]
   · rw [cutoffMulOn_apply_succ]
     simp only [Fin.cons_succ]
     apply Lp.ext
@@ -190,9 +189,7 @@ theorem cutoffMul_mem_H01_of_mem_W12 (hΩo : IsOpen Ω) {η : EuclideanSpace ℝ
       ae_restrict_of_ae (coeFn_extendL2 hΩm (U 0)),
       ae_restrict_of_ae (coeFn_extendL2 hΩm (U i.succ)), ae_restrict_mem hΩm]
       with x h0 h1 h2 h3 h4 h5 h6
-    rw [h0, Pi.add_apply, h1, h2, h3, hh]
-    simp only [hgk, hg0]
-    rw [h4, h5, Set.indicator_of_mem h6, Set.indicator_of_mem h6]
+    rw [h0, Pi.add_apply, h1, h2, h3, h4, h5, Set.indicator_of_mem h6, Set.indicator_of_mem h6]
 
 /-! ### Ambient pairing and the local weak formulation -/
 
