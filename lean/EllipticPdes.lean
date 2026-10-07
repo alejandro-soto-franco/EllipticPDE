@@ -163,6 +163,7 @@ public import EllipticPdes.Embedding.ConstOfGradZero
 public import EllipticPdes.Spectrum.RellichW12
 public import EllipticPdes.Spectrum.PoincareWirtinger
 public import EllipticPdes.Spectrum.PoincareBall
+public import EllipticPdes.Embedding.WeakDerivChain
 public import EllipticPdes.Embedding.ChainRule
 public import EllipticPdes.Existence.WeakMaximum
 public import EllipticPdes.Sobolev.H01Lattice

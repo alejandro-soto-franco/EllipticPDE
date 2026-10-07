@@ -163,6 +163,36 @@ theorem HasWeakFDerivOn.hasFDerivAt_convolution (hw : HasWeakFDerivOn Ω u G μ)
   hasFDerivAt_convolution_of_forall_integral_eq hKm hu hG
     (fun v _ hψ hψc hψs => (hw v).integral_eq hψ hψc (hψs.trans hKΩ)) ρ hy
 
+omit [CompleteSpace F] [μ.IsAddHaarMeasure] in
+/-- **A weak Fréchet derivative is locally integrable as an operator-valued function.** If
+every directional component `x ↦ G x v` is locally integrable on `Ω`, so is `G`, since on a
+finite-dimensional space `G x` is the sum of its values on a basis against the coordinate
+functionals. -/
+theorem HasWeakFDerivOn.locallyIntegrableOn (hw : HasWeakFDerivOn Ω u G μ) :
+    LocallyIntegrableOn G Ω μ := by
+  classical
+  set b := Module.finBasis ℝ E
+  set c : Fin (Module.finrank ℝ E) → E →L[ℝ] ℝ := fun i =>
+    LinearMap.toContinuousLinearMap (b.coord i)
+  have hG : G = fun x => ∑ i, (c i).smulRight (G x (b i)) := by
+    funext x
+    ext v
+    simp only [sum_apply, ContinuousLinearMap.smulRight_apply]
+    conv_lhs => rw [← b.sum_repr v, map_sum]
+    simp [c]
+  have key : LocallyIntegrableOn (fun x => ∑ i, (c i).smulRight (G x (b i))) Ω μ := by
+    refine (locallyIntegrableOn_iff Ω.isOpen.isLocallyClosed).2 fun K hK hKc => ?_
+    have hint : ∀ i ∈ Finset.univ, Integrable (fun x => (c i).smulRight (G x (b i)))
+        (μ.restrict K) := fun i _ => by
+      have hi := (hw (b i)).locallyIntegrableOn.integrableOn_compact_subset hK hKc
+      refine Integrable.mono' (hi.norm.const_mul ‖c i‖)
+        ((smulRightL ℝ E F (c i)).continuous.comp_aestronglyMeasurable hi.aestronglyMeasurable)
+        (Eventually.of_forall fun x => ?_)
+      simp
+    exact integrable_finsetSum (μ := μ.restrict K)
+      (f := fun i x => (c i).smulRight (G x (b i))) Finset.univ hint
+  rwa [← hG] at key
+
 /-- **A continuous weak derivative is a Fréchet derivative.** If `u` is continuous on the open
 set `Ω` and has a weak Fréchet derivative `G` continuous on `Ω`, then `u` is differentiable at
 every point `x` of `Ω`, with derivative `G x`. -/
