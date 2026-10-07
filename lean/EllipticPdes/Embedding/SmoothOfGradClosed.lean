@@ -71,10 +71,8 @@ theorem contDiffOn_of_ae_eq_family {B : Set (EuclideanSpace ℝ (Fin d))} (hBo :
     rw [show ((n + 1 : ℕ) : WithTop ℕ∞) = (n : WithTop ℕ∞) + 1 by push_cast; ring,
       contDiffOn_succ_iff_fderiv_of_isOpen hBo]
     refine ⟨fun y hy => ((hfd n i hi y hy).differentiableAt).differentiableWithinAt, by simp, ?_⟩
-    have hsum : ContDiffOn ℝ (n : ℕ) (fun y => gradCLM (fun k => v (nxt i k)) y) B := by
-      change ContDiffOn ℝ (n : ℕ) (fun y => ∑ k, v (nxt i k) y •
-        (EuclideanSpace.proj k : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ)) B
-      exact ContDiffOn.sum fun k _ => (ih (nxt i k) (hstep n i k hi)).smul contDiffOn_const
+    have hsum : ContDiffOn ℝ (n : ℕ) (gradCLM fun k => v (nxt i k)) B :=
+      contDiffOn_gradCLM fun k => ih (nxt i k) (hstep n i k hi)
     exact hsum.congr fun y hy => (hfd n i hi y hy).fderiv
 
 /-- **Smooth representatives of a family closed under weak differentiation.** Let `F` assign a

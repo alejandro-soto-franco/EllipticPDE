@@ -140,6 +140,42 @@ theorem hasWeakGradOn_mul_cutoff_inter {B W : Set (EuclideanSpace ℝ (Fin d))}
   rw [hgoalL]
   linarith [key]
 
+end EllipticPdes.Extension
+
+namespace EllipticPdes.Embedding
+
+open EllipticPdes.Sobolev (partialD)
+
+/-- **Cutting a weak gradient off.** If `g` is the weak gradient of `u` on `B` and `η` is a smooth
+function with `tsupport η ⊆ B`, then the extension by zero of `η u` has a weak gradient on the
+whole space, namely `η gₖ + u ∂ₖη`. This is `hasWeakGradOn_mul_cutoff_inter` with the whole space
+in place of `B` and `B` in place of the neighbourhood. -/
+theorem hasWeakGradOn_univ_mul_cutoff {B : Set (EuclideanSpace ℝ (Fin d))}
+    (_hB : MeasurableSet B) {η : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hηc : ContDiff ℝ (⊤ : ℕ∞) η) (_hηcs : HasCompactSupport η) (hηs : tsupport η ⊆ B)
+    {u : EuclideanSpace ℝ (Fin d) → ℝ} {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
+    (hu : IntegrableOn u B volume) (hgi : ∀ k, IntegrableOn (g k) B volume)
+    (h : HasWeakGradOn B u g) :
+    HasWeakGradOn Set.univ (fun x => η x * B.indicator u x)
+      (fun k x => η x * B.indicator (g k) x + partialD k η x * B.indicator u x) := by
+  have hoff : ∀ x, x ∉ B → η x = 0 := fun x hx =>
+    image_eq_zero_of_notMem_tsupport fun hc => hx (hηs hc)
+  have hoff' : ∀ (k : Fin d) x, x ∉ B → partialD k η x = 0 := fun k x hx =>
+    Extension.partialD_eq_zero_of_notMem hηs k hx
+  have := Extension.hasWeakGradOn_mul_cutoff_inter MeasurableSet.univ hηc hηs
+    (by simpa using hu) (by simpa using hgi) (by simpa using h)
+  refine this.congr_ae (Filter.Eventually.of_forall fun x => ?_)
+    fun k => Filter.Eventually.of_forall fun x => ?_
+  · by_cases hx : x ∈ B <;> simp [hx, hoff x]
+  · by_cases hx : x ∈ B <;> simp [hx, hoff x, hoff' k x]
+
+end EllipticPdes.Embedding
+
+namespace EllipticPdes.Extension
+
+open EllipticPdes.Sobolev (partialD)
+open EllipticPdes.Embedding (HasWeakGradOn partialD_mul)
+
 /-- **Multiplication of a pair by a cutoff**, as a linear map. The second component is the
 product rule. -/
 def cutOp (η : EuclideanSpace ℝ (Fin d) → ℝ) : SobolevPair d →ₗ[ℝ] SobolevPair d where

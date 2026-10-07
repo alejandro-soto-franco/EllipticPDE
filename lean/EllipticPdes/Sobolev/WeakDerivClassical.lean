@@ -6,6 +6,7 @@ Authors: Alejandro Soto Franco
 
 module
 
+public import EllipticPdes.Analysis.Mollifier
 public import EllipticPdes.Sobolev.WeakDeriv
 public import Mathlib.Analysis.Calculus.BumpFunction.Convolution
 public import Mathlib.Analysis.Calculus.BumpFunction.FiniteDimension
@@ -92,28 +93,28 @@ theorem tsupport_normed_sub_subset (ρ : ContDiffBump (0 : E)) (y : E) :
 variable {Ω : Opens E} {u : E → F} {G : E → E →L[ℝ] F}
 
 omit [CompleteSpace F] in
-/-- **The derivative of a mollification is the mollification of the weak derivative.** Let `G`
-be the weak Fréchet derivative of `u` on `Ω`, both locally integrable there, and `K ⊆ Ω`
-compact. If the closed ball of radius `ρ.rOut` around `y` lies in `K`, then the mollification of
-the extension of `u` by zero outside `K` has derivative at `y` the mollification of the
-extension of `G`. -/
-theorem HasWeakFDerivOn.hasFDerivAt_convolution (hw : HasWeakFDerivOn Ω u G μ)
-    (hG : LocallyIntegrableOn G Ω μ) {K : Set E} (hK : IsCompact K) (hKΩ : K ⊆ Ω)
+/-- **The derivative of a mollification is the mollification of the derivative.** Let the
+extensions by zero of `u` and `G` outside a set `K` be locally integrable, and suppose the
+integration by parts identity `∫ ∂ᵥψ • u = -∫ ψ • G v` holds against every `C^∞` function `ψ`
+with compact support in `K`.
+If the closed ball of radius `ρ.rOut` around `y` lies in `K`, then the mollification of the
+extension of `u` by zero outside `K` has derivative at `y` the mollification of the extension of
+`G`. -/
+theorem hasFDerivAt_convolution_of_forall_integral_eq {K : Set E}
+    (hu : LocallyIntegrable (K.indicator u) μ) (hG : LocallyIntegrable (K.indicator G) μ)
+    (hw : ∀ (v : E) (ψ : E → ℝ), ContDiff ℝ (⊤ : ℕ∞) ψ → HasCompactSupport ψ → tsupport ψ ⊆ K →
+      ∫ t, fderiv ℝ ψ t v • u t ∂μ = -∫ t, ψ t • G t v ∂μ)
     (ρ : ContDiffBump (0 : E)) {y : E} (hy : closedBall y ρ.rOut ⊆ K) :
     HasFDerivAt (ρ.normed μ ⋆[lsmul ℝ ℝ, μ] K.indicator u)
       ((ρ.normed μ ⋆[lsmul ℝ ℝ, μ] K.indicator G) y) y := by
-  have hKm := hK.measurableSet
-  have hui : LocallyIntegrable (K.indicator u) μ :=
-    (((hw 0).1.integrableOn_compact_subset hKΩ hK).integrable_indicator hKm).locallyIntegrable
-  have hGi : LocallyIntegrable (K.indicator G) μ :=
-    (IntegrableOn.integrable_indicator (ε' := E →L[ℝ] F)
-      (hG.integrableOn_compact_subset hKΩ hK) hKm).locallyIntegrable
   have hρd : ∀ n : ℕ∞, ContDiff ℝ n (ρ.normed μ) := fun n => ρ.contDiff_normed
   -- The bump reflected through `y`, a test function on `Ω`.
   set ψ : E → ℝ := fun t => ρ.normed μ (y - t) with hψ_def
   have hψ : ContDiff ℝ (⊤ : ℕ∞) ψ := (hρd ⊤).comp (contDiff_const.sub contDiff_id)
   have hψs : tsupport ψ ⊆ K := (tsupport_normed_sub_subset ρ y).trans hy
-  have hψc : HasCompactSupport ψ := hK.of_isClosed_subset (isClosed_tsupport ψ) hψs
+  have hψc : HasCompactSupport ψ :=
+    (isCompact_closedBall y ρ.rOut).of_isClosed_subset (isClosed_tsupport ψ)
+      (tsupport_normed_sub_subset ρ y)
   have hψd : ∀ t v, fderiv ℝ ψ t v = -fderiv ℝ (ρ.normed μ) (y - t) v := fun t v => by
     have h : HasFDerivAt ψ ((fderiv ℝ (ρ.normed μ) (y - t)).comp (-ContinuousLinearMap.id ℝ E))
         t := ((hρd 1).differentiable one_ne_zero (y - t)).hasFDerivAt.comp t
@@ -124,7 +125,7 @@ theorem HasWeakFDerivOn.hasFDerivAt_convolution (hw : HasWeakFDerivOn Ω u G μ)
     intro v
     rw [← convolution_flip, convolution_def, integral_apply
       ((ρ.hasCompactSupport_normed (μ := μ)).convolutionExists_right
-        (lsmul ℝ ℝ : ℝ →L[ℝ] (E →L[ℝ] F) →L[ℝ] E →L[ℝ] F).flip hGi (hρd 0).continuous y)]
+        (lsmul ℝ ℝ : ℝ →L[ℝ] (E →L[ℝ] F) →L[ℝ] E →L[ℝ] F).flip hG (hρd 0).continuous y)]
     refine integral_congr_ae (Eventually.of_forall fun t => ?_)
     simpa using congrArg (fun A : E →L[ℝ] F => A v)
       (smul_indicator_eq_of_tsupport_subset hψs G t)
@@ -140,27 +141,56 @@ theorem HasWeakFDerivOn.hasFDerivAt_convolution (hw : HasWeakFDerivOn Ω u G μ)
     simp [hψd, h]
   rw [← convolution_flip]
   convert (ρ.hasCompactSupport_normed (μ := μ)).hasFDerivAt_convolution_right
-    (lsmul ℝ ℝ : ℝ →L[ℝ] F →L[ℝ] F).flip hui (hρd 1) y using 1
+    (lsmul ℝ ℝ : ℝ →L[ℝ] F →L[ℝ] F).flip hu (hρd 1) y using 1
   ext v
-  rw [hL, convolution_precompR_apply _ hui (ρ.hasCompactSupport_normed.fderiv ℝ)
-    ((hρd 1).continuous_fderiv one_ne_zero), hR, (hw v).integral_eq hψ hψc (hψs.trans hKΩ),
+  rw [hL, convolution_precompR_apply _ hu (ρ.hasCompactSupport_normed.fderiv ℝ)
+    ((hρd 1).continuous_fderiv one_ne_zero), hR, hw v ψ hψ hψc hψs,
     neg_neg]
 
-/-- Normed bumps of outer radius `r / (n + 1)`, a mollifying sequence of scale `r`. -/
-def bumpSeq (r : ℝ) (hr : 0 < r) (n : ℕ) : ContDiffBump (0 : E) :=
-  ⟨r / (n + 1) / 2, r / (n + 1), by positivity, half_lt_self (by positivity)⟩
+omit [CompleteSpace F] in
+/-- **The derivative of a mollification is the mollification of the weak derivative.** Let `G`
+be the weak Fréchet derivative of `u` on `Ω`, and `K ⊆ Ω` a measurable set on which `u` and `G`
+are integrable. If the closed ball of radius `ρ.rOut` around `y` lies in `K`, then the
+mollification of the extension of `u` by zero outside `K` has derivative at `y` the
+mollification of the extension of `G`. -/
+theorem HasWeakFDerivOn.hasFDerivAt_convolution (hw : HasWeakFDerivOn Ω u G μ)
+    {K : Set E} (hKm : MeasurableSet K) (hKΩ : K ⊆ Ω) (hu : IntegrableOn u K μ)
+    (hG : IntegrableOn G K μ) (ρ : ContDiffBump (0 : E)) {y : E} (hy : closedBall y ρ.rOut ⊆ K) :
+    HasFDerivAt (ρ.normed μ ⋆[lsmul ℝ ℝ, μ] K.indicator u)
+      ((ρ.normed μ ⋆[lsmul ℝ ℝ, μ] K.indicator G) y) y :=
+  hasFDerivAt_convolution_of_forall_integral_eq (hu.integrable_indicator hKm).locallyIntegrable
+    (IntegrableOn.integrable_indicator (ε' := E →L[ℝ] F) hG hKm).locallyIntegrable
+    (fun v _ hψ hψc hψs => (hw v).integral_eq hψ hψc (hψs.trans hKΩ)) ρ hy
 
-omit [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] in
-/-- The bumps of `bumpSeq r hr` have outer radius at most `r`. -/
-theorem rOut_bumpSeq_le {r : ℝ} (hr : 0 < r) (n : ℕ) : (bumpSeq (E := E) r hr n).rOut ≤ r :=
-  div_le_self hr.le (by linarith [(Nat.cast_nonneg n : (0 : ℝ) ≤ n)])
-
-omit [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] in
-/-- The outer radii of `bumpSeq r hr` tend to zero. -/
-theorem tendsto_rOut_bumpSeq {r : ℝ} (hr : 0 < r) :
-    Tendsto (fun n => (bumpSeq (E := E) r hr n).rOut) atTop (𝓝 0) := by
-  simpa [bumpSeq, div_eq_mul_inv, mul_comm] using
-    tendsto_one_div_add_atTop_nhds_zero_nat.const_mul r
+omit [CompleteSpace F] [μ.IsAddHaarMeasure] in
+/-- **A weak Fréchet derivative is locally integrable as an operator-valued function.** If
+every directional component `x ↦ G x v` is locally integrable on `Ω`, so is `G`, since on a
+finite-dimensional space `G x` is the sum of its values on a basis against the coordinate
+functionals. -/
+theorem HasWeakFDerivOn.locallyIntegrableOn (hw : HasWeakFDerivOn Ω u G μ) :
+    LocallyIntegrableOn G Ω μ := by
+  classical
+  set b := Module.finBasis ℝ E
+  set c : Fin (Module.finrank ℝ E) → E →L[ℝ] ℝ := fun i =>
+    LinearMap.toContinuousLinearMap (b.coord i)
+  have hG : G = fun x => ∑ i, (c i).smulRight (G x (b i)) := by
+    funext x
+    ext v
+    simp only [sum_apply, ContinuousLinearMap.smulRight_apply]
+    conv_lhs => rw [← b.sum_repr v, map_sum]
+    simp [c]
+  have key : LocallyIntegrableOn (fun x => ∑ i, (c i).smulRight (G x (b i))) Ω μ := by
+    refine (locallyIntegrableOn_iff Ω.isOpen.isLocallyClosed).2 fun K hK hKc => ?_
+    have hint : ∀ i ∈ Finset.univ, Integrable (fun x => (c i).smulRight (G x (b i)))
+        (μ.restrict K) := fun i _ => by
+      have hi := (hw (b i)).locallyIntegrableOn.integrableOn_compact_subset hK hKc
+      refine Integrable.mono' (hi.norm.const_mul ‖c i‖)
+        ((smulRightL ℝ E F (c i)).continuous.comp_aestronglyMeasurable hi.aestronglyMeasurable)
+        (Eventually.of_forall fun x => ?_)
+      simp
+    exact integrable_finsetSum (μ := μ.restrict K)
+      (f := fun i x => (c i).smulRight (G x (b i))) Finset.univ hint
+  rwa [← hG] at key
 
 /-- **A continuous weak derivative is a Fréchet derivative.** If `u` is continuous on the open
 set `Ω` and has a weak Fréchet derivative `G` continuous on `Ω`, then `u` is differentiable at
@@ -175,9 +205,9 @@ theorem HasWeakFDerivOn.hasFDerivAt (hw : HasWeakFDerivOn Ω u G μ) (hu : Conti
   have hthick : cthickening (R / 4) (ball x (R / 4)) ⊆ K :=
     (cthickening_subset_of_subset _ ball_subset_closedBall).trans
       (cthickening_closedBall hr.le hr.le x).le
-  have hsub : ∀ n, ∀ y ∈ ball x (R / 4), closedBall y (bumpSeq (E := E) _ hr n).rOut ⊆ K :=
+  have hsub : ∀ n, ∀ y ∈ ball x (R / 4), closedBall y (mollifier (E := E) hr n).rOut ⊆ K :=
     fun n y hy => closedBall_subset_closedBall' (by
-      linarith [rOut_bumpSeq_le (E := E) hr n, (mem_ball.1 hy).le])
+      linarith [rOut_mollifier_le (E := E) hr n, (mem_ball.1 hy).le])
   have hKm := hK.measurableSet
   have huK : IntegrableOn u K μ := (hu.mono hKΩ).integrableOn_compact hK
   have hGK : IntegrableOn G K μ := (hG.mono hKΩ).integrableOn_compact hK
@@ -185,17 +215,16 @@ theorem HasWeakFDerivOn.hasFDerivAt (hw : HasWeakFDerivOn Ω u G μ) (hu : Conti
     IntegrableOn.integrable_indicator (ε' := E →L[ℝ] F) hGK hKm
   have hvals := (tendstoUniformlyOn_normed_convolution (μ := μ) hK
     ((hu.mono hKΩ).congr fun y hy => indicator_of_mem hy u)
-    (huK.integrable_indicator hKm).aestronglyMeasurable hthick (rOut_bumpSeq_le hr)
-    (tendsto_rOut_bumpSeq hr)).congr_right fun y hy => indicator_of_mem (hthick
+    (huK.integrable_indicator hKm).aestronglyMeasurable hthick (rOut_mollifier_le hr)
+    (tendsto_rOut_mollifier hr)).congr_right fun y hy => indicator_of_mem (hthick
       (self_subset_cthickening _ hy)) u
   have hders := (tendstoUniformlyOn_normed_convolution (μ := μ) hK
     ((hG.mono hKΩ).congr fun y hy => indicator_of_mem hy G)
-    hGi.aestronglyMeasurable hthick (rOut_bumpSeq_le hr)
-    (tendsto_rOut_bumpSeq hr)).congr_right fun y hy => indicator_of_mem (hthick
+    hGi.aestronglyMeasurable hthick (rOut_mollifier_le hr)
+    (tendsto_rOut_mollifier hr)).congr_right fun y hy => indicator_of_mem (hthick
       (self_subset_cthickening _ hy)) G
   exact hasFDerivAt_of_tendstoUniformlyOn isOpen_ball hders
-    (fun n y hy => hw.hasFDerivAt_convolution (hG.locallyIntegrableOn Ω.isOpen.measurableSet) hK
-      hKΩ _ (hsub n y hy))
+    (fun n y hy => hw.hasFDerivAt_convolution hKm hKΩ huK hGK _ (hsub n y hy))
     (fun y hy => hvals.tendsto_at hy) (mem_ball_self hr)
 
 end EllipticPdes

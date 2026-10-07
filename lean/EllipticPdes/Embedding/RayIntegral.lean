@@ -32,11 +32,14 @@ noncomputable section
 
 namespace EllipticPdes.Embedding
 
-variable {d : ℕ}
+variable {d : ℕ} {E F : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
+  [MeasurableSpace E] [BorelSpace E] {μ : Measure E} [μ.IsAddHaarMeasure]
+  [NormedAddCommGroup F] [NormedSpace ℝ F]
 
+omit [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] in
 /-- The segment path `t ↦ φ (x + t • v)` has derivative `(fderiv ℝ φ (x + t • v)) v`. -/
-private theorem hasDerivAt_comp_segment {φ : EuclideanSpace ℝ (Fin d) → ℝ}
-    (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (x v : EuclideanSpace ℝ (Fin d)) (t : ℝ) :
+private theorem hasDerivAt_comp_segment {φ : E → F}
+    (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (x v : E) (t : ℝ) :
     HasDerivAt (fun s : ℝ => φ (x + s • v)) ((fderiv ℝ φ (x + t • v)) v) t := by
   have hline : HasDerivAt (fun s : ℝ => x + s • v) v t := by
     simpa using ((hasDerivAt_id t).smul_const v).const_add x
@@ -44,10 +47,11 @@ private theorem hasDerivAt_comp_segment {φ : EuclideanSpace ℝ (Fin d) → ℝ
     (hφ.differentiable (by simp)).differentiableAt.hasFDerivAt
   exact hφ'.comp_hasDerivAt t hline
 
+omit [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] in
 /-- **Ray fundamental theorem of calculus.** For smooth `φ`, the increment along the
 segment from `x` to `x + v` is the integral of the directional derivative. -/
-theorem sub_eq_intervalIntegral_fderiv {φ : EuclideanSpace ℝ (Fin d) → ℝ}
-    (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (x v : EuclideanSpace ℝ (Fin d)) :
+theorem sub_eq_intervalIntegral_fderiv [CompleteSpace F] {φ : E → F}
+    (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (x v : E) :
     φ (x + v) - φ x = ∫ t in (0 : ℝ)..1, (fderiv ℝ φ (x + t • v)) v := by
   have hcont : Continuous (fun t : ℝ => (fderiv ℝ φ (x + t • v)) v) :=
     ((hφ.continuous_fderiv (by simp)).comp (by fun_prop)).clm_apply continuous_const
@@ -56,22 +60,23 @@ theorem sub_eq_intervalIntegral_fderiv {φ : EuclideanSpace ℝ (Fin d) → ℝ}
         hcont.continuousOn.intervalIntegrable]
   simp
 
+omit [FiniteDimensional ℝ E] [BorelSpace E] [μ.IsAddHaarMeasure] in
 /-- **Ray-FTC average identity over a measurable set.** For smooth `φ` and a measurable set `W`
 of positive finite measure on which `φ` is integrable, the oscillation of the `W`-average of `φ`
 about the value `φ x` equals the average over `W` of the ray integral of the directional
 derivative from `x` towards the running point `y`. This is the mechanical half of the potential
 estimate over a general averaging domain. -/
-theorem oscillation_eq_average_ray_set
-    {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφ : ContDiff ℝ (⊤ : ℕ∞) φ)
-    (x : EuclideanSpace ℝ (Fin d)) {W : Set (EuclideanSpace ℝ (Fin d))}
-    (hWmeas : MeasurableSet W) (hpos : volume W ≠ 0) (htop : volume W ≠ ⊤)
-    (hint : IntegrableOn φ W volume) :
-    (⨍ y in W, φ y) - φ x
-      = ⨍ y in W, ∫ t in (0 : ℝ)..1, (fderiv ℝ φ (x + t • (y - x))) (y - x) := by
+theorem oscillation_eq_average_ray_set [CompleteSpace F]
+    {φ : E → F} (hφ : ContDiff ℝ (⊤ : ℕ∞) φ)
+    (x : E) {W : Set (E)}
+    (hWmeas : MeasurableSet W) (hpos : μ W ≠ 0) (htop : μ W ≠ ⊤)
+    (hint : IntegrableOn φ W μ) :
+    (⨍ y in W, φ y ∂μ) - φ x
+      = ⨍ y in W, (∫ t in (0 : ℝ)..1, (fderiv ℝ φ (x + t • (y - x))) (y - x)) ∂μ := by
   -- Pointwise: replace the inner ray integral by `φ y - φ x` via the ray FTC.
-  have hcongr : (⨍ y in W, ∫ t in (0 : ℝ)..1,
-      (fderiv ℝ φ (x + t • (y - x))) (y - x))
-      = ⨍ y in W, (φ y - φ x) := by
+  have hcongr : (⨍ y in W, (∫ t in (0 : ℝ)..1,
+      (fderiv ℝ φ (x + t • (y - x))) (y - x)) ∂μ)
+      = ⨍ y in W, (φ y - φ x) ∂μ := by
     refine setAverage_congr_fun hWmeas ?_
     filter_upwards with y _
     have h := (sub_eq_intervalIntegral_fderiv hφ x (y - x)).symm
@@ -80,17 +85,18 @@ theorem oscillation_eq_average_ray_set
   -- Split the average of the difference.
   rw [setAverage_eq, setAverage_eq, integral_sub hint (integrableOn_const htop),
     smul_sub, setIntegral_const, smul_smul]
-  have hk : (volume.real W)⁻¹ * volume.real W = 1 :=
+  have hk : (μ.real W)⁻¹ * μ.real W = 1 :=
     inv_mul_cancel₀ (by
       simp only [measureReal_def, ne_eq, ENNReal.toReal_eq_zero_iff, not_or]
       exact ⟨hpos, htop⟩)
   rw [hk, one_smul]
 
+omit [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] in
 /-- **Region fact (convex form).** If `y` lies in `ball x D` and `0 < t`, then the segment point
 `x + t • (y - x)` is within distance `D t` of `x`. This is the geometric input feeding the
 Riesz-kernel tail bound: after the affine change of variables the transformed region
 `B_t = x + t • (W - x)` sits inside the ball `‖z - x‖ < D t` whenever `W ⊆ ball x D`. -/
-private theorem norm_smul_sub_lt {x y : EuclideanSpace ℝ (Fin d)} {D t : ℝ}
+private theorem norm_smul_sub_lt {x y : E} {D t : ℝ}
     (hy : y ∈ ball x D) (ht : 0 < t) :
     ‖t • (y - x)‖ < D * t := by
   have hyx : ‖y - x‖ < D := by rw [← dist_eq_norm]; rwa [mem_ball] at hy
@@ -124,22 +130,23 @@ private theorem tail_integral_bound (hd : 0 < d) {a : ℝ} (ha : 0 < a) :
 /-- **Pushforward of Lebesgue measure under the affine contraction** `y ↦ x + t • (y - x)`.
 Being the composition of a translation, a dilation by `t`, and a translation, it scales the
 Haar measure by `t^{-d}`. This is the Jacobian input to the change of variables. -/
-private theorem map_affine_dilation (x : EuclideanSpace ℝ (Fin d)) {t : ℝ} (ht : 0 < t) :
-    Measure.map (fun y => x + t • (y - x)) (volume : Measure (EuclideanSpace ℝ (Fin d)))
-      = ENNReal.ofReal ((t ^ d)⁻¹) • volume := by
-  have hC : Measurable (fun y : EuclideanSpace ℝ (Fin d) => y - x) := measurable_id.sub_const x
-  have hB : Measurable (fun w : EuclideanSpace ℝ (Fin d) => t • w) := measurable_id.const_smul t
-  have hA : Measurable (fun u : EuclideanSpace ℝ (Fin d) => x + u) := measurable_id.const_add x
-  have hcomp : (fun y : EuclideanSpace ℝ (Fin d) => x + t • (y - x))
+private theorem map_affine_dilation (hE : Module.finrank ℝ E = d) (x : E) {t : ℝ}
+    (ht : 0 < t) :
+    Measure.map (fun y => x + t • (y - x)) μ
+      = ENNReal.ofReal ((t ^ d)⁻¹) • μ := by
+  have hC : Measurable (fun y : E => y - x) := measurable_id.sub_const x
+  have hB : Measurable (fun w : E => t • w) := measurable_id.const_smul t
+  have hA : Measurable (fun u : E => x + u) := measurable_id.const_add x
+  have hcomp : (fun y : E => x + t • (y - x))
       = (fun u => x + u) ∘ ((fun w => t • w) ∘ (fun y => y - x)) := by funext y; rfl
   rw [hcomp, ← Measure.map_map hA (hB.comp hC), ← Measure.map_map hB hC]
-  have hmapC : Measure.map (fun y : EuclideanSpace ℝ (Fin d) => y - x) volume = volume := by
-    have hrw : (fun y : EuclideanSpace ℝ (Fin d) => y - x) = (fun y => y + (-x)) := by
+  have hmapC : Measure.map (fun y : E => y - x) μ = μ := by
+    have hrw : (fun y : E => y - x) = (fun y => y + (-x)) := by
       funext y; rw [sub_eq_add_neg]
     rw [hrw, map_add_right_eq_self]
-  rw [hmapC, Measure.map_addHaar_smul volume ht.ne', Measure.map_smul, map_add_left_eq_self]
+  rw [hmapC, Measure.map_addHaar_smul μ ht.ne', Measure.map_smul, map_add_left_eq_self]
   · congr 1
-    rw [finrank_euclideanSpace_fin, abs_of_nonneg (by positivity)]
+    rw [hE, abs_of_nonneg (by positivity)]
   · exact hA.aemeasurable
 
 /-- **Affine change of variables (the crux).** For `0 < t`, the singular line integrand over
@@ -147,21 +154,21 @@ the ball transforms, under `z = x + t • (y - x)`, into the same integrand over
 region `x + t • (ball c r - x)`, with Jacobian factor `t^{-(d+1)}`. This is the change of
 variables at the level of the (nonnegative) `lintegral`, built from the pushforward Jacobian
 `map_affine_dilation` together with translation invariance. -/
-private theorem potential_inner_cov {φ : EuclideanSpace ℝ (Fin d) → ℝ}
-    (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (x : EuclideanSpace ℝ (Fin d)) {t : ℝ} (ht : 0 < t)
-    {s : Set (EuclideanSpace ℝ (Fin d))} (hs : MeasurableSet s) :
-    ∫⁻ y in s, ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂volume
+private theorem potential_inner_cov {φ : E → F}
+    (hE : Module.finrank ℝ E = d) (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (x : E) {t : ℝ} (ht : 0 < t)
+    {s : Set (E)} (hs : MeasurableSet s) :
+    ∫⁻ y in s, ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂μ
       = ENNReal.ofReal (t ^ (-((d : ℤ) + 1)))
-          * ∫⁻ z in (fun y => x + t • (y - x)) '' s, ‖fderiv ℝ φ z‖ₑ * ‖z - x‖ₑ ∂volume := by
-  set e : EuclideanSpace ℝ (Fin d) → EuclideanSpace ℝ (Fin d) := fun y => x + t • (y - x) with he
-  set h : EuclideanSpace ℝ (Fin d) → ℝ≥0∞ := fun z => ‖fderiv ℝ φ z‖ₑ * ‖z - x‖ₑ with hh_def
+          * ∫⁻ z in (fun y => x + t • (y - x)) '' s, ‖fderiv ℝ φ z‖ₑ * ‖z - x‖ₑ ∂μ := by
+  set e : E → E := fun y => x + t • (y - x) with he
+  set h : E → ℝ≥0∞ := fun z => ‖fderiv ℝ φ z‖ₑ * ‖z - x‖ₑ with hh_def
   have hemb : MeasurableEmbedding e := by
-    have h1 : MeasurableEmbedding (fun u : EuclideanSpace ℝ (Fin d) => x + u) :=
+    have h1 : MeasurableEmbedding (fun u : E => x + u) :=
       measurableEmbedding_addLeft x
-    have h2 : MeasurableEmbedding (fun w : EuclideanSpace ℝ (Fin d) => t • w) :=
+    have h2 : MeasurableEmbedding (fun w : E => t • w) :=
       measurableEmbedding_const_smul₀ ht.ne'
-    have h3 : MeasurableEmbedding (fun y : EuclideanSpace ℝ (Fin d) => y - x) := by
-      have hrw : (fun y : EuclideanSpace ℝ (Fin d) => y - x) = (fun y => y + (-x)) := by
+    have h3 : MeasurableEmbedding (fun y : E => y - x) := by
+      have hrw : (fun y : E => y - x) = (fun y => y + (-x)) := by
         funext y; rw [sub_eq_add_neg]
       rw [hrw]; exact measurableEmbedding_addRight (-x)
     exact (h1.comp h2).comp h3
@@ -170,38 +177,38 @@ private theorem potential_inner_cov {φ : EuclideanSpace ℝ (Fin d) → ℝ}
     · exact ((hφ.continuous_fderiv (by simp)).enorm).measurable
     · exact ((continuous_id.sub continuous_const).enorm).measurable
   have hGmeas : Measurable
-      (fun y : EuclideanSpace ℝ (Fin d) => ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ) := by
+      (fun y : E => ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ) := by
     refine Measurable.fun_mul ?_ ?_
     · exact (((hφ.continuous_fderiv (by simp)).comp (by fun_prop)).enorm).measurable
     · exact ((continuous_id.sub continuous_const).enorm).measurable
   have huimg : MeasurableSet (e '' s) := hemb.measurableSet_image.mpr hs
-  have hmap : Measure.map e volume = ENNReal.ofReal ((t ^ d)⁻¹) • volume := by
-    rw [he]; exact map_affine_dilation x ht
+  have hmap : Measure.map e μ = ENNReal.ofReal ((t ^ d)⁻¹) • μ := by
+    rw [he]; exact map_affine_dilation hE x ht
   -- Change of variables: `∫ over image = t^d * ∫ (h ∘ e) over s`.
-  have hset := setLIntegral_map (μ := (volume : Measure (EuclideanSpace ℝ (Fin d))))
+  have hset := setLIntegral_map (μ := μ)
     huimg hhmeas hemb.measurable
   rw [hmap, setLIntegral_smul_measure,
     Set.preimage_image_eq s hemb.injective] at hset
   -- `hset : ofReal ((t^d)⁻¹) • ∫ z in e '' s, h z = ∫ y in s, h (e y)`.
-  have hcov : ∫⁻ z in e '' s, h z ∂volume
-      = ENNReal.ofReal (t ^ d) * ∫⁻ y in s, h (e y) ∂volume := by
-    calc ∫⁻ z in e '' s, h z ∂volume
+  have hcov : ∫⁻ z in e '' s, h z ∂μ
+      = ENNReal.ofReal (t ^ d) * ∫⁻ y in s, h (e y) ∂μ := by
+    calc ∫⁻ z in e '' s, h z ∂μ
         = ENNReal.ofReal (t ^ d)
-            * (ENNReal.ofReal ((t ^ d)⁻¹) • ∫⁻ z in e '' s, h z ∂volume) := by
+            * (ENNReal.ofReal ((t ^ d)⁻¹) • ∫⁻ z in e '' s, h z ∂μ) := by
           rw [smul_eq_mul, ← mul_assoc, ← ENNReal.ofReal_mul (by positivity),
             mul_inv_cancel₀ (by positivity), ENNReal.ofReal_one, one_mul]
-      _ = ENNReal.ofReal (t ^ d) * ∫⁻ y in s, h (e y) ∂volume := by rw [hset]
+      _ = ENNReal.ofReal (t ^ d) * ∫⁻ y in s, h (e y) ∂μ := by rw [hset]
   -- Pointwise `h (e y) = ofReal t * (target integrand)`.
-  have hpt : ∀ y : EuclideanSpace ℝ (Fin d),
+  have hpt : ∀ y : E,
       h (e y) = ENNReal.ofReal t * (‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ) := by
     intro y
     simp only [he, hh_def]
     have hsub : x + t • (y - x) - x = t • (y - x) := by abel
     rw [hsub, enorm_smul, Real.enorm_eq_ofReal ht.le]
     ring
-  have hstep : ∫⁻ y in s, h (e y) ∂volume
+  have hstep : ∫⁻ y in s, h (e y) ∂μ
       = ENNReal.ofReal t
-          * ∫⁻ y in s, ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂volume := by
+          * ∫⁻ y in s, ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂μ := by
     rw [setLIntegral_congr_fun hs (fun y _ => hpt y), lintegral_const_mul _ hGmeas]
   -- Solve for the target LHS.
   rw [hcov, hstep, ← mul_assoc, ← mul_assoc, ← ENNReal.ofReal_mul (by positivity),
@@ -282,11 +289,12 @@ private theorem measurable_indicator_ball_family {X : Type*} [PseudoMetricSpace 
   exact (hh.comp measurable_snd).indicator
     (measurableSet_lt (by fun_prop) (by fun_prop))
 
+omit [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] in
 /-- **The per-point scale integral.** For a point `z` at distance `w > 0` from `x`, integrating the
 singular kernel against the indicator of the growing balls `ball x (D t)` at `z` gives `f z` times
 the Riesz weight `D^d / (d w^d)`. -/
 private theorem lintegral_scale_indicator_le (hd : 0 < d) {D : ℝ} (hD : 0 < D)
-    {x z : EuclideanSpace ℝ (Fin d)} (hzx : z ≠ x) (f : EuclideanSpace ℝ (Fin d) → ℝ≥0∞) :
+    {x z : E} (hzx : z ≠ x) (f : E → ℝ≥0∞) :
     ∫⁻ t in Ioc (0 : ℝ) 1, ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) * (ball x (D * t)).indicator f z
       ≤ f z * ENNReal.ofReal (D ^ d / (d * ‖z - x‖ ^ d)) := by
   have hw : 0 < ‖z - x‖ := norm_pos_iff.mpr (sub_ne_zero.mpr hzx)
@@ -319,10 +327,11 @@ private theorem enorm_mul_riesz_weight (hd : 0 < d) {D N w : ℝ} (hD : 0 < D) (
     ← ENNReal.ofReal_pow hw.le, ← ENNReal.ofReal_div_of_pos (pow_pos hw _),
     ← ENNReal.ofReal_mul (div_nonneg (pow_nonneg hD.le _) hdR.le)]
 
+omit [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] in
 /-- The contraction of a convex set `W ∋ x` towards `x` by a factor `t ∈ (0, 1]` stays in `W` and
 in the ball `ball x (D t)` when `W ⊆ ball x D`. -/
-private theorem image_affine_subset_inter {x : EuclideanSpace ℝ (Fin d)} {D t : ℝ}
-    {W : Set (EuclideanSpace ℝ (Fin d))} (hWconv : Convex ℝ W) (hxW : x ∈ W)
+private theorem image_affine_subset_inter {x : E} {D t : ℝ}
+    {W : Set (E)} (hWconv : Convex ℝ W) (hxW : x ∈ W)
     (hWsub : W ⊆ ball x D) (ht : t ∈ Ioc (0 : ℝ) 1) :
     (fun y => x + t • (y - x)) '' W ⊆ W ∩ ball x (D * t) := by
   rintro z ⟨y, hy, rfl⟩
@@ -333,6 +342,26 @@ private theorem image_affine_subset_inter {x : EuclideanSpace ℝ (Fin d)} {D t 
   · rw [mem_ball, dist_eq_norm, add_sub_cancel_left]
     exact norm_smul_sub_lt (hWsub hy) ht.1
 
+omit [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] [μ.IsAddHaarMeasure] in
+/-- **Per-point Riesz bound.** At every `z` the scale integral of the gradient weight against the
+growing balls is the Riesz weight times `‖∇φ z‖ / ‖z - x‖^(d-1)`; at `z = x` the left side
+vanishes. -/
+private theorem scale_integral_riesz_le {φ : E → F} (hd : 0 < d) {D : ℝ} (hD : 0 < D) (x z : E) :
+    ∫⁻ t in Ioc (0 : ℝ) 1, ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) *
+        (ball x (D * t)).indicator (fun z => ‖fderiv ℝ φ z‖ₑ * ‖z - x‖ₑ) z ∂volume
+      ≤ ENNReal.ofReal (D ^ d / d) * (‖fderiv ℝ φ z‖ₑ / ‖z - x‖ₑ ^ (d - 1)) := by
+  by_cases hzx : z = x
+  · subst hzx
+    refine le_trans (le_of_eq ?_) bot_le
+    refine (setLIntegral_congr_fun measurableSet_Ioc (fun t _ => ?_)).trans
+      (lintegral_zero_fun (μ := volume.restrict (Ioc (0 : ℝ) 1)))
+    simp
+  · refine (lintegral_scale_indicator_le hd hD hzx _).trans (le_of_eq ?_)
+    have hw : 0 < ‖z - x‖ := norm_pos_iff.mpr (sub_ne_zero.mpr hzx)
+    have := enorm_mul_riesz_weight hd hD (norm_nonneg (fderiv ℝ φ z)) hw
+    simp only [ofReal_norm] at this ⊢
+    exact this
+
 /-- **Morrey kernel bound (convex form).** The double gradient line integral over a bounded
 convex measurable set `W` containing the base point `x` is controlled by the Riesz potential of
 the gradient, with a dimensional factor `D^d/d`, where `D` is any radius with `W ⊆ ball x D`.
@@ -340,75 +369,59 @@ Proof: Tonelli swap, the affine change of variables `potential_inner_cov` for ea
 region containment `W_t ⊆ W ∩ ball x (D t)` (using convexity of `W`), a second Tonelli swap, and
 the per-point Riesz factor `inner_t_bound`. Specialising `W = ball c r`, `D = 2 r` recovers the
 centred estimate. -/
-theorem kernel_bound_convex {φ : EuclideanSpace ℝ (Fin d) → ℝ}
-    (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (hd : 0 < d) (x : EuclideanSpace ℝ (Fin d))
-    {D : ℝ} (hD : 0 < D) {W : Set (EuclideanSpace ℝ (Fin d))} (hWmeas : MeasurableSet W)
+theorem kernel_bound_convex {φ : E → F}
+    (hE : Module.finrank ℝ E = d) (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (hd : 0 < d) (x : E)
+    {D : ℝ} (hD : 0 < D) {W : Set (E)} (hWmeas : MeasurableSet W)
     (hWconv : Convex ℝ W) (hxW : x ∈ W) (hWsub : W ⊆ ball x D) :
     ∫⁻ y in W, ∫⁻ t in Ioc (0 : ℝ) 1,
-        ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂volume ∂volume
+        ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂volume ∂μ
       ≤ ENNReal.ofReal (D ^ d / d)
-          * ∫⁻ z in W, ‖fderiv ℝ φ z‖ₑ / ‖z - x‖ₑ ^ (d - 1) ∂volume := by
-  have hfd : Continuous (fun z : EuclideanSpace ℝ (Fin d) => fderiv ℝ φ z) :=
+          * ∫⁻ z in W, ‖fderiv ℝ φ z‖ₑ / ‖z - x‖ₑ ^ (d - 1) ∂μ := by
+  have hfd : Continuous (fun z : E => fderiv ℝ φ z) :=
     hφ.continuous_fderiv (by simp)
-  set h : EuclideanSpace ℝ (Fin d) → ℝ≥0∞ := fun z => ‖fderiv ℝ φ z‖ₑ * ‖z - x‖ₑ with hh_def
+  set h : E → ℝ≥0∞ := fun z => ‖fderiv ℝ φ z‖ₑ * ‖z - x‖ₑ with hh_def
   have hhmeas : Measurable h :=
     (hfd.enorm.measurable).mul ((continuous_id.sub continuous_const).enorm.measurable)
   -- Step 1: Tonelli swap.
   rw [show (∫⁻ y in W, ∫⁻ t in Ioc (0 : ℝ) 1,
-        ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂volume ∂volume)
+        ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂volume ∂μ)
       = ∫⁻ t in Ioc (0 : ℝ) 1, ∫⁻ y in W,
-        ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂volume ∂volume from by
+        ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂μ ∂volume from by
     apply lintegral_lintegral_swap
     apply Measurable.aemeasurable
     apply Measurable.fun_mul
     · exact ((hfd.comp (by fun_prop)).enorm).measurable
-    · exact ((show Continuous (fun p : EuclideanSpace ℝ (Fin d) × ℝ => p.1 - x) by
+    · exact ((show Continuous (fun p : E × ℝ => p.1 - x) by
         fun_prop).enorm).measurable]
   -- Step 2: change of variables for each `t`, then bound the region.
   have hbound : ∀ t ∈ Ioc (0 : ℝ) 1,
-      ∫⁻ y in W, ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂volume
+      ∫⁻ y in W, ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂μ
         ≤ ∫⁻ z in W,
-            ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) * (ball x (D * t)).indicator h z ∂volume :=
+            ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) * (ball x (D * t)).indicator h z ∂μ :=
     fun t ht => by
-    rw [potential_inner_cov hφ x ht.1 hWmeas,
+    rw [potential_inner_cov hE hφ x ht.1 hWmeas,
       lintegral_const_mul _ (hhmeas.indicator (measurableSet_ball))]
     refine mul_le_mul' le_rfl ?_
-    calc ∫⁻ z in (fun y => x + t • (y - x)) '' W, h z ∂volume
-        ≤ ∫⁻ z in W ∩ ball x (D * t), h z ∂volume :=
+    calc ∫⁻ z in (fun y => x + t • (y - x)) '' W, h z ∂μ
+        ≤ ∫⁻ z in W ∩ ball x (D * t), h z ∂μ :=
           lintegral_mono_set (image_affine_subset_inter hWconv hxW hWsub ht)
-      _ = ∫⁻ z in W, (ball x (D * t)).indicator h z ∂volume := by
+      _ = ∫⁻ z in W, (ball x (D * t)).indicator h z ∂μ := by
           rw [← lintegral_indicator (hWmeas.inter measurableSet_ball), ← lintegral_indicator hWmeas,
             Set.indicator_indicator]
   have hzpow_meas := measurable_zpow_neg_succ d
-  -- Per-point Riesz bound (holds for every `z`; at `z = x` the left side vanishes).
-  have hper : ∀ z : EuclideanSpace ℝ (Fin d),
-      ∫⁻ t in Ioc (0 : ℝ) 1,
-          ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) * (ball x (D * t)).indicator h z ∂volume
-        ≤ ENNReal.ofReal (D ^ d / d) * (‖fderiv ℝ φ z‖ₑ / ‖z - x‖ₑ ^ (d - 1)) := fun z => by
-    by_cases hzx : z = x
-    · subst hzx
-      have h0 : h z = 0 := by simp [hh_def]
-      refine le_trans (le_of_eq ?_) bot_le
-      refine (setLIntegral_congr_fun measurableSet_Ioc (fun t _ => ?_)).trans
-        (lintegral_zero_fun (μ := volume.restrict (Ioc (0 : ℝ) 1)))
-      simp [h0]
-    · refine (lintegral_scale_indicator_le hd hD hzx h).trans (le_of_eq ?_)
-      have hw : 0 < ‖z - x‖ := norm_pos_iff.mpr (sub_ne_zero.mpr hzx)
-      have := enorm_mul_riesz_weight hd hD (norm_nonneg (fderiv ℝ φ z)) hw
-      simp only [hh_def, ofReal_norm] at this ⊢
-      exact this
+  have hper := fun z => scale_integral_riesz_le (φ := φ) hd hD x z
   calc ∫⁻ t in Ioc (0 : ℝ) 1, ∫⁻ y in W,
-          ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂volume ∂volume
+          ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂μ ∂volume
       ≤ ∫⁻ t in Ioc (0 : ℝ) 1, ∫⁻ z in W,
           ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) * (ball x (D * t)).indicator h z
-          ∂volume ∂volume :=
+          ∂μ ∂volume :=
         lintegral_mono_ae (by
           filter_upwards [ae_restrict_mem measurableSet_Ioc] with t ht
           exact hbound t ht)
     -- Step 3: second Tonelli swap.
     _ = ∫⁻ z in W, ∫⁻ t in Ioc (0 : ℝ) 1,
           ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) * (ball x (D * t)).indicator h z
-          ∂volume ∂volume := by
+          ∂volume ∂μ := by
         apply lintegral_lintegral_swap
         apply Measurable.aemeasurable
         apply Measurable.fun_mul
@@ -416,10 +429,10 @@ theorem kernel_bound_convex {φ : EuclideanSpace ℝ (Fin d) → ℝ}
         · exact measurable_indicator_ball_family hhmeas x D
     -- Step 4: per-point Riesz bound and reassembly.
     _ ≤ ∫⁻ z in W,
-          ENNReal.ofReal (D ^ d / d) * (‖fderiv ℝ φ z‖ₑ / ‖z - x‖ₑ ^ (d - 1)) ∂volume :=
+          ENNReal.ofReal (D ^ d / d) * (‖fderiv ℝ φ z‖ₑ / ‖z - x‖ₑ ^ (d - 1)) ∂μ :=
         setLIntegral_mono' hWmeas (fun z _ => hper z)
     _ = ENNReal.ofReal (D ^ d / d)
-          * ∫⁻ z in W, ‖fderiv ℝ φ z‖ₑ / ‖z - x‖ₑ ^ (d - 1) ∂volume :=
+          * ∫⁻ z in W, ‖fderiv ℝ φ z‖ₑ / ‖z - x‖ₑ ^ (d - 1) ∂μ :=
         lintegral_const_mul _ ((hfd.enorm.measurable).div
           (((continuous_id.sub continuous_const).enorm).measurable.pow_const _))
 
@@ -427,28 +440,27 @@ theorem kernel_bound_convex {φ : EuclideanSpace ℝ (Fin d) → ℝ}
 integrand `‖∇φ‖ / dist x ·^{d-1}` is integrable on the ball: the singularity `dist x ·^{-(d-1)}`
 has exponent `d - 1 < d`, and `‖∇φ‖` is bounded on the compact closure. This is what makes the
 right-hand side of the potential estimate finite (hence the estimate meaningful). -/
-theorem riesz_potential_integrableOn {φ : EuclideanSpace ℝ (Fin d) → ℝ}
-    (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (hd : 0 < d) (c x : EuclideanSpace ℝ (Fin d)) {r : ℝ}
+theorem riesz_potential_integrableOn {φ : E → F}
+    (hE : Module.finrank ℝ E = d) (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (hd : 0 < d) (c x : E) {r : ℝ}
     (_hr : 0 < r) (hx : x ∈ ball c r) :
-    IntegrableOn (fun z => ‖fderiv ℝ φ z‖ / dist x z ^ (d - 1)) (ball c r) volume := by
-  have hfd : Continuous (fun z : EuclideanSpace ℝ (Fin d) => fderiv ℝ φ z) :=
+    IntegrableOn (fun z => ‖fderiv ℝ φ z‖ / dist x z ^ (d - 1)) (ball c r) μ := by
+  have hfd : Continuous (fun z : E => fderiv ℝ φ z) :=
     hφ.continuous_fderiv (by simp)
-  have hfrk : 1 ≤ Module.finrank ℝ (EuclideanSpace ℝ (Fin d)) := by
-    rw [finrank_euclideanSpace_fin]; exact hd
+  have hfrk : 1 ≤ Module.finrank ℝ E := hE ▸ hd
   obtain ⟨M, hM⟩ :=
     (((isCompact_closedBall c (3 * r)).image hfd.norm).bddAbove)
   have hMbound : ∀ z ∈ closedBall c (3 * r), ‖fderiv ℝ φ z‖ ≤ M :=
     fun z hz => hM ⟨z, hz, rfl⟩
   -- The translated integrand `f w = ‖∇φ (x + w)‖ / ‖w‖^{d-1}` is integrable on `ball 0 (2 r)`.
-  have : Nontrivial (EuclideanSpace ℝ (Fin d)) :=
-    Module.nontrivial_of_finrank_pos (R := ℝ) (by rw [finrank_euclideanSpace_fin]; exact hd)
-  have hne0 : ∀ᵐ w ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), w ≠ 0 := by
-    rw [ae_iff, show {w : EuclideanSpace ℝ (Fin d) | ¬ w ≠ 0} = {0} from by ext w; simp]
+  have : Nontrivial (E) :=
+    Module.nontrivial_of_finrank_pos (R := ℝ) (hE ▸ hd)
+  have hne0 : ∀ᵐ w ∂μ, w ≠ 0 := by
+    rw [ae_iff, show {w : E | ¬ w ≠ 0} = {0} from by ext w; simp]
     exact measure_singleton 0
   have hf : IntegrableOn (fun w => ‖fderiv ℝ φ (x + w)‖ / ‖w‖ ^ (d - 1))
-      (ball 0 (2 * r)) volume := by
+      (ball 0 (2 * r)) μ := by
     apply MeasureTheory.integrableOn_ball_of_norm_le_rpow (C := M) (α := ((d - 1 : ℕ) : ℝ)) hfrk
-    · rw [finrank_euclideanSpace_fin]
+    · rw [hE]
       exact_mod_cast Nat.sub_lt hd Nat.one_pos
     · filter_upwards [ae_restrict_mem measurableSet_ball, ae_restrict_of_ae hne0] with w hw hw0
       have hwpos : 0 < ‖w‖ := by rw [norm_pos_iff]; exact hw0
@@ -471,8 +483,8 @@ theorem riesz_potential_integrableOn {φ : EuclideanSpace ℝ (Fin d) → ℝ}
       = fun w => ‖fderiv ℝ φ (x + w)‖ / ‖w‖ ^ (d - 1) := by
     funext w
     simp only [Function.comp_apply, dist_eq_norm, show x - (x + w) = -w from by abel, norm_neg]
-  have hmp : MeasurePreserving (fun w : EuclideanSpace ℝ (Fin d) => x + w) volume volume :=
-    measurePreserving_add_left volume x
+  have hmp : MeasurePreserving (fun w : E => x + w) μ μ :=
+    measurePreserving_add_left μ x
   rw [← hmp.integrableOn_comp_preimage (measurableEmbedding_addLeft x)]
   rw [show (fun w => x + w) ⁻¹' ball c r = ball (c - x) r from by
     ext w
@@ -490,63 +502,28 @@ theorem riesz_potential_integrableOn {φ : EuclideanSpace ℝ (Fin d) → ℝ}
       rwa [sub_add_cancel] at this
     linarith)
 
-/-- The absolute value of the ray integral of the directional derivative is bounded by the
-`ℝ≥0∞` integral of the gradient norm times `‖v‖`. -/
-private theorem ofReal_abs_ray_integral_le {φ : EuclideanSpace ℝ (Fin d) → ℝ}
-    (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (a v : EuclideanSpace ℝ (Fin d)) :
-    ENNReal.ofReal |∫ t in (0 : ℝ)..1, (fderiv ℝ φ (a + t • v)) v|
+omit [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] in
+/-- The ray integral of the directional derivative has extended norm at most the `ℝ≥0∞` integral
+of the gradient norm times `‖v‖`. -/
+private theorem enorm_ray_integral_le {φ : E → F} (a v : E) :
+    ‖∫ t in (0 : ℝ)..1, (fderiv ℝ φ (a + t • v)) v‖ₑ
       ≤ ∫⁻ t in Ioc (0 : ℝ) 1, ‖fderiv ℝ φ (a + t • v)‖ₑ * ‖v‖ₑ ∂volume := by
-  have hJc : Continuous (fun t : ℝ => (fderiv ℝ φ (a + t • v)) v) :=
-    ((hφ.continuous_fderiv (by simp)).comp (by fun_prop)).clm_apply continuous_const
-  calc ENNReal.ofReal |∫ t in (0 : ℝ)..1, (fderiv ℝ φ (a + t • v)) v|
-      ≤ ENNReal.ofReal (∫ t in Ioc (0 : ℝ) 1, |(fderiv ℝ φ (a + t • v)) v|) := by
-        apply ENNReal.ofReal_le_ofReal
-        rw [← intervalIntegral.integral_of_le (by norm_num : (0 : ℝ) ≤ 1)]
-        exact intervalIntegral.abs_integral_le_integral_abs (by norm_num)
-    _ = ∫⁻ t in Ioc (0 : ℝ) 1, ENNReal.ofReal |(fderiv ℝ φ (a + t • v)) v| ∂volume := by
-        rw [ofReal_integral_eq_lintegral_ofReal
-          ((hJc.abs.continuousOn.integrableOn_Icc).mono_set Ioc_subset_Icc_self)
-          (ae_of_all _ (fun t => abs_nonneg _))]
-    _ ≤ ∫⁻ t in Ioc (0 : ℝ) 1, ‖fderiv ℝ φ (a + t • v)‖ₑ * ‖v‖ₑ ∂volume := by
-        refine lintegral_mono fun t => ?_
-        calc ENNReal.ofReal |(fderiv ℝ φ (a + t • v)) v|
-            ≤ ENNReal.ofReal (‖fderiv ℝ φ (a + t • v)‖ * ‖v‖) := by
-              apply ENNReal.ofReal_le_ofReal
-              rw [← Real.norm_eq_abs]
-              exact (fderiv ℝ φ (a + t • v)).le_opNorm v
-          _ = ‖fderiv ℝ φ (a + t • v)‖ₑ * ‖v‖ₑ := by
-              rw [ENNReal.ofReal_mul (norm_nonneg _), ofReal_norm, ofReal_norm]
+  rw [intervalIntegral.integral_of_le zero_le_one]
+  exact (enorm_integral_le_lintegral_enorm _).trans
+    (lintegral_mono fun t => (fderiv ℝ φ (a + t • v)).le_opENorm v)
 
-/-- **Potential estimate over a convex averaging domain.** For smooth `φ`, a bounded convex
-measurable set `W` of positive finite measure containing the base point `a`, with `W ⊆ ball a R`,
-the oscillation of `φ` about its `W`-average is controlled by the Riesz potential of the gradient
-over `W`, with the explicit factor `R^d/(d · |W|)`. Combined with the subset Riesz-kernel bound
-it yields the two-point Hölder estimate. -/
-theorem oscillation_le_potential_convex
-    {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (hd : 0 < d)
-    (a : EuclideanSpace ℝ (Fin d)) {W : Set (EuclideanSpace ℝ (Fin d))}
-    (hWmeas : MeasurableSet W) (hWconv : Convex ℝ W) (haW : a ∈ W)
-    (hWpos : volume W ≠ 0) (hWtop : volume W ≠ ⊤) {R : ℝ} (hR : 0 < R) (hWsub : W ⊆ ball a R)
-    (hint : IntegrableOn (fun z => ‖fderiv ℝ φ z‖ / dist a z ^ (d - 1)) W volume) :
-    |φ a - ⨍ y in W, φ y|
-      ≤ R ^ d / (d * volume.real W) * ∫ z in W, ‖fderiv ℝ φ z‖ / dist a z ^ (d - 1) := by
-  have : Nontrivial (EuclideanSpace ℝ (Fin d)) :=
-    Module.nontrivial_of_finrank_pos (R := ℝ) (by rw [finrank_euclideanSpace_fin]; exact hd)
-  have hfd : Continuous (fun z : EuclideanSpace ℝ (Fin d) => fderiv ℝ φ z) :=
-    hφ.continuous_fderiv (by simp)
-  have hφint : IntegrableOn φ W volume :=
-    (hφ.continuous.locallyIntegrable.integrableOn_isCompact
-      (isCompact_closedBall a R)).mono_set (hWsub.trans ball_subset_closedBall)
-  set I : EuclideanSpace ℝ (Fin d) → ℝ :=
-    fun y => ∫ t in (0 : ℝ)..1, (fderiv ℝ φ (a + t • (y - a))) (y - a) with hI_def
-  set g : EuclideanSpace ℝ (Fin d) → ℝ := fun z => ‖fderiv ℝ φ z‖ / dist a z ^ (d - 1) with hg_def
-  set Rl : ℝ≥0∞ := ∫⁻ z in W, ‖fderiv ℝ φ z‖ₑ / ‖z - a‖ₑ ^ (d - 1) ∂volume with hRl_def
+omit [FiniteDimensional ℝ E] [BorelSpace E] [μ.IsAddHaarMeasure] in
+/-- **The Riesz potential of the gradient in `ℝ≥0∞` form.** If the real potential
+`‖∇φ z‖ / dist a z ^ (d - 1)` is integrable on `W`, its `ℝ≥0∞` form is finite with the same
+value. -/
+private theorem riesz_lintegral {φ : E → F} (hnex : ∀ᵐ z ∂μ, z ≠ a) {W : Set E}
+    (hint : IntegrableOn (fun z => ‖fderiv ℝ φ z‖ / dist a z ^ (d - 1)) W μ) :
+    ∫⁻ z in W, ‖fderiv ℝ φ z‖ₑ / ‖z - a‖ₑ ^ (d - 1) ∂μ < ⊤ ∧
+      (∫⁻ z in W, ‖fderiv ℝ φ z‖ₑ / ‖z - a‖ₑ ^ (d - 1) ∂μ).toReal
+        = ∫ z in W, ‖fderiv ℝ φ z‖ / dist a z ^ (d - 1) ∂μ := by
+  set g : E → ℝ := fun z => ‖fderiv ℝ φ z‖ / dist a z ^ (d - 1) with hg_def
   have hg_nn : ∀ z, 0 ≤ g z := fun z => by rw [hg_def]; positivity
-  have hnex : ∀ᵐ z ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), z ≠ a := by
-    rw [ae_iff, show {z : EuclideanSpace ℝ (Fin d) | ¬ z ≠ a} = {a} from by ext z; simp]
-    exact measure_singleton a
-  have hRl_enorm : Rl = ∫⁻ z in W, ‖g z‖ₑ ∂volume := by
-    rw [hRl_def]
+  have hRl : ∫⁻ z in W, ‖fderiv ℝ φ z‖ₑ / ‖z - a‖ₑ ^ (d - 1) ∂μ = ∫⁻ z in W, ‖g z‖ₑ ∂μ := by
     refine lintegral_congr_ae ?_
     filter_upwards [ae_restrict_of_ae hnex] with z hz
     have hzx : 0 < ‖z - a‖ := by rw [norm_pos_iff]; exact sub_ne_zero.mpr hz
@@ -555,46 +532,53 @@ theorem oscillation_le_potential_convex
     simp only [hg_def, hdist]
     rw [← ofReal_norm (fderiv ℝ φ z), ← ofReal_norm (z - a),
       ← ENNReal.ofReal_pow (norm_nonneg _), ← ENNReal.ofReal_div_of_pos (by positivity)]
-  have hRl_lt : Rl < ⊤ := by
-    rw [hRl_enorm]; exact hasFiniteIntegral_iff_enorm.mp hint.2
-  have hReq : Rl.toReal = ∫ y in W, g y ∂volume := by
-    rw [hRl_enorm, integral_eq_lintegral_of_nonneg_ae (ae_of_all _ hg_nn) hint.1]
-    congr 1
-    refine lintegral_congr fun z => ?_
-    rw [Real.enorm_eq_ofReal (hg_nn z)]
+  rw [hRl]
+  refine ⟨hasFiniteIntegral_iff_enorm.mp hint.2, ?_⟩
+  rw [integral_eq_lintegral_of_nonneg_ae (ae_of_all _ hg_nn) hint.1]
+  exact congrArg ENNReal.toReal (lintegral_congr fun z => Real.enorm_eq_ofReal (hg_nn z))
+
+/-- **Potential estimate over a convex averaging domain.** For smooth `φ`, a bounded convex
+measurable set `W` of positive finite measure containing the base point `a`, with `W ⊆ ball a R`,
+the oscillation of `φ` about its `W`-average is controlled by the Riesz potential of the gradient
+over `W`, with the explicit factor `R^d/(d · |W|)`. Combined with the subset Riesz-kernel bound
+it yields the two-point Hölder estimate. -/
+theorem oscillation_le_potential_convex [CompleteSpace F]
+    {φ : E → F} (hE : Module.finrank ℝ E = d) (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (hd : 0 < d)
+    (a : E) {W : Set E} (hWmeas : MeasurableSet W) (hWconv : Convex ℝ W) (haW : a ∈ W)
+    (hWpos : μ W ≠ 0) (hWtop : μ W ≠ ⊤) {R : ℝ} (hR : 0 < R) (hWsub : W ⊆ ball a R)
+    (hint : IntegrableOn (fun z => ‖fderiv ℝ φ z‖ / dist a z ^ (d - 1)) W μ) :
+    ‖φ a - ⨍ y in W, φ y ∂μ‖
+      ≤ R ^ d / (d * μ.real W) * ∫ z in W, ‖fderiv ℝ φ z‖ / dist a z ^ (d - 1) ∂μ := by
+  have : Nontrivial E := Module.nontrivial_of_finrank_pos (R := ℝ) (hE ▸ hd)
+  have hfd : Continuous (fun z : E => fderiv ℝ φ z) := hφ.continuous_fderiv (by simp)
+  have hint_of_cont : ∀ {f : E → F}, Continuous f → IntegrableOn f W μ := fun hf =>
+    (hf.locallyIntegrable.integrableOn_isCompact
+      (isCompact_closedBall a R)).mono_set (hWsub.trans ball_subset_closedBall)
+  set I : E → F := fun y => ∫ t in (0 : ℝ)..1, (fderiv ℝ φ (a + t • (y - a))) (y - a) with hI_def
+  obtain ⟨hRl_lt, hReq⟩ := riesz_lintegral (φ := φ) (hnex := by
+    rw [ae_iff, show {z : E | ¬ z ≠ a} = {a} from by ext z; simp]
+    exact measure_singleton a) hint
   have hIcont : Continuous I := by
-    rw [hI_def]
-    apply intervalIntegral.continuous_parametric_intervalIntegral_of_continuous'
+    refine intervalIntegral.continuous_parametric_intervalIntegral_of_continuous' ?_ 0 1
     exact (hfd.comp (by fun_prop)).clm_apply (by fun_prop)
-  have hper_y : ∀ y, ENNReal.ofReal |I y| ≤
-      ∫⁻ t in Ioc (0 : ℝ) 1, ‖fderiv ℝ φ (a + t • (y - a))‖ₑ * ‖y - a‖ₑ ∂volume :=
-    fun y => ofReal_abs_ray_integral_le hφ a (y - a)
-  have hker := kernel_bound_convex hφ hd a hR hWmeas hWconv haW hWsub
-  rw [← hRl_def] at hker
-  have hDl_lt : (∫⁻ y in W, ∫⁻ t in Ioc (0 : ℝ) 1,
-      ‖fderiv ℝ φ (a + t • (y - a))‖ₑ * ‖y - a‖ₑ ∂volume ∂volume) < ⊤ :=
-    lt_of_le_of_lt hker (ENNReal.mul_lt_top ENNReal.ofReal_lt_top hRl_lt)
-  rw [abs_sub_comm, oscillation_eq_average_ray_set hφ a hWmeas hWpos hWtop hφint,
-    setAverage_eq, smul_eq_mul, abs_mul,
-    abs_of_nonneg (by positivity : (0 : ℝ) ≤ (volume.real W)⁻¹)]
-  have hmain : |∫ y in W, I y ∂volume|
-      ≤ R ^ d / d * ∫ y in W, g y ∂volume := by
-    calc |∫ y in W, I y ∂volume|
-        ≤ ∫ y in W, |I y| ∂volume := abs_integral_le_integral_abs
-      _ = (∫⁻ y in W, ENNReal.ofReal |I y| ∂volume).toReal := by
-          rw [integral_eq_lintegral_of_nonneg_ae (ae_of_all _ (fun y => abs_nonneg _))
-            hIcont.abs.aestronglyMeasurable]
-      _ ≤ (∫⁻ y in W, ∫⁻ t in Ioc (0 : ℝ) 1,
-            ‖fderiv ℝ φ (a + t • (y - a))‖ₑ * ‖y - a‖ₑ ∂volume ∂volume).toReal :=
-          ENNReal.toReal_mono hDl_lt.ne (lintegral_mono hper_y)
-      _ ≤ (ENNReal.ofReal (R ^ d / d) * Rl).toReal :=
-          ENNReal.toReal_mono (ENNReal.mul_lt_top ENNReal.ofReal_lt_top hRl_lt).ne hker
-      _ = R ^ d / d * ∫ y in W, g y ∂volume := by
-          rw [ENNReal.toReal_mul, ENNReal.toReal_ofReal (by positivity), hReq]
-  calc (volume.real W)⁻¹ * |∫ y in W, I y ∂volume|
-      ≤ (volume.real W)⁻¹ * (R ^ d / d * ∫ y in W, g y ∂volume) :=
-        mul_le_mul_of_nonneg_left hmain (by positivity)
-    _ = R ^ d / (d * volume.real W) * ∫ z in W, g z ∂volume := by
-        rw [← mul_assoc]; congr 1; ring
+  have hker := kernel_bound_convex (μ := μ) hE hφ hd a hR hWmeas hWconv haW hWsub
+  have hmain : ‖∫ y in W, I y ∂μ‖
+      ≤ R ^ d / d * ∫ z in W, ‖fderiv ℝ φ z‖ / dist a z ^ (d - 1) ∂μ := by
+    rw [← hReq, ← ENNReal.toReal_ofReal (by positivity : 0 ≤ R ^ d / d), ← ENNReal.toReal_mul]
+    refine (ENNReal.ofReal_le_iff_le_toReal
+      (ENNReal.mul_lt_top ENNReal.ofReal_lt_top hRl_lt).ne).1 ?_
+    calc ENNReal.ofReal ‖∫ y in W, I y ∂μ‖ ≤ ENNReal.ofReal (∫ y in W, ‖I y‖ ∂μ) :=
+          ENNReal.ofReal_le_ofReal (norm_integral_le_integral_norm _)
+      _ = ∫⁻ y in W, ‖I y‖ₑ ∂μ := ofReal_integral_norm_eq_lintegral_enorm (hint_of_cont hIcont)
+      _ ≤ ∫⁻ y in W, ∫⁻ t in Ioc (0 : ℝ) 1,
+            ‖fderiv ℝ φ (a + t • (y - a))‖ₑ * ‖y - a‖ₑ ∂volume ∂μ :=
+          lintegral_mono fun y => enorm_ray_integral_le a (y - a)
+      _ ≤ _ := hker
+  rw [norm_sub_rev,
+    oscillation_eq_average_ray_set hφ a hWmeas hWpos hWtop (hint_of_cont hφ.continuous),
+    setAverage_eq, norm_smul, norm_inv, Real.norm_of_nonneg measureReal_nonneg]
+  calc (μ.real W)⁻¹ * ‖∫ y in W, I y ∂μ‖
+      ≤ (μ.real W)⁻¹ * _ := mul_le_mul_of_nonneg_left hmain (by positivity)
+    _ = _ := by rw [← mul_assoc]; congr 1; ring
 
 end EllipticPdes.Embedding
