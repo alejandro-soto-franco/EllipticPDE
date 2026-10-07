@@ -654,6 +654,49 @@ private theorem integrable_uncurry_weak (g : EucL2 d) {ψ : EuclideanSpace ℝ (
       simpa [sub_eq_add_neg] using this
     rw [hzero, mul_zero, norm_zero]
 
+/-- The partial derivative of a smooth function commutes with a translation. -/
+private theorem partialD_sub_const (k : Fin d) {ζ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hζcd : ContDiff ℝ (⊤ : ℕ∞) ζ) (w x : EuclideanSpace ℝ (Fin d)) :
+    partialD k (fun y => ζ (y - w)) x = partialD k ζ (x - w) := by
+  have hτ : HasFDerivAt (fun y : EuclideanSpace ℝ (Fin d) => y - w)
+      (ContinuousLinearMap.id ℝ (EuclideanSpace ℝ (Fin d))) x := by
+    simpa using (hasFDerivAt_id x).sub_const w
+  have hcomp : HasFDerivAt (fun y => ζ (y - w))
+      ((fderiv ℝ ζ (x - w)).comp (ContinuousLinearMap.id ℝ _)) x :=
+    ((hζcd.differentiable (by simp)).differentiableAt.hasFDerivAt).comp x hτ
+  simp only [partialD, hcomp.fderiv, ContinuousLinearMap.comp_apply,
+    ContinuousLinearMap.id_apply]
+
+/-- The inner product against a translated class is the integral against the translated
+function. -/
+private theorem inner_transL2_neg_eq_integral (g' : EucL2 d)
+    {ζ : EuclideanSpace ℝ (Fin d) → ℝ} (hζ : MemLp ζ 2 volume) (w : EuclideanSpace ℝ (Fin d)) :
+    ⟪g', transL2 (-w) (hζ.toLp ζ)⟫ = ∫ x, g' x * ζ (x - w) := by
+  rw [L2.inner_def]
+  refine integral_congr_ae ?_
+  have hqmp : MeasureTheory.Measure.QuasiMeasurePreserving (· + (-w)) volume volume :=
+    (measurePreserving_add_right volume _).quasiMeasurePreserving
+  have hae : (fun x => hζ.toLp ζ (x + (-w))) =ᵐ[volume] fun x => ζ (x + (-w)) :=
+    hqmp.ae_eq_comp hζ.coeFn_toLp
+  filter_upwards [coeFn_transL2 (-w) (hζ.toLp ζ), hae] with x hx1 hx2
+  rw [RCLike.inner_apply, conj_trivial, hx1, hx2, sub_eq_add_neg]; ring
+
+/-- **The weak-derivative identity against a translated test function.** For `g` with `L²` weak
+`k`-derivative `g'` and a smooth compactly supported `ζ`, integrating `g` against the derivative
+of a translate of `ζ` gives minus the pairing of `g'` with the translate. -/
+private theorem integral_mul_partialD_sub_const (k : Fin d) (g g' : EucL2 d)
+    (hg : HasWeakDeriv k g g') {ζ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hζcd : ContDiff ℝ (⊤ : ℕ∞) ζ) (hζcs : HasCompactSupport ζ) (hζ : MemLp ζ 2 volume)
+    (w : EuclideanSpace ℝ (Fin d)) :
+    (∫ x, g x * partialD k ζ (x - w)) = -⟪g', transL2 (-w) (hζ.toLp ζ)⟫ := by
+  have hφtcd : ContDiff ℝ (⊤ : ℕ∞) (fun y => ζ (y - w)) :=
+    hζcd.comp (by fun_prop : ContDiff ℝ (⊤ : ℕ∞) fun y : EuclideanSpace ℝ (Fin d) => y - w)
+  have hφtcs : HasCompactSupport (fun y => ζ (y - w)) := by
+    simpa only [Function.comp_def, Homeomorph.coe_addRight, sub_eq_add_neg] using
+      hζcs.comp_homeomorph (Homeomorph.addRight (-w))
+  rw [inner_transL2_neg_eq_integral g' hζ w]
+  simpa only [partialD_sub_const k hζcd w] using hg _ hφtcd hφtcs
+
 /-- **Segment-integral representation of the difference quotient (weak derivative).** For `g`
 with `L²` weak `k`-derivative `g'` and a smooth compactly supported test function `ζ`, the inner
 product of `Dₖʰ g` against `ζ` is the `[0, 1]` integral of the inner products of `g'` against the
@@ -712,46 +755,11 @@ private theorem inner_diffQuot_eq_integral_smooth (k : Fin d) (g g' : EucL2 d)
     rw [← integral_integral_swap hInt]
     refine integral_congr_ae (Filter.Eventually.of_forall (fun x => ?_))
     exact (integral_const_mul _ _).symm
-  -- The weak-derivative identity for each translated test function.
-  have hpert : ∀ t : ℝ, (∫ x, g x * partialD k ζ (x - t • v))
-      = -⟪g', transL2 (-(t • v)) ζLp⟫ := by
-    intro t
-    set φt : EuclideanSpace ℝ (Fin d) → ℝ := fun y => ζ (y - t • v) with hφt
-    have hφtcd : ContDiff ℝ (⊤ : ℕ∞) φt :=
-      hζcd.comp (by fun_prop : ContDiff ℝ (⊤ : ℕ∞)
-        fun y : EuclideanSpace ℝ (Fin d) => y - t • v)
-    have hφtcs : HasCompactSupport φt := by
-      simpa only [hφt, Function.comp_def, Homeomorph.coe_addRight, sub_eq_add_neg] using
-        hζcs.comp_homeomorph (Homeomorph.addRight (-(t • v)))
-    have hpd : ∀ x, partialD k φt x = partialD k ζ (x - t • v) := by
-      intro x
-      have hτ : HasFDerivAt (fun y : EuclideanSpace ℝ (Fin d) => y - t • v)
-          (ContinuousLinearMap.id ℝ (EuclideanSpace ℝ (Fin d))) x := by
-        simpa using (hasFDerivAt_id x).sub_const (t • v)
-      have hcomp : HasFDerivAt φt
-          ((fderiv ℝ ζ (x - t • v)).comp (ContinuousLinearMap.id ℝ _)) x :=
-        ((hζcd.differentiable (by simp)).differentiableAt.hasFDerivAt).comp x hτ
-      simp only [partialD, hcomp.fderiv, ContinuousLinearMap.comp_apply,
-        ContinuousLinearMap.id_apply]
-    have hR : ⟪g', transL2 (-(t • v)) ζLp⟫ = ∫ x, g' x * ζ (x - t • v) := by
-      rw [L2.inner_def]
-      refine integral_congr_ae ?_
-      have hqmp : MeasureTheory.Measure.QuasiMeasurePreserving
-          (· + (-(t • v))) volume volume :=
-        (measurePreserving_add_right volume _).quasiMeasurePreserving
-      have hae : (fun x => ζLp (x + (-(t • v)))) =ᵐ[volume]
-          fun x => ζ (x + (-(t • v))) := hqmp.ae_eq_comp hζ.coeFn_toLp
-      filter_upwards [coeFn_transL2 (-(t • v)) ζLp, hae] with x hx1 hx2
-      rw [RCLike.inner_apply, conj_trivial, hx1, hx2, sub_eq_add_neg]; ring
-    calc ∫ x, g x * partialD k ζ (x - t • v)
-        = ∫ x, g x * partialD k φt x := by
-          refine integral_congr_ae (Filter.Eventually.of_forall (fun x => ?_)); simp only [hpd]
-      _ = -∫ x, g' x * φt x := hg φt hφtcd hφtcs
-      _ = -⟪g', transL2 (-(t • v)) ζLp⟫ := by rw [← hR]
   -- Assemble.
   rw [diffQuot_inner_adjoint k h g ζLp, hstep2, hswap,
     intervalIntegral.integral_congr
-      (g := fun t => -⟪g', transL2 (-(t • v)) ζLp⟫) (fun t _ => hpert t),
+      (g := fun t => -⟪g', transL2 (-(t • v)) ζLp⟫) (fun t _ =>
+        integral_mul_partialD_sub_const k g g' hg hζcd hζcs hζ (t • v)),
     intervalIntegral.integral_neg, neg_neg]
 
 /-- **Difference-quotient bound against a smooth compactly supported test element.** For `g` with
