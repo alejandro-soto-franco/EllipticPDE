@@ -726,6 +726,24 @@ theorem toNNReal_eLpNorm_le_sum_apply_single {Φ : EuclideanSpace ℝ (Fin d) �
 
 end Coordinates
 
+/-- **The gradient functional of a family in `Lᵖ`.** If every component of `g` is in `Lᵖ`
+(`1 ≤ p`), then `y ↦ gradCLM g y` is in `Lᵖ` and its seminorm is at most the sum of the
+component seminorms. -/
+theorem memLp_gradCLM_of_forall {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
+    {ν : Measure (EuclideanSpace ℝ (Fin d))} {p : ℝ≥0∞} (hp : 1 ≤ p)
+    (hg : ∀ k, MemLp (g k) p ν) :
+    MemLp (gradCLM g) p ν ∧ eLpNorm (gradCLM g) p ν ≤ ∑ k, eLpNorm (g k) p ν := by
+  have hm : AEStronglyMeasurable (gradCLM g) ν := by
+    rw [show gradCLM g = ∑ k, fun y => g k y • (EuclideanSpace.proj k :
+      EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ) from funext fun y => by simp [gradCLM]]
+    exact Finset.aestronglyMeasurable_sum Finset.univ fun k _ =>
+      (hg k).aestronglyMeasurable.smul_const _
+  have hb := eLpNorm_le_sum_eLpNorm_apply_single hm hp
+    fun k => by simpa using (hg k).aestronglyMeasurable
+  simp only [gradCLM_apply_single] at hb
+  exact ⟨memLp_iff.2 (hb.trans_lt (ENNReal.sum_lt_top.2 fun k _ => (hg k).eLpNorm_lt_top)), hb⟩
+
+
 
 /-- **`Lᵖ` seminorm of a derivative by its coordinate partials.** For a function with continuous
 derivative, the `Lᵖ` seminorm of `fderiv ℝ u` is at most the sum of the `Lᵖ` seminorms of the
@@ -882,21 +900,11 @@ theorem morrey_ball (hd : 0 < d) {p : ℝ} (hp : (d : ℝ) < p)
     exact h.locallyIntegrableOn
   have hw := (hasWeakGradOn_iff_hasWeakFDerivOn Metric.isOpen_ball hu.locallyIntegrableOn hgi).1
     hweak
-  have hG : ∀ k, MemLp (fun y => gradCLM g y (EuclideanSpace.single k (1 : ℝ))) (ENNReal.ofReal p)
-      (volume.restrict (Metric.ball c r)) := fun k => by simpa using hmemg k
-  have hGm : AEStronglyMeasurable (gradCLM g) (volume.restrict (Metric.ball c r)) := by
-    rw [show gradCLM g = ∑ k, fun y => g k y • (EuclideanSpace.proj k :
-      EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ) from funext fun y => by simp [gradCLM]]
-    exact Finset.aestronglyMeasurable_sum Finset.univ fun k _ =>
-      (hmemg k).aestronglyMeasurable.smul_const _
-  have hbound := toNNReal_eLpNorm_le_sum_apply_single hGm hp1 hG
-  simp only [gradCLM_apply_single] at hbound
-  have hGp : MemLp (gradCLM g) (ENNReal.ofReal p) (volume.restrict (Metric.ball c r)) :=
-    memLp_iff.2 ((eLpNorm_le_sum_eLpNorm_apply_single hGm hp1
-      fun k => (hG k).aestronglyMeasurable).trans_lt (ENNReal.sum_lt_top.mpr fun k _ =>
-      (hG k).eLpNorm_lt_top))
+  obtain ⟨hGp, hGb⟩ := memLp_gradCLM_of_forall hp1 hmemg
   obtain ⟨u', hu'ae, hu'H⟩ := hC u (gradCLM g) hu hGp hw
-  exact ⟨u', hu'ae, hu'H.mono_const (mul_le_mul_right hbound C)⟩
+  refine ⟨u', hu'ae, hu'H.mono_const (mul_le_mul_right ?_ C)⟩
+  rw [← ENNReal.toNNReal_sum fun k _ => (hmemg k).eLpNorm_lt_top.ne]
+  exact ENNReal.toNNReal_mono (ENNReal.sum_ne_top.2 fun k _ => (hmemg k).eLpNorm_lt_top.ne) hGb
 
 /-- At the exponent `2d` the Morrey exponent is `1/2`, whatever the dimension. -/
 theorem morreyExponent_two_mul (hd : 0 < d) : morreyExponent d (2 * (d : ℝ)) = (1 / 2 : ℝ≥0) := by

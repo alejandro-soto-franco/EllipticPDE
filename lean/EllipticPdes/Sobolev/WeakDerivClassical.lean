@@ -93,22 +93,20 @@ theorem tsupport_normed_sub_subset (ρ : ContDiffBump (0 : E)) (y : E) :
 variable {Ω : Opens E} {u : E → F} {G : E → E →L[ℝ] F}
 
 omit [CompleteSpace F] in
-/-- **The derivative of a mollification is the mollification of the derivative.** Let `u` and
-`G` be integrable on a measurable set `K`, and suppose the integration by parts identity
-`∫ ∂ᵥψ • u = -∫ ψ • G ⬝ v` holds against every `C^∞` function `ψ` with compact support in `K`.
+/-- **The derivative of a mollification is the mollification of the derivative.** Let the
+extensions by zero of `u` and `G` outside a set `K` be locally integrable, and suppose the
+integration by parts identity `∫ ∂ᵥψ • u = -∫ ψ • G v` holds against every `C^∞` function `ψ`
+with compact support in `K`.
 If the closed ball of radius `ρ.rOut` around `y` lies in `K`, then the mollification of the
 extension of `u` by zero outside `K` has derivative at `y` the mollification of the extension of
 `G`. -/
-theorem hasFDerivAt_convolution_of_forall_integral_eq {K : Set E} (hKm : MeasurableSet K)
-    (hu : IntegrableOn u K μ) (hG : IntegrableOn G K μ)
+theorem hasFDerivAt_convolution_of_forall_integral_eq {K : Set E}
+    (hu : LocallyIntegrable (K.indicator u) μ) (hG : LocallyIntegrable (K.indicator G) μ)
     (hw : ∀ (v : E) (ψ : E → ℝ), ContDiff ℝ (⊤ : ℕ∞) ψ → HasCompactSupport ψ → tsupport ψ ⊆ K →
       ∫ t, fderiv ℝ ψ t v • u t ∂μ = -∫ t, ψ t • G t v ∂μ)
     (ρ : ContDiffBump (0 : E)) {y : E} (hy : closedBall y ρ.rOut ⊆ K) :
     HasFDerivAt (ρ.normed μ ⋆[lsmul ℝ ℝ, μ] K.indicator u)
       ((ρ.normed μ ⋆[lsmul ℝ ℝ, μ] K.indicator G) y) y := by
-  have hui : LocallyIntegrable (K.indicator u) μ := (hu.integrable_indicator hKm).locallyIntegrable
-  have hGi : LocallyIntegrable (K.indicator G) μ :=
-    (IntegrableOn.integrable_indicator (ε' := E →L[ℝ] F) hG hKm).locallyIntegrable
   have hρd : ∀ n : ℕ∞, ContDiff ℝ n (ρ.normed μ) := fun n => ρ.contDiff_normed
   -- The bump reflected through `y`, a test function on `Ω`.
   set ψ : E → ℝ := fun t => ρ.normed μ (y - t) with hψ_def
@@ -127,7 +125,7 @@ theorem hasFDerivAt_convolution_of_forall_integral_eq {K : Set E} (hKm : Measura
     intro v
     rw [← convolution_flip, convolution_def, integral_apply
       ((ρ.hasCompactSupport_normed (μ := μ)).convolutionExists_right
-        (lsmul ℝ ℝ : ℝ →L[ℝ] (E →L[ℝ] F) →L[ℝ] E →L[ℝ] F).flip hGi (hρd 0).continuous y)]
+        (lsmul ℝ ℝ : ℝ →L[ℝ] (E →L[ℝ] F) →L[ℝ] E →L[ℝ] F).flip hG (hρd 0).continuous y)]
     refine integral_congr_ae (Eventually.of_forall fun t => ?_)
     simpa using congrArg (fun A : E →L[ℝ] F => A v)
       (smul_indicator_eq_of_tsupport_subset hψs G t)
@@ -143,9 +141,9 @@ theorem hasFDerivAt_convolution_of_forall_integral_eq {K : Set E} (hKm : Measura
     simp [hψd, h]
   rw [← convolution_flip]
   convert (ρ.hasCompactSupport_normed (μ := μ)).hasFDerivAt_convolution_right
-    (lsmul ℝ ℝ : ℝ →L[ℝ] F →L[ℝ] F).flip hui (hρd 1) y using 1
+    (lsmul ℝ ℝ : ℝ →L[ℝ] F →L[ℝ] F).flip hu (hρd 1) y using 1
   ext v
-  rw [hL, convolution_precompR_apply _ hui (ρ.hasCompactSupport_normed.fderiv ℝ)
+  rw [hL, convolution_precompR_apply _ hu (ρ.hasCompactSupport_normed.fderiv ℝ)
     ((hρd 1).continuous_fderiv one_ne_zero), hR, hw v ψ hψ hψc hψs,
     neg_neg]
 
@@ -160,7 +158,8 @@ theorem HasWeakFDerivOn.hasFDerivAt_convolution (hw : HasWeakFDerivOn Ω u G μ)
     (hG : IntegrableOn G K μ) (ρ : ContDiffBump (0 : E)) {y : E} (hy : closedBall y ρ.rOut ⊆ K) :
     HasFDerivAt (ρ.normed μ ⋆[lsmul ℝ ℝ, μ] K.indicator u)
       ((ρ.normed μ ⋆[lsmul ℝ ℝ, μ] K.indicator G) y) y :=
-  hasFDerivAt_convolution_of_forall_integral_eq hKm hu hG
+  hasFDerivAt_convolution_of_forall_integral_eq (hu.integrable_indicator hKm).locallyIntegrable
+    (IntegrableOn.integrable_indicator (ε' := E →L[ℝ] F) hG hKm).locallyIntegrable
     (fun v _ hψ hψc hψs => (hw v).integral_eq hψ hψc (hψs.trans hKΩ)) ρ hy
 
 omit [CompleteSpace F] [μ.IsAddHaarMeasure] in

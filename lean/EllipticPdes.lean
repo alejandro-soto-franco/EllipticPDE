@@ -98,6 +98,7 @@ public import EllipticPdes.Campanato.Compare
 public import EllipticPdes.Campanato.Telescope
 public import EllipticPdes.Campanato.Holder
 public import EllipticPdes.Campanato.Converse
+public import EllipticPdes.Embedding.WeakSobolev
 public import EllipticPdes.Embedding.GagliardoNirenberg
 public import EllipticPdes.Embedding.SobolevLadder
 public import EllipticPdes.Embedding.SobolevLadderCompactSupport
@@ -144,6 +145,7 @@ public import EllipticPdes.Analysis.WeakCompactness
 public import EllipticPdes.Analysis.DirectMethodForm
 public import EllipticPdes.Analysis.LpInterpolation
 public import EllipticPdes.Analysis.Dilation
+public import EllipticPdes.Analysis.SmoothCutoff
 public import EllipticPdes.Analysis.Mollifier
 public import EllipticPdes.Embedding.H01Sobolev
 public import EllipticPdes.Embedding.SobolevSolution

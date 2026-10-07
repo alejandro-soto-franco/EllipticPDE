@@ -8,6 +8,7 @@ module
 
 public import Mathlib.Analysis.Distribution.Distribution
 public import Mathlib.Analysis.Calculus.LineDeriv.IntegrationByParts
+public import EllipticPdes.Analysis.SmoothCutoff
 
 /-!
 # Weak derivatives
@@ -383,6 +384,52 @@ theorem hasWeakFDerivOn_fderiv (hu : ContDiffOn ℝ 1 u Ω) :
     (fun x _ => (hφ.differentiable (by simp) x).hasFDerivAt) fun x hx => hd x (hs hx)
   simp only [ContinuousLinearMap.lsmul_apply] at this
   rw [this, neg_neg]
+
+omit [BorelSpace E] [μ.IsAddHaarMeasure] in
+/-- **Extension by zero.** If `g` is the weak derivative of `u` along `v` on `Ω` and both vanish
+outside a compact subset `K` of `Ω`, then `g` is the weak derivative of `u` along `v` on the whole
+space. The test function is cut off by a smooth function equal to one near `K`. -/
+theorem HasWeakLineDerivOn.top_of_forall_notMem_eq_zero [CompleteSpace F]
+    (h : HasWeakLineDerivOn Ω v u g μ) {K : Set E} (hK : IsCompact K) (hKΩ : K ⊆ Ω)
+    (hu : ∀ x ∉ K, u x = 0) (hg : ∀ x ∉ K, g x = 0) : HasWeakLineDerivOn ⊤ v u g μ := by
+  obtain ⟨hui, hgi, hint⟩ := hasWeakLineDerivOn_iff.1 h
+  obtain ⟨L, hLc, hKL, hLΩ⟩ := exists_compact_between hK Ω.isOpen hKΩ
+  obtain ⟨χ, hχ, hχc, hχs, hχ1, -⟩ := exists_contDiff_one_on_compact hLc Ω.isOpen hLΩ
+  have hglob : ∀ {f : E → F}, LocallyIntegrableOn f Ω μ → (∀ x ∉ K, f x = 0) →
+      LocallyIntegrable f μ := fun {f} hf h0 =>
+    ((integrableOn_iff_integrable_of_support_subset (s := K) fun x hx =>
+      by_contra fun hxK => hx (h0 x hxK)).1
+      (hf.integrableOn_compact_subset hKΩ hK)).locallyIntegrable
+  refine hasWeakLineDerivOn_iff.2 ⟨locallyIntegrableOn_univ.2 (hglob hui hu),
+    locallyIntegrableOn_univ.2 (hglob hgi hg), fun φ hφ hφc _ => ?_⟩
+  have key := hint (fun x => χ x * φ x) (hχ.mul hφ) hχc.mul_right
+    ((tsupport_mul_subset_left (f := χ) (g := φ)).trans hχs)
+  have hnear : ∀ x ∈ K, (fun y => χ y * φ y) =ᶠ[nhds x] φ := fun x hx =>
+    Filter.eventually_of_mem (mem_interior_iff_mem_nhds.1 (hKL hx)) fun y hy => by
+      simp [hχ1 y hy]
+  have e1 : ∫ x, fderiv ℝ φ x v • u x ∂μ
+      = ∫ x, fderiv ℝ (fun y => χ y * φ y) x v • u x ∂μ :=
+    integral_congr_ae (Filter.Eventually.of_forall fun x => by
+      dsimp only
+      by_cases hx : x ∈ K
+      · rw [(hnear x hx).fderiv_eq]
+      · simp [hu x hx])
+  have e2 : ∫ x, φ x • g x ∂μ = ∫ x, (χ x * φ x) • g x ∂μ :=
+    integral_congr_ae (Filter.Eventually.of_forall fun x => by
+      dsimp only
+      by_cases hx : x ∈ K
+      · rw [hχ1 x (interior_subset (hKL hx)), one_mul]
+      · simp [hg x hx])
+  rw [e1, key, e2]
+
+omit [BorelSpace E] [μ.IsAddHaarMeasure] in
+/-- **Extension by zero for a weak Fréchet derivative.** If `G` is the weak Fréchet derivative of
+`u` on `Ω` and both vanish outside a compact subset `K` of `Ω`, then `G` is the weak Fréchet
+derivative of `u` on the whole space. -/
+theorem HasWeakFDerivOn.top_of_forall_notMem_eq_zero [CompleteSpace F]
+    (h : HasWeakFDerivOn Ω u G μ) {K : Set E} (hK : IsCompact K) (hKΩ : K ⊆ Ω)
+    (hu : ∀ x ∉ K, u x = 0) (hG : ∀ x ∉ K, G x = 0) : HasWeakFDerivOn ⊤ u G μ :=
+  fun v => (h v).top_of_forall_notMem_eq_zero hK hKΩ hu fun x hx => by simp [hG x hx]
 
 end Smooth
 
