@@ -140,6 +140,8 @@ public import EllipticPdes.Fredholm.FredholmComplete
 public import EllipticPdes.Fredholm.GardingForm
 public import EllipticPdes.Spectrum.CompactSpectrum
 public import EllipticPdes.Spectrum.GardingSigma
+public import EllipticPdes.Fredholm.DivForm
+public import EllipticPdes.Spectrum.DivForm
 public import EllipticPdes.Spectrum.SpectrumSigma
 public import EllipticPdes.Fredholm.Compactness
 public import EllipticPdes.Spectrum.Spectrum
