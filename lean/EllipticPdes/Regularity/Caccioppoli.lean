@@ -550,6 +550,81 @@ private lemma datum_term_le {Z C a b : ℝ} (hZ : 0 ≤ Z) (hC : 0 ≤ C) (ha : 
     mul_nonneg hZ (sq_nonneg b), mul_nonneg (mul_nonneg hZ hC) (sq_nonneg a),
     mul_nonneg (mul_nonneg hZ hC) (mul_nonneg ha hb)]
 
+/-- The coefficient of the linear term in the Caccioppoli inequality. -/
+private def caccioppoliβ (Op : FullEllipticOp d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    {ζ : EuclideanSpace ℝ (Fin d) → ℝ} (hζ : IsTestFn Ω ζ) : ℝ :=
+  (Op.Bsup * hζ.supNorm + 2 * Op.toEllipticCoeff.Λ * ∑ j : Fin d, hζ.partialSupNorm j)
+    * Real.sqrt d
+
+/-- The coefficient of the quadratic term in the Caccioppoli inequality. -/
+private def caccioppoliK₂ (Op : FullEllipticOp d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    {ζ : EuclideanSpace ℝ (Fin d) → ℝ} (hζ : IsTestFn Ω ζ) : ℝ :=
+  (isTestFn_mul hζ hζ).supNorm * (1 + Op.Csup)
+
+/-- The linear coefficient of the Caccioppoli inequality is nonnegative. -/
+private lemma caccioppoliβ_nonneg (Op : FullEllipticOp d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    {ζ : EuclideanSpace ℝ (Fin d) → ℝ} (hζ : IsTestFn Ω ζ) : 0 ≤ caccioppoliβ Op hζ := by
+  have := Op.Bsup_nonneg
+  have := Op.toEllipticCoeff.Λ_nonneg
+  have := hζ.supNorm_nonneg
+  have := hζ.sum_partialSupNorm_nonneg
+  unfold caccioppoliβ
+  positivity
+
+/-- The quadratic coefficient of the Caccioppoli inequality is nonnegative. -/
+private lemma caccioppoliK₂_nonneg (Op : FullEllipticOp d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    {ζ : EuclideanSpace ℝ (Fin d) → ℝ} (hζ : IsTestFn Ω ζ) : 0 ≤ caccioppoliK₂ Op hζ := by
+  have := Op.Csup_nonneg
+  have := (isTestFn_mul hζ hζ).supNorm_nonneg
+  unfold caccioppoliK₂
+  positivity
+
+/-- **Key inequality of the Caccioppoli estimate.** With `E` the cutoff-weighted gradient energy
+and `r`, `‖f‖` the data, `λ E ≤ β (‖f‖ + r) √E + K₂ (‖f‖ + r)²`. -/
+private lemma caccioppoli_key (Op : FullEllipticOp d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    {ζ : EuclideanSpace ℝ (Fin d) → ℝ} (hζ : IsTestFn Ω ζ) (U : H1amb Ω) (f : L2D Ω)
+    (hid : TestedIdentity Op hζ U f) :
+    Op.lam * Real.sqrt (∑ i : Fin d, ‖mulTest hζ (U i.succ)‖ ^ 2) ^ 2
+      ≤ caccioppoliβ Op hζ * (‖f‖ + ‖U 0‖) * Real.sqrt (∑ i : Fin d, ‖mulTest hζ (U i.succ)‖ ^ 2)
+        + caccioppoliK₂ Op hζ * (‖f‖ + ‖U 0‖) ^ 2 := by
+  have hlow := caccioppoli_lower_bound Op hζ U f hid
+  set r : ℝ := ‖U 0‖ with hr
+  set E : ℝ := ∑ i : Fin d, ‖mulTest hζ (U i.succ)‖ ^ 2 with hE
+  have hS : ∑ i : Fin d, ‖mulTest hζ (U i.succ)‖ ≤ Real.sqrt d * Real.sqrt E :=
+    sum_le_sqrt_card_mul_sqrt_sum_sq _
+  have hS0 : 0 ≤ ∑ i : Fin d, ‖mulTest hζ (U i.succ)‖ :=
+    Finset.sum_nonneg fun i _ => norm_nonneg _
+  have hζu0 : ‖mulTest hζ (U 0)‖ ≤ hζ.supNorm * r := norm_mulTest_le_supNorm _ _
+  have hζ2u0 : ‖mulTest (isTestFn_mul hζ hζ) (U 0)‖ ≤ (isTestFn_mul hζ hζ).supNorm * r :=
+    norm_mulTest_le_supNorm _ _
+  have hT1 : ⟪f, mulTest (isTestFn_mul hζ hζ) (U 0)⟫
+      ≤ (isTestFn_mul hζ hζ).supNorm * ‖f‖ * r :=
+    (real_inner_le_norm _ _).trans (by nlinarith only [hζ2u0, norm_nonneg f])
+  have hTb := (neg_sum_bAct_inner_le Op (fun i => mulTest hζ (U i.succ)) (mulTest hζ (U 0))).trans
+    (mul_le_mul_of_nonneg_left hζu0 (mul_nonneg Op.Bsup_nonneg hS0))
+  have hTc := (neg_cAct_inner_le Op (U 0) (mulTest (isTestFn_mul hζ hζ) (U 0))).trans
+    (mul_le_mul_of_nonneg_left hζ2u0 (mul_nonneg Op.Csup_nonneg (norm_nonneg _)))
+  have hTx := neg_cross_sum_le Op.toEllipticCoeff hζ (fun i => U i.succ) (U 0)
+  rw [Real.sq_sqrt (Finset.sum_nonneg fun i _ => sq_nonneg _)]
+  obtain ⟨hr0, hZ, hSW, hΛ⟩ : 0 ≤ r ∧ 0 ≤ hζ.supNorm ∧ 0 ≤ ∑ j : Fin d, hζ.partialSupNorm j ∧
+      0 ≤ Op.toEllipticCoeff.Λ :=
+    ⟨norm_nonneg _, hζ.supNorm_nonneg, hζ.sum_partialSupNorm_nonneg,
+      Op.toEllipticCoeff.Λ_nonneg⟩
+  have h1 : (Op.Bsup * hζ.supNorm + 2 * Op.toEllipticCoeff.Λ * ∑ j : Fin d, hζ.partialSupNorm j)
+      * r * ∑ i : Fin d, ‖mulTest hζ (U i.succ)‖
+      ≤ caccioppoliβ Op hζ * (‖f‖ + r) * Real.sqrt E := by
+    calc _ ≤ (Op.Bsup * hζ.supNorm + 2 * Op.toEllipticCoeff.Λ * ∑ j : Fin d, hζ.partialSupNorm j)
+            * r * (Real.sqrt d * Real.sqrt E) :=
+          mul_le_mul_of_nonneg_left hS (by have := Op.Bsup_nonneg; positivity)
+      _ = caccioppoliβ Op hζ * r * Real.sqrt E := by rw [caccioppoliβ]; ring
+      _ ≤ _ := mul_le_mul_of_nonneg_right
+          (mul_le_mul_of_nonneg_left (by linarith [norm_nonneg f]) (caccioppoliβ_nonneg Op hζ))
+          (Real.sqrt_nonneg E)
+  have h2 := datum_term_le (isTestFn_mul hζ hζ).supNorm_nonneg Op.Csup_nonneg
+    (norm_nonneg f) hr0
+  rw [caccioppoliK₂]
+  linarith only [hlow, hT1, hTb, hTc, hTx, h1, h2]
+
 /-- **Interior energy estimate for a tested identity.** If `U ∈ H¹` satisfies the weak identity
 against `ζ² U` (`TestedIdentity`), the cutoff-weighted gradient energy `(λ/2) ∑ᵢ ‖ζ Uᵢ‖²` is
 bounded by `C (‖f‖² + ‖U₀‖²)`. The constant is quantified before `U` and `f`, so it depends only
@@ -561,59 +636,21 @@ theorem caccioppoli_core (Op : FullEllipticOp d) {Ω : Set (EuclideanSpace ℝ (
     ∃ C : ℝ, 0 ≤ C ∧ ∀ (U : H1amb Ω) (f : L2D Ω), TestedIdentity Op hζ U f →
       Op.lam / 2 * ∑ i : Fin d, ‖mulTest hζ (U i.succ)‖ ^ 2
         ≤ C * (‖f‖ ^ 2 + ‖U 0‖ ^ 2) := by
-  classical
-  set A := Op.toEllipticCoeff with hA
-  have hZ := hζ.supNorm_nonneg
-  have hZ2 := (isTestFn_mul hζ hζ).supNorm_nonneg
-  have hSW := hζ.sum_partialSupNorm_nonneg
-  have hΛ := A.Λ_nonneg
-  have hlam := A.lam_pos
-  set β : ℝ := (Op.Bsup * hζ.supNorm + 2 * A.Λ * ∑ j : Fin d, hζ.partialSupNorm j)
-    * Real.sqrt d with hβ
-  set K₂ : ℝ := (isTestFn_mul hζ hζ).supNorm * (1 + Op.Csup) with hK₂
-  have hβ0 : 0 ≤ β := by have := Op.Bsup_nonneg; positivity
-  have hK₂0 : 0 ≤ K₂ := by have := Op.Csup_nonneg; positivity
-  refine ⟨2 * (β ^ 2 / (2 * A.lam) + K₂), by positivity, fun U f hid => ?_⟩
-  have hlow := caccioppoli_lower_bound Op hζ U f hid
-  set r : ℝ := ‖U 0‖ with hr
+  have hlam : 0 < Op.lam := Op.toEllipticCoeff.lam_pos
+  have hβ0 := caccioppoliβ_nonneg Op hζ
+  have hK₂0 := caccioppoliK₂_nonneg Op hζ
+  refine ⟨2 * (caccioppoliβ Op hζ ^ 2 / (2 * Op.lam) + caccioppoliK₂ Op hζ), by positivity,
+    fun U f hid => ?_⟩
+  have hC : 0 ≤ caccioppoliβ Op hζ ^ 2 / (2 * Op.lam) + caccioppoliK₂ Op hζ := by positivity
+  have habs := absorb_energy hlam (caccioppoli_key Op hζ U f hid)
   set E : ℝ := ∑ i : Fin d, ‖mulTest hζ (U i.succ)‖ ^ 2 with hE
-  have hE0 : 0 ≤ E := Finset.sum_nonneg fun i _ => sq_nonneg _
-  have hS : ∑ i : Fin d, ‖mulTest hζ (U i.succ)‖ ≤ Real.sqrt d * Real.sqrt E :=
-    sum_le_sqrt_card_mul_sqrt_sum_sq _
-  have hS0 : 0 ≤ ∑ i : Fin d, ‖mulTest hζ (U i.succ)‖ :=
-    Finset.sum_nonneg fun i _ => norm_nonneg _
-  have hζu0 : ‖mulTest hζ (U 0)‖ ≤ hζ.supNorm * r := norm_mulTest_le_supNorm _ _
-  have hζ2u0 : ‖mulTest (isTestFn_mul hζ hζ) (U 0)‖
-      ≤ (isTestFn_mul hζ hζ).supNorm * r :=
-    norm_mulTest_le_supNorm _ _
-  have hT1 : ⟪f, mulTest (isTestFn_mul hζ hζ) (U 0)⟫
-      ≤ (isTestFn_mul hζ hζ).supNorm * ‖f‖ * r :=
-    (real_inner_le_norm _ _).trans (by nlinarith only [hζ2u0, norm_nonneg f])
-  have hTb := (neg_sum_bAct_inner_le Op (fun i => mulTest hζ (U i.succ)) (mulTest hζ (U 0))).trans
-    (mul_le_mul_of_nonneg_left hζu0 (mul_nonneg Op.Bsup_nonneg hS0))
-  have hTc := (neg_cAct_inner_le Op (U 0) (mulTest (isTestFn_mul hζ hζ) (U 0))).trans
-    (mul_le_mul_of_nonneg_left hζ2u0 (mul_nonneg Op.Csup_nonneg (norm_nonneg _)))
-  have hTx := neg_cross_sum_le A hζ (fun i => U i.succ) (U 0)
-  have hkey : A.lam * Real.sqrt E ^ 2 ≤ β * (‖f‖ + r) * Real.sqrt E + K₂ * (‖f‖ + r) ^ 2 := by
-    rw [Real.sq_sqrt hE0]
-    have hr0 : 0 ≤ r := norm_nonneg _
-    have hf0 := norm_nonneg f
-    have h1 : (Op.Bsup * hζ.supNorm + 2 * A.Λ * ∑ j : Fin d, hζ.partialSupNorm j) * r
-        * ∑ i : Fin d, ‖mulTest hζ (U i.succ)‖ ≤ β * (‖f‖ + r) * Real.sqrt E := by
-      calc _ ≤ (Op.Bsup * hζ.supNorm + 2 * A.Λ * ∑ j : Fin d, hζ.partialSupNorm j) * r
-              * (Real.sqrt d * Real.sqrt E) :=
-            mul_le_mul_of_nonneg_left hS (by have := Op.Bsup_nonneg; positivity)
-        _ = β * r * Real.sqrt E := by rw [hβ]; ring
-        _ ≤ _ := mul_le_mul_of_nonneg_right
-            (mul_le_mul_of_nonneg_left (by linarith) hβ0) (Real.sqrt_nonneg E)
-    have h2 := datum_term_le hZ2 Op.Csup_nonneg hf0 hr0
-    linarith only [hlow, hT1, hTb, hTc, hTx, h1, h2]
-  have habs := absorb_energy hlam hkey
-  rw [Real.sq_sqrt hE0] at habs
-  have hN : (‖f‖ + r) ^ 2 ≤ 2 * (‖f‖ ^ 2 + r ^ 2) := by nlinarith only [sq_nonneg (‖f‖ - r)]
-  have hC : 0 ≤ β ^ 2 / (2 * A.lam) + K₂ := by positivity
+  rw [Real.sq_sqrt (Finset.sum_nonneg fun i _ => sq_nonneg _)] at habs
+  have hN : (‖f‖ + ‖U 0‖) ^ 2 ≤ 2 * (‖f‖ ^ 2 + ‖U 0‖ ^ 2) := by
+    nlinarith only [sq_nonneg (‖f‖ - ‖U 0‖)]
   calc _ ≤ _ := habs
-    _ ≤ (β ^ 2 / (2 * A.lam) + K₂) * (2 * (‖f‖ ^ 2 + r ^ 2)) := mul_le_mul_of_nonneg_left hN hC
+    _ ≤ (caccioppoliβ Op hζ ^ 2 / (2 * Op.lam) + caccioppoliK₂ Op hζ)
+          * (2 * (‖f‖ ^ 2 + ‖U 0‖ ^ 2)) :=
+        mul_le_mul_of_nonneg_left hN hC
     _ = _ := by ring
 
 /-- **Interior energy (Caccioppoli) estimate.** For a weak solution `u ∈ H₀¹(Ω)` of
