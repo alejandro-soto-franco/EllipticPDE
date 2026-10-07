@@ -156,6 +156,43 @@ EXEMPT = {
     ),
     "EllipticPdes.DivForm.FullEllipticOp.symmetric_spectral_of_bounded_haar": (
         "the theorem warranted at EllipticPdes.Sobolev.symmetric_fullElliptic_spectral, stated over a finite-dimensional real "
+    "EllipticPdes.H1Graph.mem_H01_of_hasCompactSupport": (
+        "the theorem warranted at EllipticPdes.Sobolev.mem_H01_of_hasCompactSupport, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.H1Graph.exists_mem_H01_posPart_sub_const": (
+        "the theorem warranted at EllipticPdes.Sobolev.exists_mem_H01_posPart_sub_const, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.H1Graph.exists_truncation_mem_H01": (
+        "the theorem warranted at EllipticPdes.Sobolev.exists_truncation_mem_H01, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.H1Graph.exists_eLpNorm_le_of_mem_H01": (
+        "the theorem warranted at EllipticPdes.Embedding.eLpNorm_le_of_mem_H01_of_isBounded, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.DivForm.FullEllipticOp.weak_maximum_principle": (
+        "the theorem warranted at EllipticPdes.Sobolev.weak_maximum_principle, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.DivForm.FullEllipticOp.weak_maximum_principle_H01": (
+        "the theorem warranted at EllipticPdes.Sobolev.weak_maximum_principle_H01, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.DivForm.FullEllipticOp.eq_zero_of_weakSolution_H01": (
+        "the theorem warranted at EllipticPdes.Sobolev.eq_zero_of_weakSolution_H01, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.DivForm.FullEllipticOp.weak_maximum_principle_transport": (
+        "the theorem warranted at EllipticPdes.Sobolev.weak_maximum_principle_transport, stated over a finite-dimensional real "
         "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
         "source states it in coordinates, so the warrant sits at the coordinate declaration"
     ),
