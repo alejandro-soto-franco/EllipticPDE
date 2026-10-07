@@ -20,6 +20,7 @@ public import EllipticPdes.Form.BilinearForm
 public import EllipticPdes.Form.Hneg
 public import EllipticPdes.Existence.Existence
 public import EllipticPdes.Form.GeneralForm
+public import EllipticPdes.Existence.FullOp
 public import EllipticPdes.Existence.Garding
 public import EllipticPdes.Regularity.Caccioppoli
 public import EllipticPdes.Regularity.InteriorCompactSupport
