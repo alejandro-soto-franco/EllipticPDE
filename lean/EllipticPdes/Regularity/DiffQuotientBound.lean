@@ -591,6 +591,15 @@ theorem weakDeriv_of_diffQuot_bounded (k : Fin d) (g : EucL2 d) (M : ℝ)
 
 /-! ### General weak-derivative direction-i bound -/
 
+/-- Almost every point of the product with a restriction has its second coordinate in the set. -/
+private theorem ae_snd_mem_prod_restrict {α β : Type*} [MeasurableSpace α] [MeasurableSpace β]
+    {μ : Measure α} [SFinite μ] {ν : Measure β} [SFinite ν] {t : Set β} (ht : MeasurableSet t) :
+    ∀ᵐ p ∂(μ.prod (ν.restrict t)), p.2 ∈ t := by
+  rw [ae_iff]
+  have hset : {p : α × β | p.2 ∉ t} = univ ×ˢ tᶜ := by ext p; simp
+  rw [hset, Measure.prod_prod, Measure.restrict_apply' ht, compl_inter_self, measure_empty,
+    mul_zero]
+
 /-- The uncurried product `(x, t) ↦ g(x) · ψ(x - t v)` of an `L²` class `g` with a translate
 of a continuous compactly supported `ψ` is integrable for the product of Lebesgue measure with
 the unit-interval slice. Off the compact slab `closedBall 0 (R + ‖v‖) × Icc 0 1` the translate
@@ -627,12 +636,7 @@ private theorem integrable_uncurry_weak (g : EucL2 d) {ψ : EuclideanSpace ℝ (
     exact (hψc.comp (by fun_prop : Continuous
       fun p : EuclideanSpace ℝ (Fin d) × ℝ => p.1 - p.2 • v)).aestronglyMeasurable
   -- Almost every point has `t ∈ Ioc 0 1`, where the slab support argument applies.
-  have htioc : ∀ᵐ p ∂ρ, p.2 ∈ Ioc (0 : ℝ) 1 := by
-    rw [ae_iff]
-    have hset : {p : EuclideanSpace ℝ (Fin d) × ℝ | p.2 ∉ Ioc (0 : ℝ) 1}
-        = univ ×ˢ (Ioc (0 : ℝ) 1)ᶜ := by ext p; simp
-    rw [hset, hρ, Measure.prod_prod, Measure.restrict_apply' measurableSet_Ioc,
-      compl_inter_self, measure_empty, mul_zero]
+  have htioc : ∀ᵐ p ∂ρ, p.2 ∈ Ioc (0 : ℝ) 1 := ae_snd_mem_prod_restrict measurableSet_Ioc
   refine Integrable.mono' hDint haesm ?_
   filter_upwards [htioc] with p hp
   by_cases hpB : p.1 ∈ B
