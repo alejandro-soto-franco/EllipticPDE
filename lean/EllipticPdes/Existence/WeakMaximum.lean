@@ -6,13 +6,15 @@ Authors: Alejandro Soto Franco
 
 module
 
+public import EllipticPdes.Existence.DivFormMaximum
 public import EllipticPdes.Existence.Garding
 public import EllipticPdes.Embedding.ChainRule
 public import EllipticPdes.Extension.GlobalApproximation
+public import EllipticPdes.Form.DivFormEuclidean
 public import EllipticPdes.Poincare.BoundedDomain
 
 /-!
-# Weak maximum principle
+# Weak maximum principle in coordinates
 
 A weak subsolution of a transport-free divergence-form equation with nonnegative zeroth-order
 coefficient is bounded above by its boundary values. The boundary inequality `u ≤ k on ∂Ω`
@@ -21,21 +23,19 @@ for a Sobolev class is read, following Gilbarg and Trudinger, as membership of `
 property, which is the inequality `sup_Ω u ≤ sup_∂Ω u⁺` between the essential supremum and
 the infimum of such `k`.
 
-The proof is the transport-free case the source singles out. Testing the subsolution
-inequality against `v = (u - k)⁺`, the zeroth-order term is nonnegative because `u v ≥ 0`, so
-the principal term is nonpositive. The weak gradient of `v` is the gradient of `u` where
-`u > k` and zero elsewhere, so the principal term is the energy of `v` itself, which
-ellipticity bounds below by the gradient norm. The gradient of `v` therefore vanishes, and the
-Poincaré inequality on `H₀¹` of a bounded domain makes `v` vanish.
-
-The subsolution inequality is taken against every nonnegative element of `H₀¹(Ω)`, which is
-the form the source uses in the proof, having extended the inequality from `C¹` test functions
-by density.
+The theorem is `EllipticPdes.DivForm.FullEllipticOp.weak_maximum_principle`, over a
+finite-dimensional inner product space. The coordinate statement here is its transport along
+`EllipticPdes.H1Graph.h1Equiv`: a coordinate operator is read as a divergence-form operator by
+`EllipticPdes.DivForm.FullEllipticOp.ofCoord`, and the bilinear pairing of a class `U` of `H¹`
+against an element of `H₀¹` is the sum of the pairings of the coordinates
+(`EllipticPdes.DivForm.FullEllipticOp.form_eq_sum`).
 
 ## Main declarations
 
 * `EllipticPdes.Sobolev.weak_maximum_principle`: the weak maximum principle for a
-  transport-free operator with nonnegative zeroth-order coefficient.
+  transport-free coordinate operator with nonnegative zeroth-order coefficient.
+* `EllipticPdes.DivForm.FullEllipticOp.form_eq_sum`: the full form of `ofCoord Op` on classes of
+  `H¹` is the coordinate sum.
 
 ## References
 
@@ -51,39 +51,134 @@ open scoped RealInnerProductSpace
 
 noncomputable section
 
-namespace EllipticPdes.Sobolev
+namespace EllipticPdes
+
+namespace DivForm
+
+variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))}
+
+/-- The components of the gradient part of `X` are the coordinates of `h1Equiv X`. -/
+lemma ae_gradL_h1Equiv (X : H1Graph volume Ω) :
+    ∀ᵐ x ∂(volume.restrict Ω), ∀ i : Fin d,
+      H1Graph.gradL X x i = (H1Graph.h1Equiv Ω X) i.succ x := by
+  refine ae_all_iff.2 fun i => ?_
+  have h := H1Graph.h1Equiv_apply_succ Ω X i
+  filter_upwards [ContinuousLinearMap.coeFn_compLp
+    (EuclideanSpace.proj (𝕜 := ℝ) i : EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ)
+    (H1Graph.gradL X)] with x hx
+  rw [h, hx]
+  rfl
+
+/-- The principal form of `ofCoord A` on classes of `H¹` is the coordinate sum. -/
+theorem EllipticCoeff.form_eq_sum (A : Sobolev.EllipticCoeff d) (X Y : H1Graph volume Ω) :
+    (EllipticCoeff.ofCoord A).form Ω X Y = ∑ i, ∑ j,
+      ⟪A.actL i j ((H1Graph.h1Equiv Ω X) i.succ), (H1Graph.h1Equiv Ω Y) j.succ⟫ := by
+  rw [EllipticCoeff.form_eq_integral]
+  have key : ∫ x in Ω, (⟪(EllipticCoeff.ofCoord A).a x (H1Graph.gradL X x),
+        H1Graph.gradL Y x⟫) =
+      ∫ x in Ω, (∑ i : Fin d, ∑ j : Fin d,
+        A.a x i j * ((H1Graph.h1Equiv Ω X) i.succ x : ℝ) *
+          ((H1Graph.h1Equiv Ω Y) j.succ x : ℝ)) := by
+    refine integral_congr_ae ?_
+    filter_upwards [ae_gradL_h1Equiv X, ae_gradL_h1Equiv Y] with x hX hY
+    rw [EllipticCoeff.inner_ofCoord_a]
+    simp only [hX, hY]
+  rw [key, integral_finsetSum _ (fun i _ => integrable_finsetSum _
+      (fun j _ => A.integrable_triple i j _ _))]
+  refine Finset.sum_congr rfl fun i _ => ?_
+  rw [integral_finsetSum _ (fun j _ => A.integrable_triple i j _ _)]
+  exact Finset.sum_congr rfl fun j _ => (A.inner_actL_eq i j _ _).symm
+
+/-- The lower-order form of `ofCoord Op` on classes of `H¹` is the coordinate sum. -/
+theorem FullEllipticOp.lowerForm_eq_sum (Op : Sobolev.FullEllipticOp d)
+    (X Y : H1Graph volume Ω) :
+    (FullEllipticOp.ofCoord Op).lowerForm Ω X Y =
+      (∑ i, ⟪Op.bAct i ((H1Graph.h1Equiv Ω X) i.succ), (H1Graph.h1Equiv Ω Y) 0⟫)
+        + ⟪Op.cAct ((H1Graph.h1Equiv Ω X) 0), (H1Graph.h1Equiv Ω Y) 0⟫ := by
+  have hb : ∀ i, ∀ᵐ x ∂(volume.restrict Ω), |Op.b x i| ≤ Op.Bsup :=
+    fun i => ae_restrict_of_ae (Op.b_bdd i)
+  have hc : ∀ᵐ x ∂(volume.restrict Ω), |Op.c x| ≤ Op.Csup := ae_restrict_of_ae Op.c_bdd
+  rw [FullEllipticOp.lowerForm_eq_integral]
+  simp only [Sobolev.FullEllipticOp.bAct, Sobolev.FullEllipticOp.cAct, Sobolev.inner_mulCoeffL_eq]
+  have key : ∫ x in Ω, (⟪(FullEllipticOp.ofCoord Op).b x, H1Graph.gradL X x⟫ *
+        H1Graph.fnL Y x + (FullEllipticOp.ofCoord Op).c x * H1Graph.fnL X x *
+        H1Graph.fnL Y x) =
+      ∫ x in Ω, (∑ i : Fin d, Op.b x i * ((H1Graph.h1Equiv Ω X) i.succ x : ℝ) *
+          ((H1Graph.h1Equiv Ω Y) 0 x : ℝ) +
+        Op.c x * ((H1Graph.h1Equiv Ω X) 0 x : ℝ) * ((H1Graph.h1Equiv Ω Y) 0 x : ℝ)) := by
+    refine integral_congr_ae ?_
+    filter_upwards [ae_gradL_h1Equiv X] with x hX
+    beta_reduce
+    rw [FullEllipticOp.inner_ofCoord_b Op x]
+    simp only [hX, Finset.sum_mul]
+    rfl
+  rw [key, integral_add (integrable_finsetSum _ fun i _ => integrable_mulCoeff (Op.b_meas i)
+      (hb i) _ _) (integrable_mulCoeff Op.c_meas hc _ _),
+    integral_finsetSum _ fun i _ => integrable_mulCoeff (Op.b_meas i) (hb i) _ _]
+
+/-- **The full form on classes of `H¹` is the coordinate sum.** The pairing of `ofCoord Op` on
+`h1Equiv.symm U` against `h1Equiv.symm V` is the sum of the principal, transport and
+zeroth-order pairings of the coordinates of `U` and `V`. -/
+theorem FullEllipticOp.form_eq_sum (Op : Sobolev.FullEllipticOp d) (U V : Sobolev.H1amb Ω) :
+    (FullEllipticOp.ofCoord Op).form Ω ((H1Graph.h1Equiv Ω).symm U)
+        ((H1Graph.h1Equiv Ω).symm V) =
+      (∑ i, ∑ j, ⟪Op.toEllipticCoeff.actL i j (U i.succ), V j.succ⟫)
+        + (∑ i, ⟪Op.bAct i (U i.succ), V 0⟫) + ⟪Op.cAct (U 0), V 0⟫ := by
+  rw [FullEllipticOp.form_apply, FullEllipticOp.ofCoord_toEllipticCoeff,
+    EllipticCoeff.form_eq_sum, FullEllipticOp.lowerForm_eq_sum]
+  simp only [LinearIsometryEquiv.apply_symm_apply, add_assoc]
+
+/-- The function part of `h1Equiv.symm U` is the coordinate `0` of `U`. -/
+lemma fnL_h1Equiv_symm (U : Sobolev.H1amb Ω) :
+    H1Graph.fnL ((H1Graph.h1Equiv Ω).symm U) = U 0 := by
+  rw [← H1Graph.h1Equiv_apply_zero, LinearIsometryEquiv.apply_symm_apply]
+
+/-- A class of `W^{1,2}` in coordinates is a class of `W^{1,2}` of the graph space. -/
+lemma h1Equiv_symm_mem_W12 {U : Sobolev.H1amb Ω} (hU : U ∈ Sobolev.W12 Ω) :
+    (H1Graph.h1Equiv Ω).symm U ∈ H1Graph.W12 volume Ω := by
+  rw [← H1Graph.h1Equiv_mem_W12_iff, LinearIsometryEquiv.apply_symm_apply]
+  exact hU
+
+/-- **The coordinate subsolution inequality is the divergence-form one.** -/
+theorem FullEllipticOp.form_le_zero_of_coord (Op : Sobolev.FullEllipticOp d)
+    {U : Sobolev.H1amb Ω}
+    (hsub : ∀ V : Sobolev.H01 Ω, (∀ᵐ x ∂(volume.restrict Ω), 0 ≤ ((V : Sobolev.H1amb Ω) 0 x : ℝ)) →
+      (∑ i, ∑ j, ⟪Op.toEllipticCoeff.actL i j (U i.succ), (V : Sobolev.H1amb Ω) j.succ⟫)
+        + (∑ i, ⟪Op.bAct i (U i.succ), (V : Sobolev.H1amb Ω) 0⟫)
+        + ⟪Op.cAct (U 0), (V : Sobolev.H1amb Ω) 0⟫ ≤ 0)
+    (V : H1Graph.H01 volume Ω)
+    (hV : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ H1Graph.fnL (V : H1Graph volume Ω) x) :
+    (FullEllipticOp.ofCoord Op).form Ω ((H1Graph.h1Equiv Ω).symm U) V ≤ 0 := by
+  set W : Sobolev.H01 Ω := (H1Graph.h01Equiv Ω).symm V with hW
+  have hWV : H1Graph.h01Equiv Ω W = V := LinearIsometryEquiv.apply_symm_apply _ _
+  have e1 : (H1Graph.h1Equiv Ω).symm (W : Sobolev.H1amb Ω) = (V : H1Graph volume Ω) := by
+    rw [LinearIsometryEquiv.symm_apply_eq]
+    have := H1Graph.h1Equiv_h01Equiv Ω W
+    rwa [hWV] at this
+  have h := hsub W (by
+    filter_upwards [hV, ae_fnL_h01Equiv Ω W] with x h1 h2
+    rw [hWV] at h2
+    rwa [← h2])
+  rwa [← FullEllipticOp.form_eq_sum, e1] at h
+
+/-- **The boundary condition in coordinates is the one of the graph space.** -/
+theorem exists_fnL_eq_max_of_coord {U : Sobolev.H1amb Ω} {k : ℝ}
+    (hbd : ∃ V : Sobolev.H01 Ω, ((V : Sobolev.H1amb Ω) 0 : EuclideanSpace ℝ (Fin d) → ℝ)
+      =ᵐ[volume.restrict Ω] fun x => max ((U 0 x : ℝ) - k) 0) :
+    ∃ V : H1Graph.H01 volume Ω, ⇑(H1Graph.fnL (V : H1Graph volume Ω)) =ᵐ[volume.restrict Ω]
+      fun x => max (H1Graph.fnL ((H1Graph.h1Equiv Ω).symm U) x - k) 0 := by
+  obtain ⟨V₀, hV₀⟩ := hbd
+  refine ⟨H1Graph.h01Equiv Ω V₀, ?_⟩
+  filter_upwards [ae_fnL_h01Equiv Ω V₀, hV₀] with x h1 h2
+  rw [h1, h2, fnL_h1Equiv_symm]
+
+end DivForm
+
+namespace Sobolev
 
 open EllipticPdes.Embedding EllipticPdes.Extension EllipticPdes.Poincare
 
 variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))}
-
-/-- If `V` and `0` agree almost everywhere and `V` is the truncation `(u - k)⁺`, then `u ≤ k`
-almost everywhere. -/
-theorem ae_le_of_ae_eq_max_sub_of_ae_eq_zero {α : Type*} {mα : MeasurableSpace α}
-    {μ : Measure α} {u V : α → ℝ} {k : ℝ} (hV : V =ᵐ[μ] fun x => max (u x - k) 0)
-    (hzero : V =ᵐ[μ] 0) : ∀ᵐ x ∂μ, u x ≤ k := by
-  filter_upwards [hV, hzero] with x hx hx0
-  rw [hx0, Pi.zero_apply] at hx
-  by_contra hlt
-  rw [max_eq_left (by linarith [not_le.mp hlt])] at hx
-  linarith [not_le.mp hlt]
-
-/-- The zeroth-order pairing of a subsolution with its truncation is nonnegative when
-`c ≥ 0` and `k ≥ 0`. -/
-theorem inner_cAct_truncation_nonneg {Op : FullEllipticOp d}
-    (hc : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), 0 ≤ Op.c x) {U V : H1amb Ω}
-    {k : ℝ} (hk : 0 ≤ k)
-    (hV0 : ((V : H1amb Ω) 0 : EuclideanSpace ℝ (Fin d) → ℝ)
-      =ᵐ[volume.restrict Ω] fun x => max ((U 0 x : ℝ) - k) 0) :
-    0 ≤ ⟪Op.cAct (U 0), (V : H1amb Ω) 0⟫ := by
-  simp only [FullEllipticOp.cAct, inner_mulCoeffL_eq]
-  refine integral_nonneg_of_ae ?_
-  filter_upwards [ae_restrict_of_ae hc, hV0] with x hcx hx
-  rw [hx]
-  simp only [Pi.zero_apply]
-  by_cases hxk : k < (U 0 x : ℝ)
-  · exact mul_nonneg (mul_nonneg hcx (hk.trans hxk.le)) (le_max_right _ _)
-  · rw [max_eq_right (by linarith [not_lt.mp hxk]), mul_zero]
 
 /-- **Weak maximum principle** (Gilbarg and Trudinger Theorem 8.1, in the transport-free
 case). Let `Ω` be a bounded open set, `L` a divergence-form operator with no transport term and
@@ -103,82 +198,13 @@ theorem weak_maximum_principle (hd : 0 < d) (hΩopen : IsOpen Ω)
     (hbd : ∃ V : H01 Ω, ((V : H1amb Ω) 0 : EuclideanSpace ℝ (Fin d) → ℝ)
       =ᵐ[volume.restrict Ω] fun x => max ((U 0 x : ℝ) - k) 0) :
     ∀ᵐ x ∂(volume.restrict Ω), (U 0 x : ℝ) ≤ k := by
-  classical
-  obtain ⟨n, rfl⟩ : ∃ n, d = n + 1 := ⟨d - 1, by omega⟩
-  have : IsFiniteMeasure (volume.restrict Ω) := isFiniteMeasure_restrict_of_isBounded hΩb
-  obtain ⟨V, hV0⟩ := hbd
-  -- the class and its weak gradient
-  set u : EuclideanSpace ℝ (Fin (n + 1)) → ℝ := fun x => (U 0 x : ℝ) with hudef
-  set g : Fin (n + 1) → EuclideanSpace ℝ (Fin (n + 1)) → ℝ :=
-    fun i x => (U i.succ x : ℝ) with hgdef
-  have hwg : HasWeakGradOn Ω u g := hasWeakGradOn_of_mem_W12 hU
-  have huint : IntegrableOn u Ω volume := (Lp.memLp (U 0)).integrable one_le_two
-  have hgint : ∀ i, IntegrableOn (g i) Ω volume := fun i =>
-    (Lp.memLp (U i.succ)).integrable one_le_two
-  have hum : Measurable u := (Lp.stronglyMeasurable (U 0)).measurable
-  -- the truncation and its weak gradient
-  set w : EuclideanSpace ℝ (Fin (n + 1)) → ℝ := fun x => max (u x - k) 0 with hwdef
-  set h : Fin (n + 1) → EuclideanSpace ℝ (Fin (n + 1)) → ℝ :=
-    fun i x => if k < u x then g i x else 0 with hhdef
-  have hw : HasWeakGradOn Ω w h :=
-    hasWeakGradOn_posPart_sub_const hΩopen huint.locallyIntegrableOn
-      (fun i => (hgint i).locallyIntegrableOn) hwg k
-  have hS : MeasurableSet {x | k < u x} := measurableSet_lt measurable_const hum
-  have hhint : ∀ i, IntegrableOn (h i) Ω volume := fun i => by
-    have : h i = {x | k < u x}.indicator (g i) := by
-      funext x
-      simp only [hhdef, Set.indicator_apply, Set.mem_ofPred_eq]
-    rw [this]
-    exact (hgint i).indicator hS
-  -- `V` is the truncation together with its gradient
-  have hVW : (V : H1amb Ω) ∈ W12 Ω := H01_le_W12 Ω V.2
-  have hwgV' : HasWeakGradOn Ω w fun i x => ((V : H1amb Ω) i.succ x : ℝ) :=
-    (hasWeakGradOn_of_mem_W12 hVW).congr_ae hV0 fun _ => EventuallyEq.rfl
-  have hVgrad : ∀ i, (fun x => ((V : H1amb Ω) i.succ x : ℝ)) =ᵐ[volume.restrict Ω] h i :=
-    fun i => hasWeakGradOn_unique_ae hΩopen hΩopen.measurableSet
-      (fun i => (Lp.memLp ((V : H1amb Ω) i.succ)).integrable one_le_two) hhint hwgV' hw i
-  -- the test is nonnegative
-  have hVnn : ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ ((V : H1amb Ω) 0 x : ℝ) := by
-    filter_upwards [hV0] with x hx
-    rw [hx]
-    exact le_max_right _ _
-  have hineq := hsub V hVnn
-  -- the transport term vanishes
-  have hbsum : (∑ i, ⟪Op.bAct i (U i.succ), (V : H1amb Ω) 0⟫) = 0 := by
-    refine Finset.sum_eq_zero fun i _ => ?_
-    simp only [FullEllipticOp.bAct, inner_mulCoeffL_eq, hb, zero_mul, integral_zero]
-  -- the zeroth-order term is nonnegative
-  have hcterm : 0 ≤ ⟪Op.cAct (U 0), (V : H1amb Ω) 0⟫ :=
-    inner_cAct_truncation_nonneg hc hk hV0
-  -- the principal term is the energy of `V`
-  have hprin : (∑ i, ∑ j, ⟪Op.toEllipticCoeff.actL i j (U i.succ), (V : H1amb Ω) j.succ⟫)
-      = Op.toEllipticCoeff.bilin Ω V V := by
-    rw [EllipticCoeff.bilin_apply]
-    refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
-    rw [EllipticCoeff.inner_actL_eq, EllipticCoeff.inner_actL_eq]
-    refine integral_congr_ae ?_
-    filter_upwards [hVgrad i, hVgrad j] with x hi hj
-    have hi' : ((V : H1amb Ω) i.succ x : ℝ) = h i x := hi
-    have hj' : ((V : H1amb Ω) j.succ x : ℝ) = h j x := hj
-    rw [hi', hj']
-    simp only [hhdef, hgdef]
-    split_ifs <;> simp
-  rw [hprin, hbsum, add_zero] at hineq
-  have henergy := Op.toEllipticCoeff.bilin_self_ge V
-  have hS0 : ∑ i : Fin (n + 1), ‖(V : H1amb Ω) i.succ‖ ^ 2 ≤ 0 := by
-    have hlam := Op.lam_pos
-    have : Op.lam * ∑ i : Fin (n + 1), ‖(V : H1amb Ω) i.succ‖ ^ 2 ≤ Op.lam * 0 := by
-      rw [mul_zero]; linarith
-    exact le_of_mul_le_mul_left this hlam
-  -- Poincaré forces the truncation to vanish
-  obtain ⟨C, hC, hpoin⟩ := poincare_H01_of_bounded hΩb
-  have hV0norm : ‖(V : H1amb Ω) 0‖ ^ 2 ≤ 0 := (hpoin V V.2).trans (by nlinarith)
-  have hV0zero : (V : H1amb Ω) 0 = 0 := by
-    have : ‖(V : H1amb Ω) 0‖ = 0 := by nlinarith [norm_nonneg ((V : H1amb Ω) 0)]
-    exact norm_eq_zero.mp this
-  have hzero : ((V : H1amb Ω) 0 : EuclideanSpace ℝ (Fin (n + 1)) → ℝ)
-      =ᵐ[volume.restrict Ω] 0 := by
-    rw [hV0zero]; exact Lp.coeFn_zero _ _ _
-  exact ae_le_of_ae_eq_max_sub_of_ae_eq_zero hV0 hzero
+  have : Nonempty (Fin d) := Fin.pos_iff_nonempty.1 hd
+  have := DivForm.FullEllipticOp.weak_maximum_principle (DivForm.FullEllipticOp.ofCoord Op)
+    hΩopen hΩb (fun x => by ext i; simp [DivForm.FullEllipticOp.ofCoord, hb]) hc
+    (DivForm.h1Equiv_symm_mem_W12 hU) (DivForm.FullEllipticOp.form_le_zero_of_coord Op hsub) hk
+    (DivForm.exists_fnL_eq_max_of_coord hbd)
+  simpa only [DivForm.fnL_h1Equiv_symm] using this
 
-end EllipticPdes.Sobolev
+end Sobolev
+
+end EllipticPdes

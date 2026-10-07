@@ -417,6 +417,14 @@ assert_classical_axioms
   EllipticPdes.DivForm.FullEllipticOp.existence_three_of_bounded
   EllipticPdes.DivForm.FullEllipticOp.resolvent_bound_of_bounded
   EllipticPdes.DivForm.FullEllipticOp.symmetric_spectral_of_bounded
+  EllipticPdes.H1Graph.mem_H01_of_hasCompactSupport
+  EllipticPdes.H1Graph.exists_mem_H01_posPart_sub_const
+  EllipticPdes.H1Graph.exists_truncation_mem_H01
+  EllipticPdes.H1Graph.exists_eLpNorm_le_of_mem_H01
+  EllipticPdes.DivForm.FullEllipticOp.weak_maximum_principle
+  EllipticPdes.DivForm.FullEllipticOp.weak_maximum_principle_H01
+  EllipticPdes.DivForm.FullEllipticOp.eq_zero_of_weakSolution_H01
+  EllipticPdes.DivForm.FullEllipticOp.weak_maximum_principle_transport
   EllipticPdes.Classical.hopf_lemma
   EllipticPdes.Classical.nondivOperator.weak_maximum_principle
   EllipticPdes.Classical.nondivOperator.comparison_principle

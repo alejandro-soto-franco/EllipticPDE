@@ -203,6 +203,9 @@ public import EllipticPdes.Existence.DivFormExistence
 public import EllipticPdes.Poincare.GraphBounded
 public import EllipticPdes.Form.DivFormEuclidean
 public import EllipticPdes.Sobolev.GraphLimits
+public import EllipticPdes.Sobolev.GraphLattice
+public import EllipticPdes.Existence.DivFormMaximum
+public import EllipticPdes.Existence.DivFormMaximumTransport
 public import EllipticPdes.Sobolev.WeakDeriv
 public import EllipticPdes.Sobolev.WeakDerivClassical
 
