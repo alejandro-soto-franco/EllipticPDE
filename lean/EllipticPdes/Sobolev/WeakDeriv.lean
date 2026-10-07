@@ -389,7 +389,7 @@ omit [BorelSpace E] [μ.IsAddHaarMeasure] in
 /-- **Extension by zero.** If `g` is the weak derivative of `u` along `v` on `Ω` and both vanish
 outside a compact subset `K` of `Ω`, then `g` is the weak derivative of `u` along `v` on the whole
 space. The test function is cut off by a smooth function equal to one near `K`. -/
-theorem HasWeakLineDerivOn.top_of_forall_notMem_eq_zero [CompleteSpace F]
+theorem HasWeakLineDerivOn.top_of_forall_notMem_eq_zero
     (h : HasWeakLineDerivOn Ω v u g μ) {K : Set E} (hK : IsCompact K) (hKΩ : K ⊆ Ω)
     (hu : ∀ x ∉ K, u x = 0) (hg : ∀ x ∉ K, g x = 0) : HasWeakLineDerivOn ⊤ v u g μ := by
   obtain ⟨hui, hgi, hint⟩ := hasWeakLineDerivOn_iff.1 h
@@ -426,7 +426,7 @@ omit [BorelSpace E] [μ.IsAddHaarMeasure] in
 /-- **Extension by zero for a weak Fréchet derivative.** If `G` is the weak Fréchet derivative of
 `u` on `Ω` and both vanish outside a compact subset `K` of `Ω`, then `G` is the weak Fréchet
 derivative of `u` on the whole space. -/
-theorem HasWeakFDerivOn.top_of_forall_notMem_eq_zero [CompleteSpace F]
+theorem HasWeakFDerivOn.top_of_forall_notMem_eq_zero
     (h : HasWeakFDerivOn Ω u G μ) {K : Set E} (hK : IsCompact K) (hKΩ : K ⊆ Ω)
     (hu : ∀ x ∉ K, u x = 0) (hG : ∀ x ∉ K, G x = 0) : HasWeakFDerivOn ⊤ u G μ :=
   fun v => (h v).top_of_forall_notMem_eq_zero hK hKΩ hu fun x hx => by simp [hG x hx]
