@@ -262,32 +262,17 @@ theorem exists_rayleigh_minimiser_on (hco : IsCoercive B) (hsymm : ∀ U W : V, 
     ∃ U : V, ‖emb U‖ = 1 ∧ U ∈ S ∧ B U U = eigenvalueOn emb B S := by
   obtain ⟨C, hC, hcoer⟩ := id hco
   have hbdd : BddBelow (rayleighValuesOn emb B S) := rayleighValuesOn_bddBelow emb hco S
-  have hnonempty : (rayleighValuesOn emb B S).Nonempty := hne.image _
   -- A minimising sequence.
-  have hchoice : ∀ n : ℕ, ∃ U : V,
-      (‖emb U‖ = 1 ∧ U ∈ S) ∧ B U U < eigenvalueOn emb B S + 1 / ((n : ℝ) + 1) := by
-    intro n
-    have hlt : eigenvalueOn emb B S < eigenvalueOn emb B S + 1 / ((n : ℝ) + 1) := by
-      have : (0 : ℝ) < 1 / ((n : ℝ) + 1) := by positivity
-      linarith
-    obtain ⟨r, hr, hrlt⟩ := exists_lt_of_csInf_lt hnonempty hlt
-    obtain ⟨U, hU, rfl⟩ := hr
-    exact ⟨U, hU, hrlt⟩
-  choose U hUmem hUlt using hchoice
+  obtain ⟨r, hrmono, hrlim, hrmem⟩ := exists_seq_tendsto_sInf (hne.image _) hbdd
+  choose U hUmem hUval using hrmem
   have hUs : ∀ n, ‖emb (U n)‖ = 1 := fun n => (hUmem n).1
   have hUS : ∀ n, U n ∈ S := fun n => (hUmem n).2
-  have hUB : ∀ n, B (U n) (U n) < eigenvalueOn emb B S + 1 := by
-    intro n
-    have h1 : (1 : ℝ) / ((n : ℝ) + 1) ≤ 1 := by
-      rw [div_le_one (by positivity)]
-      linarith [Nat.cast_nonneg (α := ℝ) n]
-    linarith [hUlt n]
-  set M : ℝ := Real.sqrt ((eigenvalueOn emb B S + 1) / C) with hMdef
+  set M : ℝ := Real.sqrt (r 0 / C) with hMdef
   have hMbound : ∀ n, ‖U n‖ ≤ M := by
     intro n
-    have h2 : ‖U n‖ ^ 2 ≤ (eigenvalueOn emb B S + 1) / C := by
+    have h2 : ‖U n‖ ^ 2 ≤ r 0 / C := by
       rw [le_div_iff₀ hC]
-      nlinarith [hcoer (U n), hUB n]
+      nlinarith [hcoer (U n), hrmono (Nat.zero_le n), hUval n]
     calc ‖U n‖ = Real.sqrt (‖U n‖ ^ 2) := (Real.sqrt_sq (norm_nonneg _)).symm
       _ ≤ M := Real.sqrt_le_sqrt h2
   -- Weak compactness.
@@ -323,14 +308,7 @@ theorem exists_rayleigh_minimiser_on (hco : IsCoercive B) (hsymm : ∀ U W : V, 
   have hwS : w ∈ S := hSclosed (fun k => U (φ k)) w (fun k => hUS (φ k)) hweak
   -- Weak lower semicontinuity of the form.
   have hBUU : Tendsto (fun n => B (U n) (U n)) atTop (𝓝 (eigenvalueOn emb B S)) := by
-    refine tendsto_of_tendsto_of_tendsto_of_le_of_le (g := fun _ : ℕ => eigenvalueOn emb B S)
-      (h := fun n => eigenvalueOn emb B S + 1 / ((n : ℝ) + 1)) tendsto_const_nhds ?_
-      (fun n => csInf_le hbdd ⟨U n, hUmem n, rfl⟩) (fun n => (hUlt n).le)
-    have hzero : Tendsto (fun n : ℕ => 1 / ((n : ℝ) + 1)) atTop (𝓝 0) :=
-      tendsto_one_div_add_atTop_nhds_zero_nat
-    have hsum : Tendsto (fun n : ℕ => eigenvalueOn emb B S + 1 / ((n : ℝ) + 1)) atTop
-        (𝓝 (eigenvalueOn emb B S + 0)) := tendsto_const_nhds.add hzero
-    rwa [add_zero] at hsum
+    simpa only [hUval, eigenvalueOn, rayleighValuesOn] using hrlim
   have hlsc : B w w ≤ eigenvalueOn emb B S := by
     refine bilin_le_of_weakLimit hco hsymm hweak ?_
     simpa [Function.comp_def] using hBUU.comp hφ.tendsto_atTop
