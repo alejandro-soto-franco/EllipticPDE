@@ -241,6 +241,24 @@ theorem nondivOperator_neg (A : E → E →L[ℝ] E) (b : E → E) (c : E → �
   simp only [nondivOperator_const, mul_zero, zero_add, neg_mul, one_mul] at h
   simpa using h
 
+/-- The operator on a difference. -/
+theorem nondivOperator_sub (A : E → E →L[ℝ] E) (b : E → E) (c : E → ℝ) {u v : E → ℝ} {x : E}
+    (hu : ContDiffAt ℝ 2 u x) (hv : ContDiffAt ℝ 2 v x) :
+    nondivOperator A b c (fun y => u y - v y) x
+      = nondivOperator A b c u x - nondivOperator A b c v x := by
+  have h := nondivOperator_add_smul A b c hu hv (-1)
+  have e : (fun y => u y + (-1) * v y) = fun y => u y - v y := by ext; ring
+  rw [e] at h
+  rw [h]
+  ring
+
+/-- The operator at a point depends only on the germ of the function. -/
+theorem nondivOperator_congr_of_eventuallyEq (A : E → E →L[ℝ] E) (b : E → E) (c : E → ℝ)
+    {u v : E → ℝ} {x : E} (h : u =ᶠ[𝓝 x] v) :
+    nondivOperator A b c u x = nondivOperator A b c v x := by
+  simp only [nondivOperator, traceHessian_eq_sum_iteratedFDeriv (stdOrthonormalBasis ℝ E),
+    h.fderiv_eq, h.eq_of_nhds, (h.iteratedFDeriv ℝ 2).eq_of_nhds]
+
 /-- Changing the zeroth-order coefficient changes the operator by the difference times the
 function. -/
 theorem nondivOperator_congr_zeroth (A : E → E →L[ℝ] E) (b : E → E) (c c' : E → ℝ) (u : E → ℝ)
