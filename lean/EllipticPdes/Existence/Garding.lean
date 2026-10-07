@@ -6,7 +6,10 @@ Authors: Alejandro Soto Franco
 
 module
 
+public import EllipticPdes.Existence.DivFormExistence
 public import EllipticPdes.Existence.FullOp
+public import EllipticPdes.Form.DivFormEuclidean
+public import EllipticPdes.Form.DivFormGarding
 public import EllipticPdes.Form.GeneralForm
 public import EllipticPdes.Poincare.BoxSlice
 public import EllipticPdes.Poincare.BoundedDomain
@@ -48,14 +51,8 @@ variable {d : ℕ}
 
 /-- The Peter-Paul (Young) inequality `B x y ≤ (λ/2) x² + (B²/2λ) y²` for `λ > 0`. -/
 lemma young_peterPaul {lam B x y : ℝ} (hlam : 0 < lam) :
-    B * x * y ≤ lam / 2 * x ^ 2 + B ^ 2 / (2 * lam) * y ^ 2 := by
-  have hl : lam ≠ 0 := hlam.ne'
-  have h2l : (0 : ℝ) < 2 * lam := by linarith
-  rw [← sub_nonneg]
-  have key : lam / 2 * x ^ 2 + B ^ 2 / (2 * lam) * y ^ 2 - B * x * y
-      = (lam * x - B * y) ^ 2 / (2 * lam) := by field_simp; ring
-  rw [key]
-  exact div_nonneg (sq_nonneg _) h2l.le
+    B * x * y ≤ lam / 2 * x ^ 2 + B ^ 2 / (2 * lam) * y ^ 2 :=
+  DivForm.young_peterPaul hlam
 
 namespace FullEllipticOp
 
@@ -66,56 +63,9 @@ shift constant, `β ‖U‖²_{H¹} ≤ B[U, U] + γ ‖u₀‖²_{L²}` for eve
 theorem garding (Ω : Set (EuclideanSpace ℝ (Fin d))) (U : H01 Ω) :
     Op.lam / 2 * ‖U‖ ^ 2
       ≤ Op.fullBilin Ω U U + Op.gardingγ * ‖(U : H1amb Ω) 0‖ ^ 2 := by
-  set n0 : ℝ := ‖(U : H1amb Ω) 0‖ ^ 2 with hn0
-  set S : ℝ := ∑ i : Fin d, ‖(U : H1amb Ω) i.succ‖ ^ 2 with hS
-  set K : ℝ := (d : ℝ) * Op.Bsup ^ 2 / (2 * Op.lam) with hK
-  -- principal-part lower bound from ellipticity
-  have hA : Op.lam * S ≤ Op.toEllipticCoeff.bilin Ω U U := Op.toEllipticCoeff.bilin_self_ge U
-  -- per-term Cauchy-Schwarz + Peter-Paul, written sign-free to avoid a sum-of-negations
-  have hbound : ∀ i : Fin d, (0 : ℝ)
-      ≤ (Op.lam / 2 * ‖(U : H1amb Ω) i.succ‖ ^ 2 + Op.Bsup ^ 2 / (2 * Op.lam) * n0)
-        + ⟪Op.bAct i ((U : H1amb Ω) i.succ), ((U : H1amb Ω) 0)⟫ := by
-    intro i
-    have hcs : -⟪Op.bAct i ((U : H1amb Ω) i.succ), ((U : H1amb Ω) 0)⟫
-        ≤ Op.lam / 2 * ‖(U : H1amb Ω) i.succ‖ ^ 2 + Op.Bsup ^ 2 / (2 * Op.lam) * n0 := by
-      calc -⟪Op.bAct i ((U : H1amb Ω) i.succ), ((U : H1amb Ω) 0)⟫
-          ≤ |⟪Op.bAct i ((U : H1amb Ω) i.succ), ((U : H1amb Ω) 0)⟫| := neg_le_abs _
-        _ ≤ ‖Op.bAct i ((U : H1amb Ω) i.succ)‖ * ‖(U : H1amb Ω) 0‖ := abs_real_inner_le_norm _ _
-        _ ≤ Op.Bsup * ‖(U : H1amb Ω) i.succ‖ * ‖(U : H1amb Ω) 0‖ := by
-            gcongr; exact Op.norm_bAct_le i _
-        _ ≤ Op.lam / 2 * ‖(U : H1amb Ω) i.succ‖ ^ 2 + Op.Bsup ^ 2 / (2 * Op.lam) * n0 := by
-            rw [hn0]; exact young_peterPaul Op.lam_pos
-    linarith [hcs]
-  -- transport lower bound: `∑ ⟪bᵢ ∂ᵢu, u₀⟫ ≥ -(λ/2 S + K n0)`
-  have hT : (0 : ℝ) ≤ (Op.lam / 2 * S + K * n0)
-      + ∑ i : Fin d, ⟪Op.bAct i ((U : H1amb Ω) i.succ), ((U : H1amb Ω) 0)⟫ := by
-    calc (0 : ℝ) = ∑ _i : Fin d, (0 : ℝ) := by rw [Finset.sum_const_zero]
-      _ ≤ ∑ i : Fin d, ((Op.lam / 2 * ‖(U : H1amb Ω) i.succ‖ ^ 2
-            + Op.Bsup ^ 2 / (2 * Op.lam) * n0)
-            + ⟪Op.bAct i ((U : H1amb Ω) i.succ), ((U : H1amb Ω) 0)⟫) :=
-          Finset.sum_le_sum (fun i _ => hbound i)
-      _ = (Op.lam / 2 * S + K * n0)
-            + ∑ i : Fin d, ⟪Op.bAct i ((U : H1amb Ω) i.succ), ((U : H1amb Ω) 0)⟫ := by
-          rw [Finset.sum_add_distrib, Finset.sum_add_distrib, ← Finset.mul_sum,
-            Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, hK, hS]
-          ring
-  -- zeroth-order lower bound (|c| ≤ Csup, no sign assumed)
-  have hC : -(Op.Csup * n0) ≤ ⟪Op.cAct ((U : H1amb Ω) 0), ((U : H1amb Ω) 0)⟫ := by
-    rw [neg_le]
-    calc -⟪Op.cAct ((U : H1amb Ω) 0), ((U : H1amb Ω) 0)⟫
-        ≤ |⟪Op.cAct ((U : H1amb Ω) 0), ((U : H1amb Ω) 0)⟫| := neg_le_abs _
-      _ ≤ ‖Op.cAct ((U : H1amb Ω) 0)‖ * ‖(U : H1amb Ω) 0‖ := abs_real_inner_le_norm _ _
-      _ ≤ Op.Csup * n0 := by
-          rw [hn0]
-          calc ‖Op.cAct ((U : H1amb Ω) 0)‖ * ‖(U : H1amb Ω) 0‖
-              ≤ (Op.Csup * ‖(U : H1amb Ω) 0‖) * ‖(U : H1amb Ω) 0‖ :=
-                mul_le_mul_of_nonneg_right (Op.norm_cAct_le _) (norm_nonneg _)
-            _ = Op.Csup * ‖(U : H1amb Ω) 0‖ ^ 2 := by ring
-  -- the H¹ norm splits as n0 + S
-  have hnorm : ‖U‖ ^ 2 = n0 + S := by
-    rw [show ‖U‖ = ‖(U : H1amb Ω)‖ from rfl, PiLp.norm_sq_eq_of_L2, Fin.sum_univ_succ, hn0, hS]
-  rw [Op.fullBilin_apply, Op.lowerBilin_apply, gardingγ, ← hK, hnorm]
-  linarith [hA, hT, hC]
+  have h := (DivForm.FullEllipticOp.ofCoord Op).garding Ω (H1Graph.h01Equiv Ω U)
+  rwa [LinearIsometryEquiv.norm_map, DivForm.FullEllipticOp.form_h01Equiv,
+    DivForm.FullEllipticOp.gardingγ_ofCoord, H1Graph.fnL_h01Equiv] at h
 
 /-! ### Shifted coercivity and existence (Evans §6.2.2, Theorem 3) -/
 /-- **Shifted coercivity** (Evans §6.2.2, Theorem 3). For any shift `μ ≥ γ`, the shifted
@@ -317,9 +267,32 @@ theorem weak_solution_L2_of_nonneg_zeroth_of_bounded {n : ℕ}
           (∀ v : H01 Ω,
             Op.fullBilin Ω u v = ∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ)) →
             ‖u‖ ≤ (CP + 1) / Op.lam * ‖f‖) := by
-  obtain ⟨CP, hCP, hpoin⟩ := Poincare.poincare_H01_of_bounded hΩb
-  exact ⟨CP, hCP, Op.weak_solution_L2_of_nonneg_zeroth Ω hb hc hCP fun {φ} h =>
-    hpoin h.testGraph ((Submodule.le_topologicalClosure _) (Submodule.subset_span ⟨φ, h, rfl⟩))⟩
+  have hb' : ∀ᵐ x ∂(volume.restrict Ω), (DivForm.FullEllipticOp.ofCoord Op).b x = 0 := by
+    filter_upwards [ae_all_iff.2 hb] with x hx
+    ext i
+    simp [DivForm.FullEllipticOp.ofCoord, hx i]
+  obtain ⟨CP, hCP, h⟩ :=
+    (DivForm.FullEllipticOp.ofCoord Op).weak_solution_of_nonneg_zeroth_of_bounded hΩb hb' hc
+  refine ⟨CP, hCP, fun f => ?_⟩
+  obtain ⟨h1, h2⟩ := h f
+  have hpair (v : H01 Ω) : ⟪f, H1Graph.embL2 volume Ω (H1Graph.h01Equiv Ω v)⟫
+      = ∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ) := by
+    rw [H1Graph.embL2_h01Equiv, L2.inner_def]
+    simp [mul_comm]
+  have hiff (u : H01 Ω) : (∀ v : H1Graph.H01 volume Ω,
+        (DivForm.FullEllipticOp.ofCoord Op).formOn Ω _ (H1Graph.h01Equiv Ω u) v =
+          ⟪f, H1Graph.embL2 volume Ω v⟫) ↔
+      ∀ v : H01 Ω, Op.fullBilin Ω u v = ∫ x in Ω, (f x : ℝ) * ((v : H1amb Ω) 0 x : ℝ) := by
+    refine ⟨fun hu v => ?_, fun hu v => ?_⟩
+    · rw [← hpair, ← hu (H1Graph.h01Equiv Ω v), DivForm.FullEllipticOp.form_h01Equiv]
+    · rw [← (H1Graph.h01Equiv Ω).apply_symm_apply v]
+      exact (DivForm.FullEllipticOp.form_h01Equiv Op Ω u _).trans
+        ((hu _).trans (hpair _).symm)
+  refine ⟨?_, fun u hu => ?_⟩
+  · simp only [← hiff]
+    exact ((H1Graph.h01Equiv Ω).symm.toEquiv.existsUnique_congr_left.trans (by simp)).mp h1
+  · have := h2 _ ((hiff u).2 hu)
+    rwa [LinearIsometryEquiv.norm_map] at this
 
 end FullEllipticOp
 
