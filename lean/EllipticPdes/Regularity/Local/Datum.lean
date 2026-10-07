@@ -174,9 +174,7 @@ theorem exists_collarFamily_of_weakDerivOn {Ω W N : Set (EuclideanSpace ℝ (Fi
   refine ⟨(HuW.restrict hWm hNm hNW).congr (restrictL2_extendL2_trans hΩm hWm hNm hNW g),
     IteratedL2Bound.congr (h := restrictL2_extendL2_trans hΩm hWm hNm hNW g)
       (IteratedL2Bound.restrict (hWm := hWm) (hVm := hNm) (hVW := hNW) hHuW), fun i => ?_⟩
-  have h1 : HasWeakDerivOn W i (restrictL2 (Ω := W) (extendL2 hΩm g)) (HuW.D [i]) := by
-    have h := HuW.D_step i [] (Nat.succ_pos m)
-    rwa [HuW.D_nil] at h
+  have h1 := HuW.hasWeakDerivOn_D_singleton i
   change restrictL2 (Ω := N) (extendL2 hWm (HuW.D [i])) = _
   rw [restrictL2_extendL2_congr_of_weakDerivOn hWm hNm hNW hθW hθN h1 (hDgW i),
     restrictL2_extendL2_trans hΩm hWm hNm hNW]

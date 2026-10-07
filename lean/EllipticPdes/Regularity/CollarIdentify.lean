@@ -127,9 +127,7 @@ theorem exists_collarFamily {Ω W N : Set (EuclideanSpace ℝ (Fin d))}
   refine ⟨(HuW.restrict hWm hNm hNW).congr (restrictL2_extendL2_trans hΩm hWm hNm hNW g),
     IteratedL2Bound.congr (h := restrictL2_extendL2_trans hΩm hWm hNm hNW g)
       (IteratedL2Bound.restrict (hWm := hWm) (hVm := hNm) (hVW := hNW) hHuW), fun i => ?_⟩
-  have h1 : HasWeakDerivOn W i (restrictL2 (Ω := W) (extendL2 hΩm g)) (HuW.D [i]) := by
-    have h := HuW.D_step i [] (Nat.succ_pos m)
-    rwa [HuW.D_nil] at h
+  have h1 := HuW.hasWeakDerivOn_D_singleton i
   have h2 : HasWeakDerivOn W i (restrictL2 (Ω := W) (extendL2 hΩm g))
       (restrictL2 (Ω := W) (extendL2 hΩm (Dg i))) :=
     hasWeakDerivOn_of_hasWeakDeriv i (hDgw i)
