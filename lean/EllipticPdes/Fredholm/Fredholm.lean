@@ -7,6 +7,7 @@ Authors: Alejandro Soto Franco
 module
 
 public import EllipticPdes.Existence.Garding
+public import EllipticPdes.Fredholm.GardingForm
 public import Mathlib.Analysis.Normed.Operator.Compact.FredholmAlternative
 
 /-!
@@ -15,13 +16,10 @@ public import Mathlib.Analysis.Normed.Operator.Compact.FredholmAlternative
 Evans §6.2.3, Theorem 4.
 
 For the full divergence-form operator `Lu = -Dⱼ(aᵢⱼDᵢu) + bᵢDᵢu + cu` the Gårding inequality
-makes the shifted form `B_γ = B + γ⟨·,·⟩_{L²}` coercive (`shiftedBilin_coercive`), so `L + γ` is
-invertible by Lax-Milgram. Writing the solution operator of `L + γ` and the `L²` form as bounded
-operators on `H₀¹(Ω)` reduces the weak problem `Lu = f` to a compact-operator equation
-`(1 - K)u = h`, to which Mathlib's Fredholm alternative for compact operators
-(`IsCompactOperator.hasEigenvalue_or_mem_resolventSet`) applies at the eigenvalue `1`.
-
-The reduction is exact:
+makes the shifted form `B_γ = B + γ⟨·,·⟩_{L²}` coercive (`shiftedBilin_coercive`). The operator
+is therefore an abstract `GardingForm` on `H₀¹(Ω)` over `L²(Ω)` (`gardingForm`), and the
+reduction of the weak problem `Lu = f` to the compact-operator equation `(1 - K)u = h` is the
+one proved in `GardingForm.lean`; this file names its pieces for the elliptic operator.
 
 * `opA` / `opT`: the Riesz representatives of the full form `B` and of the `L²` form
   `⟨u₀, v₀⟩` as bounded operators on `H₀¹(Ω)` (`InnerProductSpace.continuousLinearMapOfBilin`),
@@ -48,22 +46,47 @@ namespace FullEllipticOp
 
 variable (Op : FullEllipticOp d) (Ω : Set (EuclideanSpace ℝ (Fin d)))
 
+/-! ### The Gårding form of the operator -/
+
+/-- The operator `Op` on `H₀¹(Ω)` as an abstract Gårding form over `L²(Ω)`: the form is
+`fullBilin`, the embedding is `U ↦ U₀`, and the constants are `λ/2` and `gardingγ`. -/
+def gardingForm : GardingForm (H01 Ω) (L2D Ω) where
+  form := Op.fullBilin Ω
+  emb := coordL Ω 0
+  β := Op.lam / 2
+  γ := Op.gardingγ
+  β_pos := half_pos Op.lam_pos
+  γ_pos := Op.gardingγ_pos
+  garding := Op.garding Ω
+
 /-! ### Riesz representatives of the forms as bounded operators on `H₀¹(Ω)` -/
 
 /-- The Riesz representative of the full divergence form `B` as an operator on `H₀¹(Ω)`:
 `⟪opA u, v⟫ = B[u, v]`. -/
-def opA : H01 Ω →L[ℝ] H01 Ω := continuousLinearMapOfBilin (Op.fullBilin Ω)
+def opA : H01 Ω →L[ℝ] H01 Ω := (Op.gardingForm Ω).opA
 
 /-- The Riesz representative of the `L²` form `⟨u₀, v₀⟩` as an operator on `H₀¹(Ω)`. -/
 def opT : H01 Ω →L[ℝ] H01 Ω := continuousLinearMapOfBilin (zerothForm Ω)
 
 /-- The coercive Lax-Milgram equivalence of the shifted form `B_γ`, `γ = gardingγ`. -/
-def opE : H01 Ω ≃L[ℝ] H01 Ω :=
-  (Op.shiftedBilin_coercive Ω (le_refl Op.gardingγ)).continuousLinearEquivOfBilin
+def opE : H01 Ω ≃L[ℝ] H01 Ω := (Op.gardingForm Ω).opE
+
+/-- The compact part of the reduction: `opK = γ·opE⁻¹·opT`. -/
+def opK : H01 Ω →L[ℝ] H01 Ω :=
+  Op.gardingγ • ((Op.opE Ω).symm : H01 Ω →L[ℝ] H01 Ω).comp (opT Ω)
+
+/-- The abstract `opT` of the Gårding form is the Riesz operator of the `L²` form. -/
+lemma gardingForm_opT : (Op.gardingForm Ω).opT = opT Ω := rfl
+
+/-- The abstract `opK` of the Gårding form is `opK`. -/
+lemma gardingForm_opK : (Op.gardingForm Ω).opK = Op.opK Ω := rfl
+
+/-- The shifted form of the Gårding form is `shiftedBilin` at `gardingγ`. -/
+lemma gardingForm_shifted : (Op.gardingForm Ω).shifted = Op.shiftedBilin Ω Op.gardingγ := rfl
 
 /-- Riesz identity: `⟪Op.opA Ω u, v⟫ = Op.fullBilin Ω u v`. -/
 lemma inner_opA (u v : H01 Ω) : ⟪Op.opA Ω u, v⟫ = Op.fullBilin Ω u v :=
-  continuousLinearMapOfBilin_apply (Op.fullBilin Ω) u v
+  (Op.gardingForm Ω).inner_opA u v
 
 /-- Riesz identity: `⟪opT Ω u, v⟫ = zerothForm Ω u v = ⟨u₀, v₀⟩_{L²}`. -/
 lemma inner_opT (u v : H01 Ω) : ⟪opT Ω u, v⟫ = zerothForm Ω u v :=
@@ -72,48 +95,26 @@ lemma inner_opT (u v : H01 Ω) : ⟪opT Ω u, v⟫ = zerothForm Ω u v :=
 /-- Riesz identity: `⟪Op.opE Ω u, v⟫ = Op.shiftedBilin Ω Op.gardingγ u v`. -/
 lemma inner_opE (u v : H01 Ω) :
     ⟪Op.opE Ω u, v⟫ = Op.shiftedBilin Ω Op.gardingγ u v :=
-  (Op.shiftedBilin_coercive Ω (le_refl Op.gardingγ)).continuousLinearEquivOfBilin_apply u v
+  (Op.gardingForm Ω).inner_opE u v
 
 /-! ### Reduction to `1 - opK` -/
 
 /-- `opA = opE - γ·opT`: subtracting the shift recovers the unshifted form. -/
 lemma opA_eq :
-    Op.opA Ω = (Op.opE Ω : H01 Ω →L[ℝ] H01 Ω) - Op.gardingγ • opT Ω := by
-  refine ContinuousLinearMap.ext (fun u => ext_inner_right (𝕜 := ℝ) (fun v => ?_))
-  rw [_root_.sub_apply, _root_.smul_apply, inner_sub_left,
-    real_inner_smul_left, ContinuousLinearEquiv.coe_coe, Op.inner_opA Ω, Op.inner_opE Ω,
-    inner_opT Ω, Op.shiftedBilin_apply, zerothForm_apply]
-  ring
-
-/-- The compact part of the reduction: `opK = γ·opE⁻¹·opT`. -/
-def opK : H01 Ω →L[ℝ] H01 Ω :=
-  Op.gardingγ • ((Op.opE Ω).symm : H01 Ω →L[ℝ] H01 Ω).comp (opT Ω)
+    Op.opA Ω = (Op.opE Ω : H01 Ω →L[ℝ] H01 Ω) - Op.gardingγ • opT Ω :=
+  (Op.gardingForm Ω).opA_eq
 
 /-- `opA = opE ∘ (1 - opK)`: the weak problem `Lu = f` becomes `(1 - opK)u = opE⁻¹(opA⁻¹…)`. -/
 lemma opA_factor :
-    Op.opA Ω = (Op.opE Ω : H01 Ω →L[ℝ] H01 Ω).comp (1 - Op.opK Ω) := by
-  have hcomp : (Op.opE Ω : H01 Ω →L[ℝ] H01 Ω).comp (1 - Op.opK Ω)
-      = (Op.opE Ω : H01 Ω →L[ℝ] H01 Ω) - Op.gardingγ • opT Ω := by
-    refine ContinuousLinearMap.ext (fun u => ?_)
-    simp only [ContinuousLinearMap.comp_apply, _root_.sub_apply,
-      one_apply_eq_self, _root_.smul_apply, opK,
-      ContinuousLinearEquiv.coe_coe, map_sub, map_smul,
-      ContinuousLinearEquiv.apply_symm_apply]
-  rw [Op.opA_eq Ω, hcomp]
+    Op.opA Ω = (Op.opE Ω : H01 Ω →L[ℝ] H01 Ω).comp (1 - Op.opK Ω) :=
+  (Op.gardingForm Ω).opA_factor
 
 /-- The weak problem `B[u, ·] = f` is the equation `opA u = g` for the Riesz representative `g`
 of `f`. -/
 lemma opA_eq_toDual_symm_iff (f : H01 Ω →L[ℝ] ℝ) (u : H01 Ω) :
     Op.opA Ω u = (InnerProductSpace.toDual ℝ (H01 Ω)).symm f
-      ↔ ∀ v : H01 Ω, Op.fullBilin Ω u v = f v := by
-  have hg : ∀ v, ⟪(InnerProductSpace.toDual ℝ (H01 Ω)).symm f, v⟫ = f v := fun v =>
-    InnerProductSpace.toDual_symm_apply
-  constructor
-  · intro hu v
-    rw [← Op.inner_opA Ω u v, hu, hg]
-  · intro hu
-    refine ext_inner_right (𝕜 := ℝ) (fun v => ?_)
-    rw [Op.inner_opA Ω u v, hu v, hg]
+      ↔ ∀ v : H01 Ω, Op.fullBilin Ω u v = f v :=
+  (Op.gardingForm Ω).opA_eq_toDual_symm_iff f u
 
 end FullEllipticOp
 

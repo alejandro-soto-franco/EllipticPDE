@@ -159,6 +159,15 @@ lemma gardingγ_nonneg : 0 ≤ Op.gardingγ := by
     div_nonneg (by positivity) this.le
   linarith [Op.Csup_nonneg]
 
+/-- The Gårding shift constant `γ` is strictly positive. -/
+lemma gardingγ_pos : 0 < Op.gardingγ := by
+  have h1 := Op.lam_pos
+  have h2 := Op.Csup_nonneg
+  have h3 : (0 : ℝ) ≤ (d : ℝ) * Op.Bsup ^ 2 / (2 * Op.lam) :=
+    div_nonneg (by positivity) (by linarith)
+  unfold gardingγ
+  linarith
+
 /-- **Gårding inequality** (Evans §6.2.2, Theorem 2(ii)). With `β = λ/2` and `γ` the
 shift constant, `β ‖U‖²_{H¹} ≤ B[U, U] + γ ‖u₀‖²_{L²}` for every `U ∈ H₀¹(Ω)`. -/
 theorem garding (Ω : Set (EuclideanSpace ℝ (Fin d))) (U : H01 Ω) :
