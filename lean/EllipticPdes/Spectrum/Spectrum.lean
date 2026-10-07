@@ -33,6 +33,12 @@ complete orthogonal family of eigenfunctions.
   with the elliptic eigenvalue `λ = μ⁻¹`. Letting `μ → 0⁺` gives the Dirichlet eigenvalues
   `λ → +∞`.
 
+The construction is stated first for an arbitrary bounded linear map `emb : V →L[ℝ] L` between
+real Hilbert spaces (namespace `EllipticPdes.Variational`), with the compactness of `emb` as the
+only analytic hypothesis. The abstract form of `solOp_spectral` is
+`Variational.orthogonal_iSup_eigenspace_solOp`; the Euclidean names are the instance
+`emb = embL2 Ω`.
+
 Instantiated on the Dirichlet (Poisson) form `laplaceBilin`, giving the eigenvalue theory of
 `-Δ` with Dirichlet boundary data (`dirichlet_spectral`). The compact embedding for bounded `Ω`
 is the single analytic input, threaded as the hypothesis `IsCompactOperator (embL2 Ω)`
@@ -46,35 +52,34 @@ open scoped RealInnerProductSpace
 
 noncomputable section
 
-namespace EllipticPdes.Sobolev
+namespace EllipticPdes.Variational
 
-variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))}
+variable {V L : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [CompleteSpace V]
+  [NormedAddCommGroup L] [InnerProductSpace ℝ L] [CompleteSpace L]
 
-/-- The **solution operator** on `L²(Ω)` of a coercive form `B`: `G = ι ∘ (B♯)⁻¹ ∘ ι†`, with
-`ι = embL2 Ω` the Rellich embedding and `(B♯)⁻¹` the Lax-Milgram inverse of `B`. -/
-def solOp (B : H01 Ω →L[ℝ] H01 Ω →L[ℝ] ℝ) (hco : IsCoercive B) : L2D Ω →L[ℝ] L2D Ω :=
-  (embL2 Ω).comp
-    ((hco.continuousLinearEquivOfBilin.symm : H01 Ω →L[ℝ] H01 Ω).comp (embL2 Ω).adjoint)
+/-- The **solution operator** on `L` of a coercive form `B` on `V` relative to a bounded linear
+map `emb : V →L[ℝ] L`: `G = emb ∘ (B♯)⁻¹ ∘ emb†`, with `(B♯)⁻¹` the Lax-Milgram inverse of `B`. -/
+def solOp (emb : V →L[ℝ] L) (B : V →L[ℝ] V →L[ℝ] ℝ) (hco : IsCoercive B) : L →L[ℝ] L :=
+  emb.comp ((hco.continuousLinearEquivOfBilin.symm : V →L[ℝ] V).comp emb.adjoint)
 
-variable {B : H01 Ω →L[ℝ] H01 Ω →L[ℝ] ℝ}
+variable {B : V →L[ℝ] V →L[ℝ] ℝ}
 
-/-- Evaluation: `solOp B hco f = embL2 Ω ((B♯)⁻¹ ((embL2 Ω)† f))`. -/
-lemma solOp_apply (hco : IsCoercive B) (f : L2D Ω) :
-    solOp B hco f
-      = embL2 Ω (hco.continuousLinearEquivOfBilin.symm ((embL2 Ω).adjoint f)) := by
+/-- Evaluation: `solOp emb B hco f = emb ((B♯)⁻¹ (emb† f))`. -/
+lemma solOp_apply (emb : V →L[ℝ] L) (hco : IsCoercive B) (f : L) :
+    solOp emb B hco f = emb (hco.continuousLinearEquivOfBilin.symm (emb.adjoint f)) := by
   simp only [solOp, ContinuousLinearMap.comp_apply, ContinuousLinearEquiv.coe_coe]
 
 /-! ### `B♯` and `(B♯)⁻¹` are symmetric when `B` is -/
 
 /-- The Riesz representative `B♯` of a symmetric form is symmetric: `⟪B♯ u, v⟫ = ⟪u, B♯ v⟫`. -/
-lemma clEquiv_symm_form (hco : IsCoercive B) (hsymm : ∀ U V, B U V = B V U) (u v : H01 Ω) :
+lemma clEquiv_symm_form (hco : IsCoercive B) (hsymm : ∀ U V, B U V = B V U) (u v : V) :
     ⟪hco.continuousLinearEquivOfBilin u, v⟫ = ⟪u, hco.continuousLinearEquivOfBilin v⟫ := by
   rw [hco.continuousLinearEquivOfBilin_apply, real_inner_comm,
     hco.continuousLinearEquivOfBilin_apply]
   exact hsymm u v
 
 /-- The Lax-Milgram inverse `(B♯)⁻¹` of a symmetric coercive form is symmetric. -/
-lemma clEquivSymm_symm_form (hco : IsCoercive B) (hsymm : ∀ U V, B U V = B V U) (u v : H01 Ω) :
+lemma clEquivSymm_symm_form (hco : IsCoercive B) (hsymm : ∀ U V, B U V = B V U) (u v : V) :
     ⟪hco.continuousLinearEquivOfBilin.symm u, v⟫
       = ⟪u, hco.continuousLinearEquivOfBilin.symm v⟫ := by
   set T := hco.continuousLinearEquivOfBilin with hT
@@ -85,37 +90,119 @@ lemma clEquivSymm_symm_form (hco : IsCoercive B) (hsymm : ∀ U V, B U V = B V U
 
 /-! ### Compactness, symmetry, positivity of the solution operator -/
 
-/-- The solution operator is **compact**: it is the compact embedding `ι` postcomposed with the
-bounded operator `(B♯)⁻¹ ∘ ι†`. -/
-lemma solOp_isCompact (hco : IsCoercive B) (hRellich : IsCompactOperator (embL2 Ω)) :
-    IsCompactOperator (solOp B hco) :=
-  hRellich.comp_clm
-    ((hco.continuousLinearEquivOfBilin.symm : H01 Ω →L[ℝ] H01 Ω).comp (embL2 Ω).adjoint)
+/-- The solution operator is **compact**: it is the compact map `emb` postcomposed with the
+bounded operator `(B♯)⁻¹ ∘ emb†`. -/
+lemma solOp_isCompact {emb : V →L[ℝ] L} (hco : IsCoercive B) (hemb : IsCompactOperator emb) :
+    IsCompactOperator (solOp emb B hco) :=
+  hemb.comp_clm ((hco.continuousLinearEquivOfBilin.symm : V →L[ℝ] V).comp emb.adjoint)
 
 /-- The solution operator is **symmetric**: `⟪G f, g⟫ = ⟪f, G g⟫`, because `(B♯)⁻¹` is symmetric
-and `ι`, `ι†` are mutual adjoints. -/
-lemma solOp_inner_symm (hco : IsCoercive B) (hsymm : ∀ U V, B U V = B V U) (f g : L2D Ω) :
-    ⟪solOp B hco f, g⟫ = ⟪f, solOp B hco g⟫ := by
-  have e1 := ContinuousLinearMap.adjoint_inner_right (embL2 Ω)
-    (hco.continuousLinearEquivOfBilin.symm ((embL2 Ω).adjoint f)) g
-  have e2 := ContinuousLinearMap.adjoint_inner_left (embL2 Ω)
-    (hco.continuousLinearEquivOfBilin.symm ((embL2 Ω).adjoint g)) f
+and `emb`, `emb†` are mutual adjoints. -/
+lemma solOp_inner_symm (emb : V →L[ℝ] L) (hco : IsCoercive B)
+    (hsymm : ∀ U V, B U V = B V U) (f g : L) :
+    ⟪solOp emb B hco f, g⟫ = ⟪f, solOp emb B hco g⟫ := by
+  have e1 := ContinuousLinearMap.adjoint_inner_right emb
+    (hco.continuousLinearEquivOfBilin.symm (emb.adjoint f)) g
+  have e2 := ContinuousLinearMap.adjoint_inner_left emb
+    (hco.continuousLinearEquivOfBilin.symm (emb.adjoint g)) f
   rw [solOp_apply, solOp_apply]
   exact e1.symm.trans
-    ((clEquivSymm_symm_form hco hsymm ((embL2 Ω).adjoint f) ((embL2 Ω).adjoint g)).trans e2)
+    ((clEquivSymm_symm_form hco hsymm (emb.adjoint f) (emb.adjoint g)).trans e2)
 
 /-- The solution operator is **positive**: `0 ≤ ⟪G f, f⟫`, from coercivity of `B`. -/
-lemma solOp_inner_self_nonneg (hco : IsCoercive B) (f : L2D Ω) :
-    0 ≤ ⟪solOp B hco f, f⟫ := by
+lemma solOp_inner_self_nonneg (emb : V →L[ℝ] L) (hco : IsCoercive B) (f : L) :
+    0 ≤ ⟪solOp emb B hco f, f⟫ := by
   rw [solOp_apply, ← ContinuousLinearMap.adjoint_inner_right]
-  set w := hco.continuousLinearEquivOfBilin.symm ((embL2 Ω).adjoint f) with hw
-  have ha : (embL2 Ω).adjoint f = hco.continuousLinearEquivOfBilin w := by
+  set w := hco.continuousLinearEquivOfBilin.symm (emb.adjoint f) with hw
+  have ha : emb.adjoint f = hco.continuousLinearEquivOfBilin w := by
     rw [hw, ContinuousLinearEquiv.apply_symm_apply]
   rw [ha, real_inner_comm, hco.continuousLinearEquivOfBilin_apply]
   obtain ⟨C, hC, hcoer⟩ := hco
   nlinarith [hcoer w, mul_nonneg (mul_nonneg hC.le (norm_nonneg w)) (norm_nonneg w)]
 
 /-! ### Spectral theorem and eigenfunction correspondence -/
+
+/-- **Spectral theorem for the solution operator.** Given a compact `emb`, the eigenspaces of
+the solution operator of a symmetric coercive form span `L`: their orthogonal complement is
+trivial. Equivalently, `L` has an orthonormal basis of eigenvectors of the solution operator. -/
+theorem orthogonal_iSup_eigenspace_solOp {emb : V →L[ℝ] L} (hco : IsCoercive B)
+    (hsymm : ∀ U V, B U V = B V U)
+    (hemb : IsCompactOperator emb) :
+    (⨆ μ : ℝ, Module.End.eigenspace (solOp emb B hco : Module.End ℝ L) μ)ᗮ = ⊥ :=
+  ContinuousLinearMap.orthogonalComplement_iSup_eigenspaces_eq_bot
+    (solOp_isCompact hco hemb)
+    (by intro x y; simpa using solOp_inner_symm emb hco hsymm x y)
+
+/-- **Eigenvector correspondence.** Each eigenpair `solOp φ = μ φ` lifts to a weak eigenvector
+`u ∈ V`: `emb u = μ φ` and `⟪emb u, emb v⟫ = μ B[u, v]` for every `v ∈ V`. For `μ ≠ 0` this is
+the weak eigenvalue problem `B[u, v] = λ ⟪emb u, emb v⟫` with `λ = μ⁻¹`. -/
+theorem solOp_weak_eigen {emb : V →L[ℝ] L} (hco : IsCoercive B) {μ : ℝ} {φ : L}
+    (hφ : solOp emb B hco φ = μ • φ) :
+    ∃ u : V, emb u = μ • φ ∧ ∀ v : V, ⟪emb u, emb v⟫ = μ * B u v := by
+  set u := hco.continuousLinearEquivOfBilin.symm (emb.adjoint φ) with hu
+  have hiu : emb u = μ • φ := by rw [hu, ← solOp_apply emb hco]; exact hφ
+  refine ⟨u, hiu, fun v => ?_⟩
+  have hBuv : B u v = ⟪φ, emb v⟫ := by
+    rw [← hco.continuousLinearEquivOfBilin_apply, hu,
+      ContinuousLinearEquiv.apply_symm_apply, ContinuousLinearMap.adjoint_inner_left]
+  rw [hiu, hBuv, real_inner_smul_left]
+
+/-- The eigenvalues of the solution operator are **nonnegative**: positivity of `G` forces
+`0 ≤ μ` on any nonzero eigenvector. -/
+theorem solOp_eigenvalue_nonneg (emb : V →L[ℝ] L) (hco : IsCoercive B) {μ : ℝ} {φ : L}
+    (hφ : solOp emb B hco φ = μ • φ) (hφ0 : φ ≠ 0) : 0 ≤ μ := by
+  have h1 : 0 ≤ ⟪solOp emb B hco φ, φ⟫ := solOp_inner_self_nonneg emb hco φ
+  rw [hφ, real_inner_smul_left, real_inner_self_eq_norm_sq] at h1
+  have hpos : 0 < ‖φ‖ ^ 2 := by
+    have := norm_pos_iff.mpr hφ0; positivity
+  by_contra h
+  rw [not_le] at h
+  linarith [mul_neg_of_neg_of_pos h hpos]
+
+end EllipticPdes.Variational
+
+namespace EllipticPdes.Sobolev
+
+variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))}
+
+/-- The **solution operator** on `L²(Ω)` of a coercive form `B`: `G = ι ∘ (B♯)⁻¹ ∘ ι†`, with
+`ι = embL2 Ω` the Rellich embedding and `(B♯)⁻¹` the Lax-Milgram inverse of `B`. -/
+def solOp (B : H01 Ω →L[ℝ] H01 Ω →L[ℝ] ℝ) (hco : IsCoercive B) : L2D Ω →L[ℝ] L2D Ω :=
+  Variational.solOp (embL2 Ω) B hco
+
+variable {B : H01 Ω →L[ℝ] H01 Ω →L[ℝ] ℝ}
+
+/-- Evaluation: `solOp B hco f = embL2 Ω ((B♯)⁻¹ ((embL2 Ω)† f))`. -/
+lemma solOp_apply (hco : IsCoercive B) (f : L2D Ω) :
+    solOp B hco f
+      = embL2 Ω (hco.continuousLinearEquivOfBilin.symm ((embL2 Ω).adjoint f)) :=
+  Variational.solOp_apply (embL2 Ω) hco f
+
+/-- The Riesz representative `B♯` of a symmetric form is symmetric: `⟪B♯ u, v⟫ = ⟪u, B♯ v⟫`. -/
+lemma clEquiv_symm_form (hco : IsCoercive B) (hsymm : ∀ U V, B U V = B V U) (u v : H01 Ω) :
+    ⟪hco.continuousLinearEquivOfBilin u, v⟫ = ⟪u, hco.continuousLinearEquivOfBilin v⟫ :=
+  Variational.clEquiv_symm_form hco hsymm u v
+
+/-- The Lax-Milgram inverse `(B♯)⁻¹` of a symmetric coercive form is symmetric. -/
+lemma clEquivSymm_symm_form (hco : IsCoercive B) (hsymm : ∀ U V, B U V = B V U) (u v : H01 Ω) :
+    ⟪hco.continuousLinearEquivOfBilin.symm u, v⟫
+      = ⟪u, hco.continuousLinearEquivOfBilin.symm v⟫ :=
+  Variational.clEquivSymm_symm_form hco hsymm u v
+
+/-- The solution operator is **compact** when the Rellich embedding is. -/
+lemma solOp_isCompact (hco : IsCoercive B) (hRellich : IsCompactOperator (embL2 Ω)) :
+    IsCompactOperator (solOp B hco) :=
+  Variational.solOp_isCompact hco hRellich
+
+/-- The solution operator is **symmetric**: `⟪G f, g⟫ = ⟪f, G g⟫`. -/
+lemma solOp_inner_symm (hco : IsCoercive B) (hsymm : ∀ U V, B U V = B V U) (f g : L2D Ω) :
+    ⟪solOp B hco f, g⟫ = ⟪f, solOp B hco g⟫ :=
+  Variational.solOp_inner_symm (embL2 Ω) hco hsymm f g
+
+/-- The solution operator is **positive**: `0 ≤ ⟪G f, f⟫`, from coercivity of `B`. -/
+lemma solOp_inner_self_nonneg (hco : IsCoercive B) (f : L2D Ω) :
+    0 ≤ ⟪solOp B hco f, f⟫ :=
+  Variational.solOp_inner_self_nonneg (embL2 Ω) hco f
 
 /-- **Spectral theorem for the symmetric elliptic Dirichlet problem** (Evans §6.5). Given the
 Rellich compact embedding, the eigenspaces of the solution operator span `L²(Ω)`: their
@@ -124,9 +211,7 @@ eigenfunctions of the solution operator. -/
 theorem solOp_spectral (hco : IsCoercive B) (hsymm : ∀ U V, B U V = B V U)
     (hRellich : IsCompactOperator (embL2 Ω)) :
     (⨆ μ : ℝ, Module.End.eigenspace (solOp B hco : Module.End ℝ (L2D Ω)) μ)ᗮ = ⊥ :=
-  ContinuousLinearMap.orthogonalComplement_iSup_eigenspaces_eq_bot
-    (solOp_isCompact hco hRellich)
-    (by intro x y; simpa using solOp_inner_symm hco hsymm x y)
+  Variational.orthogonal_iSup_eigenspace_solOp hco hsymm hRellich
 
 /-- **Eigenfunction correspondence.** Each eigenpair `solOp φ = μ φ` lifts to a weak eigenfunction
 `u ∈ H₀¹(Ω)` of the elliptic operator: `ι u = μ φ` and `⟪u, v⟫_{L²} = μ B[u, v]` for every
@@ -135,26 +220,14 @@ with elliptic eigenvalue `λ = μ⁻¹`. -/
 theorem solOp_weak_eigen (hco : IsCoercive B) {μ : ℝ} {φ : L2D Ω}
     (hφ : solOp B hco φ = μ • φ) :
     ∃ u : H01 Ω, embL2 Ω u = μ • φ ∧
-      ∀ v : H01 Ω, ⟪embL2 Ω u, embL2 Ω v⟫ = μ * B u v := by
-  set u := hco.continuousLinearEquivOfBilin.symm ((embL2 Ω).adjoint φ) with hu
-  have hiu : embL2 Ω u = μ • φ := by rw [hu, ← solOp_apply hco]; exact hφ
-  refine ⟨u, hiu, fun v => ?_⟩
-  have hBuv : B u v = ⟪φ, embL2 Ω v⟫ := by
-    rw [← hco.continuousLinearEquivOfBilin_apply, hu,
-      ContinuousLinearEquiv.apply_symm_apply, ContinuousLinearMap.adjoint_inner_left]
-  rw [hiu, hBuv, real_inner_smul_left]
+      ∀ v : H01 Ω, ⟪embL2 Ω u, embL2 Ω v⟫ = μ * B u v :=
+  Variational.solOp_weak_eigen hco hφ
 
 /-- The eigenvalues of the solution operator are **nonnegative** (so the elliptic eigenvalues
 `λ = μ⁻¹` are positive): positivity of `G` forces `0 ≤ μ` on any nonzero eigenvector. -/
 theorem solOp_eigenvalue_nonneg (hco : IsCoercive B) {μ : ℝ} {φ : L2D Ω}
-    (hφ : solOp B hco φ = μ • φ) (hφ0 : φ ≠ 0) : 0 ≤ μ := by
-  have h1 : 0 ≤ ⟪solOp B hco φ, φ⟫ := solOp_inner_self_nonneg hco φ
-  rw [hφ, real_inner_smul_left, real_inner_self_eq_norm_sq] at h1
-  have hpos : 0 < ‖φ‖ ^ 2 := by
-    have := norm_pos_iff.mpr hφ0; positivity
-  by_contra h
-  rw [not_le] at h
-  linarith [mul_neg_of_neg_of_pos h hpos]
+    (hφ : solOp B hco φ = μ • φ) (hφ0 : φ ≠ 0) : 0 ≤ μ :=
+  Variational.solOp_eigenvalue_nonneg (embL2 Ω) hco hφ hφ0
 
 /-! ### Instantiation at the Dirichlet (Poisson) form `-Δ` -/
 
