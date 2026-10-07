@@ -191,6 +191,7 @@ public import EllipticPdes.Extension.Descent
 public import EllipticPdes.Poincare.Slab
 public import EllipticPdes.Sobolev.Graph
 public import EllipticPdes.Form.DivForm
+public import EllipticPdes.Sobolev.GraphEuclidean
 public import EllipticPdes.Sobolev.GraphLimits
 public import EllipticPdes.Sobolev.WeakDeriv
 public import EllipticPdes.Sobolev.WeakDerivClassical
