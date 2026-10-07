@@ -495,6 +495,18 @@ theorem tendsto_diffQuot_partialD (k : Fin d) {φ : EuclideanSpace ℝ (Fin d) �
 
 /-! ### Weak sequential compactness and the converse -/
 
+/-- **A weak limit of a sequence in a closed subspace lies in the subspace.** A closed subspace
+of a Hilbert space equals its double orthogonal complement, and the pairing with each element of
+the complement is zero along the sequence, hence in the limit. -/
+theorem mem_of_tendsto_inner_of_mem {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
+    (K : Submodule ℝ E) [K.HasOrthogonalProjection] {x : ℕ → E} {W : E} (hx : ∀ m, x m ∈ K)
+    (hW : ∀ y : E, Filter.Tendsto (fun m => ⟪x m, y⟫) Filter.atTop (nhds ⟪W, y⟫)) : W ∈ K := by
+  rw [← Submodule.orthogonal_orthogonal K, Submodule.mem_orthogonal]
+  intro y hy
+  have hz : ∀ m : ℕ, ⟪x m, y⟫ = (0 : ℝ) := fun m => (Submodule.mem_orthogonal K y).mp hy _ (hx m)
+  rw [real_inner_comm]
+  exact tendsto_nhds_unique ((hW y).congr hz) tendsto_const_nhds
+
 /-- **Weak sequential compactness of bounded sequences.** A sequence bounded by `M` in a
 separable real Hilbert space has a subsequence converging weakly to a limit `g'` with
 `‖g'‖ ≤ M`. Assembled from the sequential Banach-Alaoglu theorem on the weak dual

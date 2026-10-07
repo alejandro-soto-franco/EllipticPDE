@@ -87,11 +87,7 @@ private lemma exists_cutoffMul_diffQuotG_norm_bound (Op : FullEllipticOp d)
       + 2 * ∑ i : Fin d, (T.hξ.partialSupNorm i * Dl) ^ 2) with hBtot
   refine ⟨δ, hδ, Real.sqrt Btot, fun h hsmall => ?_⟩
   rcases eq_or_ne h 0 with rfl | hh
-  · have hzero : diffQuotG ℓ (0 : ℝ) hΩm (u : H1amb Ω) = 0 := by
-      refine PiLp.ext fun j => ?_
-      rw [diffQuotG_apply]
-      simp [diffQuotD]
-    rw [hzero, map_zero, norm_zero]
+  · rw [diffQuotG_zero, map_zero, norm_zero]
     exact Real.sqrt_nonneg _
   have hmaster := hCE u f hu h hh (hS ℓ h hsmall)
   have hE : ∑ i : Fin d, ‖mulTest T.hξ (diffQuotD ℓ h hΩm ((u : H1amb Ω) i.succ))‖ ^ 2
@@ -162,24 +158,9 @@ theorem exists_mem_H01_mulTest_gradient (Op : FullEllipticOp d)
   have htξθ : tsupport T.ξ ⊆ tsupport T.θ := fun x hx =>
     subset_tsupport T.θ (by rw [Function.mem_support, T.theta_eqOn_one hx]; exact one_ne_zero)
   obtain ⟨δ, hδpos, M, hM⟩ := exists_cutoffMul_diffQuotG_norm_bound Op hΩm hA T u f hu ℓ
-  set δ₀ : ℝ := min δ T.margin with hδ₀def
-  have hδ₀pos : (0 : ℝ) < δ₀ := lt_min hδpos T.hmargin_pos
-  -- A step sequence shrinking to zero inside the margin.
-  set hs : ℕ → ℝ := fun m => δ₀ / ((m : ℝ) + 2) with hsdef
-  have hs_pos : ∀ m, 0 < hs m := by
-    intro m; simp only [hsdef]; positivity
-  have hs_ne : ∀ m, hs m ≠ 0 := fun m => ne_of_gt (hs_pos m)
-  have hs_small : ∀ m, |hs m| < δ₀ := by
-    intro m
-    rw [abs_of_pos (hs_pos m)]
-    simp only [hsdef]
-    refine div_lt_self hδ₀pos ?_
-    have : (0 : ℝ) ≤ (m : ℝ) := Nat.cast_nonneg m
-    linarith
-  have hs_lim : Filter.Tendsto hs Filter.atTop (nhds 0) := by
-    simp only [hsdef]
-    exact tendsto_const_nhds.div_atTop
-      (Filter.tendsto_atTop_add_const_right Filter.atTop 2 tendsto_natCast_atTop_atTop)
+  obtain ⟨hs, -, hs_mem, hs_lim⟩ := exists_seq_strictAnti_tendsto' (lt_min hδpos T.hmargin_pos)
+  have hs_small : ∀ m, |hs m| < min δ T.margin := fun m => by
+    rw [abs_of_pos (hs_mem m).1]; exact (hs_mem m).2
   -- The admissible discrete family and its uniform bound.
   set Wn : ℕ → H1amb Ω := fun m => cutoffMul T.hξ (diffQuotG ℓ (hs m) hΩm (u : H1amb Ω))
     with hWndef
@@ -192,17 +173,7 @@ theorem exists_mem_H01_mulTest_gradient (Op : FullEllipticOp d)
     hM (hs m) (lt_of_lt_of_le (hs_small m) (min_le_left _ _))
   obtain ⟨W, σ, hσ, _hWnorm, hWweak⟩ := exists_weak_limit_of_bounded_hilbert hWn_bd
   refine ⟨W, ?_, ?_⟩
-  · -- The weak limit of a sequence in a closed subspace stays in it.
-    have hperp : W ∈ ((H01 Ω)ᗮ)ᗮ := by
-      rw [Submodule.mem_orthogonal]
-      intro y hy
-      have hz : ∀ m : ℕ, ⟪Wn (σ m), y⟫ = (0 : ℝ) := fun m =>
-        (Submodule.mem_orthogonal (H01 Ω) y).mp hy _ (hWn_mem (σ m))
-      have hlim : Filter.Tendsto (fun _ : ℕ => (0 : ℝ)) Filter.atTop (nhds ⟪W, y⟫) :=
-        (hWweak y).congr hz
-      rw [real_inner_comm]
-      exact tendsto_nhds_unique hlim tendsto_const_nhds
-    rwa [Submodule.orthogonal_orthogonal] at hperp
+  · exact mem_of_tendsto_inner_of_mem (H01 Ω) (fun m => hWn_mem (σ m)) hWweak
   · -- The function coordinate of the limit is `ξ · ∂_ℓ u`.
     refine ext_inner_left ℝ ?_
     intro z
@@ -222,7 +193,7 @@ theorem exists_mem_H01_mulTest_gradient (Op : FullEllipticOp d)
       rw [h0, ← inner_mulTest_comm T.hξ z _, ← restrictL2_diffQuot_extendL2,
         ← extendL2_inner_restrictL2]
       exact real_inner_comm _ _
-    have hη0 : ∀ m, hs (σ m) ≠ 0 := fun m => hs_ne (σ m)
+    have hη0 : ∀ m, hs (σ m) ≠ 0 := fun m => (hs_mem (σ m)).1.ne'
     have hηlim : Filter.Tendsto (fun m => hs (σ m)) Filter.atTop (nhds 0) :=
       hs_lim.comp hσ.tendsto_atTop
     have hA2 : Filter.Tendsto (fun m => ⟪z, (Wn (σ m)) 0⟫) Filter.atTop

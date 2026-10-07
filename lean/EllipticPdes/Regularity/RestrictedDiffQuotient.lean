@@ -192,6 +192,13 @@ def diffQuotG (k : Fin d) (h : ℝ) (hΩm : MeasurableSet Ω) : H1amb Ω →L[�
     PiLp.coe_continuousLinearEquiv, PiLp.toLp_apply, ContinuousLinearMap.pi_apply,
     ContinuousLinearMap.proj_apply]
 
+/-- The difference quotient with step zero vanishes on the ambient space. -/
+@[simp] theorem diffQuotG_zero (k : Fin d) (hΩm : MeasurableSet Ω) (U : H1amb Ω) :
+    diffQuotG k 0 hΩm U = 0 := by
+  refine PiLp.ext fun j => ?_
+  rw [diffQuotG_apply]
+  simp [diffQuotD]
+
 /-! ### Whole-space compatibility as the integration-by-parts bridge -/
 
 /-- **Whole-space compatibility.** On classes whose whole-space translate stays supported
