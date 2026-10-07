@@ -344,7 +344,7 @@ namespace DivForm.FullEllipticOp
 
 variable (Op : FullEllipticOp μ)
 
-omit [FiniteDimensional ℝ E] [μ.IsAddHaarMeasure] in
+omit [FiniteDimensional ℝ E] [μ.IsAddHaarMeasure] [BorelSpace E] in
 /-- The transport pairing of a gradient class with a function class is the integral of the
 pointwise pairing. -/
 theorem inner_bAct_eq_integral (g : Lp E 2 (μ.restrict Ω)) (v : Lp ℝ 2 (μ.restrict Ω)) :
@@ -356,7 +356,7 @@ theorem inner_bAct_eq_integral (g : Lp E 2 (μ.restrict Ω)) (v : Lp ℝ 2 (μ.r
   simp only [RCLike.inner_apply, conj_trivial]
   ring
 
-omit [FiniteDimensional ℝ E] [μ.IsAddHaarMeasure] in
+omit [FiniteDimensional ℝ E] [μ.IsAddHaarMeasure] [BorelSpace E] in
 /-- The pointwise transport pairing of a gradient class with a function class is integrable. -/
 theorem integrable_inner_bAct (g : Lp E 2 (μ.restrict Ω)) (v : Lp ℝ 2 (μ.restrict Ω)) :
     Integrable (fun x => ⟪Op.b x, g x⟫ * v x) (μ.restrict Ω) := by

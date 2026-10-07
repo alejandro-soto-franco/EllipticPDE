@@ -75,12 +75,13 @@ section Datum
 
 variable {n : ℕ}
 
-/-- **Datum of the cutoff reduction at order `k`.** For a cutoff `η` supported in `N ⊆ Ω`, with
-`W^{k+1,∞}` principal and `W^{k,∞}` transport coefficients, there is a constant `K` such that
-every `U` whose coordinates have `k` weak derivatives on `N`, and every datum `f` with `k` weak
-derivatives on `Ω`, all bounded by `B`, give an `L²(Ω)` class with `k` weak derivatives bounded
-by `K B` pairing against a test function as the datum of `reduction_testFn`. -/
-theorem exists_reductionDatum (Op : FullEllipticOp (n + 1))
+/-- **Datum of the cutoff reduction at order `k`, as a pairing.** For a cutoff `η` supported in
+`N ⊆ Ω`, with `W^{k+1,∞}` principal and `W^{k,∞}` transport coefficients, there is a constant `K`
+such that every `U` whose coordinates have `k` weak derivatives on `N`, and every datum `f` with
+`k` weak derivatives on `Ω`, all bounded by `B`, give a pairing with a test function that is that
+of an `L²(Ω)` class with `k` weak derivatives bounded by `K B`, namely the datum of
+`reduction_testFn`. -/
+theorem exists_reductionDatumPairing (Op : FullEllipticOp (n + 1))
     {Ω N : Set (EuclideanSpace ℝ (Fin (n + 1)))}
     (hΩm : MeasurableSet Ω) (hNm : MeasurableSet N) (hNΩ : N ⊆ Ω) {k : ℕ}
     (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 1)) (hbc : IsWkInftyLower Op k)
@@ -151,6 +152,40 @@ theorem exists_reductionDatum (Op : FullEllipticOp (n + 1))
     setIntegral_cutoff_restrict_eq hΩm (hηD _).2.2,
     setIntegral_cutoff_restrict_eq hΩm (hηDD _ _).2.2]
   rfl
+
+/-- **Datum of the cutoff reduction at order `k`.** For a cutoff `η` supported in `N ⊆ Ω`, with
+`W^{k+1,∞}` principal and `W^{k,∞}` transport coefficients, there is a constant `K` such that
+every `U` whose coordinates have `k` weak derivatives on `N`, and every datum `f` with `k` weak
+derivatives on `Ω`, all bounded by `B`, give an `L²(Ω)` class with `k` weak derivatives bounded
+by `K B` pairing against a test function as the datum of `reduction_testFn`. -/
+theorem exists_reductionDatum (Op : FullEllipticOp (n + 1))
+    {Ω N : Set (EuclideanSpace ℝ (Fin (n + 1)))}
+    (hΩm : MeasurableSet Ω) (hNm : MeasurableSet N) (hNΩ : N ⊆ Ω) {k : ℕ}
+    (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 1)) (hbc : IsWkInftyLower Op k)
+    {η : EuclideanSpace ℝ (Fin (n + 1)) → ℝ} (hη : IsTestFn N η) :
+    ∃ K : ℝ, 0 ≤ K ∧ ∀ (U : H1amb Ω) (f : L2D Ω)
+      (HU : ∀ j : Fin (n + 2),
+        HasIteratedWeakDerivOn N k (restrictL2 (Ω := N) (extendL2 hΩm (U j))))
+      (Hf : HasIteratedWeakDerivOn Ω k f) (B : ℝ),
+      (∀ j, IteratedL2Bound (HU j) B) → IteratedL2Bound Hf B →
+      ∃ (F : L2D Ω) (HF : HasIteratedWeakDerivOn Ω k F),
+        IteratedL2Bound HF (K * B) ∧
+        ∀ v : EuclideanSpace ℝ (Fin (n + 1)) → ℝ, ContDiff ℝ (⊤ : ℕ∞) v →
+          HasCompactSupport v →
+          (∫ x in Ω, (F x : ℝ) * v x)
+            = (∫ x in Ω, (f x : ℝ) * (η x * v x))
+              - (∑ i : Fin (n + 1), ∑ j : Fin (n + 1),
+                  ∫ x in Ω, Op.a x i j * (U i.succ x : ℝ) * (partialD j η x * v x))
+              - (∑ i : Fin (n + 1), ∑ j : Fin (n + 1), ∫ x in Ω,
+                  hA.coeffWeakGrad.da j i j x * (U 0 x : ℝ) * (partialD i η x * v x))
+              - (∑ i : Fin (n + 1), ∑ j : Fin (n + 1),
+                  ∫ x in Ω, Op.a x i j * (U j.succ x : ℝ) * (partialD i η x * v x))
+              - (∑ i : Fin (n + 1), ∑ j : Fin (n + 1), ∫ x in Ω,
+                  Op.a x i j * (U 0 x : ℝ) * (partialD j (partialD i η) x * v x))
+              + (∑ i : Fin (n + 1),
+                  ∫ x in Ω, Op.b x i * (U 0 x : ℝ) * (partialD i η x * v x)) := by
+  obtain ⟨K, hK, h⟩ := exists_reductionDatumPairing Op hΩm hNm hNΩ hA hbc hη
+  exact ⟨K, hK, fun U f HU Hf B hHU hHf => h U f HU Hf B hHU hHf⟩
 
 end Datum
 
