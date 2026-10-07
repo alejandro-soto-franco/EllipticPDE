@@ -351,6 +351,45 @@ theorem resolvent_bound (Op : EllipticOperator d)
   simp only [weakForm_eq, zerothPairing_eq, datumPairing_eq] at hu
   exact hu
 
+/-! ### Satisfiability of the hypotheses -/
+
+/-- The Laplacian `-Δ` as an `EllipticOperator`: identity principal part, no lower-order terms,
+ellipticity constant `1`. It witnesses that the structure the compared theorems quantify over
+is inhabited in every dimension. -/
+def laplacian (d : ℕ) : EllipticOperator d where
+  a _ i j := if i = j then 1 else 0
+  b _ _ := 0
+  c _ := 0
+  lam := 1
+  Λ := 1
+  Bsup := 0
+  Csup := 0
+  lam_pos := one_pos
+  Λ_nonneg := zero_le_one
+  Bsup_nonneg := le_rfl
+  Csup_nonneg := le_rfl
+  a_meas _ _ := measurable_const
+  b_meas _ := measurable_const
+  c_meas := measurable_const
+  a_bdd i j := ae_of_all _ fun _ => by split_ifs <;> simp
+  b_bdd _ := ae_of_all _ fun _ => by simp
+  c_bdd := ae_of_all _ fun _ => by simp
+  elliptic := ae_of_all _ fun _ ξ => by simp [ite_mul, sq]
+
+/-- The Laplacian satisfies the hypotheses of `weak_solution_of_nonneg_zeroth`: no transport
+term and a nonnegative zeroth-order coefficient. -/
+theorem laplacian_hyps (n : ℕ) {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} :
+    (∀ i, ∀ᵐ x ∂(volume.restrict Ω), (laplacian (n + 1)).b x i = 0)
+      ∧ ∀ᵐ x ∂(volume.restrict Ω), 0 ≤ (laplacian (n + 1)).c x :=
+  ⟨fun _ => ae_of_all _ fun _ => rfl, ae_of_all _ fun _ => le_rfl⟩
+
+/-- `H₀¹` of the unit ball has a nonzero element in every positive dimension, which makes the
+solution spaces of the compared theorems nontrivial on that domain. -/
+theorem H01_ball_ne_bot (hd : 0 < d) :
+    ∃ u : H01 (Metric.ball (0 : EuclideanSpace ℝ (Fin d)) 1), u ≠ 0 := by
+  obtain ⟨V, hV⟩ := EllipticPdes.Sobolev.exists_embL2_ne_zero_ball_of_pos hd
+  exact ⟨V, fun h => hV (by subst h; exact map_zero _)⟩
+
 -- The proofs rest on the three axioms of classical Lean and on nothing else.
 /-- info: 'Palomar.garding' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs (whitespace := lax) in
