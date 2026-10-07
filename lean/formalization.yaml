@@ -32,7 +32,18 @@ project:
     Hölder continuity with its converse, the Caccioppoli inequality, and the Poincaré
     chain down to the one-dimensional inequality. H_0^1(Ω) is realised as the closure of
     the test-function graphs inside L²(Ω) × (L²(Ω))^d, so a member has its weak
-    gradient as data rather than through a weak-derivative predicate.
+    gradient as data.
+
+    The Hilbert-space theory is also stated over a finite-dimensional real inner product
+    space E with no coordinates: the graph space of pairs (u, ∇u) in L²(Ω) × L²(Ω; E), a
+    coefficient field a : E → (E →L E), and a weak derivative built on Mathlib's
+    distributions. The Gårding inequality, Lax-Milgram existence, Poincaré on a bounded set,
+    Rellich-Kondrachov, the Fredholm alternative, the exceptional set, the resolvent bound,
+    the symmetric spectral theorem, the weak maximum principles, interior smoothness and the
+    H^{-1} characterisation are proved there, the bounded-domain results for any additive Haar
+    measure; the Fredholm and spectral proofs are written once for an abstract
+    shifted-coercive form on a Hilbert space. The coordinate statements, the six compared
+    here among them, are the instances at E = R^d.
 
     Three further layers sit above that base. The maximum principles: the weak principle
     for the divergence-form operator with and without a transport term, the classical weak
@@ -275,14 +286,15 @@ status:
 automation:
   methods:
     - method: "agent"
-      models: ["claude-opus-4-5", "claude-opus-5", "claude-fable-5-1", "claude-sonnet-5"]
+      models: ["claude-opus-4-5", "claude-opus-5", "claude-opus-5-5", "claude-fable-5-1",
+        "claude-sonnet-5", "claude-sonnet-5-5"]
       framework: "Claude Code"
       tool_setup: >-
         Claude Code in a terminal on a local workstation, running lake and the repository's
         own checks directly. No retrieval harness or proof-search tool was involved, and
         no model beyond those named.
       cost:
-        wall_time: "about fourteen weeks, 2026-06-01 to 2026-09-10"
+        wall_time: "about eighteen weeks, 2026-06-01 to 2026-10-07"
         spend_usd: "subscription"
         hardware: "API-only, on a local workstation"
       prompting_notes: >-
@@ -294,11 +306,17 @@ automation:
   notes: >-
     The development was written with substantial assistance from the models named above,
     under Claude Code, directed and reviewed by the author throughout. Claude Opus 4.5 wrote
-    the work to 2026-08-19 and Claude Opus 5 the work after it, with Claude Fable 5.1 and
-    Claude Sonnet 5 on a minority of edits and on search. Every statement in the library was
-    chosen and read by the author; the axiom set of each headline result is pinned in
-    `lean/AxiomAudit.lean` and each is paired with its literature statement in
-    `proofsense/manifest.json`, both checked in CI. Wall time spans the private manuscript
+    the work to 2026-08-19 and Claude Opus 5 the work to 2026-10-05, with Claude Fable 5.1 and
+    Claude Sonnet 5 on a minority of edits and on search. The refactor of 2026-10-06 and
+    2026-10-07, which shortened the proofs and added the coordinate-free statements over a
+    general inner product space, was planned by Claude Opus 5.5 and written mostly by Claude
+    Sonnet 5.5 under the author's direction, with every statement the earlier work exposed
+    kept byte-identical by a signature check. The statements of the six compared results and
+    of the coordinate headline results were chosen and read by the author. The axiom set of
+    each headline result, the general ones included, is checked in `lean/AxiomAudit.lean`;
+    `proofsense/manifest.json` pairs the coordinate results with their literature statements,
+    and `verify/proofsense_coverage.py` points every general result at the coordinate result
+    it generalises, both checked in CI. Wall time spans the private manuscript
     repository from 2026-06-01; the public repository dates from 2026-08-02.
 
 fidelity:
@@ -401,6 +419,6 @@ alignment:
         result. The bound is on the L² norm of the solution, as in Evans.
 
 acknowledgements: >-
-  Built on Mathlib. The Sobolev layer realises H_0^1(Ω) inside the graph space rather than
-  through a weak-derivative predicate, so nothing in it depends on a Sobolev-space API
-  that Mathlib does not yet have.
+  Built on Mathlib. The Sobolev layer realises H_0^1(Ω) inside the graph space, and its
+  weak derivative is Mathlib's distributional derivative on test functions, so nothing in
+  it depends on a Sobolev-space API that Mathlib does not yet have.
