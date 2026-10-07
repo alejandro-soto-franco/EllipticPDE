@@ -57,6 +57,34 @@ open EllipticPdes.Embedding EllipticPdes.Extension EllipticPdes.Poincare
 
 variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))}
 
+/-- If `V` and `0` agree almost everywhere and `V` is the truncation `(u - k)⁺`, then `u ≤ k`
+almost everywhere. -/
+theorem ae_le_of_ae_eq_max_sub_of_ae_eq_zero {α : Type*} {mα : MeasurableSpace α}
+    {μ : Measure α} {u V : α → ℝ} {k : ℝ} (hV : V =ᵐ[μ] fun x => max (u x - k) 0)
+    (hzero : V =ᵐ[μ] 0) : ∀ᵐ x ∂μ, u x ≤ k := by
+  filter_upwards [hV, hzero] with x hx hx0
+  rw [hx0, Pi.zero_apply] at hx
+  by_contra hlt
+  rw [max_eq_left (by linarith [not_le.mp hlt])] at hx
+  linarith [not_le.mp hlt]
+
+/-- The zeroth-order pairing of a subsolution with its truncation is nonnegative when
+`c ≥ 0` and `k ≥ 0`. -/
+theorem inner_cAct_truncation_nonneg {Op : FullEllipticOp d}
+    (hc : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), 0 ≤ Op.c x) {U V : H1amb Ω}
+    {k : ℝ} (hk : 0 ≤ k)
+    (hV0 : ((V : H1amb Ω) 0 : EuclideanSpace ℝ (Fin d) → ℝ)
+      =ᵐ[volume.restrict Ω] fun x => max ((U 0 x : ℝ) - k) 0) :
+    0 ≤ ⟪Op.cAct (U 0), (V : H1amb Ω) 0⟫ := by
+  simp only [FullEllipticOp.cAct, inner_mulCoeffL_eq]
+  refine integral_nonneg_of_ae ?_
+  filter_upwards [ae_restrict_of_ae hc, hV0] with x hcx hx
+  rw [hx]
+  simp only [Pi.zero_apply]
+  by_cases hxk : k < (U 0 x : ℝ)
+  · exact mul_nonneg (mul_nonneg hcx (hk.trans hxk.le)) (le_max_right _ _)
+  · rw [max_eq_right (by linarith [not_lt.mp hxk]), mul_zero]
+
 /-- **Weak maximum principle** (Gilbarg and Trudinger Theorem 8.1, in the transport-free
 case). Let `Ω` be a bounded open set, `L` a divergence-form operator with no transport term and
 nonnegative zeroth-order coefficient, and `U ∈ H¹(Ω)` a weak subsolution, meaning the bilinear
@@ -120,17 +148,8 @@ theorem weak_maximum_principle (hd : 0 < d) (hΩopen : IsOpen Ω)
     refine Finset.sum_eq_zero fun i _ => ?_
     simp only [FullEllipticOp.bAct, inner_mulCoeffL_eq, hb, zero_mul, integral_zero]
   -- the zeroth-order term is nonnegative
-  have hcterm : 0 ≤ ⟪Op.cAct (U 0), (V : H1amb Ω) 0⟫ := by
-    simp only [FullEllipticOp.cAct, inner_mulCoeffL_eq]
-    refine integral_nonneg_of_ae ?_
-    filter_upwards [ae_restrict_of_ae hc, hV0] with x hcx hx
-    rw [hx]
-    simp only [Pi.zero_apply, hwdef]
-    by_cases hxk : k < u x
-    · have hu0 : 0 ≤ u x := hk.trans hxk.le
-      exact mul_nonneg (mul_nonneg hcx hu0) (le_max_right _ _)
-    · have hle : u x ≤ k := not_lt.mp hxk
-      rw [max_eq_right (by linarith), mul_zero]
+  have hcterm : 0 ≤ ⟪Op.cAct (U 0), (V : H1amb Ω) 0⟫ :=
+    inner_cAct_truncation_nonneg hc hk hV0
   -- the principal term is the energy of `V`
   have hprin : (∑ i, ∑ j, ⟪Op.toEllipticCoeff.actL i j (U i.succ), (V : H1amb Ω) j.succ⟫)
       = Op.toEllipticCoeff.bilin Ω V V := by
@@ -160,13 +179,6 @@ theorem weak_maximum_principle (hd : 0 < d) (hΩopen : IsOpen Ω)
   have hzero : ((V : H1amb Ω) 0 : EuclideanSpace ℝ (Fin (n + 1)) → ℝ)
       =ᵐ[volume.restrict Ω] 0 := by
     rw [hV0zero]; exact Lp.coeFn_zero _ _ _
-  filter_upwards [hV0, hzero] with x hx hx0
-  rw [hx0, Pi.zero_apply] at hx
-  simp only [hwdef] at hx
-  rcases le_or_gt (u x) k with hle | hlt
-  · exact hle
-  · exfalso
-    rw [max_eq_left (by linarith)] at hx
-    linarith
+  exact ae_le_of_ae_eq_max_sub_of_ae_eq_zero hV0 hzero
 
 end EllipticPdes.Sobolev

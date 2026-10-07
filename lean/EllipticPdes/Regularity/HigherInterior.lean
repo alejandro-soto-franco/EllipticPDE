@@ -147,6 +147,20 @@ theorem interiorRegularityAt_zero (Op : FullEllipticOp (n + 1))
         linarith
       · simp at hα
 
+/-- Under the cutoff `ϑ` the mixed second derivatives of the family commute. -/
+private lemma cutoffDeriv_mixed_comm {N : Set (EuclideanSpace ℝ (Fin (n + 1)))} {k : ℕ}
+    (hNm : MeasurableSet N) {ϑ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ} (hϑ : IsTestFn N ϑ)
+    {g : L2D N} (HuN : HasIteratedWeakDerivOn N (k + 2) g) (ℓ i : Fin (n + 1)) :
+    (fun x => ϑ x * (HuN.D [i, ℓ] x : ℝ))
+      =ᵐ[volume.restrict N] fun x => ϑ x * (HuN.D [ℓ, i] x : ℝ) := by
+  have h := mulTest_mixed_weakDeriv_comm hNm hϑ
+    (HuN.D_step i [] (Nat.succ_pos _)) (HuN.D_step ℓ [] (Nat.succ_pos _))
+    (HuN.D_step ℓ [i] (Nat.succ_lt_succ (Nat.succ_pos k)))
+    (HuN.D_step i [ℓ] (Nat.succ_lt_succ (Nat.succ_pos k)))
+  filter_upwards [mulCutoff_coeFn hϑ (HuN.D [ℓ, i]), mulCutoff_coeFn hϑ (HuN.D [i, ℓ])]
+    with x h1 h2
+  rw [← h2, ← h, h1]
+
 /-- **Weak formulation of the cut-off derivative against a test function.** Let `U` be the
 cut-off derivative `ξ · ∂_ℓ u`, with gradient given in closed form by `hgrad`, and let `HuN` be
 the family of derivatives of `u` on the collar `N`. Then `B[U, v]` is the datum
@@ -182,17 +196,7 @@ private lemma cutoffDeriv_pairing_eq (Op : FullEllipticOp (n + 1))
       (D2 := fun i => HuN.D [i, ℓ]) hgrad hU0N hD2 hv.1).trans ?_)
   unfold cutoffDatumPairing
   -- The mixed second derivative, swapped into the order the equation names.
-  have hsymm : ∀ i : Fin (n + 1),
-      (fun x => ϑ x * (HuN.D [i, ℓ] x : ℝ))
-        =ᵐ[volume.restrict N] fun x => ϑ x * (HuN.D [ℓ, i] x : ℝ) := by
-    intro i
-    have h := mulTest_mixed_weakDeriv_comm hNm hϑ
-      (HuN.D_step i [] (Nat.succ_pos _)) (HuN.D_step ℓ [] (Nat.succ_pos _))
-      (HuN.D_step ℓ [i] (Nat.succ_lt_succ (Nat.succ_pos k)))
-      (HuN.D_step i [ℓ] (Nat.succ_lt_succ (Nat.succ_pos k)))
-    filter_upwards [mulCutoff_coeFn hϑ (HuN.D [ℓ, i]), mulCutoff_coeFn hϑ (HuN.D [i, ℓ])]
-      with x h1 h2
-    rw [← h2, ← h, h1]
+  have hsymm := cutoffDeriv_mixed_comm hNm hϑ HuN ℓ
   have hψ : ∀ j : Fin (n + 1), ∀ x, ϑ x * partialD j (fun y => ξ y * v y) x
       = partialD j (fun y => ξ y * v y) x := fun j =>
     mul_eq_self_of_eqOn_one hϑ_eqOn
@@ -256,6 +260,17 @@ private lemma cutoffDeriv_pairing_eq (Op : FullEllipticOp (n + 1))
   simp only [hT, hZ, hAA, hDf]
   simp only [HuN.D_nil, Finset.sum_add_distrib]
   ring
+
+/-- The two real estimates that control the cut-off derivative: the datum's constant against
+the inductive bound, and the supremum of the cutoff against the bound on `∂_ℓ u`. -/
+private lemma cutoffDeriv_constant_le {KD C₁ Cξ M X : ℝ} (hKD : 0 ≤ KD) (hC₁ : 0 ≤ C₁)
+    (hCξ : 0 ≤ Cξ) (hX : 0 ≤ X) (hMX : M ≤ X) :
+    KD * (C₁ * X + M) ≤ (KD * (C₁ + 1) + Cξ * C₁) * X ∧
+      Cξ * (C₁ * X) ≤ (KD * (C₁ + 1) + Cξ * C₁) * X := by
+  constructor
+  · nlinarith [mul_nonneg hKD hC₁, mul_nonneg hCξ hC₁, mul_nonneg (mul_nonneg hCξ hC₁) hX,
+      mul_nonneg hKD (sub_nonneg.2 hMX)]
+  · nlinarith [mul_nonneg hKD hC₁, mul_nonneg hKD hX, mul_nonneg (mul_nonneg hKD hC₁) hX]
 
 /-- **The cut-off derivative as a weak solution.** An element `U ∈ H₀¹(Ω)` agreeing with
 `∂_ℓ u` on `V`, a datum `F ∈ L²(Ω)` with `k` weak derivatives, and the weak formulation
@@ -393,13 +408,7 @@ theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
     exact extendL2_mulTest_eq hΩm hNm hNΩ T.hξ hξNt ((u : H1amb Ω) ℓ.succ)
   · -- The datum's bound, in the data.
     refine hFbd.mono_const ?_
-    have h1 : C₁ * (M + ‖(u : H1amb Ω) 0‖) + M ≤ (C₁ + 1) * (M + ‖(u : H1amb Ω) 0‖) := by
-      linarith only [hu00]
-    calc KD * (C₁ * (M + ‖(u : H1amb Ω) 0‖) + M)
-        ≤ KD * ((C₁ + 1) * (M + ‖(u : H1amb Ω) 0‖)) := mul_le_mul_of_nonneg_left h1 hKD0
-      _ = KD * (C₁ + 1) * (M + ‖(u : H1amb Ω) 0‖) := by ring
-      _ ≤ (KD * (C₁ + 1) + hξNt.supNorm * C₁) * (M + ‖(u : H1amb Ω) 0‖) :=
-          mul_le_mul_of_nonneg_right (le_add_of_nonneg_right (mul_nonneg hCξ0 hC₁0)) hMu
+    exact (cutoffDeriv_constant_le (M := M) hKD0 hC₁0 hCξ0 hMu (by linarith only [hu00])).1
   · -- The cut-off derivative's norm, read on the collar where the cutoff lives.
     change ‖Uamb 0‖ ≤ _
     rw [hU0]
@@ -410,10 +419,7 @@ theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
       _ ≤ hξNt.supNorm * ‖HuN.D [ℓ]‖ := norm_mulTest_le_supNorm hξNt _
       _ ≤ hξNt.supNorm * (C₁ * (M + ‖(u : H1amb Ω) 0‖)) :=
           mul_le_mul_of_nonneg_left hDℓnorm hCξ0
-      _ = hξNt.supNorm * C₁ * (M + ‖(u : H1amb Ω) 0‖) := by ring
-      _ ≤ (KD * (C₁ + 1) + hξNt.supNorm * C₁) * (M + ‖(u : H1amb Ω) 0‖) :=
-          mul_le_mul_of_nonneg_right
-            (le_add_of_nonneg_left (mul_nonneg hKD0 (add_nonneg hC₁0 zero_le_one))) hMu
+      _ ≤ _ := (cutoffDeriv_constant_le (M := M) hKD0 hC₁0 hCξ0 hMu (by linarith only [hu00])).2
 
 /-- **Induction step.** Differentiating the equation once raises the order-`k` conclusion to
 order `k + 1`, under one more order of regularity on every coefficient.

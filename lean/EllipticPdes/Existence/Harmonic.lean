@@ -6,7 +6,7 @@ Authors: Alejandro Soto Franco
 
 module
 
-public import EllipticPdes.Existence.StrongMaximum
+public import EllipticPdes.Existence.StrongMaximumCorollaries
 
 /-!
 # Maximum principles for subharmonic functions
@@ -14,10 +14,13 @@ public import EllipticPdes.Existence.StrongMaximum
 The Laplacian is the non-divergence operator with the identity as coefficient matrix and no
 lower-order terms, up to sign. The classical weak and strong maximum principles and the
 uniqueness of the Dirichlet problem specialise to subharmonic, superharmonic and harmonic
-functions, in the sense of the sum of the second coordinate partials.
+functions. They are stated on a finite-dimensional real inner product space with Mathlib's
+Laplacian `Δ` (the contraction of the Hessian against the identity), and then on Euclidean
+space for the sum of the second coordinate partials.
 
 ## Main declarations
 
+* `EllipticPdes.Classical.traceHessian_one`: `tr (D²u) = Δ u`.
 * `EllipticPdes.Classical.laplacianSum`: the sum of the second coordinate partials.
 * `EllipticPdes.Classical.nondivOp_laplace`: the Laplacian as a non-divergence operator.
 * `EllipticPdes.Classical.weak_maximum_principle_subharmonic`: the weak maximum principle.
@@ -35,11 +38,97 @@ Corollary XI.1.6, Lemma XI.1.7 (p. 92) and Lemma XI.2.4 (p. 95).
 
 @[expose] public section
 
-open Set Filter Topology Metric
+open Set Filter Topology Metric InnerProductSpace
+open scoped RealInnerProductSpace
 
 noncomputable section
 
 namespace EllipticPdes.Classical
+
+section General
+
+variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+
+/-- The contraction of the Hessian against the identity is the Laplacian. -/
+theorem traceHessian_one (u : E → ℝ) (x : E) :
+    traceHessian (1 : E →L[ℝ] E) u x = Laplacian.laplacian u x := by
+  rw [traceHessian_eq_sum_iteratedFDeriv (stdOrthonormalBasis ℝ E),
+    congrFun (laplacian_eq_iteratedFDeriv_stdOrthonormalBasis (E := E) u) x]
+  simp
+
+/-- The Laplacian is the negative of the operator with identity coefficient and no lower-order
+terms. -/
+theorem nondivOperator_one (u : E → ℝ) (x : E) :
+    nondivOperator (fun _ => (1 : E →L[ℝ] E)) (fun _ => 0) (fun _ => 0) u x
+      = -Laplacian.laplacian u x := by
+  simp [nondivOperator, traceHessian_one]
+
+omit [FiniteDimensional ℝ E] in
+/-- The identity coefficient is uniformly elliptic with constant one. -/
+theorem isUniformlyElliptic_one (U : Set E) :
+    IsUniformlyElliptic (fun _ : E => (1 : E →L[ℝ] E)) U 1 :=
+  ⟨one_pos, fun _ _ => fun _ _ => rfl, fun _ _ ξ => by simp⟩
+
+/-- The trace of the identity is the dimension. -/
+theorem trace_one_le (E : Type*) [NormedAddCommGroup E] [InnerProductSpace ℝ E]
+    [FiniteDimensional ℝ E] :
+    LinearMap.trace ℝ E (((1 : E →L[ℝ] E)) : E →ₗ[ℝ] E) ≤ Module.finrank ℝ E := by
+  simp
+
+namespace laplacian
+
+/-- **Weak maximum principle for subharmonic functions** (Guo Lemma XI.1.7). -/
+theorem weak_maximum_principle_subharmonic [Nontrivial E] {U : Set E} (hU : IsOpen U)
+    (hUb : Bornology.IsBounded U) (hUne : U.Nonempty) {u : E → ℝ} (hu : ContDiffOn ℝ 2 u U)
+    (huc : ContinuousOn u (closure U)) (hsub : ∀ x ∈ U, 0 ≤ Laplacian.laplacian u x) :
+    ∃ y ∈ frontier U, ∀ x ∈ closure U, u x ≤ u y := by
+  obtain ⟨e, he⟩ := (NormedSpace.sphere_nonempty (E := E)).mpr (zero_le_one : (0 : ℝ) ≤ 1)
+  replace he : ‖e‖ = 1 := mem_sphere_zero_iff_norm.mp he
+  exact nondivOperator.weak_maximum_principle hU hUb hUne (isUniformlyElliptic_one U) he
+    (B := 0) (fun x _ => (inner_zero_left e).le) hu huc fun x hx => by
+      rw [nondivOperator_one]; linarith [hsub x hx]
+
+/-- **Strong maximum principle for subharmonic functions** (Guo Lemma XI.1.5). -/
+theorem strong_maximum_principle_subharmonic {U : Set E} (hU : IsOpen U) (hUc : IsPreconnected U)
+    {u : E → ℝ} (hu : ContDiffOn ℝ 2 u U) (hsub : ∀ x ∈ U, 0 ≤ Laplacian.laplacian u x)
+    {x₀ : E} (hx₀ : x₀ ∈ U) (hmax : ∀ x ∈ U, u x ≤ u x₀) : ∀ x ∈ U, u x = u x₀ :=
+  nondivOperator.strong_maximum_principle hU hUc (isUniformlyElliptic_one U)
+    (fun _ _ => trace_one_le E) (B := 0) (fun _ _ => norm_zero.le) (fun _ _ => le_rfl)
+    (C := 0) (fun _ _ => le_rfl) hu (fun x hx => by
+      rw [nondivOperator_one]; linarith [hsub x hx]) hx₀ hmax fun _ _ => (zero_mul _).ge
+
+/-- **Strong minimum principle for superharmonic functions** (Guo Corollary XI.1.6). -/
+theorem strong_minimum_principle_superharmonic {U : Set E} (hU : IsOpen U)
+    (hUc : IsPreconnected U) {u : E → ℝ} (hu : ContDiffOn ℝ 2 u U)
+    (hsup : ∀ x ∈ U, Laplacian.laplacian u x ≤ 0) {x₀ : E} (hx₀ : x₀ ∈ U)
+    (hmin : ∀ x ∈ U, u x₀ ≤ u x) : ∀ x ∈ U, u x = u x₀ := by
+  have h := strong_maximum_principle_subharmonic hU hUc hu.neg
+    (fun x hx => by
+      have := congrFun (laplacian_neg (E := E) (f := u)) x
+      simp only [Pi.neg_apply] at this
+      change 0 ≤ Laplacian.laplacian (-u) x
+      rw [this]
+      linarith [hsup x hx]) hx₀ (fun x hx => by linarith [hmin x hx])
+  intro x hx
+  linarith [h x hx]
+
+/-- **Uniqueness for the Dirichlet problem for the Laplacian** (Guo Lemma XI.2.4). -/
+theorem dirichlet_unique_harmonic [Nontrivial E] {U : Set E} (hU : IsOpen U)
+    (hUb : Bornology.IsBounded U) (hUne : U.Nonempty) {u v : E → ℝ} (hu : ContDiffOn ℝ 2 u U)
+    (hv : ContDiffOn ℝ 2 v U) (huc : ContinuousOn u (closure U)) (hvc : ContinuousOn v (closure U))
+    (hL : ∀ x ∈ U, Laplacian.laplacian u x = Laplacian.laplacian v x)
+    (hbd : ∀ x ∈ frontier U, u x = v x) : ∀ x ∈ closure U, u x = v x := by
+  obtain ⟨e, he⟩ := (NormedSpace.sphere_nonempty (E := E)).mpr (zero_le_one : (0 : ℝ) ≤ 1)
+  replace he : ‖e‖ = 1 := mem_sphere_zero_iff_norm.mp he
+  exact nondivOperator.dirichlet_unique hU hUb hUne (isUniformlyElliptic_one U) he (B := 0)
+    (fun x _ => (inner_zero_left e).le) (fun _ _ => le_rfl) hu hv huc hvc
+    (fun x hx => by rw [nondivOperator_one, nondivOperator_one, hL x hx]) hbd
+
+end laplacian
+
+end General
+
+/-! ### Euclidean space -/
 
 open EllipticPdes.Sobolev (partialD)
 
@@ -83,13 +172,31 @@ theorem idCoeff_bdd (i j : Fin d) : |idCoeff i j| ≤ 1 := by
   · rw [ite_eq_right h, abs_zero]
     exact zero_le_one
 
-/-- The Laplacian of a negative. -/
+/-- The sum of the second partials of a function `C²` at a point is its Laplacian. -/
+theorem laplacianSum_eq_laplacian {u : EuclideanSpace ℝ (Fin d) → ℝ}
+    {x : EuclideanSpace ℝ (Fin d)} (hu : ContDiffAt ℝ 2 u x) :
+    laplacianSum u x = Laplacian.laplacian u x := by
+  have h := nondivOp_laplace (d := d) u x
+  rw [nondivOp_eq (b := fun _ _ => 0) hu] at h
+  have e : (fun y : EuclideanSpace ℝ (Fin d) => matrixCLM (idCoeff (d := d)))
+      = fun _ => (1 : EuclideanSpace ℝ (Fin d) →L[ℝ] EuclideanSpace ℝ (Fin d)) := by
+    ext1 y
+    ext ξ i
+    simp [matrixCLM_apply, idCoeff]
+  have h0 : (fun y : EuclideanSpace ℝ (Fin d) => (WithLp.toLp 2 (fun _ : Fin d => (0 : ℝ))
+      : EuclideanSpace ℝ (Fin d))) = fun _ => 0 := by
+    ext1; ext1; rfl
+  rw [e, h0, nondivOperator_one] at h
+  linarith
+
+/-- The sum of the second partials is negated with the function. -/
 theorem laplacianSum_neg {U : Set (EuclideanSpace ℝ (Fin d))} (hU : IsOpen U)
     {u : EuclideanSpace ℝ (Fin d) → ℝ} (hu : ContDiffOn ℝ 2 u U) {x : EuclideanSpace ℝ (Fin d)}
     (hx : x ∈ U) : laplacianSum (fun y => -u y) x = -laplacianSum u x := by
-  have h := nondivOp_neg hU hu (fun _ => idCoeff) (fun _ _ => 0) (fun _ => 0) hx
-  rw [nondivOp_laplace, nondivOp_laplace] at h
-  linarith
+  rw [laplacianSum_eq_laplacian (hu.contDiffAt (hU.mem_nhds hx)),
+    laplacianSum_eq_laplacian (hu.neg.contDiffAt (hU.mem_nhds hx))]
+  have := congrFun (laplacian_neg (E := EuclideanSpace ℝ (Fin d)) (f := u)) x
+  exact this
 
 /-- **Weak maximum principle for subharmonic functions** (Guo Lemma XI.1.7). A function `C²`
 on a bounded open set, continuous on its closure, with nonnegative Laplacian on the set, attains
@@ -98,12 +205,10 @@ theorem weak_maximum_principle_subharmonic (hd : 0 < d) {U : Set (EuclideanSpace
     (hU : IsOpen U) (hUb : Bornology.IsBounded U) (hUne : U.Nonempty)
     {u : EuclideanSpace ℝ (Fin d) → ℝ} (hu : ContDiffOn ℝ 2 u U)
     (huc : ContinuousOn u (closure U)) (hsub : ∀ x ∈ U, 0 ≤ laplacianSum u x) :
-    ∃ y ∈ frontier U, ∀ x ∈ closure U, u x ≤ u y :=
-  weak_maximum_principle hd hU hUb hUne (a := fun _ => idCoeff) (b := fun _ _ => 0) (B := 0) one_pos
-    (fun _ _ => idCoeff_symm) (fun _ _ => idCoeff_ell) (fun _ _ _ => by simp) hu huc
-    fun x hx => by
-      rw [nondivOp_laplace]
-      linarith [hsub x hx]
+    ∃ y ∈ frontier U, ∀ x ∈ closure U, u x ≤ u y := by
+  have : Nontrivial (EuclideanSpace ℝ (Fin d)) := ⟨⟨EuclideanSpace.single ⟨0, hd⟩ 1, 0, by simp⟩⟩
+  exact laplacian.weak_maximum_principle_subharmonic hU hUb hUne hu huc fun x hx => by
+    rw [← laplacianSum_eq_laplacian (hu.contDiffAt (hU.mem_nhds hx))]; exact hsub x hx
 
 /-- **Strong maximum principle for subharmonic functions** (Guo Lemma XI.1.5). A function `C²`
 on a connected open set with nonnegative Laplacian that attains its supremum over the set at an
@@ -113,14 +218,10 @@ theorem strong_maximum_principle_subharmonic (hd : 0 < d) {U : Set (EuclideanSpa
     {u : EuclideanSpace ℝ (Fin d) → ℝ} (hu : ContDiffOn ℝ 2 u U)
     (hsub : ∀ x ∈ U, 0 ≤ laplacianSum u x)
     {x₀ : EuclideanSpace ℝ (Fin d)} (hx₀ : x₀ ∈ U) (hmax : ∀ x ∈ U, u x ≤ u x₀) :
-    ∀ x ∈ U, u x = u x₀ :=
-  strong_maximum_principle hd hU hUc (a := fun _ => idCoeff) (b := fun _ _ => 0) (c := fun _ => 0)
-    (A := 1) (B := 0) (C := 0) one_pos (fun _ _ => idCoeff_symm) (fun _ _ => idCoeff_ell)
-    (fun _ _ => idCoeff_bdd) (fun _ _ _ => by simp) (fun _ _ => le_rfl) (fun _ _ => le_rfl) hu
-    (fun x hx => by
-      rw [nondivOp_laplace]
-      linarith [hsub x hx])
-    hx₀ hmax fun _ _ => by simp
+    ∀ x ∈ U, u x = u x₀ := by
+  have _ := hd
+  exact laplacian.strong_maximum_principle_subharmonic hU hUc hu (fun x hx => by
+    rw [← laplacianSum_eq_laplacian (hu.contDiffAt (hU.mem_nhds hx))]; exact hsub x hx) hx₀ hmax
 
 /-- **Strong minimum principle for superharmonic functions** (Guo Corollary XI.1.6). A function
 `C²` on a connected open set with nonpositive Laplacian that attains its infimum over the set at
@@ -131,13 +232,9 @@ theorem strong_minimum_principle_superharmonic (hd : 0 < d)
     (hsup : ∀ x ∈ U, laplacianSum u x ≤ 0)
     {x₀ : EuclideanSpace ℝ (Fin d)} (hx₀ : x₀ ∈ U) (hmin : ∀ x ∈ U, u x₀ ≤ u x) :
     ∀ x ∈ U, u x = u x₀ := by
-  have h := strong_maximum_principle_subharmonic hd hU hUc hu.neg
-    (fun x hx => by
-      rw [laplacianSum_neg hU hu hx]
-      linarith [hsup x hx])
-    hx₀ (fun x hx => by linarith [hmin x hx])
-  intro x hx
-  linarith [h x hx]
+  have _ := hd
+  exact laplacian.strong_minimum_principle_superharmonic hU hUc hu (fun x hx => by
+    rw [← laplacianSum_eq_laplacian (hu.contDiffAt (hU.mem_nhds hx))]; exact hsup x hx) hx₀ hmin
 
 /-- **Harmonic functions attaining their supremum are constant** (Guo Corollary XI.1.6). -/
 theorem harmonic_const_of_max (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))}
@@ -165,10 +262,10 @@ theorem dirichlet_unique_harmonic (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin
     {u v : EuclideanSpace ℝ (Fin d) → ℝ} (hu : ContDiffOn ℝ 2 u U) (hv : ContDiffOn ℝ 2 v U)
     (huc : ContinuousOn u (closure U)) (hvc : ContinuousOn v (closure U))
     (hL : ∀ x ∈ U, laplacianSum u x = laplacianSum v x)
-    (hbd : ∀ x ∈ frontier U, u x = v x) : ∀ x ∈ closure U, u x = v x :=
-  dirichlet_unique hd hU hUb hUne (a := fun _ => idCoeff) (b := fun _ _ => 0) (c := fun _ => 0)
-    (B := 0) one_pos (fun _ _ => idCoeff_symm) (fun _ _ => idCoeff_ell) (fun _ _ _ => by simp)
-    (fun _ _ => le_rfl) hu hv huc hvc
-    (fun x hx => by rw [nondivOp_laplace, nondivOp_laplace, hL x hx]) hbd
+    (hbd : ∀ x ∈ frontier U, u x = v x) : ∀ x ∈ closure U, u x = v x := by
+  have : Nontrivial (EuclideanSpace ℝ (Fin d)) := ⟨⟨EuclideanSpace.single ⟨0, hd⟩ 1, 0, by simp⟩⟩
+  exact laplacian.dirichlet_unique_harmonic hU hUb hUne hu hv huc hvc (fun x hx => by
+    rw [← laplacianSum_eq_laplacian (hu.contDiffAt (hU.mem_nhds hx)),
+      ← laplacianSum_eq_laplacian (hv.contDiffAt (hU.mem_nhds hx))]; exact hL x hx) hbd
 
 end EllipticPdes.Classical

@@ -41,208 +41,167 @@ open scoped RealInnerProductSpace
 
 noncomputable section
 
-namespace EllipticPdes.Sobolev
-
 /-! ### Spectrum of a compact operator (Evans Appendix D.5, Theorem 6) -/
+
+section CompactSpectrum
+
+variable {𝕜 E : Type*} [RCLike 𝕜] [NormedAddCommGroup E] [InnerProductSpace 𝕜 E]
+
+open Module in
+/-- In a linearly independent family, the span of the first `n + 1` vectors contains a unit
+vector orthogonal to the span of the first `n`. -/
+theorem LinearIndependent.exists_unit_mem_span_succ_orthogonal {e : ℕ → E}
+    (hli : LinearIndependent 𝕜 e) (n : ℕ) :
+    ∃ u ∈ Submodule.span 𝕜 (e '' Set.Iio (n + 1)),
+      u ∈ (Submodule.span 𝕜 (e '' Set.Iio n))ᗮ ∧ ‖u‖ = 1 := by
+  set S := Submodule.span 𝕜 (e '' Set.Iio n)
+  have : FiniteDimensional 𝕜 S := FiniteDimensional.span_of_finite 𝕜 ((Set.finite_Iio n).image e)
+  have hmem : e n ∈ Submodule.span 𝕜 (e '' Set.Iio (n + 1)) :=
+    Submodule.subset_span ⟨n, Nat.lt_succ_self n, rfl⟩
+  have hS : S ≤ Submodule.span 𝕜 (e '' Set.Iio (n + 1)) :=
+    Submodule.span_mono (Set.image_mono (Set.Iio_subset_Iio n.le_succ))
+  have hw : e n - S.starProjection (e n) ≠ 0 := fun h0 => by
+    refine hli.notMem_span_image (s := Set.Iio n) (x := n) (by simp) ?_
+    rw [sub_eq_zero.mp h0]
+    exact S.starProjection_apply_mem _
+  refine ⟨(‖e n - S.starProjection (e n)‖⁻¹ : 𝕜) • (e n - S.starProjection (e n)),
+    Submodule.smul_mem _ _ (Submodule.sub_mem _ hmem (hS (S.starProjection_apply_mem _))),
+    Submodule.smul_mem _ _ (S.sub_starProjection_mem_orthogonal _), ?_⟩
+  exact norm_smul_inv_norm hw
+
+/-- A unit vector orthogonal to `z` is at distance at least `1` from `z`. -/
+theorem one_le_norm_sub_of_inner_eq_zero {u z : E} (hu : ‖u‖ = 1) (h : inner 𝕜 u z = 0) :
+    1 ≤ ‖u - z‖ := by
+  have hsq := norm_sub_sq (𝕜 := 𝕜) u z
+  rw [hu, h, map_zero] at hsq
+  nlinarith [norm_nonneg (u - z), sq_nonneg ‖z‖]
+
+/-- Separation along an invariant flag. Let `S n` be an increasing family of subspaces
+invariant under `K` with `(μ n - K) (S (n + 1)) ⊆ S n`, and let `u n` be unit vectors in
+`S (n + 1)` orthogonal to `S n`. Then the images `K (u n / μ n)` are pairwise at distance
+at least `1`. -/
+theorem Module.End.one_le_norm_apply_sub_of_flag {K : E →ₗ[𝕜] E} {μ : ℕ → 𝕜}
+    (hμ : ∀ n, μ n ≠ 0) {S : ℕ → Submodule 𝕜 E} (hmono : Monotone S)
+    (hK : ∀ n, ∀ x ∈ S n, K x ∈ S n) (hshift : ∀ n, ∀ x ∈ S (n + 1), μ n • x - K x ∈ S n)
+    {u : ℕ → E} (hu : ∀ n, u n ∈ S (n + 1) ∧ u n ∈ (S n)ᗮ ∧ ‖u n‖ = 1) {m n : ℕ}
+    (hmn : m < n) :
+    1 ≤ ‖K ((μ n)⁻¹ • u n) - K ((μ m)⁻¹ • u m)‖ := by
+  set z : E := (μ n)⁻¹ • (μ n • u n - K (u n)) + K ((μ m)⁻¹ • u m)
+  have hz : z ∈ S n := Submodule.add_mem _ (Submodule.smul_mem _ _ (hshift n _ (hu n).1))
+    (hmono (Nat.succ_le_of_lt hmn) (by
+      rw [map_smul]
+      exact Submodule.smul_mem _ _ (hK _ _ (hu m).1)))
+  have hdiff : K ((μ n)⁻¹ • u n) - K ((μ m)⁻¹ • u m) = u n - z := by
+    simp only [z, map_smul, smul_sub, smul_smul, inv_mul_cancel₀ (hμ n), one_smul]
+    abel
+  rw [hdiff]
+  exact one_le_norm_sub_of_inner_eq_zero (𝕜 := 𝕜) (hu n).2.2
+    ((Submodule.mem_orthogonal' (S n) (u n)).mp (hu n).2.1 z hz)
+
+/-- A compact operator maps a bounded sequence to a sequence with two terms less than `1`
+apart. -/
+theorem IsCompactOperator.exists_norm_sub_lt_one {F : Type*} [NormedAddCommGroup F]
+    [NormedSpace 𝕜 F] {K : E →ₗ[𝕜] F} (hK : IsCompactOperator K) {R : ℝ} {v : ℕ → E}
+    (hv : ∀ n, ‖v n‖ ≤ R) : ∃ m n, m < n ∧ ‖K (v n) - K (v m)‖ < 1 := by
+  have hmem : ∀ n, K (v n) ∈ closure (K '' Metric.closedBall 0 R) := fun n =>
+    subset_closure ⟨v n, by simpa using hv n, rfl⟩
+  obtain ⟨_, _, φ, hφ, hlim⟩ := (hK.isCompact_closure_image_closedBall R).tendsto_subseq hmem
+  obtain ⟨N, hN⟩ := Metric.cauchySeq_iff.mp (Filter.Tendsto.cauchySeq hlim) 1 one_pos
+  exact ⟨φ N, φ (N + 1), hφ N.lt_succ_self,
+    by simpa [dist_eq_norm, Function.comp] using hN (N + 1) N.le_succ N le_rfl⟩
+
+/-- The eigenvector flag of an injective sequence of eigenvalues: the span of the first `n`
+eigenvectors is `K`-invariant, and `μ n - K` maps the span of the first `n + 1` into the span of
+the first `n`. -/
+theorem Module.End.span_flag_of_hasEigenvector {K : E →ₗ[𝕜] E} {μ : ℕ → 𝕜} {e : ℕ → E}
+    (he : ∀ n, Module.End.HasEigenvector K (μ n) (e n)) (n : ℕ) :
+    (∀ x ∈ Submodule.span 𝕜 (e '' Set.Iio n), K x ∈ Submodule.span 𝕜 (e '' Set.Iio n)) ∧
+    ∀ x ∈ Submodule.span 𝕜 (e '' Set.Iio (n + 1)),
+      μ n • x - K x ∈ Submodule.span 𝕜 (e '' Set.Iio n) := by
+  have hKe : ∀ i, K (e i) = μ i • e i := fun i => Module.End.mem_eigenspace_iff.mp (he i).1
+  have hmem : ∀ i < n, e i ∈ Submodule.span 𝕜 (e '' Set.Iio n) := fun i hi =>
+    Submodule.subset_span ⟨i, hi, rfl⟩
+  refine ⟨fun x hx => ?_, fun x hx => ?_⟩
+  · refine (Submodule.map_span_le K _ _).mpr ?_ (Submodule.mem_map_of_mem hx)
+    rintro _ ⟨i, hi, rfl⟩
+    rw [hKe]
+    exact Submodule.smul_mem _ _ (hmem i hi)
+  · let L : E →ₗ[𝕜] E := μ n • LinearMap.id - K
+    refine (Submodule.map_span_le L _ _).mpr ?_ (Submodule.mem_map_of_mem hx)
+    rintro _ ⟨i, hi, rfl⟩
+    have : L (e i) = (μ n - μ i) • e i := by simp [L, hKe, sub_smul]
+    rw [this]
+    rcases Nat.lt_succ_iff_lt_or_eq.mp hi with h | rfl
+    · exact Submodule.smul_mem _ _ (hmem i h)
+    · simp
+
+/-- **Eigenvalues of a compact operator do not accumulate away from zero**: for every
+`δ > 0` there are only finitely many eigenvalues `μ` with `δ ≤ ‖μ‖`. The classical
+eigenvector-chain argument, with the Riesz lemma replaced by Hilbert orthogonality. -/
+theorem IsCompactOperator.finite_setOf_hasEigenvalue_norm_ge {K : E →L[𝕜] E}
+    (hK : IsCompactOperator K) {δ : ℝ} (hδ : 0 < δ) :
+    {μ : 𝕜 | Module.End.HasEigenvalue K.toLinearMap μ ∧ δ ≤ ‖μ‖}.Finite := by
+  by_contra hcon
+  set emb := (Set.not_finite.mp hcon).natEmbedding
+  set μ : ℕ → 𝕜 := fun n => (emb n : 𝕜)
+  have hprop : ∀ n, Module.End.HasEigenvalue K.toLinearMap (μ n) ∧ δ ≤ ‖μ n‖ := fun n => (emb n).2
+  have hμne : ∀ n, μ n ≠ 0 := fun n h0 => by
+    have := (hprop n).2
+    rw [h0, norm_zero] at this
+    linarith
+  choose e he using fun n => (hprop n).1.exists_hasEigenvector
+  have hli : LinearIndependent 𝕜 e := Module.End.eigenvectors_linearIndependent' K.toLinearMap μ
+    (fun a b hab => emb.injective (Subtype.coe_injective hab)) e he
+  choose u hu1 hu2 hu3 using hli.exists_unit_mem_span_succ_orthogonal
+  have hmono : Monotone fun n => Submodule.span 𝕜 (e '' Set.Iio n) := fun m n hmn =>
+    Submodule.span_mono (Set.image_mono (Set.Iio_subset_Iio hmn))
+  obtain ⟨m, n, hmn, hlt⟩ := hK.exists_norm_sub_lt_one (K := K.toLinearMap)
+    (v := fun n => (μ n)⁻¹ • u n) (R := δ⁻¹) fun n => by
+      rw [norm_smul, norm_inv, hu3, mul_one]
+      exact inv_anti₀ hδ (hprop n).2
+  exact absurd hlt (not_lt.mpr (Module.End.one_le_norm_apply_sub_of_flag hμne hmono
+    (fun n => (Module.End.span_flag_of_hasEigenvector he n).1)
+    (fun n => (Module.End.span_flag_of_hasEigenvector he n).2)
+    (fun n => ⟨hu1 n, hu2 n, hu3 n⟩) hmn))
+
+variable {K : E →L[𝕜] E}
+
+/-- The nonzero eigenvalues of a compact operator form a countable set: the union of
+the finite slices `{δ ≤ ‖μ‖}` over `δ = 1/(n+1)`. -/
+theorem IsCompactOperator.countable_setOf_hasEigenvalue_ne_zero (hK : IsCompactOperator K) :
+    {μ : 𝕜 | Module.End.HasEigenvalue K.toLinearMap μ ∧ μ ≠ 0}.Countable := by
+  refine Set.Countable.mono (fun μ ⟨hμ, hμ0⟩ => ?_) (Set.countable_iUnion fun n : ℕ =>
+    (hK.finite_setOf_hasEigenvalue_norm_ge (δ := 1 / (n + 1)) (by positivity)).countable)
+  obtain ⟨n, hn⟩ := exists_nat_one_div_lt (norm_pos_iff.mpr hμ0)
+  exact Set.mem_iUnion.mpr ⟨n, hμ, hn.le⟩
+
+/-- `0` lies in the spectrum of a compact operator on an infinite-dimensional space: an
+inverse would make the identity compact (Evans Appendix D.5, Theorem 6(i)). -/
+theorem IsCompactOperator.zero_mem_spectrum (hK : IsCompactOperator K)
+    (hinf : ¬ FiniteDimensional 𝕜 E) : (0 : 𝕜) ∈ spectrum 𝕜 K := by
+  rw [spectrum.zero_mem_iff]
+  intro hunit
+  obtain ⟨w, hw⟩ := hunit
+  refine hinf ((isCompactOperator_id_iff_finiteDimensional (𝕜 := 𝕜)).mp ?_)
+  have := hK.clm_comp (↑w⁻¹ : E →L[𝕜] E)
+  rwa [← hw, ← ContinuousLinearMap.coe_comp, ← ContinuousLinearMap.mul_def, w.inv_mul] at this
+
+/-- Away from zero the spectrum of a compact operator consists exactly of the eigenvalues
+(Evans Appendix D.5, Theorem 6(ii)), mathlib's Fredholm alternative as a set identity. -/
+theorem IsCompactOperator.spectrum_diff_zero_eq [CompleteSpace E] (hK : IsCompactOperator K) :
+    spectrum 𝕜 K \ {0} = {μ : 𝕜 | Module.End.HasEigenvalue K.toLinearMap μ} \ {0} := by
+  ext μ
+  simp only [Set.mem_sdiff, Set.mem_singleton_iff, Set.mem_ofPred_eq]
+  exact and_congr_left fun h0 => (hK.hasEigenvalue_iff_mem_spectrum h0).symm
+
+end CompactSpectrum
+
+namespace EllipticPdes.Sobolev
 
 section CompactSpectrum
 
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [CompleteSpace E]
 variable {K : E →L[ℝ] E}
-
-omit [CompleteSpace E] in
-/-- **Eigenvalues of a compact operator do not accumulate away from zero**: for every
-`δ > 0` there are only finitely many eigenvalues `μ` with `δ ≤ |μ|`. The classical
-eigenvector-chain argument, with the Riesz lemma replaced by Hilbert orthogonality. -/
-theorem finite_setOf_hasEigenvalue_abs_ge (hK : IsCompactOperator K)
-    {δ : ℝ} (hδ : 0 < δ) :
-    {μ : ℝ | Module.End.HasEigenvalue (K.toLinearMap) μ ∧ δ ≤ |μ|}.Finite := by
-  by_contra hcon
-  have hinf : {μ : ℝ | Module.End.HasEigenvalue (K.toLinearMap) μ ∧ δ ≤ |μ|}.Infinite :=
-    hcon
-  set emb := hinf.natEmbedding with hembdef
-  set μs : ℕ → ℝ := fun n => (emb n : ℝ) with hμsdef
-  have hμinj : Function.Injective μs := fun a b hab =>
-    emb.injective (Subtype.coe_injective hab)
-  have hμprop : ∀ n, Module.End.HasEigenvalue (K.toLinearMap) (μs n) ∧ δ ≤ |μs n| :=
-    fun n => (emb n).2
-  have hμne : ∀ n, μs n ≠ 0 := by
-    intro n h0
-    have h := (hμprop n).2
-    rw [h0, abs_zero] at h
-    linarith
-  -- eigenvectors and their linear independence
-  have hvec : ∀ n : ℕ, ∃ v : E, Module.End.HasEigenvector (K.toLinearMap) (μs n) v :=
-    fun n => (hμprop n).1.exists_hasEigenvector
-  choose e he using hvec
-  have hli : LinearIndependent ℝ e :=
-    Module.End.eigenvectors_linearIndependent' (K.toLinearMap) μs hμinj e he
-  have hKe : ∀ i : ℕ, K (e i) = μs i • e i := fun i =>
-    Module.End.mem_eigenspace_iff.mp (he i).1
-  -- the increasing chain of spans
-  set Espan : ℕ → Submodule ℝ E := fun n => Submodule.span ℝ (e '' Set.Iio n) with hEdef
-  have hEmono : ∀ {m n : ℕ}, m ≤ n → Espan m ≤ Espan n := fun {m n} hmn =>
-    Submodule.span_mono (Set.image_mono (Set.Iio_subset_Iio hmn))
-  have heMem : ∀ {i n : ℕ}, i < n → e i ∈ Espan n := fun {i n} hin =>
-    Submodule.subset_span ⟨i, hin, rfl⟩
-  have heNot : ∀ n : ℕ, e n ∉ Espan n := fun n =>
-    hli.notMem_span_image (by simp)
-  -- `K` preserves each `Espan n`
-  have hKmap : ∀ n : ℕ, ∀ x ∈ Espan n, K x ∈ Espan n := by
-    intro n
-    have h1 : e '' Set.Iio n ⊆ (Submodule.comap K.toLinearMap (Espan n) : Set E) := by
-      rintro _ ⟨i, hi, rfl⟩
-      rw [SetLike.mem_coe, Submodule.mem_comap]
-      change K (e i) ∈ Espan n
-      rw [hKe i]
-      exact (Espan n).smul_mem _ (heMem hi)
-    intro x hx
-    exact (Submodule.span_le.mpr h1) hx
-  -- `(μₙ - K)` drops `Espan (n+1)` into `Espan n`
-  have hshift : ∀ n : ℕ, ∀ x ∈ Espan (n + 1), μs n • x - K x ∈ Espan n := by
-    intro n
-    set L : E →ₗ[ℝ] E := μs n • LinearMap.id - K.toLinearMap with hLdef
-    have h1 : e '' Set.Iio (n + 1) ⊆ (Submodule.comap L (Espan n) : Set E) := by
-      rintro _ ⟨i, hi, rfl⟩
-      rw [SetLike.mem_coe, Submodule.mem_comap]
-      have happ : L (e i) = (μs n - μs i) • e i := by
-        simp only [hLdef, LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.id_apply,
-          ContinuousLinearMap.coe_coe]
-        rw [hKe i, sub_smul]
-      rw [happ]
-      rcases Nat.lt_succ_iff_lt_or_eq.mp hi with h | h
-      · exact (Espan n).smul_mem _ (heMem h)
-      · subst h
-        rw [sub_self, zero_smul]
-        exact Submodule.zero_mem _
-    intro x hx
-    have h3 := (Submodule.span_le.mpr h1) hx
-    rw [Submodule.mem_comap] at h3
-    simpa [hLdef, LinearMap.sub_apply, LinearMap.smul_apply] using h3
-  -- unit vectors in `Espan (n+1)` orthogonal to `Espan n`
-  have hunit : ∀ n : ℕ, ∃ u : E, u ∈ Espan (n + 1) ∧ u ∈ (Espan n)ᗮ ∧ ‖u‖ = 1 := by
-    intro n
-    have : FiniteDimensional ℝ (Espan n) :=
-      FiniteDimensional.span_of_finite ℝ ((Set.finite_Iio n).image e)
-    set w : E := e n - (Espan n).starProjection (e n) with hwdef
-    have hw_orth : w ∈ (Espan n)ᗮ := (Espan n).sub_starProjection_mem_orthogonal (e n)
-    have hproj_mem : (Espan n).starProjection (e n) ∈ Espan n := by
-      rw [Submodule.starProjection_apply]
-      exact SetLike.coe_mem _
-    have hw_mem : w ∈ Espan (n + 1) :=
-      Submodule.sub_mem _ (heMem (Nat.lt_succ_self n)) (hEmono (Nat.le_succ n) hproj_mem)
-    have hw0 : w ≠ 0 := by
-      intro h0
-      apply heNot n
-      have h1 : e n = (Espan n).starProjection (e n) := by
-        rwa [hwdef, sub_eq_zero] at h0
-      rw [h1]
-      exact hproj_mem
-    have hwn : ‖w‖ ≠ 0 := norm_ne_zero_iff.mpr hw0
-    refine ⟨‖w‖⁻¹ • w, Submodule.smul_mem _ _ hw_mem, Submodule.smul_mem _ _ hw_orth, ?_⟩
-    rw [norm_smul, norm_inv, norm_norm, inv_mul_cancel₀ hwn]
-  choose u hu_mem hu_orth hu_norm using hunit
-  -- the bounded sequence `vₙ = uₙ/μₙ` and the unit separation of its `K`-image
-  set v : ℕ → E := fun n => (μs n)⁻¹ • u n with hvdef
-  have hsep : ∀ m n : ℕ, m < n → 1 ≤ ‖K (v n) - K (v m)‖ := by
-    intro m n hmn
-    have hKvn : K (v n) = u n - (μs n)⁻¹ • (μs n • u n - K (u n)) := by
-      rw [hvdef]
-      simp only [map_smul]
-      rw [smul_sub, smul_smul, inv_mul_cancel₀ (hμne n), one_smul]
-      abel
-    set wn : E := (μs n)⁻¹ • (μs n • u n - K (u n)) with hwndef
-    have hwn_mem : wn ∈ Espan n :=
-      Submodule.smul_mem _ _ (hshift n (u n) (hu_mem n))
-    have hKvm_mem : K (v m) ∈ Espan n := by
-      have h1 : K (v m) ∈ Espan (m + 1) := by
-        rw [hvdef]
-        simp only [map_smul]
-        exact Submodule.smul_mem _ _ (hKmap (m + 1) (u m) (hu_mem m))
-      exact hEmono (Nat.succ_le_of_lt hmn) h1
-    set z : E := wn + K (v m) with hzdef
-    have hz_mem : z ∈ Espan n := Submodule.add_mem _ hwn_mem hKvm_mem
-    have hdiff : K (v n) - K (v m) = u n - z := by
-      rw [hKvn, hzdef, hwndef]
-      abel
-    have horth : ⟪u n, z⟫ = 0 :=
-      (Submodule.mem_orthogonal' (Espan n) (u n)).mp (hu_orth n) z hz_mem
-    have hsq : ‖u n - z‖ ^ 2 = 1 + ‖z‖ ^ 2 := by
-      rw [norm_sub_sq_real, horth, hu_norm n]
-      ring
-    rw [hdiff]
-    nlinarith [norm_nonneg (u n - z), sq_nonneg ‖z‖, hsq]
-  -- compactness extracts a Cauchy subsequence of `K vₙ`: contradiction
-  have hvball : ∀ n : ℕ, v n ∈ Metric.closedBall (0 : E) δ⁻¹ := by
-    intro n
-    rw [Metric.mem_closedBall, dist_zero_right, hvdef]
-    simp only [norm_smul, norm_inv, Real.norm_eq_abs]
-    rw [hu_norm n, mul_one]
-    exact inv_anti₀ hδ (hμprop n).2
-  have hK' : IsCompactOperator K.toLinearMap := hK
-  have hcpt : IsCompact (closure (K.toLinearMap '' Metric.closedBall 0 δ⁻¹)) :=
-    hK'.isCompact_closure_image_closedBall δ⁻¹
-  have hmem : ∀ n : ℕ, K (v n) ∈ closure (K.toLinearMap '' Metric.closedBall 0 δ⁻¹) :=
-    fun n => subset_closure ⟨v n, hvball n, rfl⟩
-  obtain ⟨z₀, -, φ, hφ, hzlim⟩ := hcpt.tendsto_subseq hmem
-  have hcauchy : CauchySeq (fun k => K (v (φ k))) := hzlim.cauchySeq
-  rw [Metric.cauchySeq_iff] at hcauchy
-  obtain ⟨krep, hkrep⟩ := hcauchy 1 one_pos
-  have hlt : φ krep < φ (krep + 1) := hφ (Nat.lt_succ_self krep)
-  have h1 := hkrep (krep + 1) (Nat.le_succ krep) krep (le_refl krep)
-  rw [dist_eq_norm] at h1
-  exact absurd h1 (not_lt.mpr (hsep (φ krep) (φ (krep + 1)) hlt))
-
-omit [CompleteSpace E] in
-/-- The nonzero eigenvalues of a compact operator form a countable set: the union of
-the finite slices `{δ ≤ |μ|}` over `δ = 1/(n+1)`. -/
-theorem countable_setOf_hasEigenvalue_ne_zero (hK : IsCompactOperator K) :
-    {μ : ℝ | Module.End.HasEigenvalue (K.toLinearMap) μ ∧ μ ≠ 0}.Countable := by
-  have hsub : {μ : ℝ | Module.End.HasEigenvalue (K.toLinearMap) μ ∧ μ ≠ 0}
-      ⊆ ⋃ n : ℕ, {μ : ℝ | Module.End.HasEigenvalue (K.toLinearMap) μ
-          ∧ 1 / (n + 1) ≤ |μ|} := by
-    rintro μ ⟨hμ, hμ0⟩
-    obtain ⟨n, hn⟩ := exists_nat_one_div_lt (abs_pos.mpr hμ0)
-    exact Set.mem_iUnion.mpr ⟨n, hμ, hn.le⟩
-  exact Set.Countable.mono hsub (Set.countable_iUnion (fun n =>
-    (finite_setOf_hasEigenvalue_abs_ge hK (by positivity)).countable))
-
-omit [CompleteSpace E] in
-/-- `0` lies in the (real) spectrum of a compact operator on an infinite-dimensional
-space: an inverse would make the identity compact (Evans Appendix D.5, Theorem 6(i)). -/
-theorem zero_mem_spectrum_of_compact (hK : IsCompactOperator K)
-    (hinf : ¬ FiniteDimensional ℝ E) : (0 : ℝ) ∈ spectrum ℝ K := by
-  rw [spectrum.mem_iff]
-  intro hunit
-  rw [map_zero, zero_sub] at hunit
-  have hKunit : IsUnit K := by
-    have h := hunit.neg
-    rwa [neg_neg] at h
-  obtain ⟨w, hw⟩ := hKunit
-  apply hinf
-  have hinv : (↑w⁻¹ : E →L[ℝ] E) * K = 1 := by
-    rw [← hw]
-    exact w.inv_mul
-  have hid : IsCompactOperator ((↑w⁻¹ : E →L[ℝ] E) ∘ (K : E → E)) := hK.clm_comp _
-  have hone : IsCompactOperator ⇑((↑w⁻¹ : E →L[ℝ] E) * K) := hid
-  rw [hinv] at hone
-  rw [ContinuousLinearMap.one_def, ContinuousLinearMap.coe_id'] at hone
-  rw [← isCompactOperator_id_iff_finiteDimensional (𝕜 := ℝ)]
-  exact hone
-
-/-- Away from zero the spectrum of a compact operator consists exactly of the
-eigenvalues (Evans Appendix D.5, Theorem 6(ii)), mathlib's Fredholm alternative as a
-set identity. -/
-theorem spectrum_diff_eq_eigenvalues (hK : IsCompactOperator K) :
-    spectrum ℝ K \ {0}
-      = {μ : ℝ | Module.End.HasEigenvalue (K.toLinearMap) μ} \ {0} := by
-  ext μ
-  simp only [Set.mem_sdiff, Set.mem_singleton_iff, Set.mem_ofPred_eq]
-  constructor
-  · rintro ⟨hmem, h0⟩
-    exact ⟨(hK.hasEigenvalue_iff_mem_spectrum h0).mpr hmem, h0⟩
-  · rintro ⟨heig, h0⟩
-    exact ⟨(hK.hasEigenvalue_iff_mem_spectrum h0).mp heig, h0⟩
 
 /-- **Spectrum of a compact operator (Evans Appendix D.5, Theorem 6).** On an
 infinite-dimensional real Hilbert space, a compact operator `K` has `0` in its real
@@ -256,23 +215,16 @@ theorem spectrum_compact_operator (hK : IsCompactOperator K)
         = {μ : ℝ | Module.End.HasEigenvalue (K.toLinearMap) μ} \ {0}
     ∧ (spectrum ℝ K \ {0}).Countable
     ∧ ∀ δ : ℝ, 0 < δ → {μ ∈ spectrum ℝ K | δ ≤ |μ|}.Finite := by
-  refine ⟨zero_mem_spectrum_of_compact hK hinf, spectrum_diff_eq_eigenvalues hK, ?_, ?_⟩
-  · have h1 : spectrum ℝ K \ {0}
-        ⊆ {μ : ℝ | Module.End.HasEigenvalue (K.toLinearMap) μ ∧ μ ≠ 0} := by
-      rw [spectrum_diff_eq_eigenvalues hK]
-      rintro μ ⟨hμ, h0⟩
-      exact ⟨hμ, h0⟩
-    exact Set.Countable.mono h1 (countable_setOf_hasEigenvalue_ne_zero hK)
-  · intro δ hδ
-    have h1 : {μ ∈ spectrum ℝ K | δ ≤ |μ|}
-        ⊆ {μ : ℝ | Module.End.HasEigenvalue (K.toLinearMap) μ ∧ δ ≤ |μ|} := by
-      rintro μ ⟨hmem, habs⟩
-      have h0 : μ ≠ 0 := by
-        intro h
-        rw [h, abs_zero] at habs
-        linarith
-      exact ⟨(hK.hasEigenvalue_iff_mem_spectrum h0).mpr hmem, habs⟩
-    exact (finite_setOf_hasEigenvalue_abs_ge hK hδ).subset h1
+  refine ⟨hK.zero_mem_spectrum hinf, hK.spectrum_diff_zero_eq, ?_, fun δ hδ => ?_⟩
+  · refine hK.countable_setOf_hasEigenvalue_ne_zero.mono ?_
+    rw [hK.spectrum_diff_zero_eq]
+    exact fun μ ⟨hμ, h0⟩ => ⟨hμ, h0⟩
+  · refine (hK.finite_setOf_hasEigenvalue_norm_ge hδ).subset fun μ ⟨hmem, habs⟩ => ?_
+    have h0 : μ ≠ 0 := by
+      rintro rfl
+      simp at habs
+      linarith
+    exact ⟨(hK.hasEigenvalue_iff_mem_spectrum h0).mpr hmem, by simpa using habs⟩
 
 end CompactSpectrum
 
@@ -399,7 +351,7 @@ lemma opAlam_bijective_of_notMem (hK : IsCompactOperator (Op.opK Ω)) {lam : ℝ
         (((Op.gardingγ + lam) / Op.gardingγ)⁻¹) := by
       rw [inv_div]
       exact fun h => hlam ⟨hcase, h⟩
-    have h1bij := bijective_one_sub_smul (E := H01 Ω) hK (div_ne_zero hcase hγ.ne') hnoteig
+    have h1bij := hK.bijective_one_sub_smul (div_ne_zero hcase hγ.ne') hnoteig
     have hEbij : Function.Bijective (Op.opE Ω : H01 Ω →L[ℝ] H01 Ω) := by
       simpa using (Op.opE Ω).bijective
     rw [Op.opAlam_factor Ω lam]
@@ -492,7 +444,7 @@ theorem sigmaSet_inter_Iic_finite (hK : IsCompactOperator (Op.opK Ω)) (C : ℝ)
     have hδ : 0 < δ := div_pos hγ hC
     have himg : (fun lam => Op.gardingγ / (Op.gardingγ + lam))
           '' (Op.sigmaSet Ω ∩ Set.Iic C)
-        ⊆ {μ : ℝ | Module.End.HasEigenvalue (Op.opK Ω).toLinearMap μ ∧ δ ≤ |μ|} := by
+        ⊆ {μ : ℝ | Module.End.HasEigenvalue (Op.opK Ω).toLinearMap μ ∧ δ ≤ ‖μ‖} := by
       rintro _ ⟨lam, ⟨hmem, hle⟩, rfl⟩
       obtain ⟨hne, heig⟩ := hmem
       have hpos := hposmem lam ⟨hne, heig⟩
@@ -500,11 +452,11 @@ theorem sigmaSet_inter_Iic_finite (hK : IsCompactOperator (Op.opK Ω)) (C : ℝ)
       refine ⟨heig, ?_⟩
       have hμpos : 0 < Op.gardingγ / (Op.gardingγ + lam) :=
         Op.opK_eigenvalue_pos Ω heig (div_ne_zero hγ.ne' hne)
-      rw [abs_of_pos hμpos, hδdef]
+      rw [Real.norm_eq_abs, abs_of_pos hμpos, hδdef]
       gcongr
     have hfin : ((fun lam => Op.gardingγ / (Op.gardingγ + lam))
         '' (Op.sigmaSet Ω ∩ Set.Iic C)).Finite :=
-      (finite_setOf_hasEigenvalue_abs_ge hK hδ).subset himg
+      (hK.finite_setOf_hasEigenvalue_norm_ge hδ).subset himg
     refine Set.Finite.of_finite_image hfin ?_
     rintro lam1 hlam1 lam2 hlam2 heq
     have hpos1 := hposmem lam1 hlam1.1
