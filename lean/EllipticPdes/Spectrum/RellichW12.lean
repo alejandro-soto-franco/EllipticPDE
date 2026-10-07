@@ -241,6 +241,18 @@ theorem eLpNorm_graphPair_le (U : W12 Ω) :
     _ = (d + 1) * ‖U‖ := by
         rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]; ring
 
+/-- Restricting an extension of the function part of `U` to `Ω` recovers `U₀`. -/
+theorem restrictL2_toLp_eq_embW12 {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩm : MeasurableSet Ω)
+    (U : W12 Ω) {e : EuclideanSpace ℝ (Fin d) → ℝ} (he : MemLp e 2 volume)
+    (hext : ∀ y ∈ Ω, e y = ((U : H1amb Ω) 0 : L2D Ω) y) :
+    Regularity.restrictL2 (Ω := Ω) (he.toLp e) = embW12 Ω U := by
+  rw [embW12_apply]
+  apply Lp.ext
+  filter_upwards [Regularity.coeFn_restrictL2 (Ω := Ω) (he.toLp e),
+    ae_restrict_of_ae he.coeFn_toLp, (ae_restrict_iff' hΩm).mpr (Eventually.of_forall hext)]
+    with x h1 h2 h3
+  rw [h1, h2, h3]
+
 /-- **Rellich-Kondrachov on `H¹(Ω)`** (Evans §5.7 Theorem 1 at `p = q = 2`, Guo Theorem
 IV.2.10). On a bounded open domain with `C¹` boundary, the embedding of the graph space
 `W12 Ω` into `L²(Ω)` is a compact operator. -/
@@ -311,17 +323,8 @@ theorem embW12_isCompact (hd : 0 < d) (hΩopen : IsOpen Ω) (hΩb : Bornology.Is
   have himg : embW12 Ω '' closedBall (0 : W12 Ω) 1
       ⊆ Regularity.restrictL2 (Ω := Ω) '' S := by
     rintro f ⟨U, hU, rfl⟩
-    refine ⟨Φ U, ⟨U, hU, rfl⟩, ?_⟩
-    rw [embW12_apply]
-    apply Lp.ext
-    have h1 := Regularity.coeFn_restrictL2 (Ω := Ω) (Φ U)
-    have h2 : ((hMF U).toLp (T (w U)).1 : EuclideanSpace ℝ (Fin d) → ℝ)
-        =ᵐ[volume.restrict Ω] (T (w U)).1 := ae_restrict_of_ae (hMF U).coeFn_toLp
-    have h3 : (T (w U)).1 =ᵐ[volume.restrict Ω]
-        fun x => ((U : H1amb Ω) 0 : L2D Ω) x :=
-      (ae_restrict_iff' hΩopen.measurableSet).mpr
-        (Eventually.of_forall fun y hy => (hw U).2.2.2.2.2.1 y hy)
-    exact (h1.trans h2).trans h3
+    exact ⟨Φ U, ⟨U, hU, rfl⟩, (restrictL2_toLp_eq_embW12 hΩopen.measurableSet U (hMF U)
+      (hw U).2.2.2.2.2.1)⟩
   have hTB : TotallyBounded (embW12 Ω '' closedBall (0 : W12 Ω) 1) :=
     (hSTB.image (Regularity.restrictL2 (Ω := Ω)).uniformContinuous).subset himg
   exact (isCompactOperator_iff_isCompact_closure_image_closedBall (embW12 Ω).toLinearMap
