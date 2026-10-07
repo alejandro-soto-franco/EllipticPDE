@@ -90,22 +90,18 @@ theorem exists_reductionDatum (Op : FullEllipticOp (n + 1))
         HasIteratedWeakDerivOn N k (restrictL2 (Ω := N) (extendL2 hΩm (U j))))
       (Hf : HasIteratedWeakDerivOn Ω k f) (B : ℝ),
       (∀ j, IteratedL2Bound (HU j) B) → IteratedL2Bound Hf B →
-      ∃ (F : L2D Ω) (HF : HasIteratedWeakDerivOn Ω k F),
-        IteratedL2Bound HF (K * B) ∧
-        ∀ v : EuclideanSpace ℝ (Fin (n + 1)) → ℝ, ContDiff ℝ (⊤ : ℕ∞) v →
-          HasCompactSupport v →
-          (∫ x in Ω, (F x : ℝ) * v x)
-            = (∫ x in Ω, (f x : ℝ) * (η x * v x))
-              - (∑ i : Fin (n + 1), ∑ j : Fin (n + 1),
-                  ∫ x in Ω, Op.a x i j * (U i.succ x : ℝ) * (partialD j η x * v x))
-              - (∑ i : Fin (n + 1), ∑ j : Fin (n + 1), ∫ x in Ω,
-                  hA.coeffWeakGrad.da j i j x * (U 0 x : ℝ) * (partialD i η x * v x))
-              - (∑ i : Fin (n + 1), ∑ j : Fin (n + 1),
-                  ∫ x in Ω, Op.a x i j * (U j.succ x : ℝ) * (partialD i η x * v x))
-              - (∑ i : Fin (n + 1), ∑ j : Fin (n + 1), ∫ x in Ω,
-                  Op.a x i j * (U 0 x : ℝ) * (partialD j (partialD i η) x * v x))
-              + (∑ i : Fin (n + 1),
-                  ∫ x in Ω, Op.b x i * (U 0 x : ℝ) * (partialD i η x * v x)) := by
+      IsDatumPairing Ω k (K * B) fun v =>
+        (∫ x in Ω, (f x : ℝ) * (η x * v x))
+          - (∑ i : Fin (n + 1), ∑ j : Fin (n + 1),
+              ∫ x in Ω, Op.a x i j * (U i.succ x : ℝ) * (partialD j η x * v x))
+          - (∑ i : Fin (n + 1), ∑ j : Fin (n + 1), ∫ x in Ω,
+              hA.coeffWeakGrad.da j i j x * (U 0 x : ℝ) * (partialD i η x * v x))
+          - (∑ i : Fin (n + 1), ∑ j : Fin (n + 1),
+              ∫ x in Ω, Op.a x i j * (U j.succ x : ℝ) * (partialD i η x * v x))
+          - (∑ i : Fin (n + 1), ∑ j : Fin (n + 1), ∫ x in Ω,
+              Op.a x i j * (U 0 x : ℝ) * (partialD j (partialD i η) x * v x))
+          + (∑ i : Fin (n + 1),
+              ∫ x in Ω, Op.b x i * (U 0 x : ℝ) * (partialD i η x * v x)) := by
   classical
   have hηΩ : IsTestFn Ω η := ⟨hη.1, hη.2.1, hη.2.2.trans hNΩ⟩
   have haE : ∀ i j : Fin (n + 1), IsWkInfty (fun x => Op.a x i j) k :=
@@ -116,7 +112,8 @@ theorem exists_reductionDatum (Op : FullEllipticOp (n + 1))
   have hηD : ∀ i : Fin (n + 1), IsTestFn N (partialD i η) := fun i => isTestFn_partialD hη i
   have hηDD : ∀ i j : Fin (n + 1), IsTestFn N (partialD j (partialD i η)) :=
     fun i j => isTestFn_partialD (hηD i) j
-  obtain ⟨K1, hK1, hP1⟩ := exists_datum_piece hΩm subset_rfl k hηΩ (IsWkInfty.const 1 k)
+  obtain ⟨K1, hK1, hP1⟩ := exists_datum_of_pieces (ι := Unit) (χ := fun _ => η)
+    (a := fun _ _ => (1 : ℝ)) hΩm subset_rfl k (fun _ => hηΩ) fun _ => IsWkInfty.const 1 k
   obtain ⟨K2, hK2, hP2⟩ := exists_datum_of_pieces (Ω := Ω) hNm hNΩ k
     (ι := Fin (n + 1) × Fin (n + 1))
     (χ := fun t => partialD t.2 η) (fun t => hηD t.2)
@@ -137,36 +134,25 @@ theorem exists_reductionDatum (Op : FullEllipticOp (n + 1))
     (χ := fun i => partialD i η) hηD (a := fun i => fun x => Op.b x i) hbE
   refine ⟨K1 + K2 + K3 + K4 + K5 + K6, by linarith, ?_⟩
   intro U f HU Hf B hHU hHf
-  obtain ⟨F1, HF1, hB1, hp1⟩ := hP1 Hf hHf
-  obtain ⟨F2, HF2, hB2, hp2⟩ := hP2 (fun t => restrictL2 (Ω := N) (extendL2 hΩm (U t.1.succ)))
-    (fun t => HU t.1.succ) (fun t => hHU t.1.succ)
-  obtain ⟨F3, HF3, hB3, hp3⟩ := hP3 (fun _ => restrictL2 (Ω := N) (extendL2 hΩm (U 0)))
-    (fun _ => HU 0) (fun _ => hHU 0)
-  obtain ⟨F4, HF4, hB4, hp4⟩ := hP4 (fun t => restrictL2 (Ω := N) (extendL2 hΩm (U t.2.succ)))
-    (fun t => HU t.2.succ) (fun t => hHU t.2.succ)
-  obtain ⟨F5, HF5, hB5, hp5⟩ := hP5 (fun _ => restrictL2 (Ω := N) (extendL2 hΩm (U 0)))
-    (fun _ => HU 0) (fun _ => hHU 0)
-  obtain ⟨F6, HF6, hB6, hp6⟩ := hP6 (fun _ => restrictL2 (Ω := N) (extendL2 hΩm (U 0)))
-    (fun _ => HU 0) (fun _ => hHU 0)
-  refine ⟨F1 - F2 - F3 - F4 - F5 + F6, ((((HF1.sub HF2).sub HF3).sub HF4).sub HF5).add HF6,
-    ?_, fun v hvc hvcs => ?_⟩
-  · have hB := ((((hB1.sub hB2).sub hB3).sub hB4).sub hB5).add hB6
-    refine hB.mono_const (le_of_eq ?_)
-    ring
-  · rw [setIntegral_add_mul_testFn _ _ hvc hvcs, setIntegral_sub_mul_testFn _ _ hvc hvcs,
-      setIntegral_sub_mul_testFn _ _ hvc hvcs, setIntegral_sub_mul_testFn _ _ hvc hvcs,
-      setIntegral_sub_mul_testFn _ _ hvc hvcs,
-      hp1 v, hp2 v hvc hvcs, hp3 v hvc hvcs, hp4 v hvc hvcs, hp5 v hvc hvcs, hp6 v hvc hvcs]
-    simp only [Fintype.sum_prod_type]
-    have hηt : ∀ i : Fin (n + 1), tsupport (partialD i η) ⊆ N := fun i => (hηD i).2.2
-    have hηtt : ∀ i j : Fin (n + 1), tsupport (partialD j (partialD i η)) ⊆ N :=
-      fun i j => (hηDD i j).2.2
-    simp only [setIntegral_cutoff_restrict_eq hΩm (hηt _),
-      setIntegral_cutoff_restrict_eq hΩm (hηtt _ _)]
-    have h1 : ∫ x in Ω, η x * ((1 : ℝ) * (f x : ℝ)) * v x = ∫ x in Ω, (f x : ℝ) * (η x * v x) :=
-      integral_congr_ae (Eventually.of_forall fun x => by ring)
-    rw [h1]
-    rfl
+  have h := (((((hP1 (fun _ => f) (fun _ => Hf) fun _ => hHf).sub
+    (hP2 (fun t => restrictL2 (Ω := N) (extendL2 hΩm (U t.1.succ))) (fun t => HU t.1.succ)
+      fun t => hHU t.1.succ)).sub
+    (hP3 (fun _ => restrictL2 (Ω := N) (extendL2 hΩm (U 0))) (fun _ => HU 0)
+      fun _ => hHU 0)).sub
+    (hP4 (fun t => restrictL2 (Ω := N) (extendL2 hΩm (U t.2.succ))) (fun t => HU t.2.succ)
+      fun t => hHU t.2.succ)).sub
+    (hP5 (fun _ => restrictL2 (Ω := N) (extendL2 hΩm (U 0))) (fun _ => HU 0)
+      fun _ => hHU 0)).add
+    (hP6 (fun _ => restrictL2 (Ω := N) (extendL2 hΩm (U 0))) (fun _ => HU 0) fun _ => hHU 0)
+  refine (h.mono (le_of_eq (by ring))).congr fun v _ _ => ?_
+  have hηt : ∀ i : Fin (n + 1), tsupport (partialD i η) ⊆ N := fun i => (hηD i).2.2
+  have hηtt : ∀ i j : Fin (n + 1), tsupport (partialD j (partialD i η)) ⊆ N :=
+    fun i j => (hηDD i j).2.2
+  have h1 : ∫ x in Ω, η x * ((1 : ℝ) * (f x : ℝ)) * v x = ∫ x in Ω, (f x : ℝ) * (η x * v x) :=
+    integral_congr_ae (Eventually.of_forall fun x => by ring)
+  simp only [Fintype.sum_prod_type, Finset.univ_unique, Finset.sum_singleton, h1,
+    setIntegral_cutoff_restrict_eq hΩm (hηt _), setIntegral_cutoff_restrict_eq hΩm (hηtt _ _)]
+  rfl
 
 end Datum
 
