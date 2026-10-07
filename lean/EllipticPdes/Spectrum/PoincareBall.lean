@@ -136,15 +136,15 @@ theorem average_comp_affineBall (x : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr :
 
 /-! ### The weak gradient through the affine map -/
 
-/-- **Weak gradient transported through the affine map**, which picks up the factor `r`. A test
-function on the unit ball is pushed forward to one on the ball, whose partial derivative is
-`r⁻¹` times the original's, and the integrals transport by the measure-preserving map. -/
-theorem hasWeakGradOn_comp_affineBall (x : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr : 0 < r)
-    {u : EuclideanSpace ℝ (Fin d) → ℝ} {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
-    (hw : HasWeakGradOn (ball x r) u g) :
-    HasWeakGradOn (ball (0 : EuclideanSpace ℝ (Fin d)) 1) (u ∘ affineBall x r)
-      fun k y => r * g k (affineBall x r y) := by
-  intro φ hφc hφcs hφB k
+/-- **A test function on the unit ball pushed forward to the ball.** A smooth test function `φ`
+supported in the unit ball is `ψ ∘ affineBall x r` for a smooth `ψ` with compact support in the
+ball `B(x, r)`, and `∂ₖψ ∘ affineBall x r = r⁻¹ ∂ₖφ`. -/
+theorem exists_affineBall_pushforward (x : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr : 0 < r)
+    {φ : EuclideanSpace ℝ (Fin d) → ℝ} (hφc : ContDiff ℝ (⊤ : ℕ∞) φ) (hφcs : HasCompactSupport φ)
+    (hφB : tsupport φ ⊆ ball (0 : EuclideanSpace ℝ (Fin d)) 1) (k : Fin d) :
+    ∃ ψ : EuclideanSpace ℝ (Fin d) → ℝ, ContDiff ℝ (⊤ : ℕ∞) ψ ∧ HasCompactSupport ψ ∧
+      tsupport ψ ⊆ ball x r ∧ (∀ y, ψ (affineBall x r y) = φ y) ∧
+      ∀ y, partialD k ψ (affineBall x r y) = r⁻¹ * partialD k φ y := by
   have hr0 : r ≠ 0 := hr.ne'
   -- the test function pushed forward to the ball
   set ψ : EuclideanSpace ℝ (Fin d) → ℝ := fun z => φ (r⁻¹ • (z + -x)) with hψ
@@ -167,7 +167,6 @@ theorem hasWeakGradOn_comp_affineBall (x : EuclideanSpace ℝ (Fin d)) {r : ℝ}
     rw [mem_ball, dist_zero_right, norm_smul, norm_inv, Real.norm_eq_abs, abs_of_pos hr] at h2
     rw [mem_closedBall, dist_eq_norm, ← sub_eq_add_neg] at *
     exact ((inv_mul_lt_iff₀ hr).mp h2).le
-  have hkey := hw ψ hψc hψcs hψB k
   -- the partial derivative of the pushed-forward test function
   have hψd : ∀ z, partialD k ψ z = r⁻¹ * partialD k φ (r⁻¹ • (z + -x)) := by
     intro z
@@ -182,6 +181,19 @@ theorem hasWeakGradOn_comp_affineBall (x : EuclideanSpace ℝ (Fin d)) {r : ℝ}
   have hψdA : ∀ y, partialD k ψ (affineBall x r y) = r⁻¹ * partialD k φ y := fun y => by
     rw [hψd, hA]
   -- transport of the two integrals
+  exact ⟨ψ, hψc, hψcs, hψB, hψA, hψdA⟩
+
+/-- **Weak gradient transported through the affine map**, which picks up the factor `r`. A test
+function on the unit ball is pushed forward to one on the ball, whose partial derivative is
+`r⁻¹` times the original's, and the integrals transport by the measure-preserving map. -/
+theorem hasWeakGradOn_comp_affineBall (x : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr : 0 < r)
+    {u : EuclideanSpace ℝ (Fin d) → ℝ} {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
+    (hw : HasWeakGradOn (ball x r) u g) :
+    HasWeakGradOn (ball (0 : EuclideanSpace ℝ (Fin d)) 1) (u ∘ affineBall x r)
+      fun k y => r * g k (affineBall x r y) := by
+  intro φ hφc hφcs hφB k
+  obtain ⟨ψ, hψc, hψcs, hψB, hψA, hψdA⟩ := exists_affineBall_pushforward x hr hφc hφcs hφB k
+  have hkey := hw ψ hψc hψcs hψB k
   have hc0 : 0 < (ballScale d r).toReal :=
     ENNReal.toReal_pos (ballScale_ne_zero hr) (ballScale_ne_top r)
   have e1 : ∫ y in ball (0 : EuclideanSpace ℝ (Fin d)) 1, (u ∘ affineBall x r) y * partialD k φ y
