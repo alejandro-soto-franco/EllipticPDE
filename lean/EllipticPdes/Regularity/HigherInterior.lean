@@ -361,19 +361,14 @@ theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
         = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) →
       ∀ ℓ : Fin (n + 1),
         Nonempty (CutoffDerivWeakForm Op hΩm V u ℓ k (C * (M + ‖(u : H1amb Ω) 0‖))) := by
-  -- The cutoff tower for `V ⋐ Ω`, and an open collar around its middle cutoff.
   obtain ⟨T⟩ : Nonempty (CutoffTower Ω V) :=
     ⟨cutoffTowerOfIsCompactSubsetIsOpen hVc hΩo hVΩ⟩
   obtain ⟨N, hNo, hξN, hNW, hθN⟩ := T.exists_isOpen_collar
-  have hWm : MeasurableSet (tsupport T.θ) := T.hθ.2.1.isClosed.measurableSet
   have hWΩ : tsupport T.θ ⊆ Ω := T.hθ.2.2
   have hNm : MeasurableSet N := hNo.measurableSet
   have hNΩ : N ⊆ Ω := hNW.trans hWΩ
   have hξNt : IsTestFn N T.ξ := ⟨T.hξ.1, T.hξ.2.1, hξN⟩
-  have hθWt : IsTestFn (tsupport T.θ) T.θ := ⟨T.hθ.1, T.hθ.2.1, subset_rfl⟩
-  -- A fourth cutoff, one on the middle cutoff's support and supported in the collar.
   obtain ⟨ϑ, hϑ, hϑ_eqOn⟩ := exists_isTestFn_eqOn_one_of_isCompact T.hξ.2.1 hNo hξN
-  -- The datum, and the inductive hypothesis at the outer support of the tower.
   obtain ⟨KD, hKD0, hDat⟩ := exists_cutoffDatum Op hNm hNΩ hA hbc hξNt
   obtain ⟨C₁, hC₁0, hIH⟩ := hk T.hθ.2.1 hWΩ
   have hCξ0 : (0 : ℝ) ≤ hξNt.supNorm := hξNt.supNorm_nonneg
@@ -381,12 +376,11 @@ theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
     add_nonneg (mul_nonneg hKD0 (add_nonneg hC₁0 zero_le_one)) (mul_nonneg hCξ0 hC₁0),
     fun u f M hfk hM hu ℓ => ?_⟩
   have hM0 : (0 : ℝ) ≤ M := le_trans (norm_nonneg f) hM.norm_le
-  -- The solution's derivatives to order `k + 2` on the outer support, then on the collar.
   obtain ⟨HuW, hHuW⟩ :=
     hIH u f M (hfk.mono (Nat.le_succ k)) (hM.mono_order (Nat.le_succ k)) hu
-  obtain ⟨HuN, hHuNbd, hDu⟩ := exists_collarFamily hΩm hWm hNm hNW hθWt hθN
+  obtain ⟨HuN, hHuNbd, hDu⟩ := exists_collarFamily hΩm T.hθ.2.1.isClosed.measurableSet hNm hNW
+    ⟨T.hθ.1, T.hθ.2.1, subset_rfl⟩ hθN
     (fun i => hasWeakDeriv_extendL2_of_mem_H01 hΩm i u.2) HuW hHuW
-  -- The cut-off derivative, and the closed form of its gradient.
   obtain ⟨Uamb, hUmem, hU0, hUgrad⟩ := interior_cutoffGrad_mem_H01 Op hΩm hA1 T u f hu ℓ
   have hgrad : ∀ i : Fin (n + 1), extendL2 hΩm (Uamb i.succ)
       = extendL2 hNm (mulTest (isTestFn_partialD hξNt i)
@@ -395,34 +389,27 @@ theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
     extendL2_cutoffGrad_eq hΩm hNm hNΩ T.hξ hξNt ((u : H1amb Ω) ℓ.succ) hUgrad
       (fun i => by
         simpa only [hDu ℓ] using HuN.D_step i [ℓ] (Nat.succ_lt_succ (Nat.succ_pos k)))
-  -- The datum's own derivative, cut down to the collar.
   obtain ⟨HDfN, hDfNbd⟩ := exists_restrictFamily hΩm hNm hNΩ (hfk.deriv ℓ) (hM.deriv ℓ)
-  -- One bound serving the solution's derivatives and the datum's alike.
   have hMu : (0 : ℝ) ≤ M + ‖(u : H1amb Ω) 0‖ := add_nonneg hM0 (norm_nonneg _)
   have hC₁Mu : (0 : ℝ) ≤ C₁ * (M + ‖(u : H1amb Ω) 0‖) := mul_nonneg hC₁0 hMu
   obtain ⟨F, HF, hFbd, hFpair⟩ := hDat ℓ _ _ HuN HDfN
     (C₁ * (M + ‖(u : H1amb Ω) 0‖) + M) (hHuNbd.mono_const (le_add_of_nonneg_right hM0))
     (hDfNbd.mono_const (le_add_of_nonneg_left hC₁Mu))
-  have hVm : MeasurableSet V := hVc.isClosed.measurableSet
   have hcon := cutoffDeriv_constant_le (M := M) hKD0 hC₁0 hCξ0 hMu
     (le_add_of_nonneg_right (norm_nonneg ((u : H1amb Ω) 0)))
   refine ⟨⟨⟨Uamb, hUmem⟩, F, HF, ?_, ?_, ?_, ?_⟩⟩
-  · -- The cutoff is invisible on the base set, so nothing is lost there.
-    change restrictL2 (Ω := V) (extendL2 hΩm (Uamb 0)) = _
+  · change restrictL2 (Ω := V) (extendL2 hΩm (Uamb 0)) = _
     rw [hU0]
-    exact restrictL2_extendL2_mulTest_of_eqOn hΩm hVm hVΩ T.hξ T.xi_eqOn_one_base
-      ((u : H1amb Ω) ℓ.succ)
-  · -- The weak formulation, extended from test functions by density.
-    intro w
+    exact restrictL2_extendL2_mulTest_of_eqOn hΩm hVc.isClosed.measurableSet hVΩ T.hξ
+      T.xi_eqOn_one_base ((u : H1amb Ω) ℓ.succ)
+  · intro w
     refine weakForm_of_testFn Op ⟨Uamb, hUmem⟩ F (fun v hv => ?_) w
     refine (cutoffDeriv_pairing_eq Op hΩm hNm hNΩ hA hbc hξNt hϑ hϑ_eqOn u f hu hfk HuN hDu ℓ
       hUmem (fun i => by rw [hDu ℓ]; exact hgrad i) ?_ hv).trans (hFpair v hv.1 hv.2.1).symm
     rw [hU0, hDu ℓ]
     exact extendL2_mulTest_eq hΩm hNm hNΩ T.hξ hξNt ((u : H1amb Ω) ℓ.succ)
-  · -- The datum's bound, in the data.
-    exact hFbd.mono_const hcon.1
-  · -- The cut-off derivative's norm, read on the collar where the cutoff lives.
-    change ‖Uamb 0‖ ≤ _
+  · exact hFbd.mono_const hcon.1
+  · change ‖Uamb 0‖ ≤ _
     rw [hU0]
     exact ((norm_mulTest_le_supNorm_restrict hΩm hNm hNΩ T.hξ hξNt _ (hDu ℓ)).trans
       (mul_le_mul_of_nonneg_left (hHuNbd [ℓ] (Nat.succ_le_succ (Nat.zero_le _))) hCξ0)).trans
@@ -431,20 +418,13 @@ theorem exists_cutoffDeriv_weakForm (Op : FullEllipticOp (n + 1))
 /-- **Induction step.** Differentiating the equation once raises the order-`k` conclusion to
 order `k + 1`, under one more order of regularity on every coefficient.
 
-`∂_ℓ u` lies outside `H₀¹(Ω)`: it is a first derivative of an `H₀¹` function and lies only in
-`H¹_loc`, so `InteriorRegularityAt`, which quantifies over `H01 Ω`, cannot be applied to it.
-`exists_cutoffDeriv_weakForm` supplies the cutoff that can be, together with its datum, and
-this step is what remains once that is in hand.
-
-The induction hypothesis returns `k + 2` weak derivatives of the cutoff derivative on `V`,
-which `HasIteratedWeakDerivOn.congr` reads as `k + 2` weak derivatives of `∂_ℓ u` itself,
-the cutoff being `1` there. Reassembling over `ℓ` through `HasIteratedWeakDerivOn.ofDeriv`
-gives `u ∈ H^{k + 3}(V)`.
-
-The constant is `2 C₁ C₀ + 1`, with `C₀` from the datum and `C₁` from the induction
-hypothesis. The two summands of `C₀ (M + ‖u‖) + ‖U‖` are each at most `C₀ (M + ‖u‖)`, which
-is where the factor of two comes from, and the `+ 1` covers `‖u‖` itself, which the order-zero
-entry of the assembled family needs and which no derivative bound supplies. -/
+`∂_ℓ u` lies in `H¹_loc` only, so `InteriorRegularityAt`, which quantifies over `H01 Ω`, applies
+to the cutoff derivative that `exists_cutoffDeriv_weakForm` supplies, together with its datum.
+The induction hypothesis gives that cutoff derivative `k + 2` weak derivatives on `V`, which
+`HasIteratedWeakDerivOn.congr` reads as those of `∂_ℓ u` itself, and
+`HasIteratedWeakDerivOn.ofDeriv` reassembles them over `ℓ` into `u ∈ H^{k + 3}(V)`. The constant
+is `2 C₁ C₀ + 1`, with `C₀` from the datum and `C₁` from the induction hypothesis; the `+ 1`
+covers `‖u‖`, which the order-zero entry of the assembled family needs. -/
 theorem interiorRegularityAt_succ (Op : FullEllipticOp (n + 1))
     {Ω : Set (EuclideanSpace ℝ (Fin (n + 1)))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
     (hA1 : IsLipCoeff Op.toEllipticCoeff) {k : ℕ}
