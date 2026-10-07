@@ -59,8 +59,9 @@ result in a numbered section, a named result in a section that numbers none
 
 ## Coverage
 
-Forty-two of the forty-nine declarations pinned in `lean/AxiomAudit.lean` have a
-warrant. The seven that do not, and why:
+`verify/proofsense_coverage.py` prints the current count: every declaration pinned in
+`lean/AxiomAudit.lean` has a warrant or an entry in its `EXEMPT` table with a reason. The
+original exemptions, and why:
 
 | Declaration | State |
 |---|---|
@@ -78,6 +79,17 @@ misattribution in the manuscript: `caccioppoli` is cited nowhere in
 `latex/manuscript`, and the adduce lock binds `poincare_H01_of_bounded`. The
 audit judged the declarations against sections they had been pointed at during
 that run.
+
+### General statements
+
+The general theorems of the library, stated over a finite-dimensional real inner product space
+or normed space in place of `EuclideanSpace ℝ (Fin d)` (the `EllipticPdes.DivForm`,
+`EllipticPdes.H1Graph`, `EllipticPdes.Classical.nondivOperator` and
+`EllipticPdes.Campanato.Haar` declarations, and the slab Poincaré inequality), are exempt as a
+class. Each states the theorem of a coordinate declaration that has the warrant, and the
+cited sources state those theorems in coordinates, so a warrant at the general declaration
+would assert a statement the source does not make. `EXEMPT` names the coordinate declaration
+for each.
 
 ## Known divergence
 

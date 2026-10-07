@@ -398,3 +398,26 @@ assert_classical_axioms
   EllipticPdes.Classical.comparison_principle
   EllipticPdes.Classical.abs_le_of_nondivOp_eq_zero
   EllipticPdes.Embedding.eLpNorm_le_of_mem_H01_two
+
+/-! ### General theory over a finite-dimensional inner product space -/
+
+assert_classical_axioms
+  IsCoercive.existsUnique_apply_eq
+  EllipticPdes.HasWeakFDerivOn.hasFDerivAt
+  EllipticPdes.Poincare.integral_sq_le_of_tsupport_subset_slab
+  EllipticPdes.H1Graph.poincare_H01_of_bounded
+  EllipticPdes.H1Graph.embL2_isCompact
+  EllipticPdes.DivForm.FullEllipticOp.garding
+  EllipticPdes.DivForm.FullEllipticOp.weak_solution
+  EllipticPdes.DivForm.FullEllipticOp.weak_solution_of_nonneg_zeroth_of_bounded
+  EllipticPdes.DivForm.FullEllipticOp.fredholm_alternative_of_bounded
+  EllipticPdes.DivForm.FullEllipticOp.fredholm_unique_imp_exists_of_bounded
+  EllipticPdes.DivForm.FullEllipticOp.solvable_iff_orthogonal_transpose_of_bounded
+  EllipticPdes.DivForm.FullEllipticOp.notMem_sigmaSet_iff_solvable_of_bounded
+  EllipticPdes.DivForm.FullEllipticOp.existence_three_of_bounded
+  EllipticPdes.DivForm.FullEllipticOp.resolvent_bound_of_bounded
+  EllipticPdes.DivForm.FullEllipticOp.symmetric_spectral_of_bounded
+  EllipticPdes.Classical.hopf_lemma
+  EllipticPdes.Classical.nondivOperator.weak_maximum_principle
+  EllipticPdes.Classical.nondivOperator.comparison_principle
+  EllipticPdes.Campanato.Haar.campanato_holderOnWith

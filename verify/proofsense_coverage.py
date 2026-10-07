@@ -39,6 +39,91 @@ MANIFEST = ROOT / "proofsense" / "manifest.json"
 # that no transcribed statement matches it, which the README under
 # proofsense/ has to justify in prose.
 EXEMPT = {
+    "EllipticPdes.HasWeakFDerivOn.hasFDerivAt": (
+        "the general form of hasFDerivAt_of_continuousOn_hasWeakGradOn over a finite-dimensional "
+        "space and a Banach codomain; exempt for the same reason, since Evans performs the "
+        "passage inside the proof of 5.6.3 Theorem 6 and states no separate lemma"
+    ),
+    "EllipticPdes.Poincare.integral_sq_le_of_tsupport_subset_slab": (
+        "the theorem warranted at EllipticPdes.Poincare.poincare_H01_euclBox, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.H1Graph.poincare_H01_of_bounded": (
+        "the theorem warranted at EllipticPdes.Poincare.poincare_H01_of_bounded, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.H1Graph.embL2_isCompact": (
+        "the theorem warranted at EllipticPdes.Sobolev.embL2_isCompact, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.DivForm.FullEllipticOp.garding": (
+        "the theorem warranted at EllipticPdes.Sobolev.FullEllipticOp.garding, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.DivForm.FullEllipticOp.weak_solution": (
+        "the theorem warranted at EllipticPdes.Sobolev.FullEllipticOp.weak_solution, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.DivForm.FullEllipticOp.weak_solution_of_nonneg_zeroth_of_bounded": (
+        "the theorem warranted at EllipticPdes.Sobolev.FullEllipticOp.weak_solution_L2_of_nonneg_zeroth_of_bounded, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.DivForm.FullEllipticOp.fredholm_alternative_of_bounded": (
+        "the theorem warranted at EllipticPdes.Sobolev.FullEllipticOp.fredholm_alternative_of_bounded, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.DivForm.FullEllipticOp.fredholm_unique_imp_exists_of_bounded": (
+        "the theorem warranted at EllipticPdes.Sobolev.FullEllipticOp.fredholm_alternative_of_bounded, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.DivForm.FullEllipticOp.solvable_iff_orthogonal_transpose_of_bounded": (
+        "the theorem warranted at EllipticPdes.Sobolev.FullEllipticOp.solvable_iff_orthogonal_solSpaceStar, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.DivForm.FullEllipticOp.notMem_sigmaSet_iff_solvable_of_bounded": (
+        "the theorem warranted at EllipticPdes.Sobolev.FullEllipticOp.existence_three_of_bounded, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.DivForm.FullEllipticOp.existence_three_of_bounded": (
+        "the theorem warranted at EllipticPdes.Sobolev.FullEllipticOp.existence_three_of_bounded, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.DivForm.FullEllipticOp.resolvent_bound_of_bounded": (
+        "the theorem warranted at EllipticPdes.Sobolev.FullEllipticOp.resolvent_bound_of_bounded, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.DivForm.FullEllipticOp.symmetric_spectral_of_bounded": (
+        "the theorem warranted at EllipticPdes.Sobolev.symmetric_fullElliptic_spectral, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.Classical.nondivOperator.weak_maximum_principle": (
+        "the theorem warranted at EllipticPdes.Classical.weak_maximum_principle, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.Classical.nondivOperator.comparison_principle": (
+        "the theorem warranted at EllipticPdes.Classical.comparison_principle, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.Campanato.Haar.campanato_holderOnWith": (
+        "the theorem warranted at EllipticPdes.Campanato.campanato_holderOnWith, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
     "EllipticPdes.poisson_weak_solution": (
         "the Lax-Milgram theorem at the form of the Laplacian. Evans applies it to that form "
         "in the example opening 6.2.2 and numbers nothing there, and his 6.2.2 Theorem 3 is the "
