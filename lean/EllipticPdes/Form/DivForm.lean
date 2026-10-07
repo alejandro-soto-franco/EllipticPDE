@@ -333,22 +333,11 @@ lemma abs_form_le (U V : H1Graph μ Ω) :
     |Op.form Ω U V| ≤ (Op.Λ + Op.Bsup + Op.Csup) * ‖U‖ * ‖V‖ := by
   rw [form_apply]
   refine (abs_add_le _ _).trans ?_
-  have h1 := Op.toEllipticCoeff.abs_form_le Ω U V
-  have h2 := Op.abs_lowerForm_le U V
-  have := norm_gradL_le U
-  have := norm_gradL_le V
-  have := norm_fnL_le U
-  have := norm_fnL_le V
-  have := Op.Λ_nonneg
-  have := Op.Bsup_nonneg
-  have := Op.Csup_nonneg
-  have := norm_nonneg U
-  have := norm_nonneg V
-  have := norm_nonneg (gradL U)
-  have := norm_nonneg (fnL U)
-  have := norm_nonneg (fnL V)
-  have := norm_nonneg (gradL V)
-  nlinarith [mul_le_mul (norm_gradL_le U) (norm_gradL_le V) (norm_nonneg _) (norm_nonneg _),
+  nlinarith [Op.toEllipticCoeff.abs_form_le Ω U V, Op.abs_lowerForm_le U V, norm_gradL_le U,
+    norm_gradL_le V, norm_fnL_le U, norm_fnL_le V, Op.Λ_nonneg, Op.Bsup_nonneg, Op.Csup_nonneg,
+    norm_nonneg U, norm_nonneg V, norm_nonneg (gradL U), norm_nonneg (fnL U),
+    norm_nonneg (fnL V), norm_nonneg (gradL V),
+    mul_le_mul (norm_gradL_le U) (norm_gradL_le V) (norm_nonneg _) (norm_nonneg _),
     mul_le_mul (norm_gradL_le U) (norm_fnL_le V) (norm_nonneg _) (norm_nonneg _),
     mul_le_mul (norm_fnL_le U) (norm_fnL_le V) (norm_nonneg _) (norm_nonneg _)]
 
