@@ -58,7 +58,7 @@ theorem isTestFn_dilate {φ : EuclideanSpace ℝ (Fin d) → ℝ}
     (hsupp : tsupport φ ⊆ closedBall 0 1) {lam : ℝ} (hlam0 : 0 < lam) (hlam1 : lam ≤ 1 / 2) :
     IsTestFn (ball (0 : EuclideanSpace ℝ (Fin d)) 1) (fun x => φ (lam⁻¹ • x)) := by
   have hsub : tsupport (fun x => φ (lam⁻¹ • x)) ⊆ closedBall 0 lam := by
-    have := tsupport_comp_smul_subset (f := φ) (r := lam⁻¹) (by positivity) hsupp
+    have := tsupport_comp_smul_subset_closedBall (f := φ) (r := lam⁻¹) (by positivity) hsupp
     rwa [inv_inv] at this
   refine ⟨h.1.comp (contDiff_const_smul _), ?_, hsub.trans ?_⟩
   · exact HasCompactSupport.of_support_subset_isCompact

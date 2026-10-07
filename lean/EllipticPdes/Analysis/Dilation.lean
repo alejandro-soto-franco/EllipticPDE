@@ -23,8 +23,8 @@ factors cancel, so a dilated family keeps its `L^{p⋆}` norm while its `L²` no
 * `EllipticPdes.Analysis.eLpNorm_comp_smul_eq`: the `Lᵖ` seminorm of a dilate.
 * `EllipticPdes.Analysis.fderiv_comp_smul`: the derivative of a dilate.
 * `EllipticPdes.Analysis.tsupport_comp_smul_subset_closedBall`: the support of a dilate.
-* `EllipticPdes.Analysis.eLpNorm_comp_smul`, `EllipticPdes.Analysis.partialD_comp_smul`,
-  `EllipticPdes.Analysis.tsupport_comp_smul_subset`: the same on `ℝᵈ`.
+* `EllipticPdes.Analysis.eLpNorm_comp_smul` and `EllipticPdes.Analysis.partialD_comp_smul`: the
+  same on `ℝᵈ`.
 
 ## References
 
@@ -105,12 +105,5 @@ theorem partialD_comp_smul {f : EuclideanSpace ℝ (Fin d) → ℝ} (hf : Differ
     partialD i (fun x => f (r • x)) = fun x => r * partialD i f (r • x) := by
   funext x
   simp [partialD, fderiv_comp_smul hf]
-
-/-- **Support of a dilate** on `ℝᵈ`. For `0 < r`, a function supported in the unit ball dilates
-to one supported in the ball of radius `r⁻¹`. -/
-theorem tsupport_comp_smul_subset {f : EuclideanSpace ℝ (Fin d) → ℝ} {r : ℝ} (hr : 0 < r)
-    (hf : tsupport f ⊆ closedBall 0 1) :
-    tsupport (fun x => f (r • x)) ⊆ closedBall 0 r⁻¹ :=
-  tsupport_comp_smul_subset_closedBall hr hf
 
 end EllipticPdes.Analysis

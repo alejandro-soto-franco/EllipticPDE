@@ -25,9 +25,9 @@ public import Mathlib.MeasureTheory.Function.LocallyIntegrable
 
 On a finite-dimensional real normed space `E` with an additive Haar measure `μ`, convolving an
 `Lᵖ` function `h : E → F` (with `1 ≤ p < ∞`) against a non-negative kernel of unit mass does not
-increase its `Lᵖ` seminorm (`eLpNorm_convolution_le`). The proof derives the pointwise bound
-from Hölder's inequality in `ℝ≥0∞` and closes with Tonelli, so no Minkowski integral inequality
-is required.
+increase its `Lᵖ` seminorm (`eLpNorm_convolution_le_of_integral_eq_one`). The proof derives the
+pointwise bound from Hölder's inequality in `ℝ≥0∞` and closes with Tonelli, so no Minkowski
+integral inequality is required.
 
 The mollifications `ρₙ ⋆ h` of an `Lᵖ` function by normed bumps converge to `h` in `Lᵖ` as the
 outer radii tend to `0` (`tendsto_eLpNorm_normed_convolution_sub`). The argument is a density
@@ -37,10 +37,12 @@ and drive `ρ ⋆ w - w` to zero with the uniform convergence of
 `ContDiffBump.dist_normed_convolution_le` on a fixed compact set. It holds along an arbitrary
 filter.
 
-The real-valued, Euclidean statements with the kernel on the right
-(`eLpNorm_convolution_le_euclid` and its relatives) are the instances the coordinate files use.
-The file also contains the elementary `Lᵖ` bookkeeping shared by the Sobolev ladders and the
-continuous linear maps into `Lp` built from almost everywhere linear families.
+The real-valued statements with the kernel on the right (`eLpNorm_convolution_le`,
+`contDiff_convolution_normed`, `tendsto_eLpNorm_convolution_sub`) are the forms the coordinate
+files use; they are instances of the general statements through the commutativity of
+convolution against scalar multiplication. The file also contains the elementary `Lᵖ`
+bookkeeping shared by the Sobolev ladders and the continuous linear maps into `Lp` built from
+almost everywhere linear families.
 -/
 
 @[expose] public section
@@ -323,15 +325,6 @@ theorem eLpNorm_convolution_le {p : ℝ} (hp : 1 ≤ p) {ρ : E → ℝ} (hρ0 :
   exact eLpNorm_convolution_le_of_integral_eq_one
     (by rw [← ENNReal.ofReal_one]; exact ENNReal.ofReal_le_ofReal hp) ENNReal.ofReal_ne_top
     hρ0 hρm hρ1 hh.aestronglyMeasurable
-
-/-- Young's inequality with the kernel on the right, restricted to a set `s` on the left. -/
-theorem eLpNorm_convolution_restrict_le {p : ℝ} (hp : 1 ≤ p) {ρ : E → ℝ} (hρ0 : 0 ≤ ρ)
-    (hρm : AEStronglyMeasurable ρ μ) (hρ1 : ∫ y, ρ y ∂μ = 1) {h : E → ℝ}
-    (hh : MemLp h (ENNReal.ofReal p) μ) (s : Set E) :
-    eLpNorm (h ⋆[ContinuousLinearMap.lsmul ℝ ℝ, μ] ρ) (ENNReal.ofReal p) (μ.restrict s)
-      ≤ eLpNorm h (ENNReal.ofReal p) μ :=
-  le_trans (eLpNorm_mono_measure _ Measure.restrict_le_self)
-    (eLpNorm_convolution_le hp hρ0 hρm hρ1 hh)
 
 /-- The mollification of a locally integrable function is smooth, with the kernel on the
 right. -/
