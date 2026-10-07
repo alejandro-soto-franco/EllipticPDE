@@ -578,15 +578,7 @@ data: `-∑ᵢ ⟪bᵢ ∂ᵢu, w⟫ - ⟪c u₀, w⟫ ≤ (B ∑ᵢ ‖∂ᵢu�
 private lemma neg_lowerOrder_le (Op : FullEllipticOp d) (U : H1amb Ω) (w : L2D Ω) :
     -∑ i : Fin d, ⟪Op.bAct i (U i.succ), w⟫ - ⟪Op.cAct (U 0), w⟫
       ≤ (Op.Bsup * ∑ i : Fin d, ‖U i.succ‖ + Op.Csup * ‖U 0‖) * ‖w‖ := by
-  have hb : -∑ i : Fin d, ⟪Op.bAct i (U i.succ), w⟫
-      ≤ Op.Bsup * (∑ i : Fin d, ‖U i.succ‖) * ‖w‖ := by
-    rw [← Finset.sum_neg_distrib, Finset.mul_sum, Finset.sum_mul]
-    exact Finset.sum_le_sum fun i _ => (neg_real_inner_le_mul_norm _ _).trans
-      (mul_le_mul_of_nonneg_right (Op.norm_bAct_le i _) (norm_nonneg _))
-  have hc : -⟪Op.cAct (U 0), w⟫ ≤ Op.Csup * ‖U 0‖ * ‖w‖ :=
-    (neg_real_inner_le_mul_norm _ _).trans
-      (mul_le_mul_of_nonneg_right (Op.norm_cAct_le _) (norm_nonneg _))
-  linarith only [hb, hc]
+  linarith only [neg_sum_bAct_inner_le Op (fun i => U i.succ) w, neg_cAct_inner_le Op (U 0) w]
 
 /-- The coefficient of the linear term in the energy inequality of the interior difference
 quotient: it depends on the operator, on the Lipschitz bound of the coefficients, and on the

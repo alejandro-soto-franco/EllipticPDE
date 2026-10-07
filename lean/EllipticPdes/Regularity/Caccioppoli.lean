@@ -490,6 +490,22 @@ lemma testedIdentity_of_H01 (Op : FullEllipticOp d) {Ω : Set (EuclideanSpace �
   unfold TestedIdentity
   linarith only [h]
 
+/-- The transport pairing against a vector `y` is bounded below by `-B (∑ᵢ ‖Xᵢ‖) ‖y‖`, with `B`
+the supremum of the transport coefficients. -/
+lemma neg_sum_bAct_inner_le (Op : FullEllipticOp d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    (X : Fin d → L2D Ω) (y : L2D Ω) :
+    -∑ i : Fin d, ⟪Op.bAct i (X i), y⟫ ≤ Op.Bsup * (∑ i : Fin d, ‖X i‖) * ‖y‖ := by
+  rw [← Finset.sum_neg_distrib, Finset.mul_sum, Finset.sum_mul]
+  exact Finset.sum_le_sum fun i _ => (neg_real_inner_le_mul_norm _ _).trans
+    (mul_le_mul_of_nonneg_right (Op.norm_bAct_le i _) (norm_nonneg _))
+
+/-- The zeroth-order pairing of `z` against `w` is bounded below by `-C ‖z‖ ‖w‖`, with `C` the
+supremum of the zeroth-order coefficient. -/
+lemma neg_cAct_inner_le (Op : FullEllipticOp d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    (z w : L2D Ω) : -⟪Op.cAct z, w⟫ ≤ Op.Csup * ‖z‖ * ‖w‖ :=
+  (neg_real_inner_le_mul_norm _ _).trans
+    (mul_le_mul_of_nonneg_right (Op.norm_cAct_le _) (norm_nonneg _))
+
 /-- **Energy identity for `ζ² U`.** Testing the weak formulation with `ζ² U` and bounding the
 principal part from below by ellipticity gives
 `λ ∑ᵢ ‖ζ Uᵢ‖² ≤ ⟪f, ζ² U₀⟫ - ∑ᵢ ⟪bᵢ (ζ Uᵢ), ζ U₀⟫ - ⟪c U₀, ζ² U₀⟫
@@ -527,6 +543,13 @@ lemma caccioppoli_lower_bound (Op : FullEllipticOp d) {Ω : Set (EuclideanSpace 
   rw [cutoffMulOn_apply_zero] at hlow
   linarith only [hen, hid, hbil, hlow]
 
+/-- The real-variable bound for the zeroth-order and datum terms of the Caccioppoli estimate. -/
+private lemma datum_term_le {Z C a b : ℝ} (hZ : 0 ≤ Z) (hC : 0 ≤ C) (ha : 0 ≤ a) (hb : 0 ≤ b) :
+    Z * a * b + C * Z * b ^ 2 ≤ Z * (1 + C) * (a + b) ^ 2 := by
+  nlinarith only [mul_nonneg hZ (mul_nonneg ha hb), mul_nonneg hZ (sq_nonneg a),
+    mul_nonneg hZ (sq_nonneg b), mul_nonneg (mul_nonneg hZ hC) (sq_nonneg a),
+    mul_nonneg (mul_nonneg hZ hC) (mul_nonneg ha hb)]
+
 /-- **Interior energy estimate for a tested identity.** If `U ∈ H¹` satisfies the weak identity
 against `ζ² U` (`TestedIdentity`), the cutoff-weighted gradient energy `(λ/2) ∑ᵢ ‖ζ Uᵢ‖²` is
 bounded by `C (‖f‖² + ‖U₀‖²)`. The constant is quantified before `U` and `f`, so it depends only
@@ -542,8 +565,7 @@ theorem caccioppoli_core (Op : FullEllipticOp d) {Ω : Set (EuclideanSpace ℝ (
   set A := Op.toEllipticCoeff with hA
   have hZ := hζ.supNorm_nonneg
   have hZ2 := (isTestFn_mul hζ hζ).supNorm_nonneg
-  have hSW : 0 ≤ ∑ j : Fin d, hζ.partialSupNorm j :=
-    Finset.sum_nonneg fun j _ => hζ.partialSupNorm_nonneg j
+  have hSW := hζ.sum_partialSupNorm_nonneg
   have hΛ := A.Λ_nonneg
   have hlam := A.lam_pos
   set β : ℝ := (Op.Bsup * hζ.supNorm + 2 * A.Λ * ∑ j : Fin d, hζ.partialSupNorm j)
@@ -567,26 +589,13 @@ theorem caccioppoli_core (Op : FullEllipticOp d) {Ω : Set (EuclideanSpace ℝ (
   have hT1 : ⟪f, mulTest (isTestFn_mul hζ hζ) (U 0)⟫
       ≤ (isTestFn_mul hζ hζ).supNorm * ‖f‖ * r :=
     (real_inner_le_norm _ _).trans (by nlinarith only [hζ2u0, norm_nonneg f])
-  have hTb : -∑ i : Fin d, ⟪Op.bAct i (mulTest hζ (U i.succ)),
-        mulTest hζ (U 0)⟫
-      ≤ Op.Bsup * hζ.supNorm * r * ∑ i : Fin d, ‖mulTest hζ (U i.succ)‖ := by
-    rw [← Finset.sum_neg_distrib, Finset.mul_sum]
-    refine Finset.sum_le_sum fun i _ => (neg_real_inner_le_mul_norm _ _).trans ?_
-    calc _ ≤ (Op.Bsup * ‖mulTest hζ (U i.succ)‖) * (hζ.supNorm * r) :=
-          mul_le_mul (Op.norm_bAct_le i _) hζu0 (norm_nonneg _)
-            (mul_nonneg Op.Bsup_nonneg (norm_nonneg _))
-      _ = _ := by ring
-  have hTc : -⟪Op.cAct (U 0), mulTest (isTestFn_mul hζ hζ) (U 0)⟫
-      ≤ Op.Csup * (isTestFn_mul hζ hζ).supNorm * r ^ 2 := by
-    refine (neg_real_inner_le_mul_norm _ _).trans ?_
-    calc _ ≤ (Op.Csup * r) * ((isTestFn_mul hζ hζ).supNorm * r) :=
-          mul_le_mul (Op.norm_cAct_le _) hζ2u0 (norm_nonneg _)
-            (mul_nonneg Op.Csup_nonneg (norm_nonneg _))
-      _ = _ := by ring
+  have hTb := (neg_sum_bAct_inner_le Op (fun i => mulTest hζ (U i.succ)) (mulTest hζ (U 0))).trans
+    (mul_le_mul_of_nonneg_left hζu0 (mul_nonneg Op.Bsup_nonneg hS0))
+  have hTc := (neg_cAct_inner_le Op (U 0) (mulTest (isTestFn_mul hζ hζ) (U 0))).trans
+    (mul_le_mul_of_nonneg_left hζ2u0 (mul_nonneg Op.Csup_nonneg (norm_nonneg _)))
   have hTx := neg_cross_sum_le A hζ (fun i => U i.succ) (U 0)
   have hkey : A.lam * Real.sqrt E ^ 2 ≤ β * (‖f‖ + r) * Real.sqrt E + K₂ * (‖f‖ + r) ^ 2 := by
     rw [Real.sq_sqrt hE0]
-    have he := Real.sqrt_nonneg E
     have hr0 : 0 ≤ r := norm_nonneg _
     have hf0 := norm_nonneg f
     have h1 : (Op.Bsup * hζ.supNorm + 2 * A.Λ * ∑ j : Fin d, hζ.partialSupNorm j) * r
@@ -596,14 +605,8 @@ theorem caccioppoli_core (Op : FullEllipticOp d) {Ω : Set (EuclideanSpace ℝ (
             mul_le_mul_of_nonneg_left hS (by have := Op.Bsup_nonneg; positivity)
         _ = β * r * Real.sqrt E := by rw [hβ]; ring
         _ ≤ _ := mul_le_mul_of_nonneg_right
-            (mul_le_mul_of_nonneg_left (by linarith) hβ0) he
-    have h2 : (isTestFn_mul hζ hζ).supNorm * ‖f‖ * r
-        + Op.Csup * (isTestFn_mul hζ hζ).supNorm * r ^ 2 ≤ K₂ * (‖f‖ + r) ^ 2 := by
-      rw [hK₂]
-      have := Op.Csup_nonneg
-      nlinarith only [mul_nonneg hZ2 (mul_nonneg hf0 hr0), mul_nonneg hZ2 (sq_nonneg ‖f‖),
-        mul_nonneg hZ2 (sq_nonneg r), mul_nonneg (mul_nonneg hZ2 this) (sq_nonneg ‖f‖),
-        mul_nonneg (mul_nonneg hZ2 this) (mul_nonneg hf0 hr0)]
+            (mul_le_mul_of_nonneg_left (by linarith) hβ0) (Real.sqrt_nonneg E)
+    have h2 := datum_term_le hZ2 Op.Csup_nonneg hf0 hr0
     linarith only [hlow, hT1, hTb, hTc, hTx, h1, h2]
   have habs := absorb_energy hlam hkey
   rw [Real.sq_sqrt hE0] at habs
