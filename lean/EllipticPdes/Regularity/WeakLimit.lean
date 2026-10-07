@@ -138,19 +138,9 @@ theorem tendsto_inner_diffQuot_of_hasWeakDeriv (k : Fin d) {g g' : EucL2 d}
     refine hinner.neg.congr (fun m => ?_)
     exact (diffQuot_inner_adjoint k (η m) g (hρL2.toLp ρ)).symm
   -- The weak-derivative identity turns the limit into the pairing against `g'`.
-  have hIg : ⟪g, hρpL2.toLp (partialD k ρ)⟫ = ∫ x, (g x : ℝ) * partialD k ρ x := by
-    rw [L2.inner_def]
-    refine integral_congr_ae ?_
-    filter_upwards [hρpL2.coeFn_toLp] with x hx
-    rw [RCLike.inner_apply, conj_trivial, hx, mul_comm]
-  have hIg' : ⟪g', hρL2.toLp ρ⟫ = ∫ x, (g' x : ℝ) * ρ x := by
-    rw [L2.inner_def]
-    refine integral_congr_ae ?_
-    filter_upwards [hρL2.coeFn_toLp] with x hx
-    rw [RCLike.inner_apply, conj_trivial, hx, mul_comm]
-  have hweak := hg ρ hρcd hρcs
   rw [show -⟪g, hρpL2.toLp (partialD k ρ)⟫ = ⟪g', hρL2.toLp ρ⟫ by
-    rw [hIg, hIg', hweak, neg_neg]] at hlim
+    rw [inner_eq_integral_toLp g hρpL2, inner_eq_integral_toLp g' hρL2, hg ρ hρcd hρcs,
+      neg_neg]] at hlim
   exact hlim
 
 end EllipticPdes.Regularity

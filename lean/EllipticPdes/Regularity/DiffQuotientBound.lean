@@ -586,17 +586,7 @@ theorem weakDeriv_of_diffQuot_bounded (k : Fin d) (g : EucL2 d) (M : ℝ)
     exact (diffQuot_inner_adjoint k (hseq (σ m)) g ζLp).symm
   have hkey : ⟪g', ζLp⟫ = -⟪g, ζpLp⟫ := tendsto_nhds_unique hlimA hlimB
   -- Translate the inner products back to integrals.
-  have hinnerG' : ⟪g', ζLp⟫ = ∫ x, g' x * ζ x := by
-    rw [L2.inner_def]
-    refine integral_congr_ae ?_
-    filter_upwards [hζMemLp.coeFn_toLp] with x hx
-    rw [RCLike.inner_apply, conj_trivial, hx, mul_comm]
-  have hinnerG : ⟪g, ζpLp⟫ = ∫ x, g x * partialD k ζ x := by
-    rw [L2.inner_def]
-    refine integral_congr_ae ?_
-    filter_upwards [hζpMemLp.coeFn_toLp] with x hx
-    rw [RCLike.inner_apply, conj_trivial, hx, mul_comm]
-  rw [hinnerG', hinnerG] at hkey
+  rw [inner_eq_integral_toLp g' hζMemLp, inner_eq_integral_toLp g hζpMemLp] at hkey
   linarith [hkey]
 
 /-! ### General weak-derivative direction-i bound -/

@@ -208,9 +208,8 @@ theorem neumann_unique (hU : IsOpen U) (hUc : IsPreconnected U) (hUb : Bornology
     obtain ⟨hud, hvd, z, r, hr, hball, hdist, hfd⟩ := hν y hy
     refine ⟨hud.sub hvd, z, r, hr, hball, hdist, ?_⟩
     rw [hwdef, fderiv_fun_sub hud hvd, sub_apply, hfd, sub_self]
-  have hcl : IsCompact (closure U) := hUb.isCompact_closure
-  obtain ⟨p, hp, hpmax⟩ := hcl.exists_isMaxOn hUne.closure hwc
-  obtain ⟨q, hq, hqmin⟩ := hcl.exists_isMinOn hUne.closure hwc
+  obtain ⟨p, hp, hpmax⟩ := hUb.isCompact_closure.exists_isMaxOn hUne.closure hwc
+  obtain ⟨q, hq, hqmin⟩ := hUb.isCompact_closure.exists_isMinOn hUne.closure hwc
   rcases le_or_gt 0 (w p) with hp0 | hp0
   · refine ⟨u p - v p, fun x hx => ?_⟩
     have := eq_const_of_neumann_aux hU hUc hA hT hb hc0 hcC hw hwc

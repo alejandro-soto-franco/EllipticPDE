@@ -114,6 +114,15 @@ variable {d : ℕ}
 def hshift (k : Fin d) (h : ℝ) : EuclideanSpace ℝ (Fin d) :=
   h • EuclideanSpace.single k (1 : ℝ)
 
+/-- The inner product of a class with the class of a function in `L²` is the integral of the
+product. -/
+theorem inner_eq_integral_toLp (g : EucL2 d) {ρ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hρ : MemLp ρ 2 volume) : ⟪g, hρ.toLp ρ⟫ = ∫ x, (g x : ℝ) * ρ x := by
+  rw [L2.inner_def]
+  refine integral_congr_ae ?_
+  filter_upwards [hρ.coeFn_toLp] with x hx
+  rw [RCLike.inner_apply, conj_trivial, hx, mul_comm]
+
 /-- A property that holds almost everywhere holds almost everywhere after a translation. -/
 theorem ae_comp_add_right {p : EuclideanSpace ℝ (Fin d) → Prop} (v : EuclideanSpace ℝ (Fin d))
     (h : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), p x) :
