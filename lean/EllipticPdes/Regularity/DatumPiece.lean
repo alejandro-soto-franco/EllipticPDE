@@ -115,6 +115,51 @@ theorem exists_datum_piece {Ω N : Set (EuclideanSpace ℝ (Fin d))}
   filter_upwards [mulL2_coeFn ha.measurable_self ha.ae_abs_le p] with x hx
   rw [hx]
 
+/-- **Pairing of a datum with `k` weak derivatives.** The functional `T` on test functions is
+the pairing against an `L²(Ω)` class that has `k` weak derivatives with `L²` norms at most `B`.
+Pairings of this kind are closed under signed sums, which is how the datum of an induction step
+is assembled from its pieces. -/
+def IsDatumPairing (Ω : Set (EuclideanSpace ℝ (Fin d))) (k : ℕ) (B : ℝ)
+    (T : (EuclideanSpace ℝ (Fin d) → ℝ) → ℝ) : Prop :=
+  ∃ (F : L2D Ω) (HF : HasIteratedWeakDerivOn Ω k F), IteratedL2Bound HF B ∧
+    ∀ v : EuclideanSpace ℝ (Fin d) → ℝ, ContDiff ℝ (⊤ : ℕ∞) v → HasCompactSupport v →
+      (∫ x in Ω, (F x : ℝ) * v x) = T v
+
+namespace IsDatumPairing
+
+variable {Ω : Set (EuclideanSpace ℝ (Fin d))} {k : ℕ} {B B' : ℝ}
+  {T T' : (EuclideanSpace ℝ (Fin d) → ℝ) → ℝ}
+
+/-- A pairing with a larger bound. -/
+theorem mono (h : IsDatumPairing Ω k B T) (hB : B ≤ B') : IsDatumPairing Ω k B' T := by
+  obtain ⟨F, HF, hFB, hF⟩ := h
+  exact ⟨F, HF, hFB.mono_const hB, hF⟩
+
+/-- Pairings that agree on test functions are interchangeable. -/
+theorem congr (h : IsDatumPairing Ω k B T)
+    (hT : ∀ v : EuclideanSpace ℝ (Fin d) → ℝ, ContDiff ℝ (⊤ : ℕ∞) v → HasCompactSupport v →
+      T v = T' v) : IsDatumPairing Ω k B T' := by
+  obtain ⟨F, HF, hFB, hF⟩ := h
+  exact ⟨F, HF, hFB, fun v hvc hvcs => (hF v hvc hvcs).trans (hT v hvc hvcs)⟩
+
+/-- The pairings add, with the bounds. -/
+theorem add (h : IsDatumPairing Ω k B T) (h' : IsDatumPairing Ω k B' T') :
+    IsDatumPairing Ω k (B + B') fun v => T v + T' v := by
+  obtain ⟨F, HF, hFB, hF⟩ := h
+  obtain ⟨F', HF', hFB', hF'⟩ := h'
+  exact ⟨F + F', HF.add HF', hFB.add hFB', fun v hvc hvcs => by
+    rw [setIntegral_add_mul_testFn _ _ hvc hvcs, hF v hvc hvcs, hF' v hvc hvcs]⟩
+
+/-- The pairings subtract, with the bounds adding. -/
+theorem sub (h : IsDatumPairing Ω k B T) (h' : IsDatumPairing Ω k B' T') :
+    IsDatumPairing Ω k (B + B') fun v => T v - T' v := by
+  obtain ⟨F, HF, hFB, hF⟩ := h
+  obtain ⟨F', HF', hFB', hF'⟩ := h'
+  exact ⟨F - F', HF.sub HF', hFB.sub hFB', fun v hvc hvcs => by
+    rw [setIntegral_sub_mul_testFn _ _ hvc hvcs, hF v hvc hvcs, hF' v hvc hvcs]⟩
+
+end IsDatumPairing
+
 /-- **Finite family of pieces assembled.** The datum of the induction step is a fixed finite
 list of shapes, each a cutoff against a coefficient against a derivative, and only the
 derivatives depend on the solution. Quantifying the constant before the derivatives is what
@@ -129,11 +174,7 @@ theorem exists_datum_of_pieces {Ω N : Set (EuclideanSpace ℝ (Fin d))}
     {a : ι → EuclideanSpace ℝ (Fin d) → ℝ} (ha : ∀ t, IsWkInfty (a t) k) :
     ∃ K : ℝ, 0 ≤ K ∧ ∀ (p : ι → L2D N) (hp : ∀ t, HasIteratedWeakDerivOn N k (p t)) {M : ℝ},
       (∀ t, IteratedL2Bound (hp t) M) →
-      ∃ (F : L2D Ω) (HF : HasIteratedWeakDerivOn Ω k F),
-        IteratedL2Bound HF (K * M) ∧
-        ∀ v : EuclideanSpace ℝ (Fin d) → ℝ, ContDiff ℝ (⊤ : ℕ∞) v → HasCompactSupport v →
-          (∫ x in Ω, (F x : ℝ) * v x)
-            = ∑ t, ∫ x in N, χ t x * (a t x * (p t x : ℝ)) * v x := by
+      IsDatumPairing Ω k (K * M) fun v => ∑ t, ∫ x in N, χ t x * (a t x * (p t x : ℝ)) * v x := by
   classical
   choose K hK hP using fun t => exists_datum_piece hNm hNΩ k (hχ t) (ha t)
   refine ⟨∑ t, K t, Finset.sum_nonneg fun t _ => hK t, ?_⟩
@@ -144,5 +185,25 @@ theorem exists_datum_of_pieces {Ω N : Set (EuclideanSpace ℝ (Fin d))}
     rwa [← Finset.sum_mul] at hsum
   · rw [setIntegral_sum_mul_testFn q hvc hvcs]
     exact Finset.sum_congr rfl fun t _ => hqpair t v
+
+/-- **Pieces whose coefficients depend on a direction.** The constant of
+`exists_datum_of_pieces` for a family of coefficients indexed by a finite set of directions can
+be taken to serve every direction at once, which is what lets the constant of the induction step
+be quantified before the direction of differentiation. The bound `M` is nonnegative so that
+enlarging the constant enlarges the bound. -/
+theorem exists_datum_of_pieces_dir {Ω N : Set (EuclideanSpace ℝ (Fin d))}
+    (hNm : MeasurableSet N) (hNΩ : N ⊆ Ω) (k : ℕ) {σ ι : Type*} [Finite σ] [Fintype ι]
+    {χ : ι → EuclideanSpace ℝ (Fin d) → ℝ} (hχ : ∀ t, IsTestFn N (χ t))
+    {a : σ → ι → EuclideanSpace ℝ (Fin d) → ℝ} (ha : ∀ m t, IsWkInfty (a m t) k) :
+    ∃ K : ℝ, 0 ≤ K ∧ ∀ (m : σ) (p : ι → L2D N)
+      (hp : ∀ t, HasIteratedWeakDerivOn N k (p t)) {M : ℝ}, 0 ≤ M →
+      (∀ t, IteratedL2Bound (hp t) M) →
+      IsDatumPairing Ω k (K * M) fun v =>
+        ∑ t, ∫ x in N, χ t x * (a m t x * (p t x : ℝ)) * v x := by
+  have := Fintype.ofFinite σ
+  choose K hK hP using fun m => exists_datum_of_pieces hNm hNΩ k hχ (ha m)
+  refine ⟨∑ m, K m, Finset.sum_nonneg fun m _ => hK m, fun m p hp M hM0 hM => ?_⟩
+  exact (hP m p hp hM).mono (mul_le_mul_of_nonneg_right
+    (Finset.single_le_sum (fun m _ => hK m) (Finset.mem_univ m)) hM0)
 
 end EllipticPdes.Regularity

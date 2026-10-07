@@ -194,7 +194,7 @@ private lemma cutoffDeriv_pairing_eq (Op : FullEllipticOp (n + 1))
   refine (fullBilin_testGraph_eq Op ⟨Uamb, hUmem⟩ hv).trans
     ((setIntegral_blocks_eq Op hΩm hNm hξNt hA hbc (p := HuN.D [ℓ])
       (D2 := fun i => HuN.D [i, ℓ]) hgrad hU0N hD2 hv.1).trans ?_)
-  unfold cutoffDatumPairing
+  unfold cutoffDatumPairing cutoffDatumPairingCutoff cutoffDatumPairingGrad
   -- The mixed second derivative, swapped into the order the equation names.
   have hsymm := cutoffDeriv_mixed_comm hNm hϑ HuN ℓ
   have hψ : ∀ j : Fin (n + 1), ∀ x, ϑ x * partialD j (fun y => ξ y * v y) x

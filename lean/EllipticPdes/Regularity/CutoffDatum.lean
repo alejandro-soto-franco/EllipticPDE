@@ -43,13 +43,12 @@ open EllipticPdes.Sobolev
 
 variable {n : ℕ}
 
-/-- **Pairing of the datum of the induction step with a test function.** The twelve shapes of
-Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 2 step 3, each the cutoff `ξ`
-or one of its first two partial derivatives against a coefficient of the operator or one of its
-derivatives, against a derivative of the solution `uN` of order at most two on the collar `N`,
-integrated against the test function `v`. `Df` is the derivative of the datum in the direction
-`ℓ`. -/
-def cutoffDatumPairing (Op : FullEllipticOp (n + 1))
+/-- **Shapes of the datum that carry the cutoff itself.** Seven of the twelve shapes of Evans,
+*Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 2 step 3: the cutoff `ξ` against a
+coefficient of the operator or one of its derivatives, against a derivative of the solution `uN`
+of order at most two on the collar `N`, integrated against the test function `v`. `Df` is the
+derivative of the datum in the direction `ℓ`. -/
+def cutoffDatumPairingCutoff (Op : FullEllipticOp (n + 1))
     {N : Set (EuclideanSpace ℝ (Fin (n + 1)))} {k : ℕ}
     (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 2)) (hbc : IsWkInftyLower Op (k + 1))
     (ξ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ) (ℓ : Fin (n + 1)) {uN : L2D N} (Df : L2D N)
@@ -60,13 +59,135 @@ def cutoffDatumPairing (Op : FullEllipticOp (n + 1))
     - (∫ x in N, ξ x * (hbc.cReg.D [ℓ] x * (uN x : ℝ)) * v x)
     + (∑ i, ∑ j, ∫ x in N, ξ x * (hA.D [j, ℓ] i j x * (HuN.D [i] x : ℝ)) * v x)
     + (∑ i, ∑ j, ∫ x in N, ξ x * (hA.D [ℓ] i j x * (HuN.D [j, i] x : ℝ)) * v x)
+    + ∑ i, ∫ x in N, ξ x * (Op.b x i * (HuN.D [i, ℓ] x : ℝ)) * v x
+
+/-- **Shapes of the datum that carry a derivative of the cutoff.** The other five shapes: the
+first or second partial derivatives of `ξ` against a coefficient of the operator or its
+derivative, against a derivative of the solution `uN` of order at most two. -/
+def cutoffDatumPairingGrad (Op : FullEllipticOp (n + 1))
+    {N : Set (EuclideanSpace ℝ (Fin (n + 1)))} {k : ℕ}
+    (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 2))
+    (ξ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ) (ℓ : Fin (n + 1)) {uN : L2D N}
+    (HuN : HasIteratedWeakDerivOn N (k + 2) uN) (v : EuclideanSpace ℝ (Fin (n + 1)) → ℝ) : ℝ :=
+  (∑ i, ∫ x in N, partialD i ξ x * (Op.b x i * (HuN.D [ℓ] x : ℝ)) * v x)
     - (∑ i, ∑ j, ∫ x in N, partialD j ξ x * (Op.a x i j * (HuN.D [i, ℓ] x : ℝ)) * v x)
     - (∑ i, ∑ j, ∫ x in N,
         partialD j (partialD i ξ) x * (Op.a x i j * (HuN.D [ℓ] x : ℝ)) * v x)
     - (∑ i, ∑ j, ∫ x in N, partialD i ξ x * (hA.D [j] i j x * (HuN.D [ℓ] x : ℝ)) * v x)
     - (∑ i, ∑ j, ∫ x in N, partialD i ξ x * (Op.a x i j * (HuN.D [j, ℓ] x : ℝ)) * v x)
-    + (∑ i, ∫ x in N, partialD i ξ x * (Op.b x i * (HuN.D [ℓ] x : ℝ)) * v x)
-    + ∑ i, ∫ x in N, ξ x * (Op.b x i * (HuN.D [i, ℓ] x : ℝ)) * v x
+
+/-- **Pairing of the datum of the induction step with a test function.** The twelve shapes of
+`cutoffDatumPairingCutoff` and `cutoffDatumPairingGrad`. -/
+def cutoffDatumPairing (Op : FullEllipticOp (n + 1))
+    {N : Set (EuclideanSpace ℝ (Fin (n + 1)))} {k : ℕ}
+    (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 2)) (hbc : IsWkInftyLower Op (k + 1))
+    (ξ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ) (ℓ : Fin (n + 1)) {uN : L2D N} (Df : L2D N)
+    (HuN : HasIteratedWeakDerivOn N (k + 2) uN) (v : EuclideanSpace ℝ (Fin (n + 1)) → ℝ) : ℝ :=
+  cutoffDatumPairingCutoff Op hA hbc ξ ℓ Df HuN v + cutoffDatumPairingGrad Op hA ξ ℓ HuN v
+
+/-- **A constant for a family of datum pairings.** For the pairings `T ℓ Df HuN` there is a
+constant such that every family of derivatives `HuN` of the solution on the collar `N` and every
+derivative `Df` of the datum, bounded by `B`, yield an `L²(Ω)` class with `k` weak derivatives
+bounded by `K·B` that pairs as `T`. The constant is quantified before the direction `ℓ`, the
+solution and the datum. -/
+def HasCutoffDatum (Ω N : Set (EuclideanSpace ℝ (Fin (n + 1)))) (k : ℕ)
+    (T : Fin (n + 1) → ∀ {uN : L2D N}, L2D N → HasIteratedWeakDerivOn N (k + 2) uN →
+      (EuclideanSpace ℝ (Fin (n + 1)) → ℝ) → ℝ) : Prop :=
+  ∃ K : ℝ, 0 ≤ K ∧ ∀ (ℓ : Fin (n + 1)) (uN Df : L2D N)
+    (HuN : HasIteratedWeakDerivOn N (k + 2) uN) (HDf : HasIteratedWeakDerivOn N k Df) (B : ℝ),
+    IteratedL2Bound HuN B → IteratedL2Bound HDf B → IsDatumPairing Ω k (K * B) (T ℓ Df HuN)
+
+namespace HasCutoffDatum
+
+variable {Ω N : Set (EuclideanSpace ℝ (Fin (n + 1)))} {k : ℕ}
+
+/-- Datum pairings add, with the constants. -/
+theorem add {T T' : Fin (n + 1) → ∀ {uN : L2D N}, L2D N →
+      HasIteratedWeakDerivOn N (k + 2) uN → (EuclideanSpace ℝ (Fin (n + 1)) → ℝ) → ℝ}
+    (h : HasCutoffDatum Ω N k T) (h' : HasCutoffDatum Ω N k T') :
+    HasCutoffDatum Ω N k fun ℓ _ Df HuN v => T ℓ Df HuN v + T' ℓ Df HuN v := by
+  obtain ⟨K, hK, hT⟩ := h
+  obtain ⟨K', hK', hT'⟩ := h'
+  refine ⟨K + K', add_nonneg hK hK', fun ℓ uN Df HuN HDf B hHuN hHDf => ?_⟩
+  exact ((hT ℓ uN Df HuN HDf B hHuN hHDf).add (hT' ℓ uN Df HuN HDf B hHuN hHDf)).mono
+    (le_of_eq (add_mul K K' B).symm)
+
+end HasCutoffDatum
+
+variable {Ω N : Set (EuclideanSpace ℝ (Fin (n + 1)))} {k : ℕ}
+
+/-- The shapes carrying the cutoff have a datum with a constant independent of the solution. -/
+theorem hasCutoffDatum_cutoff (Op : FullEllipticOp (n + 1))
+    (hNm : MeasurableSet N) (hNΩ : N ⊆ Ω)
+    (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 2)) (hbc : IsWkInftyLower Op (k + 1))
+    {ξ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ} (hξ : IsTestFn N ξ) :
+    HasCutoffDatum Ω N k fun ℓ _ Df HuN => cutoffDatumPairingCutoff Op hA hbc ξ ℓ Df HuN := by
+  classical
+  have hb : ∀ i : Fin (n + 1), IsWkInfty (fun x => Op.b x i) k :=
+    fun i => (hbc.bReg i).mono (by omega)
+  obtain ⟨K1, hK1, hP1⟩ := exists_datum_of_pieces (ι := Unit) (χ := fun _ => ξ)
+    (a := fun _ _ => (1 : ℝ)) hNm hNΩ k (fun _ => hξ) fun _ => IsWkInfty.const 1 k
+  obtain ⟨K2, hK2, hP2⟩ := exists_datum_of_pieces_dir (σ := Fin (n + 1))
+    (χ := fun _ : Fin (n + 1) => ξ) (a := fun m i => (hbc.bReg i).D [m]) hNm hNΩ k
+    (fun _ => hξ) fun m i => ((hbc.bReg i).deriv m).mono (by omega)
+  obtain ⟨K3, hK3, hP3⟩ := exists_datum_of_pieces (χ := fun _ : Fin (n + 1) => ξ) hNm hNΩ k
+    (fun _ => hξ) hb
+  obtain ⟨K4, hK4, hP4⟩ := exists_datum_of_pieces_dir (σ := Fin (n + 1))
+    (χ := fun _ : Unit => ξ) (a := fun m _ => hbc.cReg.D [m]) hNm hNΩ k (fun _ => hξ)
+    fun m _ => (hbc.cReg.deriv m).mono (by omega)
+  obtain ⟨K5, hK5, hP5⟩ := exists_datum_of_pieces_dir (σ := Fin (n + 1))
+    (χ := fun _ : Fin (n + 1) × Fin (n + 1) => ξ) (a := fun m t => hA.D [t.2, m] t.1 t.2)
+    hNm hNΩ k (fun _ => hξ) fun m t => (((hA.entry t.1 t.2).deriv m).deriv t.2).mono (by omega)
+  obtain ⟨K6, hK6, hP6⟩ := exists_datum_of_pieces_dir (σ := Fin (n + 1))
+    (χ := fun _ : Fin (n + 1) × Fin (n + 1) => ξ) (a := fun m t => hA.D [m] t.1 t.2)
+    hNm hNΩ k (fun _ => hξ) fun m t => ((hA.entry t.1 t.2).deriv m).mono (by omega)
+  refine ⟨K1 + K2 + 2 * K3 + K4 + K5 + K6, by positivity, ?_⟩
+  intro ℓ uN Df HuN HDf B hHuN hHDf
+  have hB0 : 0 ≤ B := (norm_nonneg uN).trans hHuN.norm_le
+  have h := (((((hP1 (fun _ => Df) (fun _ => HDf) fun _ => hHDf).sub
+    (hP2 ℓ (fun i => HuN.D [i]) (fun i => HuN.deriv₁ i) hB0 fun i => hHuN.deriv₁ i)).sub
+    (hP3 (fun i => HuN.D [ℓ, i]) (fun i => HuN.deriv₂ i ℓ) fun i => hHuN.deriv₂ i ℓ)).sub
+    (hP4 ℓ (fun _ => uN) (fun _ => HuN.mono (Nat.le_add_right k 2)) hB0
+      fun _ => hHuN.mono_order (Nat.le_add_right k 2))).add
+    (hP5 ℓ (fun t => HuN.D [t.1]) (fun t => HuN.deriv₁ t.1) hB0 fun t => hHuN.deriv₁ t.1)).add
+    (hP6 ℓ (fun t => HuN.D [t.2, t.1]) (fun t => HuN.deriv₂ t.1 t.2) hB0
+      fun t => hHuN.deriv₂ t.1 t.2)
+  refine (h.add (hP3 (fun i => HuN.D [i, ℓ]) (fun i => HuN.deriv₂ ℓ i)
+    fun i => hHuN.deriv₂ ℓ i)).mono (le_of_eq (by ring)) |>.congr fun v _ _ => ?_
+  simp [cutoffDatumPairingCutoff, Fintype.sum_prod_type]
+
+/-- The shapes carrying a derivative of the cutoff have a datum with a constant independent of
+the solution. -/
+theorem hasCutoffDatum_grad (Op : FullEllipticOp (n + 1))
+    (hNm : MeasurableSet N) (hNΩ : N ⊆ Ω)
+    (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 2)) (hbc : IsWkInftyLower Op (k + 1))
+    {ξ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ} (hξ : IsTestFn N ξ) :
+    HasCutoffDatum Ω N k fun ℓ _ _ HuN => cutoffDatumPairingGrad Op hA ξ ℓ HuN := by
+  classical
+  have hξD : ∀ i : Fin (n + 1), IsTestFn N (partialD i ξ) := fun i => isTestFn_partialD hξ i
+  have hb : ∀ i : Fin (n + 1), IsWkInfty (fun x => Op.b x i) k :=
+    fun i => (hbc.bReg i).mono (by omega)
+  have ha : ∀ t : Fin (n + 1) × Fin (n + 1), IsWkInfty (fun x => Op.a x t.1 t.2) k :=
+    fun t => (hA.entry t.1 t.2).mono (by omega)
+  obtain ⟨K7, hK7, hP7⟩ := exists_datum_of_pieces hNm hNΩ k
+    (fun t : Fin (n + 1) × Fin (n + 1) => hξD t.2) ha
+  obtain ⟨K8, hK8, hP8⟩ := exists_datum_of_pieces hNm hNΩ k
+    (fun t : Fin (n + 1) × Fin (n + 1) => isTestFn_partialD (hξD t.1) t.2) ha
+  obtain ⟨K9, hK9, hP9⟩ := exists_datum_of_pieces hNm hNΩ k
+    (a := fun t : Fin (n + 1) × Fin (n + 1) => hA.D [t.2] t.1 t.2) (fun t => hξD t.1)
+    fun t => ((hA.entry t.1 t.2).deriv t.2).mono (by omega)
+  obtain ⟨K10, hK10, hP10⟩ := exists_datum_of_pieces hNm hNΩ k
+    (fun t : Fin (n + 1) × Fin (n + 1) => hξD t.1) ha
+  obtain ⟨K11, hK11, hP11⟩ := exists_datum_of_pieces hNm hNΩ k hξD hb
+  refine ⟨K11 + K7 + K8 + K9 + K10, by positivity, ?_⟩
+  intro ℓ uN Df HuN HDf B hHuN hHDf
+  have h := ((((hP11 (fun _ => HuN.D [ℓ]) (fun _ => HuN.deriv₁ ℓ) fun _ => hHuN.deriv₁ ℓ).sub
+    (hP7 (fun t => HuN.D [t.1, ℓ]) (fun t => HuN.deriv₂ ℓ t.1) fun t => hHuN.deriv₂ ℓ t.1)).sub
+    (hP8 (fun _ => HuN.D [ℓ]) (fun _ => HuN.deriv₁ ℓ) fun _ => hHuN.deriv₁ ℓ)).sub
+    (hP9 (fun _ => HuN.D [ℓ]) (fun _ => HuN.deriv₁ ℓ) fun _ => hHuN.deriv₁ ℓ)).sub
+    (hP10 (fun t => HuN.D [t.2, ℓ]) (fun t => HuN.deriv₂ ℓ t.2) fun t => hHuN.deriv₂ ℓ t.2)
+  refine (h.mono (le_of_eq (by ring))).congr fun v _ _ => ?_
+  simp [cutoffDatumPairingGrad, Fintype.sum_prod_type]
 
 /-- **Datum of the induction step.** For a cutoff `ξ` supported in the collar `N ⊆ Ω`, there
 is a constant such that every family of derivatives of the solution on `N` bounded by `B`, and
@@ -78,108 +199,10 @@ between the differentiated equation and the zeroth-order block, and are absent. 
 transport coefficient do not, because the equation names one order of differentiation and the
 block the other, and only the symmetry of the mixed second derivatives identifies them. -/
 theorem exists_cutoffDatum (Op : FullEllipticOp (n + 1))
-    {Ω N : Set (EuclideanSpace ℝ (Fin (n + 1)))}
-    (hNm : MeasurableSet N) (hNΩ : N ⊆ Ω) {k : ℕ}
+    (hNm : MeasurableSet N) (hNΩ : N ⊆ Ω)
     (hA : IsWkInftyCoeff Op.toEllipticCoeff (k + 2)) (hbc : IsWkInftyLower Op (k + 1))
     {ξ : EuclideanSpace ℝ (Fin (n + 1)) → ℝ} (hξ : IsTestFn N ξ) :
-    ∃ K : ℝ, 0 ≤ K ∧ ∀ (ℓ : Fin (n + 1)) (uN Df : L2D N)
-      (HuN : HasIteratedWeakDerivOn N (k + 2) uN)
-      (HDf : HasIteratedWeakDerivOn N k Df) (B : ℝ),
-      IteratedL2Bound HuN B → IteratedL2Bound HDf B →
-      ∃ (F : L2D Ω) (HF : HasIteratedWeakDerivOn Ω k F),
-        IteratedL2Bound HF (K * B) ∧
-        ∀ v : EuclideanSpace ℝ (Fin (n + 1)) → ℝ, ContDiff ℝ (⊤ : ℕ∞) v →
-          HasCompactSupport v →
-          (∫ x in Ω, (F x : ℝ) * v x) = cutoffDatumPairing Op hA hbc ξ ℓ Df HuN v := by
-  classical
-  -- The coefficients, each read off its bundle at order `k`.
-  have hξD : ∀ i : Fin (n + 1), IsTestFn N (partialD i ξ) := fun i => isTestFn_partialD hξ i
-  have hξDD : ∀ i j : Fin (n + 1), IsTestFn N (partialD j (partialD i ξ)) :=
-    fun i j => isTestFn_partialD (hξD i) j
-  have P := fun {ι : Type} [Fintype ι] {χ a : ι → EuclideanSpace ℝ (Fin (n + 1)) → ℝ}
-    (hχ : ∀ t, IsTestFn N (χ t)) (ha : ∀ t, IsWkInfty (a t) k) =>
-    exists_datum_of_pieces (Ω := Ω) hNm hNΩ k hχ ha
-  have hb : ∀ i : Fin (n + 1), IsWkInfty (fun x => Op.b x i) k :=
-    fun i => (hbc.bReg i).mono (by omega)
-  have ha : ∀ t : Fin (n + 1) × Fin (n + 1), IsWkInfty (fun x => Op.a x t.1 t.2) k :=
-    fun t => (hA.entry t.1 t.2).mono (by omega)
-  -- The shapes whose coefficient does not depend on the direction of differentiation.
-  obtain ⟨K1, hK1, hP1⟩ := P (ι := Unit) (χ := fun _ => ξ) (a := fun _ _ => (1 : ℝ))
-    (fun _ => hξ) fun _ => IsWkInfty.const 1 k
-  obtain ⟨K3, hK3, hP3⟩ := P (χ := fun _ : Fin (n + 1) => ξ) (fun _ => hξ) hb
-  obtain ⟨K7, hK7, hP7⟩ := P (fun t : Fin (n + 1) × Fin (n + 1) => hξD t.2) ha
-  obtain ⟨K8, hK8, hP8⟩ := P (fun t : Fin (n + 1) × Fin (n + 1) => hξDD t.1 t.2) ha
-  obtain ⟨K9, hK9, hP9⟩ := P (a := fun t : Fin (n + 1) × Fin (n + 1) => hA.D [t.2] t.1 t.2)
-    (fun t => hξD t.1) (fun t => ((hA.entry t.1 t.2).deriv t.2).mono (by omega))
-  obtain ⟨K10, hK10, hP10⟩ := P (fun t : Fin (n + 1) × Fin (n + 1) => hξD t.1) ha
-  obtain ⟨K11, hK11, hP11⟩ := P hξD hb
-  -- The shapes that differentiate a coefficient in the direction the equation is
-  -- differentiated, collected over that direction.
-  choose K2 hK2 hP2 using fun m : Fin (n + 1) =>
-    P (χ := fun _ : Fin (n + 1) => ξ) (a := fun i => (hbc.bReg i).D [m]) (fun _ => hξ)
-      (fun i => ((hbc.bReg i).deriv m).mono (by omega))
-  choose K4 hK4 hP4 using fun m : Fin (n + 1) =>
-    P (χ := fun _ : Unit => ξ) (a := fun _ => hbc.cReg.D [m]) (fun _ => hξ)
-      (fun _ => (hbc.cReg.deriv m).mono (by omega))
-  choose K5 hK5 hP5 using fun m : Fin (n + 1) =>
-    P (χ := fun _ : Fin (n + 1) × Fin (n + 1) => ξ) (a := fun t => hA.D [t.2, m] t.1 t.2)
-      (fun _ => hξ) (fun t => (((hA.entry t.1 t.2).deriv m).deriv t.2).mono (by omega))
-  choose K6 hK6 hP6 using fun m : Fin (n + 1) =>
-    P (χ := fun _ : Fin (n + 1) × Fin (n + 1) => ξ) (a := fun t => hA.D [m] t.1 t.2)
-      (fun _ => hξ) (fun t => ((hA.entry t.1 t.2).deriv m).mono (by omega))
-  refine ⟨K1 + (∑ m, K2 m) + 2 * K3 + (∑ m, K4 m) + (∑ m, K5 m) + (∑ m, K6 m)
-      + K7 + K8 + K9 + K10 + K11, ?_, ?_⟩
-  · have h2 : (0 : ℝ) ≤ ∑ m, K2 m := Finset.sum_nonneg fun m _ => hK2 m
-    have h4 : (0 : ℝ) ≤ ∑ m, K4 m := Finset.sum_nonneg fun m _ => hK4 m
-    have h5 : (0 : ℝ) ≤ ∑ m, K5 m := Finset.sum_nonneg fun m _ => hK5 m
-    have h6 : (0 : ℝ) ≤ ∑ m, K6 m := Finset.sum_nonneg fun m _ => hK6 m
-    linarith [hK1, hK3, hK7, hK8, hK9, hK10, hK11]
-  intro ℓ uN Df HuN HDf B hHuN hHDf
-  -- The twelve pieces.
-  obtain ⟨F1, HF1, hB1, hp1⟩ := hP1 (fun _ => Df) (fun _ => HDf) (fun _ => hHDf)
-  obtain ⟨F2, HF2, hB2, hp2⟩ := hP2 ℓ (fun i => HuN.D [i]) (fun i => HuN.deriv₁ i)
-    (fun i => hHuN.deriv₁ i)
-  obtain ⟨F3, HF3, hB3, hp3⟩ := hP3 (fun i => HuN.D [ℓ, i]) (fun i => HuN.deriv₂ i ℓ)
-    (fun i => hHuN.deriv₂ i ℓ)
-  obtain ⟨F4, HF4, hB4, hp4⟩ := hP4 ℓ (fun _ => uN)
-    (fun _ => HuN.mono (Nat.le_add_right k 2))
-    (fun _ => hHuN.mono_order (Nat.le_add_right k 2))
-  obtain ⟨F5, HF5, hB5, hp5⟩ := hP5 ℓ (fun t => HuN.D [t.1]) (fun t => HuN.deriv₁ t.1)
-    (fun t => hHuN.deriv₁ t.1)
-  obtain ⟨F6, HF6, hB6, hp6⟩ := hP6 ℓ (fun t => HuN.D [t.2, t.1])
-    (fun t => HuN.deriv₂ t.1 t.2) (fun t => hHuN.deriv₂ t.1 t.2)
-  obtain ⟨F7, HF7, hB7, hp7⟩ := hP7 (fun t => HuN.D [t.1, ℓ]) (fun t => HuN.deriv₂ ℓ t.1)
-    (fun t => hHuN.deriv₂ ℓ t.1)
-  obtain ⟨F8, HF8, hB8, hp8⟩ := hP8 (fun _ => HuN.D [ℓ]) (fun _ => HuN.deriv₁ ℓ)
-    (fun _ => hHuN.deriv₁ ℓ)
-  obtain ⟨F9, HF9, hB9, hp9⟩ := hP9 (fun _ => HuN.D [ℓ]) (fun _ => HuN.deriv₁ ℓ)
-    (fun _ => hHuN.deriv₁ ℓ)
-  obtain ⟨F10, HF10, hB10, hp10⟩ := hP10 (fun t => HuN.D [t.2, ℓ])
-    (fun t => HuN.deriv₂ ℓ t.2) (fun t => hHuN.deriv₂ ℓ t.2)
-  obtain ⟨F11, HF11, hB11, hp11⟩ := hP11 (fun _ => HuN.D [ℓ]) (fun _ => HuN.deriv₁ ℓ)
-    (fun _ => hHuN.deriv₁ ℓ)
-  obtain ⟨F12, HF12, hB12, hp12⟩ := hP3 (fun i => HuN.D [i, ℓ]) (fun i => HuN.deriv₂ ℓ i)
-    (fun i => hHuN.deriv₂ ℓ i)
-  refine ⟨F1 - F2 - F3 - F4 + F5 + F6 - F7 - F8 - F9 - F10 + F11 + F12,
-    ((((((((((HF1.sub HF2).sub HF3).sub HF4).add HF5).add HF6).sub HF7).sub HF8).sub
-      HF9).sub HF10).add HF11).add HF12, ?_, ?_⟩
-  · have hB := ((((((((((hB1.sub hB2).sub hB3).sub hB4).add hB5).add hB6).sub hB7).sub
-      hB8).sub hB9).sub hB10).add hB11).add hB12
-    refine hB.mono_const ?_
-    have h2 : K2 ℓ ≤ ∑ m, K2 m := Finset.single_le_sum (fun m _ => hK2 m) (Finset.mem_univ ℓ)
-    have h4 : K4 ℓ ≤ ∑ m, K4 m := Finset.single_le_sum (fun m _ => hK4 m) (Finset.mem_univ ℓ)
-    have h5 : K5 ℓ ≤ ∑ m, K5 m := Finset.single_le_sum (fun m _ => hK5 m) (Finset.mem_univ ℓ)
-    have h6 : K6 ℓ ≤ ∑ m, K6 m := Finset.single_le_sum (fun m _ => hK6 m) (Finset.mem_univ ℓ)
-    have hB0 : (0 : ℝ) ≤ B := le_trans (norm_nonneg uN) hHuN.norm_le
-    have hK : K1 + K2 ℓ + K3 + K4 ℓ + K5 ℓ + K6 ℓ + K7 + K8 + K9 + K10 + K11 + K3
-        ≤ K1 + (∑ m, K2 m) + 2 * K3 + (∑ m, K4 m) + (∑ m, K5 m) + (∑ m, K6 m)
-          + K7 + K8 + K9 + K10 + K11 := by linarith only [h2, h4, h5, h6]
-    linarith only [mul_le_mul_of_nonneg_right hK hB0]
-  · intro v hvc hvcs
-    simp only [setIntegral_add_mul_testFn _ _ hvc hvcs, setIntegral_sub_mul_testFn _ _ hvc hvcs,
-      hp1 v hvc hvcs, hp2 v hvc hvcs, hp3 v hvc hvcs, hp4 v hvc hvcs, hp5 v hvc hvcs,
-      hp6 v hvc hvcs, hp7 v hvc hvcs, hp8 v hvc hvcs, hp9 v hvc hvcs, hp10 v hvc hvcs,
-      hp11 v hvc hvcs, hp12 v hvc hvcs, cutoffDatumPairing, Fintype.sum_prod_type,
-      Finset.univ_unique, Finset.sum_singleton]
+    HasCutoffDatum Ω N k fun ℓ _ Df HuN => cutoffDatumPairing Op hA hbc ξ ℓ Df HuN :=
+  (hasCutoffDatum_cutoff Op hNm hNΩ hA hbc hξ).add (hasCutoffDatum_grad Op hNm hNΩ hA hbc hξ)
 
 end EllipticPdes.Regularity
