@@ -317,6 +317,68 @@ private theorem integrable_uncurry_transDiff {ψ : EuclideanSpace ℝ (Fin d) �
       ⟨one_pos, le_rfl⟩ (by simpa using hx.trans_le' (le_add_of_nonneg_right (norm_nonneg v)))
   simp [eq_zero_of_far hR ht hx, hψx]
 
+/-- **Fundamental theorem of calculus for a difference quotient.** If the derivative of `φ` in
+the direction `v` is `h ψ`, with `ψ` continuous and `h ≠ 0`, the difference quotient exceeds `ψ`
+by the average of `ψ (x + t v) - ψ x` over `t ∈ [0, 1]`. -/
+private theorem diffQuot_sub_eq_integral {φ ψ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (hψc : Continuous ψ) (v : EuclideanSpace ℝ (Fin d)) {h : ℝ}
+    (hh : h ≠ 0) (hfv : ∀ y, (fderiv ℝ φ y) v = h * ψ y) (x : EuclideanSpace ℝ (Fin d)) :
+    (φ (x + v) - φ x) / h - ψ x = ∫ t in (0 : ℝ)..1, (ψ (x + t • v) - ψ x) := by
+  have hI1 : IntervalIntegrable (fun t => ψ (x + t • v)) volume 0 1 :=
+    (hψc.comp (by fun_prop)).intervalIntegrable _ _
+  have hI2 : IntervalIntegrable (fun _ : ℝ => ψ x) volume 0 1 := intervalIntegrable_const
+  have hnum : φ (x + v) - φ x = h * ∫ t in (0 : ℝ)..1, ψ (x + t • v) := by
+    rw [sub_translation_eq_integral hφ x v,
+        show (fun t : ℝ => (fderiv ℝ φ (x + t • v)) v) = fun t => h * ψ (x + t • v) from
+          funext fun t => hfv (x + t • v),
+        intervalIntegral.integral_const_mul]
+  rw [intervalIntegral.integral_sub hI1 hI2, intervalIntegral.integral_const, hnum]
+  rw [mul_comm h, mul_div_assoc, div_self hh, mul_one]
+  simp
+
+/-- **Pointwise square bound for the difference quotient.** The square of the defect of the
+difference quotient is at most the average of the squared defects along the segment, by
+one-variable Cauchy-Schwarz on `[0, 1]`. -/
+private theorem sq_diffQuot_sub_le_integral {φ ψ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (hψc : Continuous ψ) (v : EuclideanSpace ℝ (Fin d)) {h : ℝ}
+    (hh : h ≠ 0) (hfv : ∀ y, (fderiv ℝ φ y) v = h * ψ y) (x : EuclideanSpace ℝ (Fin d)) :
+    ((φ (x + v) - φ x) / h - ψ x) ^ 2 ≤ ∫ t in (0 : ℝ)..1, (ψ (x + t • v) - ψ x) ^ 2 := by
+  rw [diffQuot_sub_eq_integral hφ hψc v hh hfv x]
+  have hcx : ContinuousOn (fun t : ℝ => ψ (x + t • v) - ψ x) (Set.uIcc 0 1) :=
+    ((hψc.comp (by fun_prop)).sub continuous_const).continuousOn
+  simpa using MeasureTheory.sq_intervalIntegral_le zero_le_one hcx
+
+/-- The squared `L²` norm of a translation defect is the integral of the squared pointwise
+defect. -/
+private theorem integral_sq_translate_sub {ψ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hψ : MemLp ψ 2 volume) (w : EuclideanSpace ℝ (Fin d)) :
+    (∫ x, (ψ (x + w) - ψ x) ^ 2) = ‖transL2 w (hψ.toLp ψ) - hψ.toLp ψ‖ ^ 2 := by
+  rw [norm_sq_transL2_sub]
+  refine integral_congr_ae ?_
+  have hqmp : MeasureTheory.Measure.QuasiMeasurePreserving (· + w) volume volume :=
+    (measurePreserving_add_right volume w).quasiMeasurePreserving
+  have hshiftAE : (fun x => hψ.toLp ψ (x + w)) =ᵐ[volume] fun x => ψ (x + w) :=
+    hqmp.ae_eq_comp hψ.coeFn_toLp
+  filter_upwards [hψ.coeFn_toLp, hshiftAE] with x hx1 hx2
+  rw [hx2, hx1]
+
+/-- The squared `L²` norm of the defect of the difference quotient is the integral of the
+squared pointwise defect. -/
+private theorem norm_sq_diffQuot_sub_eq (k : Fin d) {φ ψ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hL2φ : MemLp φ 2 volume) (hL2p : MemLp ψ 2 volume) (h : ℝ) :
+    ‖diffQuot k h (hL2φ.toLp φ) - hL2p.toLp ψ‖ ^ 2
+      = ∫ x, ((φ (x + hshift k h) - φ x) / h - ψ x) ^ 2 := by
+  rw [norm_sq_eq_integral_sq]
+  refine integral_congr_ae ?_
+  have hqmp : MeasureTheory.Measure.QuasiMeasurePreserving (· + hshift k h) volume volume :=
+    (measurePreserving_add_right volume (hshift k h)).quasiMeasurePreserving
+  have hshiftAE : (fun x => hL2φ.toLp φ (x + hshift k h)) =ᵐ[volume] fun x => φ (x + hshift k h) :=
+    hqmp.ae_eq_comp hL2φ.coeFn_toLp
+  filter_upwards [Lp.coeFn_sub (diffQuot k h (hL2φ.toLp φ)) (hL2p.toLp ψ),
+    coeFn_diffQuot k h (hL2φ.toLp φ), hL2φ.coeFn_toLp, hshiftAE, hL2p.coeFn_toLp]
+    with x hx0 hx1 hx2 hx3 hx4
+  rw [hx0, Pi.sub_apply, hx1, hx2, hx3, hx4]
+
 /-- **Squared `L²` bound on the difference-quotient defect.** For `φ` smooth with compact
 support and `h ≠ 0`, the squared `L²` distance from the difference quotient `Dₖʰφ` to the
 partial derivative `∂ₖφ` is bounded by the integral over `t ∈ [0, 1]` of the squared `L²`
@@ -335,36 +397,9 @@ private theorem sq_norm_diffQuot_sub_le (k : Fin d) {φ : EuclideanSpace ℝ (Fi
             - hL2p.toLp (partialD k φ)‖ ^ 2 := by
   set ψ := partialD k φ with hψdef
   set v : EuclideanSpace ℝ (Fin d) := hshift k h with hv
-  set ψLp := hL2p.toLp (partialD k φ) with hψLp
-  set φLp := hL2φ.toLp φ with hφLp
-  have h01 : (0 : ℝ) ≤ 1 := by norm_num
   have hInt := integrable_uncurry_transDiff hψc hψcs v
-  -- Pointwise directional derivative identity: `(fderiv φ y) v = h • ∂ₖφ y`.
   have hfv : ∀ y, (fderiv ℝ φ y) v = h * ψ y := fun y => by
     simp [hv, hshift, hψdef, partialD]
-  -- Fundamental theorem of calculus, then division by `h`.
-  have hHeq : ∀ x, (φ (x + v) - φ x) / h - ψ x
-      = ∫ t in (0 : ℝ)..1, (ψ (x + t • v) - ψ x) := by
-    intro x
-    have hI1 : IntervalIntegrable (fun t => ψ (x + t • v)) volume 0 1 :=
-      (hψc.comp (by fun_prop)).intervalIntegrable _ _
-    have hI2 : IntervalIntegrable (fun _ : ℝ => ψ x) volume 0 1 := intervalIntegrable_const
-    have hnum : φ (x + v) - φ x = h * ∫ t in (0 : ℝ)..1, ψ (x + t • v) := by
-      rw [sub_translation_eq_integral hφ x v,
-          show (fun t : ℝ => (fderiv ℝ φ (x + t • v)) v) = fun t => h * ψ (x + t • v) from
-            funext fun t => hfv (x + t • v),
-          intervalIntegral.integral_const_mul]
-    rw [intervalIntegral.integral_sub hI1 hI2, intervalIntegral.integral_const, hnum]
-    rw [mul_comm h, mul_div_assoc, div_self hh, mul_one]
-    simp
-  -- Pointwise square bound via one-variable Cauchy-Schwarz on `[0, 1]`.
-  have hsqle : ∀ x, ((φ (x + v) - φ x) / h - ψ x) ^ 2
-      ≤ ∫ t in (0 : ℝ)..1, (ψ (x + t • v) - ψ x) ^ 2 := by
-    intro x
-    rw [hHeq x]
-    have hcx : ContinuousOn (fun t : ℝ => ψ (x + t • v) - ψ x) (Set.uIcc 0 1) :=
-      ((hψc.comp (by fun_prop)).sub continuous_const).continuousOn
-    simpa using MeasureTheory.sq_intervalIntegral_le h01 hcx
   -- Integrability of the left- and right-hand integrands in `x`.
   have hHcont : Continuous (fun x => (φ (x + v) - φ x) / h - ψ x) :=
     (((hφ.continuous.comp (by fun_prop)).sub hφ.continuous).div_const h).sub hψc
@@ -374,48 +409,23 @@ private theorem sq_norm_diffQuot_sub_le (k : Fin d) {φ : EuclideanSpace ℝ (Fi
       funext x; simp [div_eq_mul_inv]
     rw [hrw]
     exact ((hcs.comp_homeomorph (Homeomorph.addRight v)).sub hcs).mul_right
-  have hHcs : HasCompactSupport (fun x => (φ (x + v) - φ x) / h - ψ x) := hcs1.sub hψcs
   have hLHS_int : Integrable (fun x => ((φ (x + v) - φ x) / h - ψ x) ^ 2) :=
     (hHcont.fun_pow 2).integrable_of_hasCompactSupport
-      (hHcs.comp_left (g := fun r : ℝ => r ^ 2) (by norm_num))
+      ((hcs1.sub hψcs).comp_left (g := fun r : ℝ => r ^ 2) (by norm_num))
   have hRHS_int : Integrable (fun x => ∫ t in (0 : ℝ)..1, (ψ (x + t • v) - ψ x) ^ 2) := by
-    simp_rw [intervalIntegral.integral_of_le h01]
+    simp_rw [intervalIntegral.integral_of_le zero_le_one]
     exact hInt.integral_prod_left
   -- Integrate the pointwise bound and swap the order of integration.
-  have hmono : ∫ x, ((φ (x + v) - φ x) / h - ψ x) ^ 2
-      ≤ ∫ x, ∫ t in (0 : ℝ)..1, (ψ (x + t • v) - ψ x) ^ 2 :=
-    integral_mono hLHS_int hRHS_int hsqle
   have hswap : (∫ x, ∫ t in (0 : ℝ)..1, (ψ (x + t • v) - ψ x) ^ 2)
       = ∫ t in (0 : ℝ)..1, ∫ x, (ψ (x + t • v) - ψ x) ^ 2 := by
-    simp_rw [intervalIntegral.integral_of_le h01]
+    simp_rw [intervalIntegral.integral_of_le zero_le_one]
     exact integral_integral_swap hInt
-  -- The inner `x`-integral is the squared `L²` translation defect.
-  have hnormsq : ∀ t : ℝ, (∫ x, (ψ (x + t • v) - ψ x) ^ 2)
-      = ‖transL2 (t • v) ψLp - ψLp‖ ^ 2 := by
-    intro t
-    rw [norm_sq_transL2_sub]
-    refine integral_congr_ae ?_
-    have hqmp : MeasureTheory.Measure.QuasiMeasurePreserving (· + t • v) volume volume :=
-      (measurePreserving_add_right volume (t • v)).quasiMeasurePreserving
-    have hshiftAE : (fun x => ψLp (x + t • v)) =ᵐ[volume] fun x => ψ (x + t • v) :=
-      hqmp.ae_eq_comp hL2p.coeFn_toLp
-    filter_upwards [hL2p.coeFn_toLp, hshiftAE] with x hx1 hx2
-    rw [hx2, hx1]
-  -- Assemble.
-  have hlhs : ‖diffQuot k h φLp - ψLp‖ ^ 2 = ∫ x, ((φ (x + v) - φ x) / h - ψ x) ^ 2 := by
-    rw [norm_sq_eq_integral_sq]
-    refine integral_congr_ae ?_
-    have hqmp : MeasureTheory.Measure.QuasiMeasurePreserving (· + v) volume volume :=
-      (measurePreserving_add_right volume v).quasiMeasurePreserving
-    have hshiftAE : (fun x => φLp (x + v)) =ᵐ[volume] fun x => φ (x + v) :=
-      hqmp.ae_eq_comp hL2φ.coeFn_toLp
-    filter_upwards [Lp.coeFn_sub (diffQuot k h φLp) ψLp, coeFn_diffQuot k h φLp,
-      hL2φ.coeFn_toLp, hshiftAE, hL2p.coeFn_toLp] with x hx0 hx1 hx2 hx3 hx4
-    rw [hx0, Pi.sub_apply, hx1, hx2, hx3, hx4]
-  rw [hlhs]
-  refine le_trans hmono ?_
-  rw [hswap, intervalIntegral.integral_congr (g := fun t => ‖transL2 (t • v) ψLp - ψLp‖ ^ 2)
-    (fun t _ => hnormsq t)]
+  rw [norm_sq_diffQuot_sub_eq k hL2φ hL2p h]
+  refine (integral_mono hLHS_int hRHS_int
+    (sq_diffQuot_sub_le_integral hφ hψc v hh hfv)).trans ?_
+  rw [hswap, intervalIntegral.integral_congr (g := fun t =>
+    ‖transL2 (t • v) (hL2p.toLp ψ) - hL2p.toLp ψ‖ ^ 2) fun t _ =>
+    integral_sq_translate_sub hL2p (t • v)]
 
 /-- **Strong `L²` convergence of the difference quotient to the derivative.** For `φ` smooth
 with compact support and a sequence of nonzero steps `η m → 0`, the difference quotients
