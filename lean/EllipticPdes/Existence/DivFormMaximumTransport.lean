@@ -471,6 +471,35 @@ theorem energy_le_transport (hΩ : IsOpen Ω) (hc : ∀ᵐ x ∂μ, 0 ≤ Op.c x
 
 /-! ### The Sobolev-Hölder lower bound -/
 
+/-- A gradient norm controlled by the energy inequality: from `λ G² ≤ B G v` one gets
+`λ G ≤ B v`. -/
+theorem lam_mul_le_of_energy {lam B G v : ℝ} (hB : 0 ≤ B) (hv : 0 ≤ v) (hG : 0 ≤ G)
+    (h : lam * G ^ 2 ≤ B * G * v) : lam * G ≤ B * v := by
+  rcases hG.eq_or_lt with hG0 | hG0
+  · rw [← hG0, mul_zero]
+    exact mul_nonneg hB hv
+  · refine le_of_mul_le_mul_right ?_ hG0
+    nlinarith only [h]
+
+/-- The chain of inequalities of the Sobolev-Hölder lower bound: from `N ≤ C G`,
+`λ G ≤ B v` and `v ≤ N m` with `N > 0` one gets `1 ≤ (C B / λ + 1) m`. -/
+theorem one_le_of_sobolev_chain {lam B C G N v m : ℝ} (hlam : 0 < lam) (hC : 0 ≤ C)
+    (hB : 0 ≤ B) (hN : N ≤ C * G) (hS : lam * G ≤ B * v) (hv : v ≤ N * m) (hv0 : 0 ≤ v)
+    (hNpos : 0 < N) : 1 ≤ (C * (B / lam) + 1) * m := by
+  have hK : 0 < C * (B / lam) + 1 := by
+    have := mul_nonneg hC (div_nonneg hB hlam.le)
+    linarith
+  have hsum : G ≤ B * v / lam := by
+    rw [le_div_iff₀ hlam]
+    linarith [hS]
+  refine le_of_mul_le_mul_right (a := N) ?_ hNpos
+  calc 1 * N ≤ C * G := by linarith
+    _ ≤ C * (B * v / lam) := by gcongr
+    _ = C * (B / lam) * v := by ring
+    _ ≤ (C * (B / lam) + 1) * (N * m) :=
+        mul_le_mul (by linarith) hv hv0 hK.le
+    _ = (C * (B / lam) + 1) * m * N := by ring
+
 /-- **Bound on the measure of `Γ_k` for a fixed Sobolev exponent.** The conclusion of
 `exists_measure_truncSupport_ge_of_sobolev`: for every `V ∈ H₀¹(μ, Ω)` whose function part is
 `(u - k)⁺`, with positive superlevel set and the energy estimate, the set `Γ_k` has measure at
@@ -523,15 +552,8 @@ theorem exists_measure_truncSupport_ge_of_sobolev (hΩb : Bornology.IsBounded Ω
   set vΓ : ℝ := (eLpNorm (⇑(fnL (V : H1Graph μ Ω))) 2 (ν.restrict (truncSupport u g k))).toReal
     with hvΓdef
   have hvΓ0 : 0 ≤ vΓ := ENNReal.toReal_nonneg
-  have hS : Op.lam * G ≤ Op.Bsup * vΓ := by
-    rcases (norm_nonneg (gradL (V : H1Graph μ Ω))).eq_or_lt with hG | hG
-    · rw [← hGdef] at hG
-      rw [← hG, mul_zero]
-      exact mul_nonneg Op.Bsup_nonneg hvΓ0
-    · refine le_of_mul_le_mul_right ?_ hG
-      calc Op.lam * G * G = Op.lam * G ^ 2 := by ring
-        _ ≤ Op.Bsup * G * vΓ := henergy
-        _ = Op.Bsup * vΓ * G := by ring
+  have hS : Op.lam * G ≤ Op.Bsup * vΓ :=
+    lam_mul_le_of_energy Op.Bsup_nonneg hvΓ0 (norm_nonneg _) henergy
   have hhold : vΓ ≤ N * γ ^ θ :=
     toReal_eLpNorm_restrict_le (Lp.aestronglyMeasurable _) hq2.le hNfin _
   -- the truncation is not zero
@@ -541,19 +563,8 @@ theorem exists_measure_truncSupport_ge_of_sobolev (hΩb : Bornology.IsBounded Ω
     rcases (ENNReal.toReal_eq_zero_iff _).mp h.symm with h0 | htop
     · exact h0
     · exact absurd htop hNfin
-  have hchain : N ≤ K * γ ^ θ * N := by
-    have hsum : G ≤ Op.Bsup * vΓ / Op.lam := by
-      rw [le_div_iff₀ Op.lam_pos]
-      linarith [hS]
-    calc N ≤ C * G := hN
-      _ ≤ C * (Op.Bsup * vΓ / Op.lam) := by gcongr
-      _ = C * (Op.Bsup / Op.lam) * vΓ := by ring
-      _ ≤ K * (N * γ ^ θ) := by
-          refine mul_le_mul (by rw [hKdef]; linarith) hhold hvΓ0 hKpos.le
-      _ = K * γ ^ θ * N := by ring
-  have hone : 1 ≤ K * γ ^ θ := by
-    refine le_of_mul_le_mul_right (a := N) ?_ hNpos
-    linarith [hchain]
+  have hone : 1 ≤ K * γ ^ θ :=
+    one_le_of_sobolev_chain Op.lam_pos hC Op.Bsup_nonneg hN hS hhold hvΓ0 hNpos
   exact inv_rpow_inv_le_of_one_le_mul_rpow hKpos hγ0 hθpos hone
 
 /-- **Weak maximum principle with a transport term, given a Sobolev inequality.** Let `Ω` be a
