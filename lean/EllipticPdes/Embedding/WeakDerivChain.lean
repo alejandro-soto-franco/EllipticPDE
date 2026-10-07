@@ -334,4 +334,257 @@ theorem HasWeakFDerivOn.comp_contDiff {u : E → ℝ} {G : E → E →L[ℝ] ℝ
     simp only [e1, e2]
     exact hwhole
 
+/-! ### The positive part -/
+
+/-- The `C¹` approximation of the positive part, `√((t⁺)² + ε²) - ε`. -/
+private def posPartApprox (ε t : ℝ) : ℝ := Real.sqrt ((max t 0) ^ 2 + ε ^ 2) - ε
+
+/-- The square of the positive part is differentiable, with derivative `2 t⁺`. -/
+private theorem hasDerivAt_max_sq (t : ℝ) :
+    HasDerivAt (fun s : ℝ => (max s 0) ^ 2) (2 * max t 0) t := by
+  rcases lt_trichotomy t 0 with ht | rfl | ht
+  · have h0 : (fun s : ℝ => (max s 0) ^ 2) =ᶠ[𝓝 t] fun _ => (0 : ℝ) :=
+      (gt_mem_nhds ht).mono fun s hs => by simp [max_eq_right hs.le]
+    rw [max_eq_right ht.le, mul_zero]
+    exact (hasDerivAt_const t (0 : ℝ)).congr_of_eventuallyEq h0
+  · rw [hasDerivAt_iff_tendsto_slope_zero]
+    simp only [zero_add, max_self, zero_pow two_ne_zero, sub_zero, mul_zero, smul_eq_mul]
+    have hcont : Tendsto (fun s : ℝ => max s 0) (𝓝[≠] 0) (𝓝 0) := by
+      have hc0 : Continuous fun s : ℝ => max s 0 := continuous_id.max continuous_const
+      have := hc0.tendsto (0 : ℝ)
+      simp only [max_self] at this
+      exact tendsto_nhdsWithin_of_tendsto_nhds this
+    refine hcont.congr' (eventually_nhdsWithin_iff.mpr (Eventually.of_forall fun s hs => ?_))
+    rcases lt_or_gt_of_ne hs with hs' | hs'
+    · simp [max_eq_right hs'.le]
+    · simp only [max_eq_left hs'.le]
+      field_simp
+  · have h0 : (fun s : ℝ => (max s 0) ^ 2) =ᶠ[𝓝 t] fun s => s ^ 2 :=
+      (lt_mem_nhds ht).mono fun s hs => by simp [max_eq_left hs.le]
+    rw [max_eq_left ht.le]
+    have := hasDerivAt_pow 2 t
+    simp only [Nat.cast_ofNat, Nat.add_one_sub_one, pow_one] at this
+    exact this.congr_of_eventuallyEq h0
+
+/-- The square of the positive part is `C¹`. -/
+private theorem contDiff_max_sq : ContDiff ℝ 1 fun s : ℝ => (max s 0) ^ 2 := by
+  refine contDiff_one_iff_deriv.mpr ⟨fun t => (hasDerivAt_max_sq t).differentiableAt, ?_⟩
+  rw [funext fun t => (hasDerivAt_max_sq t).deriv]
+  exact continuous_const.mul (continuous_id.max continuous_const)
+
+/-- The argument of the square root in `posPartApprox` is positive. -/
+private theorem posPartApprox_arg_pos {ε : ℝ} (hε : ε ≠ 0) (t : ℝ) : 0 < (max t 0) ^ 2 + ε ^ 2 := by
+  have := pow_pos (abs_pos.mpr hε) 2
+  rw [sq_abs] at this
+  nlinarith [sq_nonneg (max t 0)]
+
+/-- The derivative of the approximation. -/
+private theorem hasDerivAt_posPartApprox {ε : ℝ} (hε : ε ≠ 0) (t : ℝ) :
+    HasDerivAt (posPartApprox ε)
+      (2 * max t 0 / (2 * Real.sqrt ((max t 0) ^ 2 + ε ^ 2))) t :=
+  (((hasDerivAt_max_sq t).add_const (ε ^ 2)).sqrt (posPartApprox_arg_pos hε t).ne').sub_const ε
+
+/-- The approximation is `C¹`. -/
+private theorem contDiff_posPartApprox {ε : ℝ} (hε : ε ≠ 0) : ContDiff ℝ 1 (posPartApprox ε) :=
+  ((contDiff_max_sq.add contDiff_const).sqrt fun t => (posPartApprox_arg_pos hε t).ne').sub
+    contDiff_const
+
+/-- The derivative of the approximation, in closed form. -/
+private theorem deriv_posPartApprox {ε : ℝ} (hε : ε ≠ 0) (t : ℝ) :
+    deriv (posPartApprox ε) t = max t 0 / Real.sqrt ((max t 0) ^ 2 + ε ^ 2) := by
+  rw [(hasDerivAt_posPartApprox hε t).deriv, mul_div_mul_left _ _ two_ne_zero]
+
+/-- The derivative of the approximation lies in `[0, 1]`. -/
+private theorem deriv_posPartApprox_mem {ε : ℝ} (hε : ε ≠ 0) (t : ℝ) :
+    0 ≤ deriv (posPartApprox ε) t ∧ deriv (posPartApprox ε) t ≤ 1 := by
+  rw [deriv_posPartApprox hε]
+  have hm : 0 ≤ max t 0 := le_max_right _ _
+  have hs : 0 < Real.sqrt ((max t 0) ^ 2 + ε ^ 2) :=
+    Real.sqrt_pos.mpr (posPartApprox_arg_pos hε t)
+  refine ⟨div_nonneg hm hs.le, (div_le_one hs).mpr ?_⟩
+  exact (Real.le_sqrt hm (posPartApprox_arg_pos hε t).le).mpr (by nlinarith [sq_nonneg ε])
+
+/-- The derivative of the approximation has nonnegative norm at most one. -/
+private theorem nnnorm_deriv_posPartApprox_le {ε : ℝ} (hε : ε ≠ 0) (t : ℝ) :
+    ‖deriv (posPartApprox ε) t‖₊ ≤ 1 := by
+  obtain ⟨h0, h1⟩ := deriv_posPartApprox_mem hε t
+  rw [← NNReal.coe_le_coe, coe_nnnorm, Real.norm_eq_abs, abs_of_nonneg h0, NNReal.coe_one]
+  exact h1
+
+/-- The approximation lies between `0` and the positive part. -/
+private theorem posPartApprox_mem {ε : ℝ} (hε : 0 ≤ ε) (t : ℝ) :
+    0 ≤ posPartApprox ε t ∧ posPartApprox ε t ≤ max t 0 := by
+  have hm : 0 ≤ max t 0 := le_max_right _ _
+  unfold posPartApprox
+  constructor
+  · rw [sub_nonneg]
+    calc ε = Real.sqrt (ε ^ 2) := (Real.sqrt_sq hε).symm
+      _ ≤ Real.sqrt ((max t 0) ^ 2 + ε ^ 2) :=
+          Real.sqrt_le_sqrt (by nlinarith [sq_nonneg (max t 0)])
+  · rw [sub_le_iff_le_add]
+    exact Real.sqrt_le_iff.mpr ⟨by positivity, by nlinarith⟩
+
+/-- The approximation tends to the positive part as `ε → 0`. -/
+private theorem tendsto_posPartApprox (t : ℝ) :
+    Tendsto (fun ε => posPartApprox ε t) (𝓝 0) (𝓝 (max t 0)) := by
+  have hc : Continuous fun ε : ℝ => posPartApprox ε t := by
+    unfold posPartApprox
+    fun_prop
+  have := hc.tendsto 0
+  simp only [posPartApprox, zero_pow two_ne_zero, add_zero, sub_zero,
+    Real.sqrt_sq (le_max_right t 0)] at this
+  exact this
+
+/-- The derivative of the approximation tends to the indicator of `{t > 0}` as `ε → 0`
+along positive values. -/
+private theorem tendsto_deriv_posPartApprox (t : ℝ) :
+    Tendsto (fun n : ℕ => deriv (posPartApprox (1 / (n + 1 : ℝ))) t) atTop
+      (𝓝 (if 0 < t then 1 else 0)) := by
+  have hεne : ∀ n : ℕ, (1 / (n + 1 : ℝ)) ≠ 0 := fun n => by positivity
+  simp only [fun n => deriv_posPartApprox (hεne n) t]
+  split_ifs with ht
+  · rw [max_eq_left ht.le]
+    have hc : Continuous fun ε : ℝ => t / Real.sqrt (t ^ 2 + ε ^ 2) := by
+      refine continuous_const.div (continuous_const.add (continuous_id.pow 2)).sqrt fun ε => ?_
+      exact (Real.sqrt_pos.mpr (by positivity)).ne'
+    have := (hc.tendsto 0).comp (tendsto_one_div_add_atTop_nhds_zero_nat (𝕜 := ℝ))
+    simp only [Function.comp_def, zero_pow two_ne_zero, add_zero, Real.sqrt_sq ht.le,
+      div_self ht.ne'] at this
+    exact this
+  · rw [max_eq_right (not_lt.mp ht)]
+    simp only [zero_div]
+    exact tendsto_const_nhds
+
+/-- **Measurability of a truncation.** -/
+theorem aestronglyMeasurable_ite_lt {α : Type*} {m : MeasurableSpace α} {ν : Measure α}
+    {u w : α → ℝ} (hu : AEStronglyMeasurable u ν) (hw : AEStronglyMeasurable w ν) (c : ℝ) :
+    AEStronglyMeasurable (fun x => if c < u x then w x else 0) ν := by
+  refine ⟨fun x => if c < hu.mk u x then hw.mk w x else 0, ?_, ?_⟩
+  · exact StronglyMeasurable.ite
+      (measurableSet_lt measurable_const hu.stronglyMeasurable_mk.measurable)
+      hw.stronglyMeasurable_mk stronglyMeasurable_const
+  · filter_upwards [hu.ae_eq_mk, hw.ae_eq_mk] with x h1 h2
+    simp only [h1, h2]
+
+/-- **Weak derivative of the positive part** (Gilbarg and Trudinger Lemma 7.6, Evans §5.10
+Problem 18). On an open set, `u⁺ = max u 0` has the weak Fréchet derivative `G` where `u > 0`
+and `0` elsewhere. -/
+theorem HasWeakFDerivOn.posPart {u : E → ℝ} {G : E → E →L[ℝ] ℝ} (hw : HasWeakFDerivOn Ω u G μ) :
+    HasWeakFDerivOn Ω (fun x => max (u x) 0) (fun x => if 0 < u x then G x else 0) μ := by
+  intro w
+  have hu : LocallyIntegrableOn u Ω μ := (hw 0).locallyIntegrableOn_fun
+  have hGw : LocallyIntegrableOn (fun x => G x w) Ω μ := (hw w).locallyIntegrableOn
+  have hum : AEStronglyMeasurable u (μ.restrict Ω) := hu.aestronglyMeasurable
+  have hite : (fun x => (if 0 < u x then G x else 0) w) = fun x => if 0 < u x then G x w else 0 :=
+    funext fun x => by split_ifs <;> simp
+  have hind : LocallyIntegrableOn (fun x => if 0 < u x then G x w else 0) Ω μ :=
+    locallyIntegrableOn_of_norm_le hGw (aestronglyMeasurable_ite_lt hum hGw.aestronglyMeasurable 0)
+      fun x => by split_ifs <;> simp
+  refine hasWeakLineDerivOn_iff.2 ⟨?_, hite ▸ hind, fun φ hφ hφcs hφΩ => ?_⟩
+  · refine locallyIntegrableOn_of_norm_le hu.norm
+      ((continuous_id.max continuous_const).comp_aestronglyMeasurable hum) fun x => ?_
+    simp only [Real.norm_eq_abs, abs_abs]
+    rw [abs_of_nonneg (le_max_right _ _)]
+    exact max_le (le_abs_self _) (abs_nonneg _)
+  set ε : ℕ → ℝ := fun n => 1 / (n + 1 : ℝ) with hεdef
+  have hεpos : ∀ n, 0 < ε n := fun n => by positivity
+  have hε0 : Tendsto ε atTop (𝓝 0) := tendsto_one_div_add_atTop_nhds_zero_nat
+  have hpc : Continuous (fun x => fderiv ℝ φ x w) :=
+    (hφ.continuous_fderiv (by simp)).clm_apply continuous_const
+  have hpcs : HasCompactSupport (fun x => fderiv ℝ φ x w) := hφcs.fderiv_apply (𝕜 := ℝ) w
+  have hps : tsupport (fun x => fderiv ℝ φ x w) ⊆ Ω :=
+    (tsupport_fderiv_apply_subset ℝ w).trans hφΩ
+  have hset : ∀ F : E → ℝ, (∀ x ∉ (Ω : Set E), F x = 0) → ∫ x, F x ∂μ = ∫ x in Ω, F x ∂μ :=
+    fun F hF => (setIntegral_eq_integral_of_forall_compl_eq_zero hF).symm
+  have hz1 : ∀ x ∉ (Ω : Set E), fderiv ℝ φ x w = 0 := fun x hx =>
+    image_eq_zero_of_notMem_tsupport (f := fun x => fderiv ℝ φ x w) fun hc => hx (hps hc)
+  have hz2 : ∀ x ∉ (Ω : Set E), φ x = 0 := fun x hx =>
+    image_eq_zero_of_notMem_tsupport fun hc => hx (hφΩ hc)
+  have hn : ∀ n, ∫ x in Ω, fderiv ℝ φ x w • posPartApprox (ε n) (u x) ∂μ
+      = -∫ x in Ω, φ x • (deriv (posPartApprox (ε n)) (u x) * G x w) ∂μ := fun n => by
+    have := ((hw.comp_contDiff (contDiff_posPartApprox (hεpos n).ne') (M := 1)
+      (nnnorm_deriv_posPartApprox_le (hεpos n).ne')) w).integral_eq hφ hφcs hφΩ
+    rwa [hset _ fun x hx => by simp [hz1 x hx], hset _ fun x hx => by simp [hz2 x hx]] at this
+  have hL : Tendsto (fun n => ∫ x in Ω, fderiv ℝ φ x w • posPartApprox (ε n) (u x) ∂μ) atTop
+      (𝓝 (∫ x in Ω, fderiv ℝ φ x w • max (u x) 0 ∂μ)) := by
+    refine tendsto_integral_of_dominated_convergence (fun x => ‖fderiv ℝ φ x w • u x‖)
+      (fun n => hpc.aestronglyMeasurable.smul
+        ((contDiff_posPartApprox (hεpos n).ne').continuous.comp_aestronglyMeasurable hum))
+      (hu.integrable_smul_of_tsupport_subset hpc hpcs hps).norm.integrableOn
+      (fun n => Eventually.of_forall fun x => ?_) (Eventually.of_forall fun x => ?_)
+    · obtain ⟨h0, h1⟩ := posPartApprox_mem (hεpos n).le (u x)
+      rw [norm_smul, norm_smul, Real.norm_eq_abs, Real.norm_eq_abs, abs_of_nonneg h0]
+      gcongr
+      exact h1.trans (max_le (le_abs_self _) (abs_nonneg _))
+    · exact ((tendsto_posPartApprox (u x)).comp hε0).const_smul _
+  have hR : Tendsto (fun n => ∫ x in Ω, φ x • (deriv (posPartApprox (ε n)) (u x) * G x w) ∂μ)
+      atTop (𝓝 (∫ x in Ω, φ x • ((if 0 < u x then 1 else 0) * G x w) ∂μ)) := by
+    refine tendsto_integral_of_dominated_convergence (fun x => ‖φ x • G x w‖)
+      (fun n => hφ.continuous.aestronglyMeasurable.smul
+        ((((contDiff_posPartApprox (hεpos n).ne').continuous_deriv_one
+          |>.comp_aestronglyMeasurable hum)).mul hGw.aestronglyMeasurable))
+      (hGw.integrable_smul_of_tsupport_subset hφ.continuous hφcs hφΩ).norm.integrableOn
+      (fun n => Eventually.of_forall fun x => ?_) (Eventually.of_forall fun x => ?_)
+    · obtain ⟨h0, h1⟩ := deriv_posPartApprox_mem (hεpos n).ne' (u x)
+      rw [norm_smul, norm_smul, norm_mul, Real.norm_eq_abs (deriv _ _), abs_of_nonneg h0]
+      calc ‖φ x‖ * (deriv (posPartApprox (ε n)) (u x) * ‖G x w‖)
+          ≤ ‖φ x‖ * (1 * ‖G x w‖) := by gcongr
+        _ = ‖φ x‖ * ‖G x w‖ := by ring
+    · exact (((tendsto_deriv_posPartApprox (u x)).mul_const _).const_smul _)
+  have hlim := tendsto_nhds_unique hL (by simp only [hn]; exact hR.neg)
+  rw [hset _ fun x hx => by simp [hz1 x hx], hlim,
+    hset (fun x => φ x • (if 0 < u x then G x else 0) w) fun x hx => by simp [hz2 x hx]]
+  congr 1
+  refine integral_congr_ae (Eventually.of_forall fun x => ?_)
+  simp only
+  split_ifs <;> simp
+
+/-- **A constant shift** leaves the weak Fréchet derivative unchanged. -/
+theorem HasWeakFDerivOn.sub_const {u : E → ℝ} {G : E → E →L[ℝ] ℝ} (hw : HasWeakFDerivOn Ω u G μ)
+    (c : ℝ) : HasWeakFDerivOn Ω (fun x => u x - c) G μ :=
+  (hw.sub (hasWeakFDerivOn_fderiv (u := fun _ => c) contDiffOn_const)).congr_ae
+    (Eventually.of_forall fun _ => rfl) (Eventually.of_forall fun x => by simp)
+
+/-- **Weak derivative of the negative part.** `min u 0` has the weak Fréchet derivative `G`
+where `u < 0` and `0` elsewhere. -/
+theorem HasWeakFDerivOn.negPart {u : E → ℝ} {G : E → E →L[ℝ] ℝ} (hw : HasWeakFDerivOn Ω u G μ) :
+    HasWeakFDerivOn Ω (fun x => min (u x) 0) (fun x => if u x < 0 then G x else 0) μ := by
+  refine hw.neg.posPart.neg.congr_ae (Eventually.of_forall fun x => ?_)
+    (Eventually.of_forall fun x => ?_)
+  · simp only [Pi.neg_apply]
+    rcases le_or_gt (u x) 0 with hx | hx
+    · rw [min_eq_left hx, max_eq_left (by linarith), neg_neg]
+    · rw [min_eq_right hx.le, max_eq_right (by linarith), neg_zero]
+  · simp only [Pi.neg_apply, neg_pos]
+    split_ifs <;> simp
+
+/-- **Weak derivative of the absolute value.** `|u|` has the weak Fréchet derivative `G` where
+`u > 0`, `-G` where `u < 0`, and `0` elsewhere. -/
+theorem HasWeakFDerivOn.abs {u : E → ℝ} {G : E → E →L[ℝ] ℝ} (hw : HasWeakFDerivOn Ω u G μ) :
+    HasWeakFDerivOn Ω (fun x => |u x|)
+      (fun x => if 0 < u x then G x else if u x < 0 then -G x else 0) μ := by
+  refine (hw.posPart.add hw.neg.posPart).congr_ae (Eventually.of_forall fun x => ?_)
+    (Eventually.of_forall fun x => ?_)
+  · simp only [Pi.add_apply, Pi.neg_apply]
+    exact max_zero_add_max_neg_zero_eq_abs_self (u x)
+  · simp only [Pi.add_apply, Pi.neg_apply, neg_pos]
+    rcases lt_trichotomy (u x) 0 with h | h | h
+    · simp [h, not_lt.mpr h.le]
+    · simp [h]
+    · simp [h, not_lt.mpr h.le]
+
+/-- **The weak derivative vanishes on level sets** (Gilbarg and Trudinger Lemma 7.7). On an
+open set, the weak Fréchet derivative of `u` is zero almost everywhere on `{u = c}`. -/
+theorem HasWeakFDerivOn.ae_eq_zero_of_eq_const {u : E → ℝ} {G : E → E →L[ℝ] ℝ}
+    (hw : HasWeakFDerivOn Ω u G μ) (c : ℝ) : ∀ᵐ x ∂(μ.restrict Ω), u x = c → G x = 0 := by
+  have hP := (hw.sub_const c).posPart
+  have hN := (hw.neg.sub_const (-c)).posPart
+  have h := ((hP.sub hN).congr_ae (u := fun x => max (u x - c) 0 - max ((-u) x - -c) 0)
+    (u' := fun x => u x - c) (Eventually.of_forall fun x => ?_) (Eventually.of_forall fun _ => rfl))
+  · filter_upwards [h.ae_eq (hw.sub_const c)] with x hx hxc
+    rw [← hx]
+    simp [hxc]
+  · simp only [Pi.neg_apply, neg_sub_neg]
+    rw [← neg_sub (u x) c, max_zero_sub_max_neg_zero_eq_self]
+
 end EllipticPdes
