@@ -74,9 +74,8 @@ variable (Op : FullEllipticOp d) (Ω : Set (EuclideanSpace ℝ (Fin d)))
 /-- Given the Rellich compact embedding, the reduction operator `opK = γ·opE⁻¹·opT` is compact:
 `opT` is compact and `opK` postcomposes it with the bounded `opE⁻¹` and scales it. -/
 lemma opK_isCompact (hRellich : IsCompactOperator (embL2 Ω)) :
-    IsCompactOperator (Op.opK Ω) := by
-  have hT : IsCompactOperator (FullEllipticOp.opT Ω) := opT_isCompact Ω hRellich
-  exact (hT.clm_comp ((Op.opE Ω).symm : H01 Ω →L[ℝ] H01 Ω)).smul Op.gardingγ
+    IsCompactOperator (Op.opK Ω) :=
+  (Op.gardingForm Ω).opK_isCompact hRellich
 
 /-- **Fredholm alternative on the Rellich embedding hypothesis** (Evans §6.2.3,
 Theorem 4). Identical to

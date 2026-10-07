@@ -234,15 +234,6 @@ namespace FullEllipticOp
 
 variable {d : ℕ} (Op : FullEllipticOp d) (Ω : Set (EuclideanSpace ℝ (Fin d)))
 
-/-- The Gårding shift constant `γ` is strictly positive. -/
-lemma gardingγ_pos : 0 < Op.gardingγ := by
-  have h1 := Op.lam_pos
-  have h2 := Op.Csup_nonneg
-  have h3 : (0 : ℝ) ≤ (d : ℝ) * Op.Bsup ^ 2 / (2 * Op.lam) :=
-    div_nonneg (by positivity) (by linarith)
-  unfold gardingγ
-  linarith
-
 /-- **Set `Σ` of Existence III**: the real `λ` for which `γ/(γ+λ)` is an
 eigenvalue of the compact part `opK` of the reduction, equivalently (see
 `notMem_sigmaSet_iff_solvable`), the `λ` for which the weak problem `Lu = λu + f`
