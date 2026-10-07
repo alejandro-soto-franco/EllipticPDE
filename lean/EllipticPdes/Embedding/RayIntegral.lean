@@ -342,6 +342,26 @@ private theorem image_affine_subset_inter {x : E} {D t : ℝ}
   · rw [mem_ball, dist_eq_norm, add_sub_cancel_left]
     exact norm_smul_sub_lt (hWsub hy) ht.1
 
+omit [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] [μ.IsAddHaarMeasure] in
+/-- **Per-point Riesz bound.** At every `z` the scale integral of the gradient weight against the
+growing balls is the Riesz weight times `‖∇φ z‖ / ‖z - x‖^(d-1)`; at `z = x` the left side
+vanishes. -/
+private theorem scale_integral_riesz_le {φ : E → F} (hd : 0 < d) {D : ℝ} (hD : 0 < D) (x z : E) :
+    ∫⁻ t in Ioc (0 : ℝ) 1, ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) *
+        (ball x (D * t)).indicator (fun z => ‖fderiv ℝ φ z‖ₑ * ‖z - x‖ₑ) z ∂volume
+      ≤ ENNReal.ofReal (D ^ d / d) * (‖fderiv ℝ φ z‖ₑ / ‖z - x‖ₑ ^ (d - 1)) := by
+  by_cases hzx : z = x
+  · subst hzx
+    refine le_trans (le_of_eq ?_) bot_le
+    refine (setLIntegral_congr_fun measurableSet_Ioc (fun t _ => ?_)).trans
+      (lintegral_zero_fun (μ := volume.restrict (Ioc (0 : ℝ) 1)))
+    simp
+  · refine (lintegral_scale_indicator_le hd hD hzx _).trans (le_of_eq ?_)
+    have hw : 0 < ‖z - x‖ := norm_pos_iff.mpr (sub_ne_zero.mpr hzx)
+    have := enorm_mul_riesz_weight hd hD (norm_nonneg (fderiv ℝ φ z)) hw
+    simp only [ofReal_norm] at this ⊢
+    exact this
+
 /-- **Morrey kernel bound (convex form).** The double gradient line integral over a bounded
 convex measurable set `W` containing the base point `x` is controlled by the Riesz potential of
 the gradient, with a dimensional factor `D^d/d`, where `D` is any radius with `W ⊆ ball x D`.
@@ -389,23 +409,7 @@ theorem kernel_bound_convex {φ : E → F}
           rw [← lintegral_indicator (hWmeas.inter measurableSet_ball), ← lintegral_indicator hWmeas,
             Set.indicator_indicator]
   have hzpow_meas := measurable_zpow_neg_succ d
-  -- Per-point Riesz bound (holds for every `z`; at `z = x` the left side vanishes).
-  have hper : ∀ z : E,
-      ∫⁻ t in Ioc (0 : ℝ) 1,
-          ENNReal.ofReal (t ^ (-((d : ℤ) + 1))) * (ball x (D * t)).indicator h z ∂volume
-        ≤ ENNReal.ofReal (D ^ d / d) * (‖fderiv ℝ φ z‖ₑ / ‖z - x‖ₑ ^ (d - 1)) := fun z => by
-    by_cases hzx : z = x
-    · subst hzx
-      have h0 : h z = 0 := by simp [hh_def]
-      refine le_trans (le_of_eq ?_) bot_le
-      refine (setLIntegral_congr_fun measurableSet_Ioc (fun t _ => ?_)).trans
-        (lintegral_zero_fun (μ := volume.restrict (Ioc (0 : ℝ) 1)))
-      simp [h0]
-    · refine (lintegral_scale_indicator_le hd hD hzx h).trans (le_of_eq ?_)
-      have hw : 0 < ‖z - x‖ := norm_pos_iff.mpr (sub_ne_zero.mpr hzx)
-      have := enorm_mul_riesz_weight hd hD (norm_nonneg (fderiv ℝ φ z)) hw
-      simp only [hh_def, ofReal_norm] at this ⊢
-      exact this
+  have hper := fun z => scale_integral_riesz_le (φ := φ) hd hD x z
   calc ∫⁻ t in Ioc (0 : ℝ) 1, ∫⁻ y in W,
           ‖fderiv ℝ φ (x + t • (y - x))‖ₑ * ‖y - x‖ₑ ∂μ ∂volume
       ≤ ∫⁻ t in Ioc (0 : ℝ) 1, ∫⁻ z in W,

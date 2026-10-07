@@ -240,6 +240,24 @@ lemma tendsto_eLpNorm_ite_lt_sub {μ : Measure (EuclideanSpace ℝ (Fin d))}
   rw [hsplit]
   exact eLpNorm_add_le one_le_two
 
+/-- A truncation `(v - k)⁺` of an `L²` function is in `L²`. -/
+private theorem memLp_max_sub_const {ν : Measure (EuclideanSpace ℝ (Fin d))}
+    {v : EuclideanSpace ℝ (Fin d) → ℝ} (hv : MemLp v 2 ν) {k : ℝ} (hk : 0 ≤ k) :
+    MemLp (fun x => max (v x - k) 0) 2 ν := by
+  refine hv.of_le (((continuous_id.sub continuous_const).max
+    continuous_const).comp_aestronglyMeasurable hv.aestronglyMeasurable)
+    (Eventually.of_forall fun x => ?_)
+  simp only [Real.norm_eq_abs]
+  rw [abs_of_nonneg (le_max_right _ _)]
+  exact max_le (by linarith [le_abs_self (v x)]) (abs_nonneg _)
+
+/-- The gradient of an `L²` function, cut to the superlevel set `{k < v}`, is in `L²`. -/
+private theorem memLp_ite_lt {ν : Measure (EuclideanSpace ℝ (Fin d))}
+    {v g : EuclideanSpace ℝ (Fin d) → ℝ} (hv : MemLp v 2 ν) (hg : MemLp g 2 ν) (k : ℝ) :
+    MemLp (fun x => if k < v x then g x else 0) 2 ν :=
+  hg.of_le (aestronglyMeasurable_ite_lt hv.aestronglyMeasurable hg.aestronglyMeasurable k)
+    (Eventually.of_forall fun x => by split_ifs <;> simp)
+
 /-- **Truncation in `H₀¹`.** For `V ∈ H₀¹(Ω)` and `k ≥ 0` there is `W ∈ H₀¹(Ω)` whose function
 coordinate is `(v - k)⁺` and whose gradient coordinates are those of `V` on `{v > k}` and zero
 elsewhere. -/
@@ -280,28 +298,17 @@ theorem exists_mem_H01_posPart_sub_const (hΩ : IsOpen Ω) {V : H1amb Ω} (hV : 
     (((hψc i).sub continuous_const).max continuous_const).memLp_of_hasCompactSupport
       ((hψ i).posPart_sub_const hk).1
   have hhm : ∀ i j, MemLp (fun x => if k < ψ i x then partialD j (ψ i) x else 0) 2 volume :=
-    fun i j =>
+    fun i j => memLp_ite_lt ((hψc i).memLp_of_hasCompactSupport (hψ i).hasCompactSupport)
       (((hψ i).continuous_partialD j).memLp_of_hasCompactSupport
-        ((hψ i).hasCompactSupport_partialD j)).of_le
-        (aestronglyMeasurable_ite_lt (hψc i).aestronglyMeasurable
-          ((hψ i).continuous_partialD j).aestronglyMeasurable k)
-        (Eventually.of_forall fun x => by split_ifs <;> simp)
+        ((hψ i).hasCompactSupport_partialD j)) k
   have hWmem : ∀ i, H1amb.mk (((hwm i).mono_measure Measure.restrict_le_self).toLp _)
       (fun j => ((hhm i j).mono_measure Measure.restrict_le_self).toLp _) ∈ H01 Ω := fun i =>
     mem_H01_of_hasCompactSupport hΩ (hψwg i) (hwm i) (hhm i) ((hψ i).posPart_sub_const hk).1
       ((hψ i).posPart_sub_const hk).2
   -- the limit
-  have hwlim : MemLp (fun x => max (v x - k) 0) 2 (volume.restrict Ω) := by
-    refine hvm.of_le (((continuous_id.sub continuous_const).max
-      continuous_const).comp_aestronglyMeasurable hvm.aestronglyMeasurable)
-      (Eventually.of_forall fun x => ?_)
-    simp only [Real.norm_eq_abs]
-    rw [abs_of_nonneg (le_max_right _ _)]
-    exact max_le (by linarith [le_abs_self (v x)]) (abs_nonneg _)
+  have hwlim := memLp_max_sub_const hvm hk
   have hhlim : ∀ i, MemLp (fun x => if k < v x then g i x else 0) 2 (volume.restrict Ω) :=
-    fun i => (hgm i).of_le (aestronglyMeasurable_ite_lt hvm.aestronglyMeasurable
-      (hgm i).aestronglyMeasurable k)
-      (Eventually.of_forall fun x => by split_ifs <;> simp)
+    fun i => memLp_ite_lt hvm (hgm i) k
   refine ⟨H1amb.mk (hwlim.toLp _) fun i => (hhlim i).toLp _, ?_, hwlim.coeFn_toLp,
     fun i => (hhlim i).coeFn_toLp⟩
   refine (Submodule.isClosed_topologicalClosure _).mem_of_tendsto (b := atTop) ?_

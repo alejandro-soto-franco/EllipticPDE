@@ -125,30 +125,16 @@ theorem exists_eLpNorm_sobolevConj_le_domain (hd : 0 < d)
     hMemU.mono_measure (Measure.restrict_mono hΩr le_rfl)
   refine ⟨hUΩ.ae_eq hue.symm, ?_⟩
   -- the whole-space seminorms, read back against the domain
-  have hUpiece : eLpNorm U (p : ℝ≥0∞)
-      (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) R)) ≤ (K₀ : ℝ≥0∞) * N :=
-    le_trans (eLpNorm_mono_measure _ Measure.restrict_le_self) hUb
-  have hGpiece : ∑ k, eLpNorm (G k) (p : ℝ≥0∞)
-      (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) R))
-      ≤ (d : ℝ≥0∞) * ((K₀ : ℝ≥0∞) * N) := by
-    calc ∑ k, eLpNorm (G k) (p : ℝ≥0∞)
-          (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) R))
-        ≤ ∑ _k : Fin d, (K₀ : ℝ≥0∞) * N :=
-          Finset.sum_le_sum fun k _ =>
-            le_trans (eLpNorm_mono_measure _ Measure.restrict_le_self) (hGb k)
-      _ = (d : ℝ≥0∞) * ((K₀ : ℝ≥0∞) * N) := by
-          rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+  have hpiece := add_sum_le_of_le (d := d) (b := fun k => eLpNorm (G k) (p : ℝ≥0∞)
+      (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) R)))
+    (le_trans (eLpNorm_mono_measure _ Measure.restrict_le_self) hUb : eLpNorm U (p : ℝ≥0∞)
+      (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) R)) ≤ (K₀ : ℝ≥0∞) * N)
+    (fun k => le_trans (eLpNorm_mono_measure _ Measure.restrict_le_self) (hGb k))
   calc eLpNorm u (p' : ℝ≥0∞) (volume.restrict Ω)
       = eLpNorm U (p' : ℝ≥0∞) (volume.restrict Ω) := eLpNorm_congr_ae hue
-    _ ≤ eLpNorm U (p' : ℝ≥0∞)
-          (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) r)) :=
+    _ ≤ eLpNorm U (p' : ℝ≥0∞) (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) r)) :=
         eLpNorm_mono_measure _ (Measure.restrict_mono hΩr le_rfl)
-    _ ≤ (K₁ : ℝ≥0∞) * (eLpNorm U (p : ℝ≥0∞)
-          (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) R))
-          + ∑ k, eLpNorm (G k) (p : ℝ≥0∞)
-              (volume.restrict (ball (0 : EuclideanSpace ℝ (Fin d)) R))) := hbdU
-    _ ≤ (K₁ : ℝ≥0∞) * ((K₀ : ℝ≥0∞) * N + (d : ℝ≥0∞) * ((K₀ : ℝ≥0∞) * N)) :=
-        mul_le_mul_right (add_le_add hUpiece hGpiece) _
+    _ ≤ (K₁ : ℝ≥0∞) * ((d + 1) * ((K₀ : ℝ≥0∞) * N)) := hbdU.trans (mul_le_mul_right hpiece _)
     _ = (K₁ : ℝ≥0∞) * (((d : ℝ≥0∞) + 1) * (K₀ : ℝ≥0∞)) * N := by ring
 
 /-- **Rung fed by a higher exponent.** A bounded domain has finite measure, so `Lq` data

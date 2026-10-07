@@ -64,6 +64,57 @@ variable {d : ℕ}
 
 /-! ### The tangential projection -/
 
+section Tangent
+
+variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
+
+/-- **Orthogonal projection killing a direction.** For a unit vector `n` this is the orthogonal
+projection onto the orthogonal complement of `n`, the hyperplane a chart is a graph over. -/
+def tangentialBy (n : E) : E →L[ℝ] E :=
+  ContinuousLinearMap.id ℝ E - (innerSL ℝ n).smulRight n
+
+/-- `tangentialBy n y` is `y` minus its component along `n`. -/
+theorem tangentialBy_apply (n y : E) : tangentialBy n y = y - inner ℝ n y • n := rfl
+
+/-- A unit vector has inner square one. -/
+theorem inner_self_of_norm_eq_one {n : E} (hn : ‖n‖ = 1) : inner ℝ n n = 1 := by
+  simp [hn]
+
+/-- `tangentialBy n` is unchanged by adding a multiple of the unit vector `n`. -/
+theorem tangentialBy_add_smul {n : E} (hn : ‖n‖ = 1) (y : E) (t : ℝ) :
+    tangentialBy n (y + t • n) = tangentialBy n y := by
+  simp only [tangentialBy_apply, inner_add_right, inner_smul_right, inner_self_of_norm_eq_one hn]
+  module
+
+/-- The tangential part is orthogonal to the direction. -/
+theorem inner_tangentialBy {n : E} (hn : ‖n‖ = 1) (y : E) : inner ℝ n (tangentialBy n y) = 0 := by
+  simp [tangentialBy_apply, inner_sub_right, inner_smul_right, hn]
+
+/-- **Norm split into the tangential part and the component along `n`.** -/
+theorem norm_sq_eq_tangentialBy_add_sq {n : E} (hn : ‖n‖ = 1) (y : E) :
+    ‖y‖ ^ 2 = ‖tangentialBy n y‖ ^ 2 + inner ℝ n y ^ 2 := by
+  have h := norm_add_sq_real (tangentialBy n y) (inner ℝ n y • n)
+  rw [norm_smul, mul_pow, hn, Real.norm_eq_abs, sq_abs] at h
+  have hy : tangentialBy n y + inner ℝ n y • n = y := by simp [tangentialBy_apply]
+  rw [hy] at h
+  have hi : inner ℝ (tangentialBy n y) (inner ℝ n y • n) = 0 := by
+    rw [inner_smul_right, real_inner_comm n (tangentialBy n y), inner_tangentialBy hn, mul_zero]
+  linarith
+
+/-- The projection does not increase the norm. -/
+theorem norm_tangentialBy_le {n : E} (hn : ‖n‖ = 1) (y : E) : ‖tangentialBy n y‖ ≤ ‖y‖ :=
+  (sq_le_sq₀ (norm_nonneg _) (norm_nonneg _)).1
+    (by nlinarith [norm_sq_eq_tangentialBy_add_sq hn y, sq_nonneg (inner ℝ n y)])
+
+/-- A function constant along the unit vector `n` factors through the projection. -/
+theorem apply_tangentialBy {n : E} {f : E → ℝ} (hind : IndepAlong n f) (y : E) :
+    f (tangentialBy n y) = f y := by
+  have h : tangentialBy n y = y + (-(inner ℝ n y)) • n := by
+    rw [tangentialBy_apply, neg_smul]; abel
+  rw [h, hind y]
+
+end Tangent
+
 /-- **Projection killing the `j`-th coordinate**, the direction a chart is a graph in. -/
 def tangential (j : Fin d) :
     EuclideanSpace ℝ (Fin d) →L[ℝ] EuclideanSpace ℝ (Fin d) :=
@@ -74,6 +125,12 @@ def tangential (j : Fin d) :
 /-- `tangential j y` is `y` minus its `j`-th component times the `j`-th basis vector. -/
 theorem tangential_apply (j : Fin d) (y : EuclideanSpace ℝ (Fin d)) :
     tangential j y = y - y j • EuclideanSpace.single j (1 : ℝ) := rfl
+
+/-- The coordinate projection is the projection killing the `j`-th basis vector. -/
+theorem tangential_eq_tangentialBy (j : Fin d) :
+    tangential j = tangentialBy (EuclideanSpace.single j (1 : ℝ)) := by
+  ext y : 1
+  simp [tangential_apply, tangentialBy_apply, EuclideanSpace.inner_single_left]
 
 /-- The `i`-th coordinate of `tangential j y` is `0` for `i = j` and `y i` otherwise. -/
 theorem tangential_coord (j : Fin d) (y : EuclideanSpace ℝ (Fin d)) (i : Fin d) :
@@ -86,29 +143,20 @@ theorem tangential_coord (j : Fin d) (y : EuclideanSpace ℝ (Fin d)) (i : Fin d
 /-- `tangential j` is unchanged by adding a multiple of the `j`-th basis vector. -/
 theorem tangential_add_smul (j : Fin d) (y : EuclideanSpace ℝ (Fin d)) (t : ℝ) :
     tangential j (y + t • EuclideanSpace.single j (1 : ℝ)) = tangential j y := by
-  ext i
-  rw [tangential_coord, tangential_coord]
-  by_cases h : i = j
-  · simp [h]
-  · simp [h]
+  rw [tangential_eq_tangentialBy]
+  exact tangentialBy_add_smul (by simp) y t
 
 /-- The projection does not increase the norm. -/
 theorem norm_tangential_le (j : Fin d) (y : EuclideanSpace ℝ (Fin d)) :
     ‖tangential j y‖ ≤ ‖y‖ := by
-  rw [EuclideanSpace.norm_eq, EuclideanSpace.norm_eq]
-  refine Real.sqrt_le_sqrt (Finset.sum_le_sum fun i _ => ?_)
-  rw [tangential_coord]
-  by_cases h : i = j
-  · rw [ite_eq_left h, norm_zero, zero_pow (by norm_num)]
-    positivity
-  · rw [ite_eq_right h]
+  rw [tangential_eq_tangentialBy]
+  exact norm_tangentialBy_le (by simp) y
 
 /-- A function independent of the `j`-th coordinate factors through the projection. -/
 theorem apply_tangential {j : Fin d} {f : EuclideanSpace ℝ (Fin d) → ℝ} (hind : IndepCoord j f)
     (y : EuclideanSpace ℝ (Fin d)) : f (tangential j y) = f y := by
-  have h : tangential j y = y + (-(y j)) • EuclideanSpace.single j (1 : ℝ) := by
-    rw [tangential_apply, neg_smul]; abel
-  rw [h, hind y (-(y j))]
+  rw [tangential_eq_tangentialBy]
+  exact apply_tangentialBy hind y
 
 /-- **Boundedness on a cylinder of a continuous function independent of a coordinate.** The
 function factors through the projection, so its values on the cylinder are its values on a

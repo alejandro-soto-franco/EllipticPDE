@@ -56,16 +56,9 @@ variable {d : ℕ}
 /-- **Norm split into the tangential part and the coordinate.** -/
 theorem norm_sq_eq_tangential_add_sq (j : Fin d) (y : EuclideanSpace ℝ (Fin d)) :
     ‖y‖ ^ 2 = ‖tangential j y‖ ^ 2 + (y j) ^ 2 := by
-  classical
-  rw [EuclideanSpace.norm_sq_eq, EuclideanSpace.norm_sq_eq,
-    Fintype.sum_eq_add_sum_compl j (fun i => ‖y i‖ ^ 2),
-    Fintype.sum_eq_add_sum_compl j (fun i => ‖tangential j y i‖ ^ 2),
-    tangential_coord, ite_eq_left rfl, norm_zero, zero_pow two_ne_zero, zero_add, Real.norm_eq_abs,
-    sq_abs, add_comm]
-  congr 1
-  refine Finset.sum_congr rfl fun i hi => ?_
-  have hij : i ≠ j := by simpa using hi
-  rw [tangential_coord, ite_eq_right hij]
+  rw [tangential_eq_tangentialBy]
+  simpa [EuclideanSpace.inner_single_left] using
+    norm_sq_eq_tangentialBy_add_sq (n := EuclideanSpace.single j (1 : ℝ)) (by simp) y
 
 /-- The south pole has no tangential part. -/
 theorem tangential_neg_single (j : Fin d) :

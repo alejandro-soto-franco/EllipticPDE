@@ -76,6 +76,36 @@ section Quadratic
 
 variable {H : Type*} [NormedAddCommGroup H] [NormedSpace ℝ H]
 
+/-- **The integral along a line is the norm of the line's image.** For `T` into `Lᵖ`,
+`∫ ‖(TU)(x) + t (TV)(x)‖^p = ‖T(U + t V)‖^p`. -/
+theorem integral_norm_line_rpow {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp0 : p ≠ 0) (hptop : p ≠ ∞)
+    (T : H →L[ℝ] Lp ℝ p μ) (U V : H) (t : ℝ) :
+    ∫ x, ‖(T U) x + t * (T V) x‖ ^ p.toReal ∂μ = ‖T (U + t • V)‖ ^ p.toReal := by
+  have h0 : T (U + t • V) = T U + t • T V := by rw [map_add, map_smul]
+  rw [norm_lp_rpow_eq_integral hp0 hptop, h0]
+  refine integral_congr_ae ?_
+  filter_upwards [Lp.coeFn_add (T U) (t • T V), Lp.coeFn_smul t (T V)] with x h1 h2
+  rw [h1, Pi.add_apply, h2, Pi.smul_apply, smul_eq_mul]
+
+/-- **A constrained minimiser of a quadratic form minimises the Rayleigh quotient.** If `U`
+minimises the nonnegative quadratic form `Q` over the unit sphere of `T`, then
+`Q U ‖T W‖² ≤ Q W` for every `W`, by scaling `W` onto the sphere. -/
+theorem mul_norm_sq_le_of_min {p : ℝ≥0∞} [Fact (1 ≤ p)] (T : H →L[ℝ] Lp ℝ p μ) {Q : H → ℝ}
+    (hQnonneg : ∀ W : H, 0 ≤ Q W) (hQsmul : ∀ (c : ℝ) (W : H), Q (c • W) = c ^ 2 * Q W)
+    {U : H} (hmin : ∀ W : H, ‖T W‖ = 1 → Q U ≤ Q W) (W : H) : Q U * ‖T W‖ ^ 2 ≤ Q W := by
+  rcases eq_or_ne ‖T W‖ 0 with h0 | h0
+  · rw [h0]
+    simpa using hQnonneg W
+  · have hpos : 0 < ‖T W‖ := lt_of_le_of_ne (norm_nonneg _) (Ne.symm h0)
+    have hsphere : ‖T (‖T W‖⁻¹ • W)‖ = 1 := by
+      rw [map_smul, norm_smul, Real.norm_eq_abs, abs_of_pos (inv_pos.mpr hpos)]
+      exact inv_mul_cancel₀ hpos.ne'
+    have hle := hmin _ hsphere
+    rw [hQsmul] at hle
+    calc Q U * ‖T W‖ ^ 2 ≤ (‖T W‖⁻¹) ^ 2 * Q W * ‖T W‖ ^ 2 :=
+          mul_le_mul_of_nonneg_right hle (by positivity)
+      _ = Q W := by field_simp
+
 /-- **Euler-Lagrange equation of a quadratic minimiser under an `L^q` constraint.** Let `Q` be
 nonnegative and homogeneous of degree two, and let `U` minimise `Q` over the vectors whose image
 has unit `L^q` norm. If `Q (U + tV) = Q U + 2tL + t²S`, then
@@ -106,17 +136,8 @@ theorem euler_lagrange_of_quadratic_min {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp0 :
     rw [hIdef, ← integral_const_mul]
     exact integral_congr_ae (Eventually.of_forall (fun x => by ring))
   rw [hIeq] at hNderiv
-  -- The line's image is the line of the images.
-  have hcoe : ∀ t : ℝ, ⇑(T (U + t • V)) =ᵐ[μ] fun x => u x + t * v x := by
-    intro t
-    have h0 : T (U + t • V) = T U + t • T V := by rw [map_add, map_smul]
-    rw [h0]
-    filter_upwards [Lp.coeFn_add (T U) (t • T V), Lp.coeFn_smul t (T V)] with x h1 h2
-    rw [h1, Pi.add_apply, h2, Pi.smul_apply, smul_eq_mul, hudef, hvdef]
-  have hNeq : ∀ t : ℝ, N t = ‖T (U + t • V)‖ ^ r := by
-    intro t
-    rw [norm_lp_rpow_eq_integral hp0 hptop]
-    exact (integral_congr_ae (by filter_upwards [hcoe t] with x hx; rw [hx])).symm
+  have hNeq : ∀ t : ℝ, N t = ‖T (U + t • V)‖ ^ r := fun t =>
+    integral_norm_line_rpow hp0 hptop T U V t
   -- The squared `L^q` norm along the line.
   have hgN : ∀ t : ℝ, N t ^ (2 / r) = ‖T (U + t • V)‖ ^ 2 := by
     intro t
@@ -126,25 +147,10 @@ theorem euler_lagrange_of_quadratic_min {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp0 :
   -- The function Fermat's theorem is applied to.
   set g : ℝ → ℝ := fun t => Q (U + t • V) - Q U * N t ^ (2 / r) with hgdef
   have hg0 : g 0 = 0 := by rw [hgdef]; simp [hN0]
-  have hgnonneg : ∀ t : ℝ, 0 ≤ g t := by
-    intro t
+  have hgnonneg : ∀ t : ℝ, 0 ≤ g t := fun t => by
     rw [hgdef]
     simp only [hgN t]
-    rcases eq_or_ne ‖T (U + t • V)‖ 0 with h0 | h0
-    · rw [h0]
-      simpa using hQnonneg (U + t • V)
-    · have hpos : 0 < ‖T (U + t • V)‖ := lt_of_le_of_ne (norm_nonneg _) (Ne.symm h0)
-      have hsphere : ‖T (‖T (U + t • V)‖⁻¹ • (U + t • V))‖ = 1 := by
-        rw [map_smul, norm_smul, Real.norm_eq_abs, abs_of_pos (inv_pos.mpr hpos)]
-        exact inv_mul_cancel₀ hpos.ne'
-      have hle := hmin _ hsphere
-      rw [hQsmul] at hle
-      have hs2 : (0 : ℝ) < ‖T (U + t • V)‖ ^ 2 := by positivity
-      refine sub_nonneg.mpr ?_
-      calc Q U * ‖T (U + t • V)‖ ^ 2
-          ≤ (‖T (U + t • V)‖⁻¹) ^ 2 * Q (U + t • V) * ‖T (U + t • V)‖ ^ 2 :=
-            mul_le_mul_of_nonneg_right hle hs2.le
-        _ = Q (U + t • V) := by field_simp
+    exact sub_nonneg.mpr (mul_norm_sq_le_of_min T hQnonneg hQsmul hmin _)
   -- Fermat's theorem at the global minimum.
   have hlocmin : IsLocalMin g 0 :=
     Eventually.of_forall (fun t => by rw [hg0]; exact hgnonneg t)
