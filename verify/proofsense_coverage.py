@@ -156,6 +156,9 @@ EXEMPT = {
     ),
     "EllipticPdes.DivForm.FullEllipticOp.symmetric_spectral_of_bounded_haar": (
         "the theorem warranted at EllipticPdes.Sobolev.symmetric_fullElliptic_spectral, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
     "EllipticPdes.H1Graph.mem_H01_of_hasCompactSupport": (
         "the theorem warranted at EllipticPdes.Sobolev.mem_H01_of_hasCompactSupport, stated over a finite-dimensional real "
         "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
