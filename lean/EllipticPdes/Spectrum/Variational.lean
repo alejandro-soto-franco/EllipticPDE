@@ -24,6 +24,10 @@ quotient
 the infimum is attained, and a minimiser is a weak eigenfunction at that eigenvalue. Every weak
 eigenvalue of `B` is at least `λ₁`, so the name is the theorem.
 
+Everything up to the Dirichlet instance is stated for a bounded linear map `emb : V →L[ℝ] L`
+between real Hilbert spaces and a coercive form `B` on `V` (namespace
+`EllipticPdes.Variational`); the Euclidean names are the instance `emb = embL2 Ω`.
+
 The proof is the direct method in the abstract setting. Coercivity bounds a minimising sequence in
 `H₀¹(Ω)`, `EllipticPdes.Analysis.exists_weakLimit` extracts a weak limit, and the Rellich compact
 embedding `embL2 Ω` takes the constraint to that limit along a further subsequence. Weak lower
@@ -62,88 +66,98 @@ open scoped RealInnerProductSpace
 
 noncomputable section
 
-namespace EllipticPdes.Sobolev
+namespace EllipticPdes.Variational
 
 open EllipticPdes.Analysis
 
-variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))} {B : H01 Ω →L[ℝ] H01 Ω →L[ℝ] ℝ}
+variable {V L : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [CompleteSpace V]
+  [NormedAddCommGroup L] [InnerProductSpace ℝ L] [CompleteSpace L] (emb : V →L[ℝ] L)
+  {B : V →L[ℝ] V →L[ℝ] ℝ}
 
 /-! ### The Rayleigh quotient and its infimum -/
 
-/-- The unit `L²` sphere of `H₀¹(Ω)`, the constraint set of the Rayleigh problem. -/
-def rayleighSphere (Ω : Set (EuclideanSpace ℝ (Fin d))) : Set (H01 Ω) :=
-  {U | ‖embL2 Ω U‖ = 1}
+/-- The unit sphere of `L` pulled back along `emb`, the constraint set of the Rayleigh problem. -/
+def rayleighSphere : Set V :=
+  {U | ‖emb U‖ = 1}
 
-/-- The values a bilinear form takes on the unit `L²` sphere. -/
-def rayleighValues (B : H01 Ω →L[ℝ] H01 Ω →L[ℝ] ℝ) : Set ℝ :=
-  (fun U => B U U) '' rayleighSphere Ω
+/-- The values a bilinear form takes on the `emb`-unit sphere. -/
+def rayleighValues (B : V →L[ℝ] V →L[ℝ] ℝ) : Set ℝ :=
+  (fun U => B U U) '' rayleighSphere emb
 
-/-- **Principal eigenvalue** of a symmetric coercive form on `H₀¹(Ω)`: the infimum of the
-Rayleigh quotient `B[U, U]` over the functions of unit `L²` norm. -/
-def principalEigenvalue (B : H01 Ω →L[ℝ] H01 Ω →L[ℝ] ℝ) : ℝ := sInf (rayleighValues B)
+/-- **Principal eigenvalue** of a symmetric coercive form on `V`: the infimum of the Rayleigh
+quotient `B[U, U]` over the vectors with `‖emb U‖ = 1`. -/
+def principalEigenvalue (B : V →L[ℝ] V →L[ℝ] ℝ) : ℝ := sInf (rayleighValues emb B)
 
-/-- A coercive form is positive semidefinite. -/
-lemma nonneg_of_isCoercive (hco : IsCoercive B) (U : H01 Ω) : 0 ≤ B U U :=
-  bilin_self_nonneg hco U
-
-/-- The constraint set is inhabited as soon as some element has a nonzero `L²` class: rescale. -/
-lemma rayleighSphere_nonempty (hne : ∃ V : H01 Ω, embL2 Ω V ≠ 0) :
-    (rayleighSphere Ω).Nonempty := by
-  obtain ⟨V, hV⟩ := hne
-  have hpos : 0 < ‖embL2 Ω V‖ := norm_pos_iff.mpr hV
-  refine ⟨‖embL2 Ω V‖⁻¹ • V, ?_⟩
+omit [CompleteSpace V] [CompleteSpace L] in
+/-- The constraint set is inhabited as soon as some element has a nonzero image under `emb`:
+rescale. -/
+lemma rayleighSphere_nonempty (hne : ∃ W : V, emb W ≠ 0) :
+    (rayleighSphere emb).Nonempty := by
+  obtain ⟨W, hV⟩ := hne
+  have hpos : 0 < ‖emb W‖ := norm_pos_iff.mpr hV
+  refine ⟨‖emb W‖⁻¹ • W, ?_⟩
   simp only [rayleighSphere, Set.mem_ofPred_eq, map_smul, norm_smul, Real.norm_eq_abs,
     abs_of_pos (inv_pos.mpr hpos)]
   exact inv_mul_cancel₀ hpos.ne'
 
+omit [CompleteSpace V] [CompleteSpace L] in
 /-- Positive semidefiniteness bounds the Rayleigh values below by zero. -/
-lemma rayleighValues_bddBelow (hco : IsCoercive B) : BddBelow (rayleighValues B) :=
-  ⟨0, by rintro _ ⟨U, -, rfl⟩; exact nonneg_of_isCoercive hco U⟩
+lemma rayleighValues_bddBelow (hco : IsCoercive B) : BddBelow (rayleighValues emb B) :=
+  ⟨0, by rintro _ ⟨U, -, rfl⟩; exact bilin_self_nonneg hco U⟩
 
+omit [CompleteSpace V] [CompleteSpace L] in
 /-- The infimum is a lower bound on the constraint set. -/
-lemma principalEigenvalue_le (hco : IsCoercive B) {U : H01 Ω} (hU : ‖embL2 Ω U‖ = 1) :
-    principalEigenvalue B ≤ B U U :=
-  csInf_le (rayleighValues_bddBelow hco) ⟨U, hU, rfl⟩
+lemma principalEigenvalue_le (hco : IsCoercive B) {U : V} (hU : ‖emb U‖ = 1) :
+    principalEigenvalue emb B ≤ B U U :=
+  csInf_le (rayleighValues_bddBelow emb hco) ⟨U, hU, rfl⟩
 
+omit [CompleteSpace V] [CompleteSpace L] in
 /-- **Rayleigh bound off the constraint set**: `λ₁‖U‖²_{L²} ≤ B[U, U]` for every `U`. On the
 constraint set this is the definition of the infimum, and elsewhere it follows by rescaling. -/
-theorem principalEigenvalue_mul_norm_sq_le (hco : IsCoercive B) (U : H01 Ω) :
-    principalEigenvalue B * ‖embL2 Ω U‖ ^ 2 ≤ B U U := by
-  rcases eq_or_ne (embL2 Ω U) 0 with h0 | h0
+theorem principalEigenvalue_mul_norm_sq_le (hco : IsCoercive B) (U : V) :
+    principalEigenvalue emb B * ‖emb U‖ ^ 2 ≤ B U U := by
+  rcases eq_or_ne (emb U) 0 with h0 | h0
   · rw [h0]
-    simpa using nonneg_of_isCoercive hco U
-  · have hpos : 0 < ‖embL2 Ω U‖ := norm_pos_iff.mpr h0
-    have hsphere : ‖embL2 Ω (‖embL2 Ω U‖⁻¹ • U)‖ = 1 := by
+    simpa using bilin_self_nonneg hco U
+  · have hpos : 0 < ‖emb U‖ := norm_pos_iff.mpr h0
+    have hsphere : ‖emb (‖emb U‖⁻¹ • U)‖ = 1 := by
       simp only [map_smul, norm_smul, Real.norm_eq_abs, abs_of_pos (inv_pos.mpr hpos)]
       exact inv_mul_cancel₀ hpos.ne'
-    have hval : B (‖embL2 Ω U‖⁻¹ • U) (‖embL2 Ω U‖⁻¹ • U)
-        = ‖embL2 Ω U‖⁻¹ * (‖embL2 Ω U‖⁻¹ * B U U) := by
+    have hval : B (‖emb U‖⁻¹ • U) (‖emb U‖⁻¹ • U)
+        = ‖emb U‖⁻¹ * (‖emb U‖⁻¹ * B U U) := by
       simp only [map_smul, _root_.smul_apply, smul_eq_mul]
-    have hle := principalEigenvalue_le hco hsphere
+    have hle := principalEigenvalue_le emb hco hsphere
     rw [hval] at hle
-    have hs2 : (0 : ℝ) < ‖embL2 Ω U‖ ^ 2 := by positivity
-    calc principalEigenvalue B * ‖embL2 Ω U‖ ^ 2
-        ≤ ‖embL2 Ω U‖⁻¹ * (‖embL2 Ω U‖⁻¹ * B U U) * ‖embL2 Ω U‖ ^ 2 :=
+    have hs2 : (0 : ℝ) < ‖emb U‖ ^ 2 := by positivity
+    calc principalEigenvalue emb B * ‖emb U‖ ^ 2
+        ≤ ‖emb U‖⁻¹ * (‖emb U‖⁻¹ * B U U) * ‖emb U‖ ^ 2 :=
           mul_le_mul_of_nonneg_right hle hs2.le
       _ = B U U := by field_simp
 
-/-- Coercivity bounds the principal eigenvalue below by the coercivity constant: on the constraint
-set `1 = ‖U‖_{L²} ≤ ‖U‖_{H₀¹}`, so `C ≤ C‖U‖² ≤ B[U, U]`. -/
-lemma le_principalEigenvalue_of_coercive
-    (hne : ∃ V : H01 Ω, embL2 Ω V ≠ 0) {C : ℝ} (hC : 0 < C)
-    (hcoer : ∀ U : H01 Ω, C * ‖U‖ * ‖U‖ ≤ B U U) : C ≤ principalEigenvalue B := by
-  refine le_csInf ((rayleighSphere_nonempty hne).image _) ?_
+omit [CompleteSpace V] [CompleteSpace L] in
+/-- Coercivity bounds the principal eigenvalue below: on the constraint set `1 = ‖emb U‖
+≤ ‖emb‖ ‖U‖`, so `C / ‖emb‖² ≤ C ‖U‖² ≤ B[U, U]`. -/
+lemma le_principalEigenvalue_of_coercive (hne : ∃ W : V, emb W ≠ 0) {C : ℝ} (hC : 0 < C)
+    (hcoer : ∀ U : V, C * ‖U‖ * ‖U‖ ≤ B U U) : C / ‖emb‖ ^ 2 ≤ principalEigenvalue emb B := by
+  obtain ⟨W, hW⟩ := hne
+  have hE : 0 < ‖emb‖ := norm_pos_iff.mpr fun h => hW (by simp [h])
+  refine le_csInf ((rayleighSphere_nonempty emb ⟨W, hW⟩).image _) ?_
   rintro _ ⟨U, hU, rfl⟩
-  change C ≤ B U U
-  have h1 : (1 : ℝ) ≤ ‖U‖ := hU ▸ embL2_norm_le U
-  have h2 : (1 : ℝ) ≤ ‖U‖ * ‖U‖ := by nlinarith
+  change C / ‖emb‖ ^ 2 ≤ B U U
+  have h1 : (1 : ℝ) ≤ ‖emb‖ * ‖U‖ := hU ▸ emb.le_opNorm U
+  have h2 : 1 ≤ (‖emb‖ * ‖U‖) * (‖emb‖ * ‖U‖) := by nlinarith
+  rw [div_le_iff₀ (by positivity)]
   nlinarith [hcoer U, mul_le_mul_of_nonneg_left h2 hC.le]
 
+omit [CompleteSpace V] [CompleteSpace L] in
 /-- The principal eigenvalue of a coercive form is positive. -/
-theorem principalEigenvalue_pos (hco : IsCoercive B) (hne : ∃ V : H01 Ω, embL2 Ω V ≠ 0) :
-    0 < principalEigenvalue B := by
+theorem principalEigenvalue_pos (hco : IsCoercive B) (hne : ∃ W : V, emb W ≠ 0) :
+    0 < principalEigenvalue emb B := by
   obtain ⟨C, hC, hcoer⟩ := id hco
-  exact lt_of_lt_of_le hC (le_principalEigenvalue_of_coercive hne hC hcoer)
+  obtain ⟨W, hW⟩ := hne
+  have hE : 0 < ‖emb‖ := norm_pos_iff.mpr fun h => hW (by simp [h])
+  exact lt_of_lt_of_le (by positivity)
+    (le_principalEigenvalue_of_coercive emb ⟨W, hW⟩ hC hcoer)
 
 /-! ### The Euler-Lagrange equation -/
 
@@ -162,26 +176,27 @@ lemma eq_zero_of_quadratic_nonneg {a b : ℝ} (h : ∀ t : ℝ, 0 ≤ 2 * t * b 
   have hneg := h (-(1 / (|a| + 1) * b))
   nlinarith [mul_pos (mul_pos hεpos hb2) (show (0 : ℝ) < 2 - 1 / (|a| + 1) * a by linarith)]
 
-/-- **Euler-Lagrange equation of the Rayleigh problem.** A minimiser on the unit `L²` sphere is
-a weak eigenfunction at the principal eigenvalue: `B[U, V] = λ₁⟪U, V⟫_{L²}` for every `V`. -/
-theorem rayleigh_euler_lagrange (hco : IsCoercive B) (hsymm : ∀ U V : H01 Ω, B U V = B V U)
-    {U : H01 Ω} (hU : ‖embL2 Ω U‖ = 1) (hmin : B U U = principalEigenvalue B) (V : H01 Ω) :
-    B U V = principalEigenvalue B * ⟪embL2 Ω U, embL2 Ω V⟫ := by
+omit [CompleteSpace V] [CompleteSpace L] in
+/-- **Euler-Lagrange equation of the Rayleigh problem.** A minimiser on the `emb`-unit sphere is
+a weak eigenfunction at the principal eigenvalue: `B[U, W] = λ₁⟪U, W⟫_{L²}` for every `W`. -/
+theorem rayleigh_euler_lagrange (hco : IsCoercive B) (hsymm : ∀ U W : V, B U W = B W U)
+    {U : V} (hU : ‖emb U‖ = 1) (hmin : B U U = principalEigenvalue emb B) (W : V) :
+    B U W = principalEigenvalue emb B * ⟪emb U, emb W⟫ := by
   have key : ∀ t : ℝ,
-      0 ≤ 2 * t * (B U V - principalEigenvalue B * ⟪embL2 Ω U, embL2 Ω V⟫)
-        + t ^ 2 * (B V V - principalEigenvalue B * ‖embL2 Ω V‖ ^ 2) := by
+      0 ≤ 2 * t * (B U W - principalEigenvalue emb B * ⟪emb U, emb W⟫)
+        + t ^ 2 * (B W W - principalEigenvalue emb B * ‖emb W‖ ^ 2) := by
     intro t
-    have hmain := principalEigenvalue_mul_norm_sq_le hco (U + t • V)
-    have hBexp : B (U + t • V) (U + t • V) = B U U + 2 * t * B U V + t ^ 2 * B V V := by
-      have h1 : B (U + t • V) = B U + t • B V := by rw [map_add, map_smul]
+    have hmain := principalEigenvalue_mul_norm_sq_le emb hco (U + t • W)
+    have hBexp : B (U + t • W) (U + t • W) = B U U + 2 * t * B U W + t ^ 2 * B W W := by
+      have h1 : B (U + t • W) = B U + t • B W := by rw [map_add, map_smul]
       rw [h1]
       simp only [_root_.add_apply, _root_.smul_apply, map_add, map_smul,
         smul_eq_mul]
-      rw [hsymm V U]
+      rw [hsymm W U]
       ring
-    have hNexp : ‖embL2 Ω (U + t • V)‖ ^ 2
-        = ‖embL2 Ω U‖ ^ 2 + 2 * t * ⟪embL2 Ω U, embL2 Ω V⟫ + t ^ 2 * ‖embL2 Ω V‖ ^ 2 := by
-      have h1 : embL2 Ω (U + t • V) = embL2 Ω U + t • embL2 Ω V := by
+    have hNexp : ‖emb (U + t • W)‖ ^ 2
+        = ‖emb U‖ ^ 2 + 2 * t * ⟪emb U, emb W⟫ + t ^ 2 * ‖emb W‖ ^ 2 := by
+      have h1 : emb (U + t • W) = emb U + t • emb W := by
         rw [map_add, map_smul]
       rw [h1, ← real_inner_self_eq_norm_sq, real_inner_add_add_self, real_inner_smul_right,
         real_inner_smul_left, real_inner_smul_right, real_inner_self_eq_norm_sq,
@@ -194,42 +209,244 @@ theorem rayleigh_euler_lagrange (hco : IsCoercive B) (hsymm : ∀ U V : H01 Ω, 
 
 /-! ### The Rayleigh problem under a further constraint -/
 
+/-- The values a form takes on the `emb`-unit sphere inside a set `S`. -/
+def rayleighValuesOn (B : V →L[ℝ] V →L[ℝ] ℝ) (S : Set V) : Set ℝ :=
+  (fun U => B U U) '' (rayleighSphere emb ∩ S)
+
+/-- The infimum of the Rayleigh quotient over the `emb`-unit sphere inside `S`. Taking `S` to be
+the vectors `L²`-orthogonal to the earlier eigenfunctions gives the later eigenvalues. -/
+def eigenvalueOn (B : V →L[ℝ] V →L[ℝ] ℝ) (S : Set V) : ℝ :=
+  sInf (rayleighValuesOn emb B S)
+
+omit [CompleteSpace V] [CompleteSpace L] in
+/-- With no constraint the values are those of the whole sphere. -/
+lemma rayleighValuesOn_univ : rayleighValuesOn emb B Set.univ = rayleighValues emb B := by
+  rw [rayleighValuesOn, rayleighValues, Set.inter_univ]
+
+omit [CompleteSpace V] [CompleteSpace L] in
+/-- With no constraint the infimum is the principal eigenvalue. -/
+lemma eigenvalueOn_univ : eigenvalueOn emb B Set.univ = principalEigenvalue emb B := by
+  rw [eigenvalueOn, rayleighValuesOn_univ, principalEigenvalue]
+
+omit [CompleteSpace V] [CompleteSpace L] in
+/-- Positive semidefiniteness bounds the constrained values below by zero. -/
+lemma rayleighValuesOn_bddBelow (hco : IsCoercive B) (S : Set V) :
+    BddBelow (rayleighValuesOn emb B S) :=
+  ⟨0, by rintro _ ⟨U, -, rfl⟩; exact bilin_self_nonneg hco U⟩
+
+omit [CompleteSpace V] [CompleteSpace L] in
+/-- The constrained infimum is a lower bound on the constrained sphere. -/
+lemma eigenvalueOn_le (hco : IsCoercive B) {S : Set V} {U : V}
+    (hU : ‖emb U‖ = 1) (hUS : U ∈ S) : eigenvalueOn emb B S ≤ B U U :=
+  csInf_le (rayleighValuesOn_bddBelow emb hco S) ⟨U, ⟨hU, hUS⟩, rfl⟩
+
+omit [CompleteSpace V] [CompleteSpace L] in
+/-- **Tightening the constraint raises the infimum.** -/
+lemma principalEigenvalue_le_eigenvalueOn (hco : IsCoercive B) {S : Set V}
+    (hne : (rayleighSphere emb ∩ S).Nonempty) :
+    principalEigenvalue emb B ≤ eigenvalueOn emb B S := by
+  refine le_csInf (hne.image _) ?_
+  rintro _ ⟨U, hU, rfl⟩
+  exact principalEigenvalue_le emb hco hU.1
+
+/-! ### Existence of a minimiser -/
+
+/-- **Attainment of the infimum of the Rayleigh quotient over a weakly closed set.** Coercivity
+bounds a minimising sequence, weak compactness supplies a limit, the constraint `S` passes to that
+limit by hypothesis, and the compact map `emb` takes the unit `emb`-norm to it. -/
+theorem exists_rayleigh_minimiser_on (hco : IsCoercive B) (hsymm : ∀ U W : V, B U W = B W U)
+    (hRellich : IsCompactOperator (emb)) {S : Set V}
+    (hSclosed : ∀ (u : ℕ → V) (w : V), (∀ k, u k ∈ S) →
+      (∀ v : V, Tendsto (fun k => ⟪u k, v⟫) atTop (𝓝 ⟪w, v⟫)) → w ∈ S)
+    (hne : (rayleighSphere emb ∩ S).Nonempty) :
+    ∃ U : V, ‖emb U‖ = 1 ∧ U ∈ S ∧ B U U = eigenvalueOn emb B S := by
+  obtain ⟨C, hC, hcoer⟩ := id hco
+  have hbdd : BddBelow (rayleighValuesOn emb B S) := rayleighValuesOn_bddBelow emb hco S
+  have hnonempty : (rayleighValuesOn emb B S).Nonempty := hne.image _
+  -- A minimising sequence.
+  have hchoice : ∀ n : ℕ, ∃ U : V,
+      (‖emb U‖ = 1 ∧ U ∈ S) ∧ B U U < eigenvalueOn emb B S + 1 / ((n : ℝ) + 1) := by
+    intro n
+    have hlt : eigenvalueOn emb B S < eigenvalueOn emb B S + 1 / ((n : ℝ) + 1) := by
+      have : (0 : ℝ) < 1 / ((n : ℝ) + 1) := by positivity
+      linarith
+    obtain ⟨r, hr, hrlt⟩ := exists_lt_of_csInf_lt hnonempty hlt
+    obtain ⟨U, hU, rfl⟩ := hr
+    exact ⟨U, hU, hrlt⟩
+  choose U hUmem hUlt using hchoice
+  have hUs : ∀ n, ‖emb (U n)‖ = 1 := fun n => (hUmem n).1
+  have hUS : ∀ n, U n ∈ S := fun n => (hUmem n).2
+  have hUB : ∀ n, B (U n) (U n) < eigenvalueOn emb B S + 1 := by
+    intro n
+    have h1 : (1 : ℝ) / ((n : ℝ) + 1) ≤ 1 := by
+      rw [div_le_one (by positivity)]
+      linarith [Nat.cast_nonneg (α := ℝ) n]
+    linarith [hUlt n]
+  set M : ℝ := Real.sqrt ((eigenvalueOn emb B S + 1) / C) with hMdef
+  have hMbound : ∀ n, ‖U n‖ ≤ M := by
+    intro n
+    have h2 : ‖U n‖ ^ 2 ≤ (eigenvalueOn emb B S + 1) / C := by
+      rw [le_div_iff₀ hC]
+      nlinarith [hcoer (U n), hUB n]
+    calc ‖U n‖ = Real.sqrt (‖U n‖ ^ 2) := (Real.sqrt_sq (norm_nonneg _)).symm
+      _ ≤ M := Real.sqrt_le_sqrt h2
+  -- Weak compactness.
+  obtain ⟨w, φ, hφ, hweak⟩ := exists_weakLimit (u := U) hMbound
+  have hweakL2 : ∀ g : L,
+      Tendsto (fun k => ⟪emb (U (φ k)), g⟫) atTop (𝓝 ⟪emb w, g⟫) := by
+    intro g
+    simpa only [ContinuousLinearMap.adjoint_inner_right] using hweak ((emb).adjoint g)
+  -- Rellich gives a further subsequence converging strongly in `L²`.
+  have hM1 : (0 : ℝ) < M + 1 := by positivity
+  have hcptL : IsCompactOperator ((emb).toLinearMap) := hRellich
+  have hcl :=
+    (isCompactOperator_iff_isCompact_closure_image_closedBall (emb).toLinearMap hM1).mp hcptL
+  have hmemcl : ∀ k, emb (U (φ k))
+      ∈ closure (⇑(emb).toLinearMap '' Metric.closedBall (0 : V) (M + 1)) :=
+    fun k => subset_closure ⟨U (φ k), by
+      simpa [Metric.mem_closedBall, dist_zero_right] using (hMbound (φ k)).trans (by linarith), rfl⟩
+  obtain ⟨z, -, ψ, hψ, hψtend⟩ := hcl.tendsto_subseq hmemcl
+  -- The strong limit is the image under `emb` of the weak limit.
+  have hzw : z = emb w := by
+    refine ext_inner_right ℝ (fun g => ?_)
+    have hstrong : Tendsto (fun j => ⟪emb (U (φ (ψ j))), g⟫) atTop (𝓝 ⟪z, g⟫) := by
+      simpa [Function.comp_def] using hψtend.inner (tendsto_const_nhds (x := g))
+    exact tendsto_nhds_unique hstrong ((hweakL2 g).comp hψ.tendsto_atTop)
+  have hwnorm : ‖emb w‖ = 1 := by
+    have h1 : Tendsto (fun j => ‖emb (U (φ (ψ j)))‖) atTop (𝓝 ‖z‖) := by
+      simpa [Function.comp_def] using (continuous_norm.tendsto z).comp hψtend
+    have h2 : Tendsto (fun j => ‖emb (U (φ (ψ j)))‖) atTop (𝓝 1) := by
+      simp only [hUs]
+      exact tendsto_const_nhds
+    rw [← hzw]
+    exact tendsto_nhds_unique h1 h2
+  have hwS : w ∈ S := hSclosed (fun k => U (φ k)) w (fun k => hUS (φ k)) hweak
+  -- Weak lower semicontinuity of the form.
+  have hBUU : Tendsto (fun n => B (U n) (U n)) atTop (𝓝 (eigenvalueOn emb B S)) := by
+    refine tendsto_of_tendsto_of_tendsto_of_le_of_le (g := fun _ : ℕ => eigenvalueOn emb B S)
+      (h := fun n => eigenvalueOn emb B S + 1 / ((n : ℝ) + 1)) tendsto_const_nhds ?_
+      (fun n => csInf_le hbdd ⟨U n, hUmem n, rfl⟩) (fun n => (hUlt n).le)
+    have hzero : Tendsto (fun n : ℕ => 1 / ((n : ℝ) + 1)) atTop (𝓝 0) :=
+      tendsto_one_div_add_atTop_nhds_zero_nat
+    have hsum : Tendsto (fun n : ℕ => eigenvalueOn emb B S + 1 / ((n : ℝ) + 1)) atTop
+        (𝓝 (eigenvalueOn emb B S + 0)) := tendsto_const_nhds.add hzero
+    rwa [add_zero] at hsum
+  have hlsc : B w w ≤ eigenvalueOn emb B S := by
+    refine bilin_le_of_weakLimit hco hsymm hweak ?_
+    simpa [Function.comp_def] using hBUU.comp hφ.tendsto_atTop
+  exact ⟨w, hwnorm, hwS, le_antisymm hlsc (eigenvalueOn_le emb hco hwnorm hwS)⟩
+
+/-- **Attainment of the infimum of the Rayleigh quotient.** The unconstrained case. -/
+theorem exists_rayleigh_minimiser (hco : IsCoercive B) (hsymm : ∀ U W : V, B U W = B W U)
+    (hRellich : IsCompactOperator (emb)) (hne : ∃ W : V, emb W ≠ 0) :
+    ∃ U : V, ‖emb U‖ = 1 ∧ B U U = principalEigenvalue emb B := by
+  have hne' : (rayleighSphere emb ∩ Set.univ).Nonempty := by
+    simpa using rayleighSphere_nonempty emb hne
+  obtain ⟨U, hU, -, hmin⟩ :=
+    exists_rayleigh_minimiser_on emb hco hsymm hRellich (S := Set.univ)
+      (fun _ _ _ _ => Set.mem_univ _) hne'
+  exact ⟨U, hU, by rwa [eigenvalueOn_univ] at hmin⟩
+
+/-- **Principal eigenpair.** For a symmetric coercive form with the compact map `emb`
+there is a `U` of unit `emb`-norm attaining the infimum of the Rayleigh quotient, and it solves the
+weak eigenvalue problem at that value. -/
+theorem exists_principal_eigenpair (hco : IsCoercive B) (hsymm : ∀ U W : V, B U W = B W U)
+    (hRellich : IsCompactOperator (emb)) (hne : ∃ W : V, emb W ≠ 0) :
+    ∃ U : V, ‖emb U‖ = 1 ∧ B U U = principalEigenvalue emb B ∧
+      ∀ W : V, B U W = principalEigenvalue emb B * ⟪emb U, emb W⟫ := by
+  obtain ⟨U, hU, hmin⟩ := exists_rayleigh_minimiser emb hco hsymm hRellich hne
+  exact ⟨U, hU, hmin, fun W => rayleigh_euler_lagrange emb hco hsymm hU hmin W⟩
+
+omit [CompleteSpace V] [CompleteSpace L] in
+/-- **Minimality of the principal eigenvalue.** Any nonzero weak eigenfunction has eigenvalue
+at least `λ₁`. Coercivity rules out a nonzero element with vanishing image under `emb`, so the
+Rayleigh bound applies. -/
+theorem principalEigenvalue_le_of_weak_eigenvector (hco : IsCoercive B) {lam : ℝ} {U : V}
+    (hU : U ≠ 0) (heig : ∀ W : V, B U W = lam * ⟪emb U, emb W⟫) :
+    principalEigenvalue emb B ≤ lam := by
+  have hUU : B U U = lam * ‖emb U‖ ^ 2 := by
+    rw [heig U, real_inner_self_eq_norm_sq]
+  have hnz : emb U ≠ 0 := by
+    intro h0
+    obtain ⟨C, hC, hcoer⟩ := id hco
+    have hzero : B U U = 0 := by rw [hUU, h0]; simp
+    have hUpos : 0 < ‖U‖ := norm_pos_iff.mpr hU
+    nlinarith [hcoer U, mul_pos (mul_pos hC hUpos) hUpos]
+  have hpos : 0 < ‖emb U‖ ^ 2 := by
+    have := norm_pos_iff.mpr hnz
+    positivity
+  have hkey := principalEigenvalue_mul_norm_sq_le emb hco U
+  rw [hUU] at hkey
+  exact le_of_mul_le_mul_right hkey hpos
+
+end EllipticPdes.Variational
+
+namespace EllipticPdes.Sobolev
+
+open EllipticPdes.Analysis
+
+variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))} {B : H01 Ω →L[ℝ] H01 Ω →L[ℝ] ℝ}
+
+/-- The unit `L²` sphere of `H₀¹(Ω)`, the constraint set of the Rayleigh problem. -/
+def rayleighSphere (Ω : Set (EuclideanSpace ℝ (Fin d))) : Set (H01 Ω) :=
+  {U | ‖embL2 Ω U‖ = 1}
+
+/-- The values a bilinear form takes on the unit `L²` sphere. -/
+def rayleighValues (B : H01 Ω →L[ℝ] H01 Ω →L[ℝ] ℝ) : Set ℝ :=
+  Variational.rayleighValues (embL2 Ω) B
+
+/-- **Principal eigenvalue** of a symmetric coercive form on `H₀¹(Ω)`: the infimum of the
+Rayleigh quotient `B[U, U]` over the functions of unit `L²` norm. -/
+def principalEigenvalue (B : H01 Ω →L[ℝ] H01 Ω →L[ℝ] ℝ) : ℝ :=
+  Variational.principalEigenvalue (embL2 Ω) B
+
+/-- A coercive form is positive semidefinite. -/
+lemma nonneg_of_isCoercive (hco : IsCoercive B) (U : H01 Ω) : 0 ≤ B U U :=
+  bilin_self_nonneg hco U
+
+/-- **Rayleigh bound off the constraint set**: `λ₁‖U‖²_{L²} ≤ B[U, U]` for every `U`. -/
+theorem principalEigenvalue_mul_norm_sq_le (hco : IsCoercive B) (U : H01 Ω) :
+    principalEigenvalue B * ‖embL2 Ω U‖ ^ 2 ≤ B U U :=
+  Variational.principalEigenvalue_mul_norm_sq_le (embL2 Ω) hco U
+
+/-- The principal eigenvalue of a coercive form is positive. -/
+theorem principalEigenvalue_pos (hco : IsCoercive B) (hne : ∃ V : H01 Ω, embL2 Ω V ≠ 0) :
+    0 < principalEigenvalue B :=
+  Variational.principalEigenvalue_pos (embL2 Ω) hco hne
+
+alias eq_zero_of_quadratic_nonneg := Variational.eq_zero_of_quadratic_nonneg
+
+/-- **Euler-Lagrange equation of the Rayleigh problem.** A minimiser on the unit `L²` sphere is
+a weak eigenfunction at the principal eigenvalue: `B[U, V] = λ₁⟪U, V⟫_{L²}` for every `V`. -/
+theorem rayleigh_euler_lagrange (hco : IsCoercive B) (hsymm : ∀ U V : H01 Ω, B U V = B V U)
+    {U : H01 Ω} (hU : ‖embL2 Ω U‖ = 1) (hmin : B U U = principalEigenvalue B) (V : H01 Ω) :
+    B U V = principalEigenvalue B * ⟪embL2 Ω U, embL2 Ω V⟫ :=
+  Variational.rayleigh_euler_lagrange (embL2 Ω) hco hsymm hU hmin V
+
 /-- The values a form takes on the unit `L²` sphere inside a set `S`. -/
 def rayleighValuesOn (B : H01 Ω →L[ℝ] H01 Ω →L[ℝ] ℝ) (S : Set (H01 Ω)) : Set ℝ :=
-  (fun U => B U U) '' (rayleighSphere Ω ∩ S)
+  Variational.rayleighValuesOn (embL2 Ω) B S
 
 /-- The infimum of the Rayleigh quotient over the unit `L²` sphere inside `S`. Taking `S` to be
 the vectors `L²`-orthogonal to the earlier eigenfunctions gives the later eigenvalues. -/
 def eigenvalueOn (B : H01 Ω →L[ℝ] H01 Ω →L[ℝ] ℝ) (S : Set (H01 Ω)) : ℝ :=
-  sInf (rayleighValuesOn B S)
-
-/-- With no constraint the values are those of the whole sphere. -/
-lemma rayleighValuesOn_univ : rayleighValuesOn B Set.univ = rayleighValues B := by
-  rw [rayleighValuesOn, rayleighValues, Set.inter_univ]
-
-/-- With no constraint the infimum is the principal eigenvalue. -/
-lemma eigenvalueOn_univ : eigenvalueOn B Set.univ = principalEigenvalue B := by
-  rw [eigenvalueOn, rayleighValuesOn_univ, principalEigenvalue]
+  Variational.eigenvalueOn (embL2 Ω) B S
 
 /-- Positive semidefiniteness bounds the constrained values below by zero. -/
 lemma rayleighValuesOn_bddBelow (hco : IsCoercive B) (S : Set (H01 Ω)) :
     BddBelow (rayleighValuesOn B S) :=
-  ⟨0, by rintro _ ⟨U, -, rfl⟩; exact nonneg_of_isCoercive hco U⟩
+  Variational.rayleighValuesOn_bddBelow (embL2 Ω) hco S
 
 /-- The constrained infimum is a lower bound on the constrained sphere. -/
 lemma eigenvalueOn_le (hco : IsCoercive B) {S : Set (H01 Ω)} {U : H01 Ω}
     (hU : ‖embL2 Ω U‖ = 1) (hUS : U ∈ S) : eigenvalueOn B S ≤ B U U :=
-  csInf_le (rayleighValuesOn_bddBelow hco S) ⟨U, ⟨hU, hUS⟩, rfl⟩
+  Variational.eigenvalueOn_le (embL2 Ω) hco hU hUS
 
 /-- **Tightening the constraint raises the infimum.** -/
 lemma principalEigenvalue_le_eigenvalueOn (hco : IsCoercive B) {S : Set (H01 Ω)}
     (hne : (rayleighSphere Ω ∩ S).Nonempty) :
-    principalEigenvalue B ≤ eigenvalueOn B S := by
-  refine le_csInf (hne.image _) ?_
-  rintro _ ⟨U, hU, rfl⟩
-  exact principalEigenvalue_le hco hU.1
-
-/-! ### Existence of a minimiser -/
+    principalEigenvalue B ≤ eigenvalueOn B S :=
+  Variational.principalEigenvalue_le_eigenvalueOn (embL2 Ω) hco hne
 
 /-- **Attainment of the infimum of the Rayleigh quotient over a weakly closed set.** Coercivity
 bounds a minimising sequence, weak compactness supplies a limit, the constraint `S` passes to that
@@ -239,93 +456,14 @@ theorem exists_rayleigh_minimiser_on (hco : IsCoercive B) (hsymm : ∀ U V : H01
     (hSclosed : ∀ (u : ℕ → H01 Ω) (w : H01 Ω), (∀ k, u k ∈ S) →
       (∀ v : H01 Ω, Tendsto (fun k => ⟪u k, v⟫) atTop (𝓝 ⟪w, v⟫)) → w ∈ S)
     (hne : (rayleighSphere Ω ∩ S).Nonempty) :
-    ∃ U : H01 Ω, ‖embL2 Ω U‖ = 1 ∧ U ∈ S ∧ B U U = eigenvalueOn B S := by
-  obtain ⟨C, hC, hcoer⟩ := id hco
-  have hbdd : BddBelow (rayleighValuesOn B S) := rayleighValuesOn_bddBelow hco S
-  have hnonempty : (rayleighValuesOn B S).Nonempty := hne.image _
-  -- A minimising sequence.
-  have hchoice : ∀ n : ℕ, ∃ U : H01 Ω,
-      (‖embL2 Ω U‖ = 1 ∧ U ∈ S) ∧ B U U < eigenvalueOn B S + 1 / ((n : ℝ) + 1) := by
-    intro n
-    have hlt : eigenvalueOn B S < eigenvalueOn B S + 1 / ((n : ℝ) + 1) := by
-      have : (0 : ℝ) < 1 / ((n : ℝ) + 1) := by positivity
-      linarith
-    obtain ⟨r, hr, hrlt⟩ := exists_lt_of_csInf_lt hnonempty hlt
-    obtain ⟨U, hU, rfl⟩ := hr
-    exact ⟨U, hU, hrlt⟩
-  choose U hUmem hUlt using hchoice
-  have hUs : ∀ n, ‖embL2 Ω (U n)‖ = 1 := fun n => (hUmem n).1
-  have hUS : ∀ n, U n ∈ S := fun n => (hUmem n).2
-  have hUB : ∀ n, B (U n) (U n) < eigenvalueOn B S + 1 := by
-    intro n
-    have h1 : (1 : ℝ) / ((n : ℝ) + 1) ≤ 1 := by
-      rw [div_le_one (by positivity)]
-      linarith [Nat.cast_nonneg (α := ℝ) n]
-    linarith [hUlt n]
-  set M : ℝ := Real.sqrt ((eigenvalueOn B S + 1) / C) with hMdef
-  have hMbound : ∀ n, ‖U n‖ ≤ M := by
-    intro n
-    have h2 : ‖U n‖ ^ 2 ≤ (eigenvalueOn B S + 1) / C := by
-      rw [le_div_iff₀ hC]
-      nlinarith [hcoer (U n), hUB n]
-    calc ‖U n‖ = Real.sqrt (‖U n‖ ^ 2) := (Real.sqrt_sq (norm_nonneg _)).symm
-      _ ≤ M := Real.sqrt_le_sqrt h2
-  -- Weak compactness.
-  obtain ⟨w, φ, hφ, hweak⟩ := exists_weakLimit (u := U) hMbound
-  have hweakL2 : ∀ g : L2D Ω,
-      Tendsto (fun k => ⟪embL2 Ω (U (φ k)), g⟫) atTop (𝓝 ⟪embL2 Ω w, g⟫) := by
-    intro g
-    simpa only [ContinuousLinearMap.adjoint_inner_right] using hweak ((embL2 Ω).adjoint g)
-  -- Rellich gives a further subsequence converging strongly in `L²`.
-  have hM1 : (0 : ℝ) < M + 1 := by positivity
-  have hcptL : IsCompactOperator ((embL2 Ω).toLinearMap) := hRellich
-  have hcl :=
-    (isCompactOperator_iff_isCompact_closure_image_closedBall (embL2 Ω).toLinearMap hM1).mp hcptL
-  have hmemcl : ∀ k, embL2 Ω (U (φ k))
-      ∈ closure (⇑(embL2 Ω).toLinearMap '' Metric.closedBall (0 : H01 Ω) (M + 1)) :=
-    fun k => subset_closure ⟨U (φ k), by
-      simpa [Metric.mem_closedBall, dist_zero_right] using (hMbound (φ k)).trans (by linarith), rfl⟩
-  obtain ⟨z, -, ψ, hψ, hψtend⟩ := hcl.tendsto_subseq hmemcl
-  -- The strong limit is the `L²` class of the weak limit.
-  have hzw : z = embL2 Ω w := by
-    refine ext_inner_right ℝ (fun g => ?_)
-    have hstrong : Tendsto (fun j => ⟪embL2 Ω (U (φ (ψ j))), g⟫) atTop (𝓝 ⟪z, g⟫) := by
-      simpa [Function.comp_def] using hψtend.inner (tendsto_const_nhds (x := g))
-    exact tendsto_nhds_unique hstrong ((hweakL2 g).comp hψ.tendsto_atTop)
-  have hwnorm : ‖embL2 Ω w‖ = 1 := by
-    have h1 : Tendsto (fun j => ‖embL2 Ω (U (φ (ψ j)))‖) atTop (𝓝 ‖z‖) := by
-      simpa [Function.comp_def] using (continuous_norm.tendsto z).comp hψtend
-    have h2 : Tendsto (fun j => ‖embL2 Ω (U (φ (ψ j)))‖) atTop (𝓝 1) := by
-      simp only [hUs]
-      exact tendsto_const_nhds
-    rw [← hzw]
-    exact tendsto_nhds_unique h1 h2
-  have hwS : w ∈ S := hSclosed (fun k => U (φ k)) w (fun k => hUS (φ k)) hweak
-  -- Weak lower semicontinuity of the form.
-  have hBUU : Tendsto (fun n => B (U n) (U n)) atTop (𝓝 (eigenvalueOn B S)) := by
-    refine tendsto_of_tendsto_of_tendsto_of_le_of_le (g := fun _ : ℕ => eigenvalueOn B S)
-      (h := fun n => eigenvalueOn B S + 1 / ((n : ℝ) + 1)) tendsto_const_nhds ?_
-      (fun n => csInf_le hbdd ⟨U n, hUmem n, rfl⟩) (fun n => (hUlt n).le)
-    have hzero : Tendsto (fun n : ℕ => 1 / ((n : ℝ) + 1)) atTop (𝓝 0) :=
-      tendsto_one_div_add_atTop_nhds_zero_nat
-    have hsum : Tendsto (fun n : ℕ => eigenvalueOn B S + 1 / ((n : ℝ) + 1)) atTop
-        (𝓝 (eigenvalueOn B S + 0)) := tendsto_const_nhds.add hzero
-    rwa [add_zero] at hsum
-  have hlsc : B w w ≤ eigenvalueOn B S := by
-    refine bilin_le_of_weakLimit hco hsymm hweak ?_
-    simpa [Function.comp_def] using hBUU.comp hφ.tendsto_atTop
-  exact ⟨w, hwnorm, hwS, le_antisymm hlsc (eigenvalueOn_le hco hwnorm hwS)⟩
+    ∃ U : H01 Ω, ‖embL2 Ω U‖ = 1 ∧ U ∈ S ∧ B U U = eigenvalueOn B S :=
+  Variational.exists_rayleigh_minimiser_on (embL2 Ω) hco hsymm hRellich hSclosed hne
 
 /-- **Attainment of the infimum of the Rayleigh quotient.** The unconstrained case. -/
 theorem exists_rayleigh_minimiser (hco : IsCoercive B) (hsymm : ∀ U V : H01 Ω, B U V = B V U)
     (hRellich : IsCompactOperator (embL2 Ω)) (hne : ∃ V : H01 Ω, embL2 Ω V ≠ 0) :
-    ∃ U : H01 Ω, ‖embL2 Ω U‖ = 1 ∧ B U U = principalEigenvalue B := by
-  have hne' : (rayleighSphere Ω ∩ Set.univ).Nonempty := by
-    simpa using rayleighSphere_nonempty hne
-  obtain ⟨U, hU, -, hmin⟩ :=
-    exists_rayleigh_minimiser_on hco hsymm hRellich (S := Set.univ)
-      (fun _ _ _ _ => Set.mem_univ _) hne'
-  exact ⟨U, hU, by rwa [eigenvalueOn_univ] at hmin⟩
+    ∃ U : H01 Ω, ‖embL2 Ω U‖ = 1 ∧ B U U = principalEigenvalue B :=
+  Variational.exists_rayleigh_minimiser (embL2 Ω) hco hsymm hRellich hne
 
 /-- **Principal eigenpair.** For a symmetric coercive form with the Rellich compact embedding
 there is a `U` of unit `L²` norm attaining the infimum of the Rayleigh quotient, and it solves the
@@ -333,30 +471,15 @@ weak eigenvalue problem at that value. -/
 theorem exists_principal_eigenpair (hco : IsCoercive B) (hsymm : ∀ U V : H01 Ω, B U V = B V U)
     (hRellich : IsCompactOperator (embL2 Ω)) (hne : ∃ V : H01 Ω, embL2 Ω V ≠ 0) :
     ∃ U : H01 Ω, ‖embL2 Ω U‖ = 1 ∧ B U U = principalEigenvalue B ∧
-      ∀ V : H01 Ω, B U V = principalEigenvalue B * ⟪embL2 Ω U, embL2 Ω V⟫ := by
-  obtain ⟨U, hU, hmin⟩ := exists_rayleigh_minimiser hco hsymm hRellich hne
-  exact ⟨U, hU, hmin, fun V => rayleigh_euler_lagrange hco hsymm hU hmin V⟩
+      ∀ V : H01 Ω, B U V = principalEigenvalue B * ⟪embL2 Ω U, embL2 Ω V⟫ :=
+  Variational.exists_principal_eigenpair (embL2 Ω) hco hsymm hRellich hne
 
 /-- **Minimality of the principal eigenvalue.** Any nonzero weak eigenfunction has eigenvalue
-at least `λ₁`. Coercivity rules out a nonzero element with vanishing `L²` class, so the Rayleigh
-bound applies. -/
+at least `λ₁`. -/
 theorem principalEigenvalue_le_of_weak_eigen (hco : IsCoercive B) {lam : ℝ} {U : H01 Ω}
     (hU : U ≠ 0) (heig : ∀ V : H01 Ω, B U V = lam * ⟪embL2 Ω U, embL2 Ω V⟫) :
-    principalEigenvalue B ≤ lam := by
-  have hUU : B U U = lam * ‖embL2 Ω U‖ ^ 2 := by
-    rw [heig U, real_inner_self_eq_norm_sq]
-  have hnz : embL2 Ω U ≠ 0 := by
-    intro h0
-    obtain ⟨C, hC, hcoer⟩ := id hco
-    have hzero : B U U = 0 := by rw [hUU, h0]; simp
-    have hUpos : 0 < ‖U‖ := norm_pos_iff.mpr hU
-    nlinarith [hcoer U, mul_pos (mul_pos hC hUpos) hUpos]
-  have hpos : 0 < ‖embL2 Ω U‖ ^ 2 := by
-    have := norm_pos_iff.mpr hnz
-    positivity
-  have hkey := principalEigenvalue_mul_norm_sq_le hco U
-  rw [hUU] at hkey
-  exact le_of_mul_le_mul_right hkey hpos
+    principalEigenvalue B ≤ lam :=
+  Variational.principalEigenvalue_le_of_weak_eigenvector (embL2 Ω) hco hU heig
 
 /-! ### The Dirichlet Laplacian on a bounded measurable domain -/
 
