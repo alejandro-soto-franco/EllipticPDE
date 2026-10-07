@@ -191,6 +191,26 @@ private lemma integrable_L2D_mul_of_tsupport_subset {Ω W : Set (EuclideanSpace 
   exact IntegrableOn.of_forall_sdiff_eq_zero (integrableOn_mul_bounded hfK hφcont hM) hWm
     fun x hx => by rw [image_eq_zero_of_notMem_tsupport hx.2, mul_zero]
 
+/-- A test function times a function continuous on its support's open set is integrable there. -/
+private lemma integrable_testFn_mul_continuousOn {W : Set (EuclideanSpace ℝ (Fin d))}
+    {φ G : EuclideanSpace ℝ (Fin d) → ℝ} (hφcont : Continuous φ) (hφcs : HasCompactSupport φ)
+    (hφW : tsupport φ ⊆ W) (hG : ContinuousOn G W) :
+    Integrable (fun x => φ x * G x) (volume.restrict W) :=
+  (integrable_of_continuousOn_of_eq_zero_off_compact hφcs.isCompact hφW
+    (hφcont.continuousOn.mul hG) fun x hx => by
+      simp only [Pi.mul_apply, image_eq_zero_of_notMem_tsupport hx, zero_mul]).integrableOn
+
+/-- A bounded measurable weight times a test function times a function continuous on the open
+set is integrable there. -/
+private lemma integrable_weight_mul_testFn_mul {W : Set (EuclideanSpace ℝ (Fin d))}
+    {φ G c : EuclideanSpace ℝ (Fin d) → ℝ} (hφcont : Continuous φ) (hφcs : HasCompactSupport φ)
+    (hφW : tsupport φ ⊆ W) (hG : ContinuousOn G W) (hcm : Measurable c) {M : ℝ}
+    (hc : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), |c x| ≤ M) :
+    Integrable (fun x => c x * (φ x * G x)) (volume.restrict W) :=
+  Integrable.bdd_mul (integrable_testFn_mul_continuousOn hφcont hφcs hφW hG)
+    hcm.aestronglyMeasurable (ae_restrict_of_ae (hc.mono fun x hx => by
+      simpa [Real.norm_eq_abs] using hx))
+
 /-- **The residual integrates to zero.** If the weak formulation, read against a `C²`
 representative `u'` on an open set `W`, holds against a test function `φ` supported in `W`, then
 the residual of the equation integrates to zero against `φ`. The principal term is integrated by
@@ -207,29 +227,19 @@ private lemma integral_residual_eq_zero (Op : FullEllipticOp d)
     ∫ x, φ x • (-(∑ i, ∑ j, partialD j (fun y => Op.a y i j * partialD i u' y) x)
       + ∑ i, Op.b x i * partialD i u' x + Op.c x * u' x - f x) ∂volume = 0 := by
   classical
-  have hWm := hWo.measurableSet
-  have hu'c : ContinuousOn u' W := hsm.continuousOn
   have hgrad1 := contDiffOn_partialD_one hWo hsm
   have hgradc : ∀ i, ContinuousOn (partialD i u') W := fun i => (hgrad1 i).continuousOn
   have hprod1 : ∀ i j, ContDiffOn ℝ 1 (fun y => Op.a y i j * partialD i u' y) W := fun i j =>
     (hA1.contDiff i j).contDiffOn.mul (hgrad1 i)
   have hdivc := continuousOn_partialD_flux Op hWo hsm hA1
   have hφcont : Continuous φ := hφc.continuous
-  have hoff : ∀ G : EuclideanSpace ℝ (Fin d) → ℝ, ∀ x, x ∉ tsupport φ → φ x * G x = 0 :=
-    fun G x hx => by rw [image_eq_zero_of_notMem_tsupport hx, zero_mul]
-  have hint : ∀ G : EuclideanSpace ℝ (Fin d) → ℝ, ContinuousOn G W →
-      Integrable (fun x => φ x * G x) (volume.restrict W) := fun G hG =>
-    (integrable_of_continuousOn_of_eq_zero_off_compact hφcs.isCompact hφW
-      (hφcont.continuousOn.mul hG) (hoff _)).integrableOn
-  have hint_div := fun i j => hint _ (hdivc i j)
-  have hint_b : ∀ i, Integrable (fun x => Op.b x i * (φ x * partialD i u' x))
-      (volume.restrict W) := fun i =>
-    Integrable.bdd_mul (hint _ (hgradc i)) (Op.b_meas i).aestronglyMeasurable
-      (ae_restrict_of_ae ((Op.b_bdd i).mono fun x hx => by simpa [Real.norm_eq_abs] using hx))
-  have hint_c : Integrable (fun x => Op.c x * (φ x * u' x)) (volume.restrict W) :=
-    Integrable.bdd_mul (hint _ hu'c) Op.c_meas.aestronglyMeasurable
-      (ae_restrict_of_ae (Op.c_bdd.mono fun x hx => by simpa [Real.norm_eq_abs] using hx))
-  have hint_f := integrable_L2D_mul_of_tsupport_subset f hWm hWΩ hφcont hφcs hφW
+  have hint_div := fun i j =>
+    integrable_testFn_mul_continuousOn hφcont hφcs hφW (hdivc i j)
+  have hint_b := fun i => integrable_weight_mul_testFn_mul hφcont hφcs hφW (hgradc i)
+    (Op.b_meas i) (Op.b_bdd i)
+  have hint_c := integrable_weight_mul_testFn_mul hφcont hφcs hφW hsm.continuousOn Op.c_meas Op.c_bdd
+  have hint_f :=
+    integrable_L2D_mul_of_tsupport_subset f hWo.measurableSet hWΩ hφcont hφcs hφW
   -- integration by parts on the principal term
   have hibp : ∀ i j, ∫ x in W, Op.a x i j * partialD i u' x * partialD j φ x
       = -∫ x in W, φ x * partialD j (fun y => Op.a y i j * partialD i u' y) x := fun i j => by
