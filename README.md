@@ -12,9 +12,19 @@ for every $v \in H_0^1(\Omega)$, where $B$ is the associated bilinear form.
 
 The drift term is permitted to be non-zero, so $B$ is in general non-symmetric
 and the problem has no variational structure. Existence runs through
-Lax-Milgram.
+Lax-Milgram, in the form `IsCoercive.existsUnique_apply_eq` built on Mathlib's
+`IsCoercive.continuousLinearEquivOfBilin`.
 
-**The solvability theory assumes no symmetry of $a^{ij}$.** Evans §6.1.1 assumes
+The Hilbert-space theory is stated over a finite-dimensional real inner product space
+$E$, with no coordinates: the graph space `H1Graph μ Ω` of pairs $(u, \nabla u)$ in
+$L^2(\Omega) \times L^2(\Omega; E)$, the coefficient field $a : E \to (E \to_L E)$, the
+weak derivative `HasWeakFDerivOn` built on Mathlib's distributions, and the abstract layers
+`GardingForm` and `Variational` over any Hilbert space, of which the elliptic operators are
+instances. The coordinate statements on `EuclideanSpace ℝ (Fin d)` are the instances at
+$E = \mathbb{R}^d$; the regularity theory, the Sobolev embeddings and the extension operator,
+which use coordinate directions, are stated there.
+
+**Solvability assumes no symmetry of $a^{ij}$.** Evans §6.1.1 assumes
 $a^{ij} = a^{ji}$ throughout, and Gilbarg-Trudinger ch. 8 assumes it for the
 principal part. `EllipticPdes.Sobolev.EllipticCoeff` takes an arbitrary
 measurable matrix: uniform ellipticity constrains the quadratic form
@@ -32,10 +42,35 @@ operator being read through a symmetric second-derivative matrix. With $A$
 non-symmetric the formal adjoint $L^{*}$ has principal part built from
 $A^{\top}$, which is the transpose problem the Fredholm results state.
 
+## General theory
+
+Over a finite-dimensional real inner product space `E` (normed space for the Campanato and
+mollifier results), with the volume measure where the statement needs one and any measure
+otherwise. Declarations are named without their `EllipticPdes.` prefix.
+
+| Result | Declaration |
+|---|---|
+| A continuous weak derivative is the Fréchet derivative | `HasWeakFDerivOn.hasFDerivAt` |
+| Weak derivative, uniqueness and bridges to the coordinate predicates | `HasWeakFDerivOn`, `HasWeakFDerivOn.ae_eq`, `Sobolev/WeakDeriv.lean` |
+| Graph space, `W^{1,2}` and `H_0^1` | `H1Graph`, `H1Graph.W12`, `H1Graph.H01` |
+| Poincaré inequality on a slab and on a bounded set | `Poincare.integral_sq_le_of_tsupport_subset_slab`, `H1Graph.poincare_H01_of_bounded` |
+| Rellich-Kondrachov on a bounded set | `H1Graph.embL2_isCompact` |
+| Gårding inequality | `DivForm.FullEllipticOp.garding` |
+| Existence and uniqueness after a shift, and for a nonnegative zeroth-order term | `DivForm.FullEllipticOp.weak_solution`, `DivForm.FullEllipticOp.weak_solution_of_nonneg_zeroth_of_bounded` |
+| Fredholm alternative and transpose solvability | `DivForm.FullEllipticOp.fredholm_alternative_of_bounded`, `DivForm.FullEllipticOp.solvable_iff_orthogonal_transpose_of_bounded` |
+| Exceptional set and resolvent bound | `DivForm.FullEllipticOp.existence_three_of_bounded`, `DivForm.FullEllipticOp.resolvent_bound_of_bounded` |
+| Spectral theorem for a symmetric operator | `DivForm.FullEllipticOp.symmetric_spectral_of_bounded` |
+| Abstract Fredholm and spectral layers on a Hilbert space | `GardingForm`, `Variational` |
+| Hopf lemma, weak maximum and comparison principles | `Classical.hopf_lemma`, `Classical.nondivOperator.weak_maximum_principle`, `Classical.nondivOperator.comparison_principle` |
+| Campanato's characterisation of Hölder continuity | `Campanato.Haar.campanato_holderOnWith` |
+| Morrey, Gagliardo-Nirenberg, Young, chain rule | `Embedding/Morrey.lean`, `Embedding/WeakSobolev.lean`, `Analysis/Mollifier.lean`, `Embedding/WeakDerivChain.lean` |
+
+Each is checked against the three classical axioms in `lean/AxiomAudit.lean`.
+
 ## Results
 
-Proved for the general operator `EllipticPdes.Sobolev.FullEllipticOp`, with no
-`sorry` in the library. Declarations are named without their `EllipticPdes.`
+Coordinate statements, on `EuclideanSpace ℝ (Fin d)`, for the operator
+`EllipticPdes.Sobolev.FullEllipticOp`, with no `sorry` in the library. Declarations are named without their `EllipticPdes.`
 prefix.
 
 | Result | Declaration |
@@ -817,19 +852,20 @@ $C^{k,\alpha}$ estimates remain a roadmap item.
 
 ## Dependency chain
 
-The analytic content reduces to the one-dimensional Poincaré inequality. From
-there: a per-coordinate-direction bound on a box or convex domain by Fubini, the
-averaged domain Poincaré inequality, a density extension to $H_0^1$, continuity
-and coercivity of $B$, and Lax-Milgram for existence and uniqueness. The Fredholm
-alternative, the resolvent bound, and spectral compactness follow for the general
-operator.
+The analytic content of the solvability theory reduces to the one-dimensional Poincaré
+inequality. From there: the slab inequality along any unit vector, Poincaré on a bounded set by
+density in $H_0^1$, coercivity of $B$, and Lax-Milgram for existence and uniqueness. Gårding's
+inequality makes every operator an instance of `GardingForm`, an abstract shifted-coercive form
+on a Hilbert space with a compact embedding, and the Fredholm alternative, the exceptional set,
+the resolvent bound and the spectral theorem are proved once at that level. Rellich-Kondrachov
+on a bounded set of `E` is transported from the coordinate theorem through an orthonormal basis.
 
 ## Layout
 
 - `lean/` the formalisation. A standalone lake project pinned to Lean
   `v4.35.0-rc3`.
-- `lean/AxiomAudit.lean` pins the axiom set of each headline result with
-  `#print axioms` under `#guard_msgs`, built as a target of its own.
+- `lean/AxiomAudit.lean` checks the axiom set of each headline result with
+  `assert_classical_axioms`, built as a target of its own.
 - `lean/Challenge.lean` and `lean/Solution.lean` are the Palomar submission pair
   for the six solvability results of Evans §6.2, with `lean/comparator.json` and
   `lean/formalization.yaml`.
@@ -845,13 +881,13 @@ cd lean && lake build Challenge Solution   # the Palomar pair
 CI runs these on every push. It builds from a clean clone, asserts the
 library is free of `sorry`, and pins every headline result to the axioms
 `propext`, `Classical.choice` and `Quot.sound` through `AxiomAudit.lean`, where
-each is pinned with `#guard_msgs`.
+`assert_classical_axioms` fails the build on any other axiom.
 
 CI then re-checks the library with
 [`con-leche`](https://github.com/leanprover/con-leche), an external checker for
 Lean's export format whose own consistency is proven in Lean: an accepted stream
 declares no constant of type `False`. It reads the dependency cone of every
-declaration `AxiomAudit.lean` pins, 58,597 declarations at present, admits
+declaration `AxiomAudit.lean` lists, admits
 `propext`, `Classical.choice` and `Quot.sound` alone, and rejects a stream that
 uses any other axiom, `sorryAx` included. The audit reaches that conclusion
 through the elaborator which produced the proofs; this reaches it through a
