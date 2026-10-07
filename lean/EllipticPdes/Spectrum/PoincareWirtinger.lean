@@ -190,6 +190,52 @@ theorem exists_eq_constL2_of_tendsto_zero_gradient (hΩopen : IsOpen Ω)
     ((Lp.memLp v).integrable one_le_two) hwg
   exact ⟨c, Lp.ext (hc.trans (coeFn_constL2 hΩb c).symm)⟩
 
+/-- **Normalisation of a violator of Poincaré's inequality.** If `c` times the gradient norm of
+`U` is below the distance of `U` from its mean, subtracting the mean and dividing by that
+distance gives an element of `W12 Ω` whose function part has norm one and mean zero, whose
+gradient coordinates are at most `1 / c`, and which has norm at most two when `1 ≤ c`. -/
+theorem exists_normalised_of_lt_poincare (hΩb : Bornology.IsBounded Ω)
+    (hΩ0 : volume Ω ≠ 0) {c : ℝ} (hc : 1 ≤ c) {U : W12 Ω}
+    (hU : c * Real.sqrt (∑ k : Fin d, ‖(U : H1amb Ω) k.succ‖ ^ 2)
+      < ‖embW12 Ω U - constL2 hΩb (meanL2 hΩb (embW12 Ω U))‖) :
+    ∃ V : W12 Ω, ‖embW12 Ω V‖ = 1 ∧ meanL2 hΩb (embW12 Ω V) = 0 ∧
+      (∀ j : Fin d, ‖(V : H1amb Ω) j.succ‖ ≤ 1 / c) ∧ ‖V‖ ≤ 2 := by
+  have := isFiniteMeasure_restrict_of_isBounded hΩb
+  set g : ℝ := Real.sqrt (∑ k : Fin d, ‖(U : H1amb Ω) k.succ‖ ^ 2) with hg
+  set P : L2D Ω := embW12 Ω U - constL2 hΩb (meanL2 hΩb (embW12 Ω U)) with hP
+  have hg0 : 0 ≤ g := Real.sqrt_nonneg _
+  have hPpos : 0 < ‖P‖ := lt_of_le_of_lt (mul_nonneg (by linarith) hg0) hU
+  set V : W12 Ω := ‖P‖⁻¹ •
+    (U - ⟨constGraph hΩb (meanL2 hΩb (embW12 Ω U)), constGraph_mem_W12 hΩb _⟩) with hVdef
+  have hV0 : embW12 Ω V = ‖P‖⁻¹ • P := by
+    simp only [hVdef, map_smul, map_sub]
+    congr 2
+  have hVnorm : ‖embW12 Ω V‖ = 1 := by
+    rw [hV0, norm_smul, norm_inv, norm_norm, inv_mul_cancel₀ hPpos.ne']
+  have hVsucc : ∀ j : Fin d, (V : H1amb Ω) j.succ = ‖P‖⁻¹ • (U : H1amb Ω) j.succ := fun j => by
+    simp only [hVdef, Submodule.coe_smul, Submodule.coe_sub, PiLp.smul_apply, PiLp.sub_apply,
+      constGraph_succ, sub_zero]
+  have hgV : Real.sqrt (∑ k : Fin d, ‖(V : H1amb Ω) k.succ‖ ^ 2) = ‖P‖⁻¹ * g := by
+    simp only [hg, hVsucc, norm_smul, norm_inv, norm_norm, mul_pow, ← Finset.mul_sum]
+    rw [Real.sqrt_mul (by positivity), Real.sqrt_sq (by positivity)]
+  have hgle : ‖P‖⁻¹ * g ≤ 1 / c := by
+    rw [inv_mul_eq_div, div_le_div_iff₀ hPpos (by linarith)]
+    nlinarith [hU]
+  refine ⟨V, hVnorm, ?_, fun j => ?_, ?_⟩
+  · rw [hV0, map_smul, hP, map_sub, meanL2_constL2 hΩb hΩ0, sub_self, smul_zero]
+  · refine le_trans ?_ (hgV.trans_le hgle)
+    rw [← Real.sqrt_sq (norm_nonneg _)]
+    exact Real.sqrt_le_sqrt (Finset.single_le_sum
+      (f := fun i : Fin d => ‖(V : H1amb Ω) i.succ‖ ^ 2) (fun i _ => sq_nonneg _)
+      (Finset.mem_univ j))
+  · have hsq : ‖V‖ ^ 2 = 1 + (‖P‖⁻¹ * g) ^ 2 := by
+      rw [show ‖V‖ = ‖(V : H1amb Ω)‖ from rfl, PiLp.norm_sq_eq_of_L2, Fin.sum_univ_succ,
+        ← embW12_apply, hVnorm, one_pow, ← hgV, Real.sq_sqrt (Finset.sum_nonneg fun _ _ =>
+          sq_nonneg _)]
+    have hg1 : ‖P‖⁻¹ * g ≤ 1 := hgle.trans ((div_le_one (by linarith)).2 hc)
+    exact le_of_sq_le_sq (by rw [hsq]; nlinarith [mul_nonneg (inv_nonneg.2 hPpos.le) hg0])
+      (by norm_num)
+
 /-- **Poincaré's inequality with the mean subtracted** (Evans §5.8.1 Theorem 1 at `p = 2`).
 On a bounded, connected, open domain with `C¹` boundary, one constant bounds the `L²`
 distance of every element of `H¹(Ω)` from its mean by the `L²` norm of its gradient. -/
@@ -199,67 +245,13 @@ theorem poincare_wirtinger (hd : 0 < d) (hΩopen : IsOpen Ω) (hΩb : Bornology.
       ‖embW12 Ω U - constL2 hΩb (meanL2 hΩb (embW12 Ω U))‖
         ≤ C * Real.sqrt (∑ k : Fin d, ‖(U : H1amb Ω) k.succ‖ ^ 2) := by
   classical
-  have := isFiniteMeasure_restrict_of_isBounded hΩb
   have hΩ0 : volume Ω ≠ 0 := (hΩopen.measure_pos volume hne).ne'
-  set g : W12 Ω → ℝ := fun U => Real.sqrt (∑ k : Fin d, ‖(U : H1amb Ω) k.succ‖ ^ 2) with hg
-  set P : W12 Ω → L2D Ω :=
-    fun U => embW12 Ω U - constL2 hΩb (meanL2 hΩb (embW12 Ω U)) with hP
-  have hg0 : ∀ U, 0 ≤ g U := fun U => Real.sqrt_nonneg _
   by_contra hC
   simp only [not_exists, not_forall, not_le] at hC
   choose Useq hU using fun k : ℕ => hC ((k : ℝ) + 1)
-  have hPpos : ∀ k, 0 < ‖P (Useq k)‖ := fun k =>
-    lt_of_le_of_lt (mul_nonneg (by positivity) (hg0 _)) (hU k)
-  -- the renormalised sequence
-  let V : ℕ → W12 Ω := fun k => ‖P (Useq k)‖⁻¹ •
-    (Useq k - ⟨constGraph hΩb (meanL2 hΩb (embW12 Ω (Useq k))), constGraph_mem_W12 hΩb _⟩)
-  have hV0 : ∀ k, embW12 Ω (V k) = ‖P (Useq k)‖⁻¹ • P (Useq k) := by
-    intro k
-    simp only [V, map_smul, map_sub]
-    congr 2
-  have hVnorm : ∀ k, ‖embW12 Ω (V k)‖ = 1 := by
-    intro k
-    rw [hV0, norm_smul, norm_inv, norm_norm, inv_mul_cancel₀ (hPpos k).ne']
-  have hVsucc : ∀ k (j : Fin d), ((V k : W12 Ω) : H1amb Ω) j.succ
-      = ‖P (Useq k)‖⁻¹ • ((Useq k : W12 Ω) : H1amb Ω) j.succ := by
-    intro k j
-    simp only [V, Submodule.coe_smul, Submodule.coe_sub, PiLp.smul_apply, PiLp.sub_apply,
-      constGraph_succ, sub_zero]
-  have hgV : ∀ k, g (V k) = ‖P (Useq k)‖⁻¹ * g (Useq k) := by
-    intro k
-    simp only [hg, hVsucc, norm_smul, norm_inv, norm_norm, mul_pow, ← Finset.mul_sum]
-    rw [Real.sqrt_mul (by positivity), Real.sqrt_sq (by positivity)]
-  have hgV_lt : ∀ k : ℕ, ((k : ℝ) + 1) * g (V k) < 1 := by
-    intro k
-    rw [hgV, mul_left_comm, ← div_eq_inv_mul, div_lt_one (hPpos k)]
-    exact hU k
-  have hgV_le : ∀ k : ℕ, g (V k) ≤ 1 / ((k : ℝ) + 1) := fun k => by
-    rw [le_div_iff₀ (by positivity), mul_comm]
-    exact (hgV_lt k).le
-  have hgV_tend : Tendsto (fun k => g (V k)) atTop (𝓝 0) :=
-    tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds
-      tendsto_one_div_add_atTop_nhds_zero_nat (fun k => hg0 _) hgV_le
-  have hVsucc_le : ∀ k (j : Fin d), ‖((V k : W12 Ω) : H1amb Ω) j.succ‖ ≤ g (V k) := by
-    intro k j
-    rw [hg, ← Real.sqrt_sq (norm_nonneg _)]
-    exact Real.sqrt_le_sqrt (Finset.single_le_sum
-      (f := fun i : Fin d => ‖((V k : W12 Ω) : H1amb Ω) i.succ‖ ^ 2)
-      (fun i _ => sq_nonneg _) (Finset.mem_univ j))
-  have hVmean : ∀ k, meanL2 hΩb (embW12 Ω (V k)) = 0 := by
-    intro k
-    rw [hV0, map_smul, hP, map_sub, meanL2_constL2 hΩb hΩ0, sub_self, smul_zero]
-  -- the sequence is bounded in the graph space
-  have hVbdd : ∀ k, ‖V k‖ ≤ 2 := by
-    intro k
-    have hsq : ‖V k‖ ^ 2 = 1 + g (V k) ^ 2 := by
-      rw [show ‖V k‖ = ‖((V k : W12 Ω) : H1amb Ω)‖ from rfl,
-        PiLp.norm_sq_eq_of_L2, Fin.sum_univ_succ, ← embW12_apply, hVnorm, one_pow, hg,
-        Real.sq_sqrt (Finset.sum_nonneg fun _ _ => sq_nonneg _)]
-    have hg1 : g (V k) ≤ 1 := (hgV_le k).trans (by
-      rw [div_le_one (by positivity)]; linarith [(k.cast_nonneg : (0 : ℝ) ≤ k)])
-    have : ‖V k‖ ^ 2 ≤ 2 ^ 2 := by
-      rw [hsq]; nlinarith [hg0 (V k)]
-    exact le_of_sq_le_sq this (by norm_num)
+  choose V hV1 hVmean hVsucc hVbdd using fun k : ℕ =>
+    exists_normalised_of_lt_poincare hΩb hΩ0 (c := (k : ℝ) + 1)
+      (by linarith [k.cast_nonneg (α := ℝ)]) (hU k)
   -- Rellich-Kondrachov: a subsequence converges in `L²`
   have hcpt := (embW12_isCompact hd hΩopen hΩb hC1).isCompact_closure_image_closedBall 2
   have hmem : ∀ k, embW12 Ω (V k) ∈ closure (embW12 Ω '' closedBall (0 : W12 Ω) 2) :=
@@ -267,22 +259,16 @@ theorem poincare_wirtinger (hd : 0 < d) (hΩopen : IsOpen Ω) (hΩb : Bornology.
   obtain ⟨v, -, φ, hφ, hlim⟩ := hcpt.tendsto_subseq hmem
   -- the limit has zero weak gradient, so it is constant
   obtain ⟨c, hvc⟩ := exists_eq_constL2_of_tendsto_zero_gradient hΩopen hΩb hconn hφ hlim
-    hgV_tend hVsucc_le
+    tendsto_one_div_add_atTop_nhds_zero_nat hVsucc
   -- its mean is zero, so the constant is zero
-  have hmean : meanL2 hΩb v = 0 := by
-    have h1 : Tendsto (fun j => meanL2 hΩb (embW12 Ω (V (φ j)))) atTop (𝓝 (meanL2 hΩb v)) :=
-      ((meanL2 hΩb).continuous.tendsto v).comp hlim
-    have h2 : Tendsto (fun j => meanL2 hΩb (embW12 Ω (V (φ j)))) atTop (𝓝 0) := by
-      simp only [hVmean]; exact tendsto_const_nhds
-    exact tendsto_nhds_unique h1 h2
+  have hmean : meanL2 hΩb v = 0 :=
+    tendsto_nhds_unique (((meanL2 hΩb).continuous.tendsto v).comp hlim)
+      (tendsto_const_nhds.congr fun j => (hVmean (φ j)).symm)
   rw [hvc, meanL2_constL2 hΩb hΩ0] at hmean
   rw [hmean, constL2_zero] at hvc
   -- against the unit norm of the limit
-  have hnorm1 : ‖v‖ = 1 := by
-    have h1 : Tendsto (fun j => ‖embW12 Ω (V (φ j))‖) atTop (𝓝 ‖v‖) := hlim.norm
-    have h2 : Tendsto (fun j => ‖embW12 Ω (V (φ j))‖) atTop (𝓝 1) := by
-      simp only [hVnorm]; exact tendsto_const_nhds
-    exact tendsto_nhds_unique h1 h2
+  have hnorm1 : ‖v‖ = 1 :=
+    tendsto_nhds_unique hlim.norm (tendsto_const_nhds.congr fun j => (hV1 (φ j)).symm)
   rw [hvc, norm_zero] at hnorm1
   exact zero_ne_one hnorm1
 
