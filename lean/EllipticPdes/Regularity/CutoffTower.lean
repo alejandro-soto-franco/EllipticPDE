@@ -176,6 +176,14 @@ theorem xi_eqOn_one (T : CutoffTower Ω V) : Set.EqOn T.ξ 1 (tsupport T.ζ) :=
 theorem theta_eqOn_one (T : CutoffTower Ω V) : Set.EqOn T.θ 1 (tsupport T.ξ) :=
   fun x hx => T.hθ_one.self_of_nhdsSet x hx
 
+/-- The support of the middle cutoff lies in the support of the outermost one. -/
+theorem tsupport_xi_subset (T : CutoffTower Ω V) : tsupport T.ξ ⊆ tsupport T.θ := fun x hx =>
+  subset_tsupport T.θ (by rw [Function.mem_support, T.theta_eqOn_one hx]; exact one_ne_zero)
+
+/-- The support of the innermost cutoff lies in the support of the middle one. -/
+theorem tsupport_zeta_subset (T : CutoffTower Ω V) : tsupport T.ζ ⊆ tsupport T.ξ := fun x hx =>
+  subset_tsupport T.ξ (by rw [Function.mem_support, T.xi_eqOn_one hx]; exact one_ne_zero)
+
 end CutoffTower
 
 /-- **One-neighbourhood margin.** If the cutoff `η` is `≡ 1` on a neighbourhood of a compact set
@@ -223,8 +231,7 @@ theorem exists_shiftAdmissible (T : CutoffTower Ω V) :
       ShiftAdmissible Ω T.ξ T.θ k h := by
   obtain ⟨δθ, hδθ, hθ1m⟩ := exists_one_margin T.hξ.2.1 T.hθ_one
   have hξ2 : tsupport (fun y => T.ξ y * T.ξ y) ⊆ tsupport T.ξ := tsupport_mul_subset_left
-  have hξθ : tsupport T.ξ ⊆ tsupport T.θ := fun x hx =>
-    subset_tsupport T.θ (by rw [Function.mem_support, T.theta_eqOn_one hx]; exact one_ne_zero)
+  have hξθ := T.tsupport_xi_subset
   refine ⟨min T.margin δθ, lt_min T.hmargin_pos hδθ, min_le_left _ _, fun k h hh => ?_⟩
   have hm : |h| < T.margin := hh.trans_le (min_le_left _ _)
   have hθ : |h| < δθ := hh.trans_le (min_le_right _ _)

@@ -155,6 +155,34 @@ private lemma norm_diffQuot_extendL2_mulTest (hΩm : MeasurableSet Ω)
 
 /-! ### Uniform difference-quotient norm bound for the limit passage -/
 
+/-- **Norm of a cut-off difference quotient of a gradient coordinate.** The master energy
+estimate bounds each `‖ξ · Dₖʰ ∂ᵢu‖` by a constant times `‖f‖ + ‖u₀‖`, uniformly in the step. -/
+private lemma exists_norm_mulTest_diffQuotD_le (Op : FullEllipticOp d) (hΩm : MeasurableSet Ω)
+    (hA : IsLipCoeff Op.toEllipticCoeff) {ξ θ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hξ : IsTestFn Ω ξ) (hθ : IsTestFn Ω θ) (k i : Fin d) :
+    ∃ C : ℝ, 0 ≤ C ∧ ∀ (u : H01 Ω) (f : L2D Ω),
+      (∀ w : H01 Ω, Op.fullBilin Ω u w
+        = ∫ x in Ω, (f x : ℝ) * ((w : H1amb Ω) 0 x : ℝ)) →
+      ∀ h : ℝ, h ≠ 0 → ShiftAdmissible Ω ξ θ k h →
+        ‖mulTest hξ (diffQuotD k h hΩm ((u : H1amb Ω) i.succ))‖
+          ≤ C * (‖f‖ + ‖(u : H1amb Ω) 0‖) := by
+  obtain ⟨CD2, hCD20, hD2⟩ := interior_diffQuot_energy_bound Op hΩm hA hξ hθ k
+  have hlam := Op.toEllipticCoeff.lam_pos
+  refine ⟨Real.sqrt (2 * CD2 / Op.lam), Real.sqrt_nonneg _, fun u f hu h hh hSh => ?_⟩
+  have hP0 : 0 ≤ ‖f‖ + ‖(u : H1amb Ω) 0‖ := by positivity
+  have hQ : ‖f‖ ^ 2 + ‖(u : H1amb Ω) 0‖ ^ 2 ≤ (‖f‖ + ‖(u : H1amb Ω) 0‖) ^ 2 := by
+    nlinarith only [norm_nonneg f, norm_nonneg ((u : H1amb Ω) 0)]
+  have hmaster := hD2 u f hu h hh hSh
+  have hsingle : ‖mulTest hξ (diffQuotD k h hΩm ((u : H1amb Ω) i.succ))‖ ^ 2
+      ≤ ∑ j : Fin d, ‖mulTest hξ (diffQuotD k h hΩm ((u : H1amb Ω) j.succ))‖ ^ 2 :=
+    single_le_sum_fin (fun j => ‖mulTest hξ (diffQuotD k h hΩm ((u : H1amb Ω) j.succ))‖ ^ 2)
+      (fun j => sq_nonneg _) i
+  simp only [norm_extendL2] at hmaster
+  refine le_sqrt_mul_of_sq_le (norm_nonneg _) hP0 ?_
+  rw [div_mul_eq_mul_div, le_div_iff₀ hlam]
+  nlinarith only [mul_le_mul_of_nonneg_left hsingle hlam.le, hmaster,
+    mul_le_mul_of_nonneg_left hQ hCD20]
+
 /-- **Uniform difference-quotient norm bound (Evans §5.8.2 / §6.3.1).** For a cutoff tower `T`
 and each `(k, i)`, there is a constant `Cd` such that every weak solution `u` of
 `L u = f` has the whole-space difference quotient of the extension of `ζ · ∂ᵢu` bounded in `L²`
@@ -176,52 +204,31 @@ theorem interior_diffQuot_norm_bound (Op : FullEllipticOp d) (hΩm : MeasurableS
             ‖diffQuot k h (extendL2 hΩm (mulTest T.hζ ((u : H1amb Ω) i.succ)))‖ ≤ M)
         ∧ M ≤ Cd * (‖f‖ + ‖(u : H1amb Ω) 0‖) := by
   classical
-  have hlam : (0 : ℝ) < Op.lam := Op.toEllipticCoeff.lam_pos
   have hMζ := T.hζ.supNorm_nonneg
   obtain ⟨L, hL0, hLbd⟩ := exists_abs_diffQuot_bound T.hζ
   obtain ⟨δ₁, hδ₁, hδ₁m, hS⟩ := T.exists_shiftAdmissible
   obtain ⟨δ₂, hδ₂, hloc⟩ := T.exists_zeta_shift
-  have hζθ : tsupport T.ζ ⊆ tsupport T.θ := fun x hx => by
-    have hξ : x ∈ tsupport T.ξ := subset_tsupport T.ξ
-      (by rw [Function.mem_support, T.xi_eqOn_one hx]; exact one_ne_zero)
-    exact subset_tsupport T.θ (by rw [Function.mem_support, T.theta_eqOn_one hξ]; exact one_ne_zero)
-  set δ₀ : ℝ := min δ₁ δ₂ with hδ₀
-  have hδ₀pos : 0 < δ₀ := lt_min hδ₁ hδ₂
-  have hδ₀₁ : δ₀ ≤ δ₁ := min_le_left _ _
-  have hδ₀₂ : δ₀ ≤ δ₂ := min_le_right _ _
-  obtain ⟨CD2, hCD20, hD2⟩ := interior_diffQuot_energy_bound Op hΩm hA T.hξ T.hθ k
+  have hζθ := T.tsupport_zeta_subset.trans T.tsupport_xi_subset
+  obtain ⟨δ₀, hδ₀pos, hδ₀₁, hδ₀₂⟩ : ∃ δ₀ : ℝ, 0 < δ₀ ∧ δ₀ ≤ δ₁ ∧ δ₀ ≤ δ₂ :=
+    ⟨min δ₁ δ₂, lt_min hδ₁ hδ₂, min_le_left _ _, min_le_right _ _⟩
+  obtain ⟨CB, hCB0, hB⟩ := exists_norm_mulTest_diffQuotD_le Op hΩm hA T.hξ T.hθ k i
   set dcoef : ℝ := Real.sqrt ((1 + 4 * Op.gardingγ) / (2 * Op.lam)) with hdcoef
-  set CD2coef : ℝ := Real.sqrt (2 * CD2 / Op.lam) with hCD2coef
   have hdcoef0 : 0 ≤ dcoef := Real.sqrt_nonneg _
-  have hCD2coef0 : 0 ≤ CD2coef := Real.sqrt_nonneg _
-  refine ⟨max (T.hζ.supNorm * CD2coef + L * dcoef) (2 * T.hζ.supNorm * dcoef / δ₀),
-    le_max_of_le_left (add_nonneg (mul_nonneg hMζ hCD2coef0) (mul_nonneg hL0 hdcoef0)), ?_⟩
+  refine ⟨max (T.hζ.supNorm * CB + L * dcoef) (2 * T.hζ.supNorm * dcoef / δ₀),
+    le_max_of_le_left (add_nonneg (mul_nonneg hMζ hCB0) (mul_nonneg hL0 hdcoef0)), ?_⟩
   intro u f hu
   set di : L2D Ω := (u : H1amb Ω) i.succ with hdi_def
   set P : ℝ := ‖f‖ + ‖(u : H1amb Ω) 0‖ with hP
   have hP0 : 0 ≤ P := by rw [hP]; positivity
-  have hQ : ‖f‖ ^ 2 + ‖(u : H1amb Ω) 0‖ ^ 2 ≤ P ^ 2 := by
-    rw [hP]; nlinarith only [norm_nonneg f, norm_nonneg ((u : H1amb Ω) 0)]
   have hdi : ‖di‖ ≤ dcoef * P := firstOrder_gradNorm_le Op u f hu i
-  refine ⟨max (T.hζ.supNorm * (CD2coef * P) + L * ‖di‖) (2 * (T.hζ.supNorm * ‖di‖) / δ₀),
-    le_max_of_le_left (add_nonneg (mul_nonneg hMζ (mul_nonneg hCD2coef0 hP0))
+  refine ⟨max (T.hζ.supNorm * (CB * P) + L * ‖di‖) (2 * (T.hζ.supNorm * ‖di‖) / δ₀),
+    le_max_of_le_left (add_nonneg (mul_nonneg hMζ (mul_nonneg hCB0 hP0))
       (mul_nonneg hL0 (norm_nonneg _))), ?_, ?_⟩
   · intro h hh
     by_cases hsmall : |h| < δ₀
     · refine le_trans ?_ (le_max_left _ _)
       have hSh := hS k h (hsmall.trans_le hδ₀₁)
-      have hB : ‖mulTest T.hξ (diffQuotD k h hΩm di)‖ ≤ CD2coef * P := by
-        have hmaster := hD2 u f hu h hh hSh
-        have hsingle : ‖mulTest T.hξ (diffQuotD k h hΩm di)‖ ^ 2
-            ≤ ∑ j : Fin d, ‖mulTest T.hξ (diffQuotD k h hΩm ((u : H1amb Ω) j.succ))‖ ^ 2 :=
-          single_le_sum_fin
-            (fun j => ‖mulTest T.hξ (diffQuotD k h hΩm ((u : H1amb Ω) j.succ))‖ ^ 2)
-            (fun j => sq_nonneg _) i
-        simp only [norm_extendL2] at hmaster
-        refine le_sqrt_mul_of_sq_le (norm_nonneg _) hP0 ?_
-        rw [div_mul_eq_mul_div, le_div_iff₀ hlam]
-        nlinarith only [mul_le_mul_of_nonneg_left hsingle hlam.le, hmaster,
-          mul_le_mul_of_nonneg_left hQ hCD20]
+      have hB := hB u f hu h hh hSh
       rw [norm_diffQuot_extendL2_mulTest hΩm T.hζ k h
         (fun x hx => hSh.shift_out _ (hζθ hx)) di]
       exact (norm_diffQuotD_mulTest_le hΩm T.hζ T.hξ k (hloc k h (hsmall.trans_le hδ₀₂))

@@ -155,8 +155,6 @@ theorem exists_mem_H01_mulTest_gradient (Op : FullEllipticOp d)
     ∃ W : H1amb Ω, W ∈ H01 Ω ∧ W 0 = mulTest T.hξ ((u : H1amb Ω) ℓ.succ) := by
   classical
   have : Fact ((2 : ℝ≥0∞) ≠ ⊤) := ⟨by norm_num⟩
-  have htξθ : tsupport T.ξ ⊆ tsupport T.θ := fun x hx =>
-    subset_tsupport T.θ (by rw [Function.mem_support, T.theta_eqOn_one hx]; exact one_ne_zero)
   obtain ⟨δ, hδpos, M, hM⟩ := exists_cutoffMul_diffQuotG_norm_bound Op hΩm hA T u f hu ℓ
   obtain ⟨hs, -, hs_mem, hs_lim⟩ := exists_seq_strictAnti_tendsto' (lt_min hδpos T.hmargin_pos)
   have hs_small : ∀ m, |hs m| < min δ T.margin := fun m => by
@@ -168,7 +166,8 @@ theorem exists_mem_H01_mulTest_gradient (Op : FullEllipticOp d)
     intro m
     refine cutoffMul_diffQuotG_mem_H01 T.hξ ℓ hΩm ?_ u.2
     intro x hx
-    exact T.hmargin ℓ (hs m) (lt_of_lt_of_le (hs_small m) (min_le_right _ _)) x (htξθ hx)
+    exact T.hmargin ℓ (hs m) (lt_of_lt_of_le (hs_small m) (min_le_right _ _)) x
+      (T.tsupport_xi_subset hx)
   have hWn_bd : ∀ m, ‖Wn m‖ ≤ M := fun m =>
     hM (hs m) (lt_of_lt_of_le (hs_small m) (min_le_left _ _))
   obtain ⟨W, σ, hσ, _hWnorm, hWweak⟩ := exists_weak_limit_of_bounded_hilbert hWn_bd
