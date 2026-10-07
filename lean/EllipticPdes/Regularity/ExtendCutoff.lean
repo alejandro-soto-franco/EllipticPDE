@@ -208,110 +208,105 @@ theorem hasWeakDeriv_extend_mulTest {W : Set (EuclideanSpace ℝ (Fin d))}
 
 /-! ### Order-`k` family across the cutoff -/
 
+/-- **Order-`k` transport bound across a cutoff.** The weak derivatives to order `k` of `p` on `W`,
+bounded by `M`, give every `L²(Ω)` class representing `χ·p` weak derivatives to order `k` on
+`Ω`, bounded by `K·M`. -/
+def ExtendMulTestBound {W Ω : Set (EuclideanSpace ℝ (Fin d))} (hWm : MeasurableSet W)
+    (k : ℕ) (χ : EuclideanSpace ℝ (Fin d) → ℝ) (K : ℝ) : Prop :=
+  ∀ {p : L2D W} (hp : HasIteratedWeakDerivOn W k p) {q : L2D Ω},
+    (q =ᵐ[volume.restrict Ω] fun x => χ x * (extendL2 hWm p x : ℝ)) → ∀ {M : ℝ},
+    IteratedL2Bound hp M →
+    ∃ H : HasIteratedWeakDerivOn Ω k q, IteratedL2Bound H (K * M)
+
+/-- The order-zero bound: `‖χ·p‖ ≤ (sup |χ|) ‖p‖`. -/
+theorem norm_le_supNorm_mul_of_ae_extendL2 {W Ω : Set (EuclideanSpace ℝ (Fin d))}
+    (hWm : MeasurableSet W) {χ : EuclideanSpace ℝ (Fin d) → ℝ} (hχ : IsTestFn W χ) {p : L2D W}
+    {q : L2D Ω} (hq : q =ᵐ[volume.restrict Ω] fun x => χ x * (extendL2 hWm p x : ℝ)) :
+    ‖q‖ ≤ hχ.supNorm * ‖p‖ := by
+  have hag : q =ᵐ[volume.restrict Ω]
+      fun x => χ x * ((restrictL2 (Ω := Ω) (extendL2 hWm p)) x : ℝ) := by
+    filter_upwards [hq, coeFn_restrictL2 (Ω := Ω) (extendL2 hWm p)] with x h1 h2
+    rw [h1, h2]
+  refine (norm_le_of_ae_mul hχ.continuous.measurable
+    (Filter.Eventually.of_forall hχ.abs_le_supNorm) hag).trans ?_
+  refine mul_le_mul_of_nonneg_left ((norm_restrictL2_le _).trans (norm_extendL2 hWm p).le)
+    hχ.supNorm_nonneg
+
+/-- **One derivative of a cut-off class, with its own family.** The derivative
+`∂_ℓ(χ·p) = (∂_ℓχ)·p + χ·(∂_ℓp)` has an order-`k` family bounded by `(K₁ + K₀) M`, by the
+bounds for the weights `∂_ℓχ` and `χ`. -/
+theorem exists_deriv_family_extend_mulTest {W Ω : Set (EuclideanSpace ℝ (Fin d))}
+    (hWm : MeasurableSet W) (hWΩ : W ⊆ Ω) {χ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hχ : IsTestFn W χ) {k : ℕ} {K₀ K₁ : ℝ} (ℓ : Fin d)
+    (h₀ : ExtendMulTestBound (Ω := Ω) hWm k χ K₀)
+    (h₁ : ExtendMulTestBound (Ω := Ω) hWm k (partialD ℓ χ) K₁) {p : L2D W}
+    (hp : HasIteratedWeakDerivOn W (k + 1) p) {q : L2D Ω}
+    (hq : q =ᵐ[volume.restrict Ω] fun x => χ x * (extendL2 hWm p x : ℝ)) {M : ℝ}
+    (hM : IteratedL2Bound hp M) :
+    ∃ (dq : L2D Ω) (F : HasIteratedWeakDerivOn Ω k dq),
+      HasWeakDerivOn Ω ℓ q dq ∧ IteratedL2Bound F ((K₁ + K₀) * M) := by
+  set q1 : L2D Ω := mulTest ((isTestFn_partialD hχ ℓ).mono hWΩ)
+    (restrictL2 (Ω := Ω) (extendL2 hWm p))
+  set q2 : L2D Ω := mulTest (hχ.mono hWΩ) (restrictL2 (Ω := Ω) (extendL2 hWm (hp.D [ℓ])))
+  have hq1ae : q1 =ᵐ[volume.restrict Ω]
+      fun x => partialD ℓ χ x * (extendL2 hWm p x : ℝ) := by
+    filter_upwards [mulCutoff_coeFn ((isTestFn_partialD hχ ℓ).mono hWΩ)
+        (restrictL2 (Ω := Ω) (extendL2 hWm p)),
+      coeFn_restrictL2 (Ω := Ω) (extendL2 hWm p)] with x h1 h2
+    rw [h1, h2]
+  have hq2ae : q2 =ᵐ[volume.restrict Ω]
+      fun x => χ x * (extendL2 hWm (hp.D [ℓ]) x : ℝ) := by
+    filter_upwards [mulCutoff_coeFn (hχ.mono hWΩ)
+        (restrictL2 (Ω := Ω) (extendL2 hWm (hp.D [ℓ]))),
+      coeFn_restrictL2 (Ω := Ω) (extendL2 hWm (hp.D [ℓ]))] with x h1 h2
+    rw [h1, h2]
+  have hsum : (q1 + q2) =ᵐ[volume.restrict Ω] fun x => partialD ℓ χ x * (extendL2 hWm p x : ℝ)
+      + χ x * (extendL2 hWm (hp.D [ℓ]) x : ℝ) := by
+    filter_upwards [Lp.coeFn_add q1 q2, hq1ae, hq2ae] with x hadd h1 h2
+    simp only [hadd, Pi.add_apply, h1, h2]
+  obtain ⟨H1, hH1⟩ := h₁ (hp.mono (Nat.le_succ k)) hq1ae (hM.mono_order (Nat.le_succ k))
+  obtain ⟨H2, hH2⟩ := h₀ (hp.deriv ℓ) hq2ae (hM.deriv ℓ)
+  refine ⟨q1 + q2, H1.add H2, HasWeakDerivOn.extend_mulTest hWm hWΩ hχ
+    (hp.hasWeakDerivOn_D_singleton ℓ) hq hsum, fun α hα => ?_⟩
+  exact ((norm_add_le _ _).trans (add_le_add (hH1 α hα) (hH2 α hα))).trans_eq (add_mul _ _ _).symm
+
 /-- **Transport of `k` weak derivatives from `W` up to `Ω` by a cutoff.** For a test function `χ`
 supported in `W ⊆ Ω` there is a constant `K`, depending on `χ` and `k` alone, such that whenever
 `p` has weak derivatives to order `k` on `W` bounded by `M`, every `L²(Ω)` class representing
 `χ·p` has weak derivatives to order `k` on `Ω` bounded by `K·M`.
 
 The induction is on `k`, with the weight quantified inside so that it may change at each step.
-`HasWeakDerivOn.extend_mulTest` supplies the single derivative
-`∂_ℓ(χ·p) = (∂_ℓχ)·p + χ·(∂_ℓp)`, and the induction hypothesis covers each summand: the first
-with the weight `∂_ℓχ`, again a test function supported in `W`, and the second with the
-function `∂_ℓp`, whose order-`k` family is `HasIteratedWeakDerivOn.deriv`. -/
+`exists_deriv_family_extend_mulTest` supplies each derivative
+`∂_ℓ(χ·p) = (∂_ℓχ)·p + χ·(∂_ℓp)` with its family, and the induction hypothesis covers each
+summand: the first with the weight `∂_ℓχ`, again a test function supported in `W`, and the second
+with the function `∂_ℓp`, whose order-`k` family is `HasIteratedWeakDerivOn.deriv`. -/
 theorem exists_iteratedWeakDeriv_extend_mulTest {W Ω : Set (EuclideanSpace ℝ (Fin d))}
     (hWm : MeasurableSet W) (hWΩ : W ⊆ Ω) :
     ∀ (k : ℕ) {χ : EuclideanSpace ℝ (Fin d) → ℝ}, IsTestFn W χ →
-      ∃ K : ℝ, 0 ≤ K ∧ ∀ {p : L2D W} (hp : HasIteratedWeakDerivOn W k p) {q : L2D Ω},
-        (q =ᵐ[volume.restrict Ω] fun x => χ x * (extendL2 hWm p x : ℝ)) → ∀ {M : ℝ},
-        IteratedL2Bound hp M →
-        ∃ H : HasIteratedWeakDerivOn Ω k q, IteratedL2Bound H (K * M) := by
-  -- The order-zero bound, which both cases need: `‖χ·p‖ ≤ (sup |χ|) ‖p‖ ≤ (sup |χ|) M`.
-  have base : ∀ {χ : EuclideanSpace ℝ (Fin d) → ℝ} (hχ : IsTestFn W χ) {p : L2D W} {q : L2D Ω},
-      (q =ᵐ[volume.restrict Ω] fun x => χ x * (extendL2 hWm p x : ℝ)) →
-      ‖q‖ ≤ hχ.supNorm * ‖p‖ := by
-    intro χ hχ p q hq
-    have hag : q =ᵐ[volume.restrict Ω]
-        fun x => χ x * ((restrictL2 (Ω := Ω) (extendL2 hWm p)) x : ℝ) := by
-      filter_upwards [hq, coeFn_restrictL2 (Ω := Ω) (extendL2 hWm p)] with x h1 h2
-      rw [h1, h2]
-    refine (norm_le_of_ae_mul hχ.continuous.measurable
-      (Filter.Eventually.of_forall hχ.abs_le_supNorm) hag).trans ?_
-    refine mul_le_mul_of_nonneg_left ?_
-      (hχ.supNorm_nonneg)
-    refine (norm_restrictL2_le _).trans ?_
-    rw [norm_extendL2]
+      ∃ K : ℝ, 0 ≤ K ∧ ExtendMulTestBound (Ω := Ω) hWm k χ K := by
   intro k
   induction k with
   | zero =>
     intro χ hχ
-    refine ⟨hχ.supNorm,
-      hχ.supNorm_nonneg, ?_⟩
-    intro p hp q hq M hM
-    exact ⟨HasIteratedWeakDerivOn.zero q, fun α _ =>
-      (base hχ hq).trans (mul_le_mul_of_nonneg_left hM.norm_le
-        (hχ.supNorm_nonneg))⟩
+    exact ⟨hχ.supNorm, hχ.supNorm_nonneg, fun {p} hp {q} hq M hM =>
+      ⟨HasIteratedWeakDerivOn.zero q, fun α _ =>
+        (norm_le_supNorm_mul_of_ae_extendL2 hWm hχ hq).trans
+          (mul_le_mul_of_nonneg_left hM.norm_le hχ.supNorm_nonneg)⟩⟩
   | succ k ih =>
     intro χ hχ
     obtain ⟨K0, hK0, hP0⟩ := ih hχ
     choose K1 hK1 hP1 using fun ℓ : Fin d => ih (isTestFn_partialD hχ ℓ)
-    have hCχ : (0 : ℝ) ≤ hχ.supNorm :=
-      hχ.supNorm_nonneg
-    have hKsum : 0 ≤ ∑ ℓ : Fin d, K1 ℓ := Finset.sum_nonneg fun ℓ _ => hK1 ℓ
-    refine ⟨hχ.supNorm + K0 + ∑ ℓ, K1 ℓ, by linarith, ?_⟩
-    intro p hp q hq M hM
-    set K := hχ.supNorm + K0 + ∑ ℓ : Fin d, K1 ℓ with hKdef
+    refine ⟨hχ.supNorm + K0 + ∑ ℓ, K1 ℓ, add_nonneg (add_nonneg hχ.supNorm_nonneg hK0)
+      (Finset.sum_nonneg fun ℓ _ => hK1 ℓ), fun {p} hp {q} hq M hM => ?_⟩
     have hM0 : 0 ≤ M := le_trans (norm_nonneg p) hM.norm_le
-    -- One derivative of `χ·p` in each direction, with its own order-`k` family.
-    have hstep : ∀ ℓ : Fin d, ∃ (dq : L2D Ω) (F : HasIteratedWeakDerivOn Ω k dq),
-        HasWeakDerivOn Ω ℓ q dq ∧ IteratedL2Bound F (K * M) := by
-      intro ℓ
-      set q1 : L2D Ω := mulTest ((isTestFn_partialD hχ ℓ).mono hWΩ)
-        (restrictL2 (Ω := Ω) (extendL2 hWm p)) with hq1def
-      set q2 : L2D Ω := mulTest (hχ.mono hWΩ)
-        (restrictL2 (Ω := Ω) (extendL2 hWm (hp.D [ℓ]))) with hq2def
-      have hq1ae : q1 =ᵐ[volume.restrict Ω]
-          fun x => partialD ℓ χ x * (extendL2 hWm p x : ℝ) := by
-        filter_upwards [mulCutoff_coeFn ((isTestFn_partialD hχ ℓ).mono hWΩ)
-            (restrictL2 (Ω := Ω) (extendL2 hWm p)),
-          coeFn_restrictL2 (Ω := Ω) (extendL2 hWm p)] with x h1 h2
-        rw [h1, h2]
-      have hq2ae : q2 =ᵐ[volume.restrict Ω]
-          fun x => χ x * (extendL2 hWm (hp.D [ℓ]) x : ℝ) := by
-        filter_upwards [mulCutoff_coeFn (hχ.mono hWΩ)
-            (restrictL2 (Ω := Ω) (extendL2 hWm (hp.D [ℓ]))),
-          coeFn_restrictL2 (Ω := Ω) (extendL2 hWm (hp.D [ℓ]))] with x h1 h2
-        rw [h1, h2]
-      have hsum : (q1 + q2) =ᵐ[volume.restrict Ω] fun x =>
-          partialD ℓ χ x * (extendL2 hWm p x : ℝ)
-            + χ x * (extendL2 hWm (hp.D [ℓ]) x : ℝ) := by
-        filter_upwards [Lp.coeFn_add q1 q2, hq1ae, hq2ae] with x hadd h1 h2
-        simp only [hadd, Pi.add_apply, h1, h2]
-      -- The bound on the family of `∂_ℓ p`, read off the family of `p`.
-      have hMderiv : IteratedL2Bound (hp.deriv ℓ) M := by
-        intro α hα
-        exact hM (α ++ [ℓ]) (by simpa [List.length_append] using Nat.succ_le_succ hα)
-      obtain ⟨H1, hH1⟩ := hP1 ℓ (hp.mono (Nat.le_succ k)) hq1ae
-        (hM.mono_order (Nat.le_succ k))
-      obtain ⟨H2, hH2⟩ := hP0 (hp.deriv ℓ) hq2ae hMderiv
-      refine ⟨q1 + q2, H1.add H2, ?_, ?_⟩
-      · exact HasWeakDerivOn.extend_mulTest hWm hWΩ hχ (hp.hasWeakDerivOn_D_singleton ℓ) hq hsum
-      · intro α hα
-        have hle : K1 ℓ ≤ ∑ ℓ' : Fin d, K1 ℓ' :=
-          Finset.single_le_sum (fun i _ => hK1 i) (Finset.mem_univ ℓ)
-        calc ‖(H1.add H2).D α‖ = ‖H1.D α + H2.D α‖ := rfl
-          _ ≤ ‖H1.D α‖ + ‖H2.D α‖ := norm_add_le _ _
-          _ ≤ K1 ℓ * M + K0 * M := add_le_add (hH1 α hα) (hH2 α hα)
-          _ ≤ K * M := by
-              rw [hKdef, ← add_mul]
-              exact mul_le_mul_of_nonneg_right (by linarith) hM0
-    choose dq F hleib hbnd using hstep
-    have hq0 : ‖q‖ ≤ K * M := by
-      refine (base hχ hq).trans ?_
-      calc hχ.supNorm * ‖p‖
-          ≤ hχ.supNorm * M := mul_le_mul_of_nonneg_left hM.norm_le hCχ
-        _ ≤ K * M := by
-            rw [hKdef]
-            exact mul_le_mul_of_nonneg_right (by linarith) hM0
-    exact ⟨HasIteratedWeakDerivOn.ofDeriv hleib F, IteratedL2Bound.ofDeriv hq0 hbnd⟩
+    have hKs : 0 ≤ ∑ ℓ, K1 ℓ := Finset.sum_nonneg fun ℓ _ => hK1 ℓ
+    choose dq F hleib hbnd using fun ℓ => exists_deriv_family_extend_mulTest hWm hWΩ hχ ℓ hP0
+      (hP1 ℓ) hp hq hM
+    refine ⟨HasIteratedWeakDerivOn.ofDeriv hleib F, IteratedL2Bound.ofDeriv ?_ fun ℓ => ?_⟩
+    · refine (norm_le_supNorm_mul_of_ae_extendL2 hWm hχ hq).trans ?_
+      refine (mul_le_mul_of_nonneg_left hM.norm_le hχ.supNorm_nonneg).trans ?_
+      exact mul_le_mul_of_nonneg_right (by linarith) hM0
+    · refine (hbnd ℓ).mono_const (mul_le_mul_of_nonneg_right ?_ hM0)
+      linarith [hχ.supNorm_nonneg, Finset.single_le_sum (fun i _ => hK1 i) (Finset.mem_univ ℓ)]
 
 end EllipticPdes.Regularity
