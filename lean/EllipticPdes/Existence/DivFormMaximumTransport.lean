@@ -144,6 +144,22 @@ theorem le_measure_superlevel_inter_of_levels [IsFiniteMeasure μ] {u : α → �
   rw [mem_iInter] at hx
   exact ⟨le_of_tendsto' ht_lim fun n => (hx n).1.le, (hx 0).2⟩
 
+/-- The superlevel set of `T` is null when the superlevel sets of `T + 1 / (n + 1)` are. -/
+theorem measure_superlevel_eq_zero_of_forall_add_inv {μ : Measure α} {u : α → ℝ} {T : ℝ}
+    (h : ∀ n : ℕ, μ {x | T + 1 / (n + 1 : ℝ) < u x} = 0) : μ {x | T < u x} = 0 := by
+  have hcover : {x | T < u x} = ⋃ n : ℕ, {x | T + 1 / (n + 1 : ℝ) < u x} := by
+    ext x
+    simp only [mem_ofPred_eq, mem_iUnion]
+    constructor
+    · intro hx
+      obtain ⟨n, hn⟩ := exists_nat_one_div_lt (sub_pos.mpr hx)
+      exact ⟨n, by linarith⟩
+    · rintro ⟨n, hn⟩
+      have : (0 : ℝ) < 1 / (n + 1 : ℝ) := by positivity
+      linarith
+  rw [hcover]
+  exact measure_iUnion_null h
+
 /-- **Impossibility of a uniform lower bound on the measure of `Γ_k`.** If the measure of `Γ_k`
 is at least `c > 0` at every level `k ≥ k₀` whose superlevel set has positive measure, and the
 gradient vanishes almost everywhere on every level set, then the superlevel set of `k₀` is
@@ -181,23 +197,12 @@ theorem measure_superlevel_eq_zero {μ : Measure α} [IsFiniteMeasure μ]
   have hk₀T : k₀ ≤ T := le_csSup hSbdd hk₀S
   -- the superlevel set of `T` is null
   have hTnull : μ {x | T < u x} = 0 := by
-    have hcover : {x | T < u x} = ⋃ n : ℕ, {x | T + 1 / (n + 1 : ℝ) < u x} := by
-      ext x
-      simp only [mem_ofPred_eq, mem_iUnion]
-      constructor
-      · intro hx
-        obtain ⟨n, hn⟩ := exists_nat_one_div_lt (sub_pos.mpr hx)
-        exact ⟨n, by linarith⟩
-      · rintro ⟨n, hn⟩
-        have : (0 : ℝ) < 1 / (n + 1 : ℝ) := by positivity
-        linarith
-    rw [hcover]
-    refine measure_iUnion_null fun n => ?_
+    refine measure_superlevel_eq_zero_of_forall_add_inv fun n => ?_
     by_contra hne
-    have hmem : T + 1 / (n + 1 : ℝ) ∈ S :=
-      ⟨by linarith [(by positivity : (0 : ℝ) < 1 / (n + 1 : ℝ))], pos_iff_ne_zero.mpr hne⟩
-    have := le_csSup hSbdd hmem
-    linarith [(by positivity : (0 : ℝ) < 1 / (n + 1 : ℝ))]
+    have hpos : (0 : ℝ) < 1 / (n + 1 : ℝ) := by positivity
+    have := le_csSup hSbdd (show T + 1 / (n + 1 : ℝ) ∈ S from
+      ⟨by linarith, pos_iff_ne_zero.mpr hne⟩)
+    linarith
   -- the gradient vanishes almost everywhere on the level set of `T`
   have hlevelnull : μ ({x | u x = T} ∩ {x | g x ≠ 0}) = 0 :=
     measure_mono_null (fun x (hx : u x = T ∧ g x ≠ 0) =>
@@ -340,6 +345,28 @@ namespace DivForm.FullEllipticOp
 variable (Op : FullEllipticOp μ)
 
 omit [FiniteDimensional ℝ E] [μ.IsAddHaarMeasure] in
+/-- The transport pairing of a gradient class with a function class is the integral of the
+pointwise pairing. -/
+theorem inner_bAct_eq_integral (g : Lp E 2 (μ.restrict Ω)) (v : Lp ℝ 2 (μ.restrict Ω)) :
+    ⟪Op.bAct Ω g, v⟫ = ∫ x, ⟪Op.b x, g x⟫ * v x ∂(μ.restrict Ω) := by
+  rw [L2.inner_def]
+  refine integral_congr_ae ?_
+  filter_upwards [Op.coeFn_bAct Ω g] with x hx
+  rw [hx]
+  simp only [RCLike.inner_apply, conj_trivial]
+  ring
+
+omit [FiniteDimensional ℝ E] [μ.IsAddHaarMeasure] in
+/-- The pointwise transport pairing of a gradient class with a function class is integrable. -/
+theorem integrable_inner_bAct (g : Lp E 2 (μ.restrict Ω)) (v : Lp ℝ 2 (μ.restrict Ω)) :
+    Integrable (fun x => ⟪Op.b x, g x⟫ * v x) (μ.restrict Ω) := by
+  refine (L2.integrable_inner (Op.bAct Ω g) v).congr ?_
+  filter_upwards [Op.coeFn_bAct Ω g] with x hx
+  rw [hx]
+  simp only [RCLike.inner_apply, conj_trivial]
+  ring
+
+omit [FiniteDimensional ℝ E] [μ.IsAddHaarMeasure] in
 /-- **The transport term against the truncation.** For `V` with function part the truncation
 `(u - k)⁺` and gradient part that of `u` on `{u > k}`, `⟪b · ∇u, v⟫` is at least minus the
 transport bound times `‖∇v‖` times the `L²` norm of the truncation over `Γ_k`: where `∇u ≠ 0`
@@ -372,19 +399,8 @@ theorem neg_mul_le_inner_bAct_truncation {U V : H1Graph μ Ω} {k : ℝ}
     refine integral_congr_ae (Eventually.of_forall fun x => ?_)
     simp only [RCLike.inner_apply, conj_trivial]
     ring
-  have hbint : ⟪Op.bAct Ω (gradL U), fnL V⟫ = ∫ x, ⟪Op.b x, gradL U x⟫ * fnL V x ∂ν := by
-    rw [L2.inner_def]
-    refine integral_congr_ae ?_
-    filter_upwards [Op.coeFn_bAct Ω (gradL U)] with x hx
-    rw [hx]
-    simp only [RCLike.inner_apply, conj_trivial]
-    ring
-  have hint1 : Integrable (fun x => ⟪Op.b x, gradL U x⟫ * fnL V x) ν := by
-    refine (L2.integrable_inner (Op.bAct Ω (gradL U)) (fnL V)).congr ?_
-    filter_upwards [Op.coeFn_bAct Ω (gradL U)] with x hx
-    rw [hx]
-    simp only [RCLike.inner_apply, conj_trivial]
-    ring
+  have hbint := inner_bAct_eq_integral Op (gradL U) (fnL V)
+  have hint1 := integrable_inner_bAct Op (gradL U) (fnL V)
   have hint2 : Integrable (fun x => ‖gradL V x‖ * ‖vΓ x‖) ν := by
     refine (L2.integrable_inner A B).congr ?_
     filter_upwards [(Lp.memLp (gradL V)).norm.coeFn_toLp, hvΓm.norm.coeFn_toLp] with x hx1 hx2
@@ -623,6 +639,17 @@ namespace H1Graph
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
   [MeasurableSpace E] [BorelSpace E] {Ω : Set E}
 
+/-- The sum of the extended norms of a finite family bounded by `G` is at most `n G`. -/
+theorem sum_enorm_le_ofReal_card_mul {ι E' : Type*} [Fintype ι] [SeminormedAddCommGroup E']
+    (a : ι → E') {G : ℝ} (h : ∀ i, ‖a i‖ ≤ G) :
+    ∑ i, ‖a i‖ₑ ≤ ENNReal.ofReal (Fintype.card ι * G) := by
+  calc _ ≤ ∑ _i : ι, ENNReal.ofReal G := Finset.sum_le_sum fun i _ => by
+        rw [← ofReal_norm]
+        exact ENNReal.ofReal_le_ofReal (h i)
+    _ = _ := by
+        rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul,
+          ENNReal.ofReal_mul (Nat.cast_nonneg _), ENNReal.ofReal_natCast]
+
 /-- **Sobolev inequality on `H₀¹` of a bounded set.** In dimension at least two, on a bounded
 measurable set, `H₀¹(Ω)` embeds into `L^q(Ω)` for some `q > 2`, with `‖v‖_q ≤ C ‖∇v‖₂`. -/
 theorem exists_eLpNorm_le_of_mem_H01 (hn : 2 ≤ Module.finrank ℝ E) (hΩm : MeasurableSet Ω)
@@ -670,15 +697,9 @@ theorem exists_eLpNorm_le_of_mem_H01 (hn : 2 ≤ Module.finrank ℝ E) (hΩm : M
         (fun j _ => sq_nonneg _) (Finset.mem_univ i)
       exact this
     exact (sq_le_sq₀ (norm_nonneg _) hG0).1 h2
-  have hsum : ∑ i : Fin (Module.finrank ℝ E), ‖(Y : Sobolev.H1amb Ω') i.succ‖ₑ ≤
-      ENNReal.ofReal (Module.finrank ℝ E * G) := by
-    calc _ ≤ ∑ _i : Fin (Module.finrank ℝ E), ENNReal.ofReal G := by
-          refine Finset.sum_le_sum fun i _ => ?_
-          rw [← ofReal_norm]
-          exact ENNReal.ofReal_le_ofReal (hGsq i)
-      _ = _ := by
-          rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul,
-            ENNReal.ofReal_mul (Nat.cast_nonneg _), ENNReal.ofReal_natCast]
+  have hsum := sum_enorm_le_ofReal_card_mul (fun i : Fin (Module.finrank ℝ E) =>
+    (Y : Sobolev.H1amb Ω') i.succ) hGsq
+  rw [Fintype.card_fin] at hsum
   have hbound : eLpNorm (⇑(fnL (V : H1Graph volume Ω))) q (volume.restrict Ω) ≤
       ENNReal.ofReal (K * Module.finrank ℝ E * G) := by
     rw [hE]
