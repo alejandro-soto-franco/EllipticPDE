@@ -237,7 +237,8 @@ private lemma integral_residual_eq_zero (Op : FullEllipticOp d)
     integrable_testFn_mul_continuousOn hφcont hφcs hφW (hdivc i j)
   have hint_b := fun i => integrable_weight_mul_testFn_mul hφcont hφcs hφW (hgradc i)
     (Op.b_meas i) (Op.b_bdd i)
-  have hint_c := integrable_weight_mul_testFn_mul hφcont hφcs hφW hsm.continuousOn Op.c_meas Op.c_bdd
+  have hint_c := integrable_weight_mul_testFn_mul hφcont hφcs hφW hsm.continuousOn Op.c_meas
+    Op.c_bdd
   have hint_f :=
     integrable_L2D_mul_of_tsupport_subset f hWo.measurableSet hWΩ hφcont hφcs hφW
   -- integration by parts on the principal term
