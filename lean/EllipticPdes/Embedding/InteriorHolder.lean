@@ -223,13 +223,11 @@ theorem interior_holder_estimate_of_conjugate {n : ℕ} (Op : FullEllipticOp (n 
 /-! ### Two and three dimensions -/
 
 /-- **Interior Hölder estimate in two dimensions (Evans, *Partial Differential Equations*
-(2nd ed.), §5.6.2 Thm 5, applied to the interior `H²` estimate of §6.3.1 Thm 1).** A weak
-solution `u ∈ H₀¹(Ω)` of `L u = f` with `W^{1,∞}` principal coefficients has, on every ball
-`B(c, r)` with `r < R` and `closedBall c R ⊆ Ω`, a representative that is Hölder continuous with
-exponent `1/2` and constant a multiple of `‖f‖ + ‖u‖`, the multiplier being quantified before
-the solution and the datum. At `d = 2` the Sobolev conjugate of `2` degenerates, so the step is
-taken at `p = 4/3` and raises the gradient from `L²` to `L⁴`; `morrey_ball` then applies at
-`p = 4 > 2 = d`. -/
+(2nd ed.), §5.6.2 Thm 5, applied to the interior `H²` estimate of §6.3.1 Thm 1).** On every ball
+`B(c, r)` with `r < R` and `closedBall c R ⊆ Ω`, a weak solution has a representative that is
+Hölder continuous with exponent `1/2`, with a multiplier quantified before the solution. At
+`d = 2` the Sobolev conjugate of `2` degenerates, so the step is taken at `p = 4/3` and raises the
+gradient from `L²` to `L⁴`; `morrey_ball` then applies at `p = 4 > 2 = d`. -/
 theorem interior_holder_estimate_two (Op : FullEllipticOp 2)
     {Ω : Set (EuclideanSpace ℝ (Fin 2))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
     (hA : IsLipCoeff Op.toEllipticCoeff)

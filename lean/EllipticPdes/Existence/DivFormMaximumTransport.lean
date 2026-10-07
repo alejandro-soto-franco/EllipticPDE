@@ -160,6 +160,20 @@ theorem measure_superlevel_eq_zero_of_forall_add_inv {μ : Measure α} {u : α �
   rw [hcover]
   exact measure_iUnion_null h
 
+/-- If the superlevel set of `T` is null and `g` vanishes almost everywhere on the level set of
+`T`, then `g` is zero almost everywhere on `{T ≤ u}`. -/
+theorem measure_superlevel_inter_eq_zero {μ : Measure α} {u : α → ℝ} {g : α → F} {T : ℝ}
+    (hT : μ {x | T < u x} = 0) (hlevel : ∀ᵐ x ∂μ, u x = T → g x = 0) :
+    μ ({x | T ≤ u x} ∩ {x | g x ≠ 0}) = 0 := by
+  have hlevelnull : μ ({x | u x = T} ∩ {x | g x ≠ 0}) = 0 :=
+    measure_mono_null (fun x (hx : u x = T ∧ g x ≠ 0) =>
+      show ¬(u x = T → g x = 0) from fun h => hx.2 (h hx.1)) (ae_iff.mp hlevel)
+  refine measure_mono_null (fun x hx => ?_) (measure_union_null hT hlevelnull)
+  have hx1 : T ≤ u x := hx.1
+  rcases lt_or_eq_of_le hx1 with h | h
+  · exact Or.inl h
+  · exact Or.inr ⟨h.symm, hx.2⟩
+
 /-- **Impossibility of a uniform lower bound on the measure of `Γ_k`.** If the measure of `Γ_k`
 is at least `c > 0` at every level `k ≥ k₀` whose superlevel set has positive measure, and the
 gradient vanishes almost everywhere on every level set, then the superlevel set of `k₀` is
@@ -203,10 +217,6 @@ theorem measure_superlevel_eq_zero {μ : Measure α} [IsFiniteMeasure μ]
     have := le_csSup hSbdd (show T + 1 / (n + 1 : ℝ) ∈ S from
       ⟨by linarith, pos_iff_ne_zero.mpr hne⟩)
     linarith
-  -- the gradient vanishes almost everywhere on the level set of `T`
-  have hlevelnull : μ ({x | u x = T} ∩ {x | g x ≠ 0}) = 0 :=
-    measure_mono_null (fun x (hx : u x = T ∧ g x ≠ 0) =>
-      show ¬(u x = T → g x = 0) from fun h => hx.2 (h hx.1)) (ae_iff.mp (hlevel T))
   -- the sets `Γ_t` for `t < T` have measure at least `c`, and shrink into the level set
   have hbelow : ∀ t, k₀ ≤ t → t < T → ENNReal.ofReal c ≤ μ (truncSupport u g t) := by
     intro t hk₀t htT
@@ -222,16 +232,7 @@ theorem measure_superlevel_eq_zero {μ : Measure α} [IsFiniteMeasure μ]
       rw [← hTk]
       exact hx.1.le
     · exact le_measure_superlevel_inter_of_levels hu hg hTk hbelow
-  -- the two null sets cover the intersection
-  have hcover : {x | T ≤ u x} ∩ {x | g x ≠ 0}
-      ⊆ {x | T < u x} ∪ ({x | u x = T} ∩ {x | g x ≠ 0}) := by
-    intro x hx
-    have hx1 : T ≤ u x := hx.1
-    rcases lt_or_eq_of_le hx1 with h | h
-    · exact Or.inl h
-    · exact Or.inr ⟨h.symm, hx.2⟩
-  have hzero : μ ({x | T ≤ u x} ∩ {x | g x ≠ 0}) = 0 :=
-    measure_mono_null hcover (measure_union_null hTnull hlevelnull)
+  have hzero := measure_superlevel_inter_eq_zero hTnull (hlevel T)
   rw [hzero] at hkey
   exact absurd hkey (not_le.mpr (ENNReal.ofReal_pos.mpr hc))
 

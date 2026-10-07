@@ -593,7 +593,7 @@ theorem weakDeriv_of_diffQuot_bounded (k : Fin d) (g : EucL2 d) (M : ℝ)
 
 /-- Almost every point of the product with a restriction has its second coordinate in the set. -/
 private theorem ae_snd_mem_prod_restrict {α β : Type*} [MeasurableSpace α] [MeasurableSpace β]
-    {μ : Measure α} [SFinite μ] {ν : Measure β} [SFinite ν] {t : Set β} (ht : MeasurableSet t) :
+    {μ : Measure α} {ν : Measure β} [SFinite ν] {t : Set β} (ht : MeasurableSet t) :
     ∀ᵐ p ∂(μ.prod (ν.restrict t)), p.2 ∈ t := by
   rw [ae_iff]
   have hset : {p : α × β | p.2 ∉ t} = univ ×ˢ tᶜ := by ext p; simp
