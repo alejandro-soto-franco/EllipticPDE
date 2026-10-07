@@ -24,29 +24,32 @@ decay rate, and a Campanato decay rate feeds out a Hölder bound.
 
 @[expose] public section
 
-open MeasureTheory Set Metric Filter
+open MeasureTheory Set Metric Filter Module
 
 open scoped NNReal ENNReal Topology
 
 noncomputable section
 
-namespace EllipticPdes.Campanato
+namespace EllipticPdes.Campanato.Haar
 
-variable {d : ℕ}
+variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
+  [MeasureSpace E] [BorelSpace E] [(volume : Measure E).IsAddHaarMeasure]
+
+local notation "𝔡" => Module.finrank ℝ E
 
 /-- A Hölder function stays within `K (2r)^α` of its mean over any ball of radius `r` inside the
 set where the Hölder bound holds. -/
-theorem abs_sub_ballAverage_le_of_holderOnWith {Ω : Set (EuclideanSpace ℝ (Fin d))}
-    {u : EuclideanSpace ℝ (Fin d) → ℝ} {α : ℝ} (hα : 0 < α) {K : ℝ≥0}
-    (hu : HolderOnWith K (Real.toNNReal α) u Ω) {x : EuclideanSpace ℝ (Fin d)} {r : ℝ}
+theorem abs_sub_ballAverage_le_of_holderOnWith {Ω : Set (E)}
+    {u : E → ℝ} {α : ℝ} (hα : 0 < α) {K : ℝ≥0}
+    (hu : HolderOnWith K (Real.toNNReal α) u Ω) {x : E} {r : ℝ}
     (hr : 0 < r) (hxr : Metric.ball x r ⊆ Ω) :
     ∀ y ∈ Metric.ball x r, |u y - ballAverage u x r| ≤ (K : ℝ) * (2 * r) ^ α := by
   have hαnn : ((Real.toNNReal α : ℝ≥0) : ℝ) = α := Real.coe_toNNReal α hα.le
-  have hvol : volume.real (Metric.ball x r) = r ^ (d : ℝ) * unitBallVolume d :=
+  have hvol : volume.real (Metric.ball x r) = r ^ (𝔡 : ℝ) * unitBallVolume E :=
     measureReal_ball_rpow x hr
   have hvolpos : 0 < volume.real (Metric.ball x r) := by
     rw [hvol]
-    exact mul_pos (Real.rpow_pos_of_pos hr d) unitBallVolume_pos
+    exact mul_pos (Real.rpow_pos_of_pos hr (𝔡 : ℝ)) unitBallVolume_pos
   -- The Hölder bound between any two points of the ball.
   have hpair : ∀ z ∈ Metric.ball x r, ∀ w ∈ Metric.ball x r,
       |u z - u w| ≤ (K : ℝ) * (2 * r) ^ α := by
@@ -97,14 +100,14 @@ theorem abs_sub_ballAverage_le_of_holderOnWith {Ω : Set (EuclideanSpace ℝ (Fi
 with constant `K` on `Ω` satisfies the Campanato decay hypothesis on `Ω` with constant
 `K · 2^α · √|B(0,1)|`. Squaring the mean-oscillation bound `K (2r)^α` and integrating over a ball
 of volume `r^d |B(0,1)|` is the whole proof. -/
-theorem campanatoOn_of_holderOnWith {Ω : Set (EuclideanSpace ℝ (Fin d))}
-    {u : EuclideanSpace ℝ (Fin d) → ℝ} {α : ℝ} (hα : 0 < α) {K : ℝ≥0}
+theorem campanatoOn_of_holderOnWith {Ω : Set (E)}
+    {u : E → ℝ} {α : ℝ} (hα : 0 < α) {K : ℝ≥0}
     (hu : HolderOnWith K (Real.toNNReal α) u Ω) :
-    CampanatoOn Ω u α ((K : ℝ) * 2 ^ α * Real.sqrt (unitBallVolume d)) := by
-  have hω : (0 : ℝ) < unitBallVolume d := unitBallVolume_pos
+    CampanatoOn Ω u α ((K : ℝ) * 2 ^ α * Real.sqrt (unitBallVolume E)) := by
+  have hω : (0 : ℝ) < unitBallVolume E := unitBallVolume_pos
   intro x r hr hxr
   have hosc := abs_sub_ballAverage_le_of_holderOnWith hα hu hr hxr
-  have hvol : volume.real (Metric.ball x r) = r ^ (d : ℝ) * unitBallVolume d :=
+  have hvol : volume.real (Metric.ball x r) = r ^ (𝔡 : ℝ) * unitBallVolume E :=
     measureReal_ball_rpow x hr
   have hB : (0 : ℝ) ≤ (K : ℝ) * (2 * r) ^ α :=
     mul_nonneg K.coe_nonneg (Real.rpow_nonneg (by linarith) α)
@@ -125,29 +128,87 @@ theorem campanatoOn_of_holderOnWith {Ω : Set (EuclideanSpace ℝ (Fin d))}
     exact hpt y hy
   -- Integrate the pointwise bound over the ball.
   have hle : ∫ y in Metric.ball x r, (u y - ballAverage u x r) ^ 2
-      ≤ (r ^ (d : ℝ) * unitBallVolume d) * ((K : ℝ) * (2 * r) ^ α) ^ 2 := by
+      ≤ (r ^ (𝔡 : ℝ) * unitBallVolume E) * ((K : ℝ) * (2 * r) ^ α) ^ 2 := by
     calc ∫ y in Metric.ball x r, (u y - ballAverage u x r) ^ 2
         ≤ ∫ _y in Metric.ball x r, ((K : ℝ) * (2 * r) ^ α) ^ 2 :=
           setIntegral_mono_on hintsq (integrable_const _) measurableSet_ball hpt
-      _ = (r ^ (d : ℝ) * unitBallVolume d) * ((K : ℝ) * (2 * r) ^ α) ^ 2 := by
+      _ = (r ^ (𝔡 : ℝ) * unitBallVolume E) * ((K : ℝ) * (2 * r) ^ α) ^ 2 := by
           rw [setIntegral_const, smul_eq_mul, hvol]
   refine hle.trans (le_of_eq ?_)
-  -- The constants match: `(2r)^{2α} r^d |B(0,1)| = (K 2^α √|B(0,1)|)² r^{d+2α} / K²`.
+  -- The constants match: `(2r)^{2α} r^𝔡 |B(0,1)| = (K 2^α √|B(0,1)|)² r^{𝔡+2α} / K²`.
   have h2r : ((2 : ℝ) * r) ^ α = 2 ^ α * r ^ α := Real.mul_rpow (by norm_num) hr.le
-  have hsplit : r ^ ((d : ℝ) + 2 * α) = r ^ (d : ℝ) * (r ^ α) ^ 2 := by
+  have hsplit : r ^ ((𝔡 : ℝ) + 2 * α) = r ^ (𝔡 : ℝ) * (r ^ α) ^ 2 := by
     have h2 : (r ^ α) ^ 2 = r ^ (2 * α) := by
       rw [← Real.rpow_natCast (r ^ α) 2, ← Real.rpow_mul hr.le]
       congr 1
       push_cast
       ring
     rw [Real.rpow_add hr, h2]
-  have hsq : Real.sqrt (unitBallVolume d) ^ 2 = unitBallVolume d := Real.sq_sqrt hω.le
+  have hsq : Real.sqrt (unitBallVolume E) ^ 2 = unitBallVolume E := Real.sq_sqrt hω.le
   rw [h2r, hsplit]
-  calc r ^ (d : ℝ) * unitBallVolume d * ((K : ℝ) * (2 ^ α * r ^ α)) ^ 2
-      = ((K : ℝ) * 2 ^ α) ^ 2 * (r ^ (d : ℝ) * (r ^ α) ^ 2) * unitBallVolume d := by ring
-    _ = ((K : ℝ) * 2 ^ α) ^ 2 * (r ^ (d : ℝ) * (r ^ α) ^ 2)
-          * Real.sqrt (unitBallVolume d) ^ 2 := by rw [hsq]
-    _ = ((K : ℝ) * 2 ^ α * Real.sqrt (unitBallVolume d)) ^ 2
-          * (r ^ (d : ℝ) * (r ^ α) ^ 2) := by ring
+  calc r ^ (𝔡 : ℝ) * unitBallVolume E * ((K : ℝ) * (2 ^ α * r ^ α)) ^ 2
+      = ((K : ℝ) * 2 ^ α) ^ 2 * (r ^ (𝔡 : ℝ) * (r ^ α) ^ 2) * unitBallVolume E := by ring
+    _ = ((K : ℝ) * 2 ^ α) ^ 2 * (r ^ (𝔡 : ℝ) * (r ^ α) ^ 2)
+          * Real.sqrt (unitBallVolume E) ^ 2 := by rw [hsq]
+    _ = ((K : ℝ) * 2 ^ α * Real.sqrt (unitBallVolume E)) ^ 2
+          * (r ^ (𝔡 : ℝ) * (r ^ α) ^ 2) := by ring
+
+end EllipticPdes.Campanato.Haar
+
+/-! ### Euclidean space -/
+
+namespace EllipticPdes.Campanato
+
+variable {d : ℕ}
+
+/-- The volume of the unit ball of `EuclideanSpace ℝ (Fin d)`, as a real number. -/
+def unitBallVolume (d : ℕ) : ℝ := Haar.unitBallVolume (EuclideanSpace ℝ (Fin d))
+
+/-- **Campanato decay hypothesis** on Euclidean space. The mean oscillation of `u` over every
+ball contained in `Ω` decays at the rate `r^{d + 2α}`, with constant `M`. -/
+def CampanatoOn (Ω : Set (EuclideanSpace ℝ (Fin d))) (u : EuclideanSpace ℝ (Fin d) → ℝ)
+    (α M : ℝ) : Prop :=
+  Haar.CampanatoOn Ω u α M
+
+/-- The Campanato limit on Euclidean space: the limit of the means over the balls
+`B(x, 2^{-k})`. -/
+def campanatoLimit (u : EuclideanSpace ℝ (Fin d) → ℝ) (x : EuclideanSpace ℝ (Fin d)) : ℝ :=
+  Haar.campanatoLimit u x
+
+/-- The Hölder constant Campanato's characterisation produces on Euclidean space. -/
+def campanatoHolderConst (d : ℕ) (α : ℝ) : ℝ :=
+  Haar.campanatoHolderConst (EuclideanSpace ℝ (Fin d)) α
+
+/-- **Campanato's characterisation of Hölder continuity.** Let `u` be square integrable on the ball
+`B(c, R)` and suppose its mean oscillation decays at the Campanato rate,
+
+  `∫_{B(x,r)} |u - u_{x,r}|² ≤ M² r^{d + 2α}` for every ball `B(x, r) ⊆ B(c, R)`,
+
+with `0 < α`. Then `campanatoLimit u` is a representative of `u` on every concentric ball
+`B(c, ρ)` with `5ρ ≤ R`, and it is Hölder continuous there with exponent `α` and constant
+`campanatoHolderConst d α · M`.
+
+The factor `5` comes from the hypothesis: the pair estimate at `x, y ∈ B(c, ρ)` uses the balls
+of radius `2 |x - y| < 4ρ` about both points, and those lie in `B(c, R)` exactly when `5ρ ≤ R`. -/
+theorem campanato_holderOnWith (hd : 0 < d) {u : EuclideanSpace ℝ (Fin d) → ℝ} {α M : ℝ}
+    (hα : 0 < α) (hM : 0 ≤ M) {c : EuclideanSpace ℝ (Fin d)} {R ρ : ℝ} (hρ : 0 < ρ)
+    (hRρ : 5 * ρ ≤ R) (hu : MemLp u 2 (volume.restrict (Metric.ball c R)))
+    (hcamp : CampanatoOn (Metric.ball c R) u α M) :
+    campanatoLimit u =ᵐ[volume.restrict (Metric.ball c ρ)] u ∧
+      HolderOnWith (Real.toNNReal (campanatoHolderConst d α * M)) (Real.toNNReal α)
+        (campanatoLimit u) (Metric.ball c ρ) := by
+  have : Nontrivial (EuclideanSpace ℝ (Fin d)) :=
+    Module.nontrivial_of_finrank_pos (R := ℝ) (by rw [finrank_euclideanSpace_fin]; exact hd)
+  exact Haar.campanato_holderOnWith hα hM hρ hRρ hu hcamp
+
+/-- **Converse of Campanato's characterisation.** A function that is Hölder of exponent `α`
+with constant `K` on `Ω` satisfies the Campanato decay hypothesis on `Ω` with constant
+`K · 2^α · √|B(0,1)|`. Squaring the mean-oscillation bound `K (2r)^α` and integrating over a ball
+of volume `r^d |B(0,1)|` is the whole proof. -/
+theorem campanatoOn_of_holderOnWith {Ω : Set (EuclideanSpace ℝ (Fin d))}
+    {u : EuclideanSpace ℝ (Fin d) → ℝ} {α : ℝ} (hα : 0 < α) {K : ℝ≥0}
+    (hu : HolderOnWith K (Real.toNNReal α) u Ω) :
+    CampanatoOn Ω u α ((K : ℝ) * 2 ^ α * Real.sqrt (unitBallVolume d)) :=
+  Haar.campanatoOn_of_holderOnWith hα hu
 
 end EllipticPdes.Campanato

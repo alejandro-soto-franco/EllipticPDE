@@ -35,26 +35,27 @@ source, and is not carried out here.
 
 @[expose] public section
 
-open MeasureTheory Set Metric Filter
+open MeasureTheory Set Metric Filter Module
 
 open scoped NNReal ENNReal Topology
 
 noncomputable section
 
-namespace EllipticPdes.Campanato
+namespace EllipticPdes.Campanato.Haar
 
-variable {d : ℕ}
+variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
+  [MeasureSpace E] [BorelSpace E] [(volume : Measure E).IsAddHaarMeasure]
+
+local notation "𝔡" => Module.finrank ℝ E
 
 section AlmostEverywhere
 
-variable {Ω : Set (EuclideanSpace ℝ (Fin d))} {u : EuclideanSpace ℝ (Fin d) → ℝ} {α M : ℝ}
+variable {Ω : Set (E)} {u : E → ℝ} {α M : ℝ}
 
 /-- A closed ball and the corresponding open ball agree up to a null set, because a sphere is
 Lebesgue null in positive dimension. -/
-theorem closedBall_ae_eq_ball (hd : 0 < d) (x : EuclideanSpace ℝ (Fin d)) (r : ℝ) :
+theorem closedBall_ae_eq_ball [Nontrivial E] (x : E) (r : ℝ) :
     Metric.closedBall x r =ᵐ[volume] Metric.ball x r := by
-  have : Nontrivial (EuclideanSpace ℝ (Fin d)) :=
-    Module.nontrivial_of_finrank_pos (R := ℝ) (by rw [finrank_euclideanSpace_fin]; exact hd)
   rw [ae_eq_set]
   refine ⟨?_, ?_⟩
   · rw [Metric.closedBall_sdiff_ball]
@@ -65,7 +66,7 @@ theorem closedBall_ae_eq_ball (hd : 0 < d) (x : EuclideanSpace ℝ (Fin d)) (r :
 /-- **Campanato limit as a representative of `u`.** By the Lebesgue differentiation theorem the
 ball means converge to `u` almost everywhere, and by `tendsto_ballAverage_campanatoLimit` they
 converge to `campanatoLimit u` everywhere on the open set, so the two agree almost everywhere. -/
-theorem campanatoLimit_ae_eq (hd : 0 < d) (hα : 0 < α) (hM : 0 ≤ M) (hΩ : IsOpen Ω)
+theorem campanatoLimit_ae_eq [Nontrivial E] (hα : 0 < α) (hM : 0 ≤ M) (hΩ : IsOpen Ω)
     (hΩfin : volume Ω ≠ ⊤) (hu : MemLp u 2 (volume.restrict Ω)) (hcamp : CampanatoOn Ω u α M) :
     campanatoLimit u =ᵐ[volume.restrict Ω] u := by
   have : IsFiniteMeasure (volume.restrict Ω) :=
@@ -75,7 +76,7 @@ theorem campanatoLimit_ae_eq (hd : 0 < d) (hα : 0 < α) (hM : 0 ≤ M) (hΩ : I
     huint.integrable_indicator hΩ.measurableSet
   have hloc : LocallyIntegrable (Ω.indicator u) volume := hind.locallyIntegrable
   have hae := (Besicovitch.vitaliFamily
-    (volume : Measure (EuclideanSpace ℝ (Fin d)))).ae_tendsto_average hloc
+    (volume : Measure (E))).ae_tendsto_average hloc
   have hδ : Tendsto (fun k : ℕ => (1 / 2 : ℝ) ^ k) atTop (𝓝[>] 0) :=
     tendsto_pow_atTop_nhdsWithin_zero_of_lt_one (by norm_num) (by norm_num)
   rw [Filter.EventuallyEq, ae_restrict_iff' hΩ.measurableSet]
@@ -98,7 +99,7 @@ theorem campanatoLimit_ae_eq (hd : 0 < d) (hα : 0 < α) (hM : 0 ≤ M) (hΩ : I
       (Metric.closedBall_subset_ball hkε).trans hball
     rw [setAverage_congr_fun measurableSet_closedBall
         (Filter.Eventually.of_forall fun y hy => Set.indicator_of_mem (hsubΩ hy) u),
-      setAverage_congr (closedBall_ae_eq_ball hd x ((1 / 2 : ℝ) ^ k))]
+      setAverage_congr (closedBall_ae_eq_ball x ((1 / 2 : ℝ) ^ k))]
     rfl
   have h1 : Tendsto (fun k : ℕ => ballAverage u x ((1 / 2 : ℝ) ^ k)) atTop
       (𝓝 (Ω.indicator u x)) := hcomp.congr' heq
@@ -107,33 +108,35 @@ theorem campanatoLimit_ae_eq (hd : 0 < d) (hα : 0 < α) (hM : 0 ≤ M) (hΩ : I
 
 end AlmostEverywhere
 
+variable (E) in
 /-- The Hölder constant Campanato's characterisation produces: two telescoped estimates, one at
 each centre, plus the two-centre comparison, all evaluated at the radius `2 |x - y|`. -/
-def campanatoHolderConst (d : ℕ) (α : ℝ) : ℝ :=
-  (2 * campanatoLimitConst d α + campanatoConst d) * 2 ^ α
+def campanatoHolderConst (α : ℝ) : ℝ :=
+  (2 * campanatoLimitConst E α + campanatoConst E) * 2 ^ α
 
+omit [BorelSpace E] in
 /-- The Hölder constant is nonnegative. -/
-theorem campanatoHolderConst_nonneg {α : ℝ} (hα : 0 < α) : 0 ≤ campanatoHolderConst d α := by
-  have h1 : (0 : ℝ) ≤ campanatoLimitConst d α := campanatoLimitConst_nonneg hα
-  have h2 : (0 : ℝ) ≤ campanatoConst d := campanatoConst_nonneg
+theorem campanatoHolderConst_nonneg {α : ℝ} (hα : 0 < α) : 0 ≤ campanatoHolderConst E α := by
+  have h1 : (0 : ℝ) ≤ campanatoLimitConst E α := campanatoLimitConst_nonneg hα
+  have h2 : (0 : ℝ) ≤ campanatoConst E := campanatoConst_nonneg
   have h3 : (0 : ℝ) ≤ (2 : ℝ) ^ α := Real.rpow_nonneg (by norm_num) α
   rw [campanatoHolderConst]
   positivity
 
 section Pair
 
-variable {Ω : Set (EuclideanSpace ℝ (Fin d))} {u : EuclideanSpace ℝ (Fin d) → ℝ} {α M : ℝ}
+variable {Ω : Set (E)} {u : E → ℝ} {α M : ℝ}
 
 /-- **Pair estimate.** Two values of the Campanato limit differ by at most
-`campanatoHolderConst d α · M · |x - y|^α`, provided the balls of radius `2 |x - y|` about the two
+`campanatoHolderConst E α · M · |x - y|^α`, provided the balls of radius `2 |x - y|` about the two
 points lie in `Ω`. Both means at that radius are within reach of their limits by the telescoped
 estimate, and they are within reach of each other by the two-centre comparison. -/
 theorem abs_campanatoLimit_sub_le (hα : 0 < α) (hM : 0 ≤ M) (hΩ : IsOpen Ω)
     (hu : MemLp u 2 (volume.restrict Ω)) (hcamp : CampanatoOn Ω u α M)
-    {x y : EuclideanSpace ℝ (Fin d)} (hx : x ∈ Ω) (hy : y ∈ Ω) (hne : x ≠ y)
+    {x y : E} (hx : x ∈ Ω) (hy : y ∈ Ω) (hne : x ≠ y)
     (hxr : Metric.ball x (2 * dist x y) ⊆ Ω) (hyr : Metric.ball y (2 * dist x y) ⊆ Ω) :
     |campanatoLimit u x - campanatoLimit u y|
-      ≤ campanatoHolderConst d α * M * dist x y ^ α := by
+      ≤ campanatoHolderConst E α * M * dist x y ^ α := by
   have hδ : 0 < dist x y := dist_pos.mpr hne
   have hr : 0 < 2 * dist x y := by linarith
   have h1 := abs_ballAverage_sub_campanatoLimit_le hα hM hΩ hu hcamp hx hr hxr
@@ -142,7 +145,7 @@ theorem abs_campanatoLimit_sub_le (hα : 0 < α) (hM : 0 ≤ M) (hΩ : IsOpen Ω
   have hrα : (2 * dist x y) ^ α = 2 ^ α * dist x y ^ α :=
     Real.mul_rpow (by norm_num) hδ.le
   have h1' : |campanatoLimit u x - ballAverage u x (2 * dist x y)|
-      ≤ campanatoLimitConst d α * M * (2 * dist x y) ^ α := by
+      ≤ campanatoLimitConst E α * M * (2 * dist x y) ^ α := by
     rw [abs_sub_comm]; exact h1
   calc |campanatoLimit u x - campanatoLimit u y|
       ≤ |campanatoLimit u x - ballAverage u x (2 * dist x y)|
@@ -152,11 +155,11 @@ theorem abs_campanatoLimit_sub_le (hα : 0 < α) (hM : 0 ≤ M) (hΩ : IsOpen Ω
               + |ballAverage u y (2 * dist x y) - campanatoLimit u y|) := by
           gcongr
           exact abs_sub_le _ _ _
-    _ ≤ campanatoLimitConst d α * M * (2 * dist x y) ^ α
-          + (campanatoConst d * M * (2 * dist x y) ^ α
-              + campanatoLimitConst d α * M * (2 * dist x y) ^ α) := by
+    _ ≤ campanatoLimitConst E α * M * (2 * dist x y) ^ α
+          + (campanatoConst E * M * (2 * dist x y) ^ α
+              + campanatoLimitConst E α * M * (2 * dist x y) ^ α) := by
           exact add_le_add h1' (add_le_add h3 h2)
-    _ = campanatoHolderConst d α * M * dist x y ^ α := by
+    _ = campanatoHolderConst E α * M * dist x y ^ α := by
           rw [campanatoHolderConst, hrα]; ring
 
 end Pair
@@ -168,24 +171,24 @@ end Pair
 
 with `0 < α`. Then `campanatoLimit u` is a representative of `u` on every concentric ball
 `B(c, ρ)` with `5ρ ≤ R`, and it is Hölder continuous there with exponent `α` and constant
-`campanatoHolderConst d α · M`.
+`campanatoHolderConst E α · M`.
 
 The factor `5` comes from the hypothesis: the pair estimate at `x, y ∈ B(c, ρ)` uses the balls
 of radius `2 |x - y| < 4ρ` about both points, and those lie in `B(c, R)` exactly when `5ρ ≤ R`. -/
-theorem campanato_holderOnWith (hd : 0 < d) {u : EuclideanSpace ℝ (Fin d) → ℝ} {α M : ℝ}
-    (hα : 0 < α) (hM : 0 ≤ M) {c : EuclideanSpace ℝ (Fin d)} {R ρ : ℝ} (hρ : 0 < ρ)
+theorem campanato_holderOnWith [Nontrivial E] {u : E → ℝ} {α M : ℝ}
+    (hα : 0 < α) (hM : 0 ≤ M) {c : E} {R ρ : ℝ} (hρ : 0 < ρ)
     (hRρ : 5 * ρ ≤ R) (hu : MemLp u 2 (volume.restrict (Metric.ball c R)))
     (hcamp : CampanatoOn (Metric.ball c R) u α M) :
     campanatoLimit u =ᵐ[volume.restrict (Metric.ball c ρ)] u ∧
-      HolderOnWith (Real.toNNReal (campanatoHolderConst d α * M)) (Real.toNNReal α)
+      HolderOnWith (Real.toNNReal (campanatoHolderConst E α * M)) (Real.toNNReal α)
         (campanatoLimit u) (Metric.ball c ρ) := by
   have hR : 0 < R := by linarith
   have hρR : ρ ≤ R := by linarith
   have hsubball : Metric.ball c ρ ⊆ Metric.ball c R := Metric.ball_subset_ball hρR
-  have hK : 0 ≤ campanatoHolderConst d α * M :=
+  have hK : 0 ≤ campanatoHolderConst E α * M :=
     mul_nonneg (campanatoHolderConst_nonneg hα) hM
   refine ⟨?_, ?_⟩
-  · exact (campanatoLimit_ae_eq hd hα hM Metric.isOpen_ball measure_ball_lt_top.ne hu
+  · exact (campanatoLimit_ae_eq hα hM Metric.isOpen_ball measure_ball_lt_top.ne hu
       hcamp).filter_mono (ae_mono (Measure.restrict_mono hsubball le_rfl))
   · intro x hx y hy
     rcases eq_or_ne x y with rfl | hne
@@ -197,7 +200,7 @@ theorem campanato_holderOnWith (hd : 0 < d) {u : EuclideanSpace ℝ (Fin d) → 
       calc dist x y ≤ dist x c + dist c y := dist_triangle _ _ _
         _ < ρ + ρ := by rw [dist_comm c y]; linarith
         _ = 2 * ρ := by ring
-    have hballsub : ∀ z : EuclideanSpace ℝ (Fin d), dist z c < ρ →
+    have hballsub : ∀ z : E, dist z c < ρ →
         Metric.ball z (2 * dist x y) ⊆ Metric.ball c R := by
       intro z hz w hw
       rw [Metric.mem_ball] at hw ⊢
@@ -210,13 +213,13 @@ theorem campanato_holderOnWith (hd : 0 < d) {u : EuclideanSpace ℝ (Fin d) → 
       (hsubball hx) (hsubball hy) hne (hballsub x hxc) (hballsub y hyc)
     -- Transfer the real bound to the extended-distance form `HolderOnWith` states.
     have hαnn : ((Real.toNNReal α : ℝ≥0) : ℝ) = α := Real.coe_toNNReal α hα.le
-    have hKnn : ((Real.toNNReal (campanatoHolderConst d α * M) : ℝ≥0) : ℝ)
-        = campanatoHolderConst d α * M := Real.coe_toNNReal _ hK
+    have hKnn : ((Real.toNNReal (campanatoHolderConst E α * M) : ℝ≥0) : ℝ)
+        = campanatoHolderConst E α * M := Real.coe_toNNReal _ hK
     rw [edist_dist, edist_dist, hαnn,
       ENNReal.ofReal_rpow_of_nonneg dist_nonneg hα.le, ← ENNReal.ofReal_coe_nnreal,
-      ← ENNReal.ofReal_mul (Real.toNNReal (campanatoHolderConst d α * M)).coe_nonneg]
+      ← ENNReal.ofReal_mul (Real.toNNReal (campanatoHolderConst E α * M)).coe_nonneg]
     refine ENNReal.ofReal_le_ofReal ?_
     rw [hKnn, Real.dist_eq]
     exact hbound
 
-end EllipticPdes.Campanato
+end EllipticPdes.Campanato.Haar
