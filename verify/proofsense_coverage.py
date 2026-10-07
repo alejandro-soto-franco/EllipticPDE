@@ -124,6 +124,11 @@ EXEMPT = {
         "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
         "source states it in coordinates, so the warrant sits at the coordinate declaration"
     ),
+    "EllipticPdes.H1Graph.hneg_characterization": (
+        "the theorem warranted at EllipticPdes.hneg_characterization, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
     "EllipticPdes.poisson_weak_solution": (
         "the Lax-Milgram theorem at the form of the Laplacian. Evans applies it to that form "
         "in the example opening 6.2.2 and numbers nothing there, and his 6.2.2 Theorem 3 is the "

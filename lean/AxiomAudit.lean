@@ -421,3 +421,4 @@ assert_classical_axioms
   EllipticPdes.Classical.nondivOperator.weak_maximum_principle
   EllipticPdes.Classical.nondivOperator.comparison_principle
   EllipticPdes.Campanato.Haar.campanato_holderOnWith
+  EllipticPdes.H1Graph.hneg_characterization
