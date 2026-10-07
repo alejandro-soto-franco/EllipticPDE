@@ -389,7 +389,7 @@ variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))} {B : H01 Ω →L[ℝ]
 
 /-- The unit `L²` sphere of `H₀¹(Ω)`, the constraint set of the Rayleigh problem. -/
 def rayleighSphere (Ω : Set (EuclideanSpace ℝ (Fin d))) : Set (H01 Ω) :=
-  {U | ‖embL2 Ω U‖ = 1}
+  Variational.rayleighSphere (embL2 Ω)
 
 /-- The values a bilinear form takes on the unit `L²` sphere. -/
 def rayleighValues (B : H01 Ω →L[ℝ] H01 Ω →L[ℝ] ℝ) : Set ℝ :=
