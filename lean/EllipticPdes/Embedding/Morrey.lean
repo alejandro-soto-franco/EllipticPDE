@@ -28,6 +28,12 @@ centred at the base point is controlled by `Cdp · R^{1-d/p} · ‖g‖_{Lᵖ}`.
 `1 - d/p` is the Morrey Hölder exponent, produced here from Hölder's inequality with the
 conjugate exponent `q = p/(p-1)` together with the radial `L^q` norm of the singular kernel.
 
+The results are stated on a finite-dimensional real normed space `E` with an additive Haar
+measure, for functions with values in a Banach space, and with the weak Fréchet derivative of
+`EllipticPdes.HasWeakFDerivOn` (`exists_holderOnWith_of_hasWeakFDerivOn`). The statements on
+`EuclideanSpace ℝ (Fin d)` with coordinate partial derivatives (`morrey_ball`,
+`morrey_ball_contDiff`) are instances through the gradient functional `gradCLM`.
+
 The kernel-norm computation is isolated in the private lemma `setIntegral_ball_dist_rpow`,
 a closed-form value for the radial integral `∫_{B(x,R)} dist x y^s` over a ball centred at the
 singularity, valid for `s > -d`.
@@ -319,26 +325,10 @@ private theorem lens_volume_lower_bound (hE : Module.finrank ℝ E = d) (c x x' 
       _ < 2 * r := by linarith
   have hr2 : (0 : ℝ) < r - ρ / 2 := by linarith
   -- Choose an inscribed centre `q` with `dist q c ≤ r - ρ/2` and `dist q m ≤ ρ/2`.
-  obtain ⟨q, hqc, hqm⟩ : ∃ q : E,
-      dist q c ≤ r - ρ / 2 ∧ dist q m ≤ ρ / 2 := by
-    by_cases hcase : dist m c ≤ r - ρ / 2
-    · exact ⟨m, hcase, by rw [dist_self]; linarith⟩
-    · replace hcase : r - ρ / 2 < dist m c := not_le.mp hcase
-      have hDpos : 0 < dist m c := lt_trans hr2 hcase
-      set lam := (r - ρ / 2) / dist m c with hlam
-      have hlam_nn : 0 ≤ lam := by rw [hlam]; exact div_nonneg hr2.le hDpos.le
-      have hlam_lt : lam < 1 := by rw [hlam, div_lt_one hDpos]; exact hcase
-      refine ⟨c + lam • (m - c), le_of_eq ?_, ?_⟩
-      · rw [dist_eq_norm, add_sub_cancel_left, norm_smul, Real.norm_eq_abs,
-          abs_of_nonneg hlam_nn, ← dist_eq_norm, hlam, div_eq_mul_inv, mul_assoc,
-          inv_mul_cancel₀ (ne_of_gt hDpos), mul_one]
-      · have heq : (c + lam • (m - c)) - m = (1 - lam) • (c - m) := by module
-        have hval : dist (c + lam • (m - c)) m = dist m c - (r - ρ / 2) := by
-          rw [dist_eq_norm, heq, norm_smul, Real.norm_eq_abs,
-            abs_of_nonneg (by linarith : (0:ℝ) ≤ 1 - lam), ← dist_eq_norm, dist_comm c m,
-            sub_mul, one_mul, hlam, div_eq_mul_inv, mul_assoc,
-            inv_mul_cancel₀ (ne_of_gt hDpos), mul_one]
-        rw [hval]; linarith
+  obtain ⟨q, hqc, hqm⟩ : ∃ q : E, dist q c ≤ r - ρ / 2 ∧ dist q m ≤ ρ / 2 := by
+    obtain ⟨q, h1, h2⟩ := exists_dist_le_le (x := c) (z := m) (δ := r - ρ / 2) (ε := ρ / 2)
+      hr2.le (by positivity) (by rw [dist_comm c m]; linarith)
+    exact ⟨q, by rwa [dist_comm] at h1, h2⟩
   -- The inscribed ball lies inside all three balls.
   have hsub : ball q (ρ / 4) ⊆ ball x (2 * ρ) ∩ ball x' (2 * ρ) ∩ ball c r := by
     refine subset_inter (subset_inter ?_ ?_) ?_
