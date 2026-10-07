@@ -206,6 +206,13 @@ public import EllipticPdes.Sobolev.GraphLimits
 public import EllipticPdes.Form.HnegGraph
 public import EllipticPdes.Sobolev.WeakDeriv
 public import EllipticPdes.Sobolev.WeakDerivClassical
+public import EllipticPdes.Form.DivFormIsometry
+public import EllipticPdes.Form.DivFormCoord
+public import EllipticPdes.Regularity.SmoothBdd
+public import EllipticPdes.Regularity.InteriorSmoothGeneral
+public import EllipticPdes.Sobolev.GraphHaar
+public import EllipticPdes.Spectrum.RellichHaar
+public import EllipticPdes.DivFormHaar
 
 /-!
 # EllipticPdes

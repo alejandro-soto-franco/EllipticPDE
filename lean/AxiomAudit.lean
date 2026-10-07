@@ -417,6 +417,16 @@ assert_classical_axioms
   EllipticPdes.DivForm.FullEllipticOp.existence_three_of_bounded
   EllipticPdes.DivForm.FullEllipticOp.resolvent_bound_of_bounded
   EllipticPdes.DivForm.FullEllipticOp.symmetric_spectral_of_bounded
+  EllipticPdes.DivForm.FullEllipticOp.interior_smooth
+  EllipticPdes.DivForm.FullEllipticOp.exists_weakSolution_interior_smooth
+  EllipticPdes.H1Graph.embL2_isCompact_haar
+  EllipticPdes.DivForm.FullEllipticOp.fredholm_alternative_of_bounded_haar
+  EllipticPdes.DivForm.FullEllipticOp.fredholm_unique_imp_exists_of_bounded_haar
+  EllipticPdes.DivForm.FullEllipticOp.solvable_iff_orthogonal_transpose_of_bounded_haar
+  EllipticPdes.DivForm.FullEllipticOp.notMem_sigmaSet_iff_solvable_of_bounded_haar
+  EllipticPdes.DivForm.FullEllipticOp.existence_three_of_bounded_haar
+  EllipticPdes.DivForm.FullEllipticOp.resolvent_bound_of_bounded_haar
+  EllipticPdes.DivForm.FullEllipticOp.symmetric_spectral_of_bounded_haar
   EllipticPdes.Classical.hopf_lemma
   EllipticPdes.Classical.nondivOperator.weak_maximum_principle
   EllipticPdes.Classical.nondivOperator.comparison_principle
