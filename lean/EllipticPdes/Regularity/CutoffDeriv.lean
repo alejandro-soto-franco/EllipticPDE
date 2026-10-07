@@ -78,7 +78,6 @@ private lemma exists_cutoffMul_diffQuotG_norm_bound (Op : FullEllipticOp d)
     ∃ δ : ℝ, 0 < δ ∧ ∃ M : ℝ, ∀ h : ℝ, |h| < δ →
       ‖cutoffMul T.hξ (diffQuotG ℓ h hΩm (u : H1amb Ω))‖ ≤ M := by
   classical
-  have hlam : (0 : ℝ) < Op.lam := Op.toEllipticCoeff.lam_pos
   obtain ⟨δ, hδ, -, hS⟩ := T.exists_shiftAdmissible
   obtain ⟨CE, hCE0, hCE⟩ := interior_diffQuot_energy_bound Op hΩm hA T.hξ T.hθ ℓ
   set Dl : ℝ := ‖(u : H1amb Ω) ℓ.succ‖ with hDl
@@ -93,7 +92,7 @@ private lemma exists_cutoffMul_diffQuotG_norm_bound (Op : FullEllipticOp d)
   have hE : ∑ i : Fin d, ‖mulTest T.hξ (diffQuotD ℓ h hΩm ((u : H1amb Ω) i.succ))‖ ^ 2
       ≤ 2 * CE * Q / Op.lam := by
     simp only [norm_extendL2] at hmaster
-    rw [le_div_iff₀ hlam]
+    rw [le_div_iff₀ Op.toEllipticCoeff.lam_pos]
     linarith only [hmaster]
   have hD0 : ‖diffQuotD ℓ h hΩm ((u : H1amb Ω) 0)‖ ≤ Dl := norm_diffQuotD_le_grad hΩm ℓ u h
   have hnorm0 : ‖(cutoffMul T.hξ (diffQuotG ℓ h hΩm (u : H1amb Ω))) 0‖ ≤ T.hξ.supNorm * Dl := by
@@ -127,6 +126,29 @@ private lemma exists_cutoffMul_diffQuotG_norm_bound (Op : FullEllipticOp d)
   exact Real.le_sqrt_of_sq_le hsq
 
 /-! ### Membership of a cut-off directional derivative in `H₀¹(Ω)` -/
+
+/-- The pairing of an ambient element with the element with only a function coordinate `z`. -/
+private lemma inner_single_zero (X : H1amb Ω) (z : L2D Ω) :
+    ⟪X, PiLp.single 2 (0 : Fin (d + 1)) z⟫ = ⟪z, X 0⟫ := by
+  rw [real_inner_comm, inner_single_left]
+
+/-- The pairing of `z` with a cut-off class on `Ω` is the pairing of the extensions by zero
+of the class and of the cut-off `z`. -/
+private lemma inner_extendL2_mulTest (hΩm : MeasurableSet Ω) {ξ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hξ : IsTestFn Ω ξ) (z g : L2D Ω) :
+    ⟪extendL2 hΩm g, extendL2 hΩm (mulTest hξ z)⟫ = ⟪z, mulTest hξ g⟫ := by
+  rw [extendL2_inner_restrictL2, restrictL2_extendL2, ← inner_mulTest_comm hξ z g]
+  exact real_inner_comm _ _
+
+/-- The pairing of `z` with a cut-off difference quotient of `g` is the pairing of the whole-space
+difference quotient of the extension of `g` with the extension of the cut-off `z`. -/
+private lemma inner_mulTest_diffQuotD_zero (hΩm : MeasurableSet Ω)
+    {ξ : EuclideanSpace ℝ (Fin d) → ℝ} (hξ : IsTestFn Ω ξ) (z : L2D Ω) (ℓ : Fin d) (h : ℝ)
+    (g : L2D Ω) :
+    ⟪z, mulTest hξ (diffQuotD ℓ h hΩm g)⟫
+      = ⟪diffQuot ℓ h (extendL2 hΩm g), extendL2 hΩm (mulTest hξ z)⟫ := by
+  rw [← inner_mulTest_comm hξ z _, ← restrictL2_diffQuot_extendL2, ← extendL2_inner_restrictL2]
+  exact real_inner_comm _ _
 
 /-- **Cutoff of a directional derivative is admissible (Evans, *Partial Differential
 Equations* (2nd ed.), §6.3.1, Theorem 2, step 3).** For a weak solution `u ∈ H₀¹(Ω)` of
@@ -176,38 +198,15 @@ theorem exists_mem_H01_mulTest_gradient (Op : FullEllipticOp d)
   · -- The function coordinate of the limit is `ξ · ∂_ℓ u`.
     refine ext_inner_left ℝ ?_
     intro z
-    have hrw : ∀ X : H1amb Ω, ⟪X, PiLp.single 2 (0 : Fin (d + 1)) z⟫ = ⟪z, X 0⟫ := by
-      intro X
-      rw [real_inner_comm, inner_single_left]
     have hA1 : Filter.Tendsto (fun m => ⟪z, (Wn (σ m)) 0⟫) Filter.atTop (nhds ⟪z, W 0⟫) := by
-      have hbase := hWweak (PiLp.single 2 (0 : Fin (d + 1)) z)
-      simpa only [hrw] using hbase
-    have hstep : ∀ m : ℕ, ⟪z, (Wn m) 0⟫
-        = ⟪diffQuot ℓ (hs m) (extendL2 hΩm ((u : H1amb Ω) 0)),
-            extendL2 hΩm (mulTest T.hξ z)⟫ := by
-      intro m
-      have h0 : (Wn m) 0 = mulTest T.hξ (diffQuotD ℓ (hs m) hΩm ((u : H1amb Ω) 0)) := by
-        simp only [hWndef]
-        rw [cutoffMulOn_apply_zero, diffQuotG_apply]
-      rw [h0, ← inner_mulTest_comm T.hξ z _, ← restrictL2_diffQuot_extendL2,
-        ← extendL2_inner_restrictL2]
-      exact real_inner_comm _ _
-    have hη0 : ∀ m, hs (σ m) ≠ 0 := fun m => (hs_mem (σ m)).1.ne'
-    have hηlim : Filter.Tendsto (fun m => hs (σ m)) Filter.atTop (nhds 0) :=
-      hs_lim.comp hσ.tendsto_atTop
-    have hA2 : Filter.Tendsto (fun m => ⟪z, (Wn (σ m)) 0⟫) Filter.atTop
-        (nhds ⟪extendL2 hΩm ((u : H1amb Ω) ℓ.succ), extendL2 hΩm (mulTest T.hξ z)⟫) := by
-      have hbase := tendsto_inner_diffQuot_of_hasWeakDeriv ℓ
-        (hasWeakDeriv_extendL2_of_mem_H01 hΩm ℓ u.2) hη0 hηlim
-        (extendL2 hΩm (mulTest T.hξ z))
-      exact hbase.congr (fun m => (hstep (σ m)).symm)
-    have hval : ⟪extendL2 hΩm ((u : H1amb Ω) ℓ.succ), extendL2 hΩm (mulTest T.hξ z)⟫
-        = ⟪z, mulTest T.hξ ((u : H1amb Ω) ℓ.succ)⟫ := by
-      rw [extendL2_inner_restrictL2, restrictL2_extendL2,
-        ← inner_mulTest_comm T.hξ z ((u : H1amb Ω) ℓ.succ)]
-      exact real_inner_comm _ _
-    rw [hval] at hA2
-    exact tendsto_nhds_unique hA1 hA2
+      simpa only [inner_single_zero] using hWweak (PiLp.single 2 (0 : Fin (d + 1)) z)
+    have hA2 := tendsto_inner_diffQuot_of_hasWeakDeriv ℓ
+      (hasWeakDeriv_extendL2_of_mem_H01 hΩm ℓ u.2) (fun m => (hs_mem (σ m)).1.ne')
+      (hs_lim.comp hσ.tendsto_atTop) (extendL2 hΩm (mulTest T.hξ z))
+    rw [inner_extendL2_mulTest hΩm T.hξ z] at hA2
+    refine tendsto_nhds_unique hA1 (hA2.congr fun m => ?_)
+    simp only [hWndef, cutoffMulOn_apply_zero, diffQuotG_apply]
+    exact (inner_mulTest_diffQuotD_zero hΩm T.hξ z ℓ (hs (σ m)) ((u : H1amb Ω) 0)).symm
 
 /-- **Cutoff derivative is an `H₀¹` function with its weak gradient (Evans, *Partial
 Differential Equations* (2nd ed.), §6.3.1, Theorem 2, step 3).** For a weak solution
