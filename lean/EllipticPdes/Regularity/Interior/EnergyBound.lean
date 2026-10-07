@@ -589,6 +589,29 @@ private def energyK₂ (Op : FullEllipticOp d) (hA : IsLipCoeff Op.toEllipticCoe
   (1 + Op.Bsup + Op.Csup) * (isTestFn_mul hξ hξ).partialSupNorm k
     + hA.A1 * ∑ j : Fin d, (isTestFn_mul hξ hξ).partialSupNorm j
 
+/-- The linear coefficient of the energy inequality is nonnegative. -/
+private lemma energyK₁_nonneg (Op : FullEllipticOp d) (hA : IsLipCoeff Op.toEllipticCoeff)
+    (hξ : IsTestFn Ω ξ) : 0 ≤ energyK₁ Op hA hξ := by
+  have := hξ.supNorm_nonneg
+  have := hξ.sum_partialSupNorm_nonneg
+  have := Op.toEllipticCoeff.Λ_nonneg
+  have := hA.A1_nonneg
+  have := Op.Bsup_nonneg
+  have := Op.Csup_nonneg
+  unfold energyK₁
+  positivity
+
+/-- The quadratic coefficient of the energy inequality is nonnegative. -/
+private lemma energyK₂_nonneg (Op : FullEllipticOp d) (hA : IsLipCoeff Op.toEllipticCoeff)
+    (hξ : IsTestFn Ω ξ) (k : Fin d) : 0 ≤ energyK₂ Op hA hξ k := by
+  have := (isTestFn_mul hξ hξ).sum_partialSupNorm_nonneg
+  have := (isTestFn_mul hξ hξ).partialSupNorm_nonneg k
+  have := hA.A1_nonneg
+  have := Op.Bsup_nonneg
+  have := Op.Csup_nonneg
+  unfold energyK₂
+  positivity
+
 /-- A component of a finite family is bounded by the root of the sum of squared norms. -/
 private lemma norm_le_sqrt_sum_sq {ι E : Type*} [Fintype ι] [SeminormedAddCommGroup E]
     (a : ι → E) (i : ι) : ‖a i‖ ≤ Real.sqrt (∑ j, ‖a j‖ ^ 2) :=
@@ -695,25 +718,8 @@ theorem interior_diffQuot_energy_bound (Op : FullEllipticOp d) (hΩm : Measurabl
         ≤ C * (‖f‖ ^ 2 + ‖(u : H1amb Ω) 0‖ ^ 2) := by
   classical
   have hlam := Op.toEllipticCoeff.lam_pos
-  have hK₁ : 0 ≤ energyK₁ Op hA hξ := by
-    have := hξ.supNorm_nonneg
-    have := hξ.partialSupNorm_nonneg
-    unfold energyK₁
-    have h1 := Finset.sum_nonneg fun j (_ : j ∈ Finset.univ) => hξ.partialSupNorm_nonneg j
-    have := Op.toEllipticCoeff.Λ_nonneg
-    have := hA.A1_nonneg
-    have := Op.Bsup_nonneg
-    have := Op.Csup_nonneg
-    positivity
-  have hK₂ : 0 ≤ energyK₂ Op hA hξ k := by
-    unfold energyK₂
-    have h1 := Finset.sum_nonneg fun j (_ : j ∈ Finset.univ) =>
-      (isTestFn_mul hξ hξ).partialSupNorm_nonneg j
-    have := (isTestFn_mul hξ hξ).partialSupNorm_nonneg k
-    have := hA.A1_nonneg
-    have := Op.Bsup_nonneg
-    have := Op.Csup_nonneg
-    positivity
+  have hK₁ := energyK₁_nonneg Op hA hξ
+  have hK₂ := energyK₂_nonneg Op hA hξ k
   set κ : ℝ := 3 * (1 + d * (1 + 2 * Op.gardingγ) / Op.lam) with hκ
   have hγ := Op.gardingγ_nonneg
   refine ⟨(energyK₁ Op hA hξ ^ 2 / (2 * Op.toEllipticCoeff.lam) + energyK₂ Op hA hξ k) * κ,
