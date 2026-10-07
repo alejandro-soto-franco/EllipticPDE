@@ -37,9 +37,9 @@ step, at the price of a weak derivative per rung.
 Mathlib's `MeasureTheory.eLpNorm_le_eLpNorm_fderiv_of_eq` asks for `ContDiff ℝ 1` and compact
 support, neither of which an `Lᵖ` class with weak derivatives has. Two devices bridge that.
 
-* A smooth cutoff `η` supported in the ball turns a weak gradient on the ball into a compactly
-  supported weak gradient on the whole space, with the product-rule term `v ∂ₖη`
-  (`hasWeakGradOn_univ_mul_cutoff`).
+* A smooth cutoff `η` supported in the ball turns a weak derivative on the ball into a compactly
+  supported weak derivative on the whole space, with the product-rule term `v ∂η`
+  (`HasWeakFDerivOn.smul_left` and `HasWeakFDerivOn.top_of_forall_notMem_eq_zero`).
 * Mollification turns that into a smooth compactly supported function whose classical partials
   are the mollified weak gradient (`partialD_convolution_eq_of_hasWeakGradOn` at `Set.univ`),
   whose `Lᵖ` seminorms Young's inequality (`eLpNorm_convolution_le`) keeps bounded uniformly in
@@ -49,7 +49,6 @@ support, neither of which an `Lᵖ` class with weak derivatives has. Two devices
 ## Main declarations
 
 * `HasWeakGradOn.mono`: a weak gradient restricts to a subset.
-* `hasWeakGradOn_univ_mul_cutoff`: the product rule against a smooth cutoff.
 * `exists_eLpNorm_sobolevConj_le`: the bootstrap in general dimension and at a general exponent
   pair, with a constant independent of the function.
 * `exists_eLpNorm_sobolevConj_le_of_le`: the same, fed by data at a higher exponent.
@@ -129,94 +128,6 @@ theorem partialD_mul {η φ : EuclideanSpace ℝ (Fin d) → ℝ} (k : Fin d)
   simp only [_root_.add_apply, FunLike.coe_smul, Pi.smul_apply,
     smul_eq_mul, partialD]
   ring
-
-/-- A function integrable on a set stays integrable after multiplication by a continuous
-function of compact support. -/
-theorem integrableOn_mul_of_hasCompactSupport {α : Type*} [TopologicalSpace α]
-    {m : MeasurableSpace α} [OpensMeasurableSpace α] {μ : Measure α} {B : Set α} {f ψ : α → ℝ}
-    (hf : IntegrableOn f B μ) (hψ : Continuous ψ) (hψs : HasCompactSupport ψ) :
-    IntegrableOn (fun x => f x * ψ x) B μ := by
-  obtain ⟨C, hC⟩ := hψs.exists_bound_of_continuous hψ
-  exact hf.mul_bdd hψ.aestronglyMeasurable (Filter.Eventually.of_forall hC)
-
-/-- **Cutting a weak gradient off.** If `g` is the weak gradient of `u` on `B` and `η` is a
-smooth compactly supported function with `tsupport η ⊆ B`, then the extension by zero of `η u`
-has a weak gradient on the whole space, namely `η gₖ + u ∂ₖη`. Testing against `φ` reduces to
-testing the hypothesis against `η φ`, which is again a test function supported in `B`, and the
-product rule supplies the extra term. This is what makes the mollification argument reach a
-compactly supported function without a boundary contribution from `∂B`. -/
-theorem hasWeakGradOn_univ_mul_cutoff {B : Set (EuclideanSpace ℝ (Fin d))}
-    (hB : MeasurableSet B) {η : EuclideanSpace ℝ (Fin d) → ℝ}
-    (hηc : ContDiff ℝ (⊤ : ℕ∞) η) (hηcs : HasCompactSupport η) (hηs : tsupport η ⊆ B)
-    {u : EuclideanSpace ℝ (Fin d) → ℝ} {g : Fin d → EuclideanSpace ℝ (Fin d) → ℝ}
-    (hu : IntegrableOn u B volume) (hgi : ∀ k, IntegrableOn (g k) B volume)
-    (h : HasWeakGradOn B u g) :
-    HasWeakGradOn Set.univ (fun x => η x * B.indicator u x)
-      (fun k x => η x * B.indicator (g k) x + partialD k η x * B.indicator u x) := by
-  intro φ hφc hφcs _ k
-  have hηd : Differentiable ℝ η := hηc.differentiable (by simp)
-  have hφd : Differentiable ℝ φ := hφc.differentiable (by simp)
-  -- The multipliers are continuous with compact support, hence bounded.
-  have hηpc : Continuous (partialD k η) :=
-    (hηc.continuous_fderiv (by simp)).clm_apply continuous_const
-  have hηpcs : HasCompactSupport (partialD k η) :=
-    hηcs.fderiv_apply (𝕜 := ℝ) (EuclideanSpace.single k (1 : ℝ))
-  have hφpc : Continuous (partialD k φ) :=
-    (hφc.continuous_fderiv (by simp)).clm_apply continuous_const
-  -- The hypothesis applied to the test function `η φ`.
-  have hψs : tsupport (fun x => η x * φ x) ⊆ B :=
-    (closure_mono (Function.support_mul_subset_left η φ)).trans hηs
-  have key := h (fun x => η x * φ x) (hηc.mul hφc) hφcs.mul_left hψs k
-  have hprod : ∀ x, partialD k (fun z => η z * φ z) x
-      = partialD k η x * φ x + η x * partialD k φ x :=
-    fun x => partialD_mul k (hηd x) (hφd x)
-  -- Integrability of the four products against the compactly supported smooth multipliers.
-  have hi1 : IntegrableOn (fun x => u x * (partialD k η x * φ x)) B volume :=
-    integrableOn_mul_of_hasCompactSupport hu (hηpc.mul hφc.continuous) hηpcs.mul_right
-  have hi2 : IntegrableOn (fun x => u x * (η x * partialD k φ x)) B volume :=
-    integrableOn_mul_of_hasCompactSupport hu (hηc.continuous.mul hφpc) hηcs.mul_right
-  have hi3 : IntegrableOn (fun x => (η x * g k x) * φ x) B volume :=
-    (integrableOn_mul_of_hasCompactSupport (hgi k) (hηc.continuous.mul hφc.continuous)
-      hηcs.mul_right).congr (Filter.Eventually.of_forall fun x => by simp only [Pi.mul_apply]; ring)
-  have hi4 : IntegrableOn (fun x => (partialD k η x * u x) * φ x) B volume :=
-    hi1.congr (Filter.Eventually.of_forall fun x => by ring)
-  -- Split the hypothesis by the product rule.
-  have hsplit : (∫ x in B, u x * (partialD k η x * φ x))
-      + ∫ x in B, u x * (η x * partialD k φ x)
-      = - ∫ x in B, (η x * g k x) * φ x := by
-    have hlhs : (∫ x in B, u x * (partialD k η x * φ x))
-        + ∫ x in B, u x * (η x * partialD k φ x)
-        = ∫ x in B, u x * partialD k (fun z => η z * φ z) x := by
-      rw [← integral_add hi1 hi2]
-      exact integral_congr_ae (Filter.Eventually.of_forall fun x => by
-        simp only [hprod]; ring)
-    rw [hlhs, key]
-    exact congrArg Neg.neg
-      (integral_congr_ae (Filter.Eventually.of_forall fun x => by ring))
-  -- Collapse the two whole-space integrals of the goal onto `B`.
-  have hzeroL : ∀ x ∉ B, (η x * B.indicator u x) * partialD k φ x = 0 := by
-    intro x hx
-    rw [Set.indicator_of_notMem hx, mul_zero, zero_mul]
-  have hzeroR : ∀ x ∉ B,
-      (η x * B.indicator (g k) x + partialD k η x * B.indicator u x) * φ x = 0 := by
-    intro x hx
-    rw [Set.indicator_of_notMem hx, Set.indicator_of_notMem hx, mul_zero, mul_zero, add_zero,
-      zero_mul]
-  have hL : ∫ x, (η x * B.indicator u x) * partialD k φ x
-      = ∫ x in B, u x * (η x * partialD k φ x) := by
-    rw [(setIntegral_eq_integral_of_forall_compl_eq_zero hzeroL).symm]
-    exact setIntegral_congr_fun hB fun x hx => by
-      rw [Set.indicator_of_mem hx]; ring
-  have hR : ∫ x, (η x * B.indicator (g k) x + partialD k η x * B.indicator u x) * φ x
-      = (∫ x in B, (η x * g k x) * φ x) + ∫ x in B, (partialD k η x * u x) * φ x := by
-    rw [(setIntegral_eq_integral_of_forall_compl_eq_zero hzeroR).symm, ← integral_add hi3 hi4]
-    exact setIntegral_congr_fun hB fun x hx => by
-      rw [Set.indicator_of_mem hx, Set.indicator_of_mem hx]; ring
-  have hswap : ∫ x in B, (partialD k η x * u x) * φ x
-      = ∫ x in B, u x * (partialD k η x * φ x) :=
-    integral_congr_ae (Filter.Eventually.of_forall fun x => by ring)
-  rw [Measure.restrict_univ, hL, hR, hswap]
-  linarith [hsplit]
 
 /-! ### Bootstrap -/
 
