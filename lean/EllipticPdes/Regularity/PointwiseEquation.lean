@@ -96,6 +96,22 @@ theorem hasWeakGradOn_of_contDiffOn {W : Set (EuclideanSpace ℝ (Fin d))} (hW :
     HasWeakGradOn W v fun k => partialD k v :=
   fun _ hφc hφcs hφW k => setIntegral_mul_partialD_eq_neg hW hv hφc hφcs hφW k
 
+/-- The partial derivatives of a representative that is `C²` on an open set are `C¹` there. -/
+private lemma contDiffOn_partialD_one {W : Set (EuclideanSpace ℝ (Fin d))} (hWo : IsOpen W)
+    {u' : EuclideanSpace ℝ (Fin d) → ℝ} (hsm : ContDiffOn ℝ 2 u' W) (i : Fin d) :
+    ContDiffOn ℝ 1 (partialD i u') W :=
+  (hsm.fderiv_of_isOpen hWo (by norm_num)).clm_apply contDiffOn_const
+
+/-- The flux `a_{ij} ∂ᵢu'` of a representative that is `C²` on an open set has a continuous
+divergence there when `a_{ij}` is `C¹`. -/
+private lemma continuousOn_partialD_flux (Op : FullEllipticOp d)
+    {W : Set (EuclideanSpace ℝ (Fin d))} (hWo : IsOpen W)
+    {u' : EuclideanSpace ℝ (Fin d) → ℝ} (hsm : ContDiffOn ℝ 2 u' W)
+    (hA1 : IsC1Coeff Op.toEllipticCoeff) (i j : Fin d) :
+    ContinuousOn (partialD j fun y => Op.a y i j * partialD i u' y) W :=
+  (((hA1.contDiff i j).contDiffOn.mul (contDiffOn_partialD_one hWo hsm i)
+    ).continuousOn_fderiv_of_isOpen hWo le_rfl).clm_apply continuousOn_const
+
 /-- On every ball whose closure lies in an open set `W`, the weak gradient of a `W^{1,2}`
 function agrees almost everywhere with the classical gradient of a `C²` representative, hence
 on `W`. -/
@@ -104,8 +120,7 @@ private lemma grad_ae_eq_partialD {Ω W : Set (EuclideanSpace ℝ (Fin d))} (u :
     (hu' : u' =ᵐ[volume.restrict W] fun x => ((u : H1amb Ω) 0 : L2D Ω) x)
     (hsm : ContDiffOn ℝ 2 u' W) (i : Fin d) :
     (fun x => ((u : H1amb Ω) i.succ : L2D Ω) x) =ᵐ[volume.restrict W] partialD i u' := by
-  have hgrad1 : ∀ i, ContDiffOn ℝ 1 (partialD i u') W := fun i =>
-    (hsm.fderiv_of_isOpen hWo (by norm_num)).clm_apply contDiffOn_const
+  have hgrad1 := contDiffOn_partialD_one hWo hsm
   have hgradc : ∀ i, ContinuousOn (partialD i u') W := fun i => (hgrad1 i).continuousOn
   have hweak : HasWeakGradOn W (fun x => ((u : H1amb Ω) 0 : L2D Ω) x)
       (fun i x => ((u : H1amb Ω) i.succ : L2D Ω) x) :=
@@ -135,11 +150,8 @@ private lemma locallyIntegrableOn_residual (Op : FullEllipticOp d)
     (hA1 : IsC1Coeff Op.toEllipticCoeff) (f : L2D Ω) :
     LocallyIntegrableOn (fun x => -(∑ i, ∑ j, partialD j (fun y => Op.a y i j * partialD i u' y) x)
       + ∑ i, Op.b x i * partialD i u' x + Op.c x * u' x - f x) W volume := by
-  have hgrad1 : ∀ i, ContDiffOn ℝ 1 (partialD i u') W := fun i =>
-    (hsm.fderiv_of_isOpen hWo (by norm_num)).clm_apply contDiffOn_const
-  have hdivc : ∀ i j, ContinuousOn (partialD j fun y => Op.a y i j * partialD i u' y) W :=
-    fun i j => (((hA1.contDiff i j).contDiffOn.mul (hgrad1 i)).continuousOn_fderiv_of_isOpen
-      hWo le_rfl).clm_apply continuousOn_const
+  have hgrad1 := contDiffOn_partialD_one hWo hsm
+  have hdivc := continuousOn_partialD_flux Op hWo hsm hA1
   rw [locallyIntegrableOn_iff hWo.isLocallyClosed]
   intro K hKW hK
   have hbb : ∀ i, ∀ᵐ x ∂(volume.restrict K), ‖Op.b x i‖ ≤ Op.Bsup := fun i =>
@@ -164,6 +176,21 @@ private lemma locallyIntegrableOn_residual (Op : FullEllipticOp d)
       one_le_two
   exact ((h1.neg.add h2).add h3).sub h4
 
+/-- An `L²(Ω)` class times a continuous function with compact support in a measurable `W ⊆ Ω` is
+integrable on `W`. -/
+private lemma integrable_L2D_mul_of_tsupport_subset {Ω W : Set (EuclideanSpace ℝ (Fin d))}
+    (f : L2D Ω) (hWm : MeasurableSet W) (hWΩ : W ⊆ Ω) {φ : EuclideanSpace ℝ (Fin d) → ℝ}
+    (hφcont : Continuous φ) (hφcs : HasCompactSupport φ) (hφW : tsupport φ ⊆ W) :
+    Integrable (fun x => (f x : ℝ) * φ x) (volume.restrict W) := by
+  obtain ⟨M, hM⟩ := hφcs.exists_bound_of_continuous hφcont
+  have hfK : IntegrableOn (f : EuclideanSpace ℝ (Fin d) → ℝ) (tsupport φ) volume := by
+    have : IsFiniteMeasure (volume.restrict (tsupport φ)) :=
+      ⟨by rw [Measure.restrict_apply_univ]; exact hφcs.isCompact.measure_lt_top⟩
+    exact ((Lp.memLp f).mono_measure
+      (Measure.restrict_mono (hφW.trans hWΩ) le_rfl)).integrable one_le_two
+  exact IntegrableOn.of_forall_sdiff_eq_zero (integrableOn_mul_bounded hfK hφcont hM) hWm
+    fun x hx => by rw [image_eq_zero_of_notMem_tsupport hx.2, mul_zero]
+
 /-- **The residual integrates to zero.** If the weak formulation, read against a `C²`
 representative `u'` on an open set `W`, holds against a test function `φ` supported in `W`, then
 the residual of the equation integrates to zero against `φ`. The principal term is integrated by
@@ -182,14 +209,11 @@ private lemma integral_residual_eq_zero (Op : FullEllipticOp d)
   classical
   have hWm := hWo.measurableSet
   have hu'c : ContinuousOn u' W := hsm.continuousOn
-  have hgrad1 : ∀ i, ContDiffOn ℝ 1 (partialD i u') W := fun i =>
-    (hsm.fderiv_of_isOpen hWo (by norm_num)).clm_apply contDiffOn_const
+  have hgrad1 := contDiffOn_partialD_one hWo hsm
   have hgradc : ∀ i, ContinuousOn (partialD i u') W := fun i => (hgrad1 i).continuousOn
   have hprod1 : ∀ i j, ContDiffOn ℝ 1 (fun y => Op.a y i j * partialD i u' y) W := fun i j =>
     (hA1.contDiff i j).contDiffOn.mul (hgrad1 i)
-  have hdivc : ∀ i j, ContinuousOn (partialD j fun y => Op.a y i j * partialD i u' y) W :=
-    fun i j => ((hprod1 i j).continuousOn_fderiv_of_isOpen hWo le_rfl).clm_apply
-      continuousOn_const
+  have hdivc := continuousOn_partialD_flux Op hWo hsm hA1
   have hφcont : Continuous φ := hφc.continuous
   have hoff : ∀ G : EuclideanSpace ℝ (Fin d) → ℝ, ∀ x, x ∉ tsupport φ → φ x * G x = 0 :=
     fun G x hx => by rw [image_eq_zero_of_notMem_tsupport hx, zero_mul]
@@ -205,15 +229,7 @@ private lemma integral_residual_eq_zero (Op : FullEllipticOp d)
   have hint_c : Integrable (fun x => Op.c x * (φ x * u' x)) (volume.restrict W) :=
     Integrable.bdd_mul (hint _ hu'c) Op.c_meas.aestronglyMeasurable
       (ae_restrict_of_ae (Op.c_bdd.mono fun x hx => by simpa [Real.norm_eq_abs] using hx))
-  have hint_f : Integrable (fun x => (f x : ℝ) * φ x) (volume.restrict W) := by
-    obtain ⟨M, hM⟩ := hφcs.exists_bound_of_continuous hφcont
-    have hfK : IntegrableOn (f : EuclideanSpace ℝ (Fin d) → ℝ) (tsupport φ) volume := by
-      have : IsFiniteMeasure (volume.restrict (tsupport φ)) :=
-        ⟨by rw [Measure.restrict_apply_univ]; exact hφcs.isCompact.measure_lt_top⟩
-      exact ((Lp.memLp f).mono_measure
-        (Measure.restrict_mono (hφW.trans hWΩ) le_rfl)).integrable one_le_two
-    exact IntegrableOn.of_forall_sdiff_eq_zero (integrableOn_mul_bounded hfK hφcont hM) hWm
-      fun x hx => by rw [image_eq_zero_of_notMem_tsupport hx.2, mul_zero]
+  have hint_f := integrable_L2D_mul_of_tsupport_subset f hWm hWΩ hφcont hφcs hφW
   -- integration by parts on the principal term
   have hibp : ∀ i j, ∫ x in W, Op.a x i j * partialD i u' x * partialD j φ x
       = -∫ x in W, φ x * partialD j (fun y => Op.a y i j * partialD i u' y) x := fun i j => by
