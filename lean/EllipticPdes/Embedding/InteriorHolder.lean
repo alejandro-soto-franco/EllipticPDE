@@ -227,9 +227,8 @@ theorem interior_holder_estimate_of_conjugate {n : ℕ} (Op : FullEllipticOp (n 
 solution `u ∈ H₀¹(Ω)` of `L u = f` with `W^{1,∞}` principal coefficients has, on every ball
 `B(c, r)` with `r < R` and `closedBall c R ⊆ Ω`, a representative that is Hölder continuous with
 exponent `1/2` and constant a multiple of `‖f‖ + ‖u‖`, the multiplier being quantified before
-the solution and the datum, so it depends only on the operator and the two radii. At `d = 2` the
-Sobolev conjugate of `2` degenerates, so the step is taken at `p = 4/3`, paying the finite
-measure of the ball, and raises the gradient from `L²` to `L⁴`. `morrey_ball` then applies at
+the solution and the datum. At `d = 2` the Sobolev conjugate of `2` degenerates, so the step is
+taken at `p = 4/3` and raises the gradient from `L²` to `L⁴`; `morrey_ball` then applies at
 `p = 4 > 2 = d`. -/
 theorem interior_holder_estimate_two (Op : FullEllipticOp 2)
     {Ω : Set (EuclideanSpace ℝ (Fin 2))} (hΩm : MeasurableSet Ω) (hΩo : IsOpen Ω)
