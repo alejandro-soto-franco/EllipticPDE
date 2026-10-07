@@ -61,6 +61,10 @@ otherwise. Declarations are named without their `EllipticPdes.` prefix.
 | Exceptional set and resolvent bound | `DivForm.FullEllipticOp.existence_three_of_bounded`, `DivForm.FullEllipticOp.resolvent_bound_of_bounded` |
 | Spectral theorem for a symmetric operator | `DivForm.FullEllipticOp.symmetric_spectral_of_bounded` |
 | Abstract Fredholm and spectral layers on a Hilbert space | `GardingForm`, `Variational` |
+| The same bounded-domain theorems for any additive Haar measure | `DivForm.FullEllipticOp.fredholm_alternative_of_bounded_haar` and the other `_of_bounded_haar` theorems |
+| Interior smoothness of weak solutions | `DivForm.FullEllipticOp.interior_smooth`, `DivForm.FullEllipticOp.exists_weakSolution_interior_smooth` |
+| `H⁻¹` as `f₀ - div F` with the minimal norm | `H1Graph.hneg_characterization` |
+| Difference quotients along a vector | `Regularity.diffQuotAlong` |
 | Hopf lemma, weak maximum and comparison principles | `Classical.hopf_lemma`, `Classical.nondivOperator.weak_maximum_principle`, `Classical.nondivOperator.comparison_principle` |
 | Campanato's characterisation of Hölder continuity | `Campanato.Haar.campanato_holderOnWith` |
 | Morrey, Gagliardo-Nirenberg, Young, chain rule | `Embedding/Morrey.lean`, `Embedding/WeakSobolev.lean`, `Analysis/Mollifier.lean`, `Embedding/WeakDerivChain.lean` |
