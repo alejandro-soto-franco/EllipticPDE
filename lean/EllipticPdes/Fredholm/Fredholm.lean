@@ -72,8 +72,7 @@ def opT : H01 Ω →L[ℝ] H01 Ω := continuousLinearMapOfBilin (zerothForm Ω)
 def opE : H01 Ω ≃L[ℝ] H01 Ω := (Op.gardingForm Ω).opE
 
 /-- The compact part of the reduction: `opK = γ·opE⁻¹·opT`. -/
-def opK : H01 Ω →L[ℝ] H01 Ω :=
-  Op.gardingγ • ((Op.opE Ω).symm : H01 Ω →L[ℝ] H01 Ω).comp (opT Ω)
+def opK : H01 Ω →L[ℝ] H01 Ω := (Op.gardingForm Ω).opK
 
 /-- The abstract `opT` of the Gårding form is the Riesz operator of the `L²` form. -/
 lemma gardingForm_opT : (Op.gardingForm Ω).opT = opT Ω := rfl
