@@ -133,14 +133,13 @@ theorem exists_norm_redDatum_le (Op : FullEllipticOp d) (D : CoeffWeakGrad Op.to
   have hS5 : 0 ≤ S5 := Finset.sum_nonneg fun i _ => hK5 i
   refine ⟨Mη + S1 + S2 + S1 + S4 + S5, by positivity, fun {ζ} hζ hζη U f => ?_⟩
   set N : ℝ := ‖U 0‖ + ∑ i : Fin d, ‖mulTest hζ (U i.succ)‖ with hN
-  have hGi : ∀ i : Fin d, ‖mulTest hζ (U i.succ)‖ ≤ ∑ i : Fin d, ‖mulTest hζ (U i.succ)‖ :=
-    fun i => Finset.single_le_sum (f := fun i : Fin d => ‖mulTest hζ (U i.succ)‖)
-      (fun i _ => norm_nonneg _) (Finset.mem_univ i)
   have hG0 : 0 ≤ ∑ i : Fin d, ‖mulTest hζ (U i.succ)‖ :=
     Finset.sum_nonneg fun i _ => norm_nonneg _
   have hN0 : ‖U 0‖ ≤ N := by rw [hN]; linarith
   have hNi : ∀ i : Fin d, ‖mulTest hζ (U i.succ)‖ ≤ N := fun i => by
-    rw [hN]; linarith [hGi i, norm_nonneg (U 0)]
+    rw [hN]
+    linarith [Finset.single_le_sum (f := fun i : Fin d => ‖mulTest hζ (U i.succ)‖)
+      (fun i _ => norm_nonneg _) (Finset.mem_univ i), norm_nonneg (U 0)]
   have hEq : ∀ j : Fin d, Set.EqOn ζ 1 (tsupport (partialD j η)) := fun j =>
     hζη.mono (tsupport_partialD_subset j η)
   have t0 : ‖mulTest hη f‖ ≤ Mη * ‖f‖ := norm_mulTest_le_supNorm hη f
@@ -173,11 +172,11 @@ theorem exists_norm_redDatum_le (Op : FullEllipticOp d) (D : CoeffWeakGrad Op.to
       (mul_le_mul_of_nonneg_left hN0 (hK5 i)))
   rw [hS3] at t3
   have hf0 := norm_nonneg f
-  have hU0 : 0 ≤ N := le_trans (norm_nonneg _) hN0
   rw [redDatum]
   refine (norm_six_le _ _ _ _ _ _).trans ?_
   simp only at t1 t2 t3 t4 t5
-  nlinarith [t0, t1, t2, t3, t4, t5, mul_nonneg hMη hU0, mul_nonneg hS1 hf0,
+  nlinarith [t0, t1, t2, t3, t4, t5, mul_nonneg hMη (hN0.trans' (norm_nonneg _)),
+    mul_nonneg hS1 hf0,
     mul_nonneg hS2 hf0, mul_nonneg hS4 hf0, mul_nonneg hS5 hf0]
 
 /-- **Invisibility of the cutoff where it is one.** If `η = 1` near `V ⊆ Ω`, every coordinate of
