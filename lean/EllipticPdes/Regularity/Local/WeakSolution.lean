@@ -88,6 +88,23 @@ theorem integral_extendL2_mul_eq {g : L2D Ω} (hΩm : MeasurableSet Ω)
   filter_upwards [ae_restrict_of_ae (coeFn_extendL2 hΩm g), ae_restrict_mem hΩm] with x h1 h2
   rw [h1, Set.indicator_of_mem h2]
 
+/-- The function coordinate of `η U` is `η U₀`. -/
+theorem cutoffMul_zero_ae {η : EuclideanSpace ℝ (Fin d) → ℝ} (hη : IsTestFn Ω η)
+    (U : H1amb Ω) :
+    ((cutoffMul hη U) 0 : EuclideanSpace ℝ (Fin d) → ℝ)
+      =ᵐ[volume.restrict Ω] fun x => η x * (U 0 x : ℝ) := by
+  rw [cutoffMulOn_apply_zero]; exact mulCutoff_coeFn hη (U 0)
+
+/-- The gradient coordinates of `η U` are `η U_{i+1} + ∂_i η U₀`. -/
+theorem cutoffMul_succ_ae {η : EuclideanSpace ℝ (Fin d) → ℝ} (hη : IsTestFn Ω η)
+    (U : H1amb Ω) (i : Fin d) :
+    ((cutoffMul hη U) i.succ : EuclideanSpace ℝ (Fin d) → ℝ)
+      =ᵐ[volume.restrict Ω] fun x => η x * (U i.succ x : ℝ) + partialD i η x * (U 0 x : ℝ) := by
+  rw [cutoffMulOn_apply_succ]
+  filter_upwards [Lp.coeFn_add (mulTest hη (U i.succ)) (mulTestPartial hη i (U 0)),
+    mulCutoff_coeFn hη (U i.succ), mulCutoffPartial_coeFn hη i (U 0)] with x h1 h2 h3
+  rw [h1, Pi.add_apply, h2, h3]
+
 /-- A whole-space `L²` class times a continuous compactly supported function is integrable. -/
 theorem integrable_eucL2_mul {g : EucL2 d} {ψ : EuclideanSpace ℝ (Fin d) → ℝ}
     (hc : Continuous ψ) (hcs : HasCompactSupport ψ) :
@@ -173,23 +190,20 @@ theorem cutoffMul_mem_H01_of_mem_W12 (hΩo : IsOpen Ω) {η : EuclideanSpace ℝ
   apply PiLp.ext
   intro j
   refine Fin.cases ?_ (fun i => ?_) j
-  · rw [cutoffMulOn_apply_zero]
-    simp only [Fin.cons_zero]
+  · simp only [Fin.cons_zero]
     apply Lp.ext
-    filter_upwards [mulCutoff_coeFn hη (U 0),
+    filter_upwards [cutoffMul_zero_ae hη U,
       MemLp.coeFn_toLp (hwL.mono_measure Measure.restrict_le_self),
       ae_restrict_of_ae (coeFn_extendL2 hΩm (U 0)), ae_restrict_mem hΩm] with x h1 h2 h3 h4
     rw [h1, h2, h3, Set.indicator_of_mem h4]
-  · rw [cutoffMulOn_apply_succ]
-    simp only [Fin.cons_succ]
+  · simp only [Fin.cons_succ]
     apply Lp.ext
-    filter_upwards [Lp.coeFn_add (mulTest hη (U i.succ)) (mulTestPartial hη i (U 0)),
-      mulCutoff_coeFn hη (U i.succ), mulCutoffPartial_coeFn hη i (U 0),
+    filter_upwards [cutoffMul_succ_ae hη U i,
       MemLp.coeFn_toLp ((hhL i).mono_measure Measure.restrict_le_self),
       ae_restrict_of_ae (coeFn_extendL2 hΩm (U 0)),
       ae_restrict_of_ae (coeFn_extendL2 hΩm (U i.succ)), ae_restrict_mem hΩm]
-      with x h0 h1 h2 h3 h4 h5 h6
-    rw [h0, Pi.add_apply, h1, h2, h3, h4, h5, Set.indicator_of_mem h6, Set.indicator_of_mem h6]
+      with x h1 h2 h3 h4 h5
+    rw [h1, h2, h3, h4, Set.indicator_of_mem h5, Set.indicator_of_mem h5]
 
 /-! ### Ambient pairing and the local weak formulation -/
 

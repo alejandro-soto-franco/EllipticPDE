@@ -180,23 +180,6 @@ theorem exists_norm_redDatum_le (Op : FullEllipticOp d) (D : CoeffWeakGrad Op.to
   nlinarith [t0, t1, t2, t3, t4, t5, mul_nonneg hMη hU0, mul_nonneg hS1 hf0,
     mul_nonneg hS2 hf0, mul_nonneg hS4 hf0, mul_nonneg hS5 hf0]
 
-/-- The function coordinate of `η U` is `η U₀`. -/
-theorem cutoffMul_zero_ae {η : EuclideanSpace ℝ (Fin d) → ℝ} (hη : IsTestFn Ω η)
-    (U : H1amb Ω) :
-    ((cutoffMul hη U) 0 : EuclideanSpace ℝ (Fin d) → ℝ)
-      =ᵐ[volume.restrict Ω] fun x => η x * (U 0 x : ℝ) := by
-  rw [cutoffMulOn_apply_zero]; exact mulCutoff_coeFn hη (U 0)
-
-/-- The gradient coordinates of `η U` are `η U_{i+1} + ∂_i η U₀`. -/
-theorem cutoffMul_succ_ae {η : EuclideanSpace ℝ (Fin d) → ℝ} (hη : IsTestFn Ω η)
-    (U : H1amb Ω) (i : Fin d) :
-    ((cutoffMul hη U) i.succ : EuclideanSpace ℝ (Fin d) → ℝ)
-      =ᵐ[volume.restrict Ω] fun x => η x * (U i.succ x : ℝ) + partialD i η x * (U 0 x : ℝ) := by
-  rw [cutoffMulOn_apply_succ]
-  filter_upwards [Lp.coeFn_add (mulTest hη (U i.succ)) (mulTestPartial hη i (U 0)),
-    mulCutoff_coeFn hη (U i.succ), mulCutoffPartial_coeFn hη i (U 0)] with x h1 h2 h3
-  rw [h1, Pi.add_apply, h2, h3]
-
 /-- **Invisibility of the cutoff where it is one.** If `η = 1` near `V ⊆ Ω`, every coordinate of
 `η U`, cut down to `V`, is the same coordinate of `U`. -/
 theorem restrictL2_extendL2_cutoffMul {V : Set (EuclideanSpace ℝ (Fin d))} (hΩm : MeasurableSet Ω)

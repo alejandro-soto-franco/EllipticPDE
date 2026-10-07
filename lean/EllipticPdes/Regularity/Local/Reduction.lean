@@ -174,6 +174,68 @@ theorem principal_leibniz (Op : FullEllipticOp d) (D : CoeffWeakGrad Op.toEllipt
   rw [hL, hR] at key
   linarith [key]
 
+/-- **Principal term of the cutoff reduction.** For an element `W` of the ambient space whose
+gradient coordinates are those of `η U`, the principal term `∫ a_{ij} W_i ∂_j v` is the sum of
+the terms of `F`, with the derivative of `a_{ij}` entering through `principal_leibniz`. -/
+theorem principal_cutoff_term (Op : FullEllipticOp d) (D : CoeffWeakGrad Op.toEllipticCoeff)
+    {U : H1amb Ω} (hU : U ∈ W12 Ω) {η v : EuclideanSpace ℝ (Fin d) → ℝ} (hη : IsTestFn Ω η)
+    (hv : IsTestFn Ω v) {W : H1amb Ω}
+    (hWs : ∀ i : Fin d, (W i.succ : EuclideanSpace ℝ (Fin d) → ℝ) =ᵐ[volume.restrict Ω]
+      fun x => η x * (U i.succ x : ℝ) + partialD i η x * (U 0 x : ℝ)) (i j : Fin d) :
+    ∫ x in Ω, Op.a x i j * (W i.succ x : ℝ) * partialD j v x
+      = (∫ x in Ω, Op.a x i j * (U i.succ x : ℝ)
+            * (η x * partialD j v x + partialD j η x * v x))
+        - (∫ x in Ω, Op.a x i j * (U i.succ x : ℝ) * (partialD j η x * v x))
+        + (-(∫ x in Ω, D.da j i j x * (U 0 x : ℝ) * (partialD i η x * v x))
+          - (∫ x in Ω, Op.a x i j * (U j.succ x : ℝ) * (partialD i η x * v x))
+          - ∫ x in Ω, Op.a x i j * (U 0 x : ℝ) * (partialD j (partialD i η) x * v x)) := by
+  rw [← principal_leibniz Op D hU i j hη hv]
+  have hdv := hv.continuous_partialD j
+  have j1 := integrable_weight_L2D_mul (g := U i.succ)
+    (ψ := fun x => η x * partialD j v x + partialD j η x * v x)
+    (Op.measurable i j) (Op.bdd i j)
+    ((hη.continuous.mul hdv).add ((hη.continuous_partialD j).mul hv.continuous))
+    (((hv.hasCompactSupport_partialD j).mul_left).add hv.2.1.mul_left)
+  have j2 := integrable_weight_L2D_mul (g := U i.succ) (ψ := fun x => partialD j η x * v x)
+    (Op.measurable i j) (Op.bdd i j) ((hη.continuous_partialD j).mul hv.continuous)
+    hv.2.1.mul_left
+  have j3 := integrable_weight_L2D_mul (g := U 0)
+    (ψ := fun x => partialD i η x * partialD j v x) (Op.measurable i j) (Op.bdd i j)
+    ((hη.continuous_partialD i).mul hdv) (hv.hasCompactSupport_partialD j).mul_left
+  have e : ∫ x in Ω, Op.a x i j * (W i.succ x : ℝ) * partialD j v x
+      = ∫ x in Ω, ((Op.a x i j * (U i.succ x : ℝ)
+            * (η x * partialD j v x + partialD j η x * v x)
+          - Op.a x i j * (U i.succ x : ℝ) * (partialD j η x * v x))
+          + Op.a x i j * (U 0 x : ℝ) * (partialD i η x * partialD j v x)) := by
+    refine integral_congr_ae ?_
+    filter_upwards [hWs i] with x hx
+    rw [hx]; ring
+  have j12 : Integrable (fun x =>
+      Op.a x i j * (U i.succ x : ℝ) * (η x * partialD j v x + partialD j η x * v x)
+        - Op.a x i j * (U i.succ x : ℝ) * (partialD j η x * v x)) (volume.restrict Ω) :=
+    j1.sub j2
+  rw [e, integral_add j12 j3, integral_sub j1 j2]
+
+/-- **Transport term of the cutoff reduction.** For an element `W` of the ambient space whose
+gradient coordinates are those of `η U`, the term `∫ b_i W_i v` is the sum of the transport
+terms of `F`. -/
+theorem transport_cutoff_term (Op : FullEllipticOp d) {U : H1amb Ω}
+    {η v : EuclideanSpace ℝ (Fin d) → ℝ} (hη : IsTestFn Ω η) (hv : IsTestFn Ω v)
+    {W : H1amb Ω}
+    (hWs : ∀ i : Fin d, (W i.succ : EuclideanSpace ℝ (Fin d) → ℝ) =ᵐ[volume.restrict Ω]
+      fun x => η x * (U i.succ x : ℝ) + partialD i η x * (U 0 x : ℝ)) (i : Fin d) :
+    ∫ x in Ω, Op.b x i * (W i.succ x : ℝ) * v x
+      = (∫ x in Ω, Op.b x i * (U i.succ x : ℝ) * (η x * v x))
+        + ∫ x in Ω, Op.b x i * (U 0 x : ℝ) * (partialD i η x * v x) := by
+  have j1 := integrable_weight_L2D_mul (g := U i.succ) (ψ := fun x => η x * v x)
+    (Op.b_meas i) (Op.b_bdd i) (hη.continuous.mul hv.continuous) hv.2.1.mul_left
+  have j2 := integrable_weight_L2D_mul (g := U 0) (ψ := fun x => partialD i η x * v x)
+    (Op.b_meas i) (Op.b_bdd i) ((hη.continuous_partialD i).mul hv.continuous) hv.2.1.mul_left
+  rw [← integral_add j1 j2]
+  refine integral_congr_ae ?_
+  filter_upwards [hWs i] with x hx
+  rw [hx]; ring
+
 /-- **Cutoff reduction against test functions.** For a local weak solution `U ∈ W12 Ω` and a
 test function `η` of `Ω`, the element `η U ∈ H₀¹(Ω)` satisfies `B[η U, v] = ∫ F v` for every
 test function `v`, with `F` spelled out as separate integrals. -/
@@ -195,74 +257,15 @@ theorem reduction_testFn (Op : FullEllipticOp d) (hΩo : IsOpen Ω)
         + (∑ i : Fin d, ∫ x in Ω, Op.b x i * (U 0 x : ℝ) * (partialD i η x * v x)) := by
   classical
   set W : H01 Ω := ⟨cutoffMul hη U, cutoffMul_mem_H01_of_mem_W12 hΩo hη hsol.1⟩ with hWdef
-  have hW0 : ((W : H1amb Ω) 0 : EuclideanSpace ℝ (Fin d) → ℝ)
-      =ᵐ[volume.restrict Ω] fun x => η x * (U 0 x : ℝ) := by
-    change ((cutoffMul hη U) 0 : EuclideanSpace ℝ (Fin d) → ℝ) =ᵐ[_] _
-    rw [cutoffMulOn_apply_zero]; exact mulCutoff_coeFn hη (U 0)
-  have hWs : ∀ i : Fin d, ((W : H1amb Ω) i.succ : EuclideanSpace ℝ (Fin d) → ℝ)
-      =ᵐ[volume.restrict Ω]
-        fun x => η x * (U i.succ x : ℝ) + partialD i η x * (U 0 x : ℝ) := by
-    intro i
-    change ((cutoffMul hη U) i.succ : EuclideanSpace ℝ (Fin d) → ℝ) =ᵐ[_] _
-    rw [cutoffMulOn_apply_succ]
-    filter_upwards [Lp.coeFn_add (mulTest hη (U i.succ)) (mulTestPartial hη i (U 0)),
-      mulCutoff_coeFn hη (U i.succ), mulCutoffPartial_coeFn hη i (U 0)] with x h1 h2 h3
-    rw [h1, Pi.add_apply, h2, h3]
+  have hW0 := cutoffMul_zero_ae hη U
+  have hWs := cutoffMul_succ_ae hη U
   have hηv : IsTestFn Ω (fun x => η x * v x) := isTestFn_mul hη hv
   have hloc := hsol.2 _ hηv
   rw [pairL_testGraph_eq] at hloc
   simp only [partialD_mul (hη.1.differentiable (by simp)) (hv.1.differentiable (by simp))]
     at hloc
-  have hηc := hη.continuous
-  have hvc := hv.continuous
-  have hdη : ∀ i, Continuous (partialD i η) := hη.continuous_partialD
-  have hdv : ∀ j, Continuous (partialD j v) := hv.continuous_partialD
-  -- Principal terms, one pair at a time.
-  have hprin : ∀ i j : Fin d,
-      ∫ x in Ω, Op.a x i j * ((W : H1amb Ω) i.succ x : ℝ) * partialD j v x
-        = (∫ x in Ω, Op.a x i j * (U i.succ x : ℝ)
-              * (η x * partialD j v x + partialD j η x * v x))
-          - (∫ x in Ω, Op.a x i j * (U i.succ x : ℝ) * (partialD j η x * v x))
-          + (-(∫ x in Ω, D.da j i j x * (U 0 x : ℝ) * (partialD i η x * v x))
-            - (∫ x in Ω, Op.a x i j * (U j.succ x : ℝ) * (partialD i η x * v x))
-            - ∫ x in Ω, Op.a x i j * (U 0 x : ℝ) * (partialD j (partialD i η) x * v x)) := by
-    intro i j
-    rw [← principal_leibniz Op D hsol.1 i j hη hv]
-    have j1 := integrable_weight_L2D_mul (g := U i.succ)
-      (ψ := fun x => η x * partialD j v x + partialD j η x * v x)
-      (Op.measurable i j) (Op.bdd i j) ((hηc.mul (hdv j)).add ((hdη j).mul hvc))
-      (((hv.hasCompactSupport_partialD j).mul_left).add hv.2.1.mul_left)
-    have j2 := integrable_weight_L2D_mul (g := U i.succ) (ψ := fun x => partialD j η x * v x)
-      (Op.measurable i j) (Op.bdd i j) ((hdη j).mul hvc) hv.2.1.mul_left
-    have j3 := integrable_weight_L2D_mul (g := U 0)
-      (ψ := fun x => partialD i η x * partialD j v x) (Op.measurable i j) (Op.bdd i j)
-      ((hdη i).mul (hdv j)) (hv.hasCompactSupport_partialD j).mul_left
-    have e : ∫ x in Ω, Op.a x i j * ((W : H1amb Ω) i.succ x : ℝ) * partialD j v x
-        = ∫ x in Ω, ((Op.a x i j * (U i.succ x : ℝ)
-              * (η x * partialD j v x + partialD j η x * v x)
-            - Op.a x i j * (U i.succ x : ℝ) * (partialD j η x * v x))
-            + Op.a x i j * (U 0 x : ℝ) * (partialD i η x * partialD j v x)) := by
-      refine integral_congr_ae ?_
-      filter_upwards [hWs i] with x hx
-      rw [hx]; ring
-    have j12 : Integrable (fun x =>
-        Op.a x i j * (U i.succ x : ℝ) * (η x * partialD j v x + partialD j η x * v x)
-          - Op.a x i j * (U i.succ x : ℝ) * (partialD j η x * v x)) (volume.restrict Ω) :=
-      j1.sub j2
-    rw [e, integral_add j12 j3, integral_sub j1 j2]
-  have htrans : ∀ i : Fin d,
-      ∫ x in Ω, Op.b x i * ((W : H1amb Ω) i.succ x : ℝ) * v x
-        = (∫ x in Ω, Op.b x i * (U i.succ x : ℝ) * (η x * v x))
-          + ∫ x in Ω, Op.b x i * (U 0 x : ℝ) * (partialD i η x * v x) := by
-    intro i
-    have j1 := integrable_weight_L2D_mul (g := U i.succ) (ψ := fun x => η x * v x)
-      (Op.b_meas i) (Op.b_bdd i) (hηc.mul hvc) hv.2.1.mul_left
-    have j2 := integrable_weight_L2D_mul (g := U 0) (ψ := fun x => partialD i η x * v x)
-      (Op.b_meas i) (Op.b_bdd i) ((hdη i).mul hvc) hv.2.1.mul_left
-    rw [← integral_add j1 j2]
-    refine integral_congr_ae ?_
-    filter_upwards [hWs i] with x hx
-    rw [hx]; ring
+  have hprin := fun i j => principal_cutoff_term Op D hsol.1 hη hv (W := (W : H1amb Ω)) hWs i j
+  have htrans := fun i => transport_cutoff_term Op hη hv (W := (W : H1amb Ω)) hWs i
   have hzero : ∫ x in Ω, Op.c x * ((W : H1amb Ω) 0 x : ℝ) * v x
       = ∫ x in Ω, Op.c x * (U 0 x : ℝ) * (η x * v x) := by
     refine integral_congr_ae ?_
