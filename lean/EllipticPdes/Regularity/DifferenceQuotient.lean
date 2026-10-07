@@ -37,7 +37,7 @@ section General
 
 set_option linter.unusedSectionVars false
 
-variable {E : Type*} [AddCommGroup E] [Module ℝ E] [MeasurableSpace E] [MeasurableAdd E]
+variable {E : Type*} [AddCommGroup E] [MeasurableSpace E] [MeasurableAdd E]
   (μ : Measure E) [μ.IsAddRightInvariant]
 
 /-- Translation by `v` as a linear isometry of `L²(μ)`, for an additively right invariant
@@ -73,6 +73,8 @@ theorem transLp_transLp_neg (v : E) (g : Lp ℝ 2 μ) :
 theorem transLp_inner_adjoint (v : E) (u w : Lp ℝ 2 μ) :
     ⟪transLp μ v u, w⟫ = ⟪u, transLp μ (-v) w⟫ := by
   rw [← (transLp μ v).inner_map_map u (transLp μ (-v) w), transLp_transLp_neg]
+
+variable [Module ℝ E]
 
 /-- The forward difference quotient `D_v^h u = (τ_{h v} u - u) / h` along a vector `v`, as a
 continuous linear map on `L²(μ)`. For `h = 0` it is the zero map. -/
