@@ -83,6 +83,17 @@ theorem mem_W12_of_hasWeakGradOn {F : EuclideanSpace ℝ (Fin d) → ℝ}
 
 /-! ### The operator on the graph spaces -/
 
+
+/-- **An element of the graph space with prescribed coordinates.** A class with an `L²` weak
+gradient is the function coordinate of an element of `W12 Ω` whose gradient coordinates are the
+classes of the gradient. -/
+theorem exists_W12_of_hasWeakGradOn {F : EuclideanSpace ℝ (Fin d) → ℝ}
+    {G : Fin d → EuclideanSpace ℝ (Fin d) → ℝ} (hF : MemLp F 2 (volume.restrict Ω))
+    (hG : ∀ k, MemLp (G k) 2 (volume.restrict Ω)) (hwg : HasWeakGradOn Ω F G) :
+    ∃ U : W12 Ω, (U : H1amb Ω) 0 = hF.toLp F ∧
+      ∀ k : Fin d, (U : H1amb Ω) k.succ = (hG k).toLp (G k) :=
+  ⟨⟨_, mem_W12_of_hasWeakGradOn hF hG hwg⟩, by simp, fun k => by simp⟩
+
 /-- **The pairs of a class and a gradient on `Ω`**: integrable components, and the weak gradient
 identity on `Ω`. -/
 def goodPairs (Ω : Set (EuclideanSpace ℝ (Fin d))) : Submodule ℝ (SobolevPair d) where

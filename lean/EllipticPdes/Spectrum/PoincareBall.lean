@@ -50,7 +50,7 @@ namespace EllipticPdes.Sobolev
 
 open EllipticPdes.Embedding (HasWeakGradOn)
 open EllipticPdes.Analysis (partialD_comp_smul)
-open EllipticPdes.Extension (hasC1Boundary_ball mem_W12_of_hasWeakGradOn partialD_comp_translate)
+open EllipticPdes.Extension (hasC1Boundary_ball exists_W12_of_hasWeakGradOn partialD_comp_translate)
 
 variable {d : ℕ}
 
@@ -120,6 +120,15 @@ theorem eLpNorm_comp_affineBall (x : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr :
   rw [eLpNorm_comp_measurePreserving (hf.smul_measure _) (measurePreserving_affineBall x hr),
     eLpNorm_smul_measure_of_ne_top (by norm_num) _ _ hf, smul_eq_mul]
 
+/-- The square root of the scale factor of the affine map is a positive real. -/
+theorem ballScale_rpow_half_toReal_pos {r : ℝ} (hr : 0 < r) :
+    0 < (ballScale d r ^ (1 / (2 : ℝ≥0∞)).toReal).toReal := by
+  refine ENNReal.toReal_pos ?_ (ENNReal.rpow_ne_top_of_nonneg ENNReal.toReal_nonneg
+    (ballScale_ne_top r))
+  rw [ne_eq, ENNReal.rpow_eq_zero_iff]
+  simp only [not_or, not_and]
+  exact ⟨fun h => absurd h (ballScale_ne_zero hr), fun h => absurd h (ballScale_ne_top r)⟩
+
 /-- The mean over the ball is the mean over the unit ball of the transported function. -/
 theorem average_comp_affineBall (x : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr : 0 < r)
     (f : EuclideanSpace ℝ (Fin d) → ℝ) :
@@ -177,11 +186,10 @@ theorem exists_affineBall_pushforward (x : EuclideanSpace ℝ (Fin d)) {r : ℝ}
   have hA : ∀ y : EuclideanSpace ℝ (Fin d), r⁻¹ • (affineBall x r y + -x) = y := by
     intro y
     simp only [affineBall, add_neg_cancel_right, smul_smul, inv_mul_cancel₀ hr0, one_smul]
-  have hψA : ∀ y, ψ (affineBall x r y) = φ y := fun y => by simp only [hψ, hA]
   have hψdA : ∀ y, partialD k ψ (affineBall x r y) = r⁻¹ * partialD k φ y := fun y => by
     rw [hψd, hA]
   -- transport of the two integrals
-  exact ⟨ψ, hψc, hψcs, hψB, hψA, hψdA⟩
+  exact ⟨ψ, hψc, hψcs, hψB, fun y => by simp only [hψ, hA], hψdA⟩
 
 /-- **Weak gradient transported through the affine map**, which picks up the factor `r`. A test
 function on the unit ball is pushed forward to one on the ball, whose partial derivative is
@@ -232,12 +240,7 @@ theorem exists_W12_transport_ball (x : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr
         = r * s * (eLpNorm (g k) 2 (volume.restrict (ball x r))).toReal := by
   classical
   set s : ℝ≥0∞ := ballScale d r ^ (1 / (2 : ℝ≥0∞)).toReal with hs
-  have hs0 : s ≠ 0 := by
-    rw [hs, ne_eq, ENNReal.rpow_eq_zero_iff]
-    simp only [not_or, not_and]
-    exact ⟨fun h => absurd h (ballScale_ne_zero hr), fun h => absurd h (ballScale_ne_top r)⟩
-  have hstop : s ≠ ⊤ := ENNReal.rpow_ne_top_of_nonneg ENNReal.toReal_nonneg (ballScale_ne_top r)
-  have hspos : 0 < s.toReal := ENNReal.toReal_pos hs0 hstop
+  have hspos : 0 < s.toReal := ballScale_rpow_half_toReal_pos hr
   have hMP := measurePreserving_affineBall x hr
   -- the transported class and its gradient
   have hv : MemLp (u ∘ affineBall x r) 2 (volume.restrict B₁) :=
@@ -246,26 +249,21 @@ theorem exists_W12_transport_ball (x : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr
     (((hg k).smul_measure (ballScale_ne_top r)).comp_measurePreserving hMP).const_mul r
   have hwg : HasWeakGradOn B₁ (u ∘ affineBall x r) fun k y => r * g k (affineBall x r y) :=
     hasWeakGradOn_comp_affineBall x hr hw
-  set V : H1amb B₁ := WithLp.toLp 2 (Fin.cons (hv.toLp _) fun k => (hh k).toLp _) with hV
-  have hVW : V ∈ W12 B₁ := mem_W12_of_hasWeakGradOn hv hh hwg
-  have hV0 : V 0 = hv.toLp _ := by rw [hV, PiLp.toLp_apply, Fin.cons_zero]
-  have hVk : ∀ k : Fin d, V k.succ = (hh k).toLp _ := fun k => by
-    rw [hV, PiLp.toLp_apply, Fin.cons_succ]
+  obtain ⟨U, hU0, hUk⟩ := exists_W12_of_hasWeakGradOn hv hh hwg
   -- the mean of the transported class is the mean over the ball
   set m : ℝ := ⨍ z in ball x r, u z with hm
-  have hmean : meanL2 isBounded_ball (embW12 B₁ ⟨V, hVW⟩) = m := by
+  have hmean : meanL2 isBounded_ball (embW12 B₁ U) = m := by
     rw [embW12_apply]
-    change meanL2 isBounded_ball (V 0) = m
-    rw [hV0, meanL2_apply, integral_congr_ae hv.coeFn_toLp, hm, ← average_comp_affineBall x hr,
+    rw [hU0, meanL2_apply, integral_congr_ae hv.coeFn_toLp, hm, ← average_comp_affineBall x hr,
       setAverage_eq, smul_eq_mul, measureReal_def]
     rfl
   -- the left side
-  have hL : ‖embW12 B₁ ⟨V, hVW⟩
-        - constL2 isBounded_ball (meanL2 isBounded_ball (embW12 B₁ ⟨V, hVW⟩))‖
+  have hL : ‖embW12 B₁ U
+        - constL2 isBounded_ball (meanL2 isBounded_ball (embW12 B₁ U))‖
       = s.toReal * (eLpNorm (fun y => u y - m) 2 (volume.restrict (ball x r))).toReal := by
     rw [hmean, embW12_apply]
-    change ‖V 0 - constL2 isBounded_ball m‖ = _
-    rw [hV0, Lp.norm_def]
+    change ‖(U : H1amb B₁) 0 - constL2 isBounded_ball m‖ = _
+    rw [hU0, Lp.norm_def]
     have hae : ((hv.toLp (u ∘ affineBall x r) - constL2 isBounded_ball m : L2D B₁) :
         EuclideanSpace ℝ (Fin d) → ℝ)
           =ᵐ[volume.restrict B₁] (fun y => u y - m) ∘ affineBall x r := by
@@ -278,18 +276,17 @@ theorem exists_W12_transport_ball (x : EuclideanSpace ℝ (Fin d)) {r : ℝ} (hr
       hu.aestronglyMeasurable.sub aestronglyMeasurable_const
     rw [eLpNorm_congr_ae hae, eLpNorm_comp_affineBall x hr hasm, ENNReal.toReal_mul]
   -- the right side
-  have hR : ∀ k : Fin d, ‖((⟨V, hVW⟩ : W12 B₁) : H1amb B₁) k.succ‖
+  have hR : ∀ k : Fin d, ‖(U : H1amb B₁) k.succ‖
       = r * s.toReal * (eLpNorm (g k) 2 (volume.restrict (ball x r))).toReal := by
     intro k
-    change ‖V k.succ‖ = _
-    rw [hVk, Lp.norm_toLp]
+    rw [hUk, Lp.norm_toLp]
     have : (fun y => r * g k (affineBall x r y)) = r • (g k ∘ affineBall x r) := by
       funext y; simp [Pi.smul_apply, smul_eq_mul]
     rw [this, eLpNorm_const_smul, eLpNorm_comp_affineBall x hr (hg k).aestronglyMeasurable,
       ENNReal.toReal_mul, ENNReal.toReal_mul, Real.enorm_eq_ofReal_abs,
       ENNReal.toReal_ofReal (abs_nonneg _), abs_of_pos hr]
     ring
-  refine ⟨s.toReal, hspos, ⟨V, hVW⟩, hL, hR⟩
+  refine ⟨s.toReal, hspos, U, hL, hR⟩
 
 /-- **Poincaré's inequality on a ball** (Evans §5.8.1 Theorem 2 at `p = 2`). One constant,
 depending on the dimension alone, bounds the `L²` distance of a class on any ball from its
