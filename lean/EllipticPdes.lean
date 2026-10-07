@@ -146,7 +146,9 @@ public import EllipticPdes.Spectrum.SpectrumSigma
 public import EllipticPdes.Fredholm.Compactness
 public import EllipticPdes.Spectrum.Spectrum
 public import EllipticPdes.Spectrum.RellichDischarge
+public import EllipticPdes.Spectrum.RellichGeneral
 public import EllipticPdes.BoundedInstances
+public import EllipticPdes.DivFormInstances
 public import EllipticPdes.Analysis.WeakCompactness
 public import EllipticPdes.Analysis.DirectMethodForm
 public import EllipticPdes.Analysis.LpInterpolation
@@ -194,6 +196,7 @@ public import EllipticPdes.Poincare.Slab
 public import EllipticPdes.Sobolev.Graph
 public import EllipticPdes.Form.DivForm
 public import EllipticPdes.Sobolev.GraphEuclidean
+public import EllipticPdes.Sobolev.GraphIsometry
 public import EllipticPdes.Form.DivFormGarding
 public import EllipticPdes.Existence.DivFormExistence
 public import EllipticPdes.Poincare.GraphBounded
