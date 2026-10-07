@@ -205,6 +205,10 @@ public import EllipticPdes.Form.DivFormEuclidean
 public import EllipticPdes.Sobolev.GraphLimits
 public import EllipticPdes.Sobolev.WeakDeriv
 public import EllipticPdes.Sobolev.WeakDerivClassical
+public import EllipticPdes.Form.DivFormIsometry
+public import EllipticPdes.Form.DivFormCoord
+public import EllipticPdes.Regularity.SmoothBdd
+public import EllipticPdes.Regularity.InteriorSmoothGeneral
 
 /-!
 # EllipticPdes

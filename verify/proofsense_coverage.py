@@ -109,6 +109,16 @@ EXEMPT = {
         "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
         "source states it in coordinates, so the warrant sits at the coordinate declaration"
     ),
+    "EllipticPdes.DivForm.FullEllipticOp.interior_smooth": (
+        "the theorem warranted at EllipticPdes.Regularity.interior_smooth, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.DivForm.FullEllipticOp.exists_weakSolution_interior_smooth": (
+        "the theorem warranted at EllipticPdes.Regularity.exists_weakSolution_interior_smooth, stated over a finite-dimensional real "
+        "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
     "EllipticPdes.Classical.nondivOperator.weak_maximum_principle": (
         "the theorem warranted at EllipticPdes.Classical.weak_maximum_principle, stated over a finite-dimensional real "
         "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "

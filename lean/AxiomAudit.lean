@@ -417,6 +417,8 @@ assert_classical_axioms
   EllipticPdes.DivForm.FullEllipticOp.existence_three_of_bounded
   EllipticPdes.DivForm.FullEllipticOp.resolvent_bound_of_bounded
   EllipticPdes.DivForm.FullEllipticOp.symmetric_spectral_of_bounded
+  EllipticPdes.DivForm.FullEllipticOp.interior_smooth
+  EllipticPdes.DivForm.FullEllipticOp.exists_weakSolution_interior_smooth
   EllipticPdes.Classical.hopf_lemma
   EllipticPdes.Classical.nondivOperator.weak_maximum_principle
   EllipticPdes.Classical.nondivOperator.comparison_principle
