@@ -75,6 +75,70 @@ theorem slab_closure {e : E} {m D : ℝ} (hslab : ∀ x ∈ U, m ≤ ⟪e, x⟫ 
 
 namespace nondivOperator
 
+/-- **Slab barrier.** On a set inside the slab `m ≤ x_{i₀} ≤ m + D`, with `c ≥ 0`, there is a
+smooth function that is at least `K ≥ 0` and at most `K + (e^{(B/θ + 1) D} - 1) F/θ` on the
+closure and whose image under `L` is at least `F`. It is
+`K + (F/θ)(e^{αD} - e^{α (⟪e, x⟫ - m)})` at `α = B/θ + 1`. -/
+theorem exists_slab_barrier (hA : IsUniformlyElliptic A U θ) {e : E}
+    (he : ‖e‖ = 1) (hB0 : 0 ≤ B) (hb : ∀ x ∈ U, ⟪b x, e⟫ ≤ B) (hc : ∀ x ∈ U, 0 ≤ c x)
+    {m D : ℝ} (hslab : ∀ x ∈ U, m ≤ ⟪e, x⟫ ∧ ⟪e, x⟫ ≤ m + D) {F : ℝ} (hF0 : 0 ≤ F) {K : ℝ}
+    (hK : 0 ≤ K) :
+    ∃ v : E → ℝ, ContDiffOn ℝ 2 v U ∧ ContinuousOn v (closure U) ∧
+      (∀ x ∈ closure U, K ≤ v x ∧ v x ≤ K + (Real.exp ((B / θ + 1) * D) - 1) * (F / θ)) ∧
+      ∀ x ∈ U, F ≤ nondivOperator A b c v x := by
+  have hθ := hA.pos
+  set α : ℝ := B / θ + 1 with hα
+  have hα0 : 0 < α := by positivity
+  have hF' : 0 ≤ F / θ := div_nonneg hF0 hθ.le
+  set ε : ℝ := -(F / θ) * Real.exp (-α * m) with hε
+  set c₀ : ℝ := K + F / θ * Real.exp (α * D) with hc₀
+  set v : E → ℝ := fun x => c₀ + ε * expInner α e x with hv
+  have hvx : ∀ x, v x = K + F / θ * (Real.exp (α * D) - Real.exp (α * (⟪e, x⟫ - m))) := by
+    intro x
+    simp only [hv, hc₀, hε, expInner]
+    rw [show α * (⟪e, x⟫ - m) = -α * m + α * ⟪e, x⟫ by ring, Real.exp_add]
+    ring
+  have hexp : ContDiff ℝ 2 (expInner α e) := contDiff_expInner _ _
+  have hvbd : ∀ x ∈ closure U, K ≤ v x ∧ v x ≤ K + (Real.exp (α * D) - 1) * (F / θ) := by
+    intro x hx
+    obtain ⟨h1, h2⟩ := slab_closure hslab x hx
+    rw [hvx]
+    have e1 : 1 ≤ Real.exp (α * (⟪e, x⟫ - m)) := by
+      rw [← Real.exp_zero]
+      exact Real.exp_le_exp.mpr (mul_nonneg hα0.le (by linarith))
+    have e2 : Real.exp (α * (⟪e, x⟫ - m)) ≤ Real.exp (α * D) :=
+      Real.exp_le_exp.mpr (mul_le_mul_of_nonneg_left (by linarith) hα0.le)
+    constructor
+    · nlinarith [mul_nonneg hF' (sub_nonneg.mpr e2)]
+    · nlinarith [mul_nonneg hF' (sub_nonneg.mpr e1)]
+  refine ⟨v, contDiffOn_const.add (contDiffOn_const.mul hexp.contDiffOn),
+    continuousOn_const.add (continuousOn_const.mul hexp.continuous.continuousOn), hvbd, ?_⟩
+  intro x hx
+  obtain ⟨h1, _⟩ := hslab x hx
+  have hexp2 := hexp.contDiffAt (x := x)
+  rw [hv, nondivOperator_add_smul A b c contDiffAt_const hexp2, nondivOperator_const,
+    nondivOperator_expInner]
+  have hw : 1 ≤ Real.exp (-α * m) * expInner α e x := by
+    simp only [expInner]
+    rw [← Real.exp_add, ← Real.exp_zero]
+    exact Real.exp_le_exp.mpr (by nlinarith)
+  have hprin : θ ≤ (⟪e, A x e⟫ * α ^ 2 - ⟪e, b x⟫ * α) * (Real.exp (-α * m) * expInner α e x) :=
+    le_slab_principal hθ hB0 hα (by simpa [real_inner_comm] using hA.le_inner_self hx he)
+      (by simpa [real_inner_comm] using hb x hx) hw
+  have hcv : 0 ≤ c x * v x := mul_nonneg (hc x hx) (hK.trans (hvbd x (subset_closure hx)).1)
+  have hvx' := hvx x
+  simp only [hv] at hvx' hcv
+  have key : c x * c₀ + ε * ((-(α ^ 2 * ⟪e, A x e⟫) + α * ⟪e, b x⟫ + c x) * expInner α e x)
+      = F / θ * ((⟪e, A x e⟫ * α ^ 2 - ⟪e, b x⟫ * α)
+          * (Real.exp (-α * m) * expInner α e x)) + c x * (c₀ + ε * expInner α e x) := by
+    simp only [hε]
+    ring
+  rw [key]
+  calc F = F / θ * θ := (div_mul_cancel₀ F hθ.ne').symm
+    _ ≤ F / θ * ((⟪e, A x e⟫ * α ^ 2 - ⟪e, b x⟫ * α) * (Real.exp (-α * m) * expInner α e x))
+        + c x * (c₀ + ε * expInner α e x) := by
+      linarith [mul_le_mul_of_nonneg_left hprin hF']
+
 /-- **Maximum-principle bound for a subsolution** (Guo Theorem XI.5.1(i), Gilbarg and Trudinger
 Theorem 3.7). On a bounded open set inside the slab `m ≤ x_{i₀} ≤ m + D`, with `c ≥ 0`, a function
 with `L u ≤ f` and `f ≤ F` is bounded by the maximum of its positive part over the boundary
@@ -89,81 +153,17 @@ theorem apriori_bound_sub (hU : IsOpen U) (hUb : Bornology.IsBounded U) (hUne : 
       u x ≤ max (u y) 0 + (Real.exp ((B / θ + 1) * D) - 1) * (F / θ) := by
   have : Nontrivial E := ⟨⟨e, 0, fun h => by simp [h] at he⟩⟩
   obtain ⟨x₁, hx₁⟩ := hUne
-  have hθ := hA.pos
   have hfr : IsCompact (frontier U) :=
     hUb.isCompact_closure.of_isClosed_subset isClosed_frontier frontier_subset_closure
   obtain ⟨y, hyfr, hymax⟩ := hfr.exists_isMaxOn (hUb.frontier_nonempty ⟨x₁, hx₁⟩)
     (huc.mono frontier_subset_closure)
   refine ⟨y, hyfr, ?_⟩
-  set K : ℝ := max (u y) 0 with hK
-  set α : ℝ := B / θ + 1 with hα
-  have hα0 : 0 < α := by positivity
-  have hF' : 0 ≤ F / θ := div_nonneg hF0 hθ.le
-  set ε : ℝ := -(F / θ) * Real.exp (-α * m) with hε
-  set c₀ : ℝ := K + F / θ * Real.exp (α * D) with hc₀
-  set v : E → ℝ := fun x => c₀ + ε * expInner α e x with hv
-  have hvx : ∀ x, v x = K + F / θ * (Real.exp (α * D) - Real.exp (α * (⟪e, x⟫ - m))) := by
-    intro x
-    simp only [hv, hc₀, hε, expInner]
-    rw [show α * (⟪e, x⟫ - m) = -α * m + α * ⟪e, x⟫ by ring, Real.exp_add]
-    ring
-  have hexp : ContDiff ℝ 2 (expInner α e) := contDiff_expInner _ _
-  have hvC : ContDiffOn ℝ 2 v U := contDiffOn_const.add (contDiffOn_const.mul hexp.contDiffOn)
-  have hvc : ContinuousOn v (closure U) :=
-    continuousOn_const.add (continuousOn_const.mul hexp.continuous.continuousOn)
-  -- `v` is nonnegative and at most `K + (e^{αD} - 1) F/θ` on the closure
-  have hvbd : ∀ x ∈ closure U, 0 ≤ v x ∧ v x ≤ K + (Real.exp (α * D) - 1) * (F / θ) := by
-    intro x hx
-    obtain ⟨h1, h2⟩ := slab_closure hslab x hx
-    rw [hvx]
-    have e1 : 1 ≤ Real.exp (α * (⟪e, x⟫ - m)) := by
-      rw [← Real.exp_zero]
-      exact Real.exp_le_exp.mpr (mul_nonneg hα0.le (by linarith))
-    have e2 : Real.exp (α * (⟪e, x⟫ - m)) ≤ Real.exp (α * D) :=
-      Real.exp_le_exp.mpr (mul_le_mul_of_nonneg_left (by linarith) hα0.le)
-    constructor
-    · nlinarith [mul_nonneg hF' (sub_nonneg.mpr e2), le_max_right (u y) 0]
-    · nlinarith [mul_nonneg hF' (sub_nonneg.mpr e1)]
-  -- `L u ≤ L v` on the set
-  have hL : ∀ x ∈ U, nondivOperator A b c u x ≤ nondivOperator A b c v x := by
-    intro x hx
-    obtain ⟨h1, _⟩ := hslab x hx
-    have hexp2 := hexp.contDiffAt (x := x)
-    rw [hv, nondivOperator_add_smul A b c contDiffAt_const hexp2, nondivOperator_const,
-      nondivOperator_expInner]
-    have hw : 1 ≤ Real.exp (-α * m) * expInner α e x := by
-      simp only [expInner]
-      rw [← Real.exp_add, ← Real.exp_zero]
-      exact Real.exp_le_exp.mpr (by nlinarith)
-    have hprin : θ ≤ (⟪e, A x e⟫ * α ^ 2 - ⟪e, b x⟫ * α)
-        * (Real.exp (-α * m) * expInner α e x) :=
-      le_slab_principal hθ hB0 hα (by simpa [real_inner_comm] using hA.le_inner_self hx he)
-        (by simpa [real_inner_comm] using hb x hx) hw
-    have hcv : 0 ≤ c x * v x := mul_nonneg (hc x hx) (hvbd x (subset_closure hx)).1
-    have hvx' := hvx x
-    simp only [hv] at hvx' hcv
-    have key : c x * c₀ + ε * ((-(α ^ 2 * ⟪e, A x e⟫) + α * ⟪e, b x⟫ + c x) * expInner α e x)
-        = F / θ * ((⟪e, A x e⟫ * α ^ 2 - ⟪e, b x⟫ * α)
-            * (Real.exp (-α * m) * expInner α e x)) + c x * (c₀ + ε * expInner α e x) := by
-      simp only [hε]
-      ring
-    rw [key]
-    calc nondivOperator A b c u x ≤ f x := hsub x hx
-      _ ≤ F := hF x hx
-      _ = F / θ * θ := (div_mul_cancel₀ F hθ.ne').symm
-      _ ≤ F / θ * ((⟪e, A x e⟫ * α ^ 2 - ⟪e, b x⟫ * α) * (Real.exp (-α * m) * expInner α e x))
-          + c x * (c₀ + ε * expInner α e x) := by
-        linarith [mul_le_mul_of_nonneg_left hprin hF']
-  -- `u ≤ v` on the frontier
-  have hbd : ∀ x ∈ frontier U, u x ≤ v x := by
-    intro x hx
-    obtain ⟨_, hx2⟩ := slab_closure hslab x (frontier_subset_closure hx)
-    have h4 : 0 ≤ F / θ * (Real.exp (α * D) - Real.exp (α * (⟪e, x⟫ - m))) :=
-      mul_nonneg hF' (sub_nonneg.mpr (Real.exp_le_exp.mpr
-        (mul_le_mul_of_nonneg_left (by linarith) hα0.le)))
-    rw [hvx]
-    have h1 : u x ≤ u y := hymax hx
-    linarith [le_max_left (u y) 0]
+  obtain ⟨v, hvC, hvc, hvbd, hLv⟩ := exists_slab_barrier hA he hB0 hb hc hslab hF0
+    (le_max_right (u y) 0)
+  have hL : ∀ x ∈ U, nondivOperator A b c u x ≤ nondivOperator A b c v x := fun x hx =>
+    ((hsub x hx).trans (hF x hx)).trans (hLv x hx)
+  have hbd : ∀ x ∈ frontier U, u x ≤ v x := fun x hx =>
+    (hymax hx).trans ((le_max_left (u y) 0).trans (hvbd x (frontier_subset_closure hx)).1)
   intro x hx
   have := comparison_principle hU hUb ⟨x₁, hx₁⟩ hA he hb hc hu hvC huc hvc hL hbd x hx
   linarith [(hvbd x hx).2]
