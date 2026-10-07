@@ -223,10 +223,8 @@ theorem norm_diffQuot_le_of_contDiff (k : Fin d) (h : ℝ) (φ : EuclideanSpace 
   have hmain : ∫ x, (φ (x + v) - φ x) ^ 2 ≤ h ^ 2 * ∫ x, (partialD k φ x) ^ 2 := by
     rw [← stepD, ← stepC, ← stepB]; exact stepA
   -- Transport `hmain` back to the `L²` classes via the a.e. representative formulas.
-  have hqmp : MeasureTheory.Measure.QuasiMeasurePreserving (· + v) volume volume :=
-    (measurePreserving_add_right volume v).quasiMeasurePreserving
   have hshiftAE : (fun x => (hL2.toLp φ) (x + v)) =ᵐ[volume] (fun x => φ (x + v)) :=
-    hqmp.ae_eq_comp hL2.coeFn_toLp
+    ae_eq_comp_add_right v hL2.coeFn_toLp
   have hcombine : (diffQuot k h (hL2.toLp φ) : EuclideanSpace ℝ (Fin d) → ℝ)
       =ᵐ[volume] fun x => (φ (x + v) - φ x) / h := by
     filter_upwards [coeFn_diffQuot k h (hL2.toLp φ), hL2.coeFn_toLp, hshiftAE]
@@ -355,11 +353,7 @@ private theorem integral_sq_translate_sub {ψ : EuclideanSpace ℝ (Fin d) → �
     (∫ x, (ψ (x + w) - ψ x) ^ 2) = ‖transL2 w (hψ.toLp ψ) - hψ.toLp ψ‖ ^ 2 := by
   rw [norm_sq_transL2_sub]
   refine integral_congr_ae ?_
-  have hqmp : MeasureTheory.Measure.QuasiMeasurePreserving (· + w) volume volume :=
-    (measurePreserving_add_right volume w).quasiMeasurePreserving
-  have hshiftAE : (fun x => hψ.toLp ψ (x + w)) =ᵐ[volume] fun x => ψ (x + w) :=
-    hqmp.ae_eq_comp hψ.coeFn_toLp
-  filter_upwards [hψ.coeFn_toLp, hshiftAE] with x hx1 hx2
+  filter_upwards [hψ.coeFn_toLp, ae_eq_comp_add_right w hψ.coeFn_toLp] with x hx1 hx2
   rw [hx2, hx1]
 
 /-- The squared `L²` norm of the defect of the difference quotient is the integral of the
@@ -370,12 +364,9 @@ private theorem norm_sq_diffQuot_sub_eq (k : Fin d) {φ ψ : EuclideanSpace ℝ 
       = ∫ x, ((φ (x + hshift k h) - φ x) / h - ψ x) ^ 2 := by
   rw [norm_sq_eq_integral_sq]
   refine integral_congr_ae ?_
-  have hqmp : MeasureTheory.Measure.QuasiMeasurePreserving (· + hshift k h) volume volume :=
-    (measurePreserving_add_right volume (hshift k h)).quasiMeasurePreserving
-  have hshiftAE : (fun x => hL2φ.toLp φ (x + hshift k h)) =ᵐ[volume] fun x => φ (x + hshift k h) :=
-    hqmp.ae_eq_comp hL2φ.coeFn_toLp
   filter_upwards [Lp.coeFn_sub (diffQuot k h (hL2φ.toLp φ)) (hL2p.toLp ψ),
-    coeFn_diffQuot k h (hL2φ.toLp φ), hL2φ.coeFn_toLp, hshiftAE, hL2p.coeFn_toLp]
+    coeFn_diffQuot k h (hL2φ.toLp φ), hL2φ.coeFn_toLp,
+    ae_eq_comp_add_right (hshift k h) hL2φ.coeFn_toLp, hL2p.coeFn_toLp]
     with x hx0 hx1 hx2 hx3 hx4
   rw [hx0, Pi.sub_apply, hx1, hx2, hx3, hx4]
 
@@ -686,11 +677,8 @@ private theorem inner_transL2_neg_eq_integral (g' : EucL2 d)
     ⟪g', transL2 (-w) (hζ.toLp ζ)⟫ = ∫ x, g' x * ζ (x - w) := by
   rw [L2.inner_def]
   refine integral_congr_ae ?_
-  have hqmp : MeasureTheory.Measure.QuasiMeasurePreserving (· + (-w)) volume volume :=
-    (measurePreserving_add_right volume _).quasiMeasurePreserving
-  have hae : (fun x => hζ.toLp ζ (x + (-w))) =ᵐ[volume] fun x => ζ (x + (-w)) :=
-    hqmp.ae_eq_comp hζ.coeFn_toLp
-  filter_upwards [coeFn_transL2 (-w) (hζ.toLp ζ), hae] with x hx1 hx2
+  filter_upwards [coeFn_transL2 (-w) (hζ.toLp ζ), ae_eq_comp_add_right (-w) hζ.coeFn_toLp]
+    with x hx1 hx2
   rw [RCLike.inner_apply, conj_trivial, hx1, hx2, sub_eq_add_neg]; ring
 
 /-- **The weak-derivative identity against a translated test function.** For `g` with `L²` weak
@@ -753,11 +741,8 @@ private theorem inner_diffQuot_eq_integral_smooth (k : Fin d) (g g' : EucL2 d)
       = ∫ x, g x * (∫ t in (0 : ℝ)..1, partialD k ζ (x - t • v)) := by
     rw [L2.inner_def]
     refine integral_congr_ae ?_
-    have hqmp : MeasureTheory.Measure.QuasiMeasurePreserving (· + hshift k (-h)) volume volume :=
-      (measurePreserving_add_right volume _).quasiMeasurePreserving
-    have hshiftAE : (fun x => ζLp (x + hshift k (-h))) =ᵐ[volume]
-        fun x => ζ (x + hshift k (-h)) := hqmp.ae_eq_comp hζ.coeFn_toLp
-    filter_upwards [coeFn_diffQuot k (-h) ζLp, hζ.coeFn_toLp, hshiftAE] with x hx1 hx2 hx3
+    filter_upwards [coeFn_diffQuot k (-h) ζLp, hζ.coeFn_toLp,
+      ae_eq_comp_add_right (hshift k (-h)) hζ.coeFn_toLp] with x hx1 hx2 hx3
     rw [RCLike.inner_apply, conj_trivial, hx1, hx2, hx3, hshkneg, hFTC x]; ring
   -- Tonelli swap.
   have hswap : (∫ x, g x * (∫ t in (0 : ℝ)..1, partialD k ζ (x - t • v)))

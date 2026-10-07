@@ -82,11 +82,9 @@ private lemma diffQuotD_ae_eq_zero_off (hΩm : MeasurableSet Ω) (k : Fin d) {h 
     (hgS : ∀ᵐ x ∂volume, (extendL2 hΩm g : EuclideanSpace ℝ (Fin d) → ℝ) x ≠ 0 → x ∈ S) :
     ∀ᵐ x ∂(volume.restrict Ω),
       x ∉ S → x + hshift k h ∉ S → (diffQuotD k h hΩm g x : ℝ) = 0 := by
-  have hqmp : MeasureTheory.Measure.QuasiMeasurePreserving (· + hshift k h) volume volume :=
-    (measurePreserving_add_right volume (hshift k h)).quasiMeasurePreserving
   have hgS_shift : ∀ᵐ x ∂volume,
       (extendL2 hΩm g : EuclideanSpace ℝ (Fin d) → ℝ) (x + hshift k h) ≠ 0 →
-        x + hshift k h ∈ S := hqmp.ae hgS
+        x + hshift k h ∈ S := ae_comp_add_right (hshift k h) hgS
   filter_upwards [coeFn_diffQuotD k h hΩm g, ae_restrict_of_ae hgS,
     ae_restrict_of_ae hgS_shift, ae_restrict_of_ae (coeFn_extendL2 hΩm g),
     ae_restrict_mem hΩm] with x hdq hgx hgxs hext hmem hxS hxsS
@@ -244,11 +242,8 @@ private lemma evansTest_bilin_L2D (A : EllipticCoeff d) (hΩm : MeasurableSet Ω
   have hsupp : ∀ᵐ x ∂volume,
       (extendL2 hΩm (Z j.succ) : EuclideanSpace ℝ (Fin d) → ℝ) (x + hshift k (-h)) ≠ 0
         → x ∈ Ω := by
-    have hqmp : MeasureTheory.Measure.QuasiMeasurePreserving
-        (· + hshift k (-h)) volume volume :=
-      (measurePreserving_add_right volume (hshift k (-h))).quasiMeasurePreserving
-    filter_upwards [hqmp.ae (diffQuotG_cutoffSq_supp hξ hΩm k h (u : H1amb Ω) j.succ)]
-      with x hx hne
+    filter_upwards [ae_comp_add_right (hshift k (-h))
+      (diffQuotG_cutoffSq_supp hξ hΩm k h (u : H1amb Ω) j.succ)] with x hx hne
     have hxeq : x = (x + hshift k (-h)) + hshift k h := by rw [hshift_neg]; abel
     rw [hxeq]; exact hS.shift_in _ (hx hne)
   rw [evansTest_succ_eq hΩm hξ hθ hS u j, inner_neg_right,
@@ -362,8 +357,6 @@ private lemma norm_diffQuotD_actL_sub_le {A : EllipticCoeff d} (hA : IsLipCoeff 
     (hΩm : MeasurableSet Ω) (i j k : Fin d) {h : ℝ} (hh : h ≠ 0) (g : L2D Ω) :
     ‖diffQuotD k h hΩm (A.actL i j g)
         - (A.translate (hshift k h)).actL i j (diffQuotD k h hΩm g)‖ ≤ hA.A1 * ‖g‖ := by
-  have hqmp : MeasureTheory.Measure.QuasiMeasurePreserving (· + hshift k h) volume volume :=
-    (measurePreserving_add_right volume (hshift k h)).quasiMeasurePreserving
   set cf : EuclideanSpace ℝ (Fin d) → ℝ :=
     fun x => (A.a (x + hshift k h) i j - A.a x i j) / h with hcf
   have hmeas : Measurable cf :=
@@ -379,7 +372,7 @@ private lemma norm_diffQuotD_actL_sub_le {A : EllipticCoeff d} (hA : IsLipCoeff 
       coeFn_diffQuotD k h hΩm (A.actL i j g),
       (A.translate (hshift k h)).actL_coeFn i j (diffQuotD k h hΩm g),
       coeFn_diffQuotD k h hΩm g, mulCoeffL_coeFn hmeas hbdd g,
-      ae_restrict_of_ae (hqmp.ae (extendL2_actL hΩm A i j g)),
+      ae_restrict_of_ae (ae_comp_add_right (hshift k h) (extendL2_actL hΩm A i j g)),
       A.actL_coeFn i j g] with x hsub hdq1 hact' hdq0 hmul hsha hact0
     rw [hsub, Pi.sub_apply, hdq1, hact', EllipticCoeff.translate_a, hdq0, hmul, hact0, hsha]
     simp only [hcf]

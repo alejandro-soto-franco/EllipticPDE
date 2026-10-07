@@ -99,8 +99,6 @@ private lemma norm_diffQuotD_mulTest_le (hΩm : MeasurableSet Ω) {ζ : Euclidea
     (hL : ∀ x, |(ζ (x + hshift k h) - ζ x) / h| ≤ L) (g : L2D Ω) :
     ‖diffQuotD k h hΩm (mulTest hζ g)‖
       ≤ hζ.supNorm * ‖mulTest hξ (diffQuotD k h hΩm g)‖ + L * ‖g‖ := by
-  have hqmp : MeasureTheory.Measure.QuasiMeasurePreserving (· + hshift k h) volume volume :=
-    (measurePreserving_add_right volume (hshift k h)).quasiMeasurePreserving
   -- `extendL2 (ζ g) = ζ · extendL2 g` a.e., and its shift.
   have hζext : (extendL2 hΩm (mulTest hζ g) : EuclideanSpace ℝ (Fin d) → ℝ)
       =ᵐ[volume] fun y => ζ y * (extendL2 hΩm g : EuclideanSpace ℝ (Fin d) → ℝ) y := by
@@ -125,7 +123,8 @@ private lemma norm_diffQuotD_mulTest_le (hΩm : MeasurableSet Ω) {ζ : Euclidea
     apply Lp.ext
     have hζext' : ∀ᵐ x ∂volume, (extendL2 hΩm (mulTest hζ g) : EuclideanSpace ℝ (Fin d) → ℝ)
         (x + hshift k h) = ζ (x + hshift k h)
-          * (extendL2 hΩm g : EuclideanSpace ℝ (Fin d) → ℝ) (x + hshift k h) := hqmp.ae hζext
+          * (extendL2 hΩm g : EuclideanSpace ℝ (Fin d) → ℝ) (x + hshift k h) :=
+      ae_comp_add_right (hshift k h) hζext
     filter_upwards [coeFn_diffQuotD k h hΩm (mulTest hζ g),
       mulCoeffL_add_coeFn hm1 hm1b hm2 hm2b (mulTest hξ (diffQuotD k h hΩm g)) g,
       mulCutoff_coeFn hξ (diffQuotD k h hΩm g), coeFn_diffQuotD k h hΩm g,
@@ -144,12 +143,10 @@ private lemma norm_diffQuot_extendL2_mulTest (hΩm : MeasurableSet Ω)
     {ζ : EuclideanSpace ℝ (Fin d) → ℝ} (hζ : IsTestFn Ω ζ) (k : Fin d) (h : ℝ)
     (hback : ∀ x ∈ tsupport ζ, x + hshift k (-h) ∈ Ω) (g : L2D Ω) :
     ‖diffQuot k h (extendL2 hΩm (mulTest hζ g))‖ = ‖diffQuotD k h hΩm (mulTest hζ g)‖ := by
-  have hqmp : MeasureTheory.Measure.QuasiMeasurePreserving (· + hshift k h) volume volume :=
-    (measurePreserving_add_right volume (hshift k h)).quasiMeasurePreserving
   have hsupp := extendL2_supp_of_ae_restrict hΩm (mulTest hζ g)
     (mulTest_ae_eq_zero_off_tsupport hζ g)
   rw [← extendL2_diffQuotD_eq k h hΩm (mulTest hζ g), norm_extendL2]
-  filter_upwards [hqmp.ae hsupp] with x hx hne
+  filter_upwards [ae_comp_add_right (hshift k h) hsupp] with x hx hne
   have := hback _ (hx hne)
   rwa [show x + hshift k h + hshift k (-h) = x by rw [hshift_neg]; abel] at this
 

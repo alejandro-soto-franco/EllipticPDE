@@ -114,6 +114,18 @@ variable {d : ℕ}
 def hshift (k : Fin d) (h : ℝ) : EuclideanSpace ℝ (Fin d) :=
   h • EuclideanSpace.single k (1 : ℝ)
 
+/-- A property that holds almost everywhere holds almost everywhere after a translation. -/
+theorem ae_comp_add_right {p : EuclideanSpace ℝ (Fin d) → Prop} (v : EuclideanSpace ℝ (Fin d))
+    (h : ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), p x) :
+    ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ (Fin d))), p (x + v) :=
+  (measurePreserving_add_right volume v).quasiMeasurePreserving.ae h
+
+/-- Functions that agree almost everywhere have translates that agree almost everywhere. -/
+theorem ae_eq_comp_add_right {β : Type*} {f g : EuclideanSpace ℝ (Fin d) → β}
+    (v : EuclideanSpace ℝ (Fin d)) (h : f =ᵐ[volume] g) :
+    (fun x => f (x + v)) =ᵐ[volume] fun x => g (x + v) :=
+  (measurePreserving_add_right volume v).quasiMeasurePreserving.ae_eq_comp h
+
 /-- The forward difference quotient `Dₖʰ u = (τ_{h eₖ} u - u) / h` as a
 continuous linear map on `L²(ℝⁿ)`: the instance `v = eₖ` of `diffQuotAlong`. For `h = 0` it is
 the zero map. -/
