@@ -106,7 +106,6 @@ theorem exists_norm_redDatum_le (Op : FullEllipticOp d) (D : CoeffWeakGrad Op.to
     ∃ K : ℝ, 0 ≤ K ∧ ∀ {ζ : EuclideanSpace ℝ (Fin d) → ℝ} (hζ : IsTestFn Ω ζ),
       Set.EqOn ζ 1 (tsupport η) → ∀ (U : H1amb Ω) (f : L2D Ω),
       ‖redDatum Op D hη U f‖ ≤ K * (‖f‖ + (‖U 0‖ + ∑ i : Fin d, ‖mulTest hζ (U i.succ)‖)) := by
-  classical
   set Mη : ℝ := hη.supNorm
   have hMη : 0 ≤ Mη := hη.supNorm_nonneg
   set K1 : Fin d → Fin d → ℝ := fun _ j => max Op.Λ 0 * hη.partialSupNorm j

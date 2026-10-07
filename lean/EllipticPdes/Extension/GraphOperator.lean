@@ -188,8 +188,6 @@ theorem exists_clm_of_bounded_goodPairs [IsFiniteMeasure (volume.restrict Ω)]
       (∀ U : W12 Ω, ⇑(E U 0) =ᵐ[volume] (T (pairOf U)).1) ∧
       (∀ (U : W12 Ω) k, ⇑(E U k.succ) =ᵐ[volume] (T (pairOf U)).2 k) ∧
       ∀ U : W12 Ω, ‖E U‖ ≤ C * ‖U‖ := by
-  classical
-  -- vectors of representatives against pairs, and the operator on them
   obtain ⟨ce, hce0, hces⟩ : ∃ ce : SobolevPair d ≃ₗ[ℝ]
       (Fin (d + 1) → EuclideanSpace ℝ (Fin d) → ℝ),
       (∀ p : SobolevPair d, ce p 0 = p.1) ∧ ∀ (p : SobolevPair d) k, ce p k.succ = p.2 k :=
@@ -207,7 +205,6 @@ theorem exists_clm_of_bounded_goodPairs [IsFiniteMeasure (volume.restrict Ω)]
     rw [hT', ← hrep U, ce.symm_apply_apply, hce0]
   have hT's : ∀ (U : W12 Ω) k, T' (rep (U : H1amb Ω)) k.succ = (T (pairOf U)).2 k :=
     fun U k => by rw [hT', ← hrep U, ce.symm_apply_apply, hces]
-  -- the image is in `L²`, with the bound the norm gives
   have hpair : ∀ U : W12 Ω, pairNorm 2 (volume.restrict Ω) (pairOf U).1 (pairOf U).2
       ≤ ENNReal.ofReal ((d + 1) * ‖U‖) := fun U => by
     rw [pairOf_fst, show (pairOf U).2 = _ from funext (pairOf_snd U)]
@@ -228,7 +225,6 @@ theorem exists_clm_of_bounded_goodPairs [IsFiniteMeasure (volume.restrict Ω)]
     refine Fin.cases ?_ (fun k => ?_) k
     · rw [hT'0]; exact (hbd _ (pairOf_mem_goodPairs U)).1.trans h
     · rw [hT's]; exact ((hbd _ (pairOf_mem_goodPairs U)).2 k).trans h
-  -- the operator respects almost-everywhere equality on good pairs
   have hcompat : ∀ f ∈ (goodPairs Ω).map (ce : SobolevPair d →ₗ[ℝ] _),
       ∀ g ∈ (goodPairs Ω).map (ce : SobolevPair d →ₗ[ℝ] _),
       (∀ i, f i =ᵐ[volume.restrict Ω] g i) → ∀ k, T' f k =ᵐ[volume.restrict Set.univ] T' g k := by
@@ -256,11 +252,10 @@ theorem exists_clm_of_bounded_goodPairs [IsFiniteMeasure (volume.restrict Ω)]
 
 /-- **Extension operator between the graph spaces** (Guo Theorem III.2.2 at `p = 2`,
 Evans §5.4 Theorem 1). On a bounded open domain with `C¹` boundary, and for any open set
-the closure of the domain sits in, there is a bounded linear map from `W12 Ω`, the `H¹(Ω)`
-of this development, to the graph space of the whole space, such that the image of every
-element agrees with it on the domain, function coordinate and gradient coordinates alike,
-its function coordinate vanishes almost everywhere outside the given open set, and it is
-bounded by a constant times the norm of the element. -/
+the closure of the domain sits in, there is a bounded linear map from `W12 Ω` to the graph
+space of the whole space that agrees with each element on the domain in every coordinate, has
+function coordinate vanishing almost everywhere outside the open set, and is bounded by a
+constant times the norm. -/
 theorem exists_extW12 (hd : 0 < d) (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBounded Ω)
     (hC1 : HasC1Boundary Ω) {Ω' : Set (EuclideanSpace ℝ (Fin d))} (hΩ'open : IsOpen Ω')
     (hsub : closure Ω ⊆ Ω') :
