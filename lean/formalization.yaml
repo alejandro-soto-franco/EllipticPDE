@@ -5,7 +5,7 @@
 version: "v0.4"
 
 project:
-  name: "EllipticPdes"
+  name: "Solvability of divergence-form elliptic equations (Evans §6.2)"
   description: >-
     A Lean 4 formalisation of the solvability theory of linear second-order elliptic
     operators in divergence form on a bounded domain,
@@ -13,61 +13,15 @@ project:
       -div(A grad u) + b · grad u + c u = f in Ω,   u = 0 on ∂Ω,
 
     with A uniformly elliptic and every coefficient bounded and measurable. The drift b
-    is unrestricted, so the bilinear form is in general non-symmetric and the problem
-    has no variational structure; existence runs through Lax-Milgram.
-
-    Proved with no `sorry` in the library: the Gårding inequality for the general
-    operator on any domain; existence and uniqueness of the weak solution, which needs a
-    coercive form and so is proved for a bounded domain with no drift and a nonnegative
-    zeroth-order coefficient; the Fredholm alternative for the general operator on a
-    bounded domain, which is what governs solvability when the form is not
-    coercive, together with its solvability criterion against the transpose problem; the
-    discrete set of μ off which L u = μ u + f is uniquely solvable, and boundedness of the
-    inverse off that set; spectral compactness of the operator; interior H² regularity;
-    higher interior regularity at every order; infinite differentiability in the interior;
-    and interior Hölder continuity at exponent 1/2 in dimensions one, two and three.
-
-    Supporting layers supply Morrey's inequality, the Gagliardo-Nirenberg-Sobolev estimate
-    in general dimension and at a general exponent pair, Campanato's characterisation of
-    Hölder continuity with its converse, the Caccioppoli inequality, and the Poincaré
-    chain down to the one-dimensional inequality. H_0^1(Ω) is realised as the closure of
-    the test-function graphs inside L²(Ω) × (L²(Ω))^d, so a member has its weak
-    gradient as data.
-
-    The Hilbert-space theory is also stated over a finite-dimensional real inner product
-    space E with no coordinates: the graph space of pairs (u, ∇u) in L²(Ω) × L²(Ω; E), a
-    coefficient field a : E → (E →L E), and a weak derivative built on Mathlib's
-    distributions. The Gårding inequality, Lax-Milgram existence, Poincaré on a bounded set,
-    Rellich-Kondrachov, the Fredholm alternative, the exceptional set, the resolvent bound,
-    the symmetric spectral theorem, the weak maximum principles, interior smoothness and the
-    H^{-1} characterisation are proved there, the bounded-domain results for any additive Haar
-    measure; the Fredholm and spectral proofs are written once for an abstract
-    shifted-coercive form on a Hilbert space. The coordinate statements, the six compared
-    here among them, are the instances at E = R^d.
-
-    Three further layers sit above that base. The maximum principles: the weak principle
-    for the divergence-form operator with and without a transport term, the classical weak
-    and strong principles for the non-divergence operator, Hopf's lemma, the comparison
-    and avoidance principles, uniqueness for the classical Dirichlet and Neumann problems,
-    and the a priori bound. The W^{1,p} extension operator across a C¹ boundary, with the
-    global approximation by functions smooth up to the boundary it supplies, and with
-    Rellich-Kondrachov on H^1(Ω) and the Poincaré-Wirtinger inequality above it. The
-    variational spectral theory: the direct method under a subcritical constraint, the
-    Dirichlet eigenvalue sequence by Rayleigh quotients, and the sharp Poincaré constant.
-
-    Boundary H² regularity has its foundations in place and its headline estimate open,
-    and Schauder C^{k,α} estimates remain a roadmap item.
-
-    The Comparator configuration of this submission selects six declarations and no
-    others, the solvability theory of Evans §6.2: the Gårding inequality, existence and
-    uniqueness for a bounded domain with no drift and a nonnegative zeroth-order
-    coefficient, the Fredholm alternative, solvability against the transpose problem, the
-    discrete set of exceptional μ, and boundedness of the inverse. It excludes the
-    interior-regularity results of the library, which are interior H² regularity, higher
-    interior regularity, infinite differentiability in the interior and interior Hölder
-    continuity, along with the spectral results and the Poincaré chain. Those are listed
-    under status.main_results without a Comparator configuration and will take their own
-    challenge and solution modules in a later submission.
+    is unrestricted and the bilinear form is in general non-symmetric. The six compared
+    statements are the results of Evans §6.2: the Gårding inequality, existence and
+    uniqueness of the weak solution with no drift and a nonnegative zeroth-order
+    coefficient, the Fredholm alternative, solvability against the transpose problem,
+    the discrete set of exceptional shifts and boundedness of the inverse. They ask only
+    that Ω be bounded and open, and the compact embedding of H_0^1(Ω) in L²(Ω) is
+    proved. Interior regularity at every order, the maximum principles and the Dirichlet
+    eigenvalue sequence are also proved in the library and appear without a Comparator
+    configuration. Built on Mathlib with only Lean's standard axioms.
   authors:
     - "Alejandro Soto Franco"
     - "Kobe Marshall-Stevens"
