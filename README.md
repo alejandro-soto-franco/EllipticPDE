@@ -1,5 +1,7 @@
 # EllipticPDE
 
+[![Palomar: PALOMAR-2026-10-15-000012](https://img.shields.io/badge/Palomar-PALOMAR--2026--10--15--000012-2b7a78.svg)](https://palomar-registry.org/entry.html?id=PALOMAR-2026-10-15-000012&version=1)
+
 A Lean 4 formalisation of the solvability theory of linear
 second-order elliptic operators in divergence form on a bounded domain:
 
@@ -923,6 +925,9 @@ The six `sorry`s in `Challenge.lean` are the placeholders Comparator requires.
 Nothing under `EllipticPdes/` has one, and `Solution.lean` has none either:
 each of its six results pins its own axiom set with `#guard_msgs`, so a `sorryAx`
 reaching any of them fails the build.
+
+The pair at commit `ae5e339` is registered in the [Palomar registry](https://palomar-registry.org/entry.html?id=PALOMAR-2026-10-15-000012&version=1) as
+`PALOMAR-2026-10-15-000012` version 1.
 
 ## Toolchain
 
