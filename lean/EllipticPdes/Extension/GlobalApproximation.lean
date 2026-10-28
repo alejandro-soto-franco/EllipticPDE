@@ -17,7 +17,7 @@ public import EllipticPdes.Embedding.DomainSobolev
 On a bounded domain with `C¹` boundary, a class with an `Lᵖ` weak gradient is the `W^{1,p}(Ω)`
 limit of smooth compactly supported functions on the whole space. Evans proves this by shifting
 the class into the domain near each boundary point, mollifying, and patching with a partition of
-unity, and Guo follows him. The extension operator makes the shift unnecessary: the class
+unity. The extension operator makes the shift unnecessary: the class
 extends to a compactly supported class on `ℝᵈ` with a weak gradient there, the mollifications
 of the extension are smooth, compactly supported, and converge to it in `Lᵖ(ℝᵈ)` together with
 their gradients, and the extension agrees with the class on `Ω`. Restricting to `Ω` gives the
@@ -40,8 +40,7 @@ gradient on the open set `Ω`.
 
 ## References
 
-L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.3.3 Theorem 3 (p. 266);
-Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem III.1.3.
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.3.3 Theorem 3 (p. 266).
 -/
 
 @[expose] public section
@@ -88,7 +87,7 @@ theorem tendsto_eLpNorm_convolution_sub_restrict {p : ℝ} (hp : 1 ≤ p)
     _ ≤ _ := eLpNorm_mono_measure _ Measure.restrict_le_self
 
 /-- **Global approximation by functions smooth up to the boundary** (Evans §5.3.3 Theorem 3 at
-order one, Guo Theorem III.1.3). On a bounded open domain with `C¹` boundary, a class with an
+order one). On a bounded open domain with `C¹` boundary, a class with an
 `Lᵖ` weak gradient on the domain, `1 ≤ p < ∞`, is the limit in `W^{1,p}(Ω)` of smooth
 compactly supported functions on `ℝᵈ`: the functions converge to the class in `Lᵖ(Ω)` and their
 partial derivatives to the components of the weak gradient. -/

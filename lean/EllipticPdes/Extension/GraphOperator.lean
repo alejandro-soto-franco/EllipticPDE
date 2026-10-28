@@ -15,7 +15,7 @@ public import EllipticPdes.Embedding.H01Sobolev
 # Extension operator between the graph spaces
 
 `EllipticPdes.Extension.exists_extLinear` is the extension operator on pairs of a class and its
-gradient, given as functions. Guo's Theorem III.2.2 states it as a bounded linear map
+gradient, given as functions. Evans §5.4 Theorem 1 states it as a bounded linear map
 `E : W^{1,p}(Ω) → W^{1,p}(ℝⁿ)` between the Sobolev spaces. This file states it that way at
 `p = 2`, between the graph spaces `W12 Ω` and `W12 ℝᵈ` of this development.
 
@@ -36,12 +36,11 @@ of the theorem are read off `exists_extLinear` through the representatives.
 * `EllipticPdes.Extension.mem_W12_of_hasWeakGradOn`: a class with an `L²` weak gradient,
   paired with it, lies in the graph space.
 * `EllipticPdes.Extension.exists_extW12`: the extension operator as a bounded linear map
-  between the graph spaces, with the three clauses of Guo III.2.2.
+  between the graph spaces, with the three clauses of Evans §5.4 Theorem 1.
 
 ## References
 
-Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem III.2.2
-(p. 20); L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.4 Theorem 1 (p. 253).
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.4 Theorem 1 (p. 253).
 -/
 
 @[expose] public section
@@ -261,8 +260,8 @@ theorem exists_clm_of_bounded_goodPairs [IsFiniteMeasure (volume.restrict Ω)]
   · simpa only [hT's, Measure.restrict_univ] using hE U k.succ
   · simpa [mul_assoc] using hEn U
 
-/-- **Extension operator between the graph spaces** (Guo Theorem III.2.2 at `p = 2`,
-Evans §5.4 Theorem 1). On a bounded open domain with `C¹` boundary, and for any open set
+/-- **Extension operator between the graph spaces** (Evans §5.4 Theorem 1 at `p = 2`). On a bounded
+open domain with `C¹` boundary, and for any open set
 the closure of the domain sits in, there is a bounded linear map from `W12 Ω` to the graph
 space of the whole space that agrees with each element on the domain in every coordinate, has
 function coordinate vanishing almost everywhere outside the open set, and is bounded by a

@@ -12,7 +12,7 @@ public import EllipticPdes.Extension.Basic
 /-!
 # Cutting a pair off inside a neighbourhood
 
-Guo's Theorem III.2.2 finishes by covering the boundary with finitely many chart
+The proof of Evans §5.4 Theorem 1 finishes by covering the boundary with finitely many chart
 neighbourhoods and gluing the local extensions with a partition of unity. Each piece of that
 partition is a cutoff supported in one chart's ball, and the piece it cuts out has to reach the
 whole region above that chart's graph, where the chart describes the domain only inside the
@@ -34,9 +34,8 @@ pairs, and the file bounds it in every `Lᵖ` seminorm.
 
 ## References
 
-Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem III.2.2
-(p. 20), proof step 3 (p. 21); L. C. Evans, *Partial Differential Equations* (2nd ed.),
-§5.4 Theorem 1 (p. 253).
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.4 Theorem 1 (p. 253), gluing step of
+the proof.
 -/
 
 @[expose] public section

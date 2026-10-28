@@ -12,7 +12,8 @@ public import Mathlib.Geometry.Manifold.PartitionOfUnity
 /-!
 # Partition of unity over a finite cover of the boundary
 
-Guo's third step covers the boundary with finitely many chart neighbourhoods and glues the local
+The gluing step of the proof of Evans §5.4 Theorem 1 covers the boundary with finitely many chart
+neighbourhoods and glues the local
 extensions with a partition of unity. This file supplies the partition, and bundles it with the
 cover into the data that step consumes.
 
@@ -36,9 +37,8 @@ extensions requires.
 
 ## References
 
-Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem III.2.2
-(p. 20), proof step 3 (p. 21); L. C. Evans, *Partial Differential Equations* (2nd ed.),
-§5.4 Theorem 1 (p. 253).
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.4 Theorem 1 (p. 253), gluing step of
+the proof.
 -/
 
 @[expose] public section
@@ -73,7 +73,7 @@ theorem exists_smooth_partition {ι : Type} [Fintype ι]
     exact f.sum_eq_one hx
 
 
-/-- **Data Guo's third step glues with.** A finite family of boundary charts whose balls
+/-- **Data the gluing step uses.** A finite family of boundary charts whose balls
 cover the boundary, and a smooth partition of unity subordinate to those balls together with the
 domain itself. The index `none` is the piece supported inside the domain, away from the
 boundary; each `some x` is the piece supported in the ball of the chart at `x`. -/

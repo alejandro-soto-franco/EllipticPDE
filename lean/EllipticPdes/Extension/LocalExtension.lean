@@ -14,17 +14,17 @@ public import EllipticPdes.Extension.BoundaryChart
 /-!
 # Local boundary extension
 
-Guo's Theorem III.2.2 reaches its third step with a local extension for each chart: a class on
-the chart's neighbourhood agreeing with the original on the part of the domain that
-neighbourhood meets. This file proves that statement, which is the whole content of his step 2
-once the chart is in hand.
+The proof of Evans §5.4 Theorem 1 glues a local extension for each chart: a class on the
+chart's neighbourhood agreeing with the original on the part of the domain that neighbourhood
+meets. This file proves that statement, which is the whole content of the local step once the
+chart is in hand.
 
 The extension is the composite of four linear maps on pairs of a class and a gradient: a cutoff
 between two balls makes the class reach the whole region above the chart's graph, the rigid
 motion of the chart takes it into the coordinates the graph is written in, the reflection
 extends it across the graph, and the motion takes the result back. Each map is linear by
-construction, so the extension is linear in the class. Guo's step 2 works with a function smooth
-up to the boundary and reads the chain rule off it; here every step is a weak gradient.
+construction, so the extension is linear in the class. Evans works with a function smooth up to
+the boundary and reads the chain rule off it; here every step is a weak gradient.
 
 Two points where the statement is narrower than the machinery. The chart asks nothing of the
 gradient of its graph, as Evans' definition does not, so the construction runs on the truncated
@@ -49,9 +49,8 @@ graph and the cutoff depend on the chart and the two radii alone, so the constan
 
 ## References
 
-Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem III.2.2
-(p. 20), proof step 2 (p. 21); L. C. Evans, *Partial Differential Equations* (2nd ed.),
-§5.4 Theorem 1 (p. 253).
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.4 Theorem 1 (p. 253), local step of
+the proof.
 -/
 
 @[expose] public section
@@ -314,8 +313,9 @@ theorem localOp_fst_eq {c : C1Chart d} {γ ξ : EuclideanSpace ℝ (Fin d) → �
   rw [chartExt_eq_of_mem hind hy]
   simp [hξ]
 
-/-- **Guo's local boundary extension with its constant** (Theorem III.2.2, proof step 2, p. 21).
-Near a boundary point the class extends across the boundary: on any ball strictly inside the
+/-- **Local boundary extension with its constant** (local step of the proof of Evans §5.4
+Theorem 1). Near a boundary point the class extends across the boundary: on any ball strictly inside
+the
 chart's, `localExt` has a weak gradient there and agrees with the original on the part of the
 domain the ball meets, and both it and its gradient are bounded in every `Lᵖ` seminorm by the
 class and its gradient over the domain, with one constant taken before the class. -/
@@ -349,8 +349,8 @@ theorem localExtension_bound (c : C1Chart d) {Ω : Set (EuclideanSpace ℝ (Fin 
     exact hy'.1
   · exact hξ1 y (ball_subset_closedBall hy.2)
 
-/-- **Guo's local boundary extension with its constant**, with the extension quantified away.
-This is the form the gluing of step 3 consumes. -/
+/-- **Local boundary extension with its constant**, with the extension quantified away.
+This is the form the gluing step consumes. -/
 theorem exists_localExtension_bound (c : C1Chart d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
     (hΩm : MeasurableSet Ω) {x : EuclideanSpace ℝ (Fin d)} (hfits : c.Fits Ω x) {r : ℝ}
     (hrc : r < c.radius) {p : ℝ≥0∞} (hp : 1 ≤ p) :
@@ -369,8 +369,9 @@ theorem exists_localExtension_bound (c : C1Chart d) {Ω : Set (EuclideanSpace �
   obtain ⟨h1, h2, h3, h4, h5, h6⟩ := hK u g hu hgi hwg
   exact ⟨_, _, h1, h2, h3, h4, h5, h6⟩
 
-/-- **Guo's local boundary extension** (Theorem III.2.2, proof step 2, p. 21). Near a boundary
-point the class extends across the boundary: on any ball strictly inside the chart's, there is a
+/-- **Local boundary extension** (local step of the proof of Evans §5.4 Theorem 1). Near a
+boundary point the class extends across the boundary: on any ball strictly inside the chart's, there
+is a
 class with a weak gradient there agreeing with the original on the part of the domain the ball
 meets. -/
 theorem exists_localExtension (c : C1Chart d) {Ω : Set (EuclideanSpace ℝ (Fin d))}

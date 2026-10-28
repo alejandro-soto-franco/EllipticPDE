@@ -11,8 +11,8 @@ public import EllipticPdes.Extension.Operator
 /-!
 # Extension operator as a linear map
 
-Guo's proof produces an extension of each class. Evans states the same theorem as a bounded
-linear operator, and this file packages it that way: the partition, the charts, the truncated
+The proof of Evans §5.4 Theorem 1 produces an extension of each class, and the theorem states a
+bounded linear operator. This file packages it that way: the partition, the charts, the truncated
 graphs, the radii and the cutoffs are all chosen from the domain alone, before any class appears,
 so the assembled extension is a formula in the class, and every step of that formula is
 multiplication by a fixed function, precomposition with a fixed map, or a finite sum. The map
@@ -32,9 +32,7 @@ operator is bounded in the sense the theorem asserts at every exponent, and not 
 
 ## References
 
-L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.4 Theorem 1 (p. 253);
-Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem III.2.2
-(p. 20).
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.4 Theorem 1 (p. 253).
 -/
 
 @[expose] public section

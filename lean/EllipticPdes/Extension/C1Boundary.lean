@@ -14,8 +14,7 @@ public import EllipticPdes.Extension.BoundaryChart
 The extension operator asks that the boundary be `C¹`, and this file states that hypothesis as
 Evans states it (§C.1, p. 665): the boundary `∂U` is `C^k` when for each `x⁰ ∈ ∂U` there are
 `r > 0` and a `C^k` function `γ : ℝ^{n-1} → ℝ` such that, upon relabelling and reorienting the
-coordinate axes if necessary, `U ∩ B(x⁰, r) = {x ∈ B(x⁰, r) | xₙ > γ(x₁, …, x_{n-1})}`. Guo asks
-the same in Theorem III.2.2 (p. 20).
+coordinate axes if necessary, `U ∩ B(x⁰, r) = {x ∈ B(x⁰, r) | xₙ > γ(x₁, …, x_{n-1})}`.
 
 Two points of encoding. The relabelling and reorientation of the axes is a linear isometry of
 the whole space, split here between that isometry and the direction the graph is taken in. A
@@ -45,9 +44,8 @@ the chart constrains nothing.
 
 ## References
 
-Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem III.2.2
-(p. 20) and its proof, step 2 (p. 21); L. C. Evans, *Partial Differential Equations* (2nd ed.),
-§C.1 (p. 665) and §5.4 Theorem 1 (p. 253).
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §C.1 (p. 665) and §5.4 Theorem 1
+(p. 253).
 -/
 
 @[expose] public section
@@ -379,7 +377,7 @@ theorem exists_bounded_graph (z : EuclideanSpace ℝ (Fin d)) :
 end C1Chart
 
 /-- **`Ω` has `C¹` boundary.** Every boundary point admits a chart, which is the hypothesis of
-Guo's Theorem III.2.2 and of Evans' §5.4 Theorem 1. -/
+Evans §5.4 Theorem 1. -/
 def HasC1Boundary (Ω : Set (EuclideanSpace ℝ (Fin d))) : Prop :=
   ∀ x ∈ frontier Ω, ∃ c : C1Chart d, c.Fits Ω x
 

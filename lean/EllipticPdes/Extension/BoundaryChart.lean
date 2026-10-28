@@ -14,7 +14,8 @@ public import EllipticPdes.Extension.EvenReflection
 
 Near a boundary point a domain with `C¹` boundary is, after relabelling the coordinates, the
 region above the graph of a `C¹` function `γ` of the remaining ones. This file extends a
-Sobolev class across that graph, which is the local half of Guo's extension operator.
+Sobolev class across that graph, which is the local half of the extension operator of Evans §5.4
+Theorem 1.
 
 The route is the composite of the three maps the chapter has built. The shear `S y = y + γ(y)eⱼ`
 inverts the flattening, so the flattening `T = S⁻¹` sends the region above the graph onto the
@@ -45,9 +46,8 @@ and the reflection returns through `T`.
 
 ## References
 
-Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem III.2.2
-steps 1 and 2 (p. 21); L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.4 Theorem 1
-and §C.1.
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.4 Theorem 1 (steps 1 and 2 of the
+proof) and §C.1.
 -/
 
 @[expose] public section

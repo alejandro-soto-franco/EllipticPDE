@@ -11,7 +11,8 @@ public import EllipticPdes.Extension.LocalExtension
 /-!
 # Gluing the local extensions
 
-Guo's third step covers the boundary, fixes a partition of unity subordinate to that cover with
+The gluing step of the proof of Evans §5.4 Theorem 1 covers the boundary, fixes a partition of unity
+subordinate to that cover with
 each support compactly inside its neighbourhood, and sets `ū = ∑ᵢ Pᵢ ūᵢ`. This file carries out
 that sum.
 
@@ -22,7 +23,7 @@ the class, so the piece equals `Pᵢ u` there and off the ball both sides vanish
 add to `u` because the partition adds to one. Every piece is a linear map on pairs of a class and
 a gradient, so the sum is.
 
-The support clause follows by one more cutoff, which is how Guo reaches it: any open set the
+The support clause follows by one more cutoff, which is how the theorem reaches it: any open set the
 closure of the domain sits in admits a smooth cutoff equal to one on that closure, and
 multiplying by it moves the support inside without disturbing the agreement.
 
@@ -47,9 +48,8 @@ gradient by the class and its gradient over the domain.
 
 ## References
 
-Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem III.2.2
-(p. 20), proof step 3 (p. 22); L. C. Evans, *Partial Differential Equations* (2nd ed.),
-§5.4 Theorem 1 (p. 253).
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.4 Theorem 1 (p. 253), gluing step of
+the proof.
 -/
 
 @[expose] public section
@@ -187,7 +187,7 @@ theorem extPieceOp_bound {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩopen : IsOp
     · rw [hK]
       exact (h5 k).trans_eq (by rw [mul_assoc])
 
-/-- **Guo's third step with its constant** (Theorem III.2.2, proof step 3, p. 22): the local
+/-- **Gluing step with its constant** (proof of Evans §5.4 Theorem 1): the local
 extensions glued with the partition of unity extend the class across the whole boundary, and one
 constant, taken before the class, bounds the extension and its gradient by the class and its
 gradient over the domain. -/
@@ -235,7 +235,7 @@ theorem extension_bound {Ω : Set (EuclideanSpace ℝ (Fin d))}
   · exact hbound _ fun i => (hpiece i).2.2.2.2.1
   · exact fun k => hbound _ fun i => (hpiece i).2.2.2.2.2 k
 
-/-- **Guo's third step with its constant**, with the partition and the extension quantified
+/-- **Gluing step with its constant**, with the partition and the extension quantified
 away. This is the form the support clause and the embedding consume. -/
 theorem exists_extension_bound (hd : 0 < d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
     (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBounded Ω) (hC1 : HasC1Boundary Ω)
@@ -256,7 +256,7 @@ theorem exists_extension_bound (hd : 0 < d) {Ω : Set (EuclideanSpace ℝ (Fin d
   obtain ⟨h1, h2, h3, h4, h5, h6⟩ := hK u g hu hgi hwg
   exact ⟨_, _, h1, h2, h3, h4, h5, h6⟩
 
-/-- **Guo's third step** (Theorem III.2.2, proof step 3, p. 22): the local extensions glued with
+/-- **Gluing step** (proof of Evans §5.4 Theorem 1): the local extensions glued with
 the partition of unity extend the class across the whole boundary. -/
 theorem exists_extension (hd : 0 < d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
     (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBounded Ω) (hC1 : HasC1Boundary Ω)
@@ -297,7 +297,8 @@ def extSubsetGrad {Ω : Set (EuclideanSpace ℝ (Fin d))} (P : BoundaryPartition
     (k : Fin d) : EuclideanSpace ℝ (Fin d) → ℝ :=
   fun y => χ y * extFunGrad P u g k y + partialD k χ y * extFun P u y
 
-/-- **Guo's Theorem III.2.2** (p. 20), all three clauses. The extension agrees with the class on
+/-- **Extension theorem** (Evans §5.4 Theorem 1), all three clauses. The extension agrees with the
+class on
 the domain, is supported inside any open set the closure of the domain sits in, and is bounded
 in every `Lᵖ` seminorm, together with its gradient, by the class and its gradient over the
 domain, with one constant taken before the class. -/
@@ -347,7 +348,8 @@ theorem extension_subset_bound {Ω Ω' : Set (EuclideanSpace ℝ (Fin d))}
       _).trans_eq hK.symm)
   · exact (h5 k).trans_eq hK.symm
 
-/-- **Guo's Theorem III.2.2** (p. 20), all three clauses, with the partition, the cutoff and
+/-- **Extension theorem** (Evans §5.4 Theorem 1), all three clauses, with the partition, the cutoff
+and
 the extension quantified away. -/
 theorem exists_extension_subset_bound (hd : 0 < d) {Ω Ω' : Set (EuclideanSpace ℝ (Fin d))}
     (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBounded Ω) (hC1 : HasC1Boundary Ω)
@@ -373,7 +375,8 @@ theorem exists_extension_subset_bound (hd : 0 < d) {Ω Ω' : Set (EuclideanSpace
   obtain ⟨h1, h2, h3, h4, h5, h6, h7, h8⟩ := hK u g hu hgi hwg
   exact ⟨_, _, h1, h2, h3, h4, h5, h6, h7, h8⟩
 
-/-- **Clauses (i) and (ii) of Guo's Theorem III.2.2** (p. 20). The extension agrees with the class
+/-- **Clauses (i) and (ii) of the extension theorem** (Evans §5.4 Theorem 1). The extension agrees
+with the class
 on the domain and is supported inside any open set the closure of the domain sits in. -/
 theorem exists_extension_subset (hd : 0 < d) {Ω Ω' : Set (EuclideanSpace ℝ (Fin d))}
     (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBounded Ω) (hC1 : HasC1Boundary Ω)
