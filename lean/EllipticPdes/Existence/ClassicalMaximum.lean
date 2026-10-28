@@ -60,8 +60,7 @@ bounded on the set; the sources also ask for continuity, which the proof does no
 L. C. Evans, *Partial Differential Equations* (2nd ed.), §6.4.1 Theorem 1 (p. 343) and
 Theorem 2 (p. 344);
 D. Gilbarg and N. S. Trudinger, *Elliptic Partial Differential Equations of Second Order*,
-§3.1 Theorem 3.1 (p. 32) and Corollary 3.2 (p. 33);
-Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem XI.3.7.
+§3.1 Theorem 3.1 (p. 32) and Corollary 3.2 (p. 33).
 -/
 
 @[expose] public section
@@ -490,8 +489,8 @@ theorem expInner_neg (hA : IsUniformlyElliptic A U θ) {e : E} (he : ‖e‖ = 1
   nlinarith [mul_le_mul_of_nonneg_left h1 (sq_nonneg ((B + 1) / θ)),
     mul_le_mul_of_nonneg_left h2 hlam0.le]
 
-/-- **Weak maximum principle** (Evans §6.4.1 Theorem 1(i), Gilbarg and Trudinger Theorem 3.1,
-Guo Theorem XI.3.7(i)). Let `U` be a bounded open nonempty subset of a finite-dimensional real
+/-- **Weak maximum principle** (Evans §6.4.1 Theorem 1(i), Gilbarg and Trudinger Theorem 3.1). Let
+`U` be a bounded open nonempty subset of a finite-dimensional real
 inner product space, `L` a non-divergence-form operator with symmetric uniformly elliptic
 coefficient, no zeroth-order term and transport `b` with `⟪b, e⟫ ≤ B` along a unit vector `e`, and
 `u` a function `C²` on `U` and continuous on its closure with `L u ≤ 0` on `U`. Then the maximum
@@ -549,7 +548,7 @@ theorem weak_minimum_principle (hU : IsOpen U) (hUb : Bornology.IsBounded U) (hU
   exact ⟨y, hy, fun x hx => by linarith [hmax x hx]⟩
 
 /-- **Weak maximum principle with nonnegative zeroth-order coefficient** (Evans §6.4.1
-Theorem 2(i), Gilbarg and Trudinger Corollary 3.2, Guo Theorem XI.3.7(ii)). With `c ≥ 0`, a
+Theorem 2(i), Gilbarg and Trudinger Corollary 3.2). With `c ≥ 0`, a
 subsolution is bounded on the closure by the maximum of its positive part over the boundary. -/
 theorem weak_maximum_principle_of_nonneg (hU : IsOpen U) (hUb : Bornology.IsBounded U)
     (hUne : U.Nonempty) (hA : IsUniformlyElliptic A U θ) {e : E} (he : ‖e‖ = 1)
@@ -588,7 +587,8 @@ theorem weak_maximum_principle_of_nonneg (hU : IsOpen U) (hUb : Bornology.IsBoun
       exact ⟨closure_mono hVU hy'cl.1, hy'U⟩
   linarith [hy'max x hxV]
 
-/-- **Strict maximum principle** (Guo Theorem XI.3.5). A strict subsolution, meaning `L u < 0` at
+/-- **Strict maximum principle** (first step of the proof of Gilbarg and Trudinger Theorem 3.1). A
+strict subsolution, meaning `L u < 0` at
 a point, has no local maximum there whenever `c u ≥ 0` at the point. -/
 theorem not_isLocalMax_of_neg {x₀ : E} (hsymm : (A x₀ : E →ₗ[ℝ] E).IsSymmetric)
     (hpsd : ∀ ξ, 0 ≤ ⟪A x₀ ξ, ξ⟫) {u : E → ℝ} (hu : ContDiffAt ℝ 2 u x₀)
@@ -596,7 +596,7 @@ theorem not_isLocalMax_of_neg {x₀ : E} (hsymm : (A x₀ : E →ₗ[ℝ] E).IsS
   fun hmax => absurd (le_nondivOperator_of_isLocalMax (b := b) (c := c) hsymm hpsd hu hmax)
     (not_le.mpr (hstrict.trans_le hcu))
 
-/-- **Comparison principle** (Gilbarg and Trudinger Theorem 3.3, Guo Corollary XI.3.11). With
+/-- **Comparison principle** (Gilbarg and Trudinger Theorem 3.3). With
 `c ≥ 0`, if `L u ≤ L v` on the set and `u ≤ v` on the boundary, then `u ≤ v` on the closure. -/
 theorem comparison_principle (hU : IsOpen U) (hUb : Bornology.IsBounded U) (hUne : U.Nonempty)
     (hA : IsUniformlyElliptic A U θ) {e : E} (he : ‖e‖ = 1) (hb : ∀ x ∈ U, ⟪b x, e⟫ ≤ B)
@@ -658,7 +658,8 @@ theorem weak_minimum_principle_of_nonneg (hU : IsOpen U) (hUb : Bornology.IsBoun
   rw [e]
   linarith
 
-/-- **Uniqueness for the Dirichlet problem** (Guo Corollary XI.3.9). With `c ≥ 0`, two functions
+/-- **Uniqueness for the Dirichlet problem** (Gilbarg and Trudinger Theorem 3.3). With `c ≥ 0`, two
+functions
 with the same image under `L` on the set and the same boundary values agree on the closure. -/
 theorem dirichlet_unique (hU : IsOpen U) (hUb : Bornology.IsBounded U) (hUne : U.Nonempty)
     (hA : IsUniformlyElliptic A U θ) {e : E} (he : ‖e‖ = 1) (hb : ∀ x ∈ U, ⟪b x, e⟫ ≤ B)
@@ -840,8 +841,8 @@ theorem norm_toLp_le {v : Fin d → ℝ} {B : ℝ} (hv : ∀ i, |v i| ≤ B) :
         Finset.sum_le_sum fun i _ => by simpa [norm_smul] using hv i
     _ = d * B := by simp
 
-/-- **Weak maximum principle** (Evans §6.4.1 Theorem 1(i), Gilbarg and Trudinger Theorem 3.1,
-Guo Theorem XI.3.7(i)). Let `U` be a bounded open nonempty set, `L` a non-divergence-form
+/-- **Weak maximum principle** (Evans §6.4.1 Theorem 1(i), Gilbarg and Trudinger Theorem 3.1). Let
+`U` be a bounded open nonempty set, `L` a non-divergence-form
 operator with symmetric uniformly elliptic coefficients, bounded transport coefficients and no
 zeroth-order term, and `u` a function `C²` on `U` and continuous on its closure with `L u ≤ 0`
 on `U`. Then the maximum of `u` over the closure is attained on the boundary. -/
@@ -876,7 +877,7 @@ theorem weak_minimum_principle (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d)
     exact hsup x hx
 
 /-- **Weak maximum principle with nonnegative zeroth-order coefficient** (Evans §6.4.1
-Theorem 2(i), Gilbarg and Trudinger Corollary 3.2, Guo Theorem XI.3.7(ii)). With `c ≥ 0`, a
+Theorem 2(i), Gilbarg and Trudinger Corollary 3.2). With `c ≥ 0`, a
 subsolution is bounded on the closure by the maximum of its positive part over the boundary. -/
 theorem weak_maximum_principle_of_nonneg (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))}
     (hU : IsOpen U) (hUb : Bornology.IsBounded U) (hUne : U.Nonempty)
@@ -913,7 +914,8 @@ theorem weak_minimum_principle_of_nonneg (hd : 0 < d) {U : Set (EuclideanSpace �
       rw [← nondivOp_eq_of_contDiffOn hU hu hx]
       exact hsup x hx
 
-/-- **Strict maximum principle** (Guo Theorem XI.3.5). A strict subsolution, meaning
+/-- **Strict maximum principle** (first step of the proof of Gilbarg and Trudinger Theorem 3.1). A
+strict subsolution, meaning
 `L u < 0` at a point, has no local maximum at that point whenever `c u ≥ 0` there: in
 particular when `c = 0`, when `c ≥ 0` and the maximum is nonnegative, and when the maximum is
 zero. -/
@@ -928,7 +930,7 @@ theorem not_isLocalMax_of_nondivOp_neg {a : EuclideanSpace ℝ (Fin d) → Fin d
     (fun ξ => by simpa [inner_matrixCLM] using hpsd (WithLp.ofLp ξ)) hu hcu
     (by rwa [nondivOp_eq hu] at hstrict)
 
-/-- **Comparison principle** (Gilbarg and Trudinger Theorem 3.3, Guo Corollary XI.3.11). With
+/-- **Comparison principle** (Gilbarg and Trudinger Theorem 3.3). With
 `c ≥ 0`, if `L u ≤ L v` on the set and `u ≤ v` on the boundary, then `u ≤ v` on the closure. -/
 theorem comparison_principle (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))}
     (hU : IsOpen U) (hUb : Bornology.IsBounded U) (hUne : U.Nonempty)
@@ -965,7 +967,7 @@ theorem abs_le_of_nondivOp_eq_zero (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fi
     rw [← nondivOp_eq_of_contDiffOn hU hu hx]
     exact hsol x hx
 
-/-- **Uniqueness for the Dirichlet problem** (Guo Corollary XI.3.9). With `c ≥ 0`, two
+/-- **Uniqueness for the Dirichlet problem** (Gilbarg and Trudinger Theorem 3.3). With `c ≥ 0`, two
 functions with the same image under `L` on the set and the same boundary values agree on the
 closure. -/
 theorem dirichlet_unique (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))}

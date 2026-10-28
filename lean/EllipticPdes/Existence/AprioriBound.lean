@@ -25,8 +25,7 @@ bounded in absolute value by the same expression with the boundary supremum of `
 
 ## References
 
-Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem XI.5.1
-(p. 103); D. Gilbarg and N. S. Trudinger, *Elliptic Partial Differential Equations of Second
+D. Gilbarg and N. S. Trudinger, *Elliptic Partial Differential Equations of Second
 Order*, Theorem 3.7 (p. 36).
 -/
 
@@ -139,7 +138,7 @@ theorem exists_slab_barrier (hA : IsUniformlyElliptic A U θ) {e : E}
         + c x * (c₀ + ε * expInner α e x) := by
       linarith [mul_le_mul_of_nonneg_left hprin hF']
 
-/-- **Maximum-principle bound for a subsolution** (Guo Theorem XI.5.1(i), Gilbarg and Trudinger
+/-- **Maximum-principle bound for a subsolution** (Gilbarg and Trudinger
 Theorem 3.7). On a bounded open set inside the slab `m ≤ x_{i₀} ≤ m + D`, with `c ≥ 0`, a function
 with `L u ≤ f` and `f ≤ F` is bounded by the maximum of its positive part over the boundary
 plus `(e^{(B/θ + 1) D} - 1) F/θ`. -/
@@ -168,7 +167,7 @@ theorem apriori_bound_sub (hU : IsOpen U) (hUb : Bornology.IsBounded U) (hUne : 
   have := comparison_principle hU hUb ⟨x₁, hx₁⟩ hA he hb hc hu hvC huc hvc hL hbd x hx
   linarith [(hvbd x hx).2]
 
-/-- **Maximum-principle bound for a solution** (Guo Theorem XI.5.1(ii), Gilbarg and Trudinger
+/-- **Maximum-principle bound for a solution** (Gilbarg and Trudinger
 Theorem 3.7). On a bounded open set inside the slab `m ≤ x_{i₀} ≤ m + D`, with `c ≥ 0`, a function
 with `L u = f` and `|f| ≤ F` is bounded in absolute value by the maximum of `|u|` over the
 boundary plus `(e^{(B/θ + 1) D} - 1) F/θ`. -/
@@ -211,7 +210,7 @@ end General
 
 variable {d : ℕ}
 
-/-- **Maximum-principle bound for a subsolution** (Guo Theorem XI.5.1(i), Gilbarg and Trudinger
+/-- **Maximum-principle bound for a subsolution** (Gilbarg and Trudinger
 Theorem 3.7). On a bounded open set inside the slab `m ≤ x_{i₀} ≤ m + D`, with `c ≥ 0`, a function
 with `L u ≤ f` and `f ≤ F` is bounded by the maximum of its positive part over the boundary
 plus `(e^{(B/θ + 1) D} - 1) F/θ`. -/
@@ -244,7 +243,7 @@ theorem apriori_bound_sub (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))}
   exact nondivOperator.apriori_bound_sub hU hUb hUne hA he hB0 hb' hc hslab' hu huc
     (fun x hx => by rw [← nondivOp_eq_of_contDiffOn hU hu hx]; exact hsub x hx) hF0 hF
 
-/-- **Maximum-principle bound for a solution** (Guo Theorem XI.5.1(ii), Gilbarg and Trudinger
+/-- **Maximum-principle bound for a solution** (Gilbarg and Trudinger
 Theorem 3.7). On a bounded open set inside the slab `m ≤ x_{i₀} ≤ m + D`, with `c ≥ 0`, a function
 with `L u = f` and `|f| ≤ F` is bounded in absolute value by the maximum of `|u|` over the
 boundary plus `(e^{(B/θ + 1) D} - 1) F/θ`. -/

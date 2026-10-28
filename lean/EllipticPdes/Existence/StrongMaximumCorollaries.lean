@@ -35,8 +35,8 @@ to Euclidean space with a coefficient matrix.
 
 ## References
 
-Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Lemma XI.4.3,
-Theorem XI.4.5, Corollaries XI.4.6, XI.4.7 and XI.4.8 (pp. 100–103).
+D. Gilbarg and N. S. Trudinger, *Elliptic Partial Differential Equations of Second Order*,
+§3.2 Lemma 3.4, Theorem 3.5 and Theorem 3.6.
 -/
 
 @[expose] public section
@@ -70,7 +70,8 @@ theorem eq_on_closure_of_eq_on {X : Type*} [TopologicalSpace X] {U : Set X} {w :
 
 namespace nondivOperator
 
-/-- **Hopf's lemma at a zero boundary value** (Guo Lemma XI.4.3(iii)). With the zeroth-order
+/-- **Hopf's lemma at a zero boundary value** (Gilbarg and Trudinger Lemma 3.4). With the
+zeroth-order
 coefficient bounded in absolute value and of any sign, a subsolution strictly negative on the
 ball, vanishing at a point `x₀` of the sphere and differentiable there, has positive derivative
 at `x₀` in the outward radial direction. -/
@@ -85,7 +86,7 @@ theorem hopf_lemma_of_zero (hA : IsUniformlyElliptic A U θ) (hT : ∀ x ∈ U, 
     (fun x hx => (nondivOperator_posPart_le A b c (by linarith [hlt x hx])).trans (hsub x hx))
     hr hball hx₀ hlt (fun x _ => by rw [hu0, mul_zero]) hdiff
 
-/-- **Strong maximum principle at a zero maximum** (Guo Theorem XI.4.5(iii)). With the
+/-- **Strong maximum principle at a zero maximum** (Gilbarg and Trudinger Theorem 3.5). With the
 zeroth-order coefficient bounded in absolute value and of any sign, a subsolution on a connected
 open set that attains the maximum zero at an interior point vanishes on the set. -/
 theorem strong_maximum_principle_of_zero (hU : IsOpen U) (hUc : IsPreconnected U)
@@ -100,7 +101,8 @@ theorem strong_maximum_principle_of_zero (hU : IsOpen U) (hUc : IsPreconnected U
     (fun x hx => (nondivOperator_posPart_le A b c (by linarith [hmax x hx])).trans (hsub x hx))
     hx₀ hmax (fun x _ => by rw [hu0, mul_zero])
 
-/-- **Avoidance principle** (Guo Corollary XI.4.6). On a connected open set, with the
+/-- **Avoidance principle** (the strong maximum principle applied to `u - v`). On a connected open
+set, with the
 zeroth-order coefficient bounded in absolute value, two functions with `L u ≤ L v` and `u ≤ v`
 either agree everywhere or satisfy `u < v` everywhere. -/
 theorem avoidance_principle (hU : IsOpen U) (hUc : IsPreconnected U)
@@ -124,8 +126,9 @@ theorem avoidance_principle (hU : IsOpen U) (hUc : IsPreconnected U)
     intro x hx
     exact (hle x hx).lt_of_ne fun h1 => h ⟨x, hx, h1⟩
 
-/-- **Tangency at a boundary point forces equality** (Guo Corollary XI.4.7, with the interior
-sphere condition at the point in place of a `C²` boundary). On a connected open set, two
+/-- **Tangency at a boundary point forces equality** (a consequence of Hopf's lemma and the
+avoidance principle, with the interior sphere condition at the point in place of a `C²`
+boundary). On a connected open set, two
 functions with `L u ≤ L v`, `u ≤ v` on the set, equal with equal derivatives at a point `x₀`
 of the frontier that is on the sphere of a ball inside the set, agree on the set. -/
 theorem eq_of_eq_of_fderiv_eq (hU : IsOpen U) (hUc : IsPreconnected U)
@@ -183,7 +186,8 @@ theorem eq_const_of_neumann_aux (hU : IsOpen U) (hUc : IsPreconnected U)
       rw [hfz] at hhopf
       exact lt_irrefl _ hhopf
 
-/-- **Uniqueness for the Neumann problem** (Guo Corollary XI.4.8). On a bounded connected open
+/-- **Uniqueness for the Neumann problem** (Gilbarg and Trudinger Theorem 3.6). On a bounded
+connected open
 set with an interior sphere at every frontier point, with `c ≥ 0` bounded, two functions with
 the same image under `L`, differentiable at every frontier point and with the same derivative
 there along the radius of an interior sphere, differ by a constant on the closure. -/
@@ -237,8 +241,8 @@ theorem neumann_unique (hU : IsOpen U) (hUc : IsPreconnected U) (hUb : Bornology
     simp only [hwdef] at this
     linarith
 
-/-- **Uniqueness for the Neumann problem with a nonzero zeroth-order coefficient** (Guo Remark
-XI.4.9). When `c` is nonzero somewhere on the set, the constant is zero. -/
+/-- **Uniqueness for the Neumann problem with a nonzero zeroth-order coefficient** (Gilbarg and
+Trudinger Theorem 3.6). When `c` is nonzero somewhere on the set, the constant is zero. -/
 theorem neumann_unique_of_exists_pos (hU : IsOpen U) (hUc : IsPreconnected U)
     (hUb : Bornology.IsBounded U) (hUne : U.Nonempty) (hA : IsUniformlyElliptic A U θ)
     (hT : ∀ x ∈ U, LinearMap.trace ℝ E (A x : E →ₗ[ℝ] E) ≤ T) (hb : ∀ x ∈ U, ‖b x‖ ≤ B)
@@ -285,7 +289,8 @@ theorem euclid_hyps {U : Set (EuclideanSpace ℝ (Fin d))}
   ⟨isUniformlyElliptic_matrixCLM hθ hsymm hell, fun x hx => trace_matrixCLM_le (ha x hx),
     fun x hx => norm_toLp_le (hb x hx)⟩
 
-/-- **Hopf's lemma at a zero boundary value** (Guo Lemma XI.4.3(iii)). With the zeroth-order
+/-- **Hopf's lemma at a zero boundary value** (Gilbarg and Trudinger Lemma 3.4). With the
+zeroth-order
 coefficient bounded in absolute value and of any sign, a subsolution strictly negative on the
 ball, vanishing at a point `x₀` of the sphere and differentiable there, has positive derivative
 at `x₀` in the outward radial direction. -/
@@ -311,7 +316,7 @@ theorem hopf_lemma_of_zero (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))}
       rw [← nondivOp_eq_of_contDiffOn hopen (hu.mono hball) hx]; exact hsub x (hball hx))
     hr subset_rfl hx₀ (fun x hx => hlt x (hball hx)) hu0 hdiff
 
-/-- **Strong maximum principle at a zero maximum** (Guo Theorem XI.4.5(iii)). With the
+/-- **Strong maximum principle at a zero maximum** (Gilbarg and Trudinger Theorem 3.5). With the
 zeroth-order coefficient bounded in absolute value and of any sign, a subsolution on a connected
 open set that attains the maximum zero at an interior point vanishes on the set. -/
 theorem strong_maximum_principle_of_zero (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))}
@@ -330,7 +335,8 @@ theorem strong_maximum_principle_of_zero (hd : 0 < d) {U : Set (EuclideanSpace �
   exact nondivOperator.strong_maximum_principle_of_zero hU hUc hA hT hb' hc hu
     (fun x hx => by rw [← nondivOp_eq_of_contDiffOn hU hu hx]; exact hsub x hx) hx₀ hmax hu0
 
-/-- **Avoidance principle** (Guo Corollary XI.4.6). On a connected open set, with the
+/-- **Avoidance principle** (the strong maximum principle applied to `u - v`). On a connected open
+set, with the
 zeroth-order coefficient bounded in absolute value, two functions with `L u ≤ L v` and `u ≤ v`
 either agree everywhere or satisfy `u < v` everywhere. -/
 theorem avoidance_principle (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))}
@@ -350,8 +356,9 @@ theorem avoidance_principle (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))}
       rw [← nondivOp_eq_of_contDiffOn hU hu hx, ← nondivOp_eq_of_contDiffOn hU hv hx]
       exact hL x hx) hle
 
-/-- **Tangency at a boundary point forces equality** (Guo Corollary XI.4.7, with the interior
-sphere condition at the point in place of a `C²` boundary). On a connected open set, two
+/-- **Tangency at a boundary point forces equality** (a consequence of Hopf's lemma and the
+avoidance principle, with the interior sphere condition at the point in place of a `C²`
+boundary). On a connected open set, two
 functions with `L u ≤ L v`, `u ≤ v` on the set, equal with equal derivatives at a point `x₀`
 of the frontier that is on the sphere of a ball inside the set, agree on the set. -/
 theorem eq_of_eq_of_fderiv_eq (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))}
@@ -375,7 +382,8 @@ theorem eq_of_eq_of_fderiv_eq (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))
       rw [← nondivOp_eq_of_contDiffOn hU hu hx, ← nondivOp_eq_of_contDiffOn hU hv hx]
       exact hL x hx) hle hr hball hx₀ heq hfd hud hvd
 
-/-- **Uniqueness for the Neumann problem** (Guo Corollary XI.4.8). On a bounded connected open
+/-- **Uniqueness for the Neumann problem** (Gilbarg and Trudinger Theorem 3.6). On a bounded
+connected open
 set with an interior sphere at every frontier point, with `c ≥ 0` bounded, two functions with
 the same image under `L`, differentiable at every frontier point and with the same derivative
 there along the radius of an interior sphere, differ by a constant on the closure. -/
@@ -401,8 +409,8 @@ theorem neumann_unique (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))}
       rw [← nondivOp_eq_of_contDiffOn hU hu hx, ← nondivOp_eq_of_contDiffOn hU hv hx]
       exact hL x hx) hν
 
-/-- **Uniqueness for the Neumann problem with a nonzero zeroth-order coefficient** (Guo Remark
-XI.4.9). When `c` is positive somewhere on the set, the constant is zero. -/
+/-- **Uniqueness for the Neumann problem with a nonzero zeroth-order coefficient** (Gilbarg and
+Trudinger Theorem 3.6). When `c` is positive somewhere on the set, the constant is zero. -/
 theorem neumann_unique_of_exists_pos (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))}
     (hU : IsOpen U) (hUc : IsPreconnected U) (hUb : Bornology.IsBounded U) (hUne : U.Nonempty)
     {a : EuclideanSpace ℝ (Fin d) → Fin d → Fin d → ℝ} {b : EuclideanSpace ℝ (Fin d) → Fin d → ℝ}

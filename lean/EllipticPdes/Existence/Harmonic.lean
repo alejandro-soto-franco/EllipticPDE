@@ -32,8 +32,8 @@ space for the sum of the second coordinate partials.
 
 ## References
 
-Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Lemma XI.1.5,
-Corollary XI.1.6, Lemma XI.1.7 (p. 92) and Lemma XI.2.4 (p. 95).
+D. Gilbarg and N. S. Trudinger, *Elliptic Partial Differential Equations of Second Order*,
+§2.2 Theorems 2.2 and 2.3; uniqueness for the Dirichlet problem follows from Theorem 2.3.
 -/
 
 @[expose] public section
@@ -77,7 +77,7 @@ theorem trace_one_le (E : Type*) [NormedAddCommGroup E] [InnerProductSpace ℝ E
 
 namespace laplacian
 
-/-- **Weak maximum principle for subharmonic functions** (Guo Lemma XI.1.7). -/
+/-- **Weak maximum principle for subharmonic functions** (Gilbarg and Trudinger Theorem 2.3). -/
 theorem weak_maximum_principle_subharmonic [Nontrivial E] {U : Set E} (hU : IsOpen U)
     (hUb : Bornology.IsBounded U) (hUne : U.Nonempty) {u : E → ℝ} (hu : ContDiffOn ℝ 2 u U)
     (huc : ContinuousOn u (closure U)) (hsub : ∀ x ∈ U, 0 ≤ Laplacian.laplacian u x) :
@@ -88,7 +88,7 @@ theorem weak_maximum_principle_subharmonic [Nontrivial E] {U : Set E} (hU : IsOp
     (B := 0) (fun x _ => (inner_zero_left e).le) hu huc fun x hx => by
       rw [nondivOperator_one]; linarith [hsub x hx]
 
-/-- **Strong maximum principle for subharmonic functions** (Guo Lemma XI.1.5). -/
+/-- **Strong maximum principle for subharmonic functions** (Gilbarg and Trudinger Theorem 2.2). -/
 theorem strong_maximum_principle_subharmonic {U : Set E} (hU : IsOpen U) (hUc : IsPreconnected U)
     {u : E → ℝ} (hu : ContDiffOn ℝ 2 u U) (hsub : ∀ x ∈ U, 0 ≤ Laplacian.laplacian u x)
     {x₀ : E} (hx₀ : x₀ ∈ U) (hmax : ∀ x ∈ U, u x ≤ u x₀) : ∀ x ∈ U, u x = u x₀ :=
@@ -97,7 +97,7 @@ theorem strong_maximum_principle_subharmonic {U : Set E} (hU : IsOpen U) (hUc : 
     (C := 0) (fun _ _ => le_rfl) hu (fun x hx => by
       rw [nondivOperator_one]; linarith [hsub x hx]) hx₀ hmax fun _ _ => (zero_mul _).ge
 
-/-- **Strong minimum principle for superharmonic functions** (Guo Corollary XI.1.6). -/
+/-- **Strong minimum principle for superharmonic functions** (Gilbarg and Trudinger Theorem 2.2). -/
 theorem strong_minimum_principle_superharmonic {U : Set E} (hU : IsOpen U)
     (hUc : IsPreconnected U) {u : E → ℝ} (hu : ContDiffOn ℝ 2 u U)
     (hsup : ∀ x ∈ U, Laplacian.laplacian u x ≤ 0) {x₀ : E} (hx₀ : x₀ ∈ U)
@@ -112,7 +112,8 @@ theorem strong_minimum_principle_superharmonic {U : Set E} (hU : IsOpen U)
   intro x hx
   linarith [h x hx]
 
-/-- **Uniqueness for the Dirichlet problem for the Laplacian** (Guo Lemma XI.2.4). -/
+/-- **Uniqueness for the Dirichlet problem for the Laplacian** (Gilbarg and Trudinger Theorem 2.4).
+-/
 theorem dirichlet_unique_harmonic [Nontrivial E] {U : Set E} (hU : IsOpen U)
     (hUb : Bornology.IsBounded U) (hUne : U.Nonempty) {u v : E → ℝ} (hu : ContDiffOn ℝ 2 u U)
     (hv : ContDiffOn ℝ 2 v U) (huc : ContinuousOn u (closure U)) (hvc : ContinuousOn v (closure U))
@@ -198,7 +199,8 @@ theorem laplacianSum_neg {U : Set (EuclideanSpace ℝ (Fin d))} (hU : IsOpen U)
   have := congrFun (laplacian_neg (E := EuclideanSpace ℝ (Fin d)) (f := u)) x
   exact this
 
-/-- **Weak maximum principle for subharmonic functions** (Guo Lemma XI.1.7). A function `C²`
+/-- **Weak maximum principle for subharmonic functions** (Gilbarg and Trudinger Theorem 2.3). A
+function `C²`
 on a bounded open set, continuous on its closure, with nonnegative Laplacian on the set, attains
 its maximum over the closure on the boundary. -/
 theorem weak_maximum_principle_subharmonic (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))}
@@ -210,7 +212,8 @@ theorem weak_maximum_principle_subharmonic (hd : 0 < d) {U : Set (EuclideanSpace
   exact laplacian.weak_maximum_principle_subharmonic hU hUb hUne hu huc fun x hx => by
     rw [← laplacianSum_eq_laplacian (hu.contDiffAt (hU.mem_nhds hx))]; exact hsub x hx
 
-/-- **Strong maximum principle for subharmonic functions** (Guo Lemma XI.1.5). A function `C²`
+/-- **Strong maximum principle for subharmonic functions** (Gilbarg and Trudinger Theorem 2.2). A
+function `C²`
 on a connected open set with nonnegative Laplacian that attains its supremum over the set at an
 interior point is constant. -/
 theorem strong_maximum_principle_subharmonic (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))}
@@ -223,7 +226,8 @@ theorem strong_maximum_principle_subharmonic (hd : 0 < d) {U : Set (EuclideanSpa
   exact laplacian.strong_maximum_principle_subharmonic hU hUc hu (fun x hx => by
     rw [← laplacianSum_eq_laplacian (hu.contDiffAt (hU.mem_nhds hx))]; exact hsub x hx) hx₀ hmax
 
-/-- **Strong minimum principle for superharmonic functions** (Guo Corollary XI.1.6). A function
+/-- **Strong minimum principle for superharmonic functions** (Gilbarg and Trudinger Theorem 2.2). A
+function
 `C²` on a connected open set with nonpositive Laplacian that attains its infimum over the set at
 an interior point is constant. -/
 theorem strong_minimum_principle_superharmonic (hd : 0 < d)
@@ -236,7 +240,8 @@ theorem strong_minimum_principle_superharmonic (hd : 0 < d)
   exact laplacian.strong_minimum_principle_superharmonic hU hUc hu (fun x hx => by
     rw [← laplacianSum_eq_laplacian (hu.contDiffAt (hU.mem_nhds hx))]; exact hsup x hx) hx₀ hmin
 
-/-- **Harmonic functions attaining their supremum are constant** (Guo Corollary XI.1.6). -/
+/-- **Harmonic functions attaining their supremum are constant** (Gilbarg and Trudinger Theorem
+2.2). -/
 theorem harmonic_const_of_max (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))}
     (hU : IsOpen U) (hUc : IsPreconnected U)
     {u : EuclideanSpace ℝ (Fin d) → ℝ} (hu : ContDiffOn ℝ 2 u U)
@@ -245,7 +250,8 @@ theorem harmonic_const_of_max (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))
     ∀ x ∈ U, u x = u x₀ :=
   strong_maximum_principle_subharmonic hd hU hUc hu (fun x hx => (hharm x hx).ge) hx₀ hmax
 
-/-- **Harmonic functions attaining their infimum are constant** (Guo Corollary XI.1.6). -/
+/-- **Harmonic functions attaining their infimum are constant** (Gilbarg and Trudinger Theorem 2.2).
+-/
 theorem harmonic_const_of_min (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))}
     (hU : IsOpen U) (hUc : IsPreconnected U)
     {u : EuclideanSpace ℝ (Fin d) → ℝ} (hu : ContDiffOn ℝ 2 u U)
@@ -254,8 +260,8 @@ theorem harmonic_const_of_min (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))
     ∀ x ∈ U, u x = u x₀ :=
   strong_minimum_principle_superharmonic hd hU hUc hu (fun x hx => (hharm x hx).le) hx₀ hmin
 
-/-- **Uniqueness for the Dirichlet problem for the Laplacian** (Guo Lemma XI.2.4, the uniqueness
-clause). Two functions `C²` on a bounded open set and continuous on its closure, with the same
+/-- **Uniqueness for the Dirichlet problem for the Laplacian** (Gilbarg and Trudinger Theorem 2.4).
+Two functions `C²` on a bounded open set and continuous on its closure, with the same
 Laplacian on the set and the same boundary values, agree on the closure. -/
 theorem dirichlet_unique_harmonic (hd : 0 < d) {U : Set (EuclideanSpace ℝ (Fin d))}
     (hU : IsOpen U) (hUb : Bornology.IsBounded U) (hUne : U.Nonempty)
