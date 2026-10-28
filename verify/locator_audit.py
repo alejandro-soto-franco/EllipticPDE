@@ -36,6 +36,7 @@ SOURCE_KEYS: dict[str, str] = {
     "evans-2010": "evans-2010-par-dif-equ",
     "gilbarg-2001": "gilbarg-2001-ell-par-dif",
     "fernandezreal-2023-reg-the-ell": "fernandezreal-2023-reg-the-ell",
+    "brezis-2011": "brezis-2011-fun-ana-sob",
 }
 
 # A locator names its statement last: `§6.2.3 Thm 4` ends in `4`, `§8.1 Thm
@@ -154,7 +155,8 @@ _DOCSTRING_CITE_RE = re.compile(
     re.IGNORECASE,
 )
 
-_AUTHOR_SOURCE = {"evans": "evans-2010", "gilbarg": "gilbarg-2001",
+_AUTHOR_SOURCE = {"evans": "evans-2010", "gilbarg": "gilbarg-2001", "trudinger": "gilbarg-2001",
+                  "brezis": "brezis-2011",
                   "fernández": "fernandezreal-2023-reg-the-ell",
                   "fernandez": "fernandezreal-2023-reg-the-ell"}
 

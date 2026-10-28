@@ -158,7 +158,18 @@ def test_unknown_author_citation_is_an_error(manifest, tmp_path):
     lean = tmp_path / "lean" / "EllipticPdes"
     lean.mkdir(parents=True)
     (lean / "A.lean").write_text(
-        "/-- Brezis, *Functional Analysis* (2011), Theorem 9.16 asks. -/\n"
+        "/-- Kufner, *Weighted Sobolev Spaces* (1985), Theorem 3.4 asks. -/\n"
         "theorem t : True := trivial\n", encoding="utf-8")
     findings = la.audit()
     assert findings and "unknown source" in findings[0]
+
+
+def test_initialled_gilbarg_trudinger_citation_resolves(manifest, tmp_path):
+    """`D. Gilbarg and N. S. Trudinger, *Title*` names Gilbarg and Trudinger."""
+    manifest([], "Theorem 8.3. The generalized Dirichlet problem.")
+    lean = tmp_path / "lean" / "EllipticPdes"
+    lean.mkdir(parents=True)
+    (lean / "A.lean").write_text(
+        "/-- D. Gilbarg and N. S. Trudinger, *Elliptic PDE of Second Order* (2001), Theorem 8.3. -/\n"
+        "theorem t : True := trivial\n", encoding="utf-8")
+    assert la.audit() == []
