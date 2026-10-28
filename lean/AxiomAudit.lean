@@ -316,7 +316,13 @@ assert_classical_axioms
 /-! ### The chain rule and the weak maximum principle -/
 
 assert_classical_axioms
+  EllipticPdes.HasWeakFDerivOn.comp_contDiff
   EllipticPdes.Embedding.hasWeakGradOn_comp
+
+/-! ### The fundamental lemma of the calculus of variations -/
+
+assert_classical_axioms
+  EllipticPdes.ae_eq_of_forall_integral_smul_eq
 
 /-! ### Elementary properties of weak derivatives -/
 

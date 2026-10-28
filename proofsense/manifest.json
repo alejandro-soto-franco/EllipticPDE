@@ -1177,6 +1177,12 @@
       "source_id": "evans-2010",
       "locator": "§5.4 Thm 1",
       "claim": "formalises the cited theorem at p = 2 as a bounded linear map between the Sobolev spaces: on a bounded open domain with C^1 boundary and for any open set the closure of the domain sits in, there is a bounded linear map from W12 Omega, the H^1(Omega) of this development, to the graph space of the whole space, whose image agrees with the element on the domain in the function and the gradient coordinates (clause (i)), whose function coordinate vanishes almost everywhere outside the open set (clause (ii)), and which is bounded by a constant times the norm (clause (iii)). The cited statement takes every p with 1 <= p <= infinity, and exists_extLinear states the finite exponents on representatives; the map here is that map on classes, which descends because it is linear and bounded by the seminorms over the domain"
+    },
+    {
+      "decl": "EllipticPdes.HasWeakFDerivOn.comp_contDiff",
+      "source_id": "gilbarg-2001",
+      "locator": "§7.4 Lemma 7.5",
+      "claim": "formalises the cited chain rule on a finite-dimensional real normed space with an additive Haar measure: a C^1 function of the real line with a uniformly bounded derivative, composed with a function that has a weak Fréchet derivative on an open set, has the weak Fréchet derivative given by the derivative of the function at the class times the weak derivative of the class. The cited statement takes u in W^1(Omega) on a domain of R^n and gives the partial derivatives D(f o u) = f'(u) Du; the statement here takes a weak Fréchet derivative, whose applications to the coordinate directions are those partials, and states the uniform bound on f' as a constant M on the norm of the derivative. The proof is the cited one: the class is mollified, the classical identity holds for each mollification, and both sides pass to the limit by the Lipschitz bound on f and an almost everywhere convergent subsequence"
     }
   ],
   "source_divergences": [
