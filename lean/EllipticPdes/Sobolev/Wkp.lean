@@ -33,7 +33,8 @@ continuity for every `p ∈ [1, ∞]` with no case split on `p = ∞`.
   is complete (Evans §5.2.3 Theorem 2, p. 262).
 * `EllipticPdes.Sobolev.mem_Wkp_iff`: membership is the weak-derivative relation (Evans §5.2.2
   Definition, p. 258).
-* `EllipticPdes.Sobolev.norm_Wkp_eq`: Evans's norm for `p < ∞`.
+* `EllipticPdes.Sobolev.norm_Wkp_eq`: Evans's norm for `p < ∞` (Evans §5.2.2
+  Definition, p. 259).
 * `EllipticPdes.Sobolev.norm_Wkp_top_le` and `EllipticPdes.Sobolev.sum_le_card_mul_norm_Wkp_top`:
   the sup norm of the product is equivalent to Evans's sum of norms for `p = ∞`.
 * `EllipticPdes.Sobolev.Wkp_zero_eq_top`: `W^{0,p}(U) = L^p(U)`.
@@ -147,7 +148,7 @@ instance : CompleteSpace (Wkp d k p U) := Wkp.completeSpace
 /-- **Membership in `W^{k,p}(U)` as weak derivatives.** A graph element lies in `W^{k,p}(U)`
 exactly when coordinate `α` is the weak `α`-th derivative of coordinate `0` for every `α`.
 Evans §5.2.2 Definition (p. 258). -/
-theorem mem_Wkp_iff (_hU : IsOpen U) (F : WkpGraph d k p U) :
+theorem mem_Wkp_iff (F : WkpGraph d k p U) :
     F ∈ Wkp d k p U ↔
       ∀ α : MultiIdx d k, HasWeakDeriv U α.toFun (F MultiIdx.zero) (F α) := by
   rw [mem_Wkp_iff_constraint]
@@ -164,7 +165,7 @@ theorem mem_Wkp_iff (_hU : IsOpen U) (F : WkpGraph d k p U) :
     rw [this, MultiIdx.dirs_length]
 
 /-- **Evans's norm.** For `p < ∞` the norm on `W^{k,p}(U)` is
-`(∑_{|α| ≤ k} ‖D^α u‖_p^p)^{1/p}`. Evans §5.2.2 Definition (p. 258). -/
+`(∑_{|α| ≤ k} ‖D^α u‖_p^p)^{1/p}`. Evans §5.2.2 Definition (p. 259). -/
 theorem norm_Wkp_eq (hp : p ≠ ∞) (F : Wkp d k p U) :
     ‖F‖ = (∑ α, ‖(F : WkpGraph d k p U) α‖ ^ p.toReal) ^ (1 / p.toReal) :=
   PiLp.norm_eq_sum (ENNReal.toReal_pos (zero_lt_one.trans_le Fact.out).ne' hp) _

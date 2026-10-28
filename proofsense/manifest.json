@@ -1218,7 +1218,7 @@
       "decl": "EllipticPdes.Sobolev.Wkp.completeSpace",
       "source_id": "evans-2010",
       "locator": "§5.2.3 Thm 2",
-      "claim": "formalises the completeness clause of the cited theorem for every k and every p in [1, infinity]: W^{k,p}(U) is a complete normed space, here for the ell^p product norm on the graph of the weak derivatives. The graph is the common kernel of continuous functionals, each continuous by Holder's inequality against a compactly supported smooth function. A closed subspace of the complete product of L^p(U) spaces is complete. Evans argues by Cauchy sequences, which the closedness replaces"
+      "claim": "formalises the completeness clause of the cited theorem for every k and every p in [1, infinity]: W^{k,p}(U) is a complete normed space, here for the ell^p product norm on the graph of the weak derivatives. At p = infinity that norm is the maximum where Evans sums, and the two are equivalent (norm_Wkp_top_le, sum_le_card_mul_norm_Wkp_top), so completeness transfers. The graph is the common kernel of continuous functionals, each continuous by Holder's inequality against a compactly supported smooth function. A closed subspace of the complete product of L^p(U) spaces is complete. Evans argues by Cauchy sequences, which the closedness replaces"
     },
     {
       "decl": "EllipticPdes.Sobolev.mem_Wkp_iff",
