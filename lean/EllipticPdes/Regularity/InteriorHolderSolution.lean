@@ -12,8 +12,8 @@ public import EllipticPdes.Regularity.InteriorHolderFinite
 /-!
 # Interior `C^{k,1/2}` estimate for the weak solution, in every dimension
 
-`EllipticPdes.Regularity.exists_contDiffOn_holder_ball` is case (ii) of Guo's embedding
-(Theorem IV.2.3) at `p = 2`: `m` orders of weak derivative on `V` give a `C^{k,1/2}`
+`EllipticPdes.Regularity.exists_contDiffOn_holder_ball` is case (ii) of the embedding
+of Evans §5.6.3 Theorem 6 at `p = 2`: `m` orders of weak derivative on `V` give a `C^{k,1/2}`
 representative on a ball whenever `k + 1 + ⌊d/2⌋ ≤ m`. It is stated over an abstract supply of
 weak derivatives, which is what the iterated Sobolev ladder
 `EllipticPdes.Embedding.memLp_of_gradClosed_fullStep` consumes: `⌊d/2⌋` rungs of the full step
@@ -22,7 +22,8 @@ weak derivatives, which is what the iterated Sobolev ladder
 This file discharges that supply from the equation.
 `EllipticPdes.Regularity.higher_interior_regularity` at order `j` gives `j + 2` orders of weak
 derivative of the solution on any compact `V ⊆ Ω`, so
-running it at `j = k + 1 + ⌊d/2⌋` covers the Guo condition with room to spare, and the composition
+running it at `j = k + 1 + ⌊d/2⌋` covers the embedding condition with room to spare, and the
+composition
 is the interior `C^{k,1/2}` estimate for the weak solution itself, in every dimension and at every
 finite order `k`.
 
@@ -37,8 +38,7 @@ coefficients and of the datum, and adds the Hölder seminorm bound, which the `C
 
 ## References
 
-Y. Guo, *Partial Differential Equations*, Theorem IV.2.3(ii); L. C. Evans, *Partial Differential
-Equations* (2nd ed.), §6.3.1.
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.6.3 Theorem 6(ii) and §6.3.1.
 -/
 
 @[expose] public section
@@ -59,7 +59,7 @@ coefficients of enough `W^{k,∞}` regularity and a datum with enough weak deriv
 solution of `L u = f` has a representative on every interior ball that is `C^k` there and whose
 `k`-th derivatives are Hölder of exponent `1/2`.
 
-The order asked of the datum and the coefficients is the Guo threshold `k + 1 + ⌊d/2⌋` plus the
+The order asked of the datum and the coefficients is the threshold `k + 1 + ⌊d/2⌋` plus the
 two orders `higher_interior_regularity` supplies from the equation, so the dimension enters the
 hypotheses and not the conclusion. -/
 theorem interior_holder_of_weakSolution (Op : FullEllipticOp (n + 1))
@@ -84,7 +84,7 @@ theorem interior_holder_of_weakSolution (Op : FullEllipticOp (n + 1))
     higher_interior_regularity Op hΩm hΩo hA1 (k + 1 + (n + 1) / 2) (hA.mono (by omega))
       (hbc.mono (by omega)) hVc hVΩ
   obtain ⟨hu, _hbound⟩ := hC u f M hfk hM hweak
-  -- Guo's embedding at the order the ladder needs.
+  -- The embedding at the order the ladder needs.
   obtain ⟨w, hwae, hwcn, hwhol⟩ :=
     exists_contDiffOn_holder_ball (d := n + 1) (k := k) (Nat.succ_pos n) _ hu (by omega) hr hrR hBV
   refine ⟨w, ?_, hwcn, hwhol⟩

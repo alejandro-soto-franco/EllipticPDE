@@ -34,8 +34,7 @@ family rather than part of its definition. Nothing here presumes it.
 * `HasIteratedWeakDerivOn.mono`: an order-`k` family is an order-`l` family for `l ≤ k`.
 * `HasIteratedWeakDerivOn.deriv`: the order-`k` family of a first derivative, extracted from an
   order-`k+1` family by appending the direction on the right. This is the step the induction
-  of Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem VIII.3.2
-  (p. 65) runs on.
+  in the proof of Evans, *Partial Differential Equations* (2nd ed.), §6.3.1 Theorem 2 runs on.
 * `IteratedL2Bound`: a uniform bound on every member of the family up to order `k`.
 -/
 
@@ -54,8 +53,8 @@ variable {d : ℕ} {V : Set (EuclideanSpace ℝ (Fin d))} {k l : ℕ}
 /-- **Iterated weak derivatives on a region.** A family of `L²(V)` classes indexed by lists of
 directions, with the empty list the function itself and each `cons` a weak derivative of its
 parent. Giving the family as data rather than asserting existence at each order lets a consumer
-name `D [i, j]` and pass it on, which the induction of Guo, *Partial Differential Equations I
-and II* (Course Lecture Notes), Theorem VIII.3.2 (p. 65) requires. -/
+name `D [i, j]` and pass it on, which the induction in the proof of Evans, *Partial Differential
+Equations* (2nd ed.), §6.3.1 Theorem 2 requires. -/
 structure HasIteratedWeakDerivOn (V : Set (EuclideanSpace ℝ (Fin d))) (k : ℕ) (u : L2D V)
     where
   /-- The chosen representative of the iterated weak derivative along a list of directions. -/
@@ -101,7 +100,7 @@ def congr {g : L2D V} (hu : HasIteratedWeakDerivOn V k u) (h : u = g) :
 lengths line up: `(α ++ [l]).length < k + 1` is exactly `α.length < k`, so every step the new
 family needs is a step the old family already has.
 
-This is the reduction that turns Guo's Theorem VIII.3.2 into an induction on `k`: an
+This is the reduction that turns Evans §6.3.1 Theorem 2 into an induction on `k`: an
 `H^{k+2}` conclusion for `u` is an `H^{k+1}` conclusion for each `∂_l u`, and `∂_l u` solves a
 differentiated equation of the same form. -/
 def deriv (hu : HasIteratedWeakDerivOn V (k + 1) u) (l : Fin d) :
@@ -146,8 +145,8 @@ family, assemble into an order-`k + 1` family of the function itself. The index 
 family reads `β ++ [ℓ]` as the `β`-entry of the family of `∂_ℓ u`, which is the convention
 `deriv` uses in the other direction.
 
-This is the step that brings the conclusion of the induction of Guo, *Partial Differential
-Equations I and II* (Course Lecture Notes), Theorem VIII.3.2 (p. 65) back to the solution:
+This is the step that brings the conclusion of the induction in the proof of Evans, *Partial
+Differential Equations* (2nd ed.), §6.3.1 Theorem 2 back to the solution:
 the induction hypothesis is applied to each `∂_ℓ u` and its conclusions are reassembled here. -/
 def ofDeriv {u : L2D V} {Du : Fin d → L2D V} (hu : ∀ ℓ, HasWeakDerivOn V ℓ u (Du ℓ))
     (H : ∀ ℓ, HasIteratedWeakDerivOn V k (Du ℓ)) :

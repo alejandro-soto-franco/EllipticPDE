@@ -11,8 +11,8 @@ public import EllipticPdes.Regularity.HigherWeakDeriv
 /-!
 # Iterated weak derivatives pass to a smaller region
 
-The induction of Guo, *Partial Differential Equations I and II* (Course Lecture Notes),
-Theorem VIII.3.2 (p. 65) runs on a pair `V ⋐ W ⋐ Ω`: the cutoff lives on `W`, the conclusion
+The induction in the proof of Evans, *Partial Differential Equations* (2nd ed.), §6.3.1 Theorem 2
+runs on a pair `V ⋐ W ⋐ Ω`: the cutoff lives on `W`, the conclusion
 is asked on `V`, and the datum's regularity is established on whichever of the two is
 convenient. Moving a family between them is the bookkeeping this file removes.
 

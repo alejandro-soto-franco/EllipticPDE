@@ -13,8 +13,8 @@ public import EllipticPdes.Regularity.HigherWeakDeriv
 # Multiplying an iterated weak derivative by a `W^{k,∞}` weight
 
 The datum of the differentiated equation is a sum of products, each a coefficient against a
-derivative of the solution. Feeding that datum back into the induction of Guo, *Partial
-Differential Equations I and II* (Course Lecture Notes), Theorem VIII.3.2 (p. 65) needs weak
+derivative of the solution. Feeding that datum back into the induction in the proof of Evans,
+*Partial Differential Equations* (2nd ed.), §6.3.1 Theorem 2 needs weak
 derivatives of the product up to order `k`, with a bound. This file supplies them.
 
 ## Recursion
@@ -28,7 +28,7 @@ list `ℓ :: α` reads the order-`k` family built for the `ℓ`-derivative.
 No Leibniz formula over subsets of the index list appears, and none is needed. Naming the
 derivative of each order through the recursion avoids the combinatorial statement altogether,
 with a constant that is existentially quantified rather than computed. The estimate
-of Theorem VIII.3.2 quantifies its constant before the solution and the datum and says nothing
+of Evans §6.3.1 Theorem 2 quantifies its constant before the solution and the datum and says nothing
 about its size, so nothing is lost.
 
 ## Main declarations

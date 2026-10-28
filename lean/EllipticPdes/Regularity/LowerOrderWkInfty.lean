@@ -14,8 +14,8 @@ public import EllipticPdes.Existence.Garding
 
 `EllipticPdes.Sobolev.FullEllipticOp` gives `b` and `c` sup bounds and measurability and no
 derivatives at all, which is everything the existence theory and the interior `H²` estimate
-need. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem VIII.3.2
-(p. 65) asks for `a_{ij} ∈ W^{k+2,∞}` and `b_i, c ∈ W^{k+1,∞}`, one order less on the lower-order
+need. The higher interior regularity theorem (Evans §6.3.1 Theorem 2) asks for `a_{ij} ∈ W^{k+2,∞}`
+and `b_i, c ∈ W^{k+1,∞}`, one order less on the lower-order
 coefficients than on the principal part, because the lower-order terms are differentiated once
 less often on the way to the same conclusion. This file supplies the missing hypothesis.
 
@@ -33,7 +33,7 @@ anything else the induction differentiates.
 * `IsWkInfty.ofContDiff`: a `Cᵏ` function with bounded derivatives satisfies it.
 * `IsWkInfty.const`: a constant satisfies it at every order.
 * `IsWkInftyCoeff.entry`: one entry of the coefficient matrix, as a scalar bundle.
-* `IsWkInftyLower`: Guo's hypothesis on `b` and `c`, with a uniform constant.
+* `IsWkInftyLower`: the hypothesis on `b` and `c`, with a uniform constant.
 -/
 
 @[expose] public section
@@ -87,7 +87,7 @@ def mono (hf : IsWkInfty f k) (hlk : l ≤ k) : IsWkInfty f l where
 /-- **Differentiating the hypothesis.** From `f ∈ W^{k+1,∞}`, the first derivative `D [m]` is in
 `W^{k,∞}`, with family `α ↦ D (α ++ [m])` and the bounds shifted by one order. Appending on the
 right makes the lengths line up, exactly as in `HasIteratedWeakDerivOn.deriv`; this step lets
-the induction of Guo's Theorem VIII.3.2 keep its coefficient hypothesis. -/
+the induction of Evans §6.3.1 Theorem 2 keep its coefficient hypothesis. -/
 def deriv (hf : IsWkInfty f (k + 1)) (m : Fin d) : IsWkInfty (hf.D [m]) k where
   D α := hf.D (α ++ [m])
   D_nil := by simp
@@ -158,9 +158,9 @@ def IsWkInftyCoeff.entry {A : EllipticCoeff d} {k : ℕ} (hA : IsWkInftyCoeff A 
 
 /-! ### Bundle over the lower-order coefficients -/
 
-/-- **Guo's hypothesis on the lower-order coefficients.** Every transport component and the
+/-- **Hypothesis on the lower-order coefficients.** Every transport component and the
 zeroth-order coefficient lie in `W^{k,∞}`, with one constant serving all of them. The uniform
-constant is what the estimate of Theorem VIII.3.2 is stated against, so it is recorded here
+constant is what the estimate of Evans §6.3.1 Theorem 2 is stated against, so it is recorded here
 rather than reconstructed as a maximum at the point of use. -/
 structure IsWkInftyLower (Op : FullEllipticOp d) (k : ℕ) where
   /-- Each transport component is in `W^{k,∞}`. -/

@@ -43,7 +43,6 @@ that agreement hold on the whole set.
 
 ## References
 
-Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Lemma I.2.4 (p. 3);
 L. C. Evans, *Partial Differential Equations* (2nd ed.), §6.1.2 (pp. 313–315) and §6.3.1
 Theorem 3 (p. 334).
 -/
@@ -283,7 +282,7 @@ domain satisfies the equation there almost everywhere, in the classical divergen
 diffusion being `C¹`. The weak gradient of the solution on the open set is the classical
 gradient of the representative, the weak formulation tested against a function supported
 there is integrated by parts once more, and the fundamental lemma of the calculus of variations
-(Guo Lemma I.2.4) makes the residual vanish almost everywhere. -/
+makes the residual vanish almost everywhere. -/
 theorem weakSolution_ae_eq_of_contDiffOn (Op : FullEllipticOp d)
     {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩm : MeasurableSet Ω)
     (hA1 : IsC1Coeff Op.toEllipticCoeff) (u : H01 Ω) (f : L2D Ω)

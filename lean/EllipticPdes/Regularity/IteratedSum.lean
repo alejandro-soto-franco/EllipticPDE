@@ -18,8 +18,8 @@ the weight; this file supplies the sum.
 The same observation appears at three levels: weak differentiation is linear, so an order-`k`
 family of a sum is the entrywise sum of the families, and the triangle inequality turns a bound
 on each summand into a bound on the sum. The constants add rather than being optimised, which is
-all the induction of Guo, *Partial Differential Equations I and II* (Course Lecture Notes),
-Theorem VIII.3.2 (p. 65) needs: its constant is quantified before the solution and the datum,
+all the induction in the proof of Evans, *Partial Differential Equations* (2nd ed.), §6.3.1 Theorem
+2 needs: its constant is quantified before the solution and the datum,
 and nothing constrains its size.
 
 ## Main declarations

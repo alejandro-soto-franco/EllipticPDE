@@ -12,8 +12,8 @@ public import EllipticPdes.Existence.Garding
 # Extension of the weak formulation from test functions to `H₀¹(Ω)`
 
 `EllipticPdes.Regularity.localWeakForm_of_fullBilin` reads a localised identity off the
-weak formulation `∀ w : H₀¹(Ω), B[u, w] = ⟪f, w₀⟫`. The induction of Guo, *Partial
-Differential Equations I and II* (Course Lecture Notes), Theorem VIII.3.2 (p. 65) needs
+weak formulation `∀ w : H₀¹(Ω), B[u, w] = ⟪f, w₀⟫`. The induction in the proof of Evans, *Partial
+Differential Equations* (2nd ed.), §6.3.1 Theorem 2 needs
 the converse: the differentiated equation is produced against test functions, and the
 induction hypothesis consumes an identity quantified over every `w : H₀¹(Ω)`.
 

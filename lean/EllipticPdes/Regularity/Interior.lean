@@ -39,7 +39,7 @@ variable {d : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))}
 
 /-! ### Existence of the second weak derivative -/
 
-/-- **Existence of the interior second weak derivative (Evans §6.3.1, VIII.2.1).** For each
+/-- **Existence of the interior second weak derivative (Evans §6.3.1 Theorem 1).** For each
 `(k, i)` there is a constant `Cd`, fixed before the solution and the datum, such that for every
 weak solution `u` of `L u = f` the whole-space extension of `ζ · ∂ᵢu` has an
 `L²` weak `k`-derivative `w` with `‖w‖ ≤ Cd (‖f‖ + ‖u₀‖)`: this is the weak-limit converse

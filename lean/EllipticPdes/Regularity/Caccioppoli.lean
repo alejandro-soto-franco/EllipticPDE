@@ -665,8 +665,9 @@ controls the principal part from below, and Cauchy-Schwarz together with the Pet
 `‖∇u‖_{L²(V)} ≤ C' (‖f‖ + ‖u₀‖)`. See Gilbarg-Trudinger, *Elliptic PDE of Second Order*,
 Theorem 8.8, and Evans, *Partial Differential Equations* (2nd ed.), §6.3.1.
 
-Guo, *Partial Differential Equations* (JHU AS.110.631-632), Lemma X.3.5 also has the name
-Caccioppoli, and is a different statement: it takes a non-negative subsolution `Lv ≥ 0` of the
+The Caccioppoli inequality for a non-negative subsolution, proved inside the proof of Gilbarg and
+Trudinger Theorem 8.17, has the same name and is a different statement: it takes a non-negative
+subsolution `Lv ≥ 0` of the
 principal part alone and bounds `∫ |∇(φv)|²` by `‖∇φ‖²_∞ ∫ v²`, with no datum on the right. This
 statement takes a solution of `Lu = f` for the full operator, has `f` on the right, and imposes
 no sign condition, so neither implies the other. Gilbarg and Trudinger Theorem 8.8 remains the

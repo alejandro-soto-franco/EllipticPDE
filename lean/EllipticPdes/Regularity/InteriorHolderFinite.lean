@@ -12,7 +12,8 @@ public import EllipticPdes.Embedding.HolderOfGradClosed
 /-!
 # Second case of the Sobolev embedding of order k
 
-Guo, *Partial Differential Equations*, Theorem IV.2.3: for `u ∈ W^{m,p}(Ω)` with `m > n/p`, the
+Evans, *Partial Differential Equations* (2nd ed.), §5.6.3 Theorem 6: for `u ∈ W^{m,p}(Ω)` with
+`m > n/p`, the
 conclusion is `u ∈ C^{m-1-⌊n/p⌋, γ}(Ω)`. This file states and proves the case `p = 2`, locally,
 from the supply of weak derivatives the interior regularity theory produces.
 
@@ -42,7 +43,6 @@ conclusion says exactly: on the ball the classical derivative of `v α` is the t
 
 ## References
 
-Guo, *Partial Differential Equations*, Theorem IV.2.3.
 Evans, *Partial Differential Equations* (2nd ed.), §5.6.3.
 -/
 
@@ -98,7 +98,7 @@ theorem exists_contDiffOn_holder_ball_of_hasIteratedWeakDerivOn (hd : 0 < d)
 `m`, and `k + 1 + ⌊d/2⌋ ≤ m`, has on any ball whose enlargement sits inside `V` a representative
 of class `C^k`, Hölder-`1/2` there.
 
-This is Theorem IV.2.3 case (ii) of Guo, *Partial Differential Equations*, at `p = 2`, read
+This is case (ii) of Evans §5.6.3 Theorem 6, at `p = 2`, read
 locally. The order `k = m - 1 - ⌊d/2⌋` is the cited one, and the cited hypothesis `m > d/2` is
 the displayed inequality at `k = 0`. The exponent `1/2` is the cited `⌊d/2⌋ + 1 - d/2` when `d`
 is odd; when `d` is even that value is `0`, the cited statement leaves the exponent free in

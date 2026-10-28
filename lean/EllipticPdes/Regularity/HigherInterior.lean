@@ -21,17 +21,18 @@ public import EllipticPdes.Regularity.CutoffDatum
 /-!
 # Higher interior regularity
 
-Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem VIII.3.2
-(*Higher Interior Regularity*, p. 65). For a weak solution `u` of `L u = f` with
+Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 2 (*Higher Interior
+Regularity*). For a weak solution `u` of `L u = f` with
 `a_{ij} ∈ W^{k+1,∞}`, `b_i, c ∈ W^{k,∞}` and `f ∈ H^k`, the solution lies in `H^{k+2}_loc`
 with
 
 `‖u‖_{H^{k+2}(V)} ≤ C (‖f‖_{H^k(Ω)} + ‖u‖_{L²(Ω)})` for every `V ⋐ Ω`,
 
-the constant depending on the data and the pair `V ⋐ Ω` and on neither `u` nor `f`. Evans,
-*Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 2 (p. 332) is the same statement
+the constant depending on the data and the pair `V ⋐ Ω` and on neither `u` nor `f`. Evans states the
+same result
 with `C^{k+1}` coefficients, which `IsCkCoeff.toIsWkInftyCoeff` shows to be the stronger
-hypothesis. The theorem below asks Guo's orders, together with `a_{ij} ∈ W^{1,∞}` for the base case.
+hypothesis. The theorem below asks `W^{k,∞}` orders, together with `a_{ij} ∈ W^{1,∞}` for the base
+case.
 
 ## Shape of the induction
 
@@ -458,9 +459,8 @@ theorem interiorRegularityAt_succ (Op : FullEllipticOp (n + 1))
   nlinarith [hprod]
 
 /-- **Higher interior regularity (Evans, *Partial Differential Equations* (2nd ed.),
-§6.3.1, Theorem 2, p. 332; Guo, *Partial Differential Equations I and II* (Course Lecture
-Notes), Theorem VIII.3.2, p. 65).** Evans states the result for `C^{m+1}` coefficients; the
-`W^{k,∞}` hypotheses below are Guo's, and nothing in the differentiated equation asks a
+§6.3.1, Theorem 2, p. 332).** Evans states the result for `C^{m+1}` coefficients; the
+`W^{k,∞}` hypotheses below weaken this, and nothing in the differentiated equation asks a
 coefficient to be continuous. A weak solution with `W^{k+1,∞}` principal coefficients that are
 `W^{1,∞}`, `W^{k,∞}` lower-order coefficients and an `H^k` datum has weak derivatives of every order
 up to `k + 2` on each compact `V ⋐ Ω`, bounded by the data with a constant quantified before

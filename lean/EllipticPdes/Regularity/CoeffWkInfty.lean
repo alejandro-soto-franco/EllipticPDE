@@ -12,10 +12,10 @@ public import EllipticPdes.Regularity.CoeffCk
 /-!
 # `W^{k,∞}` coefficients
 
-Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem VIII.3.2
-(*Higher Interior Regularity*, p. 65) runs the induction over `a_{ij} ∈ W^{k+1,∞}(Ω)` and
-`b_i, c ∈ W^{k,∞}(Ω)`, where Evans, *Partial Differential Equations* (2nd ed.), §6.3.1,
-Theorem 2 asks for `C^{m+1}`. The development here asks `W^{k+1,∞}` for `a_{ij}` and
+The induction in the proof of Evans, *Partial Differential Equations* (2nd ed.), §6.3.1,
+Theorem 2 asks `C^{m+1}` coefficients and uses only bounds on their derivatives, so it
+runs over `a_{ij} ∈ W^{k+1,∞}(Ω)` and `b_i, c ∈ W^{k,∞}(Ω)`. The development here asks `W^{k+1,∞}`
+for `a_{ij}` and
 `W^{k,∞}` for `b_i, c` (`higher_interior_regularity`). This file states the hypothesis: weak
 derivatives up to order `k`, each essentially bounded, with no continuity assumed anywhere.
 
@@ -30,7 +30,7 @@ functions, which is where a locally integrable coefficient lives.
 ## Indexing of the derivative family
 
 The iterated derivative is indexed by a `List (Fin d)` of directions rather than by a
-multi-index in `Fin d →₀ ℕ`. Guo's proof expands `D^α` through the Leibniz rule over
+multi-index in `Fin d →₀ ℕ`. The Leibniz rule expands `D^α` over
 `β ≤ α`, and both indexings support that; a list is chosen because one step of the recursion
 is `cons`, matching `D_step`, whereas a finitely-supported function would need the order of
 differentiation to be quotiented out before the recursion could be stated. Equality of mixed
@@ -44,7 +44,7 @@ coefficient itself and `D_step` makes each successive entry a weak derivative of
 ## Main declarations
 
 * `HasWeakPartial`: the weak partial derivative of a plain function.
-* `IsWkInftyCoeff`: Guo's coefficient hypothesis at order `k`.
+* `IsWkInftyCoeff`: the `W^{k,∞}` coefficient hypothesis at order `k`.
 * `IsWkInftyCoeff.mono`: an order-`k` bundle is an order-`l` bundle for every `l ≤ k`.
 
 ## Relation to the classical hypotheses
@@ -76,9 +76,10 @@ def HasWeakPartial (k : Fin d) (f f' : EuclideanSpace ℝ (Fin d) → ℝ) : Pro
   ∀ φ : EuclideanSpace ℝ (Fin d) → ℝ, ContDiff ℝ (⊤ : ℕ∞) φ → HasCompactSupport φ →
     ∫ x, f x * partialD k φ x = - ∫ x, f' x * φ x
 
-/-- A `W^{k,∞}` ellipticity bundle, in the sense of Guo, *Partial Differential Equations I and
-II* (Course Lecture Notes), Theorem VIII.3.2 (p. 65): every coefficient entry has weak
-derivatives up to order `k`, each measurable and essentially bounded, with no continuity
+/-- A `W^{k,∞}` ellipticity bundle, the weakening of the `C^{m+1}` hypothesis of Evans,
+*Partial Differential Equations* (2nd ed.), §6.3.1 Theorem 2 that its induction admits:
+every coefficient entry has weak derivatives up to order `k`, each measurable and essentially
+bounded, with no continuity
 assumed. The derivative family is indexed by a list of directions, one `cons` per
 differentiation. -/
 structure IsWkInftyCoeff (A : EllipticCoeff d) (k : ℕ) where

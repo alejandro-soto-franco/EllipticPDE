@@ -14,8 +14,8 @@ public import EllipticPdes.Regularity.DifferentiatedEquation
 
 `EllipticPdes.Regularity.differentiated_weakForm_wkInfty` produces an equation whose principal
 unknown is the vector `(∂_ℓ∂ᵢu)ᵢ`, one derivative in the differentiation direction of every
-first derivative of the solution. The induction of Guo, *Partial Differential Equations I and
-II* (Course Lecture Notes), Theorem VIII.3.2 (p. 65) consumes it as an equation for `∂_ℓu`,
+first derivative of the solution. The induction in the proof of Evans, *Partial Differential
+Equations* (2nd ed.), §6.3.1 Theorem 2 consumes it as an equation for `∂_ℓu`,
 whose gradient is `(∂ᵢ∂_ℓu)ᵢ`. Those two vectors agree only because mixed weak derivatives
 commute, and `HasIteratedWeakDerivOn` is deliberately built without presuming it.
 

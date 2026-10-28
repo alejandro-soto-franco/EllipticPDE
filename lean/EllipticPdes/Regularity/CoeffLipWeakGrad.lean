@@ -17,8 +17,7 @@ takes the estimate from `H_0^1(Omega)` to `H^1(Omega)` reads one thing more: a w
 of each coefficient entry, essentially bounded. A `C^1` coefficient supplies it through its
 classical partials (`IsC1Coeff.coeffWeakGrad`) and a `W^{k+1,infinity}` family through its first
 order (`IsWkInftyCoeff.coeffWeakGrad`). This file supplies it from the Lipschitz estimate alone,
-which is what Guo, *Partial Differential Equations I and II* (Course Lecture Notes),
-Theorem VIII.2.2 (p. 63) and Gilbarg-Trudinger, *Elliptic Partial Differential Equations of
+which is what Gilbarg-Trudinger, *Elliptic Partial Differential Equations of
 Second Order*, Theorem 8.8 (p. 179) ask of the leading coefficients.
 
 Rademacher's theorem (`LipschitzWith.ae_differentiableAt`) gives a derivative almost

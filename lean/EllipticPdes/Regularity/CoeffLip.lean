@@ -12,8 +12,9 @@ public import EllipticPdes.Regularity.CoeffC1
 # `W^{1,∞}` principal coefficients
 
 Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 1 asks `aᵢⱼ ∈ C¹` for the
-interior `H²` estimate, where Guo, *Partial Differential Equations I and II* (Course Lecture
-Notes), Theorem VIII.3.2 (p. 65) asks `aᵢⱼ ∈ W^{1,∞}`. On `ℝᵈ` a `W^{1,∞}` function is one
+interior `H²` estimate, where Gilbarg and Trudinger Theorem 8.8 asks `aᵢⱼ` uniformly Lipschitz, the
+class
+`W^{1,∞}`. On `ℝᵈ` a `W^{1,∞}` function is one
 with a Lipschitz representative, so in its pointwise form the hypothesis is the Lipschitz
 estimate of `IsLipCoeff` below.
 
@@ -84,7 +85,7 @@ theorem IsLipCoeff.abs_diffQuot_coeff_le {A : EllipticCoeff d} (hA : IsLipCoeff 
 
 /-- **A `C¹` bundle is a `W^{1,∞}` bundle.** The segment mean value inequality turns the
 pointwise bound on the first derivatives into the Lipschitz estimate with the same constant,
-so a result proved under `IsLipCoeff` applies to a `C¹` coefficient and Guo's hypothesis is
+so a result proved under `IsLipCoeff` applies to a `C¹` coefficient and the `W^{1,∞}` hypothesis is
 no stronger than Evans's as far as the principal coefficients go. -/
 def IsC1Coeff.toIsLipCoeff {A : EllipticCoeff d} (hA : IsC1Coeff A) : IsLipCoeff A where
   A1 := hA.A1

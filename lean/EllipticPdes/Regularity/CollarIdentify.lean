@@ -12,8 +12,8 @@ public import EllipticPdes.Regularity.IteratedRestrict
 /-!
 # Identifications on the collar
 
-The inductive hypothesis of Guo, *Partial Differential Equations I and II* (Course Lecture
-Notes), Theorem VIII.3.2 (p. 65) hands over a family of iterated weak derivatives on a compact
+The inductive hypothesis in the proof of Evans, *Partial Differential Equations* (2nd ed.), §6.3.1
+Theorem 2 hands over a family of iterated weak derivatives on a compact
 set, and says of its first entries only that they are weak derivatives of the solution. The
 ambient element has its own first derivatives, in its gradient coordinates. The two agree, but
 only almost everywhere, and only where a cutoff is invisible.

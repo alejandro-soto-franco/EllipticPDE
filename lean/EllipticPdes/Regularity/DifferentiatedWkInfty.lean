@@ -17,8 +17,8 @@ equation in a direction `ℓ`. Each term of the equation has the shape `∫_V a�
 Leibniz rule `HasWeakDerivOn.mul_isWkInfty_left` moves `∂_ℓ` onto the product `a·g`. The
 coefficients enter only through the pair `(a, ∂_ℓ a)`, which `WeakBddPair` records, so one
 identity serves a `C¹` coefficient and a `W^{1,∞}` coefficient alike: the first supplies its
-classical derivative and the second a representative from a `W^{k,∞}` bundle (Guo, *Partial
-Differential Equations I and II* (Course Lecture Notes), Theorem VIII.3.2 (p. 65)).
+classical derivative and the second a representative from a `W^{k,∞}` bundle (the induction in the
+proof of Evans, *Partial Differential Equations* (2nd ed.), §6.3.1 Theorem 2).
 
 ## Main declarations
 

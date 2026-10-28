@@ -11,12 +11,13 @@ public import EllipticPdes.Regularity.DifferentiatedWkInfty
 public import EllipticPdes.Regularity.CoeffCk
 
 /-!
-# Differentiated identity for a weak solution under Guo's coefficient hypothesis
+# Differentiated identity for a weak solution under a `W^{k,∞}` coefficient hypothesis
 
 `EllipticPdes.Regularity.differentiated_weakForm_of_weakSolution` discharges every hypothesis
 of the differentiated identity except the weak `ℓ`-derivative of the datum, for `C²` principal
-and `C¹` lower-order coefficients. Guo, *Partial Differential Equations I and II* (Course
-Lecture Notes), Theorem VIII.3.2 (p. 65) asks instead for `W^{k+2,∞}` and `W^{k+1,∞}`, and
+and `C¹` lower-order coefficients. The induction in the proof of Evans, *Partial Differential
+Equations* (2nd ed.), §6.3.1
+Theorem 2 runs instead on `W^{k+2,∞}` and `W^{k+1,∞}` coefficients, and
 `differentiated_weakForm_of_weakSolution_wkInfty` is the bridge under that hypothesis.
 
 One hypothesis on the principal part remains beyond the bundles. The interior `H²`

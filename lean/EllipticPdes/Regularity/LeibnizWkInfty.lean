@@ -227,8 +227,8 @@ theorem tendsto_setIntegral_mul_convolution_of_measurable
 `V`, and `a` is measurable and essentially bounded with an essentially bounded weak `ℓ`-derivative
 `a'`, then `a·g` has weak `ℓ`-derivative `a'·g + a·g'` on `V`.
 
-This is the hypothesis of Guo, *Partial Differential Equations I and II* (Course Lecture
-Notes), Theorem VIII.3.2 (p. 65). The identity holds for the mollified weight
+This is the weight hypothesis of the higher interior regularity theorem (Evans §6.3.1
+Theorem 2 with `W^{k,∞}` coefficients). The identity holds for the mollified weight
 (`weakDerivOn_mul_convolution_normed`), and `tendsto_setIntegral_mul_convolution_of_measurable`
 sends each of the three terms to its limit. -/
 theorem HasWeakDerivOn.mul_isWkInfty_left {V : Set (EuclideanSpace ℝ (Fin d))} (ℓ : Fin d)
