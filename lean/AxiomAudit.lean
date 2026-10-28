@@ -239,7 +239,7 @@ assert_classical_axioms
   EllipticPdes.Extension.exists_extension_bound
   EllipticPdes.Extension.exists_extension_subset_bound
 
-/-! ### The extension operator as a linear map -/
+/-! ### Extension operator as a linear map -/
 
 assert_classical_axioms
   EllipticPdes.Extension.localExtension_bound
@@ -281,27 +281,27 @@ assert_classical_axioms
   EllipticPdes.Embedding.morrey_ball
   EllipticPdes.Sobolev.embW12_isCompact
 
-/-! ### The Poincaré inequality with the mean subtracted -/
+/-! ### Poincaré inequality with the mean subtracted -/
 
 assert_classical_axioms
   EllipticPdes.Embedding.ae_const_of_hasWeakGradOn_zero
   EllipticPdes.Sobolev.poincare_wirtinger
 
-/-! ### The pointwise equation of a smooth representative -/
+/-! ### Pointwise equation of a smooth representative -/
 
 assert_classical_axioms
   EllipticPdes.Regularity.hasWeakGradOn_of_contDiffOn
   EllipticPdes.Regularity.weakSolution_ae_eq_of_contDiffOn
   EllipticPdes.Regularity.exists_weakSolution_interior_classical
 
-/-! ### The unit ball as an instance of a bounded domain with `C¹` boundary -/
+/-! ### Unit ball as an instance of a bounded domain with `C¹` boundary -/
 
 assert_classical_axioms
   EllipticPdes.Extension.hasC1Boundary_ball
   EllipticPdes.Sobolev.embW12_isCompact_ball
   EllipticPdes.Sobolev.poincare_wirtinger_ball
 
-/-! ### The extension operator between the graph spaces -/
+/-! ### Extension operator between the graph spaces -/
 
 assert_classical_axioms
   EllipticPdes.Extension.mem_W12_of_hasWeakGradOn
@@ -313,7 +313,7 @@ assert_classical_axioms
   EllipticPdes.Sobolev.hasWeakGradOn_comp_affineBall
   EllipticPdes.Sobolev.poincare_ball
 
-/-! ### The chain rule and the weak maximum principle -/
+/-! ### Chain rule and the weak maximum principle -/
 
 assert_classical_axioms
   EllipticPdes.HasWeakFDerivOn.comp_contDiff
@@ -348,7 +348,7 @@ assert_classical_axioms
   EllipticPdes.Sobolev.weak_maximum_principle_H01
   EllipticPdes.Sobolev.eq_zero_of_weakSolution_H01
 
-/-! ### The weak maximum principle with a transport term -/
+/-! ### Weak maximum principle with a transport term -/
 
 assert_classical_axioms
   EllipticPdes.Sobolev.exists_truncation_mem_H01
@@ -356,7 +356,7 @@ assert_classical_axioms
   EllipticPdes.Embedding.hasWeakGradOn_negPart
   EllipticPdes.Embedding.hasWeakGradOn_abs
 
-/-! ### The classical weak maximum principle -/
+/-! ### Classical weak maximum principle -/
 
 assert_classical_axioms
   EllipticPdes.Classical.sum_mul_nonpos_of_posSemidef
@@ -459,7 +459,7 @@ assert_classical_axioms
   EllipticPdes.Sobolev.hasWeakGradOn_iff_forall_hasWeakDeriv
   EllipticPdes.Regularity.HasIteratedWeakDerivOn.hasWeakDerivList
 
-/-! ### Space `W^{k,p}(U)` -/
+/-! ### Sobolev space `W^{k,p}(U)` -/
 
 assert_classical_axioms
   EllipticPdes.Sobolev.Wkp.completeSpace
