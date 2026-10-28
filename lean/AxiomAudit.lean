@@ -486,3 +486,13 @@ assert_classical_axioms
   EllipticPdes.Sobolev.norm_h1Equiv_symm_toH1amb
   EllipticPdes.Sobolev.hasWeakFDerivOn_iff_forall_hasWeakDeriv
   EllipticPdes.Sobolev.hasWeakDeriv_single_iff_hasWeakDerivOn
+
+/-! ### Bounded operators and duals -/
+
+assert_classical_axioms
+  EllipticPdes.Analysis.isBoundedLinear_iff_continuous
+  EllipticPdes.Analysis.IsBoundedLinear.sSup_eq_opNorm
+  EllipticPdes.Analysis.exists_dual_iff
+  EllipticPdes.Analysis.riesz_representation
+  EllipticPdes.Analysis.isReflexive_iff
+  EllipticPdes.Analysis.isReflexive_of_hilbert

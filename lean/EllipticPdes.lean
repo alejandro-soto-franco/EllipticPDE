@@ -151,6 +151,7 @@ public import EllipticPdes.Spectrum.RellichGeneral
 public import EllipticPdes.BoundedInstances
 public import EllipticPdes.DivFormInstances
 public import EllipticPdes.Analysis.WeakCompactness
+public import EllipticPdes.Analysis.OperatorBackground
 public import EllipticPdes.Analysis.DirectMethodForm
 public import EllipticPdes.Analysis.LpInterpolation
 public import EllipticPdes.Analysis.Dilation

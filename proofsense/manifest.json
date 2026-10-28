@@ -1243,6 +1243,36 @@
       "source_id": "evans-2010",
       "locator": "§5.2.2 Def (W_0^{k,p})",
       "claim": "formalises the definition of W_0^{k,p}(U) as the closure of the smooth compactly supported functions in W^{k,p}(U). Here the closure is taken in the graph space, and the declaration states that it lies in W^{k,p}(U). The graph of a test function lies in W^{k,p}(U) because a smooth function has its classical derivatives as weak derivatives, and W^{k,p}(U) is closed"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.isBoundedLinear_iff_continuous",
+      "source_id": "evans-2010",
+      "locator": "App. D (Def bounded linear operator)",
+      "claim": "formalises the equivalence of boundedness on the closed unit ball and continuity for a linear map between real normed spaces. Evans checks that a bounded operator is continuous; the converse is proved here as well, from the operator norm bound on the unit ball"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.IsBoundedLinear.sSup_eq_opNorm",
+      "source_id": "evans-2010",
+      "locator": "App. D (Def bounded linear operator)",
+      "claim": "formalises the operator norm as Evans defines it: for a bounded linear operator the supremum of the norm of A u over the closed unit ball is the operator norm of A, and that supremum is finite"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.exists_dual_iff",
+      "source_id": "evans-2010",
+      "locator": "App. D (Def dual space)",
+      "claim": "formalises the dual space as the space of bounded linear functionals: a real linear functional on a normed space is an element of the strong dual exactly when it is bounded on the closed unit ball. Evans defines the dual by boundedness; the equivalence with continuity is proved here"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.riesz_representation",
+      "source_id": "evans-2010",
+      "locator": "App. D (Thm 2)",
+      "claim": "formalises the Riesz representation theorem for a real Hilbert space: every bounded linear functional is the inner product against exactly one vector, and the assignment is a linear equivalence from the dual space onto the space. Evans states the existence and uniqueness; the linearity of the assignment is proved here as well"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.isReflexive_iff",
+      "source_id": "evans-2010",
+      "locator": "App. D (Def reflexive)",
+      "claim": "formalises Evans's more precise form of reflexivity: the canonical map into the double dual is onto exactly when every bounded functional on the dual space is evaluation at some point of the space"
     }
   ],
   "source_divergences": [

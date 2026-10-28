@@ -39,6 +39,10 @@ MANIFEST = ROOT / "proofsense" / "manifest.json"
 # that no transcribed statement matches it, which the README under
 # proofsense/ has to justify in prose.
 EXEMPT = {
+    "EllipticPdes.Analysis.isReflexive_of_hilbert": (
+        "Evans uses that a Hilbert space is reflexive in App. D after Theorem 3 (p. 723) without "
+        "a statement; this is its proof from the Riesz representation"
+    ),
     "EllipticPdes.Sobolev.testGraph_mem_W0kp": (
         "membership of the generators of the closure; a step of the definition of W_0^{k,p}"
     ),
