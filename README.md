@@ -80,6 +80,9 @@ named without their `EllipticPdes.` prefix.
 
 | Result | Declaration |
 |---|---|
+| Weak derivative of every order with its uniqueness and linearity | `Sobolev.HasWeakDeriv`, `Sobolev.HasWeakDeriv.ae_eq` |
+| $W^{k,p}(U)$ for $1 \le p \le \infty$ and its completeness | `Sobolev.Wkp`, `Sobolev.Wkp.completeSpace` |
+| $H^k(U)$ and $W_0^{k,p}(U)$ | `Sobolev.Hk`, `Sobolev.W0kp`, `Sobolev.W0kp_le_Wkp` |
 | Existence and uniqueness of the weak solution | `Sobolev.FullEllipticOp.weak_solution_L2_of_nonneg_zeroth_of_bounded` |
 | Gårding inequality | `Sobolev.FullEllipticOp.garding` |
 | Fredholm alternative: a nontrivial kernel or unique solvability for every datum | `Sobolev.FullEllipticOp.fredholm_alternative` |
