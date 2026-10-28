@@ -1183,6 +1183,36 @@
       "source_id": "gilbarg-2001",
       "locator": "§7.4 Lemma 7.5",
       "claim": "formalises the cited chain rule on a finite-dimensional real normed space with an additive Haar measure: a C^1 function of the real line with a uniformly bounded derivative, composed with a function that has a weak Fréchet derivative on an open set, has the weak Fréchet derivative given by the derivative of the function at u times the weak derivative of u. The cited statement takes u in W^1(Omega) on an open set of R^n and gives the partial derivatives D(f o u) = f'(u) Du; the statement here takes a weak Fréchet derivative, whose applications to the coordinate directions are those partials, and states the uniform bound on f' as a constant M on the norm of the derivative. The proof is the cited one: u is mollified, the classical identity holds for each mollification, and both sides pass to the limit by the Lipschitz bound on f and an almost everywhere convergent subsequence"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.HasWeakDeriv.ae_eq",
+      "source_id": "evans-2010",
+      "locator": "§5.2.1 Lem (uniqueness of weak derivatives)",
+      "claim": "formalises the lemma for an arbitrary multi-index alpha on an open set U of R^n: two weak alpha-th derivatives of one function are equal almost everywhere on U. The equality is stated for Lebesgue measure restricted to U, where Evans writes that the derivative is unique up to a set of measure zero. Both candidates are locally integrable on U, as the definition requires. The proof reduces to the fundamental lemma of the calculus of variations on U"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.HasWeakDeriv.add",
+      "source_id": "evans-2010",
+      "locator": "§5.2.3 Thm 1",
+      "claim": "formalises the additive case of clause (ii): if v and v' are weak alpha-th derivatives of u and u' on U, then v + v' is a weak alpha-th derivative of u + u'. Evans states the combination lambda u + mu v for u and v in W^{k,p}(U) with |alpha| <= k. The declaration assumes only that the four functions are locally integrable on U, which the weak derivative hypotheses supply, and states the sum without coefficients; smul states the scalar multiple"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.HasWeakDeriv.smul",
+      "source_id": "evans-2010",
+      "locator": "§5.2.3 Thm 1",
+      "claim": "formalises the scalar case of clause (ii): if v is a weak alpha-th derivative of u on U, then c v is a weak alpha-th derivative of c u for every real c. Evans states the combination lambda u + mu v for u and v in W^{k,p}(U) with |alpha| <= k. The declaration assumes only that u and v are locally integrable on U, which the weak derivative hypothesis supplies, and states one scalar; add states the sum"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.HasWeakDeriv.sub",
+      "source_id": "evans-2010",
+      "locator": "§5.2.3 Thm 1",
+      "claim": "formalises the case lambda = 1, mu = -1 of clause (ii): if v and v' are weak alpha-th derivatives of u and u' on U, then v - v' is a weak alpha-th derivative of u - u'. Evans states the combination lambda u + mu v for u and v in W^{k,p}(U) with |alpha| <= k. The declaration assumes only that the four functions are locally integrable on U, which the weak derivative hypotheses supply"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.hasWeakDeriv_of_contDiff",
+      "source_id": "evans-2010",
+      "locator": "§5.2.1 Def (weak derivative)",
+      "claim": "formalises the integration by parts identity that motivates the definition: for a smooth function u, the classical derivative D^alpha u satisfies the defining identity of a weak alpha-th derivative, with the sign (-1)^{|alpha|} and the test function differentiated alpha times. Evans takes u in C^k(U) and phi in C_c^infinity(U). The declaration takes u smooth on all of R^n and writes D^alpha u as the iterated partial derivative along the reversed list of directions. That order is the one the integrations by parts produce"
     }
   ],
   "source_divergences": [

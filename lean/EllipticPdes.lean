@@ -209,6 +209,7 @@ public import EllipticPdes.Existence.DivFormMaximum
 public import EllipticPdes.Existence.DivFormMaximumTransport
 public import EllipticPdes.Sobolev.WeakDeriv
 public import EllipticPdes.Sobolev.WeakDerivClassical
+public import EllipticPdes.Sobolev.WeakDerivMulti
 public import EllipticPdes.Form.DivFormIsometry
 public import EllipticPdes.Form.DivFormCoord
 public import EllipticPdes.Regularity.SmoothBdd

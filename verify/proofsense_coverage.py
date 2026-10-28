@@ -39,6 +39,15 @@ MANIFEST = ROOT / "proofsense" / "manifest.json"
 # that no transcribed statement matches it, which the README under
 # proofsense/ has to justify in prose.
 EXEMPT = {
+    "EllipticPdes.Sobolev.hasWeakDeriv_single_iff": (
+        "bridge to the distributional line derivative; states no source result"
+    ),
+    "EllipticPdes.Sobolev.hasWeakGradOn_iff_forall_hasWeakDeriv": (
+        "bridge to the p = 2 notion; states no source result"
+    ),
+    "EllipticPdes.Regularity.HasIteratedWeakDerivOn.hasWeakDerivList": (
+        "bridge to the p = 2 notion; states no source result"
+    ),
     "EllipticPdes.HasWeakFDerivOn.hasFDerivAt": (
         "the general form of hasFDerivAt_of_continuousOn_hasWeakGradOn over a finite-dimensional "
         "space and a Banach codomain; exempt for the same reason, since Evans performs the "

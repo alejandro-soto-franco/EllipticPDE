@@ -446,3 +446,15 @@ assert_classical_axioms
   EllipticPdes.Classical.nondivOperator.comparison_principle
   EllipticPdes.Campanato.Haar.campanato_holderOnWith
   EllipticPdes.H1Graph.hneg_characterization
+
+/-! ### Multi-index weak derivatives -/
+
+assert_classical_axioms
+  EllipticPdes.Sobolev.HasWeakDeriv.ae_eq
+  EllipticPdes.Sobolev.HasWeakDeriv.add
+  EllipticPdes.Sobolev.HasWeakDeriv.smul
+  EllipticPdes.Sobolev.HasWeakDeriv.sub
+  EllipticPdes.Sobolev.hasWeakDeriv_of_contDiff
+  EllipticPdes.Sobolev.hasWeakDeriv_single_iff
+  EllipticPdes.Sobolev.hasWeakGradOn_iff_forall_hasWeakDeriv
+  EllipticPdes.Regularity.HasIteratedWeakDerivOn.hasWeakDerivList
