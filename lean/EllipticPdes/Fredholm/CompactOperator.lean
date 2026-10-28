@@ -13,7 +13,7 @@ public import Mathlib.Analysis.Normed.Operator.Compact.FredholmAlternative
 /-!
 # Riesz theory of compact operators on a Hilbert space
 
-Evans Appendix D, Theorem 5; Guo Theorem VII.4.4.
+Evans Appendix D, Theorem 5.
 
 For a compact operator `K` on a Hilbert space over `ℝ` or `ℂ`
 (`IsCompactOperator.fredholm_alternative`): the kernel of `1 - K` is finite dimensional, the
@@ -322,7 +322,7 @@ lemma ContinuousLinearMap.finrank_ker_adjoint_of_eq_comp_equiv [CompleteSpace E]
       ContinuousLinearMap.adjoint_one, T]
   rw [hker, LinearEquiv.finrank_map_eq]
 
-/-- **Fredholm alternative** (Evans Appendix D Theorem 5, Guo Theorem VII.4.4) for a compact
+/-- **Fredholm alternative** (Evans Appendix D Theorem 5) for a compact
 operator `K` on a Hilbert space: the kernel of `1 - K` is finite dimensional, the range of
 `1 - K` is closed and is the orthogonal complement of the kernel of `1 - K†`, `1 - K` is
 injective exactly when it is surjective, and the kernels of `1 - K` and `1 - K†` have the same
@@ -364,8 +364,8 @@ theorem IsCompactOperator.bijective_one_sub_smul [CompleteSpace E] {K : E →L[�
     exact ContinuousLinearMap.isUnit_iff_bijective.mp (hfac ▸
       ((isUnit_iff_ne_zero.mpr hc).map (algebraMap 𝕜 (E →L[𝕜] E))).mul hunit)
 
-/-- **Fredholm dichotomy** (Evans Appendix D Theorem 5, the remark following it; Guo Theorem
-VII.4.4): either `(1 - K) u = h` has exactly one solution for every `h`, or the homogeneous
+/-- **Fredholm dichotomy** (Evans Appendix D Theorem 5, the remark following it):
+either `(1 - K) u = h` has exactly one solution for every `h`, or the homogeneous
 equation has a nonzero solution. -/
 theorem IsCompactOperator.fredholm_dichotomy [CompleteSpace E] {K : E →L[𝕜] E}
     (hK : IsCompactOperator K) :
@@ -385,7 +385,7 @@ section RieszTheory
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [CompleteSpace E]
 variable {K : E →L[ℝ] E}
 
-/-- **Fredholm alternative** (Evans Appendix D Theorem 5, Guo Theorem VII.4.4) for a compact
+/-- **Fredholm alternative** (Evans Appendix D Theorem 5) for a compact
 operator `K` on a real Hilbert space: the kernel of `1 - K` is finite dimensional, the range of
 `1 - K` is closed and is the orthogonal complement of the kernel of `1 - K†`, `1 - K` is
 injective exactly when it is surjective, and the kernels of `1 - K` and `1 - K†` have the same
@@ -402,8 +402,8 @@ theorem fredholm_alternative_compact (hK : IsCompactOperator K) :
       = Module.finrank ℝ (LinearMap.ker ((1 - K : E →L[ℝ] E)).toLinearMap) :=
   hK.fredholm_alternative
 
-/-- **Fredholm dichotomy** (Evans Appendix D Theorem 5, the remark following it; Guo Theorem
-VII.4.4): either `(1 - K) u = h` has exactly one solution for every `h`, or the homogeneous
+/-- **Fredholm dichotomy** (Evans Appendix D Theorem 5, the remark following it):
+either `(1 - K) u = h` has exactly one solution for every `h`, or the homogeneous
 equation has a nonzero solution. -/
 theorem fredholm_dichotomy_compact (hK : IsCompactOperator K) :
     (∀ h : E, ∃! u : E, (1 - K : E →L[ℝ] E) u = h)

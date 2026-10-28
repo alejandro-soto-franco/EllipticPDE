@@ -35,10 +35,11 @@ variable {n : ℕ}
 Friedrichs inequality, `p = q = 2`): some constant `C ≥ 0` controls the function part
 by the gradient part, uniformly over `H₀¹(Ω)`.
 
-Guo, *Partial Differential Equations* (JHU AS.110.631-632), Theorem III.4.6 states the
+Evans §5.6.1 Theorem 3 states the
 `W_0^{1,p}` form, `‖u‖_{L^q} ≤ C ‖Du‖_{L^p}` for `q ∈ [1, p*]`, and derives it from the
-Gagliardo-Nirenberg-Sobolev inequality. This declaration is its `p = q = 2` case, proved
-on a different route and consequently in every dimension: Guo's hypothesis `p ∈ [1, n)`
+Gagliardo-Nirenberg-Sobolev inequality (Gilbarg and Trudinger Theorem 7.10 is the same form).
+This declaration is its `p = q = 2` case, proved on a different route and consequently in every
+dimension: the hypothesis `p ∈ [1, n)`
 reads `n > 2` at `p = 2`, excluding `n = 1` and `n = 2`, because the GNS route needs a
 finite Sobolev conjugate. The route here goes through the slab Poincaré inequality
 `integral_sq_le_of_tsupport_subset_slab`, which asks nothing of the dimension, with a constant

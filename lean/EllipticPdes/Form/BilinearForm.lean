@@ -142,9 +142,8 @@ bounded coercive (i.e. `B(u, u) ≥ β‖u‖²_H`) bilinear form, and `f` is a 
 functional on `H`, then there is a unique `u ∈ H` such that `B(u, v) = ⟪f, v⟫` for all
 `v ∈ H`.
 
-Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem VII.3.1,
-p. 49. The two hypotheses are boundedness and coercivity, and `B` is otherwise
-arbitrary, which is Remark VII.3.2 there. This is `IsCoercive.existsUnique_apply_eq`. -/
+Evans §6.2.1 Theorem 1. The two hypotheses are boundedness and coercivity, and `B` is otherwise
+arbitrary, as in the closing remark there. This is `IsCoercive.existsUnique_apply_eq`. -/
 theorem lax_milgram {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℝ H]
     [CompleteSpace H] {B : H →L[ℝ] H →L[ℝ] ℝ} (hB : IsCoercive B) (f : H →L[ℝ] ℝ) :
     ∃! u : H, ∀ v : H, B u v = f v :=
