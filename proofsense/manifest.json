@@ -1356,7 +1356,7 @@
       "decl": "EllipticPdes.Analysis.isFullyNonlinear_sq",
       "source_id": "evans-2010",
       "locator": "§1.1 Def (linear, semilinear, quasilinear, fully nonlinear)",
-      "claim": "formalises the cited example of a fully nonlinear equation, here the first order equation (partial_i u)^2 = 0 in any dimension with an index i. Fully nonlinear means not quasilinear. Evans states it as dependence of F on the highest order derivatives that is nonlinear. The proof evaluates an assumed quasilinear form at the jets with the value t in slot i and zero elsewhere, for t = -1 and t = 0 and t = 1. These agree below order 1. The second difference of the right side is 0 and that of the left side is 2"
+      "claim": "formalises clause (iv), the dependence of F nonlinearly upon the highest order derivatives. Reading fully nonlinear as not quasilinear is a formalisation choice. The theorem proves that the first order equation (partial_i u)^2 = 0 is fully nonlinear in that sense, in any dimension with an index i. The example is the library's own witness. Evans states only the definition. The proof evaluates an assumed quasilinear form at the jets with the value t in slot i and zero elsewhere, for t = -1 and t = 0 and t = 1. These agree below order 1. The second difference of the right side is 0 and that of the left side is 2"
     }
   ],
   "source_divergences": [

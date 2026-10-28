@@ -86,8 +86,8 @@ def IsQuasilinear (F : Jet d k → EuclideanSpace ℝ (Fin d) → ℝ) : Prop :=
     ∀ j x, F j x = ∑ α with α.order = k, a α j.lower x * j α + a₀ j.lower x
 
 /-- **Fully nonlinear equation.** `F` depends nonlinearly on the derivatives of highest order,
-which is the negation of being quasilinear.
-Evans §1.1 Def (linear, semilinear, quasilinear, fully nonlinear) (p. 2). -/
+defined here as the negation of being quasilinear.
+Evans §1.1 Def (linear, semilinear, quasilinear, fully nonlinear), clause (iv) (p. 2). -/
 def IsFullyNonlinear (F : Jet d k → EuclideanSpace ℝ (Fin d) → ℝ) : Prop :=
   ¬ IsQuasilinear F
 
@@ -133,8 +133,9 @@ theorem IsSemilinear.isQuasilinear {F : Jet d k → EuclideanSpace ℝ (Fin d) �
   obtain ⟨a, a₀, hF⟩ := h
   exact ⟨fun α _ x => a α x, a₀, hF⟩
 
-/-- The equation `(∂ᵢu)² = 0` of first order is fully nonlinear.
-Evans §1.1 Def (linear, semilinear, quasilinear, fully nonlinear) (p. 2). -/
+/-- The first order equation `(∂ᵢu)² = 0` is fully nonlinear in the sense of
+`IsFullyNonlinear`. This witness is the library's own. Evans states only the definition in
+clause (iv) (§1.1, p. 2). -/
 theorem isFullyNonlinear_sq (i : Fin d) :
     IsFullyNonlinear (k := 1) (fun j _ => j (Sobolev.MultiIdx.single i) ^ 2) := by
   rintro ⟨a, a₀, hF⟩
