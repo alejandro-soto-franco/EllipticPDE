@@ -207,7 +207,7 @@ named without their `EllipticPdes.` prefix.
   representative is a weak gradient on the open set and by uniqueness the weak gradient
   of the solution there. Integrating the weak formulation by parts once more against a
   function supported in the set leaves a residual that the fundamental lemma of the
-  calculus of variations (Guo's Lemma I.2.4) makes vanish.
+  calculus of variations makes vanish.
   `exists_weakSolution_interior_classical` composes it with
   `exists_weakSolution_interior_smooth` and closes classical solvability in the interior
   on both halves of regularity and equation.
@@ -238,7 +238,7 @@ named without their `EllipticPdes.` prefix.
   attains its minimum on the functions of unit $L^q$ norm for $2 \le q < 2^{\star}$. The
   weak limit of a minimising sequence comes from `exists_weakLimit` and the constraint
   passes to that limit through `rellichEmbL_isCompact_of_lt`. Failure of the second step
-  at $2^{\star}$ is the exponent restriction Guo writes as $p + 1 < 2^{\star}$ for
+  at $2^{\star}$ is the subcritical restriction $p + 1 < 2^{\star}$ for
   $-\Delta u = u^p$.
 - The Euler-Lagrange equation of that minimiser as
   `EllipticPdes.Embedding.exists_weakSolution_semilinear_of_lt`: the minimiser is a weak
@@ -249,7 +249,7 @@ named without their `EllipticPdes.` prefix.
 - The same equation with no lower-order term as
   `EllipticPdes.Embedding.exists_weakSolution_dirichlet_of_lt`: minimising the Dirichlet
   energy $\int|\nabla u|^2$ in place of the graph norm gives a weak solution of the
-  equation $-\Delta u = \lambda|u|^{q-2}u$ of Guo IX.1 and Evans §8.4.1 Theorem 2 with
+  equation $-\Delta u = \lambda|u|^{q-2}u$ of Evans §8.4.1 Theorem 2 with
   $\lambda = \int|\nabla u|^2 > 0$. The minimiser comes from the abstract direct method
   `EllipticPdes.Analysis.exists_bilin_minimiser` and the equation from
   `EllipticPdes.Analysis.euler_lagrange_of_bilin_min`.
@@ -338,7 +338,7 @@ named without their `EllipticPdes.` prefix.
   bounded by twice its seminorm in every $L^p$. The three maps compose there: the shear
   pulls the region back to the half space, the even reflection crosses the interface and
   the inverse shear returns the result. Each step contributes its own half of the
-  gradient. Guo assembles the same steps for a function smooth up to the boundary and
+  gradient. Evans assembles the same steps for a function smooth up to the boundary and
   reaches $W^{1,p}$ by density. His reflection is therefore the higher-order one that
   keeps the extension $C^1$. A statement about weak gradients throughout needs no such
   matching and uses the plain even reflection.
@@ -352,7 +352,7 @@ named without their `EllipticPdes.` prefix.
   form Evans §C.1 states: every boundary point admits a chart consisting of an isometry
   relabelling and reorienting the axes, a direction, a $C^1$ graph of the remaining
   coordinates and a radius on whose ball the domain and the region above the graph
-  agree. That is also the hypothesis of Guo's Theorem III.2.2. The chart asks nothing of
+  agree. That is also the hypothesis of Evans §5.4 Theorem 1. The chart asks nothing of
   the gradient of its graph. Every statement about the shear needs a bound on that
   gradient, and `EllipticPdes.Extension.exists_bounded_graph` supplies it: a chart
   constrains its graph only on the ball it describes, and cutting the graph off in the
@@ -408,18 +408,18 @@ named without their `EllipticPdes.` prefix.
   a manifold.
 - The local extension against which those pieces are summed as
   `EllipticPdes.Extension.exists_localExtension` and its form with a constant
-  `exists_localExtension_bound`. Together they are Guo's second step: near a boundary
+  `exists_localExtension_bound`. Together they are the local step of the proof of Evans §5.4 Theorem 1: near a boundary
   point the class extends across the boundary to a class that has a weak gradient on any
   ball strictly inside the chart's ball and agrees with the original on the part of the
   domain that ball meets. The proof composes the chapter. A cutoff between two balls
   makes the class reach the whole region above the chart's graph, the rigid motion takes
   it into the coordinates of the graph, the reflection extends it across the graph and
-  the motion takes the result back. Guo runs that step on a function smooth up to the
+  the motion takes the result back. Evans runs that step on a function smooth up to the
   boundary and reads the chain rule off it. Every step here works with weak gradients.
   Because the chart asks nothing of the gradient of its graph, the proof uses the
   bounded graph from `exists_bounded_graph`, whose region agrees with the chart's on
   exactly the ball in play.
-- The sum that glues those pieces in Guo's third step as
+- The sum that glues those pieces in the last step of that proof as
   `EllipticPdes.Extension.exists_extension`: on a bounded open domain with $C^1$
   boundary, a class with a weak gradient on $\Omega$ extends to one with a weak gradient
   on $\mathbb{R}^d$ agreeing with it on $\Omega$. Each piece is a local extension cut
@@ -428,13 +428,13 @@ named without their `EllipticPdes.` prefix.
   extension agrees with the class, and off the ball both sides vanish. The pieces
   therefore add to $u$ because the partition adds to one.
 - The support clause as `EllipticPdes.Extension.exists_extension_subset`, which with the
-  previous item gives clauses (i) and (ii) of Guo's Theorem III.2.2: any open set
+  previous item gives clauses (i) and (ii) of Evans §5.4 Theorem 1: any open set
   containing the closure of the domain admits a smooth cutoff equal to one on that
   closure, and multiplying by it moves the support inside without disturbing the
   agreement.
 - The norm bound of clause (iii) as
-  `EllipticPdes.Extension.exists_extension_subset_bound`, which completes Theorem
-  III.2.2: one constant that depends on the domain and the exponent and is quantified
+  `EllipticPdes.Extension.exists_extension_subset_bound`, which completes Evans §5.4
+  Theorem 1: one constant that depends on the domain and the exponent and is quantified
   before the class bounds the extension and its gradient in every $L^p$ seminorm by the
   class and its gradient over $\Omega$. The chart, its bounded graph, its two cutoffs,
   the partition of unity and the supremum of each piece and of its partials depend on
@@ -456,7 +456,7 @@ named without their `EllipticPdes.` prefix.
   through `HasWeakGradOn` and has no bundled Sobolev space. The bound is therefore
   stated on the pair in place of an operator norm and at every exponent.
 - The operator between the Sobolev spaces themselves as
-  `EllipticPdes.Extension.exists_extW12` in the form Guo states Theorem III.2.2 at
+  `EllipticPdes.Extension.exists_extW12` in the form of Evans §5.4 Theorem 1 at
   $p = 2$: a bounded linear map from the graph space `W12` of the domain (the
   $H^1(\Omega)$ of this development) to the graph space of the whole space that agrees
   with the element on the domain in the function and gradient coordinates, has function
@@ -564,8 +564,8 @@ named without their `EllipticPdes.` prefix.
   has a nonzero truncation. The truncations at every level above the boundary value come
   from the truncation lemma as `EllipticPdes.Sobolev.exists_truncation_mem_H01`.
 - The classical weak maximum principle as
-  `EllipticPdes.Classical.weak_maximum_principle` (Evans's §6.4.1 Theorem 1, Gilbarg and
-  Trudinger's Theorem 3.1 and Guo's Theorem XI.3.7): a function $C^2$ on a bounded open
+  `EllipticPdes.Classical.weak_maximum_principle` (Evans's §6.4.1 Theorem 1 and Gilbarg and
+  Trudinger's Theorem 3.1): a function $C^2$ on a bounded open
   set and continuous on its closure with $Lu \le 0$ for the non-divergence-form operator
   $Lu = -a^{ij} u_{x_i x_j} + b^i u_{x_i}$ with symmetric uniformly elliptic $a$ and
   bounded $b$ attains its maximum over the closure on the boundary. At an interior local
@@ -581,7 +581,7 @@ named without their `EllipticPdes.` prefix.
   `EllipticPdes.Classical.weak_maximum_principle_of_nonneg` through Theorem 1 on the set
   where $u > 0$, and its supersolution clause is
   `EllipticPdes.Classical.weak_minimum_principle_of_nonneg`. Three corollaries follow:
-  Guo's strict maximum principle XI.3.5 as
+  the strict maximum principle that opens Gilbarg and Trudinger's proof of Theorem 3.1 as
   `EllipticPdes.Classical.not_isLocalMax_of_nondivOp_neg`, Gilbarg and Trudinger's
   comparison principle 3.3 as `EllipticPdes.Classical.comparison_principle`, and the
   bound of a solution by its boundary values in the second clause of their Corollary 3.2
@@ -601,8 +601,8 @@ named without their `EllipticPdes.` prefix.
   outward derivative of $u$. For the strong principle connectedness gives the set where
   $u$ is below its maximum a frontier point inside the domain. The largest ball about a
   nearby point of that set touches the level set of the maximum at an interior maximum
-  where Hopf's lemma nonetheless gives a nonzero gradient. Guo's chapter XI corollaries
-  follow. `EllipticPdes.Classical.hopf_lemma_of_zero` and
+  where Hopf's lemma nonetheless gives a nonzero gradient. The corollaries of the strong
+  maximum principle follow. `EllipticPdes.Classical.hopf_lemma_of_zero` and
   `EllipticPdes.Classical.strong_maximum_principle_of_zero` give the clauses with $c$ of
   any sign and a zero extremal value by replacing $c$ with its positive part, which
   lowers the image on a nonpositive function.
@@ -615,18 +615,18 @@ named without their `EllipticPdes.` prefix.
   maximum contradicts Hopf's lemma through the vanishing normal derivative.
 - The a priori bound from the maximum principle as
   `EllipticPdes.Classical.apriori_bound_sub` and
-  `EllipticPdes.Classical.apriori_bound_abs` (Guo's Theorem XI.5.1 and Gilbarg and
+  `EllipticPdes.Classical.apriori_bound_abs` (Gilbarg and
   Trudinger's Theorem 3.7) for a domain between two parallel planes a distance $D$
   apart: with $c \ge 0$ and $|f| \le F$ a solution of $Lu = f$ is bounded by the
   boundary supremum of $|u|$ plus $(e^{(B/\theta + 1) D} - 1) F/\theta$. The comparison
   function $\sup u^+ + (F/\theta)(e^{\alpha D} - e^{\alpha (x_1 - m)})$ at
   $\alpha = B/\theta + 1$ has image at least $F$ under $L$ and the comparison principle
   applies to it.
-- The maximum principles for subharmonic, superharmonic and harmonic functions in Guo's
-  Lemmas XI.1.5 and XI.1.7 and Corollary XI.1.6 as
+- The maximum principles for subharmonic, superharmonic and harmonic functions in Gilbarg and
+  Trudinger's Theorems 2.2 and 2.3 as
   `EllipticPdes.Classical.strong_maximum_principle_subharmonic`,
   `EllipticPdes.Classical.weak_maximum_principle_subharmonic` and their companions, and
-  the uniqueness clause of Lemma XI.2.4 as
+  their Theorem 2.4, uniqueness for the Dirichlet problem, as
   `EllipticPdes.Classical.dirichlet_unique_harmonic`: the Laplacian as the sum of the
   second coordinate partials is the negative of the operator with the identity as
   coefficient matrix and no lower-order terms.
@@ -703,8 +703,8 @@ transfer reads the test-function estimate as a hypothesis at an arbitrary expone
 variant of the inequality reaches $H_0^1(\Omega)$ by supplying it.
 
 Compactness at those exponents refines the $L^2$ statement without repeating its proof.
-Evans and Guo both mollify, bound the $L^1$ error uniformly over a bounded family,
-interpolate and finish with Arzelà-Ascoli. The first and last moves give compactness at
+Evans mollifies, bounds the $L^1$ error uniformly over a bounded family,
+interpolates and finishes with Arzelà-Ascoli. The first and last moves give compactness at
 the lower exponent, which `embL2_isCompact` already supplies from a translation modulus
 and without an extension operator. The interpolation does the rest: a finite net of the
 unit ball's image in $L^2(\Omega)$ is a net in $L^q(\Omega)$ at the radius the estimate
@@ -762,7 +762,7 @@ general constraint. The same argument runs at any symmetric positive semidefinit
 in place of the squared norm because it uses only the quadratic expansion of $Q(U + tV)$
 and the degree-two homogeneity of $Q$:
 `EllipticPdes.Analysis.euler_lagrange_of_quadratic_min` is that statement, and at the
-Dirichlet form it gives Guo's equation with no lower-order term.
+Dirichlet form it gives the equation $-\Delta u = \lambda|u|^{q-2}u$ with no lower-order term.
 
 The eigenvalue chapter has two independent routes to the Dirichlet spectrum.
 `solOp_spectral` runs the spectral theorem for the compact self-adjoint solution
