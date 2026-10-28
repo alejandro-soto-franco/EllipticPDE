@@ -47,8 +47,8 @@ EXEMPT = {
         "the injectivity Evans takes for granted in writing H_0^1(U) subset L^2(U) in 5.7"
     ),
     "EllipticPdes.Sobolev.compactlyEmbedded_embL2": (
-        "the Rellich-Kondrachov theorem of 5.7 Theorem 1 (p. 286) restated through the "
-        "definition of compact embedding; the theorem keeps its own warrant"
+        "the H_0^1 case of the Rellich compactness of 5.7 (p. 286) restated through the "
+        "definition of compact embedding; embL2_isCompact keeps its own warrant"
     ),
     "EllipticPdes.Analysis.isReflexive_of_hilbert": (
         "Evans uses that a Hilbert space is reflexive in App. D after Theorem 3 (p. 723) without "

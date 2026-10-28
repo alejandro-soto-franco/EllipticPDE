@@ -39,7 +39,7 @@ sequential compactness in `EllipticPdes.Analysis.exists_weakLimit`.
 
 ## References
 
-L. C. Evans, *Partial Differential Equations* (2nd ed.), Appendix D.3 (weak convergence,
+L. C. Evans, *Partial Differential Equations* (2nd ed.), Appendix D.4 (weak convergence,
 p. 723) and §5.7 (the definition of compact embedding, p. 286, and the Rellich-Kondrachov
 theorem).
 -/
@@ -57,17 +57,17 @@ variable {X Y : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
   [NormedAddCommGroup Y] [NormedSpace ℝ Y]
 
 /-- **Weak convergence.** `u k ⇀ x` when `f (u k) → f x` for every bounded linear functional `f`.
-Evans Appendix D.3 (Definition of weak convergence, p. 723). -/
+Evans Appendix D.4 (Definition of weak convergence, p. 723). -/
 def WeakConverges (u : ℕ → X) (x : X) : Prop :=
   ∀ f : StrongDual ℝ X, Tendsto (fun k => f (u k)) atTop (𝓝 (f x))
 
 /-- Strong convergence implies weak convergence. Evans records this after the definition of weak
-convergence (Appendix D.3, p. 723). -/
+convergence (Appendix D.4, p. 723). -/
 theorem weakConverges_of_tendsto {u : ℕ → X} {x : X} (h : Tendsto u atTop (𝓝 x)) :
     WeakConverges u x := fun f => (f.continuous.tendsto x).comp h
 
 /-- A weakly convergent sequence is bounded. Evans records this after the definition of weak
-convergence (Appendix D.3, p. 723). The proof applies the uniform boundedness principle to the
+convergence (Appendix D.4, p. 723). The proof applies the uniform boundedness principle to the
 sequence in the double dual. -/
 theorem WeakConverges.bddAbove_norm {u : ℕ → X} {x : X} (h : WeakConverges u x) :
     BddAbove (Set.range fun k => ‖u k‖) := by
@@ -173,8 +173,9 @@ theorem embL2_injective (hΩ : IsOpen Ω) : Function.Injective (embL2 Ω) := by
   exact (map_eq_zero_iff _ (H1Graph.h01Equiv Ω).injective).1 hV0
 
 /-- **Rellich-Kondrachov as a compact embedding.** For bounded open `Ω`, `H₀¹(Ω)` is compactly
-embedded in `L²(Ω)` in the sense of Evans §5.7 (p. 286). The compactness is the theorem
-`embL2_isCompact` of Evans §5.7 Theorem 1, and the injectivity is `embL2_injective`. -/
+embedded in `L²(Ω)` in the sense of Evans §5.7 (p. 286). The compactness is `embL2_isCompact`,
+the `H₀¹` case of the Rellich compactness of Evans §5.7 (p. 286) on any bounded open set, and the
+injectivity is `embL2_injective`. -/
 theorem compactlyEmbedded_embL2 (hΩ : IsOpen Ω) (hΩb : Bornology.IsBounded Ω) :
     Analysis.CompactlyEmbedded (embL2 Ω : H01 Ω →ₗ[ℝ] L2D Ω) :=
   (Analysis.compactlyEmbedded_iff (embL2 Ω)).2
