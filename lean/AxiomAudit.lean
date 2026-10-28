@@ -475,3 +475,10 @@ assert_classical_axioms
   EllipticPdes.Sobolev.inner_Hk_eq
   EllipticPdes.Sobolev.testGraph_mem_W0kp
   EllipticPdes.Sobolev.W0kp_le_Wkp
+
+/-! ### Graph-space bridges for `W^{1,2}(U)` and `W_0^{1,2}(U)` -/
+
+assert_classical_axioms
+  EllipticPdes.Sobolev.norm_toH1amb
+  EllipticPdes.Sobolev.mem_Wkp_one_two_iff
+  EllipticPdes.Sobolev.mem_W0kp_one_two_iff

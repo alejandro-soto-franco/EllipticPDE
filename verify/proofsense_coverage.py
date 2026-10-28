@@ -55,6 +55,15 @@ EXEMPT = {
     "EllipticPdes.Sobolev.Wkp_zero_eq_top": (
         "the observation that W^{0,p}(U) is L^p(U), which the source uses without stating it"
     ),
+    "EllipticPdes.Sobolev.norm_toH1amb": (
+        "bridge to the p = 2 graph space; states no source result"
+    ),
+    "EllipticPdes.Sobolev.mem_Wkp_one_two_iff": (
+        "bridge to the p = 2 graph space; states no source result"
+    ),
+    "EllipticPdes.Sobolev.mem_W0kp_one_two_iff": (
+        "bridge to the p = 2 graph space; states no source result"
+    ),
     "EllipticPdes.Sobolev.hasWeakDeriv_single_iff": (
         "bridge to the distributional line derivative; states no source result"
     ),
