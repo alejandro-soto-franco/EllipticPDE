@@ -542,3 +542,11 @@ assert_classical_axioms
   EllipticPdes.Extension.hasCkBoundary_aboveGraph
   EllipticPdes.Embedding.inv_sobolevConj
   EllipticPdes.Embedding.lt_sobolevConj
+
+/-! ### Dual of L^p -/
+
+assert_classical_axioms
+  EllipticPdes.Analysis.lpDualMap_apply
+  EllipticPdes.Analysis.lpDualMap_injective
+  EllipticPdes.Analysis.norm_le_norm_lpDualMap
+  EllipticPdes.Analysis.lpDualMap_surjective_of_finite

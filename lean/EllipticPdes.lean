@@ -164,6 +164,7 @@ public import EllipticPdes.Analysis.LpInterpolation
 public import EllipticPdes.Analysis.Dilation
 public import EllipticPdes.Analysis.SmoothCutoff
 public import EllipticPdes.Analysis.Mollifier
+public import EllipticPdes.Analysis.LpDuality
 public import EllipticPdes.Embedding.H01Sobolev
 public import EllipticPdes.Embedding.SobolevSolution
 public import EllipticPdes.Embedding.RellichLq
