@@ -74,8 +74,8 @@ Each is checked against the three classical axioms in `lean/AxiomAudit.lean`.
 
 ## Results
 
-The first three rows are the Sobolev spaces on an open subset of `EuclideanSpace ℝ (Fin d)`.
-The remaining rows are coordinate statements on that space for the operator
+The first three rows are weak derivatives and Sobolev spaces on a subset of
+`EuclideanSpace ℝ (Fin d)`. The remaining rows are coordinate statements on that space for the operator
 `EllipticPdes.Sobolev.FullEllipticOp`. The library has no `sorry`. Declarations are
 named without their `EllipticPdes.` prefix.
 
