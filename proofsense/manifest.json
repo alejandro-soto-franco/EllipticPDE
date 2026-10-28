@@ -1410,7 +1410,7 @@
       "decl": "EllipticPdes.Analysis.norm_le_norm_lpDualMap",
       "source_id": "gilbarg-2001",
       "locator": "§7.1 Rmk (dual of L^p)",
-      "claim": "formalises the step of the cited remark that bounds the inverse of the isomorphism: on a sigma-finite measure space with 1/p + 1/q = 1, the L^q norm of g is at most the norm of the functional f -> integral of f g on L^p. Gilbarg and Trudinger recall the isomorphism without proof. The bound covers every p including p = infinity. The case p = 1 tests g against sets of finite measure and uses sigma-finiteness"
+      "claim": "formalises the bound on the inverse that the isomorphism of the cited remark needs: on a sigma-finite measure space with 1/p + 1/q = 1, the L^q norm of g is at most the norm of the functional f -> integral of f g on L^p. Gilbarg and Trudinger state the isomorphism and give no proof. The bound covers every p including p = infinity. The case p = 1 tests g against sets of finite measure and uses sigma-finiteness"
     }
   ],
   "source_divergences": [

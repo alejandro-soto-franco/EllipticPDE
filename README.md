@@ -75,7 +75,7 @@ Each is checked against the three classical axioms in `lean/AxiomAudit.lean`.
 ## Results
 
 The first three rows are weak derivatives and Sobolev spaces on a subset of
-`EuclideanSpace ℝ (Fin d)`. The fourth row identifies the dual of $L^p$ on a σ-finite measure.
+`EuclideanSpace ℝ (Fin d)`. A fourth row identifies the dual of $L^p$.
 The remaining rows are coordinate statements on that space for the operator
 `EllipticPdes.Sobolev.FullEllipticOp`. The library has no `sorry`. Declarations are
 named without their `EllipticPdes.` prefix.
