@@ -155,6 +155,7 @@ public import EllipticPdes.Analysis.OperatorBackground
 public import EllipticPdes.Analysis.WeakConvergence
 public import EllipticPdes.Analysis.FunctionSpaces
 public import EllipticPdes.Analysis.HolderSpace
+public import EllipticPdes.Analysis.ArzelaAscoli
 public import EllipticPdes.Analysis.DirectMethodForm
 public import EllipticPdes.Analysis.LpInterpolation
 public import EllipticPdes.Analysis.Dilation

@@ -1327,6 +1327,12 @@
       "source_id": "evans-2010",
       "locator": "§5.1 Def (Hölder space)",
       "claim": "formalises the case k = 0 of the cited definition of the Hölder space C^{0,gamma}(closure U): u is in C^0(closure U) and has finite norm. The norm is finite exactly when the supremum norm is finite and the Hölder seminorm is finite, and a finite seminorm is a Hölder condition with some constant C. Evans's hypothesis 0 < gamma <= 1 is the hypothesis of the statement. The proof uses 0 < gamma and does not use gamma <= 1"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.arzela_ascoli",
+      "source_id": "evans-2010",
+      "locator": "App. C (Arzela-Ascoli compactness criterion)",
+      "claim": "formalises the cited criterion on R^n for a sequence of real functions. The sequence is bounded by a constant M and uniformly equicontinuous in Evans's sense: for each epsilon there is one delta that serves every index. Some subsequence converges uniformly on every compact set to a continuous function. The dimension is any natural number, the domain is EuclideanSpace R (Fin d), and the proof applies Mathlib's Arzela-Ascoli theorem to the closed family of continuous functions with the bound and a fixed modulus of continuity"
     }
   ],
   "source_divergences": [

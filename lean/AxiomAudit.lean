@@ -520,3 +520,8 @@ assert_classical_axioms
   EllipticPdes.Analysis.holderOnWith_iff_holderSeminorm_le
   EllipticPdes.Analysis.holderNorm_zero
   EllipticPdes.Analysis.mem_holderSpace_zero_iff
+
+/-! ### Arzelà–Ascoli -/
+
+assert_classical_axioms
+  EllipticPdes.Analysis.arzela_ascoli
