@@ -55,8 +55,7 @@ constraint is quadratic and the minimiser satisfies a linear equation, which is 
 
 ## References
 
-L. C. Evans, *Partial Differential Equations* (2nd ed.), §6.5.1, Theorem 2; Y. Guo, *Partial
-Differential Equations*, Section IX.1.
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §6.5.1, Theorem 2.
 -/
 
 @[expose] public section

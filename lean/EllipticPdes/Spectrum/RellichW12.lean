@@ -43,8 +43,7 @@ totally bounded and the embedding is compact.
 
 ## References
 
-L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.7 Theorem 1 (p. 286);
-Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem IV.2.10.
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.7 Theorem 1 (p. 286).
 -/
 
 @[expose] public section
@@ -253,8 +252,8 @@ theorem restrictL2_toLp_eq_embW12 {Ω : Set (EuclideanSpace ℝ (Fin d))} (hΩm 
     with x h1 h2 h3
   rw [h1, h2, h3]
 
-/-- **Rellich-Kondrachov on `H¹(Ω)`** (Evans §5.7 Theorem 1 at `p = q = 2`, Guo Theorem
-IV.2.10). On a bounded open domain with `C¹` boundary, the embedding of the graph space
+/-- **Rellich-Kondrachov on `H¹(Ω)`** (Evans §5.7 Theorem 1 at `p = q = 2`). On a bounded open
+domain with `C¹` boundary, the embedding of the graph space
 `W12 Ω` into `L²(Ω)` is a compact operator. -/
 theorem embW12_isCompact (hd : 0 < d) (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBounded Ω)
     (hC1 : HasC1Boundary Ω) : IsCompactOperator (embW12 Ω) := by

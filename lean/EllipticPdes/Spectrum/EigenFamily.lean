@@ -39,8 +39,7 @@ of a single vector at each stage rather than as a dimension count.
 
 ## References
 
-L. C. Evans, *Partial Differential Equations* (2nd ed.), §6.5.1, Theorem 1; Y. Guo, *Partial
-Differential Equations*, Section VII.5.
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §6.5.1, Theorem 1.
 -/
 
 @[expose] public section
