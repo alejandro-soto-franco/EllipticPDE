@@ -249,8 +249,8 @@ EXEMPT = {
     "EllipticPdes.ae_eq_of_forall_integral_smul_eq": (
         "two locally integrable functions with the same integral against every smooth test "
         "function of compact support agree almost everywhere. Evans uses it inside the proof of "
-        "the uniqueness of weak derivatives in 5.2.1 and Gilbarg and Trudinger inside the proof "
-        "of the same uniqueness in 7.3, and neither numbers a statement of it"
+        "the uniqueness of weak derivatives in 5.2.1, and Gilbarg and Trudinger assert that "
+        "uniqueness in 7.3 without proof. Neither numbers a statement of it"
     ),
     "EllipticPdes.Regularity.weakSolution_ae_eq_of_contDiffOn": (
         "a weak solution whose representative is C^2 on an open set satisfies the equation there "
