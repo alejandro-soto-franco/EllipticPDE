@@ -1231,6 +1231,18 @@
       "source_id": "evans-2010",
       "locator": "§5.2.2 Def (Sobolev space W^{k,p})",
       "claim": "formalises the norm of the cited definition for p < infinity: the p-th root of the sum over |alpha| at most k of the p-th powers of the L^p norms of D^alpha u. The case p = infinity, where Evans sums the L^infinity norms, is covered by the equivalence lemmas norm_Wkp_top_le and sum_le_card_mul_norm_Wkp_top. The graph norm there is the maximum"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.inner_Hk_eq",
+      "source_id": "evans-2010",
+      "locator": "§5.2.2 Rmk (i)",
+      "claim": "formalises the remark that H^k(U) = W^{k,2}(U) is a Hilbert space. At p = 2 the norm of the definition is the square root of the sum over |alpha| at most k of the squared L^2 norms of D^alpha u. The declaration gives the inner product that induces it: the sum over the multi-indices of the L^2(U) inner products of the coordinates. Evans does not write the inner product in the remark"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.W0kp_le_Wkp",
+      "source_id": "evans-2010",
+      "locator": "§5.2.2 Def (W_0^{k,p})",
+      "claim": "formalises the definition of W_0^{k,p}(U) as the closure of the smooth compactly supported functions in W^{k,p}(U). Here the closure is taken in the graph space, and the declaration states that it lies in W^{k,p}(U). The graph of a test function lies in W^{k,p}(U) because a smooth function has its classical derivatives as weak derivatives, and W^{k,p}(U) is closed"
     }
   ],
   "source_divergences": [

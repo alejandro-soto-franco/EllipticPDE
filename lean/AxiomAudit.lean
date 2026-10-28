@@ -468,3 +468,10 @@ assert_classical_axioms
   EllipticPdes.Sobolev.norm_Wkp_top_le
   EllipticPdes.Sobolev.sum_le_card_mul_norm_Wkp_top
   EllipticPdes.Sobolev.Wkp_zero_eq_top
+
+/-! ### Sobolev spaces `H^k(U)` and `W_0^{k,p}(U)` -/
+
+assert_classical_axioms
+  EllipticPdes.Sobolev.inner_Hk_eq
+  EllipticPdes.Sobolev.testGraph_mem_W0kp
+  EllipticPdes.Sobolev.W0kp_le_Wkp

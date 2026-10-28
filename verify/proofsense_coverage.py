@@ -39,6 +39,9 @@ MANIFEST = ROOT / "proofsense" / "manifest.json"
 # that no transcribed statement matches it, which the README under
 # proofsense/ has to justify in prose.
 EXEMPT = {
+    "EllipticPdes.Sobolev.testGraph_mem_W0kp": (
+        "membership of the generators of the closure; a step of the definition of W_0^{k,p}"
+    ),
     "EllipticPdes.Sobolev.norm_Wkp_top_le": (
         "the p = infinity case of the norm in the definition of W^{k,p}; one half of the "
         "equivalence between the maximum of the coordinate norms and Evans's sum, which the "
