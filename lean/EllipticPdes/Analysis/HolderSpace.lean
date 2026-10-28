@@ -73,8 +73,9 @@ def HolderSpace (k : ℕ) (γ : ℝ≥0) (U : Set (EuclideanSpace ℝ (Fin d))) 
 
 /-- A function satisfies a Hölder condition with constant `C` and exponent `γ` on `U` exactly
 when its Hölder seminorm on `U` is at most `C`. Evans §5.1 Def (ii) (p. 254). The converse
-of the inequality `|u x - u y| ≤ C |x - y|^γ` is proved as well.
-Evans assumes `0 < γ`. The proof does not use it and the statement keeps it. -/
+Both directions are proved: a Hölder seminorm at most `C` gives `|u x - u y| ≤ C |x - y|^γ` on
+`U`, and that inequality gives a seminorm at most `C`.
+Evans assumes `0 < γ ≤ 1`. The proof does not use it and the statement keeps it. -/
 theorem holderOnWith_iff_holderSeminorm_le (_hγ : 0 < γ) (C : ℝ≥0) :
     HolderOnWith C γ u U ↔ holderSeminorm γ U u ≤ C := by
   unfold holderSeminorm

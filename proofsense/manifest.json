@@ -1254,7 +1254,7 @@
       "decl": "EllipticPdes.Analysis.IsBoundedLinear.sSup_eq_opNorm",
       "source_id": "evans-2010",
       "locator": "App. D (Def bounded linear operator)",
-      "claim": "formalises the operator norm as Evans defines it: for a bounded linear operator the supremum of the norm of A u over the closed unit ball is the operator norm of A, and that supremum is finite"
+      "claim": "formalises the operator norm as Evans defines it: a continuous linear map is a bounded linear operator in Evans's sense, and the supremum of the norm of A u over the closed unit ball is the operator norm of A"
     },
     {
       "decl": "EllipticPdes.Analysis.exists_dual_iff",
@@ -1266,7 +1266,7 @@
       "decl": "EllipticPdes.Analysis.riesz_representation",
       "source_id": "evans-2010",
       "locator": "App. D (Thm 2)",
-      "claim": "formalises the Riesz representation theorem for a real Hilbert space: every bounded linear functional is the inner product against exactly one vector, and the assignment is a linear equivalence from the dual space onto the space. Evans states the existence and uniqueness; the linearity of the assignment is proved here as well"
+      "claim": "formalises the Riesz representation theorem for a real Hilbert space: every bounded linear functional is the inner product against exactly one vector, and the assignment is a linear equivalence from the dual space onto the space. Evans states the existence and uniqueness of the representing vector and that the assignment is a linear isomorphism of the dual space onto the space"
     },
     {
       "decl": "EllipticPdes.Analysis.isReflexive_iff",

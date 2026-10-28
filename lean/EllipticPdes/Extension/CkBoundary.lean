@@ -101,7 +101,8 @@ def C1Chart.toCkChart (c : C1Chart d) : CkChart d 1 where
   graph_contDiff := c.graph_contDiff
   graph_indep := c.graph_indep
 
-/-- **Agreement of `C^1` boundary with `C¹` boundary.** The two charts have the same fields. -/
+/-- **Evans's `C^1` boundary.** `HasCkBoundary 1` is the library's `HasC1Boundary`, since the two
+chart structures have the same fields. -/
 theorem hasCkBoundary_one_iff {Ω : Set (EuclideanSpace ℝ (Fin d))} :
     HasCkBoundary 1 Ω ↔ HasC1Boundary Ω :=
   ⟨fun h x hx => let ⟨c, hc⟩ := h x hx; ⟨c.toC1Chart, hc⟩,
@@ -117,7 +118,7 @@ def CkChart.weaken {k l : ℕ} (hlk : l ≤ k) (c : CkChart d k) : CkChart d l w
   graph_contDiff := c.graph_contDiff.of_le (by exact_mod_cast hlk)
   graph_indep := c.graph_indep
 
-/-- **Smoother boundaries are less smooth boundaries.** A `C^k` boundary is a `C^l` boundary for
+/-- **Monotonicity of `C^k` boundaries in `k`.** A `C^k` boundary is a `C^l` boundary for
 every `l ≤ k`. -/
 theorem HasCkBoundary.mono {k l : ℕ} {Ω : Set (EuclideanSpace ℝ (Fin d))} (hlk : l ≤ k)
     (h : HasCkBoundary k Ω) : HasCkBoundary l Ω :=

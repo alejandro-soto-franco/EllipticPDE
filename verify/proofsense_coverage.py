@@ -51,7 +51,7 @@ EXEMPT = {
         "the injectivity Evans takes for granted in writing H_0^1(U) subset L^2(U) in 5.7"
     ),
     "EllipticPdes.Sobolev.compactlyEmbedded_embL2": (
-        "the H_0^1 case of the Rellich compactness of 5.7 (p. 286) restated through the "
+        "the H_0^1 case of the Rellich compactness in the Remark after Theorem 1 of 5.7 (p. 289) restated through the "
         "definition of compact embedding; embL2_isCompact keeps its own warrant"
     ),
     "EllipticPdes.Analysis.isReflexive_of_hilbert": (
@@ -670,8 +670,8 @@ EXEMPT = {
         "is warranted at exists_principal_eigenpair"
     ),
     "EllipticPdes.Analysis.lpDualMap_apply": (
-        "step of the proof of the duality of L^p in Gilbarg and Trudinger "
-        "§7.1 (p. 146)"
+        "the evaluation formula of the map whose bijectivity is the duality of L^p "
+        "that Gilbarg and Trudinger §7.1 (p. 146) recall without proof"
     ),
 }
 

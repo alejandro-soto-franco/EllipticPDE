@@ -33,7 +33,7 @@ open scoped NNReal
 namespace EllipticPdes.Embedding
 
 /-- **Sobolev conjugate** `n p / (n - p)` of the exponent `p` in dimension `n` (Evans §5.6.1,
-p. 277). The truncated subtraction is harmless, as the lemmas assume `p < n`. -/
+p. 277). The lemmas assume `p < n`, so the truncated subtraction agrees with the real one. -/
 noncomputable def sobolevConj (n p : ℝ≥0) : ℝ≥0 := n * p / (n - p)
 
 variable {n p : ℝ≥0}

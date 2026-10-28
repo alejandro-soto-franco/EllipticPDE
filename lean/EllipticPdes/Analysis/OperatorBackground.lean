@@ -22,7 +22,8 @@ and `NormedSpace.inclusionInDoubleDual`.
 
 * `EllipticPdes.Analysis.IsBoundedLinear`: the supremum over the unit ball is finite.
 * `EllipticPdes.Analysis.isBoundedLinear_iff_continuous`: bounded and continuous coincide.
-* `EllipticPdes.Analysis.IsBoundedLinear.sSup_eq_opNorm`: the supremum is the operator norm.
+* `EllipticPdes.Analysis.IsBoundedLinear.sSup_eq_opNorm`: a continuous linear map is bounded and
+  the supremum is its operator norm.
 * `EllipticPdes.Analysis.exists_dual_iff`: a linear functional is a dual element iff bounded.
 * `EllipticPdes.Analysis.riesz_representation`: Riesz representation on a Hilbert space.
 * `EllipticPdes.Analysis.IsReflexive`: the canonical map into the double dual is onto.
@@ -82,11 +83,13 @@ theorem isBoundedLinear_iff_continuous (A : X →ₗ[ℝ] Y) :
       _ ≤ ‖B‖ * 1 := mul_le_mul_of_nonneg_left hu' (norm_nonneg _)
       _ = ‖B‖ := mul_one _
 
-/-- The supremum of `‖A u‖` over the closed unit ball is the operator norm. Evans Appendix D.3
-(Definition of a bounded linear operator, p. 721). -/
+/-- A continuous linear map is a bounded linear operator, and the supremum of `‖A u‖` over the
+closed unit ball is its operator norm. Evans Appendix D.3 (Definition of a bounded linear
+operator, p. 721). -/
 theorem IsBoundedLinear.sSup_eq_opNorm (A : X →L[ℝ] Y) :
-    sSup ((fun u => ‖A u‖) '' Metric.closedBall (0 : X) 1) = ‖A‖ :=
-  A.sSup_unitClosedBall_eq_norm
+    IsBoundedLinear (A : X →ₗ[ℝ] Y) ∧
+      sSup ((fun u => ‖A u‖) '' Metric.closedBall (0 : X) 1) = ‖A‖ :=
+  ⟨(isBoundedLinear_iff_continuous _).2 A.continuous, A.sSup_unitClosedBall_eq_norm⟩
 
 /-- A linear functional is an element of the dual space iff it is bounded. Evans Appendix D.3
 (Definition of the dual space, p. 722). -/

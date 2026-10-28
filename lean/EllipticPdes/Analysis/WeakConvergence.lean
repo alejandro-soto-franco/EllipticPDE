@@ -174,7 +174,8 @@ theorem embL2_injective (hΩ : IsOpen Ω) : Function.Injective (embL2 Ω) := by
 
 /-- **Rellich-Kondrachov as a compact embedding.** For bounded open `Ω`, `H₀¹(Ω)` is compactly
 embedded in `L²(Ω)` in the sense of Evans §5.7 (p. 286). The compactness is `embL2_isCompact`,
-the `H₀¹` case of the Rellich compactness of Evans §5.7 (p. 286) on any bounded open set, and the
+the `H₀¹` case of the Rellich compactness that Evans states in the Remark after the proof of
+Theorem 1 in §5.7 (p. 289) on any bounded open set, and the
 injectivity is `embL2_injective`. -/
 theorem compactlyEmbedded_embL2 (hΩ : IsOpen Ω) (hΩb : Bornology.IsBounded Ω) :
     Analysis.CompactlyEmbedded (embL2 Ω : H01 Ω →ₗ[ℝ] L2D Ω) :=

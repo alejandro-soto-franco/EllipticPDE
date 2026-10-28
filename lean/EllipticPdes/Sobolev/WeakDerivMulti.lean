@@ -67,7 +67,7 @@ namespace MultiIdx
 /-- The exponents of a multi-index as natural numbers. -/
 def toFun (α : MultiIdx d k) : Fin d → ℕ := fun i => (α.1 i : ℕ)
 
-/-- The order `|α| = ∑ α i` of a multi-index (Evans Appendix A, p. 702). -/
+/-- The order `|α| = ∑ α i` of a multi-index (Evans Appendix A, p. 701). -/
 def order (α : MultiIdx d k) : ℕ := ∑ i, (α.1 i : ℕ)
 
 /-- The zero multi-index. -/

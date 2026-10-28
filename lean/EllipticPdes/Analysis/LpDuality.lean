@@ -186,8 +186,8 @@ theorem integral_mul_le_of_memLp (g : Lp ℝ q μ) {F : α → ℝ} (hF : MemLp 
   exact (le_abs_self _).trans h
 
 /-- **Reverse Hölder bound.** On a σ-finite measure, the `L^q` norm of `g` is at most the norm
-of the functional `f ↦ ∫ f g` on `L^p`. The case `q = ∞` tests `g` against sets of positive
-finite measure, and σ-finiteness supplies them. Gilbarg and Trudinger §7.1 (p. 146). -/
+of the functional `f ↦ ∫ f g` on `L^p`. The case `q = ∞` tests `g` against sets of finite
+measure, and σ-finiteness supplies them. Gilbarg and Trudinger §7.1 (p. 146). -/
 theorem norm_le_norm_lpDualMap [SigmaFinite μ] (g : Lp ℝ q μ) :
     ‖g‖ ≤ ‖lpDualMap μ p q g‖ := by
   have hgm : AEStronglyMeasurable g μ := Lp.aestronglyMeasurable g
