@@ -30,7 +30,8 @@ which `EllipticPdes.Regularity.PointwiseEquation` proves and
 ## References
 
 L. C. Evans, *Partial Differential Equations* (2nd ed.), §6.3.1 Theorem 3 (p. 334);
-Gilbarg and Trudinger Theorem 8.10.
+D. Gilbarg and N. S. Trudinger, *Elliptic Partial Differential Equations of Second Order*,
+Corollary 8.11 (p. 186).
 -/
 
 @[expose] public section

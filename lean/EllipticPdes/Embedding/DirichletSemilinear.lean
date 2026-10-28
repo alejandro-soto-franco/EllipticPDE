@@ -18,11 +18,11 @@ ball, for `2 ≤ q < 2⋆`, produces a weak solution of
 
 `-Δu = λ|u|^{q-2}u`,   `λ = ∫ |∇u|² > 0`,
 
-which is the semilinear equation of Evans §8.5. `EllipticPdes.Analysis.exists_bilin_minimiser`
-supplies the minimiser and `EllipticPdes.Analysis.euler_lagrange_of_bilin_min` supplies the
-equation, with the Rellich compact embedding
-`EllipticPdes.Embedding.rellichEmbL_isCompact_of_lt` as the only analytic input beyond
-coercivity.
+the nonlinear eigenvalue problem of Evans §8.4.1.
+`EllipticPdes.Analysis.exists_bilin_minimiser` supplies the minimiser and
+`EllipticPdes.Analysis.euler_lagrange_of_bilin_min` supplies the equation, with the Rellich
+compact embedding `EllipticPdes.Embedding.rellichEmbL_isCompact_of_lt` as the only analytic
+input beyond coercivity.
 
 `EllipticPdes.Embedding.exists_weakSolution_semilinear_of_lt` runs the same two steps at the
 graph norm of `H₀¹(Ω)` rather than at the Dirichlet energy, and reaches
@@ -42,7 +42,7 @@ problem is the one stated here.
 ## References
 
 L. C. Evans, *Partial Differential
-Equations* (2nd ed.), §8.5.
+Equations* (2nd ed.), §8.4.1 (p. 488).
 -/
 
 @[expose] public section

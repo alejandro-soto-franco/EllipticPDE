@@ -18,7 +18,7 @@ of each coefficient entry, essentially bounded. A `C^1` coefficient supplies it 
 classical partials (`IsC1Coeff.coeffWeakGrad`) and a `W^{k+1,infinity}` family through its first
 order (`IsWkInftyCoeff.coeffWeakGrad`). This file supplies it from the Lipschitz estimate alone,
 which is what Gilbarg-Trudinger, *Elliptic Partial Differential Equations of
-Second Order*, Theorem 8.8 (p. 179) ask of the leading coefficients.
+Second Order*, Theorem 8.8 (p. 183) ask of the leading coefficients.
 
 Rademacher's theorem (`LipschitzWith.ae_differentiableAt`) gives a derivative almost
 everywhere, and `fderiv` names it: the total `fderiv` of Mathlib is the derivative where one

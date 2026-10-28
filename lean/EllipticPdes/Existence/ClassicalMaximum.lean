@@ -57,8 +57,8 @@ bounded on the set; the sources also ask for continuity, which the proof does no
 
 ## References
 
-L. C. Evans, *Partial Differential Equations* (2nd ed.), §6.4.1 Theorem 1 (p. 343) and
-Theorem 2 (p. 344);
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §6.4.1 Theorem 1 (p. 344) and
+Theorem 2 (p. 346);
 D. Gilbarg and N. S. Trudinger, *Elliptic Partial Differential Equations of Second Order*,
 §3.1 Theorem 3.1 (p. 32) and Corollary 3.2 (p. 33).
 -/
