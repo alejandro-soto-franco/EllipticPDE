@@ -29,7 +29,8 @@ equivalence that matches the two pairs of submodules.
 
 ## References
 
-* [evans-2010] L. C. Evans: *Partial Differential Equations* (2nd ed.) §5.2.2.
+* [evans-2010] L. C. Evans: *Partial Differential Equations* (2nd ed.) §5.2.2 Definition
+  (pp. 258–259).
 -/
 
 @[expose] public section
@@ -133,11 +134,6 @@ coordinate `i.succ` the entry of the multi-index `Pi.single i 1`. -/
 def toH1amb : WkpGraph d 1 2 U ≃ₗ[ℝ] H1amb U :=
   (LinearIsometryEquiv.piLpCongrLeft 2 ℝ (L2D U) MultiIdx.oneEquiv).toLinearEquiv
 
-/-- The reindexing is the isometric equivalence induced by `oneEquiv`. -/
-theorem toH1amb_eq_piLpCongrLeft :
-    (toH1amb : WkpGraph d 1 2 U ≃ₗ[ℝ] H1amb U) =
-      (LinearIsometryEquiv.piLpCongrLeft 2 ℝ (L2D U) MultiIdx.oneEquiv).toLinearEquiv := rfl
-
 /-- Coordinate `j` of `toH1amb F` is the entry of `F` at the multi-index over `j`. -/
 theorem toH1amb_apply (F : WkpGraph d 1 2 U) (j : Fin (d + 1)) :
     toH1amb F j = F (MultiIdx.oneEquiv.symm j) := rfl
@@ -149,7 +145,7 @@ theorem norm_toH1amb (F : WkpGraph d 1 2 U) : ‖toH1amb F‖ = ‖F‖ :=
 /-! ### Membership in `W^{1,2}(U)` -/
 
 /-- The inner product against the class of the `i`-th partial of a test function. -/
-theorem inner_partialCls (h : IsTestFn U φ) (i : Fin d) (u : L2D U) :
+private theorem inner_partialCls (h : IsTestFn U φ) (i : Fin d) (u : L2D U) :
     ⟪h.partialCls i, u⟫_ℝ = ∫ x in U, u x * partialD i φ x := by
   rw [L2.real_inner_eq_integral]
   refine integral_congr_ae ?_
@@ -157,7 +153,7 @@ theorem inner_partialCls (h : IsTestFn U φ) (i : Fin d) (u : L2D U) :
   rw [hx, mul_comm]
 
 /-- The inner product against the class of a test function. -/
-theorem inner_testCls (h : IsTestFn U φ) (v : L2D U) :
+private theorem inner_testCls (h : IsTestFn U φ) (v : L2D U) :
     ⟪h.testCls, v⟫_ℝ = ∫ x in U, v x * φ x := by
   rw [L2.real_inner_eq_integral]
   refine integral_congr_ae ?_
@@ -209,7 +205,6 @@ when its reindexing lies in `H01 U`. -/
 theorem mem_W0kp_one_two_iff (F : WkpGraph d 1 2 U) :
     F ∈ W0kp d 1 2 U ↔ toH1amb F ∈ H01 U := by
   set e := LinearIsometryEquiv.piLpCongrLeft 2 ℝ (L2D U) (MultiIdx.oneEquiv (d := d))
-    with he
   have himg : (toH1amb : WkpGraph d 1 2 U ≃ₗ[ℝ] H1amb U) '' wkpTestGraphs d 1 2 U =
       testGraphSet U := by
     ext G
