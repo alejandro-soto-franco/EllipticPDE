@@ -35,7 +35,8 @@ and the reason is `d/2⋆ = d/2 - 1`, the Sobolev relation itself. A family boun
 
 ## References
 
-Y. Guo, *Partial Differential Equations*, Example IV.2.11.
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.7 Theorem 1 (compactness below the
+Sobolev conjugate).
 -/
 
 @[expose] public section

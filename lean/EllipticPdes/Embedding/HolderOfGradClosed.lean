@@ -13,7 +13,7 @@ public import EllipticPdes.Embedding.ClassicalDeriv
 /-!
 # Hölder regularity of finite order from a bounded supply of weak derivatives
 
-Guo's Sobolev embedding (Guo, *Partial Differential Equations*, Theorem IV.2.3) has two cases.
+The Sobolev embedding of Evans §5.6.3 Theorem 6 has two cases.
 The first raises the exponent, and `EllipticPdes.Embedding.memLp_of_gradClosed_fullStep` runs it.
 The second reads a bounded supply of weak derivatives as classical ones: for `u ∈ W^{m,p}(Ω)`
 with `m > n/p`, the conclusion is `u ∈ C^{m-1-⌊n/p⌋, γ}(Ω)`. This file proves the second case at
@@ -25,13 +25,14 @@ The supply is spent in three places. Morrey asks for the weak gradient, so one o
 the ladder takes `⌊d/2⌋` more raising that gradient from `L²` to `L^{2d}`; and reading the `n`-th
 classical derivative asks the same of every index `n` levels up. So an index of depth `dep i`
 reaches `C^n` while `dep i + n + 1 + ⌊d/2⌋ ≤ m`, and at `dep i = 0` that is
-`n = m - 1 - ⌊d/2⌋`, which is Guo's order exactly.
+`n = m - 1 - ⌊d/2⌋`, which is the order of Evans §5.6.3 Theorem 6 exactly.
 
 ## Hölder exponent
 
 The ladder lands on `L^{2d}` and `EllipticPdes.Embedding.morrey_ball` reads off `1 - d/(2d)`, so
-the exponent is `1/2` in every dimension. For `d` odd this is Guo's `⌊d/2⌋ + 1 - d/2` on the
-nose. For `d` even `d/2` is an integer, Guo's statement leaves `γ` free in `(0, 1)`, and `1/2` is
+the exponent is `1/2` in every dimension. For `d` odd this is the `⌊d/2⌋ + 1 - d/2` of that theorem
+on
+the nose. For `d` even `d/2` is an integer, the theorem leaves `γ` free in `(0, 1)`, and `1/2` is
 one admissible choice: the ladder's landing reciprocal is `0` there, so every finite exponent is
 reached and `2d` is the one this file fixes.
 
@@ -45,8 +46,7 @@ reached and `2d` is the one this file fixes.
 
 ## References
 
-Guo, *Partial Differential Equations*, Theorem IV.2.3.
-Evans, *Partial Differential Equations* (2nd ed.), §5.6.3.
+Evans, *Partial Differential Equations* (2nd ed.), §5.6.3 Theorem 6.
 -/
 
 @[expose] public section
@@ -120,10 +120,11 @@ theorem contDiffOn_holder_of_gradClosed (hd : 0 < d) (c : EuclideanSpace ℝ (Fi
 
 /-! ### Hölder estimate with its constant -/
 
-/-- **Guo's clause (ii) with its constant against the `L²` data.** Composing the ladder's
+/-- **Clause (ii) of Evans §5.6.3 Theorem 6 with its constant against the `L²` data.** Composing the
+ladder's
 constant with Morrey's gives one constant, depending on the dimension, the rung count, the
 exponent and the two radii, bounding the Hölder seminorm of every member by a uniform `L²` bound
-on the family over the outer ball. This is the shape of Guo's
+on the family over the outer ball. This is the shape of the estimate
 `‖u‖_{C^{k-1-⌊n/p⌋,γ}} ≤ C‖u‖_{W^{k,p}}` at `p = 2`. -/
 theorem exists_const_holderOnWith_of_gradClosed_of_bound (hd : 0 < d)
     (c : EuclideanSpace ℝ (Fin d)) {r R : ℝ} (hr : 0 < r) (hrR : r < R) (ι : Type*)

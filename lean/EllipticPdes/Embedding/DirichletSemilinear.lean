@@ -18,7 +18,7 @@ ball, for `2 ≤ q < 2⋆`, produces a weak solution of
 
 `-Δu = λ|u|^{q-2}u`,   `λ = ∫ |∇u|² > 0`,
 
-which is the equation of Guo's Section IX.1. `EllipticPdes.Analysis.exists_bilin_minimiser`
+which is the semilinear equation of Evans §8.5. `EllipticPdes.Analysis.exists_bilin_minimiser`
 supplies the minimiser and `EllipticPdes.Analysis.euler_lagrange_of_bilin_min` supplies the
 equation, with the Rellich compact embedding
 `EllipticPdes.Embedding.rellichEmbL_isCompact_of_lt` as the only analytic input beyond
@@ -27,8 +27,8 @@ coercivity.
 `EllipticPdes.Embedding.exists_weakSolution_semilinear_of_lt` runs the same two steps at the
 graph norm of `H₀¹(Ω)` rather than at the Dirichlet energy, and reaches
 `-Δu + u = λ|u|^{q-2}u`. Poincaré makes the two quadratics equivalent, so both minimisation
-problems have solutions; their minimisers differ, and so do the equations. Guo states the
-Dirichlet-energy one.
+problems have solutions; their minimisers differ, and so do the equations. The Dirichlet-energy
+problem is the one stated here.
 
 ## Main declarations
 
@@ -41,7 +41,7 @@ Dirichlet-energy one.
 
 ## References
 
-Y. Guo, *Partial Differential Equations*, Section IX.1; L. C. Evans, *Partial Differential
+L. C. Evans, *Partial Differential
 Equations* (2nd ed.), §8.5.
 -/
 

@@ -16,23 +16,23 @@ public import EllipticPdes.Embedding.SobolevLadder
 the Hölder exponent off Morrey's inequality at the exponent the ladder reaches. Morrey is already
 stated for every exponent above the dimension, and the rung count and the landing exponent are
 already free there, so the base exponent is the only thing left at `2`. This file frees it, which
-is the second case of Evans, *Partial Differential Equations*, §5.6.3 Theorem 6, and of Guo,
-*Partial Differential Equations*, Theorem IV.2.3, at the exponent each quantifies over.
+is the second case of Evans, *Partial Differential Equations*, §5.6.3 Theorem 6, at the
+exponent it quantifies over.
 
 ## Landing exponent
 
 Running `s` rungs from `p₀` lands at the reciprocal `1/p₀ - s/d`, and Morrey at that exponent
 gives the Hölder exponent `1 - d/P = s + 1 - d/p₀`. At `s = ⌊d/p₀⌋` that is the
-`⌊n/p⌋ + 1 - n/p` of the cited statements. When `d/p₀` is an integer the reciprocal reaches `0`,
+`⌊n/p⌋ + 1 - n/p` of the cited statement. When `d/p₀` is an integer the reciprocal reaches `0`,
 the ladder reaches every finite exponent, and the Hölder exponent is free in `(0,1)`, which is
-the other case those statements separate out.
+the other case that statement separates out.
 
 ## Main declarations
 
 * `EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed_general`: the Hölder clause at a
   general base exponent.
 * `EllipticPdes.Embedding.morreyExponent_eq_ladder`: the exponent it lands on is the one the
-  cited statements name.
+  cited statement names.
 * `EllipticPdes.Embedding.exists_nnreal_morreyExponent_eq`: every Hölder exponent in `(0, 1)` is
   a Morrey exponent.
 * `EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed_even`: the free Hölder exponent in
@@ -41,7 +41,6 @@ the other case those statements separate out.
 ## References
 
 Evans, *Partial Differential Equations* (2nd ed.), §5.6.3 Theorem 6 clause (ii).
-Guo, *Partial Differential Equations*, Theorem IV.2.3 case (ii).
 -/
 
 @[expose] public section
@@ -92,7 +91,7 @@ theorem exists_holderOnWith_of_gradClosed_general (hd : 1 < d) (c : EuclideanSpa
 
 /-- **Agreement of the ladder's exponent with the cited one.** At the landing
 reciprocal `1/P = 1/p₀ - s/d`, Morrey's exponent is `s + 1 - d/p₀`, which at `s = ⌊d/p₀⌋` is the
-`⌊n/p⌋ + 1 - n/p` of Evans §5.6.3 Theorem 6 and Guo Theorem IV.2.3. -/
+`⌊n/p⌋ + 1 - n/p` of Evans §5.6.3 Theorem 6. -/
 theorem morreyExponent_eq_ladder (hd : 0 < d) {p₀ P : ℝ≥0} {s : ℕ}
     (hp₀ : 0 < (p₀ : ℝ)) (hPd : (d : ℝ) ≤ (P : ℝ))
     (hP : (P : ℝ)⁻¹ = (p₀ : ℝ)⁻¹ - (s : ℝ) * (d : ℝ)⁻¹) :
@@ -126,10 +125,11 @@ theorem exists_nnreal_morreyExponent_eq (hd : 0 < d) {γ : ℝ≥0} (hγ0 : 0 < 
   field_simp
   ring
 
-/-- **Guo's free Hölder exponent in even dimension.** When `d/2` is an integer, which at `p = 2`
-is Guo's case `n/p ∈ ℕ`, the ladder reaches every finite exponent, so the Hölder exponent may be
+/-- **Free Hölder exponent in even dimension.** When `d/2` is an integer, which at `p = 2`
+is the case `n/p ∈ ℕ` of Evans §5.6.3 Theorem 6, the ladder reaches every finite exponent, so the
+Hölder exponent may be
 any value in `(0,1)`. In odd dimension the reciprocal `1/2 - ⌊d/2⌋/d = 1/(2d)` caps the exponent
-at `2d` and the Hölder exponent at `1/2`, which is Guo's other case. -/
+at `2d` and the Hölder exponent at `1/2`, which is the other case of that theorem. -/
 theorem exists_holderOnWith_of_gradClosed_even (hd : 0 < d) (hdeven : 2 * (d / 2) = d)
     (c : EuclideanSpace ℝ (Fin d)) {r R : ℝ} (hr : 0 < r) (hrR : r < R)
     {ι : Type*} {F : ι → EuclideanSpace ℝ (Fin d) → ℝ} {nxt : ι → Fin d → ι}

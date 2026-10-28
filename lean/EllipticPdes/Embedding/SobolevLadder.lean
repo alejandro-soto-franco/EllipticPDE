@@ -13,7 +13,7 @@ public import EllipticPdes.Embedding.GagliardoNirenberg
 
 One Gagliardo-Nirenberg-Sobolev rung raises the exponent from `p` to `p'` with
 `1/p' = 1/p - 1/d`. Iterating it `s` times from `p₀` lands on `1/p₀ - s/d`, the exponent of
-Guo, *Partial Differential Equations*, Theorem IV.2.3, and `EllipticPdes.Embedding.morrey_ball`
+Evans §5.6.3 Theorem 6, and `EllipticPdes.Embedding.morrey_ball`
 asks for an exponent above `d`.
 
 The iteration is stated once, over an abstract conclusion `G s q x`, in
@@ -50,8 +50,7 @@ boundary, where an extension operator supplies the cutoff once, is the case of
 
 ## References
 
-Guo, *Partial Differential Equations*, Theorem IV.2.3.
-Evans, *Partial Differential Equations* (2nd ed.), §5.6.1 Thm 1 and §5.6.3.
+Evans, *Partial Differential Equations* (2nd ed.), §5.6.1 Thm 1 and §5.6.3 Thm 6.
 -/
 
 @[expose] public section
@@ -379,7 +378,8 @@ theorem memLp_two_mul_of_gradClosed_fullStep (hd : 0 < d) (c : EuclideanSpace �
 count, the exponent and the two radii alone, takes a uniform `L²` bound on the family over the
 outer ball to an `L^q` bound on the inner one, at every index the rungs reach.
 
-Guo's `‖u‖_{L^q} ≤ C‖u‖_{W^{k,p}}` at `p = 2` is this estimate: the bound is by the `L²` data
+The estimate `‖u‖_{L^q} ≤ C‖u‖_{W^{k,p}}` of Evans §5.6.3 Theorem 6 at `p = 2` is this one: the
+bound is by the `L²` data
 alone, uniformly over the members the rungs consume. -/
 theorem exists_const_eLpNorm_le_of_gradClosed_fullStep (hd : 0 < d)
     (c : EuclideanSpace ℝ (Fin d)) (ι : Type*) :

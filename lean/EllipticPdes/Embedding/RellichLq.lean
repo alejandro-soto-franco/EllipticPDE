@@ -20,12 +20,13 @@ Rellich-Kondrachov in the form that asks nothing of the boundary.
 
 ## Interpolation in place of mollification
 
-Guo proves the theorem by mollifying, bounding `‖u^ε - u‖_{L¹}` by `ε‖Du‖_{L¹}` uniformly over a
+The standard proof (Evans §5.7 Theorem 1) mollifies, bounding `‖u^ε - u‖_{L¹}` by `ε‖Du‖_{L¹}`
+uniformly over a
 bounded family, interpolating between `L¹` and `L^{p⋆}`, and finishing with Arzelà-Ascoli at fixed
 `ε`. The first and last moves produce compactness at the lower exponent, which
 `embL2_isCompact` already supplies here by a translation-modulus argument that needs no extension
 operator. What remains is the interpolation, `EllipticPdes.Analysis.eLpNorm_le_rpow_mul_rpow`,
-applied between `L²` and `L^{2⋆}` in place of Guo's `L¹` and `L^{p⋆}`: a finite net of the unit
+applied between `L²` and `L^{2⋆}` in place of `L¹` and `L^{p⋆}`: a finite net of the unit
 ball's image in `L²` is a net in `L^q`, since the `L^{2⋆}` seminorms of the differences are
 bounded on the ball.
 
@@ -40,7 +41,7 @@ is what `2 < q < 2⋆` amounts to, in the form the estimates use.
 
 ## References
 
-Y. Guo, *Partial Differential Equations*, Theorem IV.2.10; L. C. Evans, *Partial Differential
+L. C. Evans, *Partial Differential
 Equations* (2nd ed.), §5.7 Theorem 1.
 -/
 
@@ -214,7 +215,8 @@ def lqOfL2 [IsFiniteMeasure (volume.restrict Ω)] (hq2 : (q : ℝ≥0∞) ≤ 2)
 
 /-- **Compactness at every exponent up to `2`.** Below the `L²` exponent the embedding factors
 through `embL2`, the finite measure supplying the inclusion, so compactness is inherited rather
-than interpolated. Together with `rellichEmbL_isCompact` this covers Guo's range `1 ≤ q < 2⋆`. -/
+than interpolated. Together with `rellichEmbL_isCompact` this covers the range `1 ≤ q < 2⋆` of Evans
+§5.7 Theorem 1 at `p = 2`. -/
 theorem rellichEmbL_isCompact_of_le (hΩm : MeasurableSet Ω) (hΩb : IsBounded Ω) (hd : 2 < d)
     (hq : ((2 : ℝ≥0) : ℝ)⁻¹ - (d : ℝ)⁻¹ ≤ (q : ℝ)⁻¹) (hq2 : (q : ℝ≥0∞) ≤ 2) :
     IsCompactOperator (rellichEmbL hΩm hΩb hd hq) := by
@@ -231,7 +233,8 @@ theorem rellichEmbL_isCompact_of_le (hΩm : MeasurableSet Ω) (hΩb : IsBounded 
   rw [hfun]
   exact (embL2_isCompact hΩm hΩb).clm_comp (lqOfL2 (Ω := Ω) hq2)
 
-/-- **Rellich-Kondrachov in Guo's range.** On a bounded measurable domain in dimension greater than
+/-- **Rellich-Kondrachov below the Sobolev conjugate.** On a bounded measurable domain in dimension
+greater than
 two, the embedding `H₀¹(Ω) ↪ L^q(Ω)` is compact at every exponent `q` strictly below the Sobolev
 conjugate `2⋆`.
 

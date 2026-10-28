@@ -40,8 +40,7 @@ what `EllipticPdes.Embedding.memLp_of_gradClosed_general` separates on a ball.
 
 ## References
 
-Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem IV.2.3 case
-(i); L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.6.3 Theorem 6 clause (i).
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.6.3 Theorem 6 clause (i).
 -/
 
 @[expose] public section

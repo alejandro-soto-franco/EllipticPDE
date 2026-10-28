@@ -23,8 +23,8 @@ weak limit of a minimising sequence, and
 that takes the constraint to that limit.
 
 At `q = 2⋆` the second half fails, which `EllipticPdes.Embedding.not_isCompactOperator_critEmb`
-records, and the minimum need not be attained. That is the exponent restriction Guo writes as
-`p + 1 < 2⋆` for the semilinear problem `-Δu = u^p`, whose Euler-Lagrange equation this
+records, and the minimum need not be attained. That is the exponent restriction `p + 1 < 2⋆` for the
+semilinear problem `-Δu = u^p`, whose Euler-Lagrange equation this
 minimiser solves once the constraint is differentiated.
 
 ## Main declarations
@@ -34,7 +34,7 @@ minimiser solves once the constraint is differentiated.
 
 ## References
 
-Y. Guo, *Partial Differential Equations*, Section IX.1; L. C. Evans, *Partial Differential
+L. C. Evans, *Partial Differential
 Equations* (2nd ed.), §8.2.
 -/
 

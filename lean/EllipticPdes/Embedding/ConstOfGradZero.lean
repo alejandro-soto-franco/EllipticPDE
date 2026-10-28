@@ -14,8 +14,8 @@ public import EllipticPdes.Analysis.EuclideanFunctionalNorm
 
 Evans states this as Problem 11 of Chapter 5 and uses it in the proof of the Poincaré
 inequality of §5.8.1, where the limit of the renormalised sequence has zero weak gradient and
-must be constant to contradict its unit norm. Guo's Poincaré inequality is the `W_0^{1,p}`
-form and does not need it.
+must be constant to contradict its unit norm. The `W_0^{1,p}` form of the Poincaré inequality
+(Evans §5.6.1 Theorem 3) does not need it.
 
 The proof runs in three steps. On a ball whose double lies in the set, the mollifications of
 the class have zero classical gradient, since the mollified weak gradient is the gradient of

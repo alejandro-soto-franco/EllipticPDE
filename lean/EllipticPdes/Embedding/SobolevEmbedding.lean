@@ -19,8 +19,8 @@ For `Ω ⊆ ℝⁿ` open and bounded with `∂Ω` of class `C¹`, `p ∈ [1, ∞
 * if `k > n/p` then `u ∈ C^{k-1-⌊n/p⌋,γ}(closure Ω)` with `γ` any value in `(0,1)` when
   `n/p ∈ ℕ` and `γ = ⌊n/p⌋ - n/p + 1` otherwise, and `‖u‖_{C^{k-1-⌊n/p⌋,γ}} ≤ C‖u‖_{W^{k,p}}`.
 
-This file states both clauses at the exponents the theorem names. Theorem IV.2.3 of the lecture
-notes cited below is the form followed here.
+This file states both clauses at the exponents the theorem names. Evans §5.6.3 Theorem 6 is the
+form followed here.
 
 ## Reading `W^{k,p}` as a family
 
@@ -52,8 +52,7 @@ reciprocal to zero, the ladder reaches every finite exponent, and the Hölder ex
 
 ## References
 
-Y. Guo, *Partial Differential Equations I and II* (Course Lecture Notes), Theorem IV.2.3
-(pp. 32-33); L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.6.3 Theorem 6.
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.6.3 Theorem 6.
 -/
 
 @[expose] public section
