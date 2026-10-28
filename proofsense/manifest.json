@@ -1309,6 +1309,24 @@
       "source_id": "evans-2010",
       "locator": "App. B (Hölder's inequality)",
       "claim": "formalises Holder's inequality for conjugate exponents 1 <= p, q <= infinity with 1/p + 1/q = 1, and covers p = 1 and p = infinity: the integral over U of |uv| is at most the product of the L^p(U) and L^q(U) norms"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.holderOnWith_iff_holderSeminorm_le",
+      "source_id": "evans-2010",
+      "locator": "§5.1 Def (ii)",
+      "claim": "formalises the cited definition of the gamma-th Hölder seminorm as the supremum of |u(x) - u(y)| / |x - y|^gamma over x, y in U with x differing from y, valued in the extended non-negative reals. The statement is that Mathlib's HolderOnWith with constant C and exponent gamma on U is the inequality that this seminorm is at most C, and the converse is proved as well. Evans assumes 0 < gamma <= 1; the proof does not use the hypothesis 0 < gamma, which the statement keeps"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.holderNorm_zero",
+      "source_id": "evans-2010",
+      "locator": "§5.1 Def (ii)",
+      "claim": "formalises the case k = 0 of the cited Hölder norm, the sum over |alpha| <= 0 of the supremum norms of D^alpha u plus the sum over |alpha| = 0 of the gamma-th Hölder seminorms of D^alpha u. The only multiindex of order 0 is the zero multiindex and D^0 u is u. The norm is therefore the supremum norm plus the Hölder seminorm, Evans's definition (ii) of the norm of C^{0,gamma}. The norms are valued in the extended non-negative reals"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.mem_holderSpace_zero_iff",
+      "source_id": "evans-2010",
+      "locator": "§5.1 Def (Hölder space)",
+      "claim": "formalises the case k = 0 of the cited definition of the Hölder space C^{0,gamma}(closure U): u is in C^0(closure U) and has finite norm. The norm is finite exactly when the supremum norm is finite and the Hölder seminorm is finite, and a finite seminorm is a Hölder condition with some constant C. Evans's hypothesis 0 < gamma <= 1 is the hypothesis of the statement. The proof uses 0 < gamma and does not use gamma <= 1"
     }
   ],
   "source_divergences": [

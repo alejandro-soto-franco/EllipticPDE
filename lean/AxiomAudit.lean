@@ -513,3 +513,10 @@ assert_classical_axioms
   EllipticPdes.Analysis.CkBar.exists_extension
   EllipticPdes.Analysis.memLpLoc_one_iff
   EllipticPdes.Analysis.integral_abs_mul_le
+
+/-! ### Hölder spaces -/
+
+assert_classical_axioms
+  EllipticPdes.Analysis.holderOnWith_iff_holderSeminorm_le
+  EllipticPdes.Analysis.holderNorm_zero
+  EllipticPdes.Analysis.mem_holderSpace_zero_iff
