@@ -25,7 +25,7 @@ and the bounds that compare two exponents on a finite measure, and stops short o
 
 The consumer is compactness of the Sobolev embedding below the critical exponent: a sequence
 converging in `L²` and bounded in `L^{2⋆}` converges at every exponent between them, which is the
-step Guo's proof of Rellich-Kondrachov takes between `L¹` and `L^{p⋆}`.
+step the proof of Evans §5.7 Theorem 1 (Rellich-Kondrachov) takes between `L¹` and `L^{p⋆}`.
 
 ## Main declarations
 
@@ -35,7 +35,8 @@ step Guo's proof of Rellich-Kondrachov takes between `L¹` and `L^{p⋆}`.
 
 ## References
 
-Y. Guo, *Partial Differential Equations*, proof of Theorem IV.2.10; H. Brezis, *Functional
+L. C. Evans, *Partial Differential Equations* (2nd ed.), proof of §5.7 Theorem 1; H. Brezis,
+*Functional
 Analysis, Sobolev Spaces and Partial Differential Equations*, Remark 2 after Theorem 4.16.
 -/
 

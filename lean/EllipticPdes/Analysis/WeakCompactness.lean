@@ -40,7 +40,8 @@ working inside the closed span of the sequence.
 
 ## References
 
-Y. Guo, *Partial Differential Equations*, Theorem V.2.5.
+L. C. Evans, *Partial Differential Equations* (2nd ed.), Appendix D, Theorem 3 (the Hilbert
+space case).
 -/
 
 @[expose] public section

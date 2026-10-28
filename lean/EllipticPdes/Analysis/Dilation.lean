@@ -26,9 +26,6 @@ factors cancel, so a dilated family keeps its `L^{p⋆}` norm while its `L²` no
 * `EllipticPdes.Analysis.eLpNorm_comp_smul` and `EllipticPdes.Analysis.partialD_comp_smul`: the
   same on `ℝᵈ`.
 
-## References
-
-Y. Guo, *Partial Differential Equations*, Example IV.2.11.
 -/
 
 @[expose] public section

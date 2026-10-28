@@ -26,8 +26,8 @@ Two instances follow. At `Q W = ‖W‖²` the coefficient is `⟪U, V⟫` and t
 `⟪U, V⟫ = ‖U‖² ∫ |TU|^{q-2} (TU) (TV)`. At `Q W = B[W, W]` for a symmetric positive semidefinite
 `B` it is `B[U, V] = B[U, U] ∫ |TU|^{q-2} (TU) (TV)`. On `H₀¹(Ω)` the first gives
 `-Δu + u = λ|u|^{q-2}u`, since the graph inner product is `∫uv + ∫∇u·∇v`, and the second at the
-bilinear form of the Laplacian gives `-Δu = λ|u|^{q-2}u`, which is the equation of Guo's Section
-IX.1.
+bilinear form of the Laplacian gives `-Δu = λ|u|^{q-2}u`, which is the nonlinear eigenvalue
+equation of Evans §8.4.1.
 
 The argument is Fermat's theorem applied to `g(t) = Q (U + tV) - Q U ‖T(U + tV)‖²_{L^q}`, which
 vanishes at `t = 0` and is nonnegative everywhere: rescaling `U + tV` to the constraint set is
@@ -44,8 +44,7 @@ rule through `x ↦ x^{2/q}` turns that into the derivative of the squared `L^q`
 
 ## References
 
-Y. Guo, *Partial Differential Equations*, Section IX.1; L. C. Evans, *Partial Differential
-Equations* (2nd ed.), §8.4.1.
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §8.4.1.
 -/
 
 @[expose] public section

@@ -34,8 +34,7 @@ at the origin, where `q > 1` makes `|·|^q` differentiable with derivative zero.
 
 ## References
 
-Y. Guo, *Partial Differential Equations*, Section IX.1; L. C. Evans, *Partial Differential
-Equations* (2nd ed.), §8.1.2.
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §8.1.2.
 -/
 
 @[expose] public section
