@@ -148,11 +148,14 @@ def _states(text: str, kind: str, num: str) -> bool:
 # The warrants are one record of what the library leans on and the docstrings
 # are another, and a statement cited in one and absent from the source is the
 # same defect wherever it sits.
+# The stretch between the title and the statement takes an edition, a year and a
+# section, `(2nd ed.), §6.3.1,`, and may wrap onto the next docstring line. The
+# author pattern is case-sensitive and skips a lowercase word before an italic.
 _DOCSTRING_CITE_RE = re.compile(
-    r"(?P<author>[A-Z][\w-]+(?:\s+(?:and|&)\s+[A-Z][\w-]+)?)\s*,\s*\*[^*]+\*[^.\n]*?"
-    r"(?P<kind>Theorem|Thm|Lemma|Corollary|Proposition|Remark|Definition)\s*"
+    r"(?P<author>[A-Z][\w-]+(?:\s+(?:and|&)\s+[A-Z][\w-]+)?)\s*,\s*\*[^*\n]+\*"
+    r"(?P<gap>(?:[^*\n]|\n[ \t]*(?=\S)){0,80}?)"
+    r"(?P<kind>(?i:Theorem|Thm|Lemma|Corollary|Proposition|Remark|Definition))\s*"
     r"(?P<num>[0-9IVX]+(?:\.[0-9]+)*)",
-    re.IGNORECASE,
 )
 
 _AUTHOR_SOURCE = {"evans": "evans-2010", "gilbarg": "gilbarg-2001", "trudinger": "gilbarg-2001",
@@ -161,21 +164,23 @@ _AUTHOR_SOURCE = {"evans": "evans-2010", "gilbarg": "gilbarg-2001", "trudinger":
                   "fernandez": "fernandezreal-2023-reg-the-ell"}
 
 
-def _docstring_citations() -> list[tuple[str, str, str, str]]:
-    """Every `(source_id, kind, number, file)` a Lean docstring cites.
+def _docstring_citations() -> list[tuple[str, str, str, str, str | None]]:
+    """Every `(source_id, kind, number, file, section)` a Lean docstring cites.
 
     An author with no source id comes back as `unknown:<author>`."""
     lean = ROOT / "lean" / "EllipticPdes"
     if not lean.is_dir():
         return []
-    out: list[tuple[str, str, str, str]] = []
+    out: list[tuple[str, str, str, str, str | None]] = []
     for path in sorted(lean.rglob("*.lean")):
         text = path.read_text(encoding="utf-8")
         for m in _DOCSTRING_CITE_RE.finditer(text):
             author = re.split(r"[\s-]", m.group("author"))[0].lower()
             src = _AUTHOR_SOURCE.get(author, f"unknown:{m.group('author')}")
+            secs = _SECTION_RE.findall(m.group("gap"))
+            sec = secs[-1] if secs else None
             out.append((src, _KIND_WORD[m.group("kind").lower()], m.group("num"),
-                        str(path.relative_to(ROOT))))
+                        str(path.relative_to(ROOT)), sec))
     return out
 
 
@@ -234,13 +239,13 @@ def audit(only: str | None = None) -> list[str]:
                 f"({', '.join(decls[:3])})")
 
     # The same question of the docstrings, which cite the literature directly.
-    seen_doc: set[tuple[str, str, str]] = set()
-    for src, kind, num, where in _docstring_citations():
+    seen_doc: set[tuple[str, str, str, str | None]] = set()
+    for src, kind, num, where, section in _docstring_citations():
         if only and src != only:
             continue
-        if (src, kind, num) in seen_doc:
+        if (src, kind, num, section) in seen_doc:
             continue
-        seen_doc.add((src, kind, num))
+        seen_doc.add((src, kind, num, section))
         if src.startswith("unknown:"):
             findings.append(f"{where}: the docstring cites {src[8:]}, an unknown source")
             continue
@@ -252,9 +257,14 @@ def audit(only: str | None = None) -> list[str]:
         text = texts[src]
         if text is None or not _numbering_style(text, kind):
             continue
-        if not _states(text, kind, num):
+        # A bare number is section-local here as in a warrant locator.
+        scope = text
+        if section and "." not in num:
+            scope = _section_slice(text, section) or text
+        if not _states(scope, kind, num):
+            at = f" in section {section}" if section and "." not in num else ""
             findings.append(
-                f"{where}: the docstring cites {kind} {num} of {src}, "
+                f"{where}: the docstring cites {kind} {num}{at} of {src}, "
                 f"which the source does not number")
     return findings
 
@@ -275,7 +285,7 @@ def main(argv: list[str]) -> int:
         return 1
     if verbose:
         print(f"  checked {total} warrant locators and "
-              f"{len({(a, b, c) for a, b, c, _ in _docstring_citations()})} "
+              f"{len({(a, b, c, e) for a, b, c, _, e in _docstring_citations()})} "
               f"docstring citations")
     print("locators: every citation names a statement its source numbers.")
     print("         (existence only; what a statement says is read by a person)")

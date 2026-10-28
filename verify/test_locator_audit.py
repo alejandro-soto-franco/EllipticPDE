@@ -173,3 +173,56 @@ def test_initialled_gilbarg_trudinger_citation_resolves(manifest, tmp_path):
         "/-- D. Gilbarg and N. S. Trudinger, *Elliptic PDE of Second Order* (2001), Theorem 8.3. -/\n"
         "theorem t : True := trivial\n", encoding="utf-8")
     assert la.audit() == []
+
+
+def _evans_ocr(blocks):
+    (la.OCR / "evans-2010-par-dif-equ.jsonl").write_text(
+        json.dumps({"page": 1, "blocks": [{"text": t} for t in blocks]}) + "\n", encoding="utf-8")
+
+
+def test_an_evans_docstring_citation_with_edition_and_section_is_checked(manifest, tmp_path):
+    """`(2nd ed.), §6.3.1, Theorem 9` must reach the audit, and a bare number is section-local."""
+    manifest([], "unused")
+    _evans_ocr(["6.3.1. Interior regularity.", "THEOREM 1 (Interior H2-regularity).",
+                "6.3.2. Boundary regularity.", "THEOREM 9 (Elsewhere)."])
+    lean = tmp_path / "lean" / "EllipticPdes"
+    lean.mkdir(parents=True)
+    (lean / "A.lean").write_text(
+        "/-- Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 9 asks. -/\n"
+        "theorem t : True := trivial\n", encoding="utf-8")
+    findings = la.audit()
+    assert findings and "9" in findings[0]
+
+
+def test_an_unknown_author_with_an_edition_is_reported(manifest, tmp_path):
+    manifest([], "unused")
+    lean = tmp_path / "lean" / "EllipticPdes"
+    lean.mkdir(parents=True)
+    (lean / "A.lean").write_text(
+        "/-- Kufner, *Weighted Sobolev Spaces* (2nd ed.), Theorem 3.4 asks. -/\n"
+        "theorem t : True := trivial\n", encoding="utf-8")
+    findings = la.audit()
+    assert findings and "unknown source" in findings[0]
+
+
+def test_a_lowercase_word_before_an_italic_is_not_an_author(manifest, tmp_path):
+    manifest([], "unused")
+    lean = tmp_path / "lean" / "EllipticPdes"
+    lean.mkdir(parents=True)
+    (lean / "A.lean").write_text(
+        "/-- the bound, *uniform* in the family, gives Theorem 2. -/\n"
+        "theorem t : True := trivial\n", encoding="utf-8")
+    assert la.audit() == []
+
+
+def test_the_section_nearest_the_statement_scopes_it(manifest, tmp_path):
+    """`§6.1.2 (pp. 313-315) and §6.3.1 Theorem 3` cites Theorem 3 of §6.3.1."""
+    manifest([], "unused")
+    _evans_ocr(["6.1.2. Weak solutions.", "6.3.1. Interior regularity.", "THEOREM 3 (Infinite differentiability)."])
+    lean = tmp_path / "lean" / "EllipticPdes"
+    lean.mkdir(parents=True)
+    (lean / "A.lean").write_text(
+        "/-- Evans, *Partial Differential Equations* (2nd ed.), §6.1.2 (pp. 313-315) and §6.3.1\n"
+        "Theorem 3 (p. 334). -/\n"
+        "theorem t : True := trivial\n", encoding="utf-8")
+    assert la.audit() == []
