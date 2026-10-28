@@ -342,12 +342,12 @@ EXEMPT = {
     "EllipticPdes.Extension.exists_extension_subset": (
         "clauses (i) and (ii) of Evans 5.4 Theorem 1 together: the extension agrees with the class "
         "on the domain and is supported inside any open set the closure of the domain sits in. "
-        "Evans reaches (ii) by multiplying by a cutoff equal to one on the domain, which is what "
-        "this does. exists_extension_subset_bound adds clause (iii), the norm bound. Neither builds the "
+        "Evans asserts (ii) in one sentence of the gluing step; this reaches it by multiplying "
+        "by a cutoff equal to one on the domain. exists_extension_subset_bound adds clause (iii), the norm bound. Neither builds the "
         "operator as a bounded linear map, so each statement is an existence with an estimate"
     ),
     "EllipticPdes.Extension.exists_extension": (
-        "the last step of the proof of Evans 5.4 Theorem 1, the sum of the local extensions against a partition of "
+        "the gluing step of the proof of Evans 5.4 Theorem 1, the sum of the local extensions against a partition of "
         "unity, which extends the class across the whole boundary and agrees with it on the "
         "domain. That is clause (i) of the theorem together with the existence of the extension's "
         "weak gradient; exists_extension_subset states clause (ii) on the support and "
@@ -358,7 +358,7 @@ EXEMPT = {
         "the local half of clause (iii) of Evans 5.4 Theorem 1, at every exponent p >= 1: near a "
         "boundary point the extension is bounded by the class and its gradient over the "
         "domain, with a constant reading off the chart alone. Evans 5.4 Theorem 1 "
-        "proves the local bound inside the proof of the assembled operator and state no "
+        "proves the local bound inside the proof of the assembled operator and states no "
         "lemma for a single chart, so no transcribed statement matches it"
     ),
     "EllipticPdes.Extension.exists_localExtension": (
@@ -369,7 +369,7 @@ EXEMPT = {
         "off it; every step here is a weak gradient"
     ),
     "EllipticPdes.Extension.nonempty_boundaryPartition": (
-        "the cover and the partition of unity that the last step of the proof of Evans 5.4 "
+        "the cover and the partition of unity that the gluing step of the proof of Evans 5.4 "
         "Theorem 1 glues with, bundled. Evans takes the partition for granted in one clause of "
         "that step and states no "
         "lemma for it, so no transcribed statement matches it. Mathlib proves the partition for "
@@ -377,7 +377,7 @@ EXEMPT = {
         "back as ContDiff so that nothing downstream meets a manifold"
     ),
     "EllipticPdes.Extension.exists_finite_chart_cover": (
-        "the finite subcover of the boundary that opens the last step of the proof of Evans 5.4 "
+        "the finite subcover of the boundary that opens the gluing step of the proof of Evans 5.4 "
         "Theorem 1, where he writes that the boundary being compact there are finitely many points whose "
         "neighbourhoods cover it. That is a step of a proof rather than a statement of its own, "
         "so no transcribed statement matches it. The dimension is asked to be positive, since a "
@@ -599,17 +599,16 @@ EXEMPT = {
     ),
 }
 
-# A statement locator names one statement, never a whole section. Three forms
+# A statement locator names one statement, never a whole section. Four forms
 # name one, and a bare section number names none of them:
 #
 #   §6.3.1 Thm 1                  a numbered result inside a numbered section
 #   §7.11 Lemma 7.23              a result numbered by chapter inside a numbered section
-#   §I.2 Lemma I.2.4              the same with the chapter in roman numerals
 #   §1.1 Thm (Sobolev inequality) a named result in a section that numbers none
 #   App. A (H3)                   a labelled property in a lettered appendix
 #
 # The chapter-numbered form arrived with Gilbarg and Trudinger, who number every
-# result by chapter, and the roman form with lecture notes whose chapters are roman. The named and lettered forms arrived with the Fernandez-Real and Ros-Oton text,
+# result by chapter. The named and lettered forms arrived with the Fernandez-Real and Ros-Oton text,
 # which numbers its appendix properties (H1) to (H8) and leaves several chapter
 # theorems unnumbered. Restricting the rule to the first form would have forced
 # a warrant for either to cite the enclosing section, which is the failure this

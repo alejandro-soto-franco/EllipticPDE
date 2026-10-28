@@ -32,7 +32,7 @@ operator is bounded in the sense the theorem asserts at every exponent, and not 
 
 ## References
 
-L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.4 Theorem 1 (p. 253).
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.4 Theorem 1 (p. 268).
 -/
 
 @[expose] public section
@@ -94,7 +94,7 @@ theorem extLinear_spec (hΩopen : IsOpen Ω) (hΩb : Bornology.IsBounded Ω)
   simp only [extLinear_fst, extLinear_snd]
   exact hK w.1 w.2 hu hgi hwg
 
-/-- **Evans's extension operator** (§5.4 Theorem 1, p. 253). On a bounded domain with `C¹`
+/-- **Evans's extension operator** (§5.4 Theorem 1, p. 268). On a bounded domain with `C¹`
 boundary, and for any open set the closure of the domain sits in, there is one `ℝ`-linear map
 and one constant such that every class with a weak gradient on the domain goes to a class with
 a weak gradient on the whole space, agreeing with it on the domain, supported inside that open

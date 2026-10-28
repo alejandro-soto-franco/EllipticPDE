@@ -15,10 +15,10 @@ public import EllipticPdes.Regularity.CoeffCk
 
 `EllipticPdes.Regularity.differentiated_weakForm_of_weakSolution` discharges every hypothesis
 of the differentiated identity except the weak `ℓ`-derivative of the datum, for `C²` principal
-and `C¹` lower-order coefficients. The induction in the proof of Evans, *Partial Differential
-Equations* (2nd ed.), §6.3.1
-Theorem 2 runs instead on `W^{k+2,∞}` and `W^{k+1,∞}` coefficients, and
-`differentiated_weakForm_of_weakSolution_wkInfty` is the bridge under that hypothesis.
+and `C¹` lower-order coefficients. Evans, *Partial Differential Equations* (2nd ed.), §6.3.1
+Theorem 2 asks `C^{m+1}` coefficients. The development weakens that to `W^{k+2,∞}` principal
+and `W^{k+1,∞}` lower-order coefficients, and `differentiated_weakForm_of_weakSolution_wkInfty`
+is the bridge under that hypothesis.
 
 One hypothesis on the principal part remains beyond the bundles. The interior `H²`
 estimate is proved by difference quotients, which asks the Lipschitz estimate of

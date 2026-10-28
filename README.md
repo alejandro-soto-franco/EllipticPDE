@@ -419,7 +419,7 @@ named without their `EllipticPdes.` prefix.
   Because the chart asks nothing of the gradient of its graph, the proof uses the
   bounded graph from `exists_bounded_graph`, whose region agrees with the chart's on
   exactly the ball in play.
-- The sum that glues those pieces in the last step of that proof as
+- The sum that glues those pieces in the gluing step of that proof as
   `EllipticPdes.Extension.exists_extension`: on a bounded open domain with $C^1$
   boundary, a class with a weak gradient on $\Omega$ extends to one with a weak gradient
   on $\mathbb{R}^d$ agreeing with it on $\Omega$. Each piece is a local extension cut

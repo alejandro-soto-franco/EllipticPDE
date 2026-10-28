@@ -14,10 +14,10 @@ public import EllipticPdes.Existence.Garding
 
 `EllipticPdes.Sobolev.FullEllipticOp` gives `b` and `c` sup bounds and measurability and no
 derivatives at all, which is everything the existence theory and the interior `H²` estimate
-need. The higher interior regularity theorem (Evans §6.3.1 Theorem 2) asks for `a_{ij} ∈ W^{k+2,∞}`
-and `b_i, c ∈ W^{k+1,∞}`, one order less on the lower-order
-coefficients than on the principal part, because the lower-order terms are differentiated once
-less often on the way to the same conclusion. This file supplies the missing hypothesis.
+need. The higher interior regularity theorem (Evans §6.3.1 Theorem 2) asks `a^{ij}, b^i, c ∈
+C^{m+1}`, the same order for every coefficient. Its induction differentiates the lower-order
+terms once less often than the principal part, so the development asks `b_i, c ∈ W^{k+1,∞}`
+beside `a_{ij} ∈ W^{k+2,∞}`. This file supplies that hypothesis.
 
 ## Scalar predicate and bundle
 

@@ -49,7 +49,7 @@ graph and the cutoff depend on the chart and the two radii alone, so the constan
 
 ## References
 
-L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.4 Theorem 1 (p. 253), local step of
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.4 Theorem 1 (p. 268), local step of
 the proof.
 -/
 

@@ -37,7 +37,7 @@ extensions requires.
 
 ## References
 
-L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.4 Theorem 1 (p. 253), gluing step of
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.4 Theorem 1 (p. 268), gluing step of
 the proof.
 -/
 

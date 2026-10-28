@@ -37,7 +37,7 @@ there because `‖y‖² = ‖y'‖² + y_d²` with `y_d < 0`.
 
 ## References
 
-L. C. Evans, *Partial Differential Equations* (2nd ed.), §C.1 (p. 665).
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §C.1 (p. 704).
 -/
 
 @[expose] public section

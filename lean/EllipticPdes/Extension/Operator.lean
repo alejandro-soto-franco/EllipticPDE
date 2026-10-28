@@ -23,9 +23,9 @@ the class, so the piece equals `Pᵢ u` there and off the ball both sides vanish
 add to `u` because the partition adds to one. Every piece is a linear map on pairs of a class and
 a gradient, so the sum is.
 
-The support clause follows by one more cutoff, which is how the theorem reaches it: any open set the
-closure of the domain sits in admits a smooth cutoff equal to one on that closure, and
-multiplying by it moves the support inside without disturbing the agreement.
+Evans asserts the support clause in one sentence of the gluing step. Here it follows by one more
+cutoff: any open set the closure of the domain sits in admits a smooth cutoff equal to one on
+that closure, and multiplying by it moves the support inside without disturbing the agreement.
 
 ## Constant of clause (iii)
 
@@ -48,7 +48,7 @@ gradient by the class and its gradient over the domain.
 
 ## References
 
-L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.4 Theorem 1 (p. 253), gluing step of
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.4 Theorem 1 (p. 268), gluing step of
 the proof.
 -/
 

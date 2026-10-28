@@ -40,7 +40,7 @@ of the theorem are read off `exists_extLinear` through the representatives.
 
 ## References
 
-L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.4 Theorem 1 (p. 253).
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §5.4 Theorem 1 (p. 268).
 -/
 
 @[expose] public section

@@ -12,7 +12,7 @@ public import EllipticPdes.Extension.BoundaryChart
 # Domains with `C¹` boundary
 
 The extension operator asks that the boundary be `C¹`, and this file states that hypothesis as
-Evans states it (§C.1, p. 665): the boundary `∂U` is `C^k` when for each `x⁰ ∈ ∂U` there are
+Evans states it (§C.1, p. 704): the boundary `∂U` is `C^k` when for each `x⁰ ∈ ∂U` there are
 `r > 0` and a `C^k` function `γ : ℝ^{n-1} → ℝ` such that, upon relabelling and reorienting the
 coordinate axes if necessary, `U ∩ B(x⁰, r) = {x ∈ B(x⁰, r) | xₙ > γ(x₁, …, x_{n-1})}`.
 
@@ -44,8 +44,8 @@ the chart constrains nothing.
 
 ## References
 
-L. C. Evans, *Partial Differential Equations* (2nd ed.), §C.1 (p. 665) and §5.4 Theorem 1
-(p. 253).
+L. C. Evans, *Partial Differential Equations* (2nd ed.), §C.1 (p. 704) and §5.4 Theorem 1
+(p. 268).
 -/
 
 @[expose] public section

@@ -33,7 +33,7 @@ space for the sum of the second coordinate partials.
 ## References
 
 D. Gilbarg and N. S. Trudinger, *Elliptic Partial Differential Equations of Second Order*,
-§2.2 Theorems 2.2 and 2.3; uniqueness for the Dirichlet problem follows from Theorem 2.3.
+§2.2 Theorems 2.2, 2.3 and 2.4.
 -/
 
 @[expose] public section
