@@ -525,3 +525,11 @@ assert_classical_axioms
 
 assert_classical_axioms
   EllipticPdes.Analysis.arzela_ascoli
+
+/-! ### Classification of partial differential equations -/
+
+assert_classical_axioms
+  EllipticPdes.Analysis.isSolution_iff_of_isLinear
+  EllipticPdes.Analysis.IsLinear.isSemilinear
+  EllipticPdes.Analysis.IsSemilinear.isQuasilinear
+  EllipticPdes.Analysis.isFullyNonlinear_sq

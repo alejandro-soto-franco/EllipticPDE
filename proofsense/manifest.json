@@ -1333,6 +1333,30 @@
       "source_id": "evans-2010",
       "locator": "App. C (Arzela-Ascoli compactness criterion)",
       "claim": "formalises the cited criterion on R^n for a sequence of real functions. The sequence is bounded by a constant M and uniformly equicontinuous in Evans's sense: for each epsilon there is one delta that serves every index. Some subsequence converges uniformly on every compact set to a continuous function. The dimension is any natural number, the domain is EuclideanSpace R (Fin d), and the proof applies Mathlib's Arzela-Ascoli theorem to the closed family of continuous functions with the bound and a fixed modulus of continuity"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.isSolution_iff_of_isLinear",
+      "source_id": "evans-2010",
+      "locator": "§1.1 Def (partial differential equation)",
+      "claim": "formalises Evans's definition of a solution of a k-th order equation F(D^k u, ..., Du, u, x) = 0 on U, here for a linear F given by coefficients a_alpha and a right side f, and proves that u solves it exactly when the sum of a_alpha(x) D^alpha u(x) equals f(x) for every x in U. The jet of u at x is the function on the multi-indices of order at most k with values D^alpha u(x). For u of class C^k this determines Evans's arrays D^j u by the symmetry of second derivatives. Evans fixes k at least 1 and the definition admits every k. The dimension is any natural number and the converse direction is proved as well"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.IsLinear.isSemilinear",
+      "source_id": "evans-2010",
+      "locator": "§1.1 Def (linear, semilinear, quasilinear, fully nonlinear)",
+      "claim": "formalises the cited inclusion of the linear equations in the semilinear ones. A linear F is a sum of a_alpha(x) D^alpha u over all multi-indices of order at most k minus f(x). The lower-order terms and f are moved into the function a_0 of the derivatives of order below k and of x, and the coefficients of the top-order terms are kept. The jet is indexed by the multi-indices of order at most k. The order k is any natural number"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.IsSemilinear.isQuasilinear",
+      "source_id": "evans-2010",
+      "locator": "§1.1 Def (linear, semilinear, quasilinear, fully nonlinear)",
+      "claim": "formalises the cited inclusion of the semilinear equations in the quasilinear ones. A semilinear F has top-order coefficients a_alpha(x) and a lower-order term a_0. The same F is quasilinear with the coefficients regarded as functions of the derivatives of order below k that happen to ignore that argument. The jet is indexed by the multi-indices of order at most k and the order k is any natural number"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.isFullyNonlinear_sq",
+      "source_id": "evans-2010",
+      "locator": "§1.1 Def (linear, semilinear, quasilinear, fully nonlinear)",
+      "claim": "formalises the cited example of a fully nonlinear equation, here the first order equation (partial_i u)^2 = 0 in any dimension with an index i. Fully nonlinear means not quasilinear. Evans states it as dependence of F on the highest order derivatives that is nonlinear. The proof evaluates an assumed quasilinear form at the jets with the value t in slot i and zero elsewhere, for t = -1 and t = 0 and t = 1. These agree below order 1. The second difference of the right side is 0 and that of the left side is 2"
     }
   ],
   "source_divergences": [
