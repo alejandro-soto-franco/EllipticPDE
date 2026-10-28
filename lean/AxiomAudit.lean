@@ -458,3 +458,13 @@ assert_classical_axioms
   EllipticPdes.Sobolev.hasWeakDeriv_single_iff
   EllipticPdes.Sobolev.hasWeakGradOn_iff_forall_hasWeakDeriv
   EllipticPdes.Regularity.HasIteratedWeakDerivOn.hasWeakDerivList
+
+/-! ### The space `W^{k,p}(U)` -/
+
+assert_classical_axioms
+  EllipticPdes.Sobolev.Wkp.completeSpace
+  EllipticPdes.Sobolev.mem_Wkp_iff
+  EllipticPdes.Sobolev.norm_Wkp_eq
+  EllipticPdes.Sobolev.norm_Wkp_top_le
+  EllipticPdes.Sobolev.sum_le_card_mul_norm_Wkp_top
+  EllipticPdes.Sobolev.Wkp_zero_eq_top

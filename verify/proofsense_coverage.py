@@ -39,6 +39,19 @@ MANIFEST = ROOT / "proofsense" / "manifest.json"
 # that no transcribed statement matches it, which the README under
 # proofsense/ has to justify in prose.
 EXEMPT = {
+    "EllipticPdes.Sobolev.norm_Wkp_top_le": (
+        "the p = infinity case of the norm in the definition of W^{k,p}; one half of the "
+        "equivalence between the maximum of the coordinate norms and Evans's sum, which the "
+        "source states without a separate lemma"
+    ),
+    "EllipticPdes.Sobolev.sum_le_card_mul_norm_Wkp_top": (
+        "the p = infinity case of the norm in the definition of W^{k,p}; the other half of the "
+        "equivalence between the maximum of the coordinate norms and Evans's sum, which the "
+        "source states without a separate lemma"
+    ),
+    "EllipticPdes.Sobolev.Wkp_zero_eq_top": (
+        "the observation that W^{0,p}(U) is L^p(U), which the source uses without stating it"
+    ),
     "EllipticPdes.Sobolev.hasWeakDeriv_single_iff": (
         "bridge to the distributional line derivative; states no source result"
     ),

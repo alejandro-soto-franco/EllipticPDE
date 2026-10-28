@@ -1213,6 +1213,24 @@
       "source_id": "evans-2010",
       "locator": "§5.2.1 Def (weak derivative)",
       "claim": "formalises the integration by parts identity that motivates the definition: for a smooth function u, the classical derivative D^alpha u satisfies the defining identity of a weak alpha-th derivative, with the sign (-1)^{|alpha|} and the test function differentiated alpha times. Evans takes u in C^k(U) and phi in C_c^infinity(U). The declaration takes u smooth on all of R^n and writes D^alpha u as the iterated partial derivative along the reversed list of directions. That order is the one the integrations by parts produce"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.Wkp.completeSpace",
+      "source_id": "evans-2010",
+      "locator": "§5.2.3 Thm 2",
+      "claim": "formalises the completeness clause of the cited theorem for every k and every p in [1, infinity]: W^{k,p}(U) is a complete normed space, here for the ell^p product norm on the graph of the weak derivatives. The graph is the common kernel of continuous functionals, each continuous by Holder's inequality against a compactly supported smooth function. A closed subspace of the complete product of L^p(U) spaces is complete. Evans argues by Cauchy sequences, which the closedness replaces"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.mem_Wkp_iff",
+      "source_id": "evans-2010",
+      "locator": "§5.2.2 Def (Sobolev space W^{k,p})",
+      "claim": "formalises the definition of W^{k,p}(U) as the set of locally integrable u whose weak derivatives D^alpha u, for |alpha| at most k, exist in L^p(U). The declaration states it on the graph in L^p(U) to the power of the number of multi-indices: an element belongs to the space exactly when each coordinate alpha is the weak alpha-th derivative of coordinate 0 on U, for every multi-index of order at most k and every p in [1, infinity]"
+    },
+    {
+      "decl": "EllipticPdes.Sobolev.norm_Wkp_eq",
+      "source_id": "evans-2010",
+      "locator": "§5.2.2 Def (Sobolev space W^{k,p})",
+      "claim": "formalises the norm of the cited definition for p < infinity: the p-th root of the sum over |alpha| at most k of the p-th powers of the L^p norms of D^alpha u. The case p = infinity, where Evans sums the L^infinity norms, is covered by the equivalence lemmas norm_Wkp_top_le and sum_le_card_mul_norm_Wkp_top. The graph norm there is the maximum"
     }
   ],
   "source_divergences": [
