@@ -1357,6 +1357,30 @@
       "source_id": "evans-2010",
       "locator": "§1.1 Def (linear, semilinear, quasilinear, fully nonlinear)",
       "claim": "formalises clause (iv), the dependence of F nonlinearly upon the highest order derivatives. Reading fully nonlinear as not quasilinear is a formalisation choice. The theorem proves that the first order equation (partial_i u)^2 = 0 is fully nonlinear in that sense, in any dimension with an index i. The example is the library's own witness. Evans states only the definition. The proof evaluates an assumed quasilinear form at the jets with the value t in slot i and zero elsewhere, for t = -1 and t = 0 and t = 1. These agree below order 1. The second difference of the right side is 0 and that of the left side is 2"
+    },
+    {
+      "decl": "EllipticPdes.Extension.hasCkBoundary_one_iff",
+      "source_id": "evans-2010",
+      "locator": "App. C (Def C^k boundary)",
+      "claim": "formalises Evans's definition of a C^k boundary at k = 1 and proves that it is the hypothesis the library's extension theorem already uses. For each boundary point there are a radius r > 0 and a C^1 function gamma with the following property. After a relabelling and reorientation of the axes the domain meets the ball of radius r exactly where x_n > gamma(x_1, ..., x_{n-1}). The set is any subset of R^n, which includes Evans's open bounded U, and the dimension is any natural number. The converse direction is proved as well"
+    },
+    {
+      "decl": "EllipticPdes.Extension.HasCkBoundary.mono",
+      "source_id": "evans-2010",
+      "locator": "App. C (Def C^k boundary)",
+      "claim": "formalises the monotonicity of Evans's definition of a C^k boundary in k. A boundary that is C^k for some k is C^l for every l at most k, because a C^k graph is a C^l graph and the chart is otherwise unchanged. The set is any subset of R^n, the dimension is any natural number and k is any natural number"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.inv_sobolevConj",
+      "source_id": "evans-2010",
+      "locator": "§5.6.1 Def (Sobolev conjugate)",
+      "claim": "formalises the first consequence Evans notes after the definition of the Sobolev conjugate p* = np/(n - p) for 1 <= p < n: the reciprocal satisfies 1/p* = 1/p - 1/n. The exponents are nonnegative reals with 1 <= p < n as in Evans. The identity has the hypothesis form of the Gagliardo-Nirenberg-Sobolev theorem in the library"
+    },
+    {
+      "decl": "EllipticPdes.Embedding.lt_sobolevConj",
+      "source_id": "evans-2010",
+      "locator": "§5.6.1 Def (Sobolev conjugate)",
+      "claim": "formalises the second consequence Evans notes after the definition of the Sobolev conjugate p* = np/(n - p) for 1 <= p < n: p* > p. The exponents are nonnegative reals with 1 <= p < n, as in Evans"
     }
   ],
   "source_divergences": [

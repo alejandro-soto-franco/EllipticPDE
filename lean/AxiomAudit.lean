@@ -533,3 +533,12 @@ assert_classical_axioms
   EllipticPdes.Analysis.IsLinear.isSemilinear
   EllipticPdes.Analysis.IsSemilinear.isQuasilinear
   EllipticPdes.Analysis.isFullyNonlinear_sq
+
+/-! ### C^k boundary and the Sobolev conjugate -/
+
+assert_classical_axioms
+  EllipticPdes.Extension.hasCkBoundary_one_iff
+  EllipticPdes.Extension.HasCkBoundary.mono
+  EllipticPdes.Extension.hasCkBoundary_aboveGraph
+  EllipticPdes.Embedding.inv_sobolevConj
+  EllipticPdes.Embedding.lt_sobolevConj

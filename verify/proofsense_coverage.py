@@ -39,6 +39,10 @@ MANIFEST = ROOT / "proofsense" / "manifest.json"
 # that no transcribed statement matches it, which the README under
 # proofsense/ has to justify in prose.
 EXEMPT = {
+    "EllipticPdes.Extension.hasCkBoundary_aboveGraph": (
+        "the model domain of Evans's flattening in App. C.1, stated for non-vacuity of the "
+        "C^k boundary definition"
+    ),
     "EllipticPdes.Analysis.weakConverges_iff_inner": (
         "a bridge from weak convergence against the dual to the inner-product form that "
         "exists_weakLimit states, by Riesz representation"

@@ -101,6 +101,7 @@ public import EllipticPdes.Campanato.Holder
 public import EllipticPdes.Campanato.Converse
 public import EllipticPdes.Embedding.WeakSobolev
 public import EllipticPdes.Embedding.GagliardoNirenberg
+public import EllipticPdes.Embedding.SobolevConjugate
 public import EllipticPdes.Embedding.SobolevLadder
 public import EllipticPdes.Embedding.SobolevLadderCompactSupport
 public import EllipticPdes.Embedding.HolderGeneral
@@ -112,6 +113,7 @@ public import EllipticPdes.Extension.Shear
 public import EllipticPdes.Extension.ShearWeakGrad
 public import EllipticPdes.Extension.BoundaryChart
 public import EllipticPdes.Extension.C1Boundary
+public import EllipticPdes.Extension.CkBoundary
 public import EllipticPdes.Extension.BallChart
 public import EllipticPdes.Extension.Motion
 public import EllipticPdes.Extension.Patch
