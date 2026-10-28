@@ -319,7 +319,7 @@ assert_classical_axioms
   EllipticPdes.HasWeakFDerivOn.comp_contDiff
   EllipticPdes.Embedding.hasWeakGradOn_comp
 
-/-! ### The fundamental lemma of the calculus of variations -/
+/-! ### Fundamental lemma of the calculus of variations -/
 
 assert_classical_axioms
   EllipticPdes.ae_eq_of_forall_integral_smul_eq
@@ -459,7 +459,7 @@ assert_classical_axioms
   EllipticPdes.Sobolev.hasWeakGradOn_iff_forall_hasWeakDeriv
   EllipticPdes.Regularity.HasIteratedWeakDerivOn.hasWeakDerivList
 
-/-! ### The space `W^{k,p}(U)` -/
+/-! ### Space `W^{k,p}(U)` -/
 
 assert_classical_axioms
   EllipticPdes.Sobolev.Wkp.completeSpace
