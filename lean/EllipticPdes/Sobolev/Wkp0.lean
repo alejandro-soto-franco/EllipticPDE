@@ -17,15 +17,16 @@ products of the coordinates.
 
 `W_0^{k,p}(U)` is the closure in `WkpGraph` of the graphs of the test functions of `U`. Entry
 `α` of the graph of `φ` is the `L^p` class of the classical derivative `D^α φ`. A test function
-is smooth with compact support and each entry therefore lies in `L^p(U)` for every
-`p ∈ [1, ∞]`. `W^{k,p}(U)` is closed and
-contains each graph. The closure of their span therefore lies in it and is complete.
+is smooth with compact support. Each entry lies in `L^p(U)` for every `p ∈ [1, ∞]`.
+`W^{k,p}(U)` is closed and contains each graph. The closure of their span therefore lies in it
+and is complete.
 
 ## Main declarations
 
 * `EllipticPdes.Sobolev.Hk`: the space `H^k(U) = W^{k,2}(U)`.
 * `EllipticPdes.Sobolev.inner_Hk_eq`: the inner product of `H^k(U)` is the sum over
-  `|α| ≤ k` of the `L²` inner products of the coordinates (Evans §5.2.2 Remark (i), p. 258).
+  `|α| ≤ k` of the `L²` inner products of the coordinates. Evans §5.2.2 Remark (i) (p. 258)
+  states only that `H^k(U)` is a Hilbert space.
 * `EllipticPdes.Sobolev.testGraph`: the graph of a test function in `WkpGraph`, linear in the
   function (`testGraph_add`, `testGraph_smul`, `testGraph_zero`).
 * `EllipticPdes.Sobolev.W0kp`: the space `W_0^{k,p}(U)`.

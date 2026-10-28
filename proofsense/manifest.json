@@ -1236,7 +1236,7 @@
       "decl": "EllipticPdes.Sobolev.inner_Hk_eq",
       "source_id": "evans-2010",
       "locator": "§5.2.2 Rmk (i)",
-      "claim": "formalises the remark that H^k(U) = W^{k,2}(U) is a Hilbert space. At p = 2 the norm of the definition is the square root of the sum over |alpha| at most k of the squared L^2 norms of D^alpha u. The declaration gives the inner product that induces it: the sum over the multi-indices of the L^2(U) inner products of the coordinates. Evans does not write the inner product in the remark"
+      "claim": "gives the inner product that makes H^k(U) = W^{k,2}(U) an inner product space: the sum over the multi-indices |alpha| at most k of the L^2(U) inner products of the coordinates, which induces the norm of the definition at p = 2. Completeness is Wkp.completeSpace. Evans's remark asserts the Hilbert structure without writing the inner product"
     },
     {
       "decl": "EllipticPdes.Sobolev.W0kp_le_Wkp",
