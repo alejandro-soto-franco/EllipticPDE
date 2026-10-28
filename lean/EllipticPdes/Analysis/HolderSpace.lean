@@ -44,7 +44,7 @@ noncomputable section
 
 namespace EllipticPdes.Analysis
 
-variable {d k : ℕ} {U : Set (EuclideanSpace ℝ (Fin d))} {u : EuclideanSpace ℝ (Fin d) → ℝ}
+variable {d k : ℕ} {γ : ℝ≥0} {U : Set (EuclideanSpace ℝ (Fin d))} {u : EuclideanSpace ℝ (Fin d) → ℝ}
 
 /-- **Supremum norm.** `‖u‖_{C(Ū)} = sup_{x ∈ U} |u x|`, valued in `ℝ≥0∞` so that it is `⊤`
 for an unbounded function. Evans §5.1 Def (i) (p. 254). -/
@@ -127,8 +127,8 @@ theorem holderNorm_zero (γ : ℝ≥0) :
 
 /-- The space `C^{0,γ}(Ū)` is the set of `u ∈ C^0(Ū)` that are bounded on `U` and satisfy a
 Hölder condition of exponent `γ` on `U`. Evans §5.1 Def (Hölder space) (p. 255), with his
-hypothesis `0 < γ ≤ 1`. The proof uses `0 < γ`
-and does not use `γ ≤ 1`, which the statement keeps as Evans's hypothesis. -/
+hypothesis `0 < γ ≤ 1`. The statement keeps `γ ≤ 1` as Evans's hypothesis.
+The proof uses `0 < γ` only. -/
 theorem mem_holderSpace_zero_iff (hγ : 0 < γ) (_hγ1 : γ ≤ 1) :
     u ∈ HolderSpace 0 γ U ↔ CkBar 0 U u ∧ supNorm U u < ⊤ ∧ ∃ C, HolderOnWith C γ u U := by
   have hfin : ∀ {a b : ℝ≥0∞}, a + b < ⊤ ↔ a < ⊤ ∧ b < ⊤ := ENNReal.add_lt_top

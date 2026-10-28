@@ -1314,7 +1314,7 @@
       "decl": "EllipticPdes.Analysis.holderOnWith_iff_holderSeminorm_le",
       "source_id": "evans-2010",
       "locator": "§5.1 Def (ii)",
-      "claim": "formalises the cited definition of the gamma-th Hölder seminorm as the supremum of |u(x) - u(y)| / |x - y|^gamma over x, y in U with x differing from y, valued in the extended non-negative reals. The statement is that Mathlib's HolderOnWith with constant C and exponent gamma on U is the inequality that this seminorm is at most C, and the converse is proved as well. Evans assumes 0 < gamma <= 1; the proof does not use the hypothesis 0 < gamma, which the statement keeps"
+      "claim": "formalises the cited definition of the gamma-th Hölder seminorm as the supremum of |u(x) - u(y)| / |x - y|^gamma over x, y in U with x differing from y, valued in the extended non-negative reals. The statement is that Mathlib's HolderOnWith with constant C and exponent gamma on U is the inequality that this seminorm is at most C, and the converse is proved as well. Evans assumes 0 < gamma <= 1. The statement keeps 0 < gamma and the proof does not use it"
     },
     {
       "decl": "EllipticPdes.Analysis.holderNorm_zero",
