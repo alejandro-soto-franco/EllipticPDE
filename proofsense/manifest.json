@@ -1273,6 +1273,24 @@
       "source_id": "evans-2010",
       "locator": "App. D (Def reflexive)",
       "claim": "formalises Evans's more precise form of reflexivity: the canonical map into the double dual is onto exactly when every bounded functional on the dual space is evaluation at some point of the space"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.weakConverges_of_tendsto",
+      "source_id": "evans-2010",
+      "locator": "App. D (Def weak convergence)",
+      "claim": "formalises the first fact Evans records after the definition of weak convergence: a strongly convergent sequence converges weakly to the same limit, because every bounded linear functional is continuous"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.WeakConverges.bddAbove_norm",
+      "source_id": "evans-2010",
+      "locator": "App. D (Def weak convergence)",
+      "claim": "formalises the second fact Evans records after the definition of weak convergence: a weakly convergent sequence is bounded in norm, proved through the uniform boundedness principle applied to the sequence in the double dual"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.compactlyEmbedded_iff",
+      "source_id": "evans-2010",
+      "locator": "§5.7 Def (compact embedding)",
+      "claim": "formalises the cited definition of compact embedding of X into Y: the inclusion is continuous, and every bounded sequence in X has a subsequence converging in Y. The definition adds injectivity to read X as a subset of Y. The theorem proves that a bounded linear inclusion satisfies this iff it is injective and a compact operator, with the converse direction proved as well"
     }
   ],
   "source_divergences": [

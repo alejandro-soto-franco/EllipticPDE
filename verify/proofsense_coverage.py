@@ -39,6 +39,17 @@ MANIFEST = ROOT / "proofsense" / "manifest.json"
 # that no transcribed statement matches it, which the README under
 # proofsense/ has to justify in prose.
 EXEMPT = {
+    "EllipticPdes.Analysis.weakConverges_iff_inner": (
+        "a bridge from weak convergence against the dual to the inner-product form that "
+        "exists_weakLimit states, by Riesz representation"
+    ),
+    "EllipticPdes.Sobolev.embL2_injective": (
+        "the injectivity Evans takes for granted in writing H_0^1(U) subset L^2(U) in 5.7"
+    ),
+    "EllipticPdes.Sobolev.compactlyEmbedded_embL2": (
+        "the Rellich-Kondrachov theorem of 5.7 Theorem 1 (p. 286) restated through the "
+        "definition of compact embedding; the theorem keeps its own warrant"
+    ),
     "EllipticPdes.Analysis.isReflexive_of_hilbert": (
         "Evans uses that a Hilbert space is reflexive in App. D after Theorem 3 (p. 723) without "
         "a statement; this is its proof from the Riesz representation"

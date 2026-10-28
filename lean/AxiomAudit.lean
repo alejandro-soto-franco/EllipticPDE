@@ -496,3 +496,13 @@ assert_classical_axioms
   EllipticPdes.Analysis.riesz_representation
   EllipticPdes.Analysis.isReflexive_iff
   EllipticPdes.Analysis.isReflexive_of_hilbert
+
+/-! ### Weak convergence and compact embedding -/
+
+assert_classical_axioms
+  EllipticPdes.Analysis.weakConverges_of_tendsto
+  EllipticPdes.Analysis.WeakConverges.bddAbove_norm
+  EllipticPdes.Analysis.weakConverges_iff_inner
+  EllipticPdes.Analysis.compactlyEmbedded_iff
+  EllipticPdes.Sobolev.embL2_injective
+  EllipticPdes.Sobolev.compactlyEmbedded_embL2
