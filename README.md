@@ -75,7 +75,8 @@ Each is checked against the three classical axioms in `lean/AxiomAudit.lean`.
 ## Results
 
 The first three rows are weak derivatives and Sobolev spaces on a subset of
-`EuclideanSpace ℝ (Fin d)`. The remaining rows are coordinate statements on that space for the operator
+`EuclideanSpace ℝ (Fin d)`. The fourth row identifies the dual of $L^p$ on a σ-finite measure.
+The remaining rows are coordinate statements on that space for the operator
 `EllipticPdes.Sobolev.FullEllipticOp`. The library has no `sorry`. Declarations are
 named without their `EllipticPdes.` prefix.
 
@@ -84,6 +85,7 @@ named without their `EllipticPdes.` prefix.
 | Weak derivative of every order with its uniqueness and linearity | `Sobolev.HasWeakDeriv`, `Sobolev.HasWeakDeriv.ae_eq` |
 | $W^{k,p}(U)$ for $1 \le p \le \infty$ and its completeness | `Sobolev.Wkp`, `Sobolev.Wkp.completeSpace` |
 | $H^k(U)$ and $W_0^{k,p}(U)$ | `Sobolev.Hk`, `Sobolev.W0kp`, `Sobolev.W0kp_le_Wkp` |
+| Dual of $L^p$ for $1 \le p < \infty$ | `Analysis.exists_lpDual_eq`, `Analysis.lpDualEquiv` |
 | Existence and uniqueness of the weak solution | `Sobolev.FullEllipticOp.weak_solution_L2_of_nonneg_zeroth_of_bounded` |
 | Gårding inequality | `Sobolev.FullEllipticOp.garding` |
 | Fredholm alternative: a nontrivial kernel or unique solvability for every datum | `Sobolev.FullEllipticOp.fredholm_alternative` |

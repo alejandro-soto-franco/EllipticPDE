@@ -1381,6 +1381,36 @@
       "source_id": "evans-2010",
       "locator": "§5.6.1 Def (Sobolev conjugate)",
       "claim": "formalises the second consequence Evans notes after the definition of the Sobolev conjugate p* = np/(n - p) for 1 <= p < n: p* > p. The exponents are nonnegative reals with 1 <= p < n, as in Evans"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.exists_lpDual_eq",
+      "source_id": "gilbarg-2001",
+      "locator": "§7.1 Rmk (dual of L^p)",
+      "claim": "formalises the cited remark in full on a set Omega of a finite-dimensional real space with Haar measure: for 1 <= p < infinity and 1/p + 1/q = 1, every continuous linear functional phi on L^p(Omega) is f -> integral over Omega of f g for exactly one g in L^q(Omega). Gilbarg and Trudinger recall the isomorphism without proof. The proof here covers every such p including p = 1 by the Radon-Nikodym theorem on sets of finite measure and a gluing of the densities along an exhaustion of Omega by such sets"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.lpDualMap_surjective",
+      "source_id": "gilbarg-2001",
+      "locator": "§7.1 Rmk (dual of L^p)",
+      "claim": "formalises the surjective half of the cited remark on a sigma-finite measure space: for 1 <= p < infinity and 1/p + 1/q = 1, every continuous linear functional on L^p is f -> integral of f g for some g in L^q. Gilbarg and Trudinger recall the isomorphism on a set of R^n without proof. The proof here covers a sigma-finite measure and every such p including p = 1. The finite case gives a density on each set of an increasing exhausting sequence of sets of finite measure, and Fatou's lemma puts the glued density in L^q"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.lpDualMap_surjective_of_finite",
+      "source_id": "gilbarg-2001",
+      "locator": "§7.1 Rmk (dual of L^p)",
+      "claim": "formalises the surjective half of the cited remark on a finite measure space: for 1 <= p < infinity and 1/p + 1/q = 1, every continuous linear functional phi on L^p is f -> integral of f g for some g in L^q. Gilbarg and Trudinger recall the isomorphism on a set of R^n without proof. The proof here takes the Radon-Nikodym density of the signed measure E -> phi(1_E) and puts it in L^q by Fatou's lemma. The sigma-finite case lpDualMap_surjective rests on it"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.lpDualMap_injective",
+      "source_id": "gilbarg-2001",
+      "locator": "§7.1 Rmk (dual of L^p)",
+      "claim": "formalises the injective half of the cited remark on a sigma-finite measure space: for 1/p + 1/q = 1, a function g in L^q whose integral against every f in L^p vanishes is zero. Gilbarg and Trudinger recall the isomorphism without proof. The statement here covers every p including p = infinity. The proof reads the integral of g over a set of finite measure as the functional on the indicator of the set"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.norm_le_norm_lpDualMap",
+      "source_id": "gilbarg-2001",
+      "locator": "§7.1 Rmk (dual of L^p)",
+      "claim": "formalises the step of the cited remark that bounds the inverse of the isomorphism: on a sigma-finite measure space with 1/p + 1/q = 1, the L^q norm of g is at most the norm of the functional f -> integral of f g on L^p. Gilbarg and Trudinger recall the isomorphism without proof. The bound covers every p including p = infinity. The case p = 1 tests g against sets of finite measure and uses sigma-finiteness"
     }
   ],
   "source_divergences": [

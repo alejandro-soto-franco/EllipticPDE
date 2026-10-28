@@ -550,3 +550,5 @@ assert_classical_axioms
   EllipticPdes.Analysis.lpDualMap_injective
   EllipticPdes.Analysis.norm_le_norm_lpDualMap
   EllipticPdes.Analysis.lpDualMap_surjective_of_finite
+  EllipticPdes.Analysis.lpDualMap_surjective
+  EllipticPdes.Analysis.exists_lpDual_eq

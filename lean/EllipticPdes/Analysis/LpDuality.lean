@@ -6,11 +6,14 @@ Authors: Alejandro Soto Franco
 
 module
 
+public import Mathlib.Analysis.Normed.Module.FiniteDimension
+public import Mathlib.Analysis.Normed.Operator.Banach
 public import Mathlib.MeasureTheory.Function.AEEqOfIntegral
 public import Mathlib.MeasureTheory.Function.Holder
 public import Mathlib.MeasureTheory.Function.LpSeminorm.LpNorm
 public import Mathlib.MeasureTheory.Function.LpSpace.Complete
 public import Mathlib.MeasureTheory.Function.SimpleFuncDenseLp
+public import Mathlib.MeasureTheory.Group.Measure
 public import Mathlib.MeasureTheory.VectorMeasure.Decomposition.RadonNikodym
 
 /-!
@@ -19,7 +22,9 @@ public import Mathlib.MeasureTheory.VectorMeasure.Decomposition.RadonNikodym
 Gilbarg and Trudinger state in §7.1 that the dual space of `L^p(Ω)` is isomorphic to `L^q(Ω)`
 for `1/p + 1/q = 1` and `p < ∞`. This file builds the map `L^q → (L^p)*` sending `g` to the
 functional `f ↦ ∫ f g`, proves that it is injective on a σ-finite measure space, proves the
-reverse Hölder bound `‖g‖_q ≤ ‖∫ · g‖`, and proves that the map is onto for a finite measure.
+reverse Hölder bound `‖g‖_q ≤ ‖∫ · g‖`, and proves that the map is onto for a finite measure and
+then for a σ-finite measure. The open mapping theorem makes it an isomorphism `lpDualEquiv`, and
+`exists_lpDual_eq` states it on a set of `ℝⁿ` in the form of Gilbarg and Trudinger.
 
 The surjectivity proof follows the classical route. A functional `φ` defines the signed measure
 `E ↦ φ(1_E)`, countably additive because the indicators of the partial unions converge in `L^p`
@@ -28,6 +33,12 @@ represents `φ` on indicators. The truncations of `g` at the levels `|g| ≤ n` 
 reverse Hölder bound gives them `L^q` norm at most `‖φ‖`. Fatou's lemma puts `g` in `L^q`, and
 two functionals agreeing on indicators agree on `L^p`.
 
+On a σ-finite measure the finite case gives a density `k_n` on each set `S_n` of an increasing
+exhausting sequence of sets of finite measure. The densities agree almost everywhere on the
+overlaps. Their common limit `g` has `L^q` norm at most `‖φ‖` by Fatou's lemma. The functionals
+of `g` and `φ` agree on the indicator of each `E ∩ S_n`, and continuity passes the equality to
+the indicator of `E`.
+
 ## Main declarations
 
 * `EllipticPdes.Analysis.lpDualMap`: the map `L^q → (L^p)*`, `g ↦ (f ↦ ∫ f g)`.
@@ -35,6 +46,10 @@ two functionals agreeing on indicators agree on `L^p`.
 * `EllipticPdes.Analysis.lpDualMap_injective`: injectivity on a σ-finite measure.
 * `EllipticPdes.Analysis.norm_le_norm_lpDualMap`: the reverse Hölder bound.
 * `EllipticPdes.Analysis.lpDualMap_surjective_of_finite`: surjectivity on a finite measure.
+* `EllipticPdes.Analysis.lpDualMap_surjective`: surjectivity on a σ-finite measure.
+* `EllipticPdes.Analysis.lpDualEquiv`: the isomorphism `L^q ≃ (L^p)*` on a σ-finite measure.
+* `EllipticPdes.Analysis.exists_lpDual_eq`: the form of Gilbarg and Trudinger on a set of `ℝⁿ`.
+* `EllipticPdes.Analysis.extendByZeroLp`: the extension by zero `L^p(μ|s) → L^p(μ)`.
 * `EllipticPdes.Analysis.ext_of_indicatorConstLp`: functionals on `L^p` for `p < ∞` that agree
   on the indicators of sets of finite measure are equal.
 
@@ -474,5 +489,236 @@ theorem lpDualMap_surjective_of_finite (hp : p ≠ ∞) : Function.Surjective (l
   exact integral_congr_ae (ae_restrict_of_ae (MemLp.coeFn_toLp _))
 
 end Finite
+
+/-! ### Extension by zero -/
+
+section Extend
+
+variable {s : Set α}
+
+/-- A function of `L^p(μ|s)` extended by zero off `s` lies in `L^p(μ)`. -/
+theorem memLp_indicator_restrict (hs : MeasurableSet s) (f : Lp ℝ p (μ.restrict s)) :
+    MemLp (s.indicator f) p μ :=
+  (memLp_indicator_iff_restrict hs).2 (Lp.memLp f)
+
+variable [Fact (1 ≤ p)]
+
+variable (μ p) in
+/-- **Extension by zero.** The continuous linear map `L^p(μ|s) → L^p(μ)` that extends a function
+by zero off the measurable set `s`. -/
+def extendByZeroLp (hs : MeasurableSet s) : Lp ℝ p (μ.restrict s) →L[ℝ] Lp ℝ p μ :=
+  LinearMap.mkContinuous
+    { toFun := fun f => (memLp_indicator_restrict hs f).toLp _
+      map_add' := fun f g => by
+        refine Lp.ext ?_
+        filter_upwards [(memLp_indicator_restrict hs (f + g)).coeFn_toLp,
+          Lp.coeFn_add ((memLp_indicator_restrict hs f).toLp _)
+            ((memLp_indicator_restrict hs g).toLp _),
+          (memLp_indicator_restrict hs f).coeFn_toLp, (memLp_indicator_restrict hs g).coeFn_toLp,
+          (ae_restrict_iff' hs).1 (Lp.coeFn_add f g)] with x h1 h2 h3 h4 h5
+        rw [h1, h2, Pi.add_apply, h3, h4]
+        by_cases hx : x ∈ s
+        · rw [indicator_of_mem hx, indicator_of_mem hx, indicator_of_mem hx, h5 hx, Pi.add_apply]
+        · simp [indicator_of_notMem hx]
+      map_smul' := fun c f => by
+        refine Lp.ext ?_
+        filter_upwards [(memLp_indicator_restrict hs (c • f)).coeFn_toLp,
+          Lp.coeFn_smul c ((memLp_indicator_restrict hs f).toLp _),
+          (memLp_indicator_restrict hs f).coeFn_toLp,
+          (ae_restrict_iff' hs).1 (Lp.coeFn_smul c f)] with x h1 h2 h3 h4
+        rw [h1, RingHom.id_apply, h2, Pi.smul_apply, h3]
+        by_cases hx : x ∈ s
+        · rw [indicator_of_mem hx, indicator_of_mem hx, h4 hx, Pi.smul_apply]
+        · simp [indicator_of_notMem hx] }
+    1 fun f => by
+      simp only [LinearMap.coe_mk, AddHom.coe_mk, one_mul]
+      rw [Lp.norm_toLp, eLpNorm_indicator_eq_eLpNorm_restrict hs, Lp.norm_def]
+
+/-- The extension by zero of `f` is almost everywhere equal to `s.indicator f`. -/
+theorem extendByZeroLp_coeFn (hs : MeasurableSet s) (f : Lp ℝ p (μ.restrict s)) :
+    extendByZeroLp μ p hs f =ᵐ[μ] s.indicator f :=
+  (memLp_indicator_restrict hs f).coeFn_toLp
+
+/-- The extension by zero has operator norm at most `1`. -/
+theorem norm_extendByZeroLp_le (hs : MeasurableSet s) : ‖extendByZeroLp μ p hs‖ ≤ 1 :=
+  LinearMap.mkContinuous_norm_le _ zero_le_one _
+
+/-- The extension by zero of the indicator of `t` in `L^p(μ|s)` is the indicator of `t ∩ s` in
+`L^p(μ)`. -/
+theorem extendByZeroLp_indicatorConstLp (hs : MeasurableSet s) {t : Set α}
+    (ht : MeasurableSet t) (hμt : μ (t ∩ s) ≠ ∞) :
+    extendByZeroLp μ p hs (indicatorConstLp p ht (by rwa [Measure.restrict_apply ht]) (1 : ℝ)) =
+      indicatorConstLp p (ht.inter hs) hμt (1 : ℝ) := by
+  refine Lp.ext ?_
+  filter_upwards [extendByZeroLp_coeFn hs
+      (indicatorConstLp p ht (by rwa [Measure.restrict_apply ht]) (1 : ℝ)),
+    (ae_restrict_iff' hs).1 (indicatorConstLp_coeFn (p := p) (μ := μ.restrict s) (hs := ht)
+      (hμs := by rwa [Measure.restrict_apply ht]) (c := (1 : ℝ))),
+    indicatorConstLp_coeFn (p := p) (hs := ht.inter hs) (hμs := hμt) (c := (1 : ℝ))]
+    with x h1 h2 h3
+  rw [h1, h3]
+  by_cases hx : x ∈ s
+  · rw [indicator_of_mem hx, h2 hx]
+    by_cases hxt : x ∈ t <;> simp [hx, hxt]
+  · simp [hx]
+
+end Extend
+
+/-! ### Duality on a σ-finite measure -/
+
+section SigmaFinite
+
+variable [p.HolderConjugate q] [Fact (1 ≤ p)] [Fact (1 ≤ q)]
+
+/-- **Surjectivity of `L^q → (L^p)*`.** For `1 ≤ p < ∞` and a σ-finite measure, every continuous
+functional on `L^p` is `f ↦ ∫ f g` for some `g ∈ L^q`. The proof applies the finite case on each
+set of an increasing exhausting sequence of sets of finite measure and glues the densities.
+Gilbarg and Trudinger §7.1 (p. 146). -/
+theorem lpDualMap_surjective [SigmaFinite μ] (hp : p ≠ ∞) :
+    Function.Surjective (lpDualMap μ p q) := by
+  intro φ
+  set S := spanningSets μ
+  have hS : ∀ n, MeasurableSet (S n) := measurableSet_spanningSets μ
+  have hSμ : ∀ n, μ (S n) ≠ ∞ := fun n => (measure_spanningSets_lt_top μ n).ne
+  have hSf : ∀ n, IsFiniteMeasure (μ.restrict (S n)) := fun n =>
+    isFiniteMeasure_restrict.2 (hSμ n)
+  have hq1 : 1 ≤ q := ENNReal.HolderConjugate.one_le q p
+  -- the finite case gives a density on each `S n`
+  have hk : ∀ n, ∃ k : Lp ℝ q (μ.restrict (S n)),
+      lpDualMap (μ.restrict (S n)) p q k = φ.comp (extendByZeroLp μ p (hS n)) := fun n => by
+    have := hSf n
+    exact lpDualMap_surjective_of_finite hp _
+  choose k hk using hk
+  have hrep : ∀ n (t : Set α) (ht : MeasurableSet t) (hμt : μ (t ∩ S n) ≠ ∞),
+      ∫ x in t, k n x ∂μ.restrict (S n) =
+        φ (indicatorConstLp p (ht.inter (hS n)) hμt (1 : ℝ)) := by
+    intro n t ht hμt
+    rw [← lpDualMap_indicatorConstLp (p := p) (k n) ht (by rwa [Measure.restrict_apply ht]),
+      hk n, ContinuousLinearMap.comp_apply, extendByZeroLp_indicatorConstLp]
+  have hnorm : ∀ n, ‖k n‖ ≤ ‖φ‖ := by
+    intro n
+    have := hSf n
+    refine (norm_le_norm_lpDualMap (p := p) (k n)).trans ?_
+    rw [hk n]
+    exact (φ.opNorm_comp_le _).trans
+      (mul_le_of_le_one_right (norm_nonneg _) (norm_extendByZeroLp_le (hS n)))
+  -- the densities agree on the overlaps
+  have hagree : ∀ n m, n ≤ m → k n =ᵐ[μ.restrict (S n)] k m := by
+    intro n m hnm
+    have := hSf n
+    have hsub : S n ⊆ S m := monotone_spanningSets μ hnm
+    have hres : (μ.restrict (S m)).restrict (S n) = μ.restrict (S n) := by
+      rw [Measure.restrict_restrict (hS n), inter_eq_left.2 hsub]
+    have hint : Integrable (k m) (μ.restrict (S n)) := by
+      have := hSf m
+      rw [← hres]
+      exact ((Lp.memLp (k m)).restrict (S n)).integrable hq1
+    refine ae_eq_of_forall_setIntegral_eq_of_sigmaFinite
+      (fun t _ _ => ((Lp.memLp (k n)).integrable hq1).integrableOn)
+      (fun t _ _ => hint.integrableOn) fun t ht _ => ?_
+    have h1 : μ (t ∩ S n) ≠ ∞ := measure_ne_top_of_subset inter_subset_right (hSμ n)
+    have h2 : μ (t ∩ S n ∩ S m) ≠ ∞ := measure_ne_top_of_subset inter_subset_left h1
+    rw [hrep n t ht h1, ← hres, Measure.restrict_restrict ht, hrep m _ (ht.inter (hS n)) h2]
+    exact congrArg φ (indicatorConstLp_congr_set
+      (inter_eq_left.2 (inter_subset_right.trans hsub)).symm _ _ _ _ _)
+  have hgood : ∀ᵐ x ∂μ, ∀ n m, n ≤ m → x ∈ S n → k n x = k m x := by
+    rw [ae_all_iff]
+    intro n
+    rw [ae_all_iff]
+    intro m
+    by_cases hnm : n ≤ m
+    · filter_upwards [(ae_restrict_iff' (hS n)).1 (hagree n m hnm)] with x hx _ hxn
+        using hx hxn
+    · exact ae_of_all _ fun x h => absurd h hnm
+  -- glue the densities
+  set G : ℕ → α → ℝ := fun n => (S n).indicator (k n)
+  set g : α → ℝ := fun x => limUnder atTop fun n => G n x
+  have hlim : ∀ᵐ x ∂μ, ∀ n, x ∈ S n → Tendsto (fun m => G m x) atTop (𝓝 (k n x)) := by
+    filter_upwards [hgood] with x hx n hxn
+    refine tendsto_const_nhds.congr' ?_
+    filter_upwards [eventually_ge_atTop n] with m hm
+    change k n x = (S m).indicator (k m) x
+    rw [indicator_of_mem (monotone_spanningSets μ hm hxn), hx n m hm hxn]
+  have hgk : ∀ᵐ x ∂μ, ∀ n, x ∈ S n → g x = k n x := by
+    filter_upwards [hlim] with x hx n hxn
+    exact (hx n hxn).limUnder_eq
+  have hgt : ∀ᵐ x ∂μ, Tendsto (fun m => G m x) atTop (𝓝 (g x)) := by
+    filter_upwards [hlim, hgk] with x hx hx'
+    obtain ⟨n, hn⟩ := mem_iUnion.1 (show x ∈ ⋃ n, S n by rw [iUnion_spanningSets]; trivial)
+    rw [hx' n hn]
+    exact hx n hn
+  have hGm : ∀ n, AEStronglyMeasurable (G n) μ := fun n =>
+    (aestronglyMeasurable_indicator_iff (hS n)).2 (Lp.aestronglyMeasurable (k n))
+  have hgm : AEStronglyMeasurable g μ := aestronglyMeasurable_of_tendsto_ae atTop hGm hgt
+  -- Fatou puts `g` in `L^q`
+  have hle : ∀ n, eLpNorm (G n) q μ ≤ ENNReal.ofReal ‖φ‖ := by
+    intro n
+    rw [eLpNorm_indicator_eq_eLpNorm_restrict (hS n)]
+    refine (ENNReal.le_ofReal_iff_toReal_le (Lp.eLpNorm_ne_top _) (norm_nonneg _)).2 ?_
+    rw [← Lp.norm_def]
+    exact hnorm n
+  have hgq : MemLp g q μ := by
+    have hlt : eLpNorm g q μ < ∞ := calc eLpNorm g q μ ≤ atTop.liminf fun n => eLpNorm (G n) q μ :=
+          Lp.eLpNorm_lim_le_liminf_eLpNorm hGm g hgm hgt
+      _ ≤ ENNReal.ofReal ‖φ‖ := liminf_le_of_frequently_le' (Frequently.of_forall hle)
+      _ < ∞ := ENNReal.ofReal_lt_top
+    exact hlt
+  -- pass to the limit along the indicators of `t ∩ S n`
+  refine ⟨hgq.toLp g, ext_of_indicatorConstLp hp fun t ht hμt => ?_⟩
+  have hμtn : ∀ n, μ (t ∩ S n) ≠ ∞ := fun n => measure_ne_top_of_subset inter_subset_left hμt
+  have hseq : ∀ n, lpDualMap μ p q (hgq.toLp g)
+      (indicatorConstLp p (ht.inter (hS n)) (hμtn n) 1) =
+        φ (indicatorConstLp p (ht.inter (hS n)) (hμtn n) 1) := by
+    intro n
+    rw [lpDualMap_indicatorConstLp, ← hrep n t ht (hμtn n), Measure.restrict_restrict ht]
+    refine integral_congr_ae ?_
+    have h1 : ∀ᵐ x ∂μ.restrict (t ∩ S n), x ∈ S n :=
+      ae_restrict_of_forall_mem (ht.inter (hS n)) fun x hx => hx.2
+    filter_upwards [ae_restrict_of_ae hgq.coeFn_toLp, ae_restrict_of_ae hgk, h1]
+      with x h2 h3 h4
+    rw [h2, h3 n h4]
+  have hconv : Tendsto (fun n => indicatorConstLp p (ht.inter (hS n)) (hμtn n) (1 : ℝ)) atTop
+      (𝓝 (indicatorConstLp p ht hμt 1)) := by
+    refine tendsto_indicatorConstLp_set hp ?_
+    have he : ∀ n, (t ∩ S n) ∆ t = t \ S n := fun n => by
+      rw [symmDiff_of_le inter_subset_left, sdiff_self_inter]
+    simp_rw [he]
+    have h := tendsto_measure_iInter_atTop (μ := μ) (s := fun n => t \ S n)
+      (fun n => (ht.diff (hS n)).nullMeasurableSet)
+      (fun n m h => sdiff_subset_sdiff_right (monotone_spanningSets μ h))
+      ⟨0, measure_ne_top_of_subset sdiff_subset hμt⟩
+    rwa [← sdiff_iUnion, iUnion_spanningSets, sdiff_univ, measure_empty] at h
+  exact tendsto_nhds_unique ((((lpDualMap μ p q _).continuous.tendsto _).comp hconv).congr hseq)
+    ((φ.continuous.tendsto _).comp hconv)
+
+variable (μ p q) in
+/-- **Dual of `L^p`.** For `1 ≤ p < ∞` and a σ-finite measure, `g ↦ (f ↦ ∫ f g)` is an
+isomorphism of Banach spaces from `L^q` onto the dual of `L^p`. The open mapping theorem gives the
+continuity of the inverse. Gilbarg and Trudinger §7.1 (p. 146). -/
+def lpDualEquiv [SigmaFinite μ] (hp : p ≠ ∞) : Lp ℝ q μ ≃L[ℝ] StrongDual ℝ (Lp ℝ p μ) :=
+  ContinuousLinearEquiv.ofBijective (lpDualMap μ p q)
+    (LinearMap.ker_eq_bot.2 lpDualMap_injective)
+    (LinearMap.range_eq_top.2 (lpDualMap_surjective hp))
+
+/-- The isomorphism `lpDualEquiv` is the map `lpDualMap`. -/
+theorem coe_lpDualEquiv [SigmaFinite μ] (hp : p ≠ ∞) :
+    ⇑(lpDualEquiv μ p q hp) = lpDualMap μ p q :=
+  rfl
+
+/-- **Dual of `L^p(Ω)`.** Let `Ω` be a set of a finite-dimensional real space with Haar measure
+and let `1 ≤ p < ∞` have conjugate exponent `q`. Every continuous functional `φ` on `L^p(Ω)` is
+`f ↦ ∫_Ω f g` for exactly one `g ∈ L^q(Ω)`. The case `p = 1` is included.
+Gilbarg and Trudinger §7.1 (p. 146). -/
+theorem exists_lpDual_eq {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    [FiniteDimensional ℝ E] [MeasureSpace E] [(volume : Measure E).IsAddHaarMeasure] (hp : p ≠ ∞)
+    (Ω : Set E)
+    (φ : StrongDual ℝ (Lp ℝ p (volume.restrict Ω))) :
+    ∃! g : Lp ℝ q (volume.restrict Ω), ∀ f, φ f = ∫ x in Ω, f x * g x := by
+  obtain ⟨g, hg⟩ := lpDualMap_surjective (μ := volume.restrict Ω) (q := q) hp φ
+  refine ⟨g, fun f => by rw [← hg, lpDualMap_apply], fun g' hg' => ?_⟩
+  refine lpDualMap_injective (p := p) (ContinuousLinearMap.ext fun f => ?_)
+  rw [lpDualMap_apply, ← hg' f, hg]
+
+end SigmaFinite
 
 end EllipticPdes.Analysis

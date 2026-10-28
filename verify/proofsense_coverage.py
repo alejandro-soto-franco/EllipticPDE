@@ -673,18 +673,6 @@ EXEMPT = {
         "step of the proof of the duality of L^p in Gilbarg and Trudinger "
         "§7.1 (p. 146)"
     ),
-    "EllipticPdes.Analysis.lpDualMap_injective": (
-        "step of the proof of the duality of L^p in Gilbarg and Trudinger "
-        "§7.1 (p. 146)"
-    ),
-    "EllipticPdes.Analysis.norm_le_norm_lpDualMap": (
-        "step of the proof of the duality of L^p in Gilbarg and Trudinger "
-        "§7.1 (p. 146)"
-    ),
-    "EllipticPdes.Analysis.lpDualMap_surjective_of_finite": (
-        "step of the proof of the duality of L^p in Gilbarg and Trudinger "
-        "§7.1 (p. 146)"
-    ),
 }
 
 # A statement locator names one statement, never a whole section. Four forms
