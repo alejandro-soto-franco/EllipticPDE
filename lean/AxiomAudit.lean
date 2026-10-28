@@ -482,3 +482,7 @@ assert_classical_axioms
   EllipticPdes.Sobolev.norm_toH1amb
   EllipticPdes.Sobolev.mem_Wkp_one_two_iff
   EllipticPdes.Sobolev.mem_W0kp_one_two_iff
+  EllipticPdes.Sobolev.mem_Wkp_one_two_iff_W12
+  EllipticPdes.Sobolev.norm_h1Equiv_symm_toH1amb
+  EllipticPdes.Sobolev.hasWeakFDerivOn_iff_forall_hasWeakDeriv
+  EllipticPdes.Sobolev.hasWeakDeriv_single_iff_hasWeakDerivOn

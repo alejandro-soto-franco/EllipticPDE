@@ -73,34 +73,6 @@ theorem memLp_iterPartialD (h : IsTestFn U φ) (l : List (Fin d)) :
     MemLp (iterPartialD l φ) p (volume.restrict U) :=
   (h.iterPartialD l).continuous.memLp_of_hasCompactSupport (h.iterPartialD l).hasCompactSupport
 
-/-- The iterated derivative is additive on smooth functions. -/
-theorem iterPartialD_add (l : List (Fin d)) (hφ : ContDiff ℝ (⊤ : ℕ∞) φ)
-    (hψ : ContDiff ℝ (⊤ : ℕ∞) ψ) :
-    iterPartialD l (φ + ψ) = iterPartialD l φ + iterPartialD l ψ := by
-  induction l generalizing φ ψ with
-  | nil => rfl
-  | cons m l ih =>
-    rw [iterPartialD_cons, iterPartialD_cons, iterPartialD_cons,
-      partialD_add (hφ.differentiable (by simp)) (hψ.differentiable (by simp)) m]
-    exact ih (contDiff_iterPartialD hφ [m]) (contDiff_iterPartialD hψ [m])
-
-/-- The iterated derivative commutes with scalar multiplication on smooth functions. -/
-theorem iterPartialD_smul (l : List (Fin d)) (c : ℝ) (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) :
-    iterPartialD l (c • φ) = c • iterPartialD l φ := by
-  induction l generalizing φ with
-  | nil => rfl
-  | cons m l ih =>
-    rw [iterPartialD_cons, iterPartialD_cons,
-      partialD_const_smul (hφ.differentiable (by simp)) c m]
-    exact ih (contDiff_iterPartialD hφ [m])
-
-/-- The iterated derivative of zero is zero. -/
-theorem iterPartialD_zero (l : List (Fin d)) :
-    iterPartialD l (0 : EuclideanSpace ℝ (Fin d) → ℝ) = 0 := by
-  induction l with
-  | nil => rfl
-  | cons m l ih => rw [iterPartialD_cons, partialD_zero, ih]
-
 /-- **Graph of a test function.** Entry `α` is the `L^p(U)` class of the classical derivative
 `D^α φ`. -/
 def testGraph (h : IsTestFn U φ) : WkpGraph d k p U :=
@@ -163,13 +135,11 @@ of entry `0`, since a smooth function has its classical derivative as weak deriv
 theorem testGraph_mem_Wkp (h : IsTestFn U φ) : (testGraph h : WkpGraph d k p U) ∈ Wkp d k p U := by
   rw [mem_Wkp_iff]
   intro α
-  have h0 : MultiIdx.dirs (MultiIdx.zero (d := d) (k := k)).toFun = [] := by
-    simp [MultiIdx.dirs, MultiIdx.zero, MultiIdx.toFun]
   have e0 : (testGraph h : WkpGraph d k p U) MultiIdx.zero =ᵐ[volume.restrict U] φ := by
     rw [testGraph_apply]
     filter_upwards [MemLp.coeFn_toLp (memLp_iterPartialD (p := p) h
       (MultiIdx.dirs (MultiIdx.zero (d := d) (k := k)).toFun).reverse)] with x hx
-    rw [hx, h0]
+    rw [hx, MultiIdx.dirs_zero]
     rfl
   have eα : (testGraph h : WkpGraph d k p U) α =ᵐ[volume.restrict U]
       iterPartialD (MultiIdx.dirs α.toFun).reverse φ := by

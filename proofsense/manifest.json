@@ -1194,19 +1194,19 @@
       "decl": "EllipticPdes.Sobolev.HasWeakDeriv.add",
       "source_id": "evans-2010",
       "locator": "§5.2.3 Thm 1",
-      "claim": "formalises the additive case of clause (ii): if v and v' are weak alpha-th derivatives of u and u' on U, then v + v' is a weak alpha-th derivative of u + u'. Evans states the combination lambda u + mu v for u and v in W^{k,p}(U) with |alpha| <= k. The declaration assumes only that the four functions are locally integrable on U, which the weak derivative hypotheses supply, and states the sum without coefficients; smul states the scalar multiple"
+      "claim": "formalises the additive case of clause (ii): if v and v' are weak alpha-th derivatives of u and u' on U, then v + v' is a weak alpha-th derivative of u + u'. Evans states the combination lambda u + mu v for u and v in W^{k,p}(U) with |alpha| <= k. The declaration assumes the two weak derivative relations and no membership in W^{k,p}(U); the membership half of clause (ii) is the submodule structure of Wkp. It states the sum without coefficients, and smul states the scalar multiple"
     },
     {
       "decl": "EllipticPdes.Sobolev.HasWeakDeriv.smul",
       "source_id": "evans-2010",
       "locator": "§5.2.3 Thm 1",
-      "claim": "formalises the scalar case of clause (ii): if v is a weak alpha-th derivative of u on U, then c v is a weak alpha-th derivative of c u for every real c. Evans states the combination lambda u + mu v for u and v in W^{k,p}(U) with |alpha| <= k. The declaration assumes only that u and v are locally integrable on U, which the weak derivative hypothesis supplies, and states one scalar; add states the sum"
+      "claim": "formalises the scalar case of clause (ii): if v is a weak alpha-th derivative of u on U, then c v is a weak alpha-th derivative of c u for every real c. Evans states the combination lambda u + mu v for u and v in W^{k,p}(U) with |alpha| <= k. The declaration assumes the one weak derivative relation and no membership in W^{k,p}(U); the membership half of clause (ii) is the submodule structure of Wkp. It states one scalar, and add states the sum"
     },
     {
       "decl": "EllipticPdes.Sobolev.HasWeakDeriv.sub",
       "source_id": "evans-2010",
       "locator": "§5.2.3 Thm 1",
-      "claim": "formalises the case lambda = 1, mu = -1 of clause (ii): if v and v' are weak alpha-th derivatives of u and u' on U, then v - v' is a weak alpha-th derivative of u - u'. Evans states the combination lambda u + mu v for u and v in W^{k,p}(U) with |alpha| <= k. The declaration assumes only that the four functions are locally integrable on U, which the weak derivative hypotheses supply"
+      "claim": "formalises the case lambda = 1, mu = -1 of clause (ii): if v and v' are weak alpha-th derivatives of u and u' on U, then v - v' is a weak alpha-th derivative of u - u'. Evans states the combination lambda u + mu v for u and v in W^{k,p}(U) with |alpha| <= k. The declaration assumes the two weak derivative relations and no membership in W^{k,p}(U); the membership half of clause (ii) is the submodule structure of Wkp"
     },
     {
       "decl": "EllipticPdes.Sobolev.hasWeakDeriv_of_contDiff",

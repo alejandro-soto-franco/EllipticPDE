@@ -62,18 +62,9 @@ abbrev WkpGraph (d k : ℕ) (p : ℝ≥0∞) (U : Set (EuclideanSpace ℝ (Fin d
   WithLp p (MultiIdx d k → Lp ℝ p (volume.restrict U))
 
 /-- An `L^p` class on `U` is locally integrable on `U` for Lebesgue measure, for `1 ≤ p`. -/
-theorem locallyIntegrableOn_lp (f : Lp ℝ p (volume.restrict U)) : LocallyIntegrableOn f U := by
-  intro x _
-  have hmem : Metric.ball x 1 ∩ U ∈ nhdsWithin x U := by
-    rw [inter_comm]
-    exact inter_mem_nhdsWithin U (Metric.ball_mem_nhds x one_pos)
-  refine ⟨Metric.ball x 1 ∩ U, hmem, ?_⟩
-  have hf : MemLp f p (volume.restrict U) := Lp.memLp f
-  have hf' : MemLp f p ((volume.restrict U).restrict (Metric.ball x 1)) := hf.restrict _
-  rw [Measure.restrict_restrict Metric.isOpen_ball.measurableSet] at hf'
-  have : IsFiniteMeasure (volume.restrict (Metric.ball x 1 ∩ U)) :=
-    ⟨by simpa using lt_of_le_of_lt (measure_mono inter_subset_left) measure_ball_lt_top⟩
-  exact hf'.integrable (Fact.out : 1 ≤ p)
+theorem locallyIntegrableOn_lp (f : Lp ℝ p (volume.restrict U)) : LocallyIntegrableOn f U :=
+  locallyIntegrableOn_of_locallyIntegrable_restrict
+    ((Lp.memLp f).locallyIntegrable (Fact.out : 1 ≤ p))
 
 /-- Pairing with a continuous compactly supported function `g` is a continuous linear
 functional on `L^p(U)`. The bound is Hölder's inequality against `g ∈ L^{p'}`, valid for every
@@ -196,9 +187,7 @@ theorem Wkp_zero_eq_top : Wkp d 0 p U = ⊤ := by
   have hα : α = MultiIdx.zero := Subtype.ext (funext fun i =>
     Fin.ext (by have := (α.1 i).isLt; change (α.1 i).val = 0; omega))
   subst hα
-  have e : MultiIdx.dirs (MultiIdx.zero (d := d) (k := 0)).toFun = [] := by
-    simp [MultiIdx.dirs, MultiIdx.zero, MultiIdx.toFun]
-  rw [constraint_apply, e]
+  rw [constraint_apply, MultiIdx.dirs_zero]
   simp [MultiIdx.zero, MultiIdx.toFun]
 
 end EllipticPdes.Sobolev

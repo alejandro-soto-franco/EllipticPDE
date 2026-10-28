@@ -8,6 +8,8 @@ module
 
 public import EllipticPdes.Sobolev.Wkp0
 public import EllipticPdes.Sobolev.Basic
+public import EllipticPdes.Sobolev.GraphEuclidean
+public import EllipticPdes.Regularity.DiffQuotientBound
 
 /-!
 # Graph-space bridges for `W^{1,2}(U)` and `W_0^{1,2}(U)`
@@ -26,6 +28,13 @@ equivalence that matches the two pairs of submodules.
 * `EllipticPdes.Sobolev.norm_toH1amb`: the reindexing preserves the norm.
 * `EllipticPdes.Sobolev.mem_Wkp_one_two_iff`: it maps `W^{1,2}(U)` onto `W12 U`.
 * `EllipticPdes.Sobolev.mem_W0kp_one_two_iff`: it maps `W_0^{1,2}(U)` onto `H01 U`.
+* `EllipticPdes.Sobolev.mem_Wkp_one_two_iff_W12` and
+  `EllipticPdes.Sobolev.norm_h1Equiv_symm_toH1amb`: the same for the general graph space
+  `H1Graph.W12`, with the norm.
+* `EllipticPdes.Sobolev.hasWeakFDerivOn_iff_forall_hasWeakDeriv`: the weak Fréchet derivative
+  is the family of coordinate weak derivatives.
+* `EllipticPdes.Sobolev.hasWeakDeriv_single_iff_hasWeakDerivOn`: the coordinate weak derivative
+  of `L²` classes is `Regularity.HasWeakDerivOn`.
 
 ## References
 
@@ -47,10 +56,6 @@ variable {d : ℕ} {U : Set (EuclideanSpace ℝ (Fin d))} {φ : EuclideanSpace �
 /-! ### Multi-indices of order at most one -/
 
 namespace MultiIdx
-
-/-- The zero multi-index differentiates in no direction. -/
-theorem dirs_zero : dirs (zero (d := d) (k := 1)).toFun = [] := by
-  simp [dirs, zero, toFun]
 
 /-- The multi-index of order one in direction `i`. -/
 def single (i : Fin d) : MultiIdx d 1 :=
@@ -236,5 +241,49 @@ theorem mem_W0kp_one_two_iff (F : WkpGraph d 1 2 U) :
     rw [this]
     exact (toH1amb : WkpGraph d 1 2 U ≃ₗ[ℝ] H1amb U).injective.mem_set_image
   exact hF.symm
+
+/-! ### Bridges to the general graph space and to the `L²` weak derivative -/
+
+/-- **`W^{1,2}(U)` in the general graph space.** A graph element lies in `W^{1,2}(U)` exactly
+when its image in `H1Graph volume U` lies in `H1Graph.W12 volume U`. -/
+theorem mem_Wkp_one_two_iff_W12 (F : WkpGraph d 1 2 U) :
+    F ∈ Wkp d 1 2 U ↔
+      (EllipticPdes.H1Graph.h1Equiv U).symm (toH1amb F) ∈ EllipticPdes.H1Graph.W12 volume U := by
+  rw [mem_Wkp_one_two_iff, ← EllipticPdes.H1Graph.h1Equiv_mem_W12_iff,
+    LinearIsometryEquiv.apply_symm_apply]
+
+/-- **Norm preservation into the general graph space.** The image of `F` in
+`H1Graph volume U` has the norm of `F`. -/
+theorem norm_h1Equiv_symm_toH1amb (F : WkpGraph d 1 2 U) :
+    ‖(EllipticPdes.H1Graph.h1Equiv U).symm (toH1amb F)‖ = ‖F‖ := by
+  rw [LinearIsometryEquiv.norm_map, norm_toH1amb]
+
+/-- **Weak Fréchet derivative as coordinate weak derivatives.** A locally integrable `u` has
+weak Fréchet derivative `G` on the open set `U` exactly when, for each `i`, the function
+`x ↦ G x eᵢ` is the weak derivative of `u` for the multi-index `Pi.single i 1`. -/
+theorem hasWeakFDerivOn_iff_forall_hasWeakDeriv (hU : IsOpen U)
+    {G : EuclideanSpace ℝ (Fin d) → EuclideanSpace ℝ (Fin d) →L[ℝ] ℝ}
+    (hu : LocallyIntegrableOn φ U) :
+    EllipticPdes.HasWeakFDerivOn ⟨U, hU⟩ φ G ↔
+      ∀ i, HasWeakDeriv U (Pi.single i 1) φ (fun x => G x (EuclideanSpace.single i 1)) := by
+  rw [EllipticPdes.hasWeakFDerivOn_iff_basis (EuclideanSpace.basisFun (Fin d) ℝ).toBasis hu]
+  refine forall_congr' fun i => ?_
+  rw [hasWeakDeriv_single_iff hU]
+  simp
+
+/-- **Coordinate weak derivative of `L²` classes.** For classes `g` and `g'` of `L²(U)`, the
+weak derivative in direction `i` for the multi-index `Pi.single i 1` is
+`Regularity.HasWeakDerivOn`. -/
+theorem hasWeakDeriv_single_iff_hasWeakDerivOn (i : Fin d) (g g' : L2D U) :
+    HasWeakDeriv U (Pi.single i 1) (g : EuclideanSpace ℝ (Fin d) → ℝ)
+        (g' : EuclideanSpace ℝ (Fin d) → ℝ) ↔
+      Regularity.HasWeakDerivOn U i g g' := by
+  rw [hasWeakDeriv_single_iff_integral]
+  constructor
+  · rintro ⟨-, -, h⟩ φ hφ hc hs
+    exact h φ ⟨hφ, hc, hs⟩
+  · intro h
+    exact ⟨Regularity.locallyIntegrableOn_L2D g, Regularity.locallyIntegrableOn_L2D g',
+      fun φ hφ => h φ hφ.1 hφ.2.1 hφ.2.2⟩
 
 end EllipticPdes.Sobolev

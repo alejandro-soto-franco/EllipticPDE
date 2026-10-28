@@ -78,6 +78,10 @@ def dirs (α : Fin d → ℕ) : List (Fin d) :=
 theorem dirs_length (α : Fin d → ℕ) : (dirs α).length = ∑ i, α i := by
   simp [dirs, List.length_flatMap, Fin.sum_univ_def]
 
+/-- The zero multi-index differentiates in no direction. -/
+theorem dirs_zero : dirs (zero (d := d) (k := k)).toFun = [] := by
+  simp [dirs, zero, toFun]
+
 /-- The multi-index `Pi.single i 1` differentiates once in direction `i`. -/
 theorem dirs_single (i : Fin d) : dirs (Pi.single i 1) = [i] := by
   have h : ∀ j : Fin d,
@@ -157,6 +161,34 @@ theorem contDiff_iterPartialD (h : ContDiff ℝ (⊤ : ℕ∞) w) (l : List (Fin
   induction l generalizing w with
   | nil => exact h
   | cons m l ih => exact ih (contDiff_partialD h m)
+
+/-- The iterated derivative is additive on smooth functions. -/
+theorem iterPartialD_add (l : List (Fin d)) (hφ : ContDiff ℝ (⊤ : ℕ∞) φ)
+    (hψ : ContDiff ℝ (⊤ : ℕ∞) ψ) :
+    iterPartialD l (φ + ψ) = iterPartialD l φ + iterPartialD l ψ := by
+  induction l generalizing φ ψ with
+  | nil => rfl
+  | cons m l ih =>
+    rw [iterPartialD_cons, iterPartialD_cons, iterPartialD_cons,
+      partialD_add (hφ.differentiable (by simp)) (hψ.differentiable (by simp)) m]
+    exact ih (contDiff_iterPartialD hφ [m]) (contDiff_iterPartialD hψ [m])
+
+/-- The iterated derivative commutes with scalar multiplication on smooth functions. -/
+theorem iterPartialD_smul (l : List (Fin d)) (c : ℝ) (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) :
+    iterPartialD l (c • φ) = c • iterPartialD l φ := by
+  induction l generalizing φ with
+  | nil => rfl
+  | cons m l ih =>
+    rw [iterPartialD_cons, iterPartialD_cons,
+      partialD_const_smul (hφ.differentiable (by simp)) c m]
+    exact ih (contDiff_iterPartialD hφ [m])
+
+/-- The iterated derivative of zero is zero. -/
+theorem iterPartialD_zero (l : List (Fin d)) :
+    iterPartialD l (0 : EuclideanSpace ℝ (Fin d) → ℝ) = 0 := by
+  induction l with
+  | nil => rfl
+  | cons m l ih => rw [iterPartialD_cons, partialD_zero, ih]
 
 /-! ### Integrals against test functions -/
 
@@ -374,18 +406,9 @@ open EllipticPdes.Sobolev MeasureTheory
 variable {d : ℕ} {V : Set (EuclideanSpace ℝ (Fin d))}
 
 /-- An `L²` class on `V` is locally integrable on `V` for Lebesgue measure. -/
-theorem locallyIntegrableOn_L2D (f : L2D V) : LocallyIntegrableOn f V := by
-  intro x _
-  have hmem : Metric.ball x 1 ∩ V ∈ nhdsWithin x V := by
-    rw [inter_comm]
-    exact inter_mem_nhdsWithin V (Metric.ball_mem_nhds x one_pos)
-  refine ⟨Metric.ball x 1 ∩ V, hmem, ?_⟩
-  have hf : MemLp f 2 (volume.restrict V) := Lp.memLp f
-  have hf' : MemLp f 2 ((volume.restrict V).restrict (Metric.ball x 1)) := hf.restrict _
-  rw [Measure.restrict_restrict Metric.isOpen_ball.measurableSet] at hf'
-  have : IsFiniteMeasure (volume.restrict (Metric.ball x 1 ∩ V)) :=
-    ⟨by simpa using lt_of_le_of_lt (measure_mono inter_subset_left) measure_ball_lt_top⟩
-  exact hf'.integrable (by norm_num)
+theorem locallyIntegrableOn_L2D (f : L2D V) : LocallyIntegrableOn f V :=
+  locallyIntegrableOn_of_locallyIntegrable_restrict
+    ((Lp.memLp f).locallyIntegrable (by norm_num))
 
 namespace HasIteratedWeakDerivOn
 
