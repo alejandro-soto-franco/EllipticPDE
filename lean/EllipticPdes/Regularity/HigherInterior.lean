@@ -21,10 +21,9 @@ public import EllipticPdes.Regularity.CutoffDatum
 /-!
 # Higher interior regularity
 
-Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 2 (*Higher Interior
-Regularity*). For a weak solution `u` of `L u = f` with
-`a_{ij} ∈ W^{k+1,∞}`, `b_i, c ∈ W^{k,∞}` and `f ∈ H^k`, the solution lies in `H^{k+2}_loc`
-with
+Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 2 (*Higher Interior Regularity*).
+For a weak solution `u` of `L u = f` with `a_{ij} ∈ W^{k+1,∞}`, `b_i, c ∈ W^{k,∞}` and `f ∈ H^k`,
+the solution lies in `H^{k+2}_loc` with
 
 `‖u‖_{H^{k+2}(V)} ≤ C (‖f‖_{H^k(Ω)} + ‖u‖_{L²(Ω)})` for every `V ⋐ Ω`,
 

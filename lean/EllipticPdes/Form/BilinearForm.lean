@@ -178,8 +178,7 @@ theorem norm_weak_solution_le {H : Type*} [NormedAddCommGroup H] [InnerProductSp
 
 /-- A right-hand side `f ∈ L²(Ω)` as a continuous linear functional on `H₀¹(Ω)`:
 `v ↦ ⟪f, v₀⟫_{L²}`, the weak pairing `⟨f, v⟩ = ∫_Ω f · v₀`. This is the embedding
-`L²(Ω) ⊆ H⁻¹(Ω)` (Evans §5.9.1, Theorem 1(iii)) through which the classical Dirichlet
-problem
+`L²(Ω) ⊆ H⁻¹(Ω)` (Evans §5.9.1, Theorem 1(iii)) through which the classical Dirichlet problem
 `Lu = f`, `f ∈ L²(Ω)`, enters the abstract Lax-Milgram statement. -/
 def l2Functional (Ω : Set (EuclideanSpace ℝ (Fin d))) (f : L2D Ω) : (H01 Ω) →L[ℝ] ℝ :=
   ((innerSL ℝ f).comp

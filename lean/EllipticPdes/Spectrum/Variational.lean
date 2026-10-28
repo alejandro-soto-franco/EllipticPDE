@@ -15,9 +15,8 @@ public import EllipticPdes.Poincare.BoundedDomain
 # Variational characterisation of the principal eigenvalue
 
 `EllipticPdes.Sobolev.solOp_spectral` produces the Dirichlet eigenvalues from the spectral theorem
-for the compact self-adjoint solution operator, one eigenvalue at a time and with no formula for
-any of them. This file gives the first eigenvalue a formula: it is the infimum of the Rayleigh
-quotient
+for the compact self-adjoint solution operator, one eigenvalue at a time and with no formula for any
+of them. This file gives the first eigenvalue a formula: it is the infimum of the Rayleigh quotient
 
 `λ₁ = inf { B[U, U] : U ∈ H₀¹(Ω), ‖U‖_{L²(Ω)} = 1 }`,
 

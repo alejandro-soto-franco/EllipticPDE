@@ -13,10 +13,8 @@ public import EllipticPdes.Regularity.CoeffC1
 
 Evans, *Partial Differential Equations* (2nd ed.), §6.3.1, Theorem 1 asks `aᵢⱼ ∈ C¹` for the
 interior `H²` estimate, where Gilbarg and Trudinger Theorem 8.8 asks `aᵢⱼ` uniformly Lipschitz, the
-class
-`W^{1,∞}`. On `ℝᵈ` a `W^{1,∞}` function is one
-with a Lipschitz representative, so in its pointwise form the hypothesis is the Lipschitz
-estimate of `IsLipCoeff` below.
+class `W^{1,∞}`. On `ℝᵈ` a `W^{1,∞}` function is one with a Lipschitz representative, so in its
+pointwise form the hypothesis is the Lipschitz estimate of `IsLipCoeff` below.
 
 The estimate consumes the hypothesis through `abs_diffQuot_coeff_le` alone, which
 `IsC1Coeff` supplies by the mean value inequality and a Lipschitz coefficient supplies

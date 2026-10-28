@@ -48,7 +48,7 @@
       "decl": "EllipticPdes.Sobolev.FullEllipticOp.fredholm_alternative",
       "source_id": "evans-2010",
       "locator": "§6.2.3 Thm 4",
-      "claim": "formalises clause (i), the dichotomy, with the compactness of opK as a hypothesis rather than as a consequence of Rellich-Kondrachov: either the homogeneous problem has a nonzero weak solution in H_0^1(Omega), or every continuous functional on H_0^1(Omega) is the datum of a unique weak solution. Evans takes f in L^2(U), where the declaration takes any element of the dual, which is the H^{-1} form Evans records under Mapping H_0^1 to H^{-1} after §6.2.2 Theorem 3. fredholm_alternative_of_bounded is the same statement with the compactness discharged"
+      "claim": "formalises clause (i), the alternative, with the compactness of opK as a hypothesis, where Evans derives it from Rellich-Kondrachov: either the homogeneous problem has a nonzero weak solution in H_0^1(Omega), or every continuous functional on H_0^1(Omega) is the datum of a unique weak solution. Evans takes f in L^2(U), where the declaration takes any element of the dual, which is the H^{-1} form Evans records under Mapping H_0^1 to H^{-1} after §6.2.2 Theorem 3. fredholm_alternative_of_bounded is the same statement with the compactness discharged"
     },
     {
       "decl": "EllipticPdes.Sobolev.FullEllipticOp.solvable_iff_orthogonal_solSpaceStar",
@@ -66,13 +66,13 @@
       "decl": "EllipticPdes.Sobolev.FullEllipticOp.finiteDimensional_solSpace",
       "source_id": "evans-2010",
       "locator": "§6.2.3 Thm 4",
-      "claim": "formalises the finite-dimensionality half of clause (ii): the space N of weak solutions of the homogeneous problem, taken in H_0^1(Omega), is finite-dimensional. Evans states it under alternative (beta); the declaration states it unconditionally, which is vacuous under (alpha), where N is trivial. The compactness of opK is a hypothesis rather than a consequence of Rellich-Kondrachov"
+      "claim": "formalises the finite-dimensionality half of clause (ii): the space N of weak solutions of the homogeneous problem, taken in H_0^1(Omega), is finite-dimensional. Evans states it under alternative (beta); the declaration states it unconditionally, which is vacuous under (alpha), where N is trivial. The compactness of opK is a hypothesis, where Evans derives it from Rellich-Kondrachov"
     },
     {
       "decl": "EllipticPdes.Sobolev.FullEllipticOp.finrank_solSpaceStar_eq_finrank_solSpace",
       "source_id": "evans-2010",
       "locator": "§6.2.3 Thm 4",
-      "claim": "formalises the index half of clause (ii): the space N* of weak solutions of the transpose problem and the space N of weak solutions of the homogeneous problem, both taken in H_0^1(Omega), have the same finite dimension. Evans states it under alternative (beta); the declaration states it unconditionally, both ranks being zero under (alpha). The compactness of opK is a hypothesis rather than a consequence of Rellich-Kondrachov"
+      "claim": "formalises the index half of clause (ii): the space N* of weak solutions of the transpose problem and the space N of weak solutions of the homogeneous problem, both taken in H_0^1(Omega), have the same finite dimension. Evans states it under alternative (beta); the declaration states it unconditionally, both ranks being zero under (alpha). The compactness of opK is a hypothesis, where Evans derives it from Rellich-Kondrachov"
     },
     {
       "decl": "EllipticPdes.Sobolev.FullEllipticOp.existence_three_of_bounded",
@@ -84,7 +84,7 @@
       "decl": "EllipticPdes.Sobolev.FullEllipticOp.resolvent_bound",
       "source_id": "evans-2010",
       "locator": "§6.2.3 Thm 6",
-      "claim": "formalises the theorem with the compactness of opK as a hypothesis rather than as a consequence of Rellich-Kondrachov: for lambda outside Sigma there is C > 0 with ‖u‖_{L^2(Omega)} <= C · ‖f‖_{L^2(Omega)} for every f in L^2(Omega) and every u in H_0^1(Omega) satisfying the weak identity for Lu = lambda u + f. Evans quantifies over the unique weak solution, which is the same element once §6.2.3 Theorem 5 supplies uniqueness. resolvent_bound_of_bounded is the same statement with the compactness discharged"
+      "claim": "formalises the theorem with the compactness of opK as a hypothesis, where Evans derives it from Rellich-Kondrachov: for lambda outside Sigma there is C > 0 with ‖u‖_{L^2(Omega)} <= C · ‖f‖_{L^2(Omega)} for every f in L^2(Omega) and every u in H_0^1(Omega) satisfying the weak identity for Lu = lambda u + f. Evans quantifies over the unique weak solution, which is the same element once §6.2.3 Theorem 5 supplies uniqueness. resolvent_bound_of_bounded is the same statement with the compactness discharged"
     },
     {
       "decl": "EllipticPdes.Sobolev.FullEllipticOp.resolvent_bound_of_bounded",
@@ -138,13 +138,13 @@
       "decl": "EllipticPdes.Campanato.campanato_holderOnWith",
       "source_id": "fernandezreal-2023-reg-the-ell",
       "locator": "App. A (H3)",
-      "claim": "formalises the cited property: an L^2 mean oscillation bounded by C_0 r^alpha on every ball gives a Holder-alpha representative with seminorm a multiple of C_0. The cited property concludes on B_1 from a hypothesis over all balls inside it; this concludes on an inner ball of radius rho with 5 rho <= R, and produces the continuous representative as the Campanato limit rather than asserting one exists"
+      "claim": "formalises the cited property: an L^2 mean oscillation bounded by C_0 r^alpha on every ball gives a Holder-alpha representative with seminorm a multiple of C_0. The cited property concludes on B_1 from a hypothesis over all balls inside it; this concludes on an inner ball of radius rho with 5 rho <= R, and constructs the continuous representative as the Campanato limit, where the cited property asserts that one exists"
     },
     {
       "decl": "EllipticPdes.Regularity.interior_cutoffGrad_mem_H01",
       "source_id": "evans-2010",
       "locator": "§6.3.1 Thm 2",
-      "claim": "formalises the admissibility step of the induction, for a weak solution quantified over H_0^1(Omega) rather than H^1(U): the cutoff xi times a first derivative of the solution is again in H_0^1(Omega), carrying its weak gradient"
+      "claim": "formalises the admissibility step of the induction, for a weak solution quantified over H_0^1(Omega), where Evans takes H^1(U): the cutoff xi times a first derivative of the solution is again in H_0^1(Omega), with its weak gradient"
     },
     {
       "decl": "EllipticPdes.Embedding.interior_holder_estimate",
@@ -168,7 +168,7 @@
       "decl": "EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le",
       "source_id": "evans-2010",
       "locator": "§5.6.1 Thm 1",
-      "claim": "formalises the inequality in general dimension d and at a general exponent pair with 1/p' = 1/p - 1/d, transported from Evans' smooth compactly supported setting to a weak gradient on a ball by a cutoff and a mollification, so the bound carries the ball data ‖v‖ + sum of ‖g k‖ rather than the gradient alone"
+      "claim": "formalises the inequality in general dimension d and at a general exponent pair with 1/p' = 1/p - 1/d, transported from Evans' smooth compactly supported setting to a weak gradient on a ball by a cutoff and a mollification, and the right-hand side of the bound is then the ball data ‖v‖ + sum of ‖g k‖, where Evans has the gradient alone"
     },
     {
       "decl": "EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_of_le",
@@ -210,7 +210,7 @@
       "decl": "EllipticPdes.Regularity.cutoffMulOn_tangDiffQuotG_mem_H01",
       "source_id": "evans-2010",
       "locator": "§6.3.2 Thm 4",
-      "claim": "formalises the admissibility of Evans' test element on a literal half-ball, for a weak solution quantified over H_0^1(halfBall d r) rather than H^1(U): the cutoff zeta times a tangential difference quotient of the solution is again in H_0^1. Evans frames tangentiality as a constraint on the step h; the formalisation shows it is unconditional in h, and that tangentiality enters through the support inclusion tsupport (D_k^h phi) subset {x | 0 < x 0} The step is proof steps 1 to 3 of that theorem."
+      "claim": "formalises the admissibility of Evans' test element on a literal half-ball, for a weak solution quantified over H_0^1(halfBall d r), where Evans takes H^1(U): the cutoff zeta times a tangential difference quotient of the solution is again in H_0^1. Evans frames tangentiality as a constraint on the step h; the formalisation shows it is unconditional in h, and that tangentiality enters through the support inclusion tsupport (D_k^h phi) subset {x | 0 < x 0} The step is proof steps 1 to 3 of that theorem."
     },
     {
       "decl": "EllipticPdes.Regularity.HasWeakDerivOn.of_mul_contDiff_left",
@@ -228,19 +228,19 @@
       "decl": "EllipticPdes.Regularity.interior_smooth",
       "source_id": "evans-2010",
       "locator": "§6.3.1 Thm 3",
-      "claim": "formalises the theorem for a weak solution quantified over H_0^1(Omega) rather than Evans' H^1(U), and for coefficients in W^{k,infty} at every order rather than C^infty: the solution has a representative smooth on the interior of each compact V inside Omega. Evans states u in C^infty(U) for smooth coefficients and datum, which is an instance through IsC1Coeff.toIsLipCoeff, IsCkCoeff.toIsWkInftyCoeff and IsWkInfty.ofContDiff. Beside the bundles the declaration asks the principal coefficients Lipschitz, which the base case reads. The conclusion names a representative, an L^2 class having no pointwise values, and it is smooth on the interior of V rather than on V, since smoothness is a statement about an open set"
+      "claim": "formalises the theorem for a weak solution quantified over H_0^1(Omega) and for coefficients in W^{k,infty} at every order, where Evans takes H^1(U) and C^infty: the solution has a representative smooth on the interior of each compact V inside Omega. Evans states u in C^infty(U) for smooth coefficients and datum, which is an instance through IsC1Coeff.toIsLipCoeff, IsCkCoeff.toIsWkInftyCoeff and IsWkInfty.ofContDiff. Beside the bundles the declaration asks the principal coefficients Lipschitz, which the base case reads. The conclusion names a representative, an L^2 class having no pointwise values, and it is smooth on the interior of V, since smoothness is a statement about an open set"
     },
     {
       "decl": "EllipticPdes.Regularity.interior_smooth_global",
       "source_id": "evans-2010",
       "locator": "§6.3.1 Thm 3",
-      "claim": "extends interior_smooth to a single representative smooth on the whole of Omega, gluing the per-compact representatives of the cited theorem through exists_contDiffOn_of_compact_ae rather than through a fresh construction: two representatives are continuous and agree almost everywhere on the interior of whichever compact set is the smaller of the two, hence agree there. The two divergences of interior_smooth remain unchanged here: the solution is quantified over H_0^1(Omega) rather than Evans' H^1(U), and the coefficient bundle is global and in W^{k,infty} at every order rather than C^infty(U), an instance through IsCkCoeff.toIsWkInftyCoeff and IsWkInfty.ofContDiff. Evans' own statement already concludes u in C^infty(U) on the whole region rather than on a compact exhaustion piece at a time, so this declaration is the one that reaches the shape of his stated conclusion"
+      "claim": "extends interior_smooth to a single representative smooth on the whole of Omega, gluing the per-compact representatives of the cited theorem through exists_contDiffOn_of_compact_ae: two representatives are continuous and agree almost everywhere on the interior of whichever compact set is the smaller of the two, hence agree there. The two divergences of interior_smooth remain unchanged here: the solution is quantified over H_0^1(Omega), where Evans takes H^1(U), and the coefficient bundle is global and in W^{k,infty} at every order, where Evans takes C^infty(U), an instance through IsCkCoeff.toIsWkInftyCoeff and IsWkInfty.ofContDiff. Evans' own statement concludes u in C^infty(U) on the whole region, and this declaration is the one that reaches the shape of his stated conclusion"
     },
     {
       "decl": "EllipticPdes.Regularity.HasWeakDeriv.unique",
       "source_id": "evans-2010",
       "locator": "§6.3.1 Thm 2",
-      "claim": "formalises the uniqueness of the L^2 weak derivative on R^d, the identification that lets a second derivative obtained as a weak limit of difference quotients be equated with the one obtained from the Leibniz rule. Evans states no such lemma and performs the identification silently. The development quantifies its weak solutions over H_0^1(Omega) rather than Evans' H^1(U); this lemma is independent of that choice, holding for any L^2 class on the whole space. The step is proof step 3 of that theorem, the passage from (34) to the reading of D^alpha u in (35)."
+      "claim": "formalises the uniqueness of the L^2 weak derivative on R^d, the identification that lets a second derivative obtained as a weak limit of difference quotients be equated with the one obtained from the Leibniz rule. Evans states no such lemma and performs the identification silently. The development quantifies its weak solutions over H_0^1(Omega), where Evans takes H^1(U); this lemma is independent of that choice, holding for any L^2 class on the whole space. The step is proof step 3 of that theorem, the passage from (34) to the reading of D^alpha u in (35)."
     },
     {
       "decl": "EllipticPdes.Regularity.setIntegral_mul_partialD_cut_eq",
@@ -252,25 +252,25 @@
       "decl": "EllipticPdes.Regularity.outer_secondWeakDeriv",
       "source_id": "evans-2010",
       "locator": "§6.3.1 Thm 2",
-      "claim": "formalises the choice of the intermediate region W with V compactly inside W compactly inside U, as a second cutoff tower based at the topological support of the first tower's middle cutoff, together with the interior second weak derivatives of the solution on that region, as whole-space L^2 classes bounded by the data with one constant covering every direction pair. Evans fixes W and reads (31) and (32) off the induction hypothesis at m; here they come from interior_H2_estimate, for a weak solution quantified over H_0^1(Omega) rather than Evans' H^1(U). The step is proof step 2 of that theorem, the choice of W and the induction hypotheses (31) and (32)."
+      "claim": "formalises the choice of the intermediate region W with V compactly inside W compactly inside U, as a second cutoff tower based at the topological support of the first tower's middle cutoff, together with the interior second weak derivatives of the solution on that region, as whole-space L^2 classes bounded by the data with one constant covering every direction pair. Evans fixes W and reads (31) and (32) off the induction hypothesis at m; here they come from interior_H2_estimate, for a weak solution quantified over H_0^1(Omega), where Evans takes H^1(U). The step is proof step 2 of that theorem, the choice of W and the induction hypotheses (31) and (32)."
     },
     {
       "decl": "EllipticPdes.Regularity.localWeakForm_of_fullBilin",
       "source_id": "evans-2010",
       "locator": "§6.3.1 Thm 2",
-      "claim": "formalises the passage from the identity B[u, v] = (f, v)_{L^2(U)}, which this development states through a bounded bilinear form on the trial space H_0^1(Omega) rather than over Evans' H^1(U), to the plain-integral form of the same identity on a measurable V inside Omega, against test functions supported in V, with each coordinate read as the V-restriction of its extension by zero. Evans moves between the two forms without comment. The step is proof step 3 of that theorem, the identity into which v := (-1)^{|alpha|} D^alpha v-tilde is inserted."
+      "claim": "formalises the passage from the identity B[u, v] = (f, v)_{L^2(U)}, which this development states through a bounded bilinear form on the trial space H_0^1(Omega), where Evans takes H^1(U), to the plain-integral form of the same identity on a measurable V inside Omega, against test functions supported in V, with each coordinate read as the V-restriction of its extension by zero. Evans moves between the two forms without comment. The step is proof step 3 of that theorem, the identity into which v := (-1)^{|alpha|} D^alpha v-tilde is inserted."
     },
     {
       "decl": "EllipticPdes.Regularity.differentiated_weakForm_of_weakSolution",
       "source_id": "evans-2010",
       "locator": "§6.3.1 Thm 2",
-      "claim": "formalises equation (34) at |alpha| = 1 for a weak solution quantified over H_0^1(Omega) rather than Evans' H^1(U): on any compact V inside Omega the second weak derivatives exist with the interior H^2 bound, and the differentiated identity holds against every test function supported in V, with the datum delivered as the explicit lower-order sum of (36) rather than packaged as a single L^2 class. The weak l-derivative of f is carried as a hypothesis, since Evans (26) assumes f in H^m(U) and the datum (36) contains D^alpha f, which f in L^2 alone does not supply. The step is proof step 3 of that theorem, equations (34) to (36)."
+      "claim": "formalises equation (34) at |alpha| = 1 for a weak solution quantified over H_0^1(Omega), where Evans takes H^1(U): on any compact V inside Omega the second weak derivatives exist with the interior H^2 bound, and the differentiated identity holds against every test function supported in V, with the datum delivered as the explicit lower-order sum of (36). The weak l-derivative of f is a hypothesis, since Evans (26) assumes f in H^m(U) and the datum (36) contains D^alpha f, which f in L^2 alone does not supply. The step is proof step 3 of that theorem, equations (34) to (36)."
     },
     {
       "decl": "EllipticPdes.Regularity.higher_interior_regularity",
       "source_id": "evans-2010",
       "locator": "§6.3.1 Thm 2",
-      "claim": "formalises the theorem for a weak solution quantified over H_0^1(Omega) rather than Evans' H^1(U), and for coefficients in W^{k,infty} rather than C^{k+1}: a^{ij} in W^{k+1,infinity} and Lipschitz, b and c in W^{k,infinity}. On every compact V inside Omega the solution has weak derivatives to order k + 2, with one constant bounding all of them by the L^2 norms of the solution and of the datum's derivatives. Evans states the conclusion as u in H^{k+2}(V) with the estimate; the family indexed by lists of directions records the same data, named so that the induction can hand a derivative on. The datum's derivatives are a hypothesis with a bound, where Evans takes f in H^k(U). The induction differentiates the equation once per step, and the datum of the step to order k + 1 asks a^{ij} in W^{k+2,infinity} and b, c in W^{k+1,infinity}"
+      "claim": "formalises the theorem for a weak solution quantified over H_0^1(Omega), where Evans takes H^1(U), and for coefficients in W^{k,infty}, where Evans takes C^{k+1}: a^{ij} in W^{k+1,infinity} and Lipschitz, b and c in W^{k,infinity}. On every compact V inside Omega the solution has weak derivatives to order k + 2, with one constant bounding all of them by the L^2 norms of the solution and of the datum's derivatives. Evans states the conclusion as u in H^{k+2}(V) with the estimate; the family indexed by lists of directions records the same data, named so that the induction can hand a derivative on. The datum's derivatives are a hypothesis with a bound, where Evans takes f in H^k(U). The induction differentiates the equation once per step, and the datum of the step to order k + 1 asks a^{ij} in W^{k+2,infinity} and b, c in W^{k+1,infinity}"
     },
     {
       "decl": "EllipticPdes.Poincare.intervalIntegral_mul_sq_le",
@@ -288,7 +288,7 @@
       "decl": "EllipticPdes.Poincare.poincare_H01_of_bounded",
       "source_id": "evans-2010",
       "locator": "§5.6.1 Thm 3",
-      "claim": "formalises the p = q = 2 case on an arbitrary bounded Omega, over the solution space H_0^1(Omega) that Evans also takes: some C >= 0 bounds the function part by the gradient part throughout H_0^1(Omega). Evans takes U bounded and open and restricts to 1 <= p < n, so p = 2 carries the hypothesis n > 2; the declaration holds in every dimension and asks boundedness alone of Omega, the constant being transported from an enclosing box rather than derived from the Gagliardo-Nirenberg-Sobolev inequality, at the cost of L/sqrt(2n) in place of the sharp constant"
+      "claim": "formalises the p = q = 2 case on an arbitrary bounded Omega, over the solution space H_0^1(Omega) that Evans also takes: some C >= 0 bounds the function part by the gradient part throughout H_0^1(Omega). Evans takes U bounded and open and restricts to 1 <= p < n, and p = 2 then asks n > 2; the declaration holds in every dimension and asks boundedness alone of Omega, the constant being transported from an enclosing box, where Evans derives it from the Gagliardo-Nirenberg-Sobolev inequality, at the cost of L/sqrt(2n) in place of the sharp constant"
     },
     {
       "decl": "EllipticPdes.Embedding.memLp_of_gradClosed_fullStep",
@@ -306,7 +306,7 @@
       "decl": "EllipticPdes.Embedding.contDiffOn_holder_of_gradClosed",
       "source_id": "evans-2010",
       "locator": "§5.6.3 Thm 6",
-      "claim": "formalises clause (ii) at finite order, on a family closed under weak differentiation to bounded depth in place of a single W^{k,p} function: on a smaller concentric ball a member sitting n + 1 + floor(d/2) orders below the top of the supply has a representative of class C^n, and one sitting 1 + floor(d/2) below has a Holder-1/2 representative. At p = 2 that order is Evans' k - [n/p] - 1 exactly. The Holder exponent is his gamma = [n/p] + 1 - n/p when d is odd, and one admissible choice from the interval (0, 1) his statement leaves open when d is even. The conclusion is stated on the open ball rather than on a closure, and it names representatives, an L^2 class having no pointwise values; the last component identifies the family's entries as the classical partial derivatives of one another, which is what makes C^{n, 1/2} read as the multi-index statement Evans writes"
+      "claim": "formalises clause (ii) at finite order, on a family closed under weak differentiation to bounded depth in place of a single W^{k,p} function: on a smaller concentric ball a member sitting n + 1 + floor(d/2) orders below the top of the supply has a representative of class C^n, and one sitting 1 + floor(d/2) below has a Holder-1/2 representative. At p = 2 that order is Evans' k - [n/p] - 1 exactly. The Holder exponent is his gamma = [n/p] + 1 - n/p when d is odd, and one admissible choice from the interval (0, 1) his statement leaves open when d is even. The conclusion is stated on the open ball, and it names representatives, an L^2 class having no pointwise values; the last component identifies the family's entries as the classical partial derivatives of one another, which is what makes C^{n, 1/2} read as the multi-index statement Evans writes"
     },
     {
       "decl": "EllipticPdes.Regularity.exists_contDiffOn_holder_ball_of_hasIteratedWeakDerivOn",
@@ -324,7 +324,7 @@
       "decl": "EllipticPdes.Embedding.eLpNorm_le_of_mem_H01",
       "source_id": "evans-2010",
       "locator": "§5.6.1 Thm 3",
-      "claim": "formalises the estimate at the critical exponent alone, and on an arbitrary measurable Omega in place of a bounded open one. Evans states the range q in [1, p*] for a bounded U, and his proof reaches q = p* by approximating u in W_0^{1,p}(U) with C_c^infty(U) functions and applying Theorem 1 to the zero extension, using |U| < infinity only to drop from p* to a smaller q. At p = 2 that first half is what this states. The seminorm is the ENNReal-valued one and the gradient is read off the graph coordinates, so the right-hand side is the sum of the coordinate norms rather than ||Du||_{L^2}, and the constant is Mathlib's Gagliardo-Nirenberg-Sobolev constant, which depends on the dimension and the exponent alone where Evans lets C depend on U as well"
+      "claim": "formalises the estimate at the critical exponent alone, and on an arbitrary measurable Omega in place of a bounded open one. Evans states the range q in [1, p*] for a bounded U, and his proof reaches q = p* by approximating u in W_0^{1,p}(U) with C_c^infty(U) functions and applying Theorem 1 to the zero extension, using |U| < infinity only to drop from p* to a smaller q. At p = 2 that first half is what this states. The seminorm is the ENNReal-valued one and the gradient is read off the graph coordinates, so the right-hand side is the sum of the coordinate norms, where Evans writes ||Du||_{L^2}, and the constant is Mathlib's Gagliardo-Nirenberg-Sobolev constant, which depends on the dimension and the exponent alone where Evans lets C depend on U as well"
     },
     {
       "decl": "EllipticPdes.Embedding.eLpNorm_le_of_mem_H01_of_isBounded",
@@ -336,7 +336,7 @@
       "decl": "EllipticPdes.Analysis.eLpNorm_le_rpow_mul_rpow",
       "source_id": "evans-2010",
       "locator": "App. B (h)",
-      "claim": "formalises the interpolation inequality for L^p norms in the ENNReal-valued seminorm, at finite positive exponents and with a real parameter theta in (0,1), the reciprocal relation written 1/q = theta/r + (1-theta)/s. Evans states it for 1 <= s <= r <= t <= infinity and u in the intersection of the two end spaces; the seminorm form asks no membership, since an infinite right-hand side makes the bound vacuous, and the ordering of the three exponents follows from the relation rather than being assumed. The proof is his, Holder against the splitting of |u|^r into the two powers"
+      "claim": "formalises the interpolation inequality for L^p norms in the ENNReal-valued seminorm, at finite positive exponents and with a real parameter theta in (0,1), the reciprocal relation written 1/q = theta/r + (1-theta)/s. Evans states it for 1 <= s <= r <= t <= infinity and u in the intersection of the two end spaces; the seminorm form asks no membership, since an infinite right-hand side makes the bound vacuous, and the ordering of the three exponents follows from the relation. The proof is his, Holder against the splitting of |u|^r into the two powers"
     },
     {
       "decl": "EllipticPdes.Embedding.rellichEmbL_isCompact",
@@ -354,7 +354,7 @@
       "decl": "EllipticPdes.Embedding.rellichEmbL_isCompact_of_lt",
       "source_id": "evans-2010",
       "locator": "§5.7 Thm 1",
-      "claim": "formalises the theorem at p = 2 over its whole range, in the zero-boundary form: on a bounded measurable Omega the embedding of H_0^1(Omega) into L^q(Omega) is a compact operator for every q below the Sobolev conjugate, where Evans asks a bounded open U with C^1 boundary and writes the range as 1 <= q < p*. The lower bound q >= 1 is the Fact instance the target space needs. The interpolation parameter of the exponents above 2 is recovered from q < 2* here rather than assumed, and the two halves are rellichEmbL_isCompact_of_le and rellichEmbL_isCompact"
+      "claim": "formalises the theorem at p = 2 over its whole range, in the zero-boundary form: on a bounded measurable Omega the embedding of H_0^1(Omega) into L^q(Omega) is a compact operator for every q below the Sobolev conjugate, where Evans asks a bounded open U with C^1 boundary and writes the range as 1 <= q < p*. The lower bound q >= 1 is the Fact instance the target space needs. The interpolation parameter of the exponents above 2 is recovered here from q < 2*, and the two halves are rellichEmbL_isCompact_of_le and rellichEmbL_isCompact"
     },
     {
       "decl": "EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed_even",
@@ -384,7 +384,7 @@
       "decl": "EllipticPdes.Embedding.exists_minimiser_of_lt",
       "source_id": "evans-2010",
       "locator": "§8.4.1 Thm 1",
-      "claim": "formalises the existence of a constrained minimiser, with three differences from the statement as written. The constraint is the unit sphere of L^q rather than the vanishing of an integral of a general G, which is that constraint at G(z) = |z|^q minus a constant; the functional minimised is the H_0^1 norm rather than the Dirichlet energy, and Poincare makes the two equivalent on a bounded domain; and the exponent is restricted to q below the Sobolev conjugate, which is where rellichEmbL_isCompact_of_lt takes the constraint to the weak limit and where Evans' growth condition on G is spent. The domain is the unit ball, where the constraint set is inhabited by a renormalised bump"
+      "claim": "formalises the existence of a constrained minimiser, with three differences from the statement as written. The constraint is the unit sphere of L^q, which is the vanishing of the integral of G at G(z) = |z|^q minus a constant, where Evans allows a general G; the functional minimised is the H_0^1 norm, where Evans minimises the Dirichlet energy, and Poincare makes the two equivalent on a bounded domain; and the exponent is restricted to q below the Sobolev conjugate, which is where rellichEmbL_isCompact_of_lt takes the constraint to the weak limit and where Evans' growth condition on G is spent. The domain is the unit ball, where the constraint set is inhabited by a renormalised bump"
     },
     {
       "decl": "EllipticPdes.Sobolev.exists_principal_eigenpair",
@@ -396,7 +396,7 @@
       "decl": "EllipticPdes.Sobolev.principalEigenvalue_le_of_weak_eigen",
       "source_id": "evans-2010",
       "locator": "§6.5.1 Thm 2",
-      "claim": "formalises the reading of clause (i) as a minimum over the eigenvalues rather than over the constraint set: any nonzero weak solution of B[u, v] = lambda (u, v) has lambda >= lambda_1, so the infimum of the Rayleigh quotient is the smallest eigenvalue and the name principal eigenvalue is earned. Evans obtains this from the orthonormal basis of eigenfunctions of Theorem 1 and the ordering 0 < lambda_1 <= lambda_2 <= ... that precedes the definition; the proof here needs no basis, being the Rayleigh bound applied to the eigenfunction itself. Coercivity rules out a nonzero element with vanishing L^2 class, which is where the divergence-form hypotheses are spent"
+      "claim": "formalises the reading of clause (i) as a minimum over the eigenvalues: any nonzero weak solution of B[u, v] = lambda (u, v) has lambda >= lambda_1, so the infimum of the Rayleigh quotient is the smallest eigenvalue and the name principal eigenvalue is earned. Evans obtains this from the orthonormal basis of eigenfunctions of Theorem 1 and the ordering 0 < lambda_1 <= lambda_2 <= ... that precedes the definition; the proof here needs no basis, being the Rayleigh bound applied to the eigenfunction itself. Coercivity rules out a nonzero element with vanishing L^2 class, which is where the divergence-form hypotheses are spent"
     },
     {
       "decl": "EllipticPdes.Sobolev.dirichlet_principal_eigenpair",
@@ -408,7 +408,7 @@
       "decl": "EllipticPdes.Analysis.euler_lagrange_of_norm_min",
       "source_id": "evans-2010",
       "locator": "§8.4.1 Thm 2",
-      "claim": "formalises the Lagrange multiplier equation (10) in the abstract setting the proof needs: a vector minimising the norm of a real inner product space over the unit sphere of the image of a continuous linear map into L^q satisfies (U, V) = lambda times the integral of |TU|^{q-2} (TU)(TV) for every V. Evans states the constraint as the vanishing of the integral of a smooth G obeying the growth bound (3), which at G(z) = |z|^q / q minus a constant gives g(z) = |z|^{q-2} z and this constraint. Two differences: the functional is a squared norm rather than the Dirichlet energy, and the multiplier is named rather than merely asserted to exist, being the square of the minimum. Evans differentiates the constraint by the implicit function theorem, which the homogeneity of the L^q norm replaces here, rescaling U + tV back to the sphere"
+      "claim": "formalises the Lagrange multiplier equation (10) in the abstract setting the proof needs: a vector minimising the norm of a real inner product space over the unit sphere of the image of a continuous linear map into L^q satisfies (U, V) = lambda times the integral of |TU|^{q-2} (TU)(TV) for every V. Evans states the constraint as the vanishing of the integral of a smooth G obeying the growth bound (3), which at G(z) = |z|^q / q minus a constant gives g(z) = |z|^{q-2} z and this constraint. Two differences: the functional is a squared norm in place of the Dirichlet energy, and the multiplier is named as the square of the minimum, where Evans asserts only that one exists. Evans differentiates the constraint by the implicit function theorem, which the homogeneity of the L^q norm replaces here, rescaling U + tV back to the sphere"
     },
     {
       "decl": "EllipticPdes.Embedding.exists_weakSolution_semilinear_of_lt",
@@ -420,19 +420,19 @@
       "decl": "EllipticPdes.Analysis.exists_bilin_minimiser",
       "source_id": "evans-2010",
       "locator": "§8.4.1 Thm 1",
-      "claim": "states the existence of a constrained minimiser in the abstract setting the proof uses: a symmetric coercive form on a real Hilbert space attains its minimum on the set where a compact linear map into a normed space has unit norm. Evans minimises the Dirichlet energy I over the admissible class J[w] = 0 on a bounded connected smooth domain, and the two steps are the same, a weak limit of a minimising sequence and the passage of the constraint to that limit through compactness. Three differences: the constraint is the unit sphere of the image rather than the vanishing of an integral of a smooth G, so Evans's growth bound (3) has no counterpart; the compactness is a hypothesis on the map rather than the Rellich theorem at a fixed pair of exponents; and the target of the map is any normed space, the identification of the strong limit with the image of the weak limit going through the dual rather than through an adjoint"
+      "claim": "states the existence of a constrained minimiser in the abstract setting the proof uses: a symmetric coercive form on a real Hilbert space attains its minimum on the set where a compact linear map into a normed space has unit norm. Evans minimises the Dirichlet energy I over the admissible class J[w] = 0 on a bounded connected smooth domain, and the two steps are the same, a weak limit of a minimising sequence and the passage of the constraint to that limit through compactness. Three differences: the constraint is the unit sphere of the image in place of the vanishing of an integral of a smooth G, so Evans's growth bound (3) has no counterpart; the compactness is a hypothesis on the map, where Evans uses the Rellich theorem at a fixed pair of exponents; and the target of the map is any normed space, the identification of the strong limit with the image of the weak limit going through the dual"
     },
     {
       "decl": "EllipticPdes.Analysis.euler_lagrange_of_bilin_min",
       "source_id": "evans-2010",
       "locator": "§8.4.1 Thm 2",
-      "claim": "formalises the Lagrange multiplier equation (10) with the Dirichlet energy replaced by a symmetric positive semidefinite form B: a minimiser of B[W, W] over the unit L^q sphere of the image of T satisfies B[U, V] = B[U, U] times the integral of |TU|^{q-2} (TU)(TV) for every V. Evans states the constraint as the vanishing of the integral of a smooth G obeying (3), which at G(z) = |z|^q / q minus a constant gives g(z) = |z|^{q-2} z and this constraint. Two differences from Evans: the multiplier is named rather than merely asserted to exist, being the minimum itself, and the differentiation of the constraint uses the homogeneity of the L^q norm in place of the implicit function theorem, rescaling U + tV back to the sphere"
+      "claim": "formalises the Lagrange multiplier equation (10) with the Dirichlet energy replaced by a symmetric positive semidefinite form B: a minimiser of B[W, W] over the unit L^q sphere of the image of T satisfies B[U, V] = B[U, U] times the integral of |TU|^{q-2} (TU)(TV) for every V. Evans states the constraint as the vanishing of the integral of a smooth G obeying (3), which at G(z) = |z|^q / q minus a constant gives g(z) = |z|^{q-2} z and this constraint. Two differences from Evans: the multiplier is named as the minimum itself, where Evans asserts only that one exists, and the differentiation of the constraint uses the homogeneity of the L^q norm in place of the implicit function theorem, rescaling U + tV back to the sphere"
     },
     {
       "decl": "EllipticPdes.Embedding.exists_weakSolution_dirichlet_of_lt",
       "source_id": "evans-2010",
       "locator": "§8.4.1 Thm 2",
-      "claim": "instantiates the Lagrange multiplier equation (10) at the minimiser of the Dirichlet energy on the unit L^q sphere of the unit ball, so the pair (u, lambda) solves the nonlinear eigenvalue problem (11) of the Remark, -Delta u = lambda |u|^{q-2} u with zero boundary data, for 2 <= q below the Sobolev conjugate. This is Evans's equation with no lower-order term, where exists_weakSolution_semilinear_of_lt minimises the graph norm instead and reaches -Delta u + u = lambda |u|^{q-2} u. Two differences from Evans: the multiplier is the minimum of the Dirichlet energy, stated and shown positive, where Evans asserts only that some real lambda exists; and G(z) = |z|^q / q exceeds the quadratic growth (4) once q > 2, so the compactness supplying the minimiser is the Rellich theorem below the critical exponent rather than the L^2 convergence Evans uses in Theorem 1"
+      "claim": "instantiates the Lagrange multiplier equation (10) at the minimiser of the Dirichlet energy on the unit L^q sphere of the unit ball, so the pair (u, lambda) solves the nonlinear eigenvalue problem (11) of the Remark, -Delta u = lambda |u|^{q-2} u with zero boundary data, for 2 <= q below the Sobolev conjugate. This is Evans's equation with no lower-order term, where exists_weakSolution_semilinear_of_lt minimises the graph norm instead and reaches -Delta u + u = lambda |u|^{q-2} u. Two differences from Evans: the multiplier is the minimum of the Dirichlet energy, stated and shown positive, where Evans asserts only that some real lambda exists; and G(z) = |z|^q / q exceeds the quadratic growth (4) once q > 2, so the compactness supplying the minimiser is the Rellich theorem below the critical exponent, where Theorem 1 uses L^2 convergence"
     },
     {
       "decl": "EllipticPdes.Embedding.exists_weakSolution_dirichlet_of_lt'",
@@ -450,13 +450,13 @@
       "decl": "EllipticPdes.Sobolev.exists_eigen_family",
       "source_id": "evans-2010",
       "locator": "§6.5.1 Thm 1",
-      "claim": "gives clauses (ii) and (iii) for a finite initial segment and by the variational route: for every n there is an L^2-orthonormal family of n weak eigenfunctions of a symmetric coercive form in H_0^1(Omega) whose eigenvalues increase with the index, each eigenvalue being the infimum of the Rayleigh quotient over the vectors L^2-orthogonal to its predecessors. Evans obtains the same sequence from the spectral theorem for the compact self-adjoint inverse S = L^{-1}, so no eigenvalue of his is named by a formula, where solOp_spectral is that route. Three parts of Evans are absent: the family is finite at each stage rather than an orthonormal basis of L^2(U), the divergence of lambda_k is not stated, and the recursion takes as a hypothesis the existence at each stage of a vector of nonzero L^2 class orthogonal to the family built so far, which on a bounded domain is the infinite dimensionality of H_0^1(Omega)"
+      "claim": "gives clauses (ii) and (iii) for a finite initial segment and by the variational route: for every n there is an L^2-orthonormal family of n weak eigenfunctions of a symmetric coercive form in H_0^1(Omega) whose eigenvalues increase with the index, each eigenvalue being the infimum of the Rayleigh quotient over the vectors L^2-orthogonal to its predecessors. Evans obtains the same sequence from the spectral theorem for the compact self-adjoint inverse S = L^{-1}, so no eigenvalue of his is named by a formula, where solOp_spectral is that route. Three parts of Evans are absent: the family is finite at each stage, where Evans has an orthonormal basis of L^2(U), the divergence of lambda_k is not stated, and the recursion takes as a hypothesis the existence at each stage of a vector of nonzero L^2 class orthogonal to the family built so far, which on a bounded domain is the infinite dimensionality of H_0^1(Omega)"
     },
     {
       "decl": "EllipticPdes.Sobolev.dirichlet_eigen_family_of_bounded",
       "source_id": "evans-2010",
       "locator": "§6.5.1 Thm 1",
-      "claim": "instantiates clauses (ii) and (iii) at L = -Delta with Dirichlet data on a bounded measurable domain: for every n an L^2-orthonormal family of n weak solutions of -Delta w = lambda w with 0 < lambda_1 <= ... <= lambda_n, which is Evans's ordering read off a finite initial segment. The form is the Dirichlet one, so the eigenvalue is that of -Delta with no shift. Three parts of Evans are absent, as for exists_eigen_family: the family is finite rather than an orthonormal basis of L^2(U), the divergence of lambda_k is not stated, and the infinite dimensionality of H_0^1(Omega) is a hypothesis. Evans supposes the coefficients smooth and U connected with the eigenvalues coming from the spectral theorem for L^{-1}; here the domain is any bounded measurable set and each eigenvalue is an infimum of the Rayleigh quotient"
+      "claim": "instantiates clauses (ii) and (iii) at L = -Delta with Dirichlet data on a bounded measurable domain: for every n an L^2-orthonormal family of n weak solutions of -Delta w = lambda w with 0 < lambda_1 <= ... <= lambda_n, which is Evans's ordering read off a finite initial segment. The form is the Dirichlet one, so the eigenvalue is that of -Delta with no shift. Three parts of Evans are absent, as for exists_eigen_family: the family is finite, where Evans has an orthonormal basis of L^2(U), the divergence of lambda_k is not stated, and the infinite dimensionality of H_0^1(Omega) is a hypothesis. Evans supposes the coefficients smooth and U connected with the eigenvalues coming from the spectral theorem for L^{-1}; here the domain is any bounded measurable set and each eigenvalue is an infimum of the Rayleigh quotient"
     },
     {
       "decl": "EllipticPdes.Sobolev.dirichlet_principal_eigenpair_ball",
@@ -468,13 +468,13 @@
       "decl": "EllipticPdes.Sobolev.dirichlet_eigen_family_ball",
       "source_id": "evans-2010",
       "locator": "§6.5.1 Thm 1",
-      "claim": "clauses (ii) and (iii) at L = -Delta on the unit ball of R^d for d > 2, with no hypothesis beyond the dimension: for every n an L^2-orthonormal family of n weak solutions of -Delta w = lambda w with 0 < lambda_1 <= ... <= lambda_n. The infinite dimensionality of H_0^1 that exists_eigen_family and dirichlet_eigen_family_of_bounded take as a hypothesis is discharged by n bumps at the points ((2k+1)/(2n) - 1/2)e_i with disjoint supports, so this is the ordering Evans states with every side condition met. Two parts of Evans are still absent: the family is finite at each stage rather than an orthonormal basis of L^2(U), and the divergence of lambda_k stays open. Evans supposes the coefficients smooth and U connected and reads the sequence off the spectral theorem for L^{-1}; here each eigenvalue is an infimum of the Rayleigh quotient over the vectors orthogonal to its predecessors"
+      "claim": "clauses (ii) and (iii) at L = -Delta on the unit ball of R^d for d > 2, with no hypothesis beyond the dimension: for every n an L^2-orthonormal family of n weak solutions of -Delta w = lambda w with 0 < lambda_1 <= ... <= lambda_n. The infinite dimensionality of H_0^1 that exists_eigen_family and dirichlet_eigen_family_of_bounded take as a hypothesis is discharged by n bumps at the points ((2k+1)/(2n) - 1/2)e_i with disjoint supports, so this is the ordering Evans states with every side condition met. Two parts of Evans are still absent: the family is finite at each stage, where Evans has an orthonormal basis of L^2(U), and the divergence of lambda_k stays open. Evans supposes the coefficients smooth and U connected and reads the sequence off the spectral theorem for L^{-1}; here each eigenvalue is an infimum of the Rayleigh quotient over the vectors orthogonal to its predecessors"
     },
     {
       "decl": "EllipticPdes.Sobolev.weak_eigenvalue_pos",
       "source_id": "evans-2010",
       "locator": "§6.5.1 Thm 1",
-      "claim": "the positivity clause of (ii), 0 < lambda_1, in the form the variational route gives it: every weak eigenvalue of a symmetric coercive form on H_0^1(Omega) is positive, being at least the principal eigenvalue, which exceeds the coercivity constant. Evans reads the same positivity off the spectral theorem for the compact self-adjoint inverse S = L^{-1} together with the energy estimate, and states it inside clause (ii) rather than separately. The statement here quantifies over weak eigenpairs of the form directly, so it covers the eigenvalues of solOp through solOp_weak_eigen without passing through S"
+      "claim": "the positivity clause of (ii), 0 < lambda_1, in the form the variational route gives it: every weak eigenvalue of a symmetric coercive form on H_0^1(Omega) is positive, being at least the principal eigenvalue, which exceeds the coercivity constant. Evans reads the same positivity off the spectral theorem for the compact self-adjoint inverse S = L^{-1} together with the energy estimate, and states it inside clause (ii). The statement here quantifies over weak eigenpairs of the form directly, so it covers the eigenvalues of solOp through solOp_weak_eigen without passing through S"
     },
     {
       "decl": "EllipticPdes.Sobolev.solOp_finiteDimensional_eigenspace",
@@ -498,25 +498,25 @@
       "decl": "EllipticPdes.Embedding.memLp_of_gradClosed_general_ideal",
       "source_id": "evans-2010",
       "locator": "§5.6.3 Thm 6",
-      "claim": "clause (i) at the exponent Evans names: under the strict rung condition p_0 s < d, which is his k < n/p, the reciprocal 1/p_0 - s/d is positive and the ladder lands on the exponent naming it, which is his 1/q = 1/p - k/n. Three differences from Evans: the conclusion is on a ball inside a ball rather than on a bounded C^1 domain, so no extension operator is involved; it is membership rather than the norm estimate, which exists_const_eLpNorm_le_of_gradClosed_fullStep supplies at p_0 = 2; and the object iterated on is a family closed under weak differentiation with a depth function in place of the symbol D^alpha u at every order"
+      "claim": "clause (i) at the exponent Evans names: under the strict rung condition p_0 s < d, which is his k < n/p, the reciprocal 1/p_0 - s/d is positive and the ladder lands on the exponent naming it, which is his 1/q = 1/p - k/n. Three differences from Evans: the conclusion is on a ball inside a ball in place of a bounded C^1 domain and involves no extension operator; it states membership in place of the norm estimate, which exists_const_eLpNorm_le_of_gradClosed_fullStep supplies at p_0 = 2; and the object iterated on is a family closed under weak differentiation with a depth function in place of the symbol D^alpha u at every order"
     },
     {
       "decl": "EllipticPdes.Embedding.memLp_of_gradClosed_compactSupport",
       "source_id": "evans-2010",
       "locator": "§5.6.3 Thm 6",
-      "claim": "the machinery behind clause (i) on the whole space, with the target exponent left free. Evans states, for u in W^{k,p}(U) with k < n/p, that u lies in L^q(U) for 1/q = 1/p - k/n; this iterates the single rung of §5.6.1 Theorem 1 from an arbitrary base exponent p_0 in [1, infinity) over a compactly supported family closed under weak differentiation and to bounded depth, landing on any q >= p_0 whose reciprocal is at least 1/p_0 - s/d after s rungs with p_0 s <= d. Two differences from Evans: the domain is R^d rather than a bounded C^1 domain, so no extension operator is involved and no rung shrinks the domain, a compactly supported class needing none of the cutoff the ball version applies at every rung; and the object iterated on is a family closed under weak differentiation with a depth function in place of the symbol D^alpha u at every order. This is the half of the order-k embedding that asks nothing of a boundary"
+      "claim": "the machinery behind clause (i) on the whole space, with the target exponent left free. Evans states, for u in W^{k,p}(U) with k < n/p, that u lies in L^q(U) for 1/q = 1/p - k/n; this iterates the single rung of §5.6.1 Theorem 1 from an arbitrary base exponent p_0 in [1, infinity) over a compactly supported family closed under weak differentiation and to bounded depth, landing on any q >= p_0 whose reciprocal is at least 1/p_0 - s/d after s rungs with p_0 s <= d. Two differences from Evans: the domain is R^d in place of a bounded C^1 domain, where no extension operator is involved and no rung shrinks the domain, a compactly supported class needing none of the cutoff the ball version applies at every rung; and the object iterated on is a family closed under weak differentiation with a depth function in place of the symbol D^alpha u at every order. This is the half of the order-k embedding that asks nothing of a boundary"
     },
     {
       "decl": "EllipticPdes.Embedding.memLp_of_gradClosed_compactSupport_ideal",
       "source_id": "evans-2010",
       "locator": "§5.6.3 Thm 6",
-      "claim": "clause (i) at the exponent Evans names, on the whole space: under the strict rung condition p_0 s < d, which is his k < n/p, the reciprocal 1/p_0 - s/d is positive and the ladder lands on the exponent naming it, which is his 1/q = 1/p - k/n. Three differences from Evans: the domain is R^d and the family compactly supported, so no extension operator is involved and no rung shrinks the domain; it is membership rather than the norm estimate; and the object iterated on is a family closed under weak differentiation with a depth function in place of D^alpha u at every order"
+      "claim": "clause (i) at the exponent Evans names, on the whole space: under the strict rung condition p_0 s < d, which is his k < n/p, the reciprocal 1/p_0 - s/d is positive and the ladder lands on the exponent naming it, which is his 1/q = 1/p - k/n. Three differences from Evans: the domain is R^d and the family compactly supported, where no extension operator is involved and no rung shrinks the domain; it states membership in place of the norm estimate; and the object iterated on is a family closed under weak differentiation with a depth function in place of D^alpha u at every order"
     },
     {
       "decl": "EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed_general",
       "source_id": "evans-2010",
       "locator": "§5.6.3 Thm 6",
-      "claim": "clause (ii) at a general base exponent. Evans states, for u in W^{k,p}(U) with k > n/p, that u lies in C^{k-1-floor(n/p), gamma}(closure U); this runs the ladder for s rungs from L^{p_0} over a family closed under weak differentiation and reads the Holder exponent off Morrey's inequality at the exponent the ladder reaches. The rung count and the landing exponent are free, so the statement covers both of the cases Evans separates: the exponent floor(n/p) + 1 - n/p when n/p is not an integer, and every value in (0,1) when it is, since the ladder then reaches every finite exponent. Three differences from Evans: the conclusion is on a ball inside a ball rather than on a bounded C^1 domain and its closure, so no extension operator is involved; it is Holder continuity of a representative rather than the norm estimate; and the object is a family closed under weak differentiation with a depth function in place of D^alpha u at every order"
+      "claim": "clause (ii) at a general base exponent. Evans states, for u in W^{k,p}(U) with k > n/p, that u lies in C^{k-1-floor(n/p), gamma}(closure U); this runs the ladder for s rungs from L^{p_0} over a family closed under weak differentiation and reads the Holder exponent off Morrey's inequality at the exponent the ladder reaches. The rung count and the landing exponent are free, so the statement covers both of the cases Evans separates: the exponent floor(n/p) + 1 - n/p when n/p is not an integer, and every value in (0,1) when it is, since the ladder then reaches every finite exponent. Three differences from Evans: the conclusion is on a ball inside a ball in place of a bounded C^1 domain and its closure and involves no extension operator; it states Holder continuity of a representative in place of the norm estimate; and the object is a family closed under weak differentiation with a depth function in place of D^alpha u at every order"
     },
     {
       "decl": "EllipticPdes.Embedding.morreyExponent_eq_ladder",
@@ -552,7 +552,7 @@
       "decl": "EllipticPdes.Embedding.exists_const_holderOnWith_of_gradClosed_domain",
       "source_id": "evans-2010",
       "locator": "§5.6.3 Thm 6",
-      "claim": "case (ii) of the theorem at a general exponent above the dimension: the iteration on the domain followed by Morrey's inequality places a member of depth at most m - 1 - s in C^{0,1-d/P} on the closure of the domain. The same constant bounds the supremum, so the estimate is on the whole Hölder norm rather than the seminorm alone"
+      "claim": "case (ii) of the theorem at a general exponent above the dimension: the iteration on the domain followed by Morrey's inequality places a member of depth at most m - 1 - s in C^{0,1-d/P} on the closure of the domain. The same constant bounds the supremum and the estimate covers the whole Hölder norm"
     },
     {
       "decl": "EllipticPdes.Embedding.exists_const_memLp_of_gradClosed_domain_ideal",
@@ -594,13 +594,13 @@
       "decl": "EllipticPdes.Extension.localExtension_bound",
       "source_id": "evans-2010",
       "locator": "§5.4 Thm 1",
-      "claim": "formalises the local half of the theorem, on one boundary chart, against a named extension rather than an existentially quantified one. Evans reflects across a flattened boundary with the higher-order formula that keeps the extension C^1; this reflects evenly, which is what a statement about weak gradients throughout needs, and the chart's graph and cutoff are chosen from the chart alone so that the extension is a formula in the class"
+      "claim": "formalises the local half of the theorem, on one boundary chart, against a named extension, where Evans quantifies the extension existentially. Evans reflects across a flattened boundary with the higher-order formula that keeps the extension C^1; this reflects evenly, which is what a statement about weak gradients throughout needs, and the chart's graph and cutoff are chosen from the chart alone so that the extension is a formula in the class"
     },
     {
       "decl": "EllipticPdes.Extension.extension_bound",
       "source_id": "evans-2010",
       "locator": "§5.4 Thm 1",
-      "claim": "formalises the theorem without its support clause, against a named extension: the pieces of a given partition of unity are summed, and the estimate of clause (iii) has its constant quantified before the class. The partition is an argument rather than a choice inside the proof, which is what lets the sum be read as a function of the class"
+      "claim": "formalises the theorem without its support clause, against a named extension: the pieces of a given partition of unity are summed, and the estimate of clause (iii) has its constant quantified before the class. The partition is an argument of the statement, and this lets the sum be read as a function of the class"
     },
     {
       "decl": "EllipticPdes.Extension.extension_subset_bound",
@@ -612,7 +612,7 @@
       "decl": "EllipticPdes.Extension.exists_extLinear",
       "source_id": "evans-2010",
       "locator": "§5.4 Thm 1",
-      "claim": "formalises the theorem as Evans states it, as one linear map and one constant serving every class. The cited statement gives a bounded linear operator between W^{1,p}(U) and W^{1,p}(R^n); the statement here gives an R-linear map on the pair of a class and its gradient, with the three clauses and the bound holding of every pair that has a weak gradient on the domain, at every exponent. The difference is the space: this development relates a class to its gradient through HasWeakGradOn rather than through a bundled Sobolev space, so the bound is stated on the pair in place of an operator norm"
+      "claim": "formalises the theorem as Evans states it, as one linear map and one constant serving every class. The cited statement gives a bounded linear operator between W^{1,p}(U) and W^{1,p}(R^n); the statement here gives an R-linear map on the pair of a class and its gradient, with the three clauses and the bound holding of every pair that has a weak gradient on the domain, at every exponent. The difference is the space: this development relates a class to its gradient through HasWeakGradOn in place of a bundled Sobolev space, and the bound is stated on the pair in place of an operator norm"
     },
     {
       "decl": "EllipticPdes.Regularity.exists_weakSolution_interior_smooth",
@@ -900,7 +900,7 @@
       "decl": "EllipticPdes.Embedding.morrey_ball_contDiff",
       "source_id": "evans-2010",
       "locator": "§5.6.2 Thm 4",
-      "claim": "formalises the Hölder-seminorm clause of the cited inequality, for a smooth function on a ball rather than a C^1 function on R^n, in the sharper form the remark after the proof describes as trickier: the seminorm of u at the exponent 1 - n/p over the ball is bounded by a constant times the L^p norms of the partial derivatives over the same ball. The supremum clause of the C^{0,gamma} norm, which the source bounds by the W^{1,p} norm through the L^p norm of u, remains open. The proof is the cited one, the averaged estimate of |u(x) - u(y)| by the integral of |Du(z)|/|x - z|^{n-1} over a ball and Hölder's inequality"
+      "claim": "formalises the Hölder-seminorm clause of the cited inequality, for a smooth function on a ball, where Evans takes a C^1 function on R^n, in the sharper form the remark after the proof describes as trickier: the seminorm of u at the exponent 1 - n/p over the ball is bounded by a constant times the L^p norms of the partial derivatives over the same ball. The supremum clause of the C^{0,gamma} norm, which the source bounds by the W^{1,p} norm through the L^p norm of u, remains open. The proof is the cited one, the averaged estimate of |u(x) - u(y)| by the integral of |Du(z)|/|x - z|^{n-1} over a ball and Hölder's inequality"
     },
     {
       "decl": "EllipticPdes.Embedding.morrey_ball",
@@ -971,8 +971,8 @@
     {
       "decl": "EllipticPdes.Regularity.interior_smooth",
       "source_id": "gilbarg-2001",
-      "locator": "§8.3 Thm 8.10",
-      "claim": "formalises the conclusion of the cited theorem at every order at once, which is its Corollary 8.11 for a solution with zero boundary values: with the coefficients of the operator having bounded weak derivatives of every order on the set, the source's C^{k,1} and C^{k-1,1} for every k, and f with weak derivatives of every order in L^2, the solution of L u = f in W_0^{1,2}(Omega) has a representative smooth on the interior of any compact subset. The estimate (8.24) at each finite order remains open in this form. The proof is the cited one, the induction of Theorem 8.8 through the differentiated equation"
+      "locator": "§8.3 Cor 8.11",
+      "claim": "formalises the corollary for a solution with zero boundary values: with the coefficients of the operator having bounded weak derivatives of every order on the set and f having weak derivatives of every order in L^2, where the corollary asks C^infty(Omega) of both, the solution of L u = f in W_0^{1,2}(Omega) has a representative smooth on the interior of any compact subset. The estimate (8.24) of Theorem 8.10 at each finite order remains open in this form. The proof is that of Theorem 8.10, the induction of Theorem 8.8 through the differentiated equation"
     },
     {
       "decl": "EllipticPdes.Sobolev.symmetric_fullElliptic_spectral",

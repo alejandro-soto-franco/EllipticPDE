@@ -21,11 +21,9 @@ weak derivatives, which is what the iterated Sobolev ladder
 
 This file discharges that supply from the equation.
 `EllipticPdes.Regularity.higher_interior_regularity` at order `j` gives `j + 2` orders of weak
-derivative of the solution on any compact `V ⊆ Ω`, so
-running it at `j = k + 1 + ⌊d/2⌋` covers the embedding condition with room to spare, and the
-composition
-is the interior `C^{k,1/2}` estimate for the weak solution itself, in every dimension and at every
-finite order `k`.
+derivative of the solution on any compact `V ⊆ Ω`, so running it at `j = k + 1 + ⌊d/2⌋` covers the
+embedding condition with room to spare, and the composition is the interior `C^{k,1/2}` estimate for
+the weak solution itself, in every dimension and at every finite order `k`.
 
 `EllipticPdes.Regularity.interior_smooth` is the same composition run at every order at once, and
 concludes `C^∞` on the interior of `V`. The finite-order statement here asks finitely much of the

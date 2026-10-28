@@ -29,9 +29,8 @@ reaches `C^n` while `dep i + n + 1 + ⌊d/2⌋ ≤ m`, and at `dep i = 0` that i
 
 ## Hölder exponent
 
-The ladder lands on `L^{2d}` and `EllipticPdes.Embedding.morrey_ball` reads off `1 - d/(2d)`, so
-the exponent is `1/2` in every dimension. For `d` odd this is the `⌊d/2⌋ + 1 - d/2` of that theorem
-on
+The ladder lands on `L^{2d}` and `EllipticPdes.Embedding.morrey_ball` reads off `1 - d/(2d)`, so the
+exponent is `1/2` in every dimension. For `d` odd this is the `⌊d/2⌋ + 1 - d/2` of that theorem on
 the nose. For `d` even `d/2` is an integer, the theorem leaves `γ` free in `(0, 1)`, and `1/2` is
 one admissible choice: the ladder's landing reciprocal is `0` there, so every finite exponent is
 reached and `2d` is the one this file fixes.

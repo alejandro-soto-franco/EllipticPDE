@@ -315,8 +315,7 @@ theorem localOp_fst_eq {c : C1Chart d} {γ ξ : EuclideanSpace ℝ (Fin d) → �
 
 /-- **Local boundary extension with its constant** (local step of the proof of Evans §5.4
 Theorem 1). Near a boundary point the class extends across the boundary: on any ball strictly inside
-the
-chart's, `localExt` has a weak gradient there and agrees with the original on the part of the
+the chart's, `localExt` has a weak gradient there and agrees with the original on the part of the
 domain the ball meets, and both it and its gradient are bounded in every `Lᵖ` seminorm by the
 class and its gradient over the domain, with one constant taken before the class. -/
 theorem localExtension_bound (c : C1Chart d) {Ω : Set (EuclideanSpace ℝ (Fin d))}
