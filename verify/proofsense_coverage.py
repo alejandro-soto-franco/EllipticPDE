@@ -246,8 +246,32 @@ EXEMPT = {
         "the converse of the unpacking of that space's defining constraint and states nothing "
         "either text numbers; both define W^{1,2}(Omega) as the set of such classes"
     ),
+    "EllipticPdes.Regularity.weakSolution_ae_eq_of_contDiffOn": (
+        "a weak solution whose representative is C^2 on an open set satisfies the equation there "
+        "almost everywhere, by integration by parts and the fundamental lemma of the calculus of "
+        "variations. Evans reads a smooth weak solution as a classical one in 6.1.2 and 6.3.1 "
+        "without stating a lemma, and Gilbarg and Trudinger likewise, so no transcribed "
+        "statement matches it"
+    ),
+    "EllipticPdes.Classical.not_isLocalMax_of_nondivOp_neg": (
+        "a strict subsolution has no interior local maximum. Gilbarg and Trudinger prove it as "
+        "the first step of 3.1 Theorem 3.1 and Evans as the first step of 6.4.1 Theorem 1, and "
+        "neither states it as a result, so no transcribed statement matches it"
+    ),
+    "EllipticPdes.Classical.avoidance_principle": (
+        "two ordered functions with ordered images under L either agree or are strictly "
+        "ordered on a connected open set. It is the strong maximum principle of Gilbarg and "
+        "Trudinger 3.2 Theorem 3.5 applied to the difference, which neither text states as a "
+        "result, so no transcribed statement matches it"
+    ),
+    "EllipticPdes.Classical.eq_of_eq_of_fderiv_eq": (
+        "two ordered functions with ordered images under L that touch with equal derivatives "
+        "at a boundary point with an interior sphere agree. It is the Hopf lemma of Gilbarg and "
+        "Trudinger 3.2 Lemma 3.4 applied to the difference, which neither text states as a "
+        "result, so no transcribed statement matches it"
+    ),
     "EllipticPdes.Extension.hasC1Boundary_ball": (
-        "the unit ball has C^1 boundary in the sense of Evans C.1 and Guo III.1.1. Both texts "
+        "the unit ball has C^1 boundary in the sense of Evans C.1 and Gilbarg and Trudinger 6.2. Both texts "
         "define the notion and neither states a lemma that a ball satisfies it, so no transcribed "
         "statement matches it; it is the instance that shows the boundary hypothesis of every "
         "bounded-domain theorem here is inhabited"
@@ -256,7 +280,7 @@ EXEMPT = {
         "the classical gradient of a C^1 function on an open set is a weak gradient there, by "
         "integration by parts against a test function of compact support. Both texts read a "
         "classical derivative as a weak one without stating a lemma, Evans in 5.2.1 after the "
-        "definition of the weak derivative and Guo in II.1, so no transcribed statement matches it"
+        "definition of the weak derivative and Gilbarg and Trudinger in 7.3, so no transcribed statement matches it"
     ),
     "EllipticPdes.Embedding.ae_const_of_hasWeakGradOn_zero": (
         "a class with zero weak gradient on a preconnected open set is constant almost "
@@ -316,14 +340,14 @@ EXEMPT = {
         "boundary, which is the remaining step of that theorem"
     ),
     "EllipticPdes.Extension.exists_extension_subset": (
-        "clauses (i) and (ii) of Guo III.2.2 together: the extension agrees with the class on the "
-        "domain and is supported inside any open set the closure of the domain sits in. Guo "
-        "reaches (ii) by multiplying by a cutoff equal to one on the domain, which is what this "
-        "does. exists_extension_subset_bound adds clause (iii), the norm bound. Neither builds the "
+        "clauses (i) and (ii) of Evans 5.4 Theorem 1 together: the extension agrees with the class "
+        "on the domain and is supported inside any open set the closure of the domain sits in. "
+        "Evans reaches (ii) by multiplying by a cutoff equal to one on the domain, which is what "
+        "this does. exists_extension_subset_bound adds clause (iii), the norm bound. Neither builds the "
         "operator as a bounded linear map, so each statement is an existence with an estimate"
     ),
     "EllipticPdes.Extension.exists_extension": (
-        "step 3 of Guo's proof of III.2.2, the sum of the local extensions against a partition of "
+        "the last step of the proof of Evans 5.4 Theorem 1, the sum of the local extensions against a partition of "
         "unity, which extends the class across the whole boundary and agrees with it on the "
         "domain. That is clause (i) of the theorem together with the existence of the extension's "
         "weak gradient; exists_extension_subset states clause (ii) on the support and "
@@ -331,30 +355,30 @@ EXEMPT = {
         "transcribed statements, so no locator matches"
     ),
     "EllipticPdes.Extension.exists_localExtension_bound": (
-        "the local half of clause (iii) of Guo III.2.2, at every exponent p >= 1: near a "
+        "the local half of clause (iii) of Evans 5.4 Theorem 1, at every exponent p >= 1: near a "
         "boundary point the extension is bounded by the class and its gradient over the "
-        "domain, with a constant reading off the chart alone. Evans 5.4 Theorem 1 and Guo "
-        "both prove the local bound inside the proof of the assembled operator and state no "
+        "domain, with a constant reading off the chart alone. Evans 5.4 Theorem 1 "
+        "proves the local bound inside the proof of the assembled operator and state no "
         "lemma for a single chart, so no transcribed statement matches it"
     ),
     "EllipticPdes.Extension.exists_localExtension": (
-        "step 2 of Guo's proof of III.2.2: near a boundary point the class extends across the "
+        "the local step of the proof of Evans 5.4 Theorem 1: near a boundary point the class extends across the "
         "boundary, agreeing with the original on the part of the domain the neighbourhood meets. "
-        "That is a step of a proof rather than a numbered statement, and Evans 5.4 Theorem 1 "
-        "performs the same passage inside its own proof, so no transcribed statement matches it. "
-        "Guo runs the step on a function smooth up to the boundary and reads the chain rule off "
-        "it; every step here is a weak gradient"
+        "That is a step of a proof and no numbered statement, so no transcribed statement matches "
+        "it. Evans runs the step on a function smooth up to the boundary and reads the chain rule "
+        "off it; every step here is a weak gradient"
     ),
     "EllipticPdes.Extension.nonempty_boundaryPartition": (
-        "the cover and the partition of unity that step 3 of Guo's proof of III.2.2 glues with, "
-        "bundled. Guo takes the partition for granted in one clause of that step and states no "
+        "the cover and the partition of unity that the last step of the proof of Evans 5.4 "
+        "Theorem 1 glues with, bundled. Evans takes the partition for granted in one clause of "
+        "that step and states no "
         "lemma for it, so no transcribed statement matches it. Mathlib proves the partition for "
         "a manifold; a normed space is one over itself, and the smoothness of each piece is read "
         "back as ContDiff so that nothing downstream meets a manifold"
     ),
     "EllipticPdes.Extension.exists_finite_chart_cover": (
-        "the finite subcover of the boundary that opens step 3 of Guo's proof of III.2.2, where "
-        "he writes that the boundary being compact there are finitely many points whose "
+        "the finite subcover of the boundary that opens the last step of the proof of Evans 5.4 "
+        "Theorem 1, where he writes that the boundary being compact there are finitely many points whose "
         "neighbourhoods cover it. That is a step of a proof rather than a statement of its own, "
         "so no transcribed statement matches it. The dimension is asked to be positive, since a "
         "chart names a direction for its graph and dimension zero has none"
@@ -389,8 +413,8 @@ EXEMPT = {
         "states a first-derivative Caccioppoli estimate, which Evans proves "
         "inside 6.3.1 Theorem 1 rather than stating as a numbered result; "
         "Gilbarg and Trudinger Theorem 8.8 is the match and is not transcribed. "
-        "Guo Lemma X.3.5 carries the name but states the non-negative "
-        "subsolution form with no datum, so it is a different lemma"
+        "The De Giorgi form, for a non-negative subsolution with no datum, "
+        "is a different lemma"
     ),
     "EllipticPdes.Poincare.poincare_domain": (
         "the averaging step over an arbitrary family, with no gradient and no "
@@ -516,8 +540,8 @@ EXEMPT = {
     "EllipticPdes.Embedding.not_isCompactOperator_critEmb": (
         "the sharpness of the range in 5.7 Theorem 1. Evans states compactness "
         "for q < p* and says nothing of the endpoint, and the scaling family "
-        "that rules it out is Guo's Example IV.2.11, which is not among the "
-        "transcribed sources, so no transcribed statement matches it. The "
+        "that rules it out is a standard dilation example, which no "
+        "transcribed source states, so no transcribed statement matches it. The "
         "compactness it complements is warranted at rellichEmbL_isCompact_of_lt"
     ),
     "EllipticPdes.Embedding.eLpNorm_weakSolution_le": (
@@ -585,7 +609,7 @@ EXEMPT = {
 #   App. A (H3)                   a labelled property in a lettered appendix
 #
 # The chapter-numbered form arrived with Gilbarg and Trudinger, who number every
-# result by chapter, and the roman form with Guo, whose chapters are roman. The named and lettered forms arrived with the Fernandez-Real and Ros-Oton text,
+# result by chapter, and the roman form with lecture notes whose chapters are roman. The named and lettered forms arrived with the Fernandez-Real and Ros-Oton text,
 # which numbers its appendix properties (H1) to (H8) and leaves several chapter
 # theorems unnumbered. Restricting the rule to the first form would have forced
 # a warrant for either to cite the enclosing section, which is the failure this

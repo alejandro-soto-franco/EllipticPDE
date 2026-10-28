@@ -28,7 +28,7 @@ def manifest(tmp_path, monkeypatch):
     def write(warrants: list[dict], source_text: str) -> None:
         (tmp_path / "proofsense" / "manifest.json").write_text(
             json.dumps({"warrants": warrants}), encoding="utf-8")
-        (ocr / "guo-2026-par-dif-equ.jsonl").write_text(
+        (ocr / "gilbarg-2001-ell-par-dif.jsonl").write_text(
             json.dumps({"page": 1, "blocks": [{"text": source_text}]}) + "\n",
             encoding="utf-8")
 
@@ -36,21 +36,21 @@ def manifest(tmp_path, monkeypatch):
 
 
 def _warrant(locator: str) -> dict:
-    return {"decl": "EllipticPdes.t", "source_id": "guo-2026",
+    return {"decl": "EllipticPdes.t", "source_id": "gilbarg-2001",
             "locator": locator, "claim": "formalises it"}
 
 
 def test_a_locator_the_source_does_not_number_is_found(manifest):
-    """Guo's section VII.4 stops at VII.4.6, and the manuscript cited VII.4.7."""
-    manifest([_warrant("§VII.4 Thm VII.4.7")],
-             "Theorem VII.4.4. Fredholm Alternative. Remark VII.4.6.")
+    """A manuscript once cited a theorem one past the last its section numbers."""
+    manifest([_warrant("§6.3 Thm 6.16")],
+             "Theorem 6.13. The Dirichlet problem. Theorem 6.15. Fredholm alternative.")
     findings = la.audit()
-    assert findings and "VII.4.7" in findings[0]
+    assert findings and "6.16" in findings[0]
 
 
 def test_a_locator_the_source_numbers_passes(manifest):
-    manifest([_warrant("§VII.4 Thm VII.4.4")],
-             "Theorem VII.4.4. Fredholm Alternative.")
+    manifest([_warrant("§6.3 Thm 6.15")],
+             "Theorem 6.15. Fredholm alternative.")
     assert la.audit() == []
 
 
@@ -67,8 +67,8 @@ def test_a_section_numbered_statement_matches_on_its_own_number(manifest):
 
 def test_a_source_with_no_transcription_is_reported(manifest, monkeypatch):
     """A missing transcription is reported rather than passed over."""
-    manifest([_warrant("§VII.4 Thm VII.4.4")], "Theorem VII.4.4.")
-    (la.OCR / "guo-2026-par-dif-equ.jsonl").unlink()
+    manifest([_warrant("§6.3 Thm 6.15")], "Theorem 6.15.")
+    (la.OCR / "gilbarg-2001-ell-par-dif.jsonl").unlink()
     findings = la.audit()
     assert findings and "adduce cite ocr" in findings[0]
 
@@ -82,28 +82,28 @@ def test_a_source_the_map_does_not_know_is_reported(manifest):
 
 def test_a_locator_naming_a_statement_in_words_is_left_to_a_reader(manifest):
     """`App. A (H3)` names a labelled property, which no number resolves."""
-    manifest([_warrant("App. A (H3)")], "Theorem VII.4.4.")
+    manifest([_warrant("App. A (H3)")], "Theorem 6.15.")
     assert la.audit() == []
 
 
 def test_a_docstring_citing_a_statement_the_source_lacks_is_found(manifest, tmp_path):
     """The docstrings are a second record of what the library leans on."""
-    manifest([], "Theorem VIII.3.2. Higher Interior Regularity.")
+    manifest([], "Theorem 8.3. The generalized Dirichlet problem.")
     lean = tmp_path / "lean" / "EllipticPdes"
     lean.mkdir(parents=True)
     (lean / "A.lean").write_text(
-        "/-- Guo, *Partial Differential Equations* (Notes), Theorem VIII.9.9 asks. -/\n"
+        "/-- Gilbarg and Trudinger, *Elliptic PDE of Second Order* (2001), Theorem 8.99 asks. -/\n"
         "theorem t : True := trivial\n", encoding="utf-8")
     findings = la.audit()
-    assert findings and "VIII.9.9" in findings[0]
+    assert findings and "8.99" in findings[0]
 
 
 def test_a_docstring_citing_a_statement_the_source_numbers_passes(manifest, tmp_path):
-    manifest([], "Theorem VIII.3.2. Higher Interior Regularity.")
+    manifest([], "Theorem 8.3. The generalized Dirichlet problem.")
     lean = tmp_path / "lean" / "EllipticPdes"
     lean.mkdir(parents=True)
     (lean / "A.lean").write_text(
-        "/-- Guo, *Partial Differential Equations* (Notes), Theorem VIII.3.2 asks. -/\n"
+        "/-- Gilbarg and Trudinger, *Elliptic PDE of Second Order* (2001), Theorem 8.3 asks. -/\n"
         "theorem t : True := trivial\n", encoding="utf-8")
     assert la.audit() == []
 
@@ -150,3 +150,15 @@ def test_a_dotted_number_is_not_confined_to_the_cited_section(manifest):
             {"text": "Theorem 8.3. The generalized Dirichlet problem."}]}) + "\n",
         encoding="utf-8")
     assert la.audit() == []
+
+
+def test_unknown_author_citation_is_an_error(manifest, tmp_path):
+    """A docstring citing a work the audit has no transcription for is reported."""
+    manifest([], "Theorem 8.3. The generalized Dirichlet problem.")
+    lean = tmp_path / "lean" / "EllipticPdes"
+    lean.mkdir(parents=True)
+    (lean / "A.lean").write_text(
+        "/-- Brezis, *Functional Analysis* (2011), Theorem 9.16 asks. -/\n"
+        "theorem t : True := trivial\n", encoding="utf-8")
+    findings = la.audit()
+    assert findings and "unknown source" in findings[0]

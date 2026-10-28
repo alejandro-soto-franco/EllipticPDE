@@ -6,15 +6,15 @@ does not. Nothing here reads the mathematics; it asks only whether the thing
 cited exists.
 
 It was written after two failures of that kind on 2026-09-10. The manuscript
-cited Guo's Theorem VII.4.7, and Guo's section VII.4 stops at VII.4.6. A
-docstring reported Guo's Theorem VIII.3.2 as running over `a ∈ W^{k+2,∞}` where
-the theorem asks `W^{k+1,∞}`, and that misreading reached the manuscript,
-because it was taken from the docstring rather than from Guo.
+cited a theorem one past the last its section numbers. A docstring reported a
+regularity theorem as running over `a ∈ W^{k+2,∞}` where the theorem asks
+`W^{k+1,∞}`, and that misreading reached the manuscript, because it was taken
+from the docstring and not from the source.
 
 The transcriptions live in the local Adduce library, one JSONL of OCR blocks per
 work, so this runs offline and needs no key.
 
-    uv run python verify/locator_audit.py [--source guo-2026] [--verbose]
+    uv run python verify/locator_audit.py [--source gilbarg-2001] [--verbose]
 """
 
 from __future__ import annotations
@@ -34,13 +34,12 @@ PDFS = Path.home() / ".adduce" / "library" / "pdfs"
 # to the manifest cannot slip past unchecked.
 SOURCE_KEYS: dict[str, str] = {
     "evans-2010": "evans-2010-par-dif-equ",
-    "guo-2026": "guo-2026-par-dif-equ",
     "gilbarg-2001": "gilbarg-2001-ell-par-dif",
     "fernandezreal-2023-reg-the-ell": "fernandezreal-2023-reg-the-ell",
 }
 
-# A locator names its statement last: `§6.2.3 Thm 4` ends in `4`, `§VII.3 Thm
-# VII.3.1` ends in `VII.3.1`. The kind word before it says what to look for.
+# A locator names its statement last: `§6.2.3 Thm 4` ends in `4`, `§8.1 Thm
+# 8.1` ends in `8.1`. The kind word before it says what to look for.
 _KIND = r"Thm|Theorem|Lem|Lemma|Cor|Corollary|Def|Definition|Rmk|Remark|Prop|Proposition|Ex|Example"
 _LOCATOR_RE = re.compile(
     rf"(?P<kind>{_KIND})\s*\.?\s*(?P<num>[0-9IVXivx]+(?:\.[0-9]+)*)\s*$",
@@ -66,7 +65,7 @@ def _transcription(key: str) -> str | None:
     """The source as text: the OCR blocks and the PDF text layer together.
 
     Neither alone is enough. The OCR reads the mathematics and drops the odd
-    heading, which on a first run here reported four Guo statements as absent
+    heading, which on a first run here reported four statements as absent
     when all four sit in the PDF, and a check that cries wolf is worse than no
     check. The PDF layer reads headings and mangles display equations. Only
     existence of a numbered statement is asked here, so the union answers it and
@@ -126,8 +125,8 @@ def _section_slice(text: str, section: str) -> str | None:
 def _states(text: str, kind: str, num: str) -> bool:
     """Whether the source numbers a statement of that kind at that number.
 
-    Evans writes `THEOREM 4` under a section heading and Guo writes `Theorem
-    VII.4.4` in full, so the section part of a locator is dropped and the
+    Evans writes `THEOREM 4` under a section heading and Gilbarg and Trudinger
+    write `Theorem 8.1` in full, so the section part of a locator is dropped and the
     statement number matched on its own. A number that appears only in a cross
     reference still counts: the work numbers it either way.
     """
@@ -142,22 +141,28 @@ def _states(text: str, kind: str, num: str) -> bool:
     return False
 
 
-# A citation inside a Lean docstring: `Guo, *Title* (...), Theorem VIII.3.2`.
+# A citation inside a Lean docstring: `Evans, *Title* (...), Theorem 2`. Any
+# author is matched, so a citation of a work with no transcription is reported
+# and never passes unread.
 # The warrants are one record of what the library leans on and the docstrings
 # are another, and a statement cited in one and absent from the source is the
 # same defect wherever it sits.
 _DOCSTRING_CITE_RE = re.compile(
-    r"(?P<author>Guo|Evans|Gilbarg[^,]{0,24})\s*,\s*\*[^*]+\*[^.\n]*?"
+    r"(?P<author>[A-Z][\w-]+(?:\s+(?:and|&)\s+[A-Z][\w-]+)?)\s*,\s*\*[^*]+\*[^.\n]*?"
     r"(?P<kind>Theorem|Thm|Lemma|Corollary|Proposition|Remark|Definition)\s*"
     r"(?P<num>[0-9IVX]+(?:\.[0-9]+)*)",
     re.IGNORECASE,
 )
 
-_AUTHOR_SOURCE = {"guo": "guo-2026", "evans": "evans-2010", "gilbarg": "gilbarg-2001"}
+_AUTHOR_SOURCE = {"evans": "evans-2010", "gilbarg": "gilbarg-2001",
+                  "fernández": "fernandezreal-2023-reg-the-ell",
+                  "fernandez": "fernandezreal-2023-reg-the-ell"}
 
 
 def _docstring_citations() -> list[tuple[str, str, str, str]]:
-    """Every `(source_id, kind, number, file)` a Lean docstring cites."""
+    """Every `(source_id, kind, number, file)` a Lean docstring cites.
+
+    An author with no source id comes back as `unknown:<author>`."""
     lean = ROOT / "lean" / "EllipticPdes"
     if not lean.is_dir():
         return []
@@ -165,10 +170,8 @@ def _docstring_citations() -> list[tuple[str, str, str, str]]:
     for path in sorted(lean.rglob("*.lean")):
         text = path.read_text(encoding="utf-8")
         for m in _DOCSTRING_CITE_RE.finditer(text):
-            author = m.group("author").split()[0].strip(",").lower()
-            src = _AUTHOR_SOURCE.get(author)
-            if src is None:
-                continue
+            author = re.split(r"[\s-]", m.group("author"))[0].lower()
+            src = _AUTHOR_SOURCE.get(author, f"unknown:{m.group('author')}")
             out.append((src, _KIND_WORD[m.group("kind").lower()], m.group("num"),
                         str(path.relative_to(ROOT))))
     return out
@@ -210,8 +213,8 @@ def audit(only: str | None = None) -> list[str]:
             continue  # the work numbers nothing of this kind
         # A bare number is section-local, so Evans's `§5.2.3 Thm 1` has to be
         # found in §5.2.3 and the book's other forty `THEOREM 1`s do not answer
-        # for it. A dotted number already names its chapter, as Guo's `VII.3.1`
-        # and Gilbarg and Trudinger's `8.3` do, and Gilbarg and Trudinger number
+        # for it. A dotted number already names its chapter, as Gilbarg and
+        # Trudinger's `8.3` does, and Gilbarg and Trudinger number
         # across a whole chapter, so `Thm 8.3` need not sit in §8.2.
         scope, where = text, "the transcribed source"
         sec = _SECTION_RE.search(loc)
@@ -236,6 +239,9 @@ def audit(only: str | None = None) -> list[str]:
         if (src, kind, num) in seen_doc:
             continue
         seen_doc.add((src, kind, num))
+        if src.startswith("unknown:"):
+            findings.append(f"{where}: the docstring cites {src[8:]}, an unknown source")
+            continue
         key = SOURCE_KEYS.get(src)
         if key is None:
             continue

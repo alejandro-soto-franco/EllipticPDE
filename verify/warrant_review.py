@@ -32,7 +32,7 @@ The point of the packets is that a reading is what settles the rest, and a
 reading needs the two texts side by side. ``--packets <dir>`` writes one file per
 warrant: the source statement as transcribed, the Lean signature, and the claim.
 
-    uv run python verify/warrant_review.py [--packets out/] [--source guo-2026]
+    uv run python verify/warrant_review.py [--packets out/] [--source gilbarg-2001]
 """
 
 from __future__ import annotations
@@ -50,7 +50,6 @@ PDFS = Path.home() / ".adduce" / "library" / "pdfs"
 
 SOURCE_KEYS = {
     "evans-2010": "evans-2010-par-dif-equ",
-    "guo-2026": "guo-2026-par-dif-equ",
     "gilbarg-2001": "gilbarg-2001-ell-par-dif",
     "fernandezreal-2023-reg-the-ell": "fernandezreal-2023-reg-the-ell",
 }
@@ -74,7 +73,7 @@ _CLAUSE_IN_CLAIM_RE = re.compile(
 # for a claim silent about scope, so these count as having said it.
 _SCOPE_RE = re.compile(
     r"\bin full\b|\bclauses\b|\bat once\b|\bboth\b|\bhalf\b|\bwithout its\b"
-    r"|\bas (?:Evans|Guo|the source|the cited)\b|\bevery clause\b",
+    r"|\bas (?:Evans|Gilbarg and Trudinger|the source|the cited)\b|\bevery clause\b",
     re.IGNORECASE)
 
 # Hypotheses worth noticing when a statement names one and nothing else does.
@@ -125,7 +124,8 @@ _KIND_ALTS = {
     "ex": r"Example|Ex", "example": r"Example|Ex",
 }
 
-# The section part of a locator, which Evans needs and Guo does not. Evans
+# The section part of a locator, which Evans needs and Gilbarg and Trudinger do
+# not. Evans
 # numbers a theorem within its section, so `§5.2.1 Thm 1` is `THEOREM 1` under
 # the heading `5.2.1`, and the book has forty other `THEOREM 1`s.
 _SECTION_RE = re.compile(r"§\s*([0-9]+(?:\.[0-9]+)*)")

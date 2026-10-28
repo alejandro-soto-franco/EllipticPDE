@@ -14,10 +14,6 @@
     {
       "id": "gilbarg-2001",
       "content_list": "../latex/litreview/sources/transcribed-mineru/gilbarg-2001-ell-par-dif.md"
-    },
-    {
-      "id": "guo-2026",
-      "content_list": "../latex/litreview/sources/transcribed-mineru/guo-2026-par-dif-equ.md"
     }
   ],
   "space_map": {
@@ -35,12 +31,6 @@
       "source_id": "evans-2010",
       "locator": "§6.2.2 Thm 2",
       "claim": "formalises clause (ii) of the cited theorem, the Garding inequality beta ‖u‖^2_{H_0^1} <= B[u, u] + gamma ‖u‖^2_{L^2} for every u in H_0^1(Omega), at beta = lambda/2 and gamma = lambda/2 + ‖c‖_infinity + d ‖b‖^2_infinity/(2 lambda). Clause (i), boundedness of the form, is the continuity of the type fullBilin inhabits"
-    },
-    {
-      "decl": "EllipticPdes.lax_milgram",
-      "source_id": "guo-2026",
-      "locator": "§VII.3 Thm VII.3.1",
-      "claim": "formalises the cited theorem: if H is a Hilbert space and B : H x H -> R is a bounded coercive bilinear form, that is B(u, u) >= beta ‖u‖^2_H, and f is in H*, then there is a unique u in H with B(u, v) = <f, v> for every v in H. Boundedness is the continuity of the type H ->L[R] H ->L[R] R and coercivity is IsCoercive. Symmetry of B is not assumed, which is Remark VII.3.2 there"
     },
     {
       "decl": "EllipticPdes.lax_milgram",
@@ -508,7 +498,7 @@
       "decl": "EllipticPdes.Embedding.memLp_of_gradClosed_general_ideal",
       "source_id": "evans-2010",
       "locator": "§5.6.3 Thm 6",
-      "claim": "clause (i) at the exponent Evans names: under the strict rung condition p_0 s < d, which is his k < n/p, the reciprocal 1/p_0 - s/d is positive and the ladder lands on the exponent naming it, which is his 1/q = 1/p - k/n. Guo states the same as Theorem IV.2.3 case (i). Three differences from Evans: the conclusion is on a ball inside a ball rather than on a bounded C^1 domain, so no extension operator is involved; it is membership rather than the norm estimate, which exists_const_eLpNorm_le_of_gradClosed_fullStep supplies at p_0 = 2; and the object iterated on is a family closed under weak differentiation with a depth function in place of the symbol D^alpha u at every order"
+      "claim": "clause (i) at the exponent Evans names: under the strict rung condition p_0 s < d, which is his k < n/p, the reciprocal 1/p_0 - s/d is positive and the ladder lands on the exponent naming it, which is his 1/q = 1/p - k/n. Three differences from Evans: the conclusion is on a ball inside a ball rather than on a bounded C^1 domain, so no extension operator is involved; it is membership rather than the norm estimate, which exists_const_eLpNorm_le_of_gradClosed_fullStep supplies at p_0 = 2; and the object iterated on is a family closed under weak differentiation with a depth function in place of the symbol D^alpha u at every order"
     },
     {
       "decl": "EllipticPdes.Embedding.memLp_of_gradClosed_compactSupport",
@@ -520,7 +510,7 @@
       "decl": "EllipticPdes.Embedding.memLp_of_gradClosed_compactSupport_ideal",
       "source_id": "evans-2010",
       "locator": "§5.6.3 Thm 6",
-      "claim": "clause (i) at the exponent Evans names, on the whole space: under the strict rung condition p_0 s < d, which is his k < n/p, the reciprocal 1/p_0 - s/d is positive and the ladder lands on the exponent naming it, which is his 1/q = 1/p - k/n. Guo states the same as Theorem IV.2.3 case (i). Three differences from Evans: the domain is R^d and the family compactly supported, so no extension operator is involved and no rung shrinks the domain; it is membership rather than the norm estimate; and the object iterated on is a family closed under weak differentiation with a depth function in place of D^alpha u at every order"
+      "claim": "clause (i) at the exponent Evans names, on the whole space: under the strict rung condition p_0 s < d, which is his k < n/p, the reciprocal 1/p_0 - s/d is positive and the ladder lands on the exponent naming it, which is his 1/q = 1/p - k/n. Three differences from Evans: the domain is R^d and the family compactly supported, so no extension operator is involved and no rung shrinks the domain; it is membership rather than the norm estimate; and the object iterated on is a family closed under weak differentiation with a depth function in place of D^alpha u at every order"
     },
     {
       "decl": "EllipticPdes.Embedding.exists_holderOnWith_of_gradClosed_general",
@@ -661,12 +651,6 @@
       "claim": "formalises the cited theorem at p = 2 for the graph space W12 Omega, the H^1(Omega) of this development: on a bounded, connected, open domain with C^1 boundary, one constant bounds the L^2 distance of every element from its mean by the L^2 norm of its gradient, the gradient norm being read as the square root of the sum of the squared L^2 norms of its components. The cited statement takes 1 <= p <= infinity; the statement here takes p = 2, and asks the domain to be nonempty, which the cited statement leaves implicit in the mean. The proof is the cited one, by contradiction through the Rellich-Kondrachov theorem of 5.7 and the constancy of a class with zero weak gradient on a connected set, which the cited proof refers to Problem 11 of the chapter"
     },
     {
-      "decl": "EllipticPdes.Regularity.weakSolution_ae_eq_of_contDiffOn",
-      "source_id": "guo-2026",
-      "locator": "§I.2 Lemma I.2.4",
-      "claim": "applies the cited lemma, the fundamental lemma of the calculus of variations, to the residual of the equation: a weak solution of the Dirichlet problem whose function coordinate has a C^2 representative on an open subset of the domain satisfies the equation there almost everywhere in the classical divergence form, the diffusion being C^1. The cited statement says that a locally integrable function on an open set vanishes almost everywhere if and only if it integrates to zero against every test function; the statement here is the consequence for the residual, the integration by parts and the identification of the weak gradient with the classical one being the two steps in between, and only the direction from the vanishing integrals to the vanishing function is used"
-    },
-    {
       "decl": "EllipticPdes.Regularity.exists_weakSolution_interior_classical",
       "source_id": "evans-2010",
       "locator": "§6.3.1 Thm 3",
@@ -683,12 +667,6 @@
       "source_id": "evans-2010",
       "locator": "§5.8.1 Thm 1",
       "claim": "instantiates poincare_wirtinger on the unit ball, the cited theorem at p = 2 with the domain fixed, with no hypothesis left: the ball is open, bounded, convex hence connected, nonempty, and has C^1 boundary"
-    },
-    {
-      "decl": "EllipticPdes.Extension.exists_extW12",
-      "source_id": "guo-2026",
-      "locator": "§III.2 Thm III.2.2",
-      "claim": "formalises the cited theorem at p = 2 as it is stated, as a bounded linear map between the Sobolev spaces: on a bounded open domain with C^1 boundary and for any open set the closure of the domain sits in, there is a bounded linear map from W12 Omega, the H^1(Omega) of this development, to the graph space of the whole space, whose image agrees with the element on the domain in the function and the gradient coordinates, whose function coordinate vanishes almost everywhere outside the open set, and which is bounded by a constant times the norm. The cited statement takes every p in [1, infinity) and writes the bound as an operator norm; the statement here takes p = 2, states clause (ii) for the function coordinate, and states the bound elementwise. The map on classes is the map on representatives of exists_extLinear, which descends because it is linear and bounded by the seminorms over the domain"
     },
     {
       "decl": "EllipticPdes.Sobolev.poincare_ball",
@@ -817,12 +795,6 @@
       "claim": "formalises clause (ii) of the cited theorem: with the zeroth-order coefficient nonnegative and bounded on the connected open set, a subsolution C^2 on the set that attains a nonnegative maximum over the set at an interior point is constant on the set. It is strong_maximum_principle with c times the maximum nonnegative, which is the product of two nonnegative numbers"
     },
     {
-      "decl": "EllipticPdes.Classical.not_isLocalMax_of_nondivOp_neg",
-      "source_id": "guo-2026",
-      "locator": "§XI.3 Thm XI.3.5",
-      "claim": "formalises the three clauses of the cited theorem at once: a strict subsolution of a non-divergence-form elliptic operator, which in the sign of this development means L u < 0 at a point, has no local maximum at that point whenever c u >= 0 there, which covers c = 0, the case c >= 0 with a nonnegative maximum, and the case of a zero maximum. The cited statement takes u in C^2 of the set and continuous on the closure and speaks of interior maxima over the set; the statement here is pointwise, at a point where u is C^2 and the coefficient matrix is symmetric positive semidefinite. The proof is the cited one: at a local maximum the gradient vanishes and the coefficient-weighted Hessian is nonpositive, so L u >= c u >= 0 there"
-    },
-    {
       "decl": "EllipticPdes.Classical.comparison_principle",
       "source_id": "gilbarg-2001",
       "locator": "§3.1 Thm 3.3",
@@ -839,108 +811,6 @@
       "source_id": "gilbarg-2001",
       "locator": "§8.1 Thm 8.1",
       "claim": "supplies the two-dimensional Sobolev inequality the remark on n = 2 in the proof of the cited theorem asks for, an inequality of the same form with an exponent above 2 in place of 2n/(n - 2): on a bounded domain in the plane, an element of W_0^{1,2} is bounded in L^4 by a constant times the sum of the L^2 norms of its gradient coordinates, the constant depending on the measure of the domain. The proof is the Gagliardo-Nirenberg-Sobolev inequality at p = 3/2, whose conjugate exponent 6 exceeds 4, together with Hölder's inequality from L^2 to L^{3/2} on the domain, first on test functions and then on the closure by the transfer principle of the critical case"
-    },
-    {
-      "decl": "EllipticPdes.Classical.weak_maximum_principle",
-      "source_id": "guo-2026",
-      "locator": "§XI.3 Thm XI.3.7",
-      "claim": "formalises clause (i) of the cited theorem, whose operator L u = a^{ij} D_{ij} u + b^i D_i u + c u with L u >= 0 for a subsolution is, in the sign convention of this development, the operator with a, -b and -c applied to a subsolution with nonpositive image: on a bounded open set with L elliptic and the ratio of |b| to the ellipticity constant bounded, a subsolution with c = 0 has its supremum over the closure attained on the boundary, stated as a boundary point y with u <= u y on the closure. The bound on |b|/lambda is read as separate bounds theta on the ellipticity and B on |b|; the cited proof is the one followed, the perturbation by exp(alpha x_1) with alpha large"
-    },
-    {
-      "decl": "EllipticPdes.Classical.weak_maximum_principle_of_nonneg",
-      "source_id": "guo-2026",
-      "locator": "§XI.3 Thm XI.3.7",
-      "claim": "formalises clause (ii) of the cited theorem, whose c <= 0 is the nonnegative zeroth-order coefficient of this development: sup u <= sup of u^+ over the boundary, stated as a boundary point y with u <= max (u y) 0 on the closure. The proof is the cited one, clause (i) on the set where u > 0"
-    },
-    {
-      "decl": "EllipticPdes.Classical.weak_minimum_principle",
-      "source_id": "guo-2026",
-      "locator": "§XI.3 Cor XI.3.13",
-      "claim": "formalises clause (i) of the cited corollary, for a supersolution with c = 0: the infimum over the closure is attained on the boundary, stated as a boundary point y with u y <= u on the closure. The proof is the cited one, the weak maximum principle applied to -u"
-    },
-    {
-      "decl": "EllipticPdes.Classical.weak_minimum_principle_of_nonneg",
-      "source_id": "guo-2026",
-      "locator": "§XI.3 Cor XI.3.13",
-      "claim": "formalises clause (ii) of the cited corollary, whose c <= 0 is the nonnegative zeroth-order coefficient of this development: inf u >= inf of -u^- over the boundary, stated as a boundary point y with min (u y) 0 <= u on the closure. The proof is the cited one, the weak maximum principle with c >= 0 applied to -u"
-    },
-    {
-      "decl": "EllipticPdes.Classical.abs_le_of_nondivOp_eq_zero",
-      "source_id": "guo-2026",
-      "locator": "§XI.3 Cor XI.3.13",
-      "claim": "formalises the final clause of the cited corollary, for a solution with the source's c <= 0: sup |u| = sup of |u| over the boundary, stated as a boundary point y with |u| <= |u y| on the closure, the equality following since the boundary lies in the closure. The proof is the cited one, the two clauses of the weak maximum principle for u and -u"
-    },
-    {
-      "decl": "EllipticPdes.Classical.comparison_principle",
-      "source_id": "guo-2026",
-      "locator": "§XI.3 Cor XI.3.11",
-      "claim": "formalises the cited corollary, whose c <= 0 is the nonnegative zeroth-order coefficient of this development and whose L u >= L v is, in the sign convention of this development, the inequality L u <= L v: with u <= v on the boundary, u <= v on the closure. The proof is the cited one, the weak maximum principle with c >= 0 applied to u - v"
-    },
-    {
-      "decl": "EllipticPdes.Classical.dirichlet_unique",
-      "source_id": "guo-2026",
-      "locator": "§XI.3 Cor XI.3.9",
-      "claim": "formalises the cited corollary, with the source's c <= 0 read as the nonnegative zeroth-order coefficient of this development: two functions C^2 on a bounded open set and continuous on its closure, with the same image under L on the set and the same boundary values, agree on the closure, which is the uniqueness of a solution of the Dirichlet problem. The proof is the cited one, the weak maximum principle with c >= 0 applied to u - v and to v - u, here through the comparison principle in both directions"
-    },
-    {
-      "decl": "EllipticPdes.Classical.hopf_lemma",
-      "source_id": "guo-2026",
-      "locator": "§XI.4 Lemma XI.4.3",
-      "claim": "formalises clauses (i) and (ii) of the cited lemma, with the interior sphere condition at the boundary point given by a ball inside the open set whose sphere passes through the point: with c = 0, or with the source's c <= 0 and u(y) >= 0, both read as c u(y) >= 0 for the nonnegative zeroth-order coefficient of this development, the derivative of u at y along the outward radius is positive. The cited statement asks u continuous on the boundary off y and the outer normal derivative when it exists, the derivative here is asked to exist at y and u is continuous on the closure; the bound on (|b| + |c|)/lambda is read as separate bounds. The proof is the cited one, the barrier exp(-alpha |x - z|^2) - exp(-alpha R^2) on the annulus and the comparison principle"
-    },
-    {
-      "decl": "EllipticPdes.Classical.hopf_lemma_of_zero",
-      "source_id": "guo-2026",
-      "locator": "§XI.4 Lemma XI.4.3",
-      "claim": "formalises clause (iii) of the cited lemma, with c of any sign bounded in absolute value and u(y) = 0, under the interior sphere condition given by a ball inside the open set whose sphere passes through y. The proof is the cited one: the operator with c replaced by its positive part, which in the source is c - c^+, has nonpositive image on u since u < u(y) = 0 on the set, and clause (ii) applies"
-    },
-    {
-      "decl": "EllipticPdes.Classical.strong_maximum_principle",
-      "source_id": "guo-2026",
-      "locator": "§XI.4 Thm XI.4.5",
-      "claim": "formalises clauses (i) and (ii) of the cited theorem, for a subsolution C^2 on a connected open set with c = 0, or with the source's c <= 0 and a nonnegative interior maximum, both read as c times the maximum nonnegative for the nonnegative zeroth-order coefficient of this development: the function is constant. The cited statement takes u continuous on the closure and the bound on (|b| + |c|)/lambda, read here as separate bounds and with the maximum over the open set. The proof is the cited one: the level set of the maximum is closed in the set, and a point of its complement whose distance to the level set is less than its distance to the boundary gives a ball touching the level set, where Hopf's lemma contradicts the vanishing gradient at an interior maximum"
-    },
-    {
-      "decl": "EllipticPdes.Classical.strong_maximum_principle_of_zero",
-      "source_id": "guo-2026",
-      "locator": "§XI.4 Thm XI.4.5",
-      "claim": "formalises clause (iii) of the cited theorem, with c of any sign bounded in absolute value and a zero interior maximum on a connected open set: the function is constant. The proof is the cited one, clause (ii) for the operator with c replaced by its positive part, which has nonpositive image on u since u <= 0 on the set"
-    },
-    {
-      "decl": "EllipticPdes.Classical.avoidance_principle",
-      "source_id": "guo-2026",
-      "locator": "§XI.4 Cor XI.4.6",
-      "claim": "formalises the cited corollary, whose L u >= L v is, in the sign convention of this development, L u <= L v, with c of any sign bounded in absolute value on a connected open set: two functions C^2 on the set with u <= v either agree everywhere or satisfy u < v everywhere. The proof is the cited one, the strong maximum principle at a zero maximum applied to u - v at a point where the two agree"
-    },
-    {
-      "decl": "EllipticPdes.Classical.eq_of_eq_of_fderiv_eq",
-      "source_id": "guo-2026",
-      "locator": "§XI.4 Cor XI.4.7",
-      "claim": "formalises the cited corollary with the interior sphere condition at the boundary point in place of a C^2 boundary, which the source uses only through that condition: two functions C^2 on a connected open set and continuous on its closure, with L u <= L v in the sign convention of this development, u <= v on the set, equal at a point y of the frontier on the sphere of a ball inside the set, differentiable at y with equal derivatives there, agree on the set. The proof is the cited one: by the avoidance principle either the two agree or u < v throughout, and in the second case Hopf's lemma at a zero boundary value gives a nonzero derivative of u - v at y"
-    },
-    {
-      "decl": "EllipticPdes.Classical.neumann_unique",
-      "source_id": "guo-2026",
-      "locator": "§XI.4 Cor XI.4.8",
-      "claim": "formalises the cited corollary, on a bounded connected open set with an interior sphere at every frontier point and the source's c <= 0 read as the nonnegative zeroth-order coefficient of this development: two functions C^2 on the set and continuous on the closure, with the same image under L on the set, differentiable at every frontier point with the same derivative along the radius of an interior sphere there, which is the normal derivative times the radius, differ by a constant on the closure. The cited statement takes u in C^1 of the closure and the normal derivative on the boundary; the source's proof is the one followed: the difference attains its maximum over the compact closure, a nonnegative maximum at an interior point makes it constant by the strong maximum principle and one attained only on the boundary contradicts Hopf's lemma through the vanishing normal derivative, and a negative maximum is handled through the negative of the difference"
-    },
-    {
-      "decl": "EllipticPdes.Classical.neumann_unique_of_exists_pos",
-      "source_id": "guo-2026",
-      "locator": "§XI.4 Cor XI.4.8",
-      "claim": "formalises the addendum of Remark XI.4.9 to the cited corollary: when c is nonzero at a point of the set the constant is zero, since L of the constant is c times it. The proof is the cited one"
-    },
-    {
-      "decl": "EllipticPdes.Classical.apriori_bound_sub",
-      "source_id": "guo-2026",
-      "locator": "§XI.5 Thm XI.5.1",
-      "claim": "formalises clause (i) of the cited theorem, whose L u >= f with c <= 0 is, in the sign convention of this development, L u <= f with a nonnegative zeroth-order coefficient, on a bounded open set inside a slab of width D in a coordinate direction: with |f| bounded by F, sup u <= sup of u^+ over the boundary + (exp((beta + 1) D) - 1) F/theta, stated as a boundary point y with u <= max (u y) 0 + (exp((B/theta + 1) D) - 1) F/theta on the closure. The source's beta is sup |b|/lambda and its d is the diameter, and its proof places the set in the slab 0 < x_1 < d after a translation, so the width D of a slab containing the set, which is at most the diameter, gives the constant the source names; the bound F on f is on f rather than |f|, which is what the proof uses. Connectedness, which the cited statement asks, is unused. The proof is the cited one: the comparison function sup u^+ + (F/theta)(exp(alpha D) - exp(alpha (x_1 - m))) at alpha = beta + 1 has image under L at least F on the set and dominates u on the boundary, so the comparison principle gives u <= v"
-    },
-    {
-      "decl": "EllipticPdes.Classical.apriori_bound_abs",
-      "source_id": "guo-2026",
-      "locator": "§XI.5 Thm XI.5.1",
-      "claim": "formalises clause (ii) of the cited theorem, for L u = f with c <= 0 in the source's sign and |f| <= F, on a bounded open set inside a slab of width D: sup |u| <= sup of |u| over the boundary + (exp((beta + 1) D) - 1) F/theta, stated as a boundary point y with |u| <= |u y| + (exp((B/theta + 1) D) - 1) F/theta on the closure, with the constant of clause (i). The proof is the cited one, clause (i) applied to u and to -u"
     },
     {
       "decl": "EllipticPdes.Classical.apriori_bound_sub",
@@ -1013,42 +883,6 @@
       "source_id": "gilbarg-2001",
       "locator": "§3.2 Thm 3.6",
       "claim": "formalises the final clause of the cited theorem, that with c < 0 at some point in the source's sign, which is c nonzero at some point here, the constant is zero, since L of the constant is c times it; stated for the difference of two functions with the same image under L"
-    },
-    {
-      "decl": "EllipticPdes.Classical.weak_maximum_principle_subharmonic",
-      "source_id": "guo-2026",
-      "locator": "§XI.1 Lemma XI.1.7",
-      "claim": "formalises the cited lemma: on a bounded open set, a function C^2 on the set and continuous on its closure with nonnegative Laplacian, the Laplacian read as the sum of the second coordinate partials, has its supremum over the closure attained on the boundary, stated as a boundary point y with u <= u y on the closure. Connectedness, which the source's word domain includes, is unused. The proof is the classical weak maximum principle for the operator with the identity as coefficient matrix and no lower-order terms, whose image is the negative of the Laplacian; the source's own proof goes through the strong maximum principle, which is Lemma XI.1.5"
-    },
-    {
-      "decl": "EllipticPdes.Classical.strong_maximum_principle_subharmonic",
-      "source_id": "guo-2026",
-      "locator": "§XI.1 Lemma XI.1.5",
-      "claim": "formalises the cited lemma: a function C^2 on a connected open set with nonnegative Laplacian, read as the sum of the second coordinate partials, that attains its supremum over the set at an interior point is constant. The proof is the classical strong maximum principle for the operator with the identity as coefficient matrix and no lower-order terms, through Hopf's lemma, where the source argues through the mean value property"
-    },
-    {
-      "decl": "EllipticPdes.Classical.strong_minimum_principle_superharmonic",
-      "source_id": "guo-2026",
-      "locator": "§XI.1 Cor XI.1.6",
-      "claim": "formalises the first clause of the cited corollary: a function C^2 on a connected open set with nonpositive Laplacian that attains its infimum at an interior point is constant. It is Lemma XI.1.5 applied to -u"
-    },
-    {
-      "decl": "EllipticPdes.Classical.harmonic_const_of_max",
-      "source_id": "guo-2026",
-      "locator": "§XI.1 Cor XI.1.6",
-      "claim": "formalises the second clause of the cited corollary for the supremum: a harmonic function, with zero Laplacian read as the sum of the second coordinate partials, on a connected open set, attaining its supremum at an interior point, is constant. It is Lemma XI.1.5 since a harmonic function is subharmonic"
-    },
-    {
-      "decl": "EllipticPdes.Classical.harmonic_const_of_min",
-      "source_id": "guo-2026",
-      "locator": "§XI.1 Cor XI.1.6",
-      "claim": "formalises the second clause of the cited corollary for the infimum: a harmonic function on a connected open set attaining its infimum at an interior point is constant. It is the first clause since a harmonic function is superharmonic"
-    },
-    {
-      "decl": "EllipticPdes.Classical.dirichlet_unique_harmonic",
-      "source_id": "guo-2026",
-      "locator": "§XI.2 Lemma XI.2.4",
-      "claim": "formalises the uniqueness clause of the cited lemma: two functions C^2 on a bounded open set and continuous on its closure, with the same Laplacian on the set and the same boundary values, agree on the closure, so the Dirichlet problem for the Laplacian with continuous boundary data has at most one solution. The source states C^infinity on the set and the Laplacian zero; both are cases. The existence clause, which the source obtains by approximating the boundary data and passing to a uniform limit under an assumption on the boundary, remains open. The proof is the one the source names, the weak maximum principle of Lemma XI.1.7 applied to the difference in both directions"
     },
     {
       "decl": "EllipticPdes.Regularity.norm_diffQuot_le_of_hasWeakDeriv",
@@ -1237,144 +1071,6 @@
       "claim": "formalises the cited theorem as stated, with the shift: there is gamma >= 0, the constant of Gårding's inequality, such that for every mu >= gamma and every bounded functional f on H_0^1(Omega), which is the source's H^{-1}(U), the shifted weak problem B[u, v] + mu (u, v) = f(v) has exactly one solution u in H_0^1(Omega). The operators are those of this development, whose coefficients are bounded and measurable with the leading part strictly elliptic. The proof is the cited one, coercivity of the shifted form from Gårding's inequality and the Lax-Milgram theorem"
     },
     {
-      "decl": "EllipticPdes.Sobolev.FullEllipticOp.weak_solution",
-      "source_id": "guo-2026",
-      "locator": "§VII.3 Thm VII.3.3",
-      "claim": "formalises the cited theorem: for the operators of this development, with bounded coefficients and strictly elliptic leading part, there is gamma >= 0 such that for mu >= gamma and f in H^{-1}(Omega), read as a bounded functional on H_0^1(Omega), the problem L u + mu u = f with zero boundary values has exactly one weak solution in H_0^1(Omega). The proof is the cited one, Gårding's inequality and the Lax-Milgram theorem"
-    },
-    {
-      "decl": "EllipticPdes.Sobolev.FullEllipticOp.garding",
-      "source_id": "guo-2026",
-      "locator": "§VII.2 Thm VII.2.5",
-      "claim": "formalises the cited inequality, named in the proof of Theorem VII.3.3 as Gårding's inequality from Theorem VII.2.5: for the operators of this development there are beta > 0 and gamma >= 0 with beta ‖u‖^2_{H_0^1} <= B(u, u) + gamma ‖u‖^2_{L^2} for every u in H_0^1(Omega). The proof is the cited one, ellipticity and Cauchy's inequality with epsilon on the lower-order terms"
-    },
-    {
-      "decl": "EllipticPdes.Embedding.partialD_convolution_eq_of_hasWeakGradOn",
-      "source_id": "guo-2026",
-      "locator": "§II.3 Lemma II.3.8",
-      "claim": "formalises the identity behind clause (ii) of the cited lemma at first order: at a point whose closed ball of the mollifier's radius lies inside the set, the classical partial derivative of the mollification is the mollification of the weak partial derivative, so the mollification converges to u in W^{1,p} on compactly contained subsets once the mollifications of u and of its weak gradient converge in L^p, which is tendsto_eLpNorm_convolution_sub. Clause (i), the norm bound, remains open. The proof is differentiation under the integral sign and the definition of the weak derivative"
-    },
-    {
-      "decl": "EllipticPdes.Embedding.tendsto_eLpNorm_convolution_sub",
-      "source_id": "guo-2026",
-      "locator": "§II.3 Lemma II.3.8",
-      "claim": "formalises the convergence in L^p of clause (ii) of the cited lemma on the whole space, which gives the local convergence on compactly contained subsets after extension: the mollifications of a class in L^p(R^d) converge to it in L^p as the radius tends to zero, for mollifiers with comparable inner and outer radii. The proof is continuity of translation in L^p"
-    },
-    {
-      "decl": "EllipticPdes.Extension.exists_smooth_tendsto_of_mem_W12",
-      "source_id": "guo-2026",
-      "locator": "§III.1 Thm III.1.3",
-      "claim": "formalises the cited theorem at k = 1 and p = 2 for a bounded open set with C^1 boundary: an element of W^{1,2}(Omega) is the limit in W^{1,2}(Omega) of smooth functions with compact support on R^n, whose restrictions to the closure are the source's C^infinity of the closure. The proof is the cited one, extension to the whole space and mollification"
-    },
-    {
-      "decl": "EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_compactSupport",
-      "source_id": "guo-2026",
-      "locator": "§III.4 Thm III.4.3",
-      "claim": "formalises the cited inequality for p in [1, n), for a compactly supported integrable function on R^n in L^p with an L^p weak gradient, of which the source's C_c^1(R^n) is a case: the L^{p^*} norm is bounded by a constant depending on n and p times the sum of the L^p norms of the gradient components, which is the norm of Du read componentwise. The proof is Mathlib's Gagliardo-Nirenberg-Sobolev inequality for smooth functions and mollification, where the source integrates the fundamental theorem of calculus along the axes"
-    },
-    {
-      "decl": "EllipticPdes.Embedding.exists_eLpNorm_sobolevConj_le_domain",
-      "source_id": "guo-2026",
-      "locator": "§III.4 Thm III.4.5",
-      "claim": "formalises the cited theorem: on a bounded open set with C^1 boundary and p in [1, n), a function in L^p(Omega) with an L^p weak gradient lies in L^{p^*}(Omega), with the L^{p^*} norm bounded by a constant depending on Omega, p and n times the W^{1,p} norm, read as the L^p norm of u plus the L^p norms of the gradient components. The proof is the cited one, extension, mollification and the inequality on R^n"
-    },
-    {
-      "decl": "EllipticPdes.Embedding.eLpNorm_le_of_mem_H01_of_isBounded",
-      "source_id": "guo-2026",
-      "locator": "§III.4 Thm III.4.6",
-      "claim": "formalises the cited inequality at p = 2 < n on a bounded measurable set, for every q with 1/q at least 1/2 - 1/n, which is q in (0, 2^*]: the L^q seminorm of an element of H_0^1(Omega) is bounded by a constant depending on Omega and q times the sum of the L^2 norms of its gradient components. The case q = p = 2 in every dimension is poincare_H01_of_bounded. The proof is the cited one, the inequality on test functions and their density"
-    },
-    {
-      "decl": "EllipticPdes.Poincare.poincare_H01_of_bounded",
-      "source_id": "guo-2026",
-      "locator": "§III.4 Thm III.4.6",
-      "claim": "formalises the cited inequality at p = q = 2 on a bounded set in every dimension, the case the source singles out: the L^2 norm of an element of H_0^1(Omega) is bounded by a constant depending on Omega times the L^2 norms of its gradient components. The proof is by the one-dimensional inequality along a coordinate on a box containing the set, on test functions, then density"
-    },
-    {
-      "decl": "EllipticPdes.Embedding.morrey_ball_contDiff",
-      "source_id": "guo-2026",
-      "locator": "§IV.1 Thm IV.1.6",
-      "claim": "formalises the Hölder-seminorm clause of the cited inequality for a smooth function on a ball, in place of a C^1 function on R^n: the seminorm at the exponent 1 - n/p over the ball is bounded by a constant times the L^p norms of the partial derivatives over the ball. The supremum clause of the C^{0,gamma} norm remains open. The proof is the cited one, the averaged estimate of |u(x) - u(y)| by the potential of |Du| and Hölder's inequality"
-    },
-    {
-      "decl": "EllipticPdes.Embedding.morrey_ball",
-      "source_id": "guo-2026",
-      "locator": "§IV.1 Thm IV.1.7",
-      "claim": "formalises the cited theorem on a ball, a bounded open set with C^1 boundary, for the Hölder seminorm: a function on the ball with an L^p weak gradient there, p > n, agrees almost everywhere with a function Hölder continuous on the ball at the exponent 1 - n/p, with seminorm bounded by a constant times the L^p norms of the gradient components over the ball. The supremum clause and the extension to the closure remain open, and the case p = infinity is outside the statement. The proof is by mollification in the interior, where the source extends and mollifies"
-    },
-    {
-      "decl": "EllipticPdes.Sobolev.embW12_isCompact",
-      "source_id": "guo-2026",
-      "locator": "§IV.2 Thm IV.2.10",
-      "claim": "formalises the first clause of the cited theorem at p = q = 2 on a bounded open set with C^1 boundary: the embedding of W^{1,2}(Omega) into L^2(Omega) is compact. The proof is the cited one, extension to the whole space and the translation modulus"
-    },
-    {
-      "decl": "EllipticPdes.Embedding.rellichEmbL_isCompact",
-      "source_id": "guo-2026",
-      "locator": "§IV.2 Thm IV.2.10",
-      "claim": "formalises the first clause of the cited theorem for W_0^{1,2}(Omega) at 2 < q < 2^* on a bounded measurable set, with no condition on the boundary, through the interpolation parameter theta of the proof. The endpoint q = 2 is embL2_isCompact"
-    },
-    {
-      "decl": "EllipticPdes.Sobolev.embL2_isCompact",
-      "source_id": "guo-2026",
-      "locator": "§IV.2 Thm IV.2.10",
-      "claim": "formalises the final clause of the cited theorem at p = 2: the embedding of W_0^{1,2}(Omega) into L^2(Omega) is compact on a bounded measurable set, with no condition on the boundary. The proof is extension by zero and the translation modulus of a class with a weak gradient"
-    },
-    {
-      "decl": "EllipticPdes.Analysis.exists_weakLimit",
-      "source_id": "guo-2026",
-      "locator": "§V.2 Thm V.2.5",
-      "claim": "formalises the cited theorem for a real Hilbert space, a case of a reflexive Banach space: a bounded sequence has a subsequence converging weakly, the weak convergence read through the inner product as Example V.2.3 does. The proof is by a diagonal argument on a countable dense set of the closed span, where the source cites the Banach-Alaoglu theorem"
-    },
-    {
-      "decl": "EllipticPdes.Regularity.norm_diffQuot_le_of_hasWeakDeriv",
-      "source_id": "guo-2026",
-      "locator": "§VI.1 Lemma VI.1.4",
-      "claim": "formalises clause (i) of the cited lemma at p = 2 on the whole space: the L^2 norm of the difference quotient of a class with an L^2 weak derivative in that direction is at most the L^2 norm of the derivative, with constant one. The source states the bound on a compactly contained subset with a constant depending on n and p. The proof is the cited one, the integral representation along the segment and approximation"
-    },
-    {
-      "decl": "EllipticPdes.Regularity.weakDeriv_of_diffQuot_bounded",
-      "source_id": "guo-2026",
-      "locator": "§VI.1 Lemma VI.1.4",
-      "claim": "formalises clause (ii) of the cited lemma at p = 2 on the whole space: an L^2 class whose difference quotients in a direction are bounded in L^2 by M for every nonzero step has a weak derivative in that direction of norm at most M. The proof is the cited one, weak compactness and passage to the limit against a test function"
-    },
-    {
-      "decl": "EllipticPdes.hneg_characterization",
-      "source_id": "guo-2026",
-      "locator": "§VII.1 Thm VII.1.6",
-      "claim": "formalises the cited theorem at the level of the representation (6) and of the norm: a bounded functional f on H_0^1(Omega) is represented by L^2 functions f_0, ..., f_n as the integral of f_0 v minus the sum of the integrals of f_i D_i v, and the representative given has the norm of f, which is at most the norm of every other representative; the norm of f in H^{-1} is therefore the infimum the source states, attained. The proof is the cited one, the Riesz representation in H_0^1(Omega) and the Cauchy-Schwarz inequality"
-    },
-    {
-      "decl": "EllipticPdes.Sobolev.spectrum_compact_operator",
-      "source_id": "guo-2026",
-      "locator": "§VII.5 Thm VII.5.3",
-      "claim": "formalises the cited theorem for a compact operator on an infinite-dimensional real Hilbert space: 0 lies in the spectrum, the nonzero spectrum consists of eigenvalues, and the nonzero spectrum is countable with finitely many points of modulus at least any positive delta, which is its convergence to 0. The proof is the Riesz theory of compact operators"
-    },
-    {
-      "decl": "EllipticPdes.Sobolev.FullEllipticOp.existence_three_of_bounded",
-      "source_id": "guo-2026",
-      "locator": "§VII.5 Thm VII.5.4",
-      "claim": "formalises the cited theorem for the operators of this development on a bounded measurable set: there is a countable set Sigma of real numbers such that for every f in L^2(Omega) the problem L u = lambda u + f with zero boundary values has exactly one weak solution in H_0^1(Omega) exactly when lambda is outside Sigma, and Sigma has finitely many members below any bound, which is clause (ii), the members increasing to infinity when Sigma is infinite. The proof is the cited one, the Fredholm alternative for the compact operator gamma L_gamma^{-1} and the spectrum of compact operators"
-    },
-    {
-      "decl": "EllipticPdes.Sobolev.FullEllipticOp.resolvent_bound_of_bounded",
-      "source_id": "guo-2026",
-      "locator": "§VII.5 Thm VII.5.6",
-      "claim": "formalises the cited theorem on a bounded measurable set: for lambda outside Sigma there is a constant C > 0 depending on lambda, Omega and L with ‖u‖_{L^2} <= C ‖f‖_{L^2} for the weak solution u in H_0^1(Omega) of L u = lambda u + f. The clause on the growth of C as lambda approaches Sigma remains open. The proof is the cited one, by contradiction through the compact embedding"
-    },
-    {
-      "decl": "EllipticPdes.Regularity.interior_H2_estimate",
-      "source_id": "guo-2026",
-      "locator": "§VIII.2 Thm VIII.2.2",
-      "claim": "formalises the cited theorem for a solution with zero boundary values, with the leading coefficients Lipschitz, which is the source's W^{1,infinity} in pointwise form, and the lower-order coefficients bounded: a weak solution in H_0^1(Omega) of L u = f with f in L^2(Omega) has second weak derivatives in L^2 on any compact subset, with the estimate ‖u‖_{H^2} on the subset at most C times ‖f‖_{L^2} + ‖u‖_{L^2}, the constant depending on Omega, the subset and L. The proof is the cited one, difference quotients of the weak form with a cutoff and Lemma VI.1.4"
-    },
-    {
-      "decl": "EllipticPdes.Regularity.interior_smooth",
-      "source_id": "guo-2026",
-      "locator": "§VIII.3 Thm VIII.3.3",
-      "claim": "formalises the cited theorem for a solution with zero boundary values, with the coefficients having bounded weak derivatives of every order on the set, which the source's C^infinity coefficients on a bounded set with bounded derivatives satisfy, and f with weak derivatives of every order bounded in L^2: the weak solution in H_0^1(Omega) of L u = f has a representative smooth on the interior of every compact subset of the set. The proof is the cited one, Theorem VIII.3.2 at every order and the Sobolev embedding; the estimate of Theorem VIII.3.2 at each finite order remains open in this form"
-    },
-    {
       "decl": "EllipticPdes.Sobolev.fredholm_alternative_compact",
       "source_id": "evans-2010",
       "locator": "App. D (Thm 5)",
@@ -1385,18 +1081,6 @@
       "source_id": "evans-2010",
       "locator": "App. D (Thm 5)",
       "claim": "formalises the remark following the cited theorem, the alternative (alpha) or (beta): for a compact operator K on a real Hilbert space, either u - K u = f has exactly one solution for every f, or the homogeneous equation u - K u = 0 has a nonzero solution. It is clause (iv) of the theorem"
-    },
-    {
-      "decl": "EllipticPdes.Sobolev.fredholm_alternative_compact",
-      "source_id": "guo-2026",
-      "locator": "§VII.4 Thm VII.4.4",
-      "claim": "formalises the cited theorem for a compact operator K on a real Hilbert space: the finite dimensionality of the space of solutions of (Id - K) u = 0, the equality of its dimension with that of the solutions of (Id - K^*) u = 0, and the solvability of (Id - K) u = h exactly when h is orthogonal to the kernel of Id - K^*, which is the final clause, together with the closed range and the equivalence of injectivity and surjectivity of Id - K from which the dichotomy of clauses (i) and (ii) follows in fredholm_dichotomy_compact. The proof is the Riesz theory of compact operators"
-    },
-    {
-      "decl": "EllipticPdes.Sobolev.fredholm_dichotomy_compact",
-      "source_id": "guo-2026",
-      "locator": "§VII.4 Thm VII.4.4",
-      "claim": "formalises the dichotomy of the cited theorem, clauses (i) and (ii): for a compact operator K on a real Hilbert space, either (Id - K) u = h has exactly one solution for every h, or (Id - K) u = 0 has a nonzero solution. It is the equivalence of injectivity and surjectivity of Id - K"
     },
     {
       "decl": "EllipticPdes.Regularity.interior_H2_estimate_W12",
@@ -1435,12 +1119,6 @@
       "claim": "formalises the cited theorem with its hypotheses as stated: U is a bounded open subset of R^n for any n >= 0, a^{ij}, b^i, c and f are C^infinity on U, the operator is uniformly elliptic with a constant theta > 0 for almost every x in U as in §6.1.1 (4), a^{ij} = a^{ji} on U, and u in H^1(U) is given as a function u with a weak gradient G on U, both in L^2(U). The conclusion is a function in C^infinity(U) agreeing with u almost everywhere on U, which is u in C^infinity(U) for a function defined up to a null set. The weak formulation is the identity B[u, v] = (f, v) for every v in C_c^infinity(U), the form Evans uses in Remark (ii) after Theorem 1; his §6.1.2 definition tests against H_0^1(U) for coefficients in L^infinity(U), which smooth coefficients on U need not be, and a solution in that sense is a solution in the sense taken here. The boundedness of U and the symmetry of a^{ij} enter the statement only because Evans assumes them and are not used. The proof builds SmoothOpOn from the hypotheses and applies exists_contDiffOn_of_localWeakSol"
     },
     {
-      "decl": "EllipticPdes.Regularity.higher_interior_regularity",
-      "source_id": "guo-2026",
-      "locator": "§VIII.3 Thm VIII.3.2",
-      "claim": "formalises the cited theorem for a solution with zero boundary values, with the coefficient orders of the source, a^{i,j} in W^{k+1,infinity} and b^i, c in W^{k,infinity}, the principal coefficients also Lipschitz, and the coefficient bundle global on R^n: a weak solution in H_0^1(Omega) of L u = f with f having k weak derivatives in L^2(Omega) bounded by M has weak derivatives to order k + 2 on every compact subset V of Omega, each bounded by C(M + ‖u‖_{L^2(Omega)}), with C quantified before the solution and the datum. The proof is by induction on k, differentiating the equation once per step as the cited proof differentiates it by a multi-index of length k + 1"
-    },
-    {
       "decl": "EllipticPdes.Regularity.interior_H2_regularity_evans",
       "source_id": "evans-2010",
       "locator": "§6.3.1 Thm 1",
@@ -1451,6 +1129,54 @@
       "source_id": "evans-2010",
       "locator": "§6.3.1 Thm 2",
       "claim": "formalises the cited theorem with its hypotheses as stated: m is a nonnegative integer, U is a bounded open subset of R^n for any n >= 0, a^{ij}, b^i and c are C^{m+1} on U with no bound, the operator is uniformly elliptic with a constant theta > 0 for almost every x in U as in §6.1.1 (4), a^{ij} = a^{ji} on U, f lies in H^m(U), given as f in L^2(U) with a family of weak derivatives up to order m in L^2(U), and u in H^1(U) is given as a function u with a weak gradient G on U, both in L^2(U). For every open V with compact closure inside U there is a constant C, fixed before f and u, such that every weak solution u of L u = f in U has weak derivatives up to order m + 2 in L^2(V) with ‖u‖_{H^{m+2}(V)} <= C(‖f‖_{H^m(U)} + ‖u‖_{L^2(U)}); since V is arbitrary this is also u in H^{m+2}_loc(U). Both Sobolev norms are iteratedNorm, the sum over lists of directions, equivalent to Evans's multi-index norm with constants depending on n and the order alone. The weak formulation is tested against C_c^infinity(U), which a solution tested against H_0^1(U) satisfies. The boundedness of U and the symmetry of a^{ij} enter only because Evans assumes them and are not used. The proof localises the coefficients to an open W between the closure of V and U (exists_localOp_Ck), applies higher_interior_regularity_W12 at order m there, which asks a^{ij} in W^{m+1,infinity} and C^1 and b, c in W^{m,infinity}, and transfers the family to V"
+    },
+    {
+      "decl": "EllipticPdes.Classical.dirichlet_unique",
+      "source_id": "gilbarg-2001",
+      "locator": "§3.1 Thm 3.3",
+      "claim": "formalises the first assertion of the cited theorem, with the source's c <= 0 read as the nonnegative zeroth-order coefficient of this development: two functions C^2 on a bounded open set and continuous on its closure, with the same image under L on the set and the same boundary values, agree on the closure. The proof is the second assertion of the cited theorem, the comparison principle (comparison_principle), applied in both directions"
+    },
+    {
+      "decl": "EllipticPdes.Classical.weak_maximum_principle_subharmonic",
+      "source_id": "gilbarg-2001",
+      "locator": "§2.2 Thm 2.3",
+      "claim": "formalises the cited theorem for Delta u >= 0: on a bounded open set, a function C^2 on the set and continuous on its closure with nonnegative Laplacian, the Laplacian read as the sum of the second coordinate partials, attains its supremum over the closure on the boundary, stated as a boundary point y with u <= u y on the closure. Connectedness, which the source's word domain includes, is unused. The proof is the classical weak maximum principle for the operator with the identity as coefficient matrix and no lower-order terms, whose image is the negative of the Laplacian"
+    },
+    {
+      "decl": "EllipticPdes.Classical.strong_maximum_principle_subharmonic",
+      "source_id": "gilbarg-2001",
+      "locator": "§2.2 Thm 2.2",
+      "claim": "formalises the cited theorem for Delta u >= 0: a function C^2 on a connected open set with nonnegative Laplacian, read as the sum of the second coordinate partials, that attains its supremum over the set at an interior point is constant. The proof is the classical strong maximum principle for the operator with the identity as coefficient matrix and no lower-order terms, through Hopf's lemma, where the source argues through the mean value inequality"
+    },
+    {
+      "decl": "EllipticPdes.Classical.strong_minimum_principle_superharmonic",
+      "source_id": "gilbarg-2001",
+      "locator": "§2.2 Thm 2.2",
+      "claim": "formalises the cited theorem for Delta u <= 0: a function C^2 on a connected open set with nonpositive Laplacian that attains its infimum at an interior point is constant. It is the case Delta u >= 0 applied to -u"
+    },
+    {
+      "decl": "EllipticPdes.Classical.harmonic_const_of_max",
+      "source_id": "gilbarg-2001",
+      "locator": "§2.2 Thm 2.2",
+      "claim": "formalises the consequence the cited theorem states for harmonic functions, for the maximum: a harmonic function, with zero Laplacian read as the sum of the second coordinate partials, on a connected open set, attaining its supremum at an interior point, is constant. It is the case Delta u >= 0 since a harmonic function is subharmonic"
+    },
+    {
+      "decl": "EllipticPdes.Classical.harmonic_const_of_min",
+      "source_id": "gilbarg-2001",
+      "locator": "§2.2 Thm 2.2",
+      "claim": "formalises the consequence the cited theorem states for harmonic functions, for the minimum: a harmonic function on a connected open set attaining its infimum at an interior point is constant. It is the case Delta u <= 0 since a harmonic function is superharmonic"
+    },
+    {
+      "decl": "EllipticPdes.Classical.dirichlet_unique_harmonic",
+      "source_id": "gilbarg-2001",
+      "locator": "§2.2 Thm 2.4",
+      "claim": "formalises the cited theorem: two functions C^2 on a bounded open set and continuous on its closure, with the same Laplacian on the set and the same boundary values, agree on the closure. The proof is the cited one, the weak maximum principle (Theorem 2.3, weak_maximum_principle_subharmonic) applied to the difference in both directions"
+    },
+    {
+      "decl": "EllipticPdes.Extension.exists_extW12",
+      "source_id": "evans-2010",
+      "locator": "§5.4 Thm 1",
+      "claim": "formalises the cited theorem at p = 2 as a bounded linear map between the Sobolev spaces: on a bounded open domain with C^1 boundary and for any open set the closure of the domain sits in, there is a bounded linear map from W12 Omega, the H^1(Omega) of this development, to the graph space of the whole space, whose image agrees with the element on the domain in the function and the gradient coordinates (clause (i)), whose function coordinate vanishes almost everywhere outside the open set (clause (ii)), and which is bounded by a constant times the norm (clause (iii)). The cited statement takes every p in [1, infinity), which exists_extLinear states on representatives; the map here is that map on classes, which descends because it is linear and bounded by the seminorms over the domain"
     }
   ],
   "source_divergences": [
@@ -1515,15 +1241,6 @@
         "H_0^1"
       ],
       "note": "Symmetry is a hypothesis of the cited theorem and is discharged for the form of the Laplacian by laplaceBilin_symm rather than assumed."
-    },
-    {
-      "source_id": "guo-2026",
-      "locator": "§VIII.2 Thm VIII.2.2",
-      "labels": [
-        "H^1 (not H_0^1)",
-        "L^infinity"
-      ],
-      "note": "Guo's interior estimate asks a^{i,j} in W^{1,infinity}(Omega) and b^i, c in L^infinity(Omega), both local, where the coefficient bundle is global on R^n, and takes the solution in H^1 where the interior chain takes it in H_0^1(Omega)."
     }
   ]
 }
