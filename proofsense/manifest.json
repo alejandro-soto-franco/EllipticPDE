@@ -1291,6 +1291,24 @@
       "source_id": "evans-2010",
       "locator": "§5.7 Def (compact embedding)",
       "claim": "formalises the cited definition of compact embedding of X into Y: the inclusion is continuous, and every bounded sequence in X has a subsequence converging in Y. The definition adds injectivity to read X as a subset of Y. The theorem proves that a bounded linear inclusion satisfies this iff it is injective and a compact operator, with the converse direction proved as well"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.CkBar.exists_extension",
+      "source_id": "evans-2010",
+      "locator": "App. A (Def function spaces)",
+      "claim": "formalises Evans's remark after the definition of C^k(closure U): for u in C^k(closure U) and every multiindex alpha with |alpha| <= k, the derivative D^alpha u extends continuously to the closure of U; the extension agrees with D^alpha u on U"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.memLpLoc_one_iff",
+      "source_id": "evans-2010",
+      "locator": "App. A (Def function spaces)",
+      "claim": "states that the case p = 1 of Evans's L^p_loc(U), the functions integrable over every V compactly contained in U, is Mathlib's local integrability on the open set U, which the weak derivative of the Sobolev development uses; both directions are proved"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.integral_abs_mul_le",
+      "source_id": "evans-2010",
+      "locator": "App. B (Hölder's inequality)",
+      "claim": "formalises Holder's inequality for conjugate exponents 1 <= p, q <= infinity with 1/p + 1/q = 1, and covers p = 1 and p = infinity: the integral over U of |uv| is at most the product of the L^p(U) and L^q(U) norms"
     }
   ],
   "source_divergences": [

@@ -506,3 +506,10 @@ assert_classical_axioms
   EllipticPdes.Analysis.compactlyEmbedded_iff
   EllipticPdes.Sobolev.embL2_injective
   EllipticPdes.Sobolev.compactlyEmbedded_embL2
+
+/-! ### Function spaces and Hölder's inequality -/
+
+assert_classical_axioms
+  EllipticPdes.Analysis.CkBar.exists_extension
+  EllipticPdes.Analysis.memLpLoc_one_iff
+  EllipticPdes.Analysis.integral_abs_mul_le

@@ -25,6 +25,7 @@ list need no commutation of partial derivatives. `HasWeakDeriv` specialises the 
 ## Main declarations
 
 * `EllipticPdes.Sobolev.MultiIdx`: multi-indices of order at most `k` in dimension `d`.
+* `EllipticPdes.Sobolev.MultiIdx.order`: the order `|α|` of a multi-index.
 * `EllipticPdes.Sobolev.iterPartialD`: iterated classical partial derivative along a list.
 * `EllipticPdes.Sobolev.HasWeakDerivList` and `EllipticPdes.Sobolev.HasWeakDeriv`: the weak
   derivative (Evans §5.2.1 Definition, p. 256).
@@ -65,6 +66,9 @@ namespace MultiIdx
 
 /-- The exponents of a multi-index as natural numbers. -/
 def toFun (α : MultiIdx d k) : Fin d → ℕ := fun i => (α.1 i : ℕ)
+
+/-- The order `|α| = ∑ α i` of a multi-index (Evans Appendix A, p. 702). -/
+def order (α : MultiIdx d k) : ℕ := ∑ i, (α.1 i : ℕ)
 
 /-- The zero multi-index. -/
 def zero : MultiIdx d k := ⟨fun _ => 0, by simp⟩
