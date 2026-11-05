@@ -570,3 +570,12 @@ assert_classical_axioms
   EllipticPdes.exists_eq_of_potential
   EllipticPdes.existsUnique_eq_of_potential
   EllipticPdes.laxMilgram_symm_of_potential
+
+/-! ### Reflexivity of `L^p` and of closed subspaces -/
+
+assert_classical_axioms
+  EllipticPdes.Analysis.isReflexive_Lp
+  EllipticPdes.Analysis.IsReflexive.submodule
+  EllipticPdes.Analysis.IsReflexive.continuousLinearEquiv
+  EllipticPdes.Analysis.IsReflexive.prod
+  EllipticPdes.Analysis.isReflexive_Lp_finiteDimensional

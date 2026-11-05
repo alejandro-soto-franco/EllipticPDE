@@ -1455,6 +1455,18 @@
       "source_id": "brezis-2011",
       "locator": "§5 Cor 5.8",
       "claim": "formalises the existence and uniqueness clause (17) of the cited corollary for a symmetric form: a bounded, coercive and symmetric bilinear form B on a real Hilbert space and a bounded linear functional f give a unique u with B(u, v) = f(v) for every v. The source does not assume symmetry for (17), so the declaration is the symmetric case, which it reaches through the potential u -> B(u, u)/2 and the direct method; the minimisation characterisation (18) is not stated"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.isReflexive_Lp",
+      "source_id": "brezis-2011",
+      "locator": "§4 Thm 4.10",
+      "claim": "formalises the reflexivity of L^p for 1 < p < infinity on a finite measure space, with reflexivity as the Lean predicate IsReflexive. The source takes an arbitrary measure space (Omega, M, mu), and the declaration is stated for a finite measure, the case the duality theorem lpDualMap_surjective_of_finite covers"
+    },
+    {
+      "decl": "EllipticPdes.Analysis.IsReflexive.submodule",
+      "source_id": "brezis-2011",
+      "locator": "§3 Prop 3.20",
+      "claim": "formalises the cited proposition: a closed linear subspace of a reflexive space is reflexive. The space is a real normed space with the predicate IsReflexive and no CompleteSpace hypothesis where the source takes a Banach space"
     }
   ],
   "source_divergences": [
@@ -1561,6 +1573,22 @@
         "symmetric"
       ],
       "note": "The source states (17) for a continuous coercive bilinear form with no symmetry and adds the minimisation characterisation (18) for a symmetric one. laxMilgram_symm_of_potential assumes symmetry and states (17) alone; EllipticPdes.lax_milgram is the form without symmetry."
+    },
+    {
+      "source_id": "brezis-2011",
+      "locator": "§4 Thm 4.10",
+      "labels": [
+        "finite measure"
+      ],
+      "note": "The source states reflexivity of L^p(Omega) for 1 < p < infinity on an arbitrary measure space. isReflexive_Lp takes a finite measure, since the duality theorem it composes is proved here on finite measures; the real-valued case is stated."
+    },
+    {
+      "source_id": "brezis-2011",
+      "locator": "§3 Prop 3.20",
+      "labels": [
+        "no CompleteSpace"
+      ],
+      "note": "The source takes a reflexive Banach space E and a closed subspace M. IsReflexive.submodule takes a real normed space with the predicate IsReflexive and no completeness."
     }
   ]
 }

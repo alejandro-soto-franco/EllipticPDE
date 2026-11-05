@@ -181,3 +181,14 @@ potential operator is onto the dual (`exists_eq_of_potential`) or that strict
 monotonicity makes the preimage unique (`existsUnique_eq_of_potential`). The
 docstrings of the first two cite Remark 2.17 for the setting they work in,
 which the remark does not state for them.
+
+## Reflexivity results
+
+`isReflexive_Lp` states Brezis Theorem 4.10 for a finite measure, where the
+source takes an arbitrary measure space, and `IsReflexive.submodule` states
+Proposition 3.20 for a real normed space with the predicate `IsReflexive`, where
+the source takes a Banach space. Three declarations are exempt. A space
+isomorphic to a reflexive space (`IsReflexive.continuousLinearEquiv`) and the
+product `WithLp p (X × Y)` of reflexive spaces (`IsReflexive.prod`) are
+elementary and no transcribed statement states them. `isReflexive_Lp_finiteDimensional`
+is the vector-valued space, and Theorem 4.10 is scalar.

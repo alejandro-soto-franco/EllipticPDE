@@ -62,6 +62,20 @@ EXEMPT = {
         "the elementary argument that two preimages give a zero of a positive pairing; no "
         "transcribed statement asserts it"
     ),
+    "EllipticPdes.Analysis.IsReflexive.continuousLinearEquiv": (
+        "a space isomorphic to a reflexive space is reflexive, which is elementary and which "
+        "no transcribed statement states"
+    ),
+    "EllipticPdes.Analysis.IsReflexive.prod": (
+        "the product WithLp p (X x Y) of reflexive spaces is reflexive. Brezis states only the "
+        "closed-subspace and L^p cases, and the product is a routine consequence of the "
+        "decomposition of a functional on the product along the two factors"
+    ),
+    "EllipticPdes.Analysis.isReflexive_Lp_finiteDimensional": (
+        "L^p with values in a finite-dimensional space is reflexive, by a basis of the codomain "
+        "and the scalar case. Brezis Theorem 4.10 is scalar and no transcribed statement covers "
+        "the vector-valued space"
+    ),
     "EllipticPdes.Extension.hasCkBoundary_aboveGraph": (
         "the model domain of Evans's flattening in App. C.1, stated for non-vacuity of the "
         "C^k boundary definition"
