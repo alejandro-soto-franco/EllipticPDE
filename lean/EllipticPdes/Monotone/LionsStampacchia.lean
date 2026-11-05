@@ -108,7 +108,7 @@ theorem IsCoerciveOp.sub_const (hA : IsCoerciveOp K A) (f : StrongDual ℝ X) :
 A monotone, hemicontinuous, coercive operator on a closed convex set `K` of a reflexive Banach
 space has, for each `f ∈ X*`, a point `u ∈ K` that satisfies `⟨f, v - u⟩ ≤ ⟨A u, v - u⟩` for all
 `v ∈ K`. -/
-theorem exists_strongVI [CompleteSpace X] (hX : Analysis.IsReflexive X) (hK : Convex ℝ K)
+theorem exists_strongVI (hX : Analysis.IsReflexive X) (hK : Convex ℝ K)
     (hKc : IsClosed K) (hA : IsMonotoneOp K A) (hh : IsHemicontinuousOp K A)
     (hco : IsCoerciveOp K A) (f : StrongDual ℝ X) :
     ∃ u ∈ K, ∀ v ∈ K, f (v - u) ≤ A u (v - u) := by
@@ -120,7 +120,7 @@ theorem exists_strongVI [CompleteSpace X] (hX : Analysis.IsReflexive X) (hK : Co
 
 /-- **Uniqueness in the Lions–Stampacchia theorem.** Under strict monotonicity the solution is
 unique. -/
-theorem existsUnique_strongVI [CompleteSpace X] (hX : Analysis.IsReflexive X) (hK : Convex ℝ K)
+theorem existsUnique_strongVI (hX : Analysis.IsReflexive X) (hK : Convex ℝ K)
     (hKc : IsClosed K) (hA : IsStrictlyMonotoneOp K A) (hh : IsHemicontinuousOp K A)
     (hco : IsCoerciveOp K A) (f : StrongDual ℝ X) :
     ∃! u, u ∈ K ∧ ∀ v ∈ K, f (v - u) ≤ A u (v - u) := by

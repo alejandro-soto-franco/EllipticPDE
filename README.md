@@ -809,6 +809,14 @@ differentiable.
 | Result | Declaration |
 |---|---|
 | The Knaster–Kuratowski–Mazurkiewicz lemma, from Brouwer's fixed-point theorem (the `fixed-point-theorems` package, MIT) | `kkm_stdSimplex`, `kkm` |
+| The Debrunner–Flor inequality on the convex hull of a finite set | `exists_minty_convexHull_finset` |
+| Ferreira–Gomes–Üçer Theorem 2.16 for a convex set, concluding $u \in \overline{K}$ | `exists_weakVI_closure` |
+| The same for a closed convex set, concluding $u \in K$, and for a bounded one with no coercivity hypothesis | `exists_weakVI`, `exists_weakVI_of_isBounded` |
+| The convex set $(0, 1]$ in $\mathbb{R}$ with $A = \mathrm{id}$, where no solution lies in $K$ | `not_exists_weakVI_Ioc` |
+| Minty's lemma and its converse | `IsHemicontinuousOp.strongVI_of_weakVI`, `IsMonotoneOp.weakVI_of_strongVI` |
+| The Lions–Stampacchia theorem for a monotone hemicontinuous coercive operator, with uniqueness under strict monotonicity | `exists_strongVI`, `existsUnique_strongVI` |
+| The Browder–Minty theorem: onto the dual for a monotone operator, bijective for a strictly monotone one | `surjective_of_monotone`, `bijective_of_strictlyMonotone` |
+| The Lax–Milgram theorem without symmetry on a reflexive Banach space | `laxMilgram_of_reflexive` |
 | Reflexivity of $L^p$ for $1 < p < \infty$ on a finite measure, and of its closed subspaces | `Analysis.isReflexive_Lp`, `Analysis.IsReflexive.submodule` |
 | Reflexivity of $W_0^{1,p}(\Omega)$ | `isReflexive_W1p0` |
 | Existence of a minimiser of a coercive convex functional | `exists_isMinOn_of_convex` |
@@ -817,6 +825,9 @@ differentiable.
 | Convexity, continuity and Gateaux derivative of the $p$-energy | `pEnergy_convex`, `pEnergy_continuous`, `pEnergy_gateaux` |
 | Existence of the weak solution of the screened $p$-Laplacian | `exists_weakSolution_pLaplacian` |
 | Uniqueness of that weak solution | `existsUnique_weakSolution_pLaplacian` |
+| Existence and uniqueness for the screened $p$-Laplacian with a skew principal part $-\operatorname{div}(S \nabla u)$ | `existsUnique_weakSolution_skewPLaplacian` |
+
+The Brouwer fixed-point theorem comes from the `fixed-point-theorems` package (MIT), which `lean/lakefile.toml` requires alongside Mathlib. Ferreira, Gomes and Üçer Theorem 2.16 (p. 11) concludes $u \in \overline{K}$ for a convex $K$. The conclusion $u \in K$ needs $K$ closed, and `not_exists_weakVI_Ioc` shows that convexity alone does not give it.
 
 ## Dependency chain
 

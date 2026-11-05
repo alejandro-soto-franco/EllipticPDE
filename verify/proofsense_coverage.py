@@ -60,26 +60,15 @@ EXEMPT = {
         "coercivity is vacuous on a bounded set, because the filter cobounded inf principal K is "
         "trivial. No transcribed statement asserts it"
     ),
-    "EllipticPdes.exists_weakVI_closure": (
-        "Ferreira-Gomes-Ucer Theorem 2.16 (p. 11) with the conclusion u in closure K, which the "
-        "convex-set hypothesis supports. The printed conclusion u in K needs K closed. The "
-        "transcription of ferreira-2025-sol-mea-gam was not in the library when this was written, "
-        "so no locator has been checked"
-    ),
-    "EllipticPdes.exists_weakVI": (
-        "Ferreira-Gomes-Ucer Theorem 2.16 (p. 11) for closed K. The transcription of "
-        "ferreira-2025-sol-mea-gam was not in the library when this was written, so the warrant "
-        "waits for a checked locator"
-    ),
     "EllipticPdes.exists_weakVI_of_isBounded": (
         "the Debrunner-Flor theorem on a bounded closed convex set, with no coercivity "
         "hypothesis. Ferreira-Gomes-Ucer cite it in the proof of Theorem 2.16 and state no such "
         "result"
     ),
     "EllipticPdes.not_exists_weakVI_Ioc": (
-        "the counterexample X = R, K = (0, 1], A = id to the printed conclusion u in K of "
-        "Ferreira-Gomes-Ucer Theorem 2.16 (p. 11). It contradicts the printed statement, so no "
-        "source states it"
+        "the counterexample X = R, K = (0, 1], A = id, which shows that the conclusion u in K "
+        "cannot replace u in the closure of K in Ferreira-Gomes-Ucer Theorem 2.16 (p. 11) for a "
+        "convex set. No source states it"
     ),
     "EllipticPdes.IsMonotoneOp.weakVI_of_strongVI": (
         "the converse of Minty's lemma: a monotone operator satisfies the weak inequality wherever it "

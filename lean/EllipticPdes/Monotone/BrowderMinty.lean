@@ -37,7 +37,7 @@ variable {X : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X] {A : X → Stron
 
 /-- **Existence in the Browder–Minty theorem.** A monotone, hemicontinuous and coercive operator
 on a reflexive Banach space is onto the dual (Brezis, Theorem 5.16, p. 145). -/
-theorem surjective_of_monotone [CompleteSpace X] (hX : Analysis.IsReflexive X)
+theorem surjective_of_monotone (hX : Analysis.IsReflexive X)
     (hA : IsMonotoneOp Set.univ A) (hh : IsHemicontinuousOp Set.univ A)
     (hco : IsCoerciveOp Set.univ A) : Function.Surjective A := by
   intro f
@@ -52,7 +52,7 @@ theorem surjective_of_monotone [CompleteSpace X] (hX : Analysis.IsReflexive X)
 /-- **Bijectivity in the Browder–Minty theorem.** A strictly monotone, hemicontinuous and coercive
 operator on a reflexive Banach space is a bijection onto the dual (Brezis, Theorem 5.16,
 p. 145). -/
-theorem bijective_of_strictlyMonotone [CompleteSpace X] (hX : Analysis.IsReflexive X)
+theorem bijective_of_strictlyMonotone (hX : Analysis.IsReflexive X)
     (hA : IsStrictlyMonotoneOp Set.univ A) (hh : IsHemicontinuousOp Set.univ A)
     (hco : IsCoerciveOp Set.univ A) : Function.Bijective A := by
   refine ⟨fun u v huv => ?_, surjective_of_monotone hX hA.isMonotoneOp hh hco⟩
@@ -63,7 +63,7 @@ theorem bijective_of_strictlyMonotone [CompleteSpace X] (hX : Analysis.IsReflexi
 /-- **Lax–Milgram theorem without symmetry** on a reflexive Banach space. A bounded bilinear
 form `B` with `c ‖u‖ ^ 2 ≤ B u u` and `0 < c` has, for each `f` in the dual, a unique `u` with
 `B u = f` (compare Brezis, Corollary 5.8, p. 140, for a Hilbert space). -/
-theorem laxMilgram_of_reflexive [CompleteSpace X] (hX : Analysis.IsReflexive X)
+theorem laxMilgram_of_reflexive (hX : Analysis.IsReflexive X)
     (B : X →L[ℝ] X →L[ℝ] ℝ) {c : ℝ} (hc : 0 < c) (hB : ∀ u, c * ‖u‖ ^ 2 ≤ B u u)
     (f : StrongDual ℝ X) : ∃! u, B u = f := by
   have hsm : IsStrictlyMonotoneOp Set.univ (fun u => B u) := by
