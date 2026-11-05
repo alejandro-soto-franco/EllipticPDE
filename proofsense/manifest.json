@@ -14,6 +14,14 @@
     {
       "id": "gilbarg-2001",
       "content_list": "../latex/litreview/sources/transcribed-mineru/gilbarg-2001-ell-par-dif.md"
+    },
+    {
+      "id": "brezis-2011",
+      "content_list": "../latex/litreview/sources/transcribed-mineru/brezis-2011-fun-ana-sob.md"
+    },
+    {
+      "id": "ferreira-2025",
+      "content_list": "../latex/litreview/sources/transcribed-mineru/ferreira-2025-sol-mea-gam.md"
     }
   ],
   "space_map": {
@@ -1411,6 +1419,42 @@
       "source_id": "gilbarg-2001",
       "locator": "§7.1 Rmk (dual of L^p)",
       "claim": "formalises the bound on the inverse that the isomorphism of the cited remark needs: on a sigma-finite measure space with 1/p + 1/q = 1, the L^q norm of g is at most the norm of the functional f -> integral of f g on L^p. Gilbarg and Trudinger state the isomorphism and give no proof. The bound covers every p including p = infinity. The case p = 1 tests g against sets of finite measure and uses sigma-finiteness"
+    },
+    {
+      "decl": "EllipticPdes.isClosed_toWeakSpace_of_convex",
+      "source_id": "brezis-2011",
+      "locator": "§3 Thm 3.7",
+      "claim": "formalises the forward half of Mazur's theorem: a convex subset of a real normed space that is closed in the norm topology has closed image in the weak topology. The source states the equivalence, for a convex subset of a Banach space E; the converse is the continuity of the identity from the norm topology to the weak topology and is not stated"
+    },
+    {
+      "decl": "EllipticPdes.isCompact_toWeakSpace_closedBall",
+      "source_id": "brezis-2011",
+      "locator": "§3 Thm 3.17",
+      "claim": "formalises the forward half of Kakutani's theorem: in a reflexive normed space the closed ball of any radius r has compact image in the weak topology. The source states the equivalence for a Banach space E, with the closed unit ball B_E; the converse (weak compactness of the ball implies reflexivity) is not stated, and the radius is arbitrary where the source takes 1"
+    },
+    {
+      "decl": "EllipticPdes.isCompact_toWeakSpace_of_bounded_convex_closed",
+      "source_id": "brezis-2011",
+      "locator": "§3 Cor 3.22",
+      "claim": "formalises the cited corollary: in a reflexive space a bounded, closed, convex set is compact in the weak topology. Reflexivity is the Lean predicate IsReflexive, with no CompleteSpace hypothesis where the source takes a Banach space"
+    },
+    {
+      "decl": "EllipticPdes.exists_isMinOn_of_convex_of_bounded",
+      "source_id": "brezis-2011",
+      "locator": "§3 Cor 3.23",
+      "claim": "formalises the cited corollary in the bounded case, the one the source marks 'no assumption if A is bounded': a convex lower semicontinuous function on a nonempty, bounded, closed, convex subset of a reflexive space attains its minimum. The function is real valued where the source allows values in (-infinity, +infinity] with phi not identically +infinity, and the reflexive space is not required to be complete"
+    },
+    {
+      "decl": "EllipticPdes.exists_isMinOn_of_convex",
+      "source_id": "brezis-2011",
+      "locator": "§3 Cor 3.23",
+      "claim": "formalises the cited corollary with the coercivity hypothesis (5): a convex lower semicontinuous function on a nonempty closed convex subset of a reflexive space, tending to +infinity along the cobounded filter restricted to the set, attains its minimum. The function is real valued where the source allows values in (-infinity, +infinity] with phi not identically +infinity, and the reflexive space is not required to be complete"
+    },
+    {
+      "decl": "EllipticPdes.laxMilgram_symm_of_potential",
+      "source_id": "brezis-2011",
+      "locator": "§5 Cor 5.8",
+      "claim": "formalises the existence and uniqueness clause (17) of the cited corollary for a symmetric form: a bounded, coercive and symmetric bilinear form B on a real Hilbert space and a bounded linear functional f give a unique u with B(u, v) = f(v) for every v. The source does not assume symmetry for (17), so the declaration is the symmetric case, which it reaches through the potential u -> B(u, u)/2 and the direct method; the minimisation characterisation (18) is not stated"
     }
   ],
   "source_divergences": [
@@ -1475,6 +1519,48 @@
         "H_0^1"
       ],
       "note": "Symmetry is a hypothesis of the cited theorem and is discharged for the form of the Laplacian by laplaceBilin_symm rather than assumed."
+    },
+    {
+      "source_id": "brezis-2011",
+      "locator": "§3 Thm 3.7",
+      "labels": [
+        "one direction"
+      ],
+      "note": "Mazur's theorem is an equivalence of weak and norm closedness for convex sets. isClosed_toWeakSpace_of_convex states the direction from norm closed to weakly closed, and the space is a real normed space where the source takes a Banach space."
+    },
+    {
+      "source_id": "brezis-2011",
+      "locator": "§3 Thm 3.17",
+      "labels": [
+        "one direction",
+        "no CompleteSpace"
+      ],
+      "note": "Kakutani's theorem is an equivalence between reflexivity and weak compactness of the closed unit ball of a Banach space. isCompact_toWeakSpace_closedBall states the direction from reflexivity to weak compactness of a closed ball of any radius, with no CompleteSpace hypothesis."
+    },
+    {
+      "source_id": "brezis-2011",
+      "locator": "§3 Cor 3.22",
+      "labels": [
+        "no CompleteSpace"
+      ],
+      "note": "The source takes a Banach space; isCompact_toWeakSpace_of_bounded_convex_closed takes a real normed space with the predicate IsReflexive and no completeness."
+    },
+    {
+      "source_id": "brezis-2011",
+      "locator": "§3 Cor 3.23",
+      "labels": [
+        "real-valued",
+        "no CompleteSpace"
+      ],
+      "note": "The source takes phi: A -> (-infinity, +infinity] convex, lower semicontinuous and not identically +infinity. exists_isMinOn_of_convex and exists_isMinOn_of_convex_of_bounded take a real-valued function, which is the case of phi finite everywhere, and a real normed space with the predicate IsReflexive."
+    },
+    {
+      "source_id": "brezis-2011",
+      "locator": "§5 Cor 5.8",
+      "labels": [
+        "symmetric"
+      ],
+      "note": "The source states (17) for a continuous coercive bilinear form with no symmetry and adds the minimisation characterisation (18) for a symmetric one. laxMilgram_symm_of_potential assumes symmetry and states (17) alone; EllipticPdes.lax_milgram is the form without symmetry."
     }
   ]
 }

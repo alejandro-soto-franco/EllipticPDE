@@ -3,9 +3,12 @@
 A [proofsense](https://github.com/alejandro-soto-franco/proofsense) manifest
 pairing this development's audited results with the literature statements
 they cite, so a claim of the form "this formalises Evans Theorem N" is checkable
-rather than asserted. Two sources supply warrants: Evans for the existence,
-Fredholm, spectral and interior-regularity chain, and Fernández-Real and
-Ros-Oton for Campanato's characterisation of Hölder continuity.
+rather than asserted. Three sources supply warrants: Evans for the existence,
+Fredholm, spectral and interior-regularity chain, Fernández-Real and
+Ros-Oton for Campanato's characterisation of Hölder continuity, and Brezis for
+the weak compactness, direct-method and symmetric Lax–Milgram results of
+`EllipticPdes.Monotone`. Ferreira, Gomes and Üçer is registered as a source for
+the monotone-operator definitions; no warrant cites it.
 
 proofsense supplies the formal verdict: a Lean declaration against the
 literature statement it cites, yielding a relation, a trust rung and any defect.
@@ -154,3 +157,27 @@ no constant at all.
 Ros-Oton §1.1 rather than Evans §5.6.1, because the declaration is stated at the
 `Lᵖ`-seminorm level on a pair of nested balls, which is closer to the
 Fernández-Real form.
+
+## Monotone-operator results
+
+Five declarations of `EllipticPdes.Monotone` have Brezis warrants, each with a
+recorded divergence. `isClosed_toWeakSpace_of_convex` and
+`isCompact_toWeakSpace_closedBall` state one direction of the equivalences in
+Theorems 3.7 (Mazur) and 3.17 (Kakutani). Every Brezis statement takes a Banach
+space, and the declarations take a real normed space, with reflexivity as the
+predicate `IsReflexive`. The two direct-method declarations state Corollary 3.23
+for a real-valued function, where the source allows values in
+`(-∞, +∞]`. `laxMilgram_symm_of_potential` assumes symmetry, which Corollary 5.8 asks
+only for its clause (18), and states clause (17) alone.
+
+Four declarations are exempt, because no transcribed statement matches them.
+Ferreira, Gomes and Üçer Remark 2.17 (p. 12) begins from a hemicontinuous
+monotone operator and a solution of the weak inequality of Theorem 2.16. It
+neither states that the Gateaux derivative of a convex functional is monotone
+(`isMonotoneOp_of_convex_gateaux`), nor starts from a minimiser
+(`variationalInequality_of_isMinOn`). Theorem 2.16 concludes a weak variational
+inequality on a convex set, and no source statement asserts that a coercive
+potential operator is onto the dual (`exists_eq_of_potential`) or that strict
+monotonicity makes the preimage unique (`existsUnique_eq_of_potential`). The
+docstrings of the first two cite Remark 2.17 for the setting they work in,
+which the remark does not state for them.

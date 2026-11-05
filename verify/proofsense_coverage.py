@@ -39,6 +39,29 @@ MANIFEST = ROOT / "proofsense" / "manifest.json"
 # that no transcribed statement matches it, which the README under
 # proofsense/ has to justify in prose.
 EXEMPT = {
+    "EllipticPdes.isMonotoneOp_of_convex_gateaux": (
+        "the Gateaux derivative of a convex functional is a monotone operator, which is classical. "
+        "Ferreira-Gomes-Ucer Definition 2.15(a) defines monotonicity and Remark 2.17 treats an "
+        "operator already assumed monotone, and neither states the potential case"
+    ),
+    "EllipticPdes.variationalInequality_of_isMinOn": (
+        "a minimiser of a Gateaux differentiable functional on a convex set satisfies the strong "
+        "variational inequality. Ferreira-Gomes-Ucer Remark 2.17 derives the strong inequality from "
+        "a solution of the weak inequality of Theorem 2.16 for a hemicontinuous operator, by the "
+        "same limit t -> 0, and starts from no minimiser"
+    ),
+    "EllipticPdes.exists_eq_of_potential": (
+        "a coercive monotone operator that is the Gateaux derivative of a convex lower "
+        "semicontinuous functional on a reflexive space is onto the dual, proved by the direct "
+        "method of Brezis Corollary 3.23. Ferreira-Gomes-Ucer Theorem 2.16 concludes the weak "
+        "variational inequality on a convex set for a monotone coercive operator, and no "
+        "transcribed statement asserts surjectivity of a potential operator"
+    ),
+    "EllipticPdes.existsUnique_eq_of_potential": (
+        "the uniqueness companion of exists_eq_of_potential under strict monotonicity, which is "
+        "the elementary argument that two preimages give a zero of a positive pairing; no "
+        "transcribed statement asserts it"
+    ),
     "EllipticPdes.Extension.hasCkBoundary_aboveGraph": (
         "the model domain of Evans's flattening in App. C.1, stated for non-vacuity of the "
         "C^k boundary definition"
