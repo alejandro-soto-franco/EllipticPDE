@@ -39,6 +39,14 @@ MANIFEST = ROOT / "proofsense" / "manifest.json"
 # that no transcribed statement matches it, which the README under
 # proofsense/ has to justify in prose.
 EXEMPT = {
+    "EllipticPdes.kkm_stdSimplex": (
+        "the Knaster-Kuratowski-Mazurkiewicz lemma on the standard simplex, derived from Brouwer's "
+        "fixed-point theorem. No source in the library states it"
+    ),
+    "EllipticPdes.kkm": (
+        "the Knaster-Kuratowski-Mazurkiewicz lemma on the convex hull of finitely many points of a "
+        "normed space. No source in the library states it"
+    ),
     "EllipticPdes.pEnergy_convex": (
         "the convexity of the p-energy (1/p) int |grad u|^p + (c/p) int |u|^p on W_0^{1,p}, which "
         "is the convexity of the norm to the power p. Evans 8.1.2 asks convexity of the "

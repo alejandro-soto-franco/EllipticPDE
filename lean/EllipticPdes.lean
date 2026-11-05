@@ -159,6 +159,7 @@ public import EllipticPdes.Monotone.ReflexiveCompact
 public import EllipticPdes.Monotone.DirectMethod
 public import EllipticPdes.Monotone.Potential
 public import EllipticPdes.Monotone.ReflexiveLp
+public import EllipticPdes.Monotone.KKM
 public import EllipticPdes.SobolevP.Graph
 public import EllipticPdes.SobolevP.PLaplacian
 public import EllipticPdes.SobolevP.Reflexive

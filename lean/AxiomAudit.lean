@@ -571,6 +571,12 @@ assert_classical_axioms
   EllipticPdes.existsUnique_eq_of_potential
   EllipticPdes.laxMilgram_symm_of_potential
 
+/-! ### The KKM lemma -/
+
+assert_classical_axioms
+  EllipticPdes.kkm_stdSimplex
+  EllipticPdes.kkm
+
 /-! ### Reflexivity of `L^p` and of closed subspaces -/
 
 assert_classical_axioms

@@ -808,6 +808,7 @@ differentiable.
 
 | Result | Declaration |
 |---|---|
+| The Knaster–Kuratowski–Mazurkiewicz lemma, from Brouwer's fixed-point theorem (the `fixed-point-theorems` package, MIT) | `kkm_stdSimplex`, `kkm` |
 | Reflexivity of $L^p$ for $1 < p < \infty$ on a finite measure, and of its closed subspaces | `Analysis.isReflexive_Lp`, `Analysis.IsReflexive.submodule` |
 | Reflexivity of $W_0^{1,p}(\Omega)$ | `isReflexive_W1p0` |
 | Existence of a minimiser of a coercive convex functional | `exists_isMinOn_of_convex` |
