@@ -552,3 +552,10 @@ assert_classical_axioms
   EllipticPdes.Analysis.lpDualMap_surjective_of_finite
   EllipticPdes.Analysis.lpDualMap_surjective
   EllipticPdes.Analysis.exists_lpDual_eq
+
+/-! ### Weak compactness in reflexive spaces -/
+
+assert_classical_axioms
+  EllipticPdes.isClosed_toWeakSpace_of_convex
+  EllipticPdes.isCompact_toWeakSpace_closedBall
+  EllipticPdes.isCompact_toWeakSpace_of_bounded_convex_closed

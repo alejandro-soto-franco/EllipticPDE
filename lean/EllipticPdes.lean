@@ -155,6 +155,7 @@ public import EllipticPdes.DivFormInstances
 public import EllipticPdes.Analysis.WeakCompactness
 public import EllipticPdes.Analysis.OperatorBackground
 public import EllipticPdes.Monotone.Basic
+public import EllipticPdes.Monotone.ReflexiveCompact
 public import EllipticPdes.Analysis.WeakConvergence
 public import EllipticPdes.Analysis.FunctionSpaces
 public import EllipticPdes.Analysis.HolderSpace
