@@ -561,3 +561,12 @@ assert_classical_axioms
   EllipticPdes.isCompact_toWeakSpace_of_bounded_convex_closed
   EllipticPdes.exists_isMinOn_of_convex_of_bounded
   EllipticPdes.exists_isMinOn_of_convex
+
+/-! ### Potential operators -/
+
+assert_classical_axioms
+  EllipticPdes.isMonotoneOp_of_convex_gateaux
+  EllipticPdes.variationalInequality_of_isMinOn
+  EllipticPdes.exists_eq_of_potential
+  EllipticPdes.existsUnique_eq_of_potential
+  EllipticPdes.laxMilgram_symm_of_potential
