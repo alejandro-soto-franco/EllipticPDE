@@ -21,8 +21,8 @@ This file derives it from Brouwer's fixed-point theorem (`brouwer_fixed_point` o
 simplex whose fixed point contradicts the covering condition.
 
 The lemma is the input to the Debrunner–Flor theorem and the Browder–Minty theorem. It is the
-closed-set form of Knaster–Kuratowski–Mazurkiewicz (Math. Ann. 1929), which no source in the
-Adduce library states.
+closed-set form of Knaster–Kuratowski–Mazurkiewicz (Fund. Math. 14, 1929). None of the cited
+sources states it.
 
 ## Main declarations
 

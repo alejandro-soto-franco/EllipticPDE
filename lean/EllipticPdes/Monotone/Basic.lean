@@ -22,6 +22,7 @@ order-theoretic `Monotone` and `MonotoneOn`.
 
 * `EllipticPdes.IsMonotoneOp`: `0 ≤ ⟨A u - A v, u - v⟩` for `u`, `v` in `K`.
 * `EllipticPdes.IsStrictlyMonotoneOp`: the inequality is strict for `u ≠ v`.
+* `EllipticPdes.IsStrictlyMonotoneOp.isMonotoneOp`: strict monotonicity implies monotonicity.
 * `EllipticPdes.IsCoerciveOp`: `⟨A v - A v₀, v - v₀⟩ / ‖v‖` tends to infinity along `K`.
 * `EllipticPdes.IsHemicontinuousOp`: `t ↦ ⟨A ((1 - t) u + t v), w⟩` is continuous on `[0, 1]`.
 * `EllipticPdes.IsMonotoneOp.of_bilin`: a bounded bilinear form with `0 ≤ B u u` is monotone.
@@ -45,6 +46,15 @@ distinct `u`, `v` in `K`. This is the strict form of Ferreira–Gomes–Üçer, 
 p. 11. -/
 def IsStrictlyMonotoneOp (K : Set X) (A : X → StrongDual ℝ X) : Prop :=
   ∀ u ∈ K, ∀ v ∈ K, u ≠ v → 0 < (A u - A v) (u - v)
+
+/-- Strict monotonicity implies monotonicity. -/
+theorem IsStrictlyMonotoneOp.isMonotoneOp {K : Set X} {A : X → StrongDual ℝ X}
+    (hA : IsStrictlyMonotoneOp K A) : IsMonotoneOp K A := by
+  intro u hu v hv
+  by_cases huv : u = v
+  · subst huv
+    simp
+  · exact (hA u hu v hv huv).le
 
 /-- An operator `A : X → X*` is coercive on `K` when some `v₀ ∈ K` makes
 `⟨A v - A v₀, v - v₀⟩ / ‖v‖` tend to infinity as `‖v‖ → ∞` within `K`. The filter is

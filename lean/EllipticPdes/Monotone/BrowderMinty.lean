@@ -12,19 +12,22 @@ public import EllipticPdes.Monotone.LionsStampacchia
 # Browder–Minty theorem and Lax–Milgram without symmetry
 
 On the whole space `K = univ` the Lions–Stampacchia inequality
-`⟨f, v - u⟩ ≤ ⟨A u, v - u⟩` at `v = u ± w` forces `⟨A u, w⟩ = ⟨f, w⟩` for every `w`, so
-`A u = f`. A monotone, hemicontinuous, coercive operator on a reflexive Banach space is therefore
-onto, and a strictly monotone one is a bijection (Brezis, `brezis-2011-fun-ana-sob`,
+`⟨f, v - u⟩ ≤ ⟨A u, v - u⟩` at `v = u ± w` forces `⟨A u, w⟩ = ⟨f, w⟩` for every `w`.
+Then `A u = f`. A monotone, hemicontinuous, coercive operator on a reflexive Banach space is
+therefore onto, and a strictly monotone one is a bijection (Brezis, `brezis-2011-fun-ana-sob`,
 Theorem 5.16 (Minty–Browder), p. 145). A bounded bilinear form `B` with
-`c ‖u‖ ^ 2 ≤ B u u` gives a strictly monotone, continuous and coercive operator `u ↦ B u`, which
-yields the Lax–Milgram theorem (Brezis, Corollary 5.8, p. 140) with no symmetry hypothesis and on
-any reflexive Banach space.
+`c ‖u‖ ^ 2 ≤ B u u` gives a strictly monotone, continuous and coercive operator `u ↦ B u`. This
+yields the Lax–Milgram theorem (Brezis, Corollary 5.8, p. 140) with no symmetry hypothesis. The
+coercivity `c ‖u‖ ^ 2 ≤ B u u` makes the symmetric part of `B` an inner product with an equivalent
+norm, so a space with such a `B` is isomorphic to a Hilbert space. The statement needs no
+chosen inner product, and covers no space beyond the Hilbertian ones.
 
 ## Main declarations
 
 * `EllipticPdes.surjective_of_monotone`: the Browder–Minty theorem, existence.
 * `EllipticPdes.bijective_of_strictlyMonotone`: the Browder–Minty theorem, with uniqueness.
-* `EllipticPdes.laxMilgram_of_reflexive`: Lax–Milgram on a reflexive Banach space.
+* `EllipticPdes.laxMilgram_of_reflexive`: Lax–Milgram for a coercive bounded bilinear form, with
+  the space assumed reflexive in place of a chosen inner product.
 -/
 
 @[expose] public section

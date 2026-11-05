@@ -47,7 +47,7 @@ EXEMPT = {
         "the Knaster-Kuratowski-Mazurkiewicz lemma on the convex hull of finitely many points of a "
         "normed space. No source in the library states it"
     ),
-    "EllipticPdes.IsMonotoneOp.exists_le_pairing_centerMass": (
+    "EllipticPdes.IsMonotoneOp.exists_le_pairing_sum_smul": (
         "the averaging step of the Debrunner-Flor lemma: for a convex combination of points of K, "
         "some vertex of positive weight has a non-negative pairing. Ferreira-Gomes-Ucer cite "
         "Debrunner-Flor in the proof of Theorem 2.16 (p. 11) and state no such lemma"
@@ -65,7 +65,7 @@ EXEMPT = {
         "hypothesis. Ferreira-Gomes-Ucer cite it in the proof of Theorem 2.16 and state no such "
         "result"
     ),
-    "EllipticPdes.not_exists_weakVI_Ioc": (
+    "EllipticPdes.weakVI_Ioc_counterexample": (
         "the counterexample X = R, K = (0, 1], A = id, which shows that the conclusion u in K "
         "cannot replace u in the closure of K in Ferreira-Gomes-Ucer Theorem 2.16 (p. 11) for a "
         "convex set. No source states it"

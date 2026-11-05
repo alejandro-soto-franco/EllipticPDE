@@ -16,7 +16,7 @@ For a monotone operator `A : X → X*` on a convex set `K`, the weak inequality
 are equivalent when `A` is hemicontinuous (Ferreira–Gomes–Üçer, `ferreira-2025-sol-mea-gam`,
 Remark 2.17, p. 12). The strong direction needs hemicontinuity and the weak direction needs
 monotonicity. Subtracting a datum `f ∈ X*` from `A` keeps monotonicity, hemicontinuity and
-coercivity, so the weak variational inequality of `EllipticPdes.exists_weakVI` yields the
+coercivity. The weak variational inequality of `EllipticPdes.exists_weakVI` then yields the
 Lions–Stampacchia theorem: a solution `u ∈ K` of `⟨f, v - u⟩ ≤ ⟨A u, v - u⟩` for every `v ∈ K`.
 
 ## Main declarations
@@ -74,14 +74,6 @@ theorem IsMonotoneOp.weakVI_of_strongVI (hA : IsMonotoneOp K A) {u : X} (hu : u 
   have h2 := h v hv
   simp only [sub_apply] at h1
   linarith
-
-/-- Strict monotonicity implies monotonicity. -/
-theorem IsStrictlyMonotoneOp.isMonotoneOp (hA : IsStrictlyMonotoneOp K A) : IsMonotoneOp K A := by
-  intro u hu v hv
-  by_cases huv : u = v
-  · subst huv
-    simp
-  · exact (hA u hu v hv huv).le
 
 /-- Subtracting a datum `f` keeps monotonicity. -/
 theorem IsMonotoneOp.sub_const (hA : IsMonotoneOp K A) (f : StrongDual ℝ X) :

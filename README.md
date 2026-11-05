@@ -812,11 +812,11 @@ differentiable.
 | The Debrunner–Flor inequality on the convex hull of a finite set | `exists_minty_convexHull_finset` |
 | Ferreira–Gomes–Üçer Theorem 2.16 for a convex set, concluding $u \in \overline{K}$ | `exists_weakVI_closure` |
 | The same for a closed convex set, concluding $u \in K$, and for a bounded one with no coercivity hypothesis | `exists_weakVI`, `exists_weakVI_of_isBounded` |
-| The convex set $(0, 1]$ in $\mathbb{R}$ with $A = \mathrm{id}$, where no solution lies in $K$ | `not_exists_weakVI_Ioc` |
+| The convex set $K = (0, 1]$ in $\mathbb{R}$ with $A = \mathrm{id}$: convex, with no solution in $K$ | `weakVI_Ioc_counterexample` |
 | Minty's lemma and its converse | `IsHemicontinuousOp.strongVI_of_weakVI`, `IsMonotoneOp.weakVI_of_strongVI` |
 | The Lions–Stampacchia theorem for a monotone hemicontinuous coercive operator, with uniqueness under strict monotonicity | `exists_strongVI`, `existsUnique_strongVI` |
-| The Browder–Minty theorem: onto the dual for a monotone operator, bijective for a strictly monotone one | `surjective_of_monotone`, `bijective_of_strictlyMonotone` |
-| The Lax–Milgram theorem without symmetry on a reflexive Banach space | `laxMilgram_of_reflexive` |
+| The Browder–Minty theorem: onto the dual for a monotone, hemicontinuous, coercive operator, bijective when it is strictly monotone | `surjective_of_monotone`, `bijective_of_strictlyMonotone` |
+| The Lax–Milgram theorem without symmetry, for a coercive bounded bilinear form on a reflexive space (coercivity makes the norm Hilbertian) | `laxMilgram_of_reflexive` |
 | Reflexivity of $L^p$ for $1 < p < \infty$ on a finite measure, and of its closed subspaces | `Analysis.isReflexive_Lp`, `Analysis.IsReflexive.submodule` |
 | Reflexivity of $W_0^{1,p}(\Omega)$ | `isReflexive_W1p0` |
 | Existence of a minimiser of a coercive convex functional | `exists_isMinOn_of_convex` |
@@ -827,7 +827,7 @@ differentiable.
 | Uniqueness of that weak solution | `existsUnique_weakSolution_pLaplacian` |
 | Existence and uniqueness for the screened $p$-Laplacian with a skew principal part $-\operatorname{div}(S \nabla u)$ | `existsUnique_weakSolution_skewPLaplacian` |
 
-The Brouwer fixed-point theorem comes from the `fixed-point-theorems` package (MIT), which `lean/lakefile.toml` requires alongside Mathlib. Ferreira, Gomes and Üçer Theorem 2.16 (p. 11) concludes $u \in \overline{K}$ for a convex $K$. The conclusion $u \in K$ needs $K$ closed, and `not_exists_weakVI_Ioc` shows that convexity alone does not give it.
+The Brouwer fixed-point theorem comes from the `fixed-point-theorems` package (MIT), which `lean/lakefile.toml` requires alongside Mathlib. Ferreira, Gomes and Üçer Theorem 2.16 (p. 11) concludes $u \in \overline{K}$ for a convex $K$. The conclusion $u \in K$ needs $K$ closed, and `weakVI_Ioc_counterexample` shows that convexity alone does not give it.
 
 ## Dependency chain
 

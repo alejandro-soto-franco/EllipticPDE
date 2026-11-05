@@ -1484,7 +1484,7 @@
       "decl": "EllipticPdes.exists_weakVI",
       "source_id": "ferreira-2025",
       "locator": "§2.4 Thm 2.16",
-      "claim": "formalises the theorem for a closed convex set K, where the conclusion u in the closure of K becomes u in K. The source concludes in the closure and Remark 2.17 then assumes u in K; closedness of K is the hypothesis that delivers it, and EllipticPdes.not_exists_weakVI_Ioc shows that convexity of K alone does not give it"
+      "claim": "formalises the theorem for a closed convex set K, where the conclusion u in the closure of K becomes u in K. The source concludes in the closure and Remark 2.17 then assumes u in K; closedness of K is the hypothesis that delivers it, and EllipticPdes.weakVI_Ioc_counterexample shows that convexity of K alone does not give it"
     },
     {
       "decl": "EllipticPdes.bijective_of_strictlyMonotone",
@@ -1627,7 +1627,7 @@
         "hemicontinuous",
         "base point"
       ],
-      "note": "The source assumes A continuous and <Av, v>/||v|| tending to infinity. bijective_of_strictlyMonotone assumes hemicontinuity, which continuity implies, and coercivity of A around some base point v0, which is the source condition for v0 = 0 when A 0 = 0."
+      "note": "The source assumes A continuous and <Av, v>/||v|| tending to infinity. bijective_of_strictlyMonotone assumes hemicontinuity, which continuity implies, and coercivity of A around some base point v0, which the source condition gives with v0 = 0, since <A 0, v>/||v|| is bounded."
     },
     {
       "source_id": "brezis-2011",
@@ -1635,7 +1635,7 @@
       "labels": [
         "reflexive Banach space"
       ],
-      "note": "The source takes a Hilbert space and a continuous coercive bilinear form. laxMilgram_of_reflexive takes a reflexive Banach space and the coercivity c ||u||^2 <= B(u, u), which is the Hilbert-space coercivity when the norm is Hilbertian; it needs no inner product."
+      "note": "The source takes a Hilbert space and a continuous coercive bilinear form. laxMilgram_of_reflexive takes a reflexive Banach space and the coercivity c ||u||^2 <= B(u, u). That coercivity makes the symmetric part of B an inner product with an equivalent norm, so the space is isomorphic to a Hilbert space and the declaration covers no wider class. The gain over Corollary 5.8 is that no inner product is chosen."
     },
     {
       "source_id": "ferreira-2025",
@@ -1645,7 +1645,7 @@
         "IsReflexive",
         "closed K"
       ],
-      "note": "The source takes a Banach space and an operator A : K -> X'; the declarations take a reflexive space as the predicate IsReflexive with no CompleteSpace, an operator on all of X, and monotonicity and coercivity on K. exists_weakVI adds closedness of K to conclude u in K. The conclusion u in the closure of K cannot be improved on a convex K: the counterexample X = R, K = (0, 1], A = id satisfies every hypothesis and has no solution in K (EllipticPdes.not_exists_weakVI_Ioc)."
+      "note": "The source takes a reflexive Banach space and an operator A : K -> X'; the declarations take a reflexive space as the predicate IsReflexive with no CompleteSpace, an operator on all of X, and monotonicity and coercivity on K. exists_weakVI adds closedness of K to conclude u in K. The conclusion u in the closure of K cannot be improved on a convex K: the counterexample X = R, K = (0, 1], A = id satisfies every hypothesis and has no solution in K (EllipticPdes.weakVI_Ioc_counterexample)."
     }
   ]
 }

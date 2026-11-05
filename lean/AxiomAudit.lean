@@ -580,7 +580,7 @@ assert_classical_axioms
 /-! ### The Debrunner–Flor inequality on a polytope -/
 
 assert_classical_axioms
-  EllipticPdes.IsMonotoneOp.exists_le_pairing_centerMass
+  EllipticPdes.IsMonotoneOp.exists_le_pairing_sum_smul
   EllipticPdes.exists_minty_convexHull_finset
 
 /-! ### The weak variational inequality (Ferreira–Gomes–Üçer, Theorem 2.16) -/
@@ -590,7 +590,7 @@ assert_classical_axioms
   EllipticPdes.exists_weakVI_closure
   EllipticPdes.exists_weakVI
   EllipticPdes.exists_weakVI_of_isBounded
-  EllipticPdes.not_exists_weakVI_Ioc
+  EllipticPdes.weakVI_Ioc_counterexample
 
 /-! ### Minty's lemma and the Lions–Stampacchia theorem -/
 

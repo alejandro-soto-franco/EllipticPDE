@@ -16,8 +16,8 @@ public import EllipticPdes.Monotone.ReflexiveCompact
 Ferreira–Gomes–Üçer (`ferreira-2025-sol-mea-gam`, Theorem 2.16, p. 11) state that a monotone
 coercive operator `A : K → X*` on a nonempty convex subset `K` of a reflexive Banach space has a
 point `u ∈ closure K` with `0 ≤ ⟨A v, v - u⟩` for every `v ∈ K`. The closure cannot be dropped
-for a convex set that lacks closure: take `X = ℝ`, `K = (0, 1]` and `A v = id`.
-`EllipticPdes.not_exists_weakVI_Ioc` proves this. The general theorem below is the printed
+for a non-closed convex set: take `X = ℝ`, `K = (0, 1]` and `A v = id`.
+`EllipticPdes.weakVI_Ioc_counterexample` proves this. The general theorem below is the printed
 statement, and the closed case gives `u ∈ K`, the form Remark 2.17 (p. 12) starts from.
 
 The proof follows the paper. Coercivity bounds the solutions of the finite-dimensional problems
@@ -31,7 +31,7 @@ property pass to all of `K`.
 * `EllipticPdes.exists_weakVI_closure`: the weak variational inequality with `u ∈ closure K`.
 * `EllipticPdes.exists_weakVI`: Theorem 2.16 for closed `K`.
 * `EllipticPdes.exists_weakVI_of_isBounded`: the bounded case, with no coercivity hypothesis.
-* `EllipticPdes.not_exists_weakVI_Ioc`: the counterexample for `K = (0, 1]`.
+* `EllipticPdes.weakVI_Ioc_counterexample`: the counterexample for `K = (0, 1]`.
 -/
 
 @[expose] public section
@@ -96,7 +96,7 @@ private lemma exists_radius {K : Set X} {A : X → StrongDual ℝ X} {v₀ : X}
 For a monotone coercive operator `A` on a convex subset `K` of a reflexive Banach space there
 is a point `u` of the closure of `K` with `0 ≤ ⟨A v, v - u⟩` for every `v ∈ K`. The conclusion
 `u ∈ K` needs `K` closed (`exists_weakVI`). Coercivity names a point of
-`K`, so `K` is nonempty without a separate hypothesis. -/
+`K`. Hence `K` is nonempty without a separate hypothesis. -/
 theorem exists_weakVI_closure (hX : Analysis.IsReflexive X) {K : Set X}
     (hK : Convex ℝ K) {A : X → StrongDual ℝ X} (hA : IsMonotoneOp K A)
     (hco : IsCoerciveOp K A) : ∃ u ∈ closure K, ∀ v ∈ K, 0 ≤ A v (v - u) := by
@@ -183,20 +183,21 @@ theorem exists_weakVI_of_isBounded (hX : Analysis.IsReflexive X) {K : Set X}
 /-- **Counterexample to the conclusion `u ∈ K` of Theorem 2.16 for a convex set.** On `X = ℝ`
 with `K = (0, 1]` and `A v = id`, the set `K` is convex and nonempty and `A` is monotone and
 coercive, yet no `u ∈ K` satisfies `0 ≤ ⟨A v, v - u⟩` for all `v ∈ K`. Theorem 2.16 of
-`ferreira-2025-sol-mea-gam` (p. 11) therefore concludes `u ∈ closure K`, and `u ∈ K` needs `K`
-closed. -/
-theorem not_exists_weakVI_Ioc (A : ℝ → StrongDual ℝ ℝ)
-    (hA : ∀ v, A v = ContinuousLinearMap.id ℝ ℝ) :
+`ferreira-2025-sol-mea-gam` (p. 11) concludes `u ∈ closure K`. This example shows that the
+closure is needed, and `u ∈ K` needs `K` closed. -/
+theorem weakVI_Ioc_counterexample :
+    let A : ℝ → StrongDual ℝ ℝ := fun _ => ContinuousLinearMap.id ℝ ℝ
     Convex ℝ (Ioc (0 : ℝ) 1) ∧ (Ioc (0 : ℝ) 1).Nonempty ∧ IsMonotoneOp (Ioc (0 : ℝ) 1) A ∧
       IsCoerciveOp (Ioc (0 : ℝ) 1) A ∧
       ¬ ∃ u ∈ Ioc (0 : ℝ) 1, ∀ v ∈ Ioc (0 : ℝ) 1, 0 ≤ A v (v - u) := by
+  intro A
   have hne : (Ioc (0 : ℝ) 1).Nonempty := ⟨1, by norm_num⟩
   refine ⟨convex_Ioc 0 1, hne, ?_, IsCoerciveOp.of_isBounded (Metric.isBounded_Ioc 0 1) hne A, ?_⟩
   · intro u _ v _
-    simp [hA]
+    simp [A]
   · rintro ⟨u, hu, h⟩
     have := h (u / 2) ⟨by linarith [hu.1], by linarith [hu.2]⟩
-    simp [hA] at this
+    simp [A] at this
     linarith [hu.1]
 
 end EllipticPdes

@@ -20,11 +20,11 @@ averaging identity shows that some vertex of a convex combination `u` of points 
 `0 ≤ ⟨A v, v - u⟩`. The sets `{u | 0 ≤ ⟨A v, v - u⟩}` then cover every face of the polytope in the
 KKM sense, and compactness of the polytope passes from finite subfamilies to all of them.
 
-No source in the Adduce library states the finite-dimensional lemma.
+None of the cited sources states the finite-dimensional lemma.
 
 ## Main declarations
 
-* `EllipticPdes.IsMonotoneOp.exists_le_pairing_centerMass`: for a convex combination
+* `EllipticPdes.IsMonotoneOp.exists_le_pairing_sum_smul`: for a convex combination
   `u = ∑ i, w i • v i` of points of `K`, some `i` with `0 < w i` has `0 ≤ ⟨A (v i), v i - u⟩`.
 * `EllipticPdes.exists_minty_convexHull_finset`: the Debrunner–Flor inequality on the convex hull
   of a nonempty finite set.
@@ -41,9 +41,9 @@ variable {X : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
 /-- **Averaging lemma.** Let `A` be monotone on `K`, let `v i` lie in `K` and let the weights `w i`
 be non-negative with sum `1`. Then some vertex `v i` of positive weight satisfies
 `0 ≤ ⟨A (v i), v i - u⟩` for the convex combination `u = ∑ i, w i • v i`. The proof expands
-`∑ i, w i * ⟨A (v i), v i - u⟩` as `(1/2) ∑ i, ∑ j, w i * w j * ⟨A (v i) - A (v j), v i - v j⟩`,
-which is non-negative by monotonicity. -/
-theorem IsMonotoneOp.exists_le_pairing_centerMass {K : Set X} {A : X → StrongDual ℝ X}
+`∑ i, w i * ⟨A (v i), v i - u⟩` as `(1/2) ∑ i, ∑ j, w i * w j * ⟨A (v i) - A (v j), v i - v j⟩`.
+Monotonicity makes the double sum non-negative. -/
+theorem IsMonotoneOp.exists_le_pairing_sum_smul {K : Set X} {A : X → StrongDual ℝ X}
     (hA : IsMonotoneOp K A) {ι : Type*} [Fintype ι] (v : ι → X) (hv : ∀ i, v i ∈ K) (w : ι → ℝ)
     (hw0 : ∀ i, 0 ≤ w i) (hw1 : ∑ i, w i = 1) :
     ∃ i, 0 < w i ∧ 0 ≤ A (v i) (v i - ∑ j, w j • v j) := by
@@ -121,7 +121,7 @@ theorem exists_minty_convexHull_finset {S : Finset X} (hS : S.Nonempty) {A : X �
       have hzC : ∀ i, z i ∈ C := fun i => by
         obtain ⟨a, _, ha⟩ := hz i
         exact ha ▸ hx a
-      obtain ⟨i, -, hi⟩ := hA.exists_le_pairing_centerMass z hzC w hw0 hw1
+      obtain ⟨i, -, hi⟩ := hA.exists_le_pairing_sum_smul z hzC w hw0 hw1
       obtain ⟨a, ha, haz⟩ := hz i
       have hp' : p = ∑ j, w j • z j := by
         exact hpz.symm

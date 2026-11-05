@@ -17,10 +17,10 @@ bilinear forms on `E` with `S x ξ ξ = 0`, the operator
 `u ↦ -div (|∇u|^{p-2} ∇u) + c |u|^{p-2} u - div (S ∇u)` on `W₀^{1,p}(Ω)` is strictly monotone,
 hemicontinuous and coercive. It is therefore a bijection onto the dual by the Browder–Minty
 theorem. The gradient is read in `E` by the Riesz isometry `PLap.dualE`, as in `pForm`. The skew
-part `skewForm` is a bounded bilinear form with `skewForm u u = 0`, so the operator is not a
-potential operator in general. For `S` built from a stream function it is a divergence-free
-drift. The hypothesis `2 ≤ p` puts `∇u` in `L²` on a set of finite measure, which bounds
-`skewForm`.
+part `skewForm` is a bounded bilinear form with `skewForm u u = 0`. A nonzero `S` makes
+`skewForm` antisymmetric and nonzero. The operator is then not a potential operator. For `S` built
+from a stream function it is a divergence-free drift. The hypothesis `2 ≤ p` puts `∇u` in `L²` on
+a set of finite measure. This bounds `skewForm`.
 
 Hemicontinuity of the `p`-Laplacian part follows from convexity of its energy alone: the Gateaux
 derivative of a convex continuous functional is continuous along lines
@@ -29,7 +29,7 @@ derivative of a convex continuous functional is continuous along lines
 ## Main declarations
 
 * `EllipticPdes.skewForm`: the bilinear form `∫_Ω S ∇u ∇v`.
-* `EllipticPdes.exists_skewCLM`: `skewForm` is a continuous bilinear map.
+* `EllipticPdes.skewCLM`: `skewForm` as a continuous bilinear map, with `skewCLM_apply`.
 * `EllipticPdes.skewForm_self`: `skewForm u u = 0`.
 * `EllipticPdes.continuous_apply_add_smul_of_convex_gateaux`: continuity of the derivative of a
   convex potential along a line.
@@ -126,7 +126,7 @@ theorem continuous_apply_add_smul_of_convex_gateaux (hJc : ConvexOn ℝ univ J)
   constructor <;> linarith [u1.1, u1.2, l1.1, l1.2, hh1.1, hh1.2, hh2.1, hh2.2]
 
 /-- The derivative of a convex potential is continuous along the segment `(1 - t) u + t v`. -/
-theorem continuous_apply_segment_of_convex_gateaux (hJc : ConvexOn ℝ univ J)
+private theorem continuous_apply_segment_of_convex_gateaux (hJc : ConvexOn ℝ univ J)
     (hJ0 : Continuous J)
     (hJ : ∀ u v, HasDerivAt (fun t : ℝ => J (u + t • v)) (A u v) 0) (u v w : X) :
     Continuous (fun t : ℝ => A ((1 - t) • u + t • v) w) := by
@@ -144,7 +144,7 @@ variable {F : Type*} [NormedAddCommGroup F]
 /-- **`L²` bound on a finite measure space.** For `2 ≤ p` and `G`, `H` in `L^p`, the product
 `‖G‖ ‖H‖` is integrable and `∫ ‖G‖ ‖H‖ ≤ ν(univ)^{1 - 2/p} ‖G‖_p ‖H‖_p`. This is Cauchy–Schwarz
 after the embedding `L^p ⊆ L²` on a finite measure space. -/
-theorem integral_norm_mul_le {p : ℝ} (hp : 2 ≤ p) [Fact (1 ≤ ENNReal.ofReal p)]
+private theorem integral_norm_mul_le_of_two_le {p : ℝ} (hp : 2 ≤ p) [Fact (1 ≤ ENNReal.ofReal p)]
     (G H : Lp F (ENNReal.ofReal p) ν) :
     Integrable (fun x => ‖G x‖ * ‖H x‖) ν ∧
       ∫ x, ‖G x‖ * ‖H x‖ ∂ν ≤
@@ -213,12 +213,13 @@ variable {S}
 
 omit [BorelSpace E] [μ.IsAddHaarMeasure] in
 /-- The integrand of `skewForm` is integrable when `S` is measurable and bounded and `2 ≤ p`. -/
-lemma integrable_skew (hΩ : μ Ω ≠ ∞) (hp : 2 ≤ p) (hS : StronglyMeasurable S) {M : ℝ}
+private lemma integrable_skew (hΩ : μ Ω ≠ ∞) (hp : 2 ≤ p) (hS : StronglyMeasurable S) {M : ℝ}
     (hM : ∀ x, ‖S x‖ ≤ M) (G H : Lp (StrongDual ℝ E) (ENNReal.ofReal p) (μ.restrict Ω)) :
     Integrable (fun x => S x (dualE E (G x)) (dualE E (H x))) (μ.restrict Ω) := by
   have : IsFiniteMeasure (μ.restrict Ω) := ⟨by simpa [lt_top_iff_ne_top] using hΩ⟩
   have hM0 : 0 ≤ M := (ContinuousLinearMap.opNorm_nonneg _).trans (hM 0)
-  refine ((integral_norm_mul_le hp G H).1.const_mul M).mono' ?_ (Eventually.of_forall fun x => ?_)
+  refine ((integral_norm_mul_le_of_two_le hp G H).1.const_mul M).mono' ?_
+    (Eventually.of_forall fun x => ?_)
   · have hΦ : Continuous (fun q : (E →L[ℝ] E →L[ℝ] ℝ) × E × E => q.1 q.2.1 q.2.2) :=
       (continuous_fst.clm_apply continuous_snd.fst).clm_apply continuous_snd.snd
     exact hΦ.comp_aestronglyMeasurable (hS.aestronglyMeasurable.prodMk
@@ -243,7 +244,7 @@ private lemma norm_gradL_le (hp : 1 < p) (U : W1p0 (ENNReal.ofReal p) μ Ω) :
   exact (Real.rpow_le_rpow_iff (norm_nonneg _) (norm_nonneg _) hp0).1 (by linarith)
 
 /-- `skewForm` is bounded: `|skewForm u v| ≤ C ‖u‖ ‖v‖` for some constant `C`. -/
-lemma exists_abs_skewForm_le (hΩ : μ Ω ≠ ∞) (hp : 2 ≤ p) (hS : StronglyMeasurable S) {M : ℝ}
+private lemma exists_abs_skewForm_le (hΩ : μ Ω ≠ ∞) (hp : 2 ≤ p) (hS : StronglyMeasurable S) {M : ℝ}
     (hM : ∀ x, ‖S x‖ ≤ M) :
     ∃ C : ℝ, ∀ U V : W1p0 (ENNReal.ofReal p) μ Ω, |skewForm S U V| ≤ C * (‖U‖ * ‖V‖) := by
   have : IsFiniteMeasure (μ.restrict Ω) := ⟨by simpa [lt_top_iff_ne_top] using hΩ⟩
@@ -251,7 +252,7 @@ lemma exists_abs_skewForm_le (hΩ : μ Ω ≠ ∞) (hp : 2 ≤ p) (hS : Strongly
   set K : ℝ := ((μ.restrict Ω) univ ^ (1 / (2 : ℝ≥0∞).toReal -
     1 / (ENNReal.ofReal p).toReal)).toReal ^ 2 with hK
   refine ⟨M * K, fun U V => ?_⟩
-  have hb := integral_norm_mul_le hp (W1p0.gradL U) (W1p0.gradL V)
+  have hb := integral_norm_mul_le_of_two_le hp (W1p0.gradL U) (W1p0.gradL V)
   have hint := integrable_skew hΩ hp hS hM (W1p0.gradL U) (W1p0.gradL V)
   have h1 : |skewForm S U V| ≤ ∫ x, M * (‖W1p0.gradL U x‖ * ‖W1p0.gradL V x‖) ∂(μ.restrict Ω) := by
     unfold skewForm
@@ -277,7 +278,7 @@ lemma exists_abs_skewForm_le (hΩ : μ Ω ≠ ∞) (hp : 2 ≤ p) (hS : Strongly
         gcongr
     _ = M * K * (‖U‖ * ‖V‖) := by ring
 
-lemma skewForm_smul_left (a : ℝ) (U V : W1p0 (ENNReal.ofReal p) μ Ω) :
+private lemma skewForm_smul_left (a : ℝ) (U V : W1p0 (ENNReal.ofReal p) μ Ω) :
     skewForm S (a • U) V = a * skewForm S U V := by
   unfold skewForm
   rw [← integral_const_mul]
@@ -286,7 +287,7 @@ lemma skewForm_smul_left (a : ℝ) (U V : W1p0 (ENNReal.ofReal p) μ Ω) :
   filter_upwards [Lp.coeFn_smul a (W1p0.gradL U)] with x hx
   simp only [hx, Pi.smul_apply, map_smul, smul_apply, smul_eq_mul]
 
-lemma skewForm_smul_right (a : ℝ) (U V : W1p0 (ENNReal.ofReal p) μ Ω) :
+private lemma skewForm_smul_right (a : ℝ) (U V : W1p0 (ENNReal.ofReal p) μ Ω) :
     skewForm S U (a • V) = a * skewForm S U V := by
   unfold skewForm
   rw [← integral_const_mul]
@@ -302,7 +303,7 @@ variable (hΩ : μ Ω ≠ ∞) (hp : 2 ≤ p) (hS : StronglyMeasurable S) {M : �
 
 include hΩ hp hS hM
 
-lemma skewForm_add_left (U U' V : W1p0 (ENNReal.ofReal p) μ Ω) :
+private lemma skewForm_add_left (U U' V : W1p0 (ENNReal.ofReal p) μ Ω) :
     skewForm S (U + U') V = skewForm S U V + skewForm S U' V := by
   unfold skewForm
   rw [← integral_add (integrable_skew hΩ hp hS hM _ _) (integrable_skew hΩ hp hS hM _ _)]
@@ -311,7 +312,7 @@ lemma skewForm_add_left (U U' V : W1p0 (ENNReal.ofReal p) μ Ω) :
   filter_upwards [Lp.coeFn_add (W1p0.gradL U) (W1p0.gradL U')] with x hx
   simp only [hx, Pi.add_apply, map_add, add_apply]
 
-lemma skewForm_add_right (U V V' : W1p0 (ENNReal.ofReal p) μ Ω) :
+private lemma skewForm_add_right (U V V' : W1p0 (ENNReal.ofReal p) μ Ω) :
     skewForm S U (V + V') = skewForm S U V + skewForm S U V' := by
   unfold skewForm
   rw [← integral_add (integrable_skew hΩ hp hS hM _ _) (integrable_skew hΩ hp hS hM _ _)]
@@ -322,20 +323,24 @@ lemma skewForm_add_right (U V V' : W1p0 (ENNReal.ofReal p) μ Ω) :
 
 end Linear
 
-/-- **`skewForm` is a bounded bilinear form.** For a bounded strongly measurable field `S` and
-`2 ≤ p`, `skewForm S` is a continuous bilinear map on `W₀^{1,p}(Ω)`. -/
-theorem exists_skewCLM (hΩ : μ Ω ≠ ∞) (hp : 2 ≤ p) (hS : StronglyMeasurable S) {M : ℝ}
+/-- **`skewForm` as a continuous bilinear map.** For a bounded strongly measurable field `S` and
+`2 ≤ p`, `skewCLM` is `skewForm S` as a continuous bilinear map on `W₀^{1,p}(Ω)`. -/
+@[no_expose] def skewCLM (hΩ : μ Ω ≠ ∞) (hp : 2 ≤ p) (hS : StronglyMeasurable S) {M : ℝ}
     (hM : ∀ x, ‖S x‖ ≤ M) :
-    ∃ B : W1p0 (ENNReal.ofReal p) μ Ω →L[ℝ] W1p0 (ENNReal.ofReal p) μ Ω →L[ℝ] ℝ,
-      ∀ U V, B U V = skewForm S U V := by
-  obtain ⟨C, hC⟩ := exists_abs_skewForm_le hΩ hp hS hM
-  let f : W1p0 (ENNReal.ofReal p) μ Ω →ₗ[ℝ] W1p0 (ENNReal.ofReal p) μ Ω →ₗ[ℝ] ℝ :=
-    LinearMap.mk₂ ℝ (skewForm S) (skewForm_add_left hΩ hp hS hM)
+    W1p0 (ENNReal.ofReal p) μ Ω →L[ℝ] W1p0 (ENNReal.ofReal p) μ Ω →L[ℝ] ℝ :=
+  (LinearMap.mk₂ ℝ (skewForm S) (skewForm_add_left hΩ hp hS hM)
       skewForm_smul_left (skewForm_add_right hΩ hp hS hM)
-      skewForm_smul_right
-  refine ⟨f.mkContinuous₂ C fun U V => ?_, fun U V => rfl⟩
-  rw [mul_assoc]
-  exact (Real.norm_eq_abs _).le.trans (hC U V)
+      skewForm_smul_right).mkContinuous₂ (Classical.choose (exists_abs_skewForm_le hΩ hp hS hM))
+    fun U V => by
+      rw [mul_assoc]
+      exact (Real.norm_eq_abs _).le.trans
+        (Classical.choose_spec (exists_abs_skewForm_le hΩ hp hS hM) U V)
+
+/-- `skewCLM` agrees with `skewForm`. -/
+theorem skewCLM_apply (hΩ : μ Ω ≠ ∞) (hp : 2 ≤ p) (hS : StronglyMeasurable S) {M : ℝ}
+    (hM : ∀ x, ‖S x‖ ≤ M) (U V : W1p0 (ENNReal.ofReal p) μ Ω) :
+    skewCLM hΩ hp hS hM U V = skewForm S U V := by
+  simp [skewCLM]
 
 /-- A skew field makes the diagonal of `skewForm` vanish. -/
 theorem skewForm_self (hskew : ∀ x ξ, S x ξ ξ = 0) (U : W1p0 (ENNReal.ofReal p) μ Ω) :
@@ -353,10 +358,10 @@ section Operator
 
 variable {c : ℝ} (B : W1p0 (ENNReal.ofReal p) μ Ω →L[ℝ] W1p0 (ENNReal.ofReal p) μ Ω →L[ℝ] ℝ)
 
-lemma skewPOp_apply (hp : 1 < p) (U V : W1p0 (ENNReal.ofReal p) μ Ω) :
+private lemma skewPOp_apply (hp : 1 < p) (U V : W1p0 (ENNReal.ofReal p) μ Ω) :
     skewPOp hp c B U V = pOp hp c U V + B U V := rfl
 
-lemma skewPOp_sub_apply (hp : 1 < p) (U V W : W1p0 (ENNReal.ofReal p) μ Ω) :
+private lemma skewPOp_sub_apply (hp : 1 < p) (U V W : W1p0 (ENNReal.ofReal p) μ Ω) :
     (skewPOp hp c B U - skewPOp hp c B V) W = (pOp hp c U - pOp hp c V) W + B (U - V) W := by
   simp only [skewPOp, sub_apply, add_apply, map_sub]
   ring
@@ -411,7 +416,8 @@ theorem existsUnique_weakSolution_skewPLaplacian (hΩ : μ Ω ≠ ∞) (hp : 2 �
     (ENNReal.one_lt_ofReal.2 hp1) ENNReal.ofReal_ne_top
   have hcomplete : CompleteSpace (W1p0 (ENNReal.ofReal p) μ Ω) :=
     (isClosed_W1p0 (ENNReal.ofReal p) μ Ω).completeSpace_coe
-  obtain ⟨B, hB⟩ := exists_skewCLM hΩ hp hS hM
+  set B := skewCLM hΩ hp hS hM with hBdef
+  have hB : ∀ U V, B U V = skewForm S U V := skewCLM_apply hΩ hp hS hM
   have hBself : ∀ w, B w w = 0 := fun w => by rw [hB, skewForm_self hskew]
   have hAapp : ∀ U V, skewPOp hp1 c B U V = pForm c U V + skewForm S U V := fun U V => by
     rw [skewPOp_apply, pOp_apply, hB]
