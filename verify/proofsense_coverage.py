@@ -39,6 +39,29 @@ MANIFEST = ROOT / "proofsense" / "manifest.json"
 # that no transcribed statement matches it, which the README under
 # proofsense/ has to justify in prose.
 EXEMPT = {
+    "EllipticPdes.pEnergy_convex": (
+        "the convexity of the p-energy (1/p) int |grad u|^p + (c/p) int |u|^p on W_0^{1,p}, which "
+        "is the convexity of the norm to the power p. Evans 8.1.2 asks convexity of the "
+        "integrand in the gradient variable and states no separate lemma for this functional"
+    ),
+    "EllipticPdes.pEnergy_continuous": (
+        "continuity of the p-energy in the graph norm, which is continuity of the power of a "
+        "norm. No transcribed statement asserts it"
+    ),
+    "EllipticPdes.pEnergy_gateaux": (
+        "the Gateaux derivative of the p-energy along a line, by differentiation under the "
+        "integral. Evans 8.1.2 derives the Euler-Lagrange equation inside the proof of Theorem 3 "
+        "for a smooth Lagrangian and states no p-Laplacian derivative"
+    ),
+    "EllipticPdes.exists_weakSolution_pLaplacian": (
+        "existence for the screened p-Laplacian on W_0^{1,p} by the direct method (Brezis "
+        "Corollary 3.23 applied to the energy). No transcribed theorem states the p-Laplacian "
+        "equation, with the screening term, as a numbered result"
+    ),
+    "EllipticPdes.existsUnique_weakSolution_pLaplacian": (
+        "uniqueness of that solution from strict convexity of the energy. No transcribed "
+        "theorem states it"
+    ),
     "EllipticPdes.isMonotoneOp_of_convex_gateaux": (
         "the Gateaux derivative of a convex functional is a monotone operator, which is classical. "
         "Ferreira-Gomes-Ucer Definition 2.15(a) defines monotonicity and Remark 2.17 treats an "

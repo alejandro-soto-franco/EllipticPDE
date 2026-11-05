@@ -585,3 +585,12 @@ assert_classical_axioms
 assert_classical_axioms
   EllipticPdes.isClosed_W1p0
   EllipticPdes.isReflexive_W1p0
+
+/-! ### The screened `p`-Laplacian -/
+
+assert_classical_axioms
+  EllipticPdes.pEnergy_convex
+  EllipticPdes.pEnergy_continuous
+  EllipticPdes.pEnergy_gateaux
+  EllipticPdes.exists_weakSolution_pLaplacian
+  EllipticPdes.existsUnique_weakSolution_pLaplacian
