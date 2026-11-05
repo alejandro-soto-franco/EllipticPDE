@@ -163,6 +163,7 @@ public import EllipticPdes.Monotone.KKM
 public import EllipticPdes.Monotone.DebrunnerFlorFinite
 public import EllipticPdes.Monotone.DebrunnerFlor
 public import EllipticPdes.Monotone.LionsStampacchia
+public import EllipticPdes.Monotone.BrowderMinty
 public import EllipticPdes.SobolevP.Graph
 public import EllipticPdes.SobolevP.PLaplacian
 public import EllipticPdes.SobolevP.Reflexive

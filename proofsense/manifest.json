@@ -1473,6 +1473,18 @@
       "source_id": "ferreira-2025",
       "locator": "§2.4 Remark 2.17",
       "claim": "formalises the remark: for a hemicontinuous operator on a convex set, a point u in K with 0 <= <A v, v - u> for every v in K satisfies 0 <= <A u, v - u> for every v in K, by testing with (1 - t) u + t v, dividing by t and letting t tend to 0. The remark assumes u is the solution given by Theorem 2.16, and the declaration takes any u in K satisfying the weak inequality; monotonicity is not used in the argument"
+    },
+    {
+      "decl": "EllipticPdes.bijective_of_strictlyMonotone",
+      "source_id": "brezis-2011",
+      "locator": "§5 Thm 5.16",
+      "claim": "formalises the Minty-Browder theorem: a strictly monotone, coercive operator A from a reflexive Banach space to its dual is a bijection, so Au = f has a unique solution for every f in the dual. The declaration assumes hemicontinuity where the source assumes continuity, and states coercivity around some base point v0 as <Av - Av0, v - v0>/||v|| tending to infinity, where the source takes v0 = 0"
+    },
+    {
+      "decl": "EllipticPdes.laxMilgram_of_reflexive",
+      "source_id": "brezis-2011",
+      "locator": "§5 Cor 5.8",
+      "claim": "formalises clause (17) of the Lax-Milgram theorem for a continuous bilinear form B with c ||u||^2 <= B(u, u) and a bounded linear functional f: there is a unique u with B(u, v) = f(v) for every v. The declaration is stated on a reflexive Banach space, where the source takes a Hilbert space, and states no minimisation characterisation (18)"
     }
   ],
   "source_divergences": [
@@ -1595,6 +1607,23 @@
         "no CompleteSpace"
       ],
       "note": "The source takes a reflexive Banach space E and a closed subspace M. IsReflexive.submodule takes a real normed space with the predicate IsReflexive and no completeness."
+    },
+    {
+      "source_id": "brezis-2011",
+      "locator": "§5 Thm 5.16",
+      "labels": [
+        "hemicontinuous",
+        "base point"
+      ],
+      "note": "The source assumes A continuous and <Av, v>/||v|| tending to infinity. bijective_of_strictlyMonotone assumes hemicontinuity, which continuity implies, and coercivity of A around some base point v0, which is the source condition for v0 = 0 when A 0 = 0."
+    },
+    {
+      "source_id": "brezis-2011",
+      "locator": "§5 Cor 5.8",
+      "labels": [
+        "reflexive Banach space"
+      ],
+      "note": "The source takes a Hilbert space and a continuous coercive bilinear form. laxMilgram_of_reflexive takes a reflexive Banach space and the coercivity c ||u||^2 <= B(u, u), which is the Hilbert-space coercivity when the norm is Hilbertian; it needs no inner product."
     }
   ]
 }

@@ -600,6 +600,13 @@ assert_classical_axioms
   EllipticPdes.exists_strongVI
   EllipticPdes.existsUnique_strongVI
 
+/-! ### The Browder–Minty theorem and Lax–Milgram without symmetry -/
+
+assert_classical_axioms
+  EllipticPdes.surjective_of_monotone
+  EllipticPdes.bijective_of_strictlyMonotone
+  EllipticPdes.laxMilgram_of_reflexive
+
 /-! ### Reflexivity of `L^p` and of closed subspaces -/
 
 assert_classical_axioms

@@ -96,6 +96,11 @@ EXEMPT = {
         "uniqueness of that solution under strict monotonicity, by adding the two inequalities. "
         "No transcribed statement asserts it"
     ),
+    "EllipticPdes.surjective_of_monotone": (
+        "the Browder-Minty theorem for a monotone hemicontinuous coercive operator, onto the dual. "
+        "Brezis Theorem 5.16 (p. 145) assumes strict monotonicity and states the bijective form, "
+        "which EllipticPdes.bijective_of_strictlyMonotone warrants"
+    ),
     "EllipticPdes.pEnergy_convex": (
         "the convexity of the p-energy (1/p) int |grad u|^p + (c/p) int |u|^p on W_0^{1,p}, which "
         "is the convexity of the norm to the power p. Evans 8.1.2 asks convexity of the "
