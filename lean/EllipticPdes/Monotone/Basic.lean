@@ -12,11 +12,11 @@ public import Mathlib.Topology.MetricSpace.Bounded
 /-!
 # Monotone operators
 
-Ferreira–Gomes–Üçer (`ferreira-2025-sol-mea-gam`, Definition 2.15, p. 11) study an operator `A` from a real normed
-space `X` into its dual through the pairing `⟨A u, v⟩`, and call it monotone, coercive or
-hemicontinuous by the behaviour of that pairing. This file states each notion for a map
-`A : X → StrongDual ℝ X` on a set `K ⊆ X`. The names end in `Op` so that they stay
-distinct from Mathlib's order-theoretic `Monotone` and `MonotoneOn`.
+Ferreira–Gomes–Üçer (`ferreira-2025-sol-mea-gam`, Definition 2.15, p. 11) study an operator `A` from
+a real normed space `X` into its dual through the pairing `⟨A u, v⟩`, and call it monotone, coercive
+or hemicontinuous by the behaviour of that pairing. This file states each notion for a map `A : X →
+StrongDual ℝ X` on a set `K ⊆ X`. The names end in `Op` so that they stay distinct from Mathlib's
+order-theoretic `Monotone` and `MonotoneOn`.
 
 ## Main declarations
 

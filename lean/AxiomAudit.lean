@@ -559,3 +559,5 @@ assert_classical_axioms
   EllipticPdes.isClosed_toWeakSpace_of_convex
   EllipticPdes.isCompact_toWeakSpace_closedBall
   EllipticPdes.isCompact_toWeakSpace_of_bounded_convex_closed
+  EllipticPdes.exists_isMinOn_of_convex_of_bounded
+  EllipticPdes.exists_isMinOn_of_convex
