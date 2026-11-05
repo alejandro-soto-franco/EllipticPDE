@@ -37,13 +37,15 @@ variable {X : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
 
 /-- **Direct method on bounded sets.** A convex lower semicontinuous function attains its minimum
 on a non-empty bounded closed convex subset of a reflexive Banach space (Brezis, Corollary 3.23,
-p. 71). `K.Nonempty` is required: on `K = ∅` the conclusion `∃ u ∈ K, ...` is false. -/
+p. 71). Convexity of `K` comes from `ConvexOn ℝ K J`. `K.Nonempty` is required: on `K = ∅`
+the conclusion `∃ u ∈ K, ...` is false. -/
 theorem exists_isMinOn_of_convex_of_bounded (hX : Analysis.IsReflexive X) {K : Set X}
-    (hKc : Convex ℝ K) (hKcl : IsClosed K) (hKne : K.Nonempty) {J : X → ℝ}
+    (hKcl : IsClosed K) (hKne : K.Nonempty) {J : X → ℝ}
     (hJc : ConvexOn ℝ K J) (hJl : LowerSemicontinuousOn J K) (hKb : Bornology.IsBounded K) :
     ∃ u ∈ K, IsMinOn J K u := by
   set e := toWeakSpace ℝ X with he
-  have hS : IsCompact (e '' K) := isCompact_toWeakSpace_of_bounded_convex_closed hX hKc hKcl hKb
+  have hS : IsCompact (e '' K) :=
+    isCompact_toWeakSpace_of_bounded_convex_closed hX hJc.1 hKcl hKb
   have hlsc : LowerSemicontinuousOn (fun y => J (e.symm y)) (e '' K) := by
     rw [lowerSemicontinuousOn_iff_preimage_Iic]
     intro b
@@ -69,9 +71,10 @@ theorem exists_isMinOn_of_convex_of_bounded (hX : Analysis.IsReflexive X) {K : S
 
 /-- **Direct method.** A convex, lower semicontinuous and coercive function attains its minimum on
 a non-empty closed convex subset of a reflexive Banach space (Brezis, Corollary 3.23, p. 71).
-`K.Nonempty` is required: on `K = ∅` the conclusion `∃ u ∈ K, ...` is false. -/
+Convexity of `K` comes from `ConvexOn ℝ K J`. `K.Nonempty` is required: on `K = ∅`
+the conclusion `∃ u ∈ K, ...` is false. -/
 theorem exists_isMinOn_of_convex (hX : Analysis.IsReflexive X) {K : Set X}
-    (_hKc : Convex ℝ K) (hKcl : IsClosed K) (hKne : K.Nonempty) {J : X → ℝ}
+    (hKcl : IsClosed K) (hKne : K.Nonempty) {J : X → ℝ}
     (hJc : ConvexOn ℝ K J) (hJl : LowerSemicontinuousOn J K)
     (hJco : Tendsto J (Bornology.cobounded X ⊓ 𝓟 K) atTop) : ∃ u ∈ K, IsMinOn J K u := by
   obtain ⟨v₀, hv₀⟩ := hKne
@@ -89,7 +92,7 @@ theorem exists_isMinOn_of_convex (hX : Analysis.IsReflexive X) {K : Set X}
     refine hb.subset ?_
     rintro x ⟨hxK, hx⟩ hcon
     exact absurd (hcon hxK) (not_lt.mpr hx)
-  obtain ⟨u, huL, hu⟩ := exists_isMinOn_of_convex_of_bounded hX (hJc.convex_le (J v₀)) hLcl
+  obtain ⟨u, huL, hu⟩ := exists_isMinOn_of_convex_of_bounded hX hLcl
     ⟨v₀, hv₀, le_rfl⟩ (hJc.subset hLsub (hJc.convex_le (J v₀)))
     (hJl.mono hLsub) hLb
   refine ⟨u, huL.1, fun v hv => ?_⟩
