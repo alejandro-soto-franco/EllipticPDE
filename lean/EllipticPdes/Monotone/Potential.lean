@@ -14,11 +14,13 @@ public import EllipticPdes.Monotone.DirectMethod
 /-!
 # Potential operators and the variational inequality
 
-Ferreira–Gomes–Üçer (`ferreira-2025-sol-mea-gam`, Remark 2.17, p. 12) observe that an operator
-`A : X → X*` which is the Gateaux derivative of a convex functional `J` is monotone, and that a
-minimiser of `J` on a convex set `K` satisfies the variational inequality
-`0 ≤ ⟨A u, v - u⟩` for `v` in `K`. This file proves both statements and applies the direct method
-to show that a coercive potential operator is onto the dual.
+An operator `A : X → X*` which is the Gateaux derivative of a convex functional `J` is monotone,
+and a minimiser of `J` on a convex set `K` satisfies the variational inequality
+`0 ≤ ⟨A u, v - u⟩` for `v` in `K`. The second argument adapts Ferreira–Gomes–Üçer
+(`ferreira-2025-sol-mea-gam`, Remark 2.17, p. 12), who pass from the weak to the strong
+variational inequality by testing with `(1 - t) u + t v` and letting `t → 0`. This file proves
+both statements and applies the direct method to show that a coercive potential operator is onto
+the dual.
 
 The Gateaux hypothesis is `∀ u v, HasDerivAt (fun t : ℝ => J (u + t • v)) (A u v) 0`. Convexity
 gives the gradient inequality `J u + ⟨A u, v - u⟩ ≤ J v`. Applied at `v` and at the midpoint of `v`
@@ -66,7 +68,8 @@ theorem gradient_inequality_of_convex_gateaux (hJc : ConvexOn ℝ univ J)
   linarith
 
 /-- **Monotonicity of a convex potential.** If `J` is convex and `A u` is its Gateaux derivative
-at `u`, then `A` is monotone on the whole space (Ferreira–Gomes–Üçer, Remark 2.17, p. 12). -/
+at `u`, then `A` is monotone on the whole space. This is the classical monotonicity of the
+derivative of a convex function, which follows from the gradient inequality at `u` and at `v`. -/
 theorem isMonotoneOp_of_convex_gateaux (hJc : ConvexOn ℝ univ J)
     (hJ : ∀ u v, HasDerivAt (fun t : ℝ => J (u + t • v)) (A u v) 0) :
     IsMonotoneOp univ A := by
@@ -79,7 +82,10 @@ theorem isMonotoneOp_of_convex_gateaux (hJc : ConvexOn ℝ univ J)
   linarith
 
 /-- **Variational inequality.** A minimiser `u` of `J` on a convex set `K` satisfies
-`0 ≤ ⟨A u, v - u⟩` for every `v` in `K` (Ferreira–Gomes–Üçer, Remark 2.17, p. 12). -/
+`0 ≤ ⟨A u, v - u⟩` for every `v` in `K`. The proof adapts the argument of Ferreira–Gomes–Üçer,
+Remark 2.17, p. 12, which passes from the weak to the strong variational inequality by testing with
+`(1 - t) u + t v` and letting `t → 0`; here the test point lies in `K` by convexity and `u` is
+a minimiser of the Gateaux-differentiable `J`. -/
 theorem variationalInequality_of_isMinOn
     (hJ : ∀ u v, HasDerivAt (fun t : ℝ => J (u + t • v)) (A u v) 0) {K : Set X}
     (hKc : Convex ℝ K) {u : X} (hu : u ∈ K) (hmin : IsMinOn J K u) :
