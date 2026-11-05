@@ -50,7 +50,8 @@ variable {X : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
   {J : X → ℝ} {A : X → StrongDual ℝ X}
 
 /-- **Gradient inequality.** A convex function with Gateaux derivative `A` lies above its tangent:
-`J u + ⟨A u, v - u⟩ ≤ J v` (Ferreira–Gomes–Üçer, Remark 2.17, p. 12). -/
+`J u + ⟨A u, v - u⟩ ≤ J v`. The proof uses the testing argument of Ferreira–Gomes–Üçer,
+Remark 2.17, p. 12: convexity along `(1 - t) u + t v`, division by `t` and the limit `t → 0`. -/
 theorem gradient_inequality_of_convex_gateaux (hJc : ConvexOn ℝ univ J)
     (hJ : ∀ u v, HasDerivAt (fun t : ℝ => J (u + t • v)) (A u v) 0) (u v : X) :
     J u + A u (v - u) ≤ J v := by
@@ -106,7 +107,7 @@ theorem variationalInequality_of_isMinOn
 /-- **Lower bound for a coercive potential.** If `A` is coercive on the whole space and `J` is a
 convex potential of `A`, then `J - f` tends to infinity at infinity for every `f` in the dual. The
 bound applies the gradient inequality at `v` and at the midpoint `m` of `v` and the base point
-`v₀` of coercivity (Ferreira–Gomes–Üçer, Remark 2.17, p. 12). -/
+`v₀` of coercivity. -/
 theorem tendsto_sub_of_coercive_potential (hJc : ConvexOn ℝ univ J)
     (hJ : ∀ u v, HasDerivAt (fun t : ℝ => J (u + t • v)) (A u v) 0)
     (hco : IsCoerciveOp univ A) (f : StrongDual ℝ X) :
@@ -163,8 +164,8 @@ theorem tendsto_sub_of_coercive_potential (hJc : ConvexOn ℝ univ J)
 /-- **Surjectivity of a coercive potential monotone operator.** Let `X` be reflexive, `J` convex
 and lower semicontinuous with Gateaux derivative `A`, and `A` coercive. Then `A` is onto the dual.
 The proof minimises `J - f` by the direct method, whose minimiser satisfies the variational
-inequality of `A - f` on the whole space, which forces `A u = f` (Ferreira–Gomes–Üçer,
-Remark 2.17, p. 12; Brezis, Corollary 3.23, p. 71). -/
+inequality of `A - f` on the whole space, which forces `A u = f` (the direct method
+is Brezis, Corollary 3.23, p. 71). -/
 theorem exists_eq_of_potential (hX : Analysis.IsReflexive X)
     (hJc : ConvexOn ℝ univ J) (hJl : LowerSemicontinuous J)
     (hJ : ∀ u v, HasDerivAt (fun t : ℝ => J (u + t • v)) (A u v) 0)
@@ -195,8 +196,7 @@ theorem exists_eq_of_potential (hX : Analysis.IsReflexive X)
   linarith
 
 /-- **Uniqueness for a coercive potential operator.** Under the hypotheses of
-`exists_eq_of_potential`, a strictly monotone `A` has exactly one `u` with `A u = f`
-(Ferreira–Gomes–Üçer, Remark 2.17, p. 12). -/
+`exists_eq_of_potential`, a strictly monotone `A` has exactly one `u` with `A u = f`. -/
 theorem existsUnique_eq_of_potential (hX : Analysis.IsReflexive X)
     (hJc : ConvexOn ℝ univ J) (hJl : LowerSemicontinuous J)
     (hJ : ∀ u v, HasDerivAt (fun t : ℝ => J (u + t • v)) (A u v) 0)
