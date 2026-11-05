@@ -1467,6 +1467,12 @@
       "source_id": "brezis-2011",
       "locator": "§3 Prop 3.20",
       "claim": "formalises the cited proposition: a closed linear subspace of a reflexive space is reflexive. The space is a real normed space with the predicate IsReflexive and no CompleteSpace hypothesis where the source takes a Banach space"
+    },
+    {
+      "decl": "EllipticPdes.IsHemicontinuousOp.strongVI_of_weakVI",
+      "source_id": "ferreira-2025",
+      "locator": "§2.4 Remark 2.17",
+      "claim": "formalises the remark: for a hemicontinuous operator on a convex set, a point u in K with 0 <= <A v, v - u> for every v in K satisfies 0 <= <A u, v - u> for every v in K, by testing with (1 - t) u + t v, dividing by t and letting t tend to 0. The remark assumes u is the solution given by Theorem 2.16, and the declaration takes any u in K satisfying the weak inequality; monotonicity is not used in the argument"
     }
   ],
   "source_divergences": [

@@ -81,6 +81,21 @@ EXEMPT = {
         "Ferreira-Gomes-Ucer Theorem 2.16 (p. 11). It contradicts the printed statement, so no "
         "source states it"
     ),
+    "EllipticPdes.IsMonotoneOp.weakVI_of_strongVI": (
+        "the converse of Minty's lemma: a monotone operator satisfies the weak inequality wherever it "
+        "satisfies the strong one. Ferreira-Gomes-Ucer Remark 2.17 (p. 12) states only the forward "
+        "direction"
+    ),
+    "EllipticPdes.exists_strongVI": (
+        "the Lions-Stampacchia theorem for a monotone hemicontinuous coercive operator and a datum f "
+        "in the dual, obtained from Ferreira-Gomes-Ucer Theorem 2.16 applied to A - f and Remark 2.17. "
+        "Brezis Theorem 5.6 (Stampacchia) states the linear case on a Hilbert space and no "
+        "transcribed statement is the nonlinear reflexive form"
+    ),
+    "EllipticPdes.existsUnique_strongVI": (
+        "uniqueness of that solution under strict monotonicity, by adding the two inequalities. "
+        "No transcribed statement asserts it"
+    ),
     "EllipticPdes.pEnergy_convex": (
         "the convexity of the p-energy (1/p) int |grad u|^p + (c/p) int |u|^p on W_0^{1,p}, which "
         "is the convexity of the norm to the power p. Evans 8.1.2 asks convexity of the "

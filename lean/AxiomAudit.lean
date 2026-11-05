@@ -592,6 +592,14 @@ assert_classical_axioms
   EllipticPdes.exists_weakVI_of_isBounded
   EllipticPdes.not_exists_weakVI_Ioc
 
+/-! ### Minty's lemma and the Lions–Stampacchia theorem -/
+
+assert_classical_axioms
+  EllipticPdes.IsHemicontinuousOp.strongVI_of_weakVI
+  EllipticPdes.IsMonotoneOp.weakVI_of_strongVI
+  EllipticPdes.exists_strongVI
+  EllipticPdes.existsUnique_strongVI
+
 /-! ### Reflexivity of `L^p` and of closed subspaces -/
 
 assert_classical_axioms
