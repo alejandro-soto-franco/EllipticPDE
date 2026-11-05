@@ -24,7 +24,7 @@ direct method of `Monotone/Potential.lean` gives a weak solution of
 `∫ ‖∇u‖^{p-2} ⟪∇u, ∇v⟫ + c ∫ |u|^{p-2} u v = f v` for every `f` in the dual. Strict convexity
 of the energy gives uniqueness.
 
-The gradient part takes values in `E*`. The Riesz isometry `dualE` reads it in `E`, where
+The gradient part takes values in `E*`. The Riesz isometry `PLap.dualE` reads it in `E`, where
 `‖·‖^p` is differentiable because the norm of an inner-product space is smooth. The derivative
 of `t ↦ ∫ ‖g + t h‖^p` is proved here for functions into an inner-product space, following
 `EllipticPdes.Analysis.hasDerivAt_integral_abs_rpow`.
@@ -67,7 +67,7 @@ lemma rpow_sub_two_mul_le {r : ℝ} (hr : 1 < r) {y : F} {a : ℝ} (hy : ‖y‖
     rw [hsplit, show r - 2 + 1 = r - 1 by ring]
     exact Real.rpow_le_rpow (norm_nonneg y) hy (by linarith)
 
-lemma norm_combo_le' (a b : F) {s t : ℝ} (hs : 0 ≤ s) (ht : 0 ≤ t) :
+private lemma norm_combo_le' (a b : F) {s t : ℝ} (hs : 0 ≤ s) (ht : 0 ≤ t) :
     ‖s • a + t • b‖ ≤ s * ‖a‖ + t * ‖b‖ := by
   refine (norm_add_le _ _).trans ?_
   rw [norm_smul, norm_smul, Real.norm_of_nonneg hs, Real.norm_of_nonneg ht]
@@ -105,7 +105,7 @@ section Integral
 variable {α : Type*} [MeasurableSpace α] {ν : Measure α}
 variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℝ H]
 
-lemma ofReal_toReal_aux {r : ℝ} (hr : 1 < r) : (ENNReal.ofReal r).toReal = r :=
+private lemma ofReal_toReal_aux {r : ℝ} (hr : 1 < r) : (ENNReal.ofReal r).toReal = r :=
   ENNReal.toReal_ofReal (by linarith)
 
 omit [InnerProductSpace ℝ H] in
@@ -146,7 +146,7 @@ lemma integrable_pair {r : ℝ} (hr : 1 < r) {g h : α → H}
 /-- **Derivative of the `L^r` norm functional along a line.** For `g`, `h` in `L^r` with `r > 1`,
 `t ↦ ∫ ‖g + t h‖^r` is differentiable at `0` with derivative `r ∫ ‖g‖^{r-2} ⟪g, h⟫`. The proof
 repeats `EllipticPdes.Analysis.hasDerivAt_integral_abs_rpow` with the Fréchet derivative of
-`‖·‖^r` on an inner-product space (Evans, §8.1.2). -/
+`‖·‖^r` on an inner-product space. -/
 theorem hasDerivAt_integral_norm_rpow {r : ℝ} (hr : 1 < r) {g h : α → H}
     (hg : MemLp g (ENNReal.ofReal r) ν) (hh : MemLp h (ENNReal.ofReal r) ν) :
     HasDerivAt (fun t : ℝ => ∫ x, ‖g x + t • h x‖ ^ r ∂ν)
@@ -458,7 +458,7 @@ variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDim
 
 variable (E) in
 /-- The Riesz identification of the dual `E*` with `E`, as a real linear isometry equivalence. -/
-def dualE : StrongDual ℝ E ≃ₗᵢ[ℝ] E where
+def PLap.dualE : StrongDual ℝ E ≃ₗᵢ[ℝ] E where
   toFun := (InnerProductSpace.toDual ℝ E).symm
   invFun := InnerProductSpace.toDual ℝ E
   map_add' := map_add _
@@ -467,17 +467,6 @@ def dualE : StrongDual ℝ E ≃ₗᵢ[ℝ] E where
   right_inv := fun x => (InnerProductSpace.toDual ℝ E).symm_apply_apply x
   norm_map' := (InnerProductSpace.toDual ℝ E).symm.norm_map
 
-/-- The function part of an element of `W₀^{1,p}`, as a continuous linear map. -/
-def W1p0.fnL : W1p0 (ENNReal.ofReal p) μ Ω →L[ℝ] Lp ℝ (ENNReal.ofReal p) (μ.restrict Ω) :=
-  (W1pGraph.fnL (p := ENNReal.ofReal p) (μ := μ) (Ω := Ω)).comp
-    (W1p0 (ENNReal.ofReal p) μ Ω).subtypeL
-
-/-- The gradient part of an element of `W₀^{1,p}`, as a continuous linear map. -/
-def W1p0.gradL :
-    W1p0 (ENNReal.ofReal p) μ Ω →L[ℝ] Lp (StrongDual ℝ E) (ENNReal.ofReal p) (μ.restrict Ω) :=
-  (W1pGraph.gradL (p := ENNReal.ofReal p) (μ := μ) (Ω := Ω)).comp
-    (W1p0 (ENNReal.ofReal p) μ Ω).subtypeL
-
 /-- The energy `(1/p) ∫ ‖∇u‖^p + (c/p) ∫ |u|^p` of the screened `p`-Laplacian on `W₀^{1,p}(Ω)`,
 with the integrals over `Ω`. -/
 def pEnergy (c : ℝ) (U : W1p0 (ENNReal.ofReal p) μ Ω) : ℝ :=
@@ -485,7 +474,7 @@ def pEnergy (c : ℝ) (U : W1p0 (ENNReal.ofReal p) μ Ω) : ℝ :=
     (c / p) * ∫ x, |W1p0.fnL U x| ^ p ∂(μ.restrict Ω)
 
 /-- The weak form `∫ ‖∇u‖^{p-2} ⟪∇u, ∇v⟫ + c ∫ |u|^{p-2} u v` of the screened `p`-Laplacian, with
-`∇u` read in `E` by `dualE`. -/
+`∇u` read in `E` by `PLap.dualE`. -/
 def pForm (c : ℝ) (U V : W1p0 (ENNReal.ofReal p) μ Ω) : ℝ :=
   (∫ x, ‖W1p0.gradL U x‖ ^ (p - 2) *
       inner ℝ (dualE E (W1p0.gradL U x)) (dualE E (W1p0.gradL V x)) ∂(μ.restrict Ω)) +
@@ -540,7 +529,7 @@ def pOp (hp : 1 < p) (c : ℝ) (U : W1p0 (ENNReal.ofReal p) μ Ω) :
     c • (pairCLM (LinearIsometryEquiv.refl ℝ ℝ) hp (W1p0.fnL U)).comp W1p0.fnL
 
 omit [Fact (1 ≤ ENNReal.ofReal p)] in
-lemma scalar_pair (f v : ℝ) :
+private lemma scalar_pair (f v : ℝ) :
     ‖f‖ ^ (p - 2) * inner ℝ f v = |f| ^ (p - 2) * f * v := by
   rw [Real.norm_eq_abs, mul_assoc]
   congr 1
@@ -552,7 +541,7 @@ lemma pOp_apply (hp : 1 < p) (c : ℝ) (U V : W1p0 (ENNReal.ofReal p) μ Ω) :
     smul_apply, pairCLM_apply, smul_eq_mul, LinearIsometryEquiv.coe_refl, id_eq, scalar_pair]
 
 /-- **Gateaux derivative of the energy.** Along the line `u + t v`, `pEnergy c` has derivative
-`pForm c u v` at `t = 0` (Evans, §8.1.2, for the Euler-Lagrange computation). -/
+`pForm c u v` at `t = 0`. -/
 theorem pEnergy_gateaux (hp : 1 < p) (c : ℝ) (U V : W1p0 (ENNReal.ofReal p) μ Ω) :
     HasDerivAt (fun t : ℝ => pEnergy c (U + t • V)) (pForm c U V) 0 := by
   have hp0 : 0 < p := by linarith
@@ -589,34 +578,34 @@ theorem pEnergy_gateaux (hp : 1 < p) (c : ℝ) (U V : W1p0 (ENNReal.ofReal p) μ
   field_simp
 
 omit [FiniteDimensional ℝ E] in
-lemma ext_W1p0 {U W : W1p0 (ENNReal.ofReal p) μ Ω} (hf : W1p0.fnL U = W1p0.fnL W)
+lemma W1p0.ext {U W : W1p0 (ENNReal.ofReal p) μ Ω} (hf : W1p0.fnL U = W1p0.fnL W)
     (hg : W1p0.gradL U = W1p0.gradL W) : U = W := by
   apply Subtype.ext
   apply WithLp.ofLp_injective
   exact Prod.ext hf hg
 
 omit [FiniteDimensional ℝ E] in
-lemma gradL_norm_rpow_le (hp : 1 < p) (U W : W1p0 (ENNReal.ofReal p) μ Ω) {a b : ℝ}
+private lemma gradL_norm_rpow_le (hp : 1 < p) (U W : W1p0 (ENNReal.ofReal p) μ Ω) {a b : ℝ}
     (ha : 0 ≤ a) (hb : 0 ≤ b) (hab : a + b = 1) :
     ‖W1p0.gradL (a • U + b • W)‖ ^ p ≤ a * ‖W1p0.gradL U‖ ^ p + b * ‖W1p0.gradL W‖ ^ p := by
   have h := norm_rpow_combo_le hp.le (W1p0.gradL U) (W1p0.gradL W) ha hb hab
   rwa [← map_smul, ← map_smul, ← map_add] at h
 
 omit [FiniteDimensional ℝ E] in
-lemma fnL_norm_rpow_le (hp : 1 < p) (U W : W1p0 (ENNReal.ofReal p) μ Ω) {a b : ℝ}
+private lemma fnL_norm_rpow_le (hp : 1 < p) (U W : W1p0 (ENNReal.ofReal p) μ Ω) {a b : ℝ}
     (ha : 0 ≤ a) (hb : 0 ≤ b) (hab : a + b = 1) :
     ‖W1p0.fnL (a • U + b • W)‖ ^ p ≤ a * ‖W1p0.fnL U‖ ^ p + b * ‖W1p0.fnL W‖ ^ p := by
   have h := norm_rpow_combo_le hp.le (W1p0.fnL U) (W1p0.fnL W) ha hb hab
   rwa [← map_smul, ← map_smul, ← map_add] at h
 
-lemma gradL_norm_rpow_lt (hp : 1 < p) {U W : W1p0 (ENNReal.ofReal p) μ Ω}
+private lemma gradL_norm_rpow_lt (hp : 1 < p) {U W : W1p0 (ENNReal.ofReal p) μ Ω}
     (hg : W1p0.gradL U ≠ W1p0.gradL W) {a b : ℝ} (ha : 0 < a) (hb : 0 < b) (hab : a + b = 1) :
     ‖W1p0.gradL (a • U + b • W)‖ ^ p < a * ‖W1p0.gradL U‖ ^ p + b * ‖W1p0.gradL W‖ ^ p := by
   have h := lp_norm_rpow_combo_lt (dualE E) hp hg ha hb hab
   rwa [← map_smul, ← map_smul, ← map_add] at h
 
 omit [FiniteDimensional ℝ E] in
-lemma fnL_norm_rpow_lt (hp : 1 < p) {U W : W1p0 (ENNReal.ofReal p) μ Ω}
+private lemma fnL_norm_rpow_lt (hp : 1 < p) {U W : W1p0 (ENNReal.ofReal p) μ Ω}
     (hf : W1p0.fnL U ≠ W1p0.fnL W) {a b : ℝ} (ha : 0 < a) (hb : 0 < b) (hab : a + b = 1) :
     ‖W1p0.fnL (a • U + b • W)‖ ^ p < a * ‖W1p0.fnL U‖ ^ p + b * ‖W1p0.fnL W‖ ^ p := by
   have h := lp_norm_rpow_combo_lt (LinearIsometryEquiv.refl ℝ ℝ) hp hf ha hb hab
@@ -634,7 +623,7 @@ theorem pEnergy_strictConvex (hp : 1 < p) {c : ℝ} (hc : 0 < c) :
   have k1 := mul_le_mul_of_nonneg_left h1 (show 0 ≤ 1 / p by positivity)
   have k2 := mul_le_mul_of_nonneg_left h2 (show 0 ≤ c / p by positivity)
   by_cases hg : W1p0.gradL U = W1p0.gradL W
-  · have hf : W1p0.fnL U ≠ W1p0.fnL W := fun hf => hUW (ext_W1p0 hf hg)
+  · have hf : W1p0.fnL U ≠ W1p0.fnL W := fun hf => hUW (W1p0.ext hf hg)
     have k2' := mul_lt_mul_of_pos_left (fnL_norm_rpow_lt hp hf ha hb hab)
       (show 0 < c / p by positivity)
     linarith [k1, k2']
@@ -643,7 +632,8 @@ theorem pEnergy_strictConvex (hp : 1 < p) {c : ℝ} (hc : 0 < c) :
     linarith [k1', k2]
 
 omit [Fact (1 ≤ ENNReal.ofReal p)] in
-lemma rpow_sub_two_mul_sq (hp : 0 < p) {y : ℝ} (hy : 0 ≤ y) : y ^ (p - 2) * y ^ 2 = y ^ p := by
+private lemma rpow_sub_two_mul_sq (hp : 0 < p) {y : ℝ} (hy : 0 ≤ y) :
+    y ^ (p - 2) * y ^ 2 = y ^ p := by
   rcases hy.eq_or_lt with h | h
   · rw [← h]
     simp [Real.zero_rpow hp.ne']
@@ -654,7 +644,7 @@ lemma rpow_sub_two_mul_sq (hp : 0 < p) {y : ℝ} (hy : 0 ≤ y) : y ^ (p - 2) * 
 
 omit [FiniteDimensional ℝ E] in
 /-- The exponent `p` of the norm of an element of `W₀^{1,p}` splits over the parts. -/
-lemma norm_rpow_eq_parts (hp : 1 < p) (U : W1p0 (ENNReal.ofReal p) μ Ω) :
+lemma W1p0.norm_rpow_eq (hp : 1 < p) (U : W1p0 (ENNReal.ofReal p) μ Ω) :
     ‖U‖ ^ p = ‖W1p0.fnL U‖ ^ p + ‖W1p0.gradL U‖ ^ p := by
   have hp0 : 0 < p := by linarith
   have h := WithLp.prod_norm_eq_add (p := ENNReal.ofReal p)
@@ -730,7 +720,7 @@ theorem isCoerciveOp_pOp (hp : 1 < p) {c : ℝ} (hc : 0 < c) :
     rw [← Real.rpow_add_one hv.ne']
     congr 1
     ring
-  have hn := norm_rpow_eq_parts hp v
+  have hn := W1p0.norm_rpow_eq hp v
   have a1 : 0 ≤ ‖W1p0.fnL v‖ ^ p := Real.rpow_nonneg (norm_nonneg _) _
   have a2 : 0 ≤ ‖W1p0.gradL v‖ ^ p := Real.rpow_nonneg (norm_nonneg _) _
   have m1 : m ≤ 1 := min_le_left _ _
@@ -751,13 +741,12 @@ theorem hasDerivAt_pOp (hp : 1 < p) (c : ℝ) (U V : W1p0 (ENNReal.ofReal p) μ 
 inner-product space with an additive Haar measure `μ`, `Ω` a set of finite measure, `1 < p < ∞`
 and `0 < c`. For every `f` in the dual of `W₀^{1,p}(Ω)` there is `u` with
 `∫ ‖∇u‖^{p-2} ⟪∇u, ∇v⟫ + c ∫ |u|^{p-2} u v = f v` for all `v`, where `∇u` is the gradient part
-of `u` read in `E` through the Riesz isometry `dualE` (this is the pairing `∇u(∇v)`). The
+of `u` read in `E` through the Riesz isometry `PLap.dualE` (this is the pairing `∇u(∇v)`). The
 energy `pEnergy` is a convex, continuous, coercive potential of this operator on the reflexive
-space `W₀^{1,p}(Ω)`, so the direct method applies (Evans, §8.1.2 for `p = 2`; Brezis,
-Corollary 3.23, p. 71 for the direct method). The screening coefficient `c = 0` would need a
-`p`-Poincaré inequality on `W₀^{1,p}` for coercivity, which the library does not yet have. The
-inner-product structure on `E` is needed because `‖·‖^p` on `E*` is differentiable only when
-the norm is smooth. -/
+space `W₀^{1,p}(Ω)`, so the direct method applies (Brezis, Corollary 3.23, p. 71). The screening
+coefficient `c = 0` would need a `p`-Poincaré inequality on `W₀^{1,p}` for coercivity, which the
+library does not yet have. The proof takes `E` to be an inner-product space so that `‖·‖^p` is
+differentiable. Callers supply `[Fact (1 ≤ ENNReal.ofReal p)]` with `fact_one_le_ofReal hp`. -/
 theorem exists_weakSolution_pLaplacian (hΩ : μ Ω ≠ ∞) (hp : 1 < p) {c : ℝ} (hc : 0 < c)
     (f : StrongDual ℝ (W1p0 (ENNReal.ofReal p) μ Ω)) :
     ∃ u : W1p0 (ENNReal.ofReal p) μ Ω, ∀ v : W1p0 (ENNReal.ofReal p) μ Ω,
@@ -772,7 +761,8 @@ theorem exists_weakSolution_pLaplacian (hΩ : μ Ω ≠ ∞) (hp : 1 < p) {c : �
 /-- **Uniqueness for the screened `p`-Laplacian.** The weak solution of
 `exists_weakSolution_pLaplacian` is unique. The energy is strictly convex for `c > 0` and
 `p > 1`, since `‖·‖^p` is strictly convex pointwise and the graph norm sees both parts, so its
-derivative is strictly monotone. -/
+derivative is strictly monotone. Callers supply `[Fact (1 ≤ ENNReal.ofReal p)]` with
+`fact_one_le_ofReal hp`. -/
 theorem existsUnique_weakSolution_pLaplacian (hΩ : μ Ω ≠ ∞) (hp : 1 < p) {c : ℝ} (hc : 0 < c)
     (f : StrongDual ℝ (W1p0 (ENNReal.ofReal p) μ Ω)) :
     ∃! u : W1p0 (ENNReal.ofReal p) μ Ω, ∀ v : W1p0 (ENNReal.ofReal p) μ Ω,

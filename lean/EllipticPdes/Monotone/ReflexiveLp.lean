@@ -27,6 +27,9 @@ A space which is a finite sum of retracts of a reflexive space is reflexive. Thi
 `WithLp p (X × Y)`, transport along a continuous linear equivalence, and vector-valued `L^p` over a
 finite-dimensional codomain.
 
+The file uses `namespace EllipticPdes.Analysis` so that `Analysis.IsReflexive` takes dot
+notation, as in `hX.submodule`.
+
 ## Main declarations
 
 * `EllipticPdes.Analysis.isReflexive_Lp`: `L^p` is reflexive for `1 < p < ∞` on a finite measure.
@@ -37,8 +40,7 @@ finite-dimensional codomain.
 
 ## References
 
-H. Brezis, *Functional Analysis, Sobolev Spaces and Partial Differential Equations*,
-Theorem 4.10 (p. 95).
+Brezis (`brezis-2011-fun-ana-sob`), Theorem 4.10 (p. 95).
 -/
 
 @[expose] public section
@@ -62,8 +64,9 @@ private def precompDual (T : X →L[ℝ] Y) : StrongDual ℝ Y →L[ℝ] StrongD
 private theorem precompDual_apply (T : X →L[ℝ] Y) (ξ : StrongDual ℝ Y) (x : X) :
     precompDual T ξ x = ξ (T x) := rfl
 
-/-- **Reflexivity from a finite family of retractions.** If `z = ∑ ιᵢ (πᵢ z)` for continuous
-linear maps `πᵢ : Z → X` and `ιᵢ : X → Z` and `X` is reflexive, then `Z` is reflexive. -/
+/-- **Reflexivity from a finite family of retractions.** Elementary; no source states it.
+If `z = ∑ ιᵢ (πᵢ z)` for continuous linear maps `πᵢ : Z → X` and `ιᵢ : X → Z` and `X` is
+reflexive, then `Z` is reflexive. -/
 theorem isReflexive_of_sum_retract {ι : Type*} [Fintype ι] (hX : IsReflexive X)
     (incl : ι → X →L[ℝ] Z) (proj : ι → Z →L[ℝ] X) (h : ∀ z, ∑ i, incl i (proj i z) = z) :
     IsReflexive Z := by
@@ -122,7 +125,8 @@ theorem IsReflexive.submodule (hX : IsReflexive X) (S : Submodule ℝ X)
     _ = g ⟨x, hxS⟩ := hF ⟨x, hxS⟩
 
 /-- **Products.** If `X` and `Y` are reflexive then so is `X × Y`. -/
-theorem isReflexive_prod (hX : IsReflexive X) (hY : IsReflexive Y) : IsReflexive (X × Y) := by
+private theorem isReflexive_prod (hX : IsReflexive X) (hY : IsReflexive Y) :
+    IsReflexive (X × Y) := by
   rw [isReflexive_iff] at hX hY ⊢
   intro φ
   obtain ⟨x, hx⟩ := hX (φ.comp (precompDual (ContinuousLinearMap.fst ℝ X Y)))
