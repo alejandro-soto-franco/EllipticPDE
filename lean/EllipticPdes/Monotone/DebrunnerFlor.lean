@@ -93,11 +93,12 @@ private lemma exists_radius {K : Set X} {A : X → StrongDual ℝ X} {v₀ : X}
   nlinarith [norm_nonneg (A v₀), norm_nonneg v₀]
 
 /-- **Ferreira–Gomes–Üçer, Theorem 2.16, general form** (`ferreira-2025-sol-mea-gam`, p. 11).
-For a monotone coercive operator `A` on a nonempty convex subset `K` of a reflexive Banach space
-there is a point `u` of the closure of `K` with `0 ≤ ⟨A v, v - u⟩` for every `v ∈ K`. The printed
-statement concludes `u ∈ K`, which needs `K` closed (`exists_weakVI`). -/
+For a monotone coercive operator `A` on a convex subset `K` of a reflexive Banach space there
+is a point `u` of the closure of `K` with `0 ≤ ⟨A v, v - u⟩` for every `v ∈ K`. The printed
+statement concludes `u ∈ K`, which needs `K` closed (`exists_weakVI`). Coercivity names a point of
+`K`, so `K` is nonempty without a separate hypothesis. -/
 theorem exists_weakVI_closure [CompleteSpace X] (hX : Analysis.IsReflexive X) {K : Set X}
-    (hK : Convex ℝ K) (_hne : K.Nonempty) {A : X → StrongDual ℝ X} (hA : IsMonotoneOp K A)
+    (hK : Convex ℝ K) {A : X → StrongDual ℝ X} (hA : IsMonotoneOp K A)
     (hco : IsCoerciveOp K A) : ∃ u ∈ closure K, ∀ v ∈ K, 0 ≤ A v (v - u) := by
   obtain ⟨v₀, hv₀, hT⟩ := hco
   obtain ⟨R, -, hR⟩ := exists_radius hT
@@ -166,9 +167,9 @@ theorem exists_weakVI_closure [CompleteSpace X] (hX : Analysis.IsReflexive X) {K
 convex set `K`: a monotone coercive operator has a point `u ∈ K` with
 `0 ≤ ⟨A v, v - u⟩` for every `v ∈ K`. -/
 theorem exists_weakVI [CompleteSpace X] (hX : Analysis.IsReflexive X) {K : Set X}
-    (hK : Convex ℝ K) (hc : IsClosed K) (hne : K.Nonempty) {A : X → StrongDual ℝ X}
+    (hK : Convex ℝ K) (hc : IsClosed K) {A : X → StrongDual ℝ X}
     (hA : IsMonotoneOp K A) (hco : IsCoerciveOp K A) : ∃ u ∈ K, ∀ v ∈ K, 0 ≤ A v (v - u) := by
-  obtain ⟨u, hu, h⟩ := exists_weakVI_closure hX hK hne hA hco
+  obtain ⟨u, hu, h⟩ := exists_weakVI_closure hX hK hA hco
   exact ⟨u, hc.closure_eq ▸ hu, h⟩
 
 /-- **Debrunner–Flor theorem.** A monotone operator on a bounded closed convex nonempty subset of
@@ -177,7 +178,7 @@ a reflexive Banach space satisfies the weak variational inequality, with no coer
 theorem exists_weakVI_of_isBounded [CompleteSpace X] (hX : Analysis.IsReflexive X) {K : Set X}
     (hK : Convex ℝ K) (hc : IsClosed K) (hb : Bornology.IsBounded K) (hne : K.Nonempty)
     {A : X → StrongDual ℝ X} (hA : IsMonotoneOp K A) : ∃ u ∈ K, ∀ v ∈ K, 0 ≤ A v (v - u) :=
-  exists_weakVI hX hK hc hne hA (IsCoerciveOp.of_isBounded hb hne A)
+  exists_weakVI hX hK hc hA (IsCoerciveOp.of_isBounded hb hne A)
 
 /-- **Counterexample to the printed form of Theorem 2.16.** On `X = ℝ` with `K = (0, 1]` and
 `A v = id`, the set `K` is convex and nonempty and `A` is monotone and coercive, yet no `u ∈ K`
