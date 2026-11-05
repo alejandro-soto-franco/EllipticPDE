@@ -7,6 +7,7 @@ Authors: Alejandro Soto Franco
 module
 
 public import EllipticPdes.Analysis.LqDerivative
+public import Mathlib.Analysis.SpecialFunctions.Pow.Deriv
 public import Mathlib.Analysis.Calculus.LocalExtr.Basic
 public import Mathlib.MeasureTheory.Function.LpSpace.Basic
 public import Mathlib.Analysis.InnerProductSpace.Basic

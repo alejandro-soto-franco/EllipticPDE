@@ -207,8 +207,8 @@ theorem eLpNorm_signedExt_le {p : ℝ≥0∞} (hp : 1 ≤ p) (hs : |s| = 1)
         eLpNorm_add_le hp
     _ ≤ eLpNorm f p (volume.restrict (halfSpace j))
         + eLpNorm f p (volume.restrict (halfSpace j)) := by
-        rw [eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_halfSpace j),
-          eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_halfSpaceNeg j)]
+        rw [eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_halfSpace j).nullMeasurableSet,
+          eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_halfSpaceNeg j).nullMeasurableSet]
         exact add_le_add le_rfl hsign
     _ = 2 * eLpNorm f p (volume.restrict (halfSpace j)) := (two_mul _).symm
 

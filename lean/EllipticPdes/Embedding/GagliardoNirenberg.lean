@@ -170,7 +170,7 @@ theorem eLpNorm_cutoff_mul_le {α : Type*} [TopologicalSpace α] {m : Measurable
     fun x => by
       rw [norm_mul]
       exact mul_le_of_le_one_left (norm_nonneg _) (hη1 x)).trans_eq
-    (eLpNorm_indicator_eq_eLpNorm_restrict hB)
+    (eLpNorm_indicator_eq_eLpNorm_restrict hB.nullMeasurableSet)
 
 /-- **From `Lᵖ` to the Sobolev conjugate `Lᵖ'` (Evans, *Partial Differential Equations*
 (2nd ed.), §5.6.1 Thm 1).** On a ball `Metric.ball c R` of `ℝᵈ` with `d ≥ 1`, a function `v` with

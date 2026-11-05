@@ -386,9 +386,9 @@ theorem neg_mul_le_inner_bAct_truncation {U V : H1Graph μ Ω} {k : ℝ}
   have hgm : Measurable ⇑(gradL U) := (Lp.stronglyMeasurable _).measurable
   have hΓ : MeasurableSet Γ := measurableSet_truncSupport hum hgm k
   set vΓ : E → ℝ := Γ.indicator ⇑(fnL V) with hvΓdef
-  have hvΓm : MemLp vΓ 2 ν := (Lp.memLp _).indicator hΓ
+  have hvΓm : MemLp vΓ 2 ν := (Lp.memLp _).indicator hΓ.nullMeasurableSet
   have hnormΓ : (eLpNorm vΓ 2 ν).toReal = (eLpNorm (⇑(fnL V)) 2 (ν.restrict Γ)).toReal := by
-    rw [hvΓdef, eLpNorm_indicator_eq_eLpNorm_restrict hΓ]
+    rw [hvΓdef, eLpNorm_indicator_eq_eLpNorm_restrict hΓ.nullMeasurableSet]
   -- the classes `‖∇v‖` and `|v 1_Γ|`
   set A : Lp ℝ 2 ν := (Lp.memLp (gradL V)).norm.toLp _ with hAdef
   set B : Lp ℝ 2 ν := hvΓm.norm.toLp _ with hBdef

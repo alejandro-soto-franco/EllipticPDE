@@ -8,6 +8,7 @@ module
 
 public import EllipticPdes.Extension.C1Boundary
 public import Mathlib.Geometry.Manifold.PartitionOfUnity
+public import Mathlib.Topology.MetricSpace.ProperSpace.Lemmas
 
 /-!
 # Partition of unity over a finite cover of the boundary

@@ -257,7 +257,7 @@ theorem eLpNorm_cutoff_mul_le {S W T : Set (EuclideanSpace ℝ (Fin d))}
     _ ≤ ENNReal.ofReal C * eLpNorm (T.indicator v) p volume :=
         mul_le_mul_right (eLpNorm_mono_measure _ Measure.restrict_le_self) _
     _ = ENNReal.ofReal C * eLpNorm v p (volume.restrict T) := by
-        rw [eLpNorm_indicator_eq_eLpNorm_restrict hT]
+        rw [eLpNorm_indicator_eq_eLpNorm_restrict hT.nullMeasurableSet]
 
 /-- **Bound on the second component of a cut-off pair.** -/
 theorem eLpNorm_cutOp_snd_le {S W T : Set (EuclideanSpace ℝ (Fin d))}

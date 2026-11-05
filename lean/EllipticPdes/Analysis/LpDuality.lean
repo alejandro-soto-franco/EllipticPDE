@@ -211,10 +211,10 @@ theorem norm_le_norm_lpDualMap [SigmaFinite μ] (g : Lp ℝ q μ) :
           hFm.restrict
         have hbd : ∀ x, ‖signPow 1 (g x)‖ ≤ 1 := fun x => abs_signPow_one_le _
         have hF : MemLp F 1 μ := by
-          rw [memLp_indicator_iff_restrict hs]
+          rw [memLp_indicator_iff_restrict hs.nullMeasurableSet]
           exact MemLp.of_bound hFms 1 (ae_of_all _ hbd)
         have hFn : (eLpNorm F 1 μ).toReal ≤ μ.real s := by
-          rw [eLpNorm_indicator_eq_eLpNorm_restrict hs]
+          rw [eLpNorm_indicator_eq_eLpNorm_restrict hs.nullMeasurableSet]
           have := eLpNorm_le_of_ae_bound (p := 1) hFms (ae_of_all _ hbd)
           rw [Measure.restrict_apply_univ] at this
           simp only [ENNReal.toReal_one, inv_one, ENNReal.rpow_one, ENNReal.ofReal_one,
@@ -499,7 +499,7 @@ variable {s : Set α}
 /-- A function of `L^p(μ|s)` extended by zero off `s` lies in `L^p(μ)`. -/
 theorem memLp_indicator_restrict (hs : MeasurableSet s) (f : Lp ℝ p (μ.restrict s)) :
     MemLp (s.indicator f) p μ :=
-  (memLp_indicator_iff_restrict hs).2 (Lp.memLp f)
+  (memLp_indicator_iff_restrict hs.nullMeasurableSet).2 (Lp.memLp f)
 
 variable [Fact (1 ≤ p)]
 
@@ -532,7 +532,7 @@ def extendByZeroLp (hs : MeasurableSet s) : Lp ℝ p (μ.restrict s) →L[ℝ] L
         · simp [indicator_of_notMem hx] }
     1 fun f => by
       simp only [LinearMap.coe_mk, AddHom.coe_mk, one_mul]
-      rw [Lp.norm_toLp, eLpNorm_indicator_eq_eLpNorm_restrict hs, Lp.norm_def]
+      rw [Lp.norm_toLp, eLpNorm_indicator_eq_eLpNorm_restrict hs.nullMeasurableSet, Lp.norm_def]
 
 /-- The extension by zero of `f` is almost everywhere equal to `s.indicator f`. -/
 theorem extendByZeroLp_coeFn (hs : MeasurableSet s) (f : Lp ℝ p (μ.restrict s)) :
@@ -653,7 +653,7 @@ theorem lpDualMap_surjective [SigmaFinite μ] (hp : p ≠ ∞) :
   -- Fatou puts `g` in `L^q`
   have hle : ∀ n, eLpNorm (G n) q μ ≤ ENNReal.ofReal ‖φ‖ := by
     intro n
-    rw [eLpNorm_indicator_eq_eLpNorm_restrict (hS n)]
+    rw [eLpNorm_indicator_eq_eLpNorm_restrict (hS n).nullMeasurableSet]
     refine (ENNReal.le_ofReal_iff_toReal_le (Lp.eLpNorm_ne_top _) (norm_nonneg _)).2 ?_
     rw [← Lp.norm_def]
     exact hnorm n

@@ -18,6 +18,7 @@ public import Mathlib.Analysis.Matrix.PosDef
 public import Mathlib.Analysis.CStarAlgebra.Matrix
 public import Mathlib.Analysis.Matrix.Spectrum
 public import Mathlib.Topology.Connected.Clopen
+public import Mathlib.Analysis.InnerProductSpace.Calculus
 
 /-!
 # Classical weak maximum principle

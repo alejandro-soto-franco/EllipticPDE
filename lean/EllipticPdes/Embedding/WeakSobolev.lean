@@ -101,7 +101,7 @@ theorem eLpNorm_cutoff_deriv_le {B : Set E} (hB : MeasurableSet B) {η : E → �
       exact hx (by simp [image_eq_zero_of_notMem_tsupport h,
         image_eq_zero_of_notMem_tsupport (f := fderiv ℝ η)
           fun h' => h (tsupport_fderiv_subset ℝ h')]))
-  have hind := eLpNorm_indicator_eq_eLpNorm_restrict (μ := μ) (p := p) hB
+  have hind := eLpNorm_indicator_eq_eLpNorm_restrict (μ := μ) (p := p) hB.nullMeasurableSet
     (f := fun x => η x • G x + (fderiv ℝ η x).smulRight (v x))
   rw [indicator_eq_self.2 hsupp] at hind
   rw [hind]

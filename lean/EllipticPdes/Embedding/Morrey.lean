@@ -280,7 +280,7 @@ private theorem exists_kernel_bound_subset (hE : Module.finrank ℝ E = d) (hd :
   obtain ⟨Cdp, hCdp⟩ := exists_kernel_bound (μ := μ) hE hd hp
   refine ⟨Cdp, ?_⟩
   intro x R hR g hg S hSmeas hSsub
-  have key := hCdp x hR (S.indicator g) (hg.indicator hSmeas)
+  have key := hCdp x hR (S.indicator g) (hg.indicator hSmeas.nullMeasurableSet)
   have hfun : (fun y => ‖(S.indicator g) y‖ / dist x y ^ (d - 1))
       = S.indicator (fun y => ‖g y‖ / dist x y ^ (d - 1)) := by
     funext y
@@ -288,7 +288,7 @@ private theorem exists_kernel_bound_subset (hE : Module.finrank ℝ E = d) (hd :
     · rw [Set.indicator_of_mem hy, Set.indicator_of_mem hy]
     · rw [Set.indicator_of_notMem hy, Set.indicator_of_notMem hy, norm_zero, zero_div]
   rw [hfun, setIntegral_indicator hSmeas, Set.inter_eq_right.mpr hSsub,
-    eLpNorm_indicator_eq_eLpNorm_restrict hSmeas,
+    eLpNorm_indicator_eq_eLpNorm_restrict hSmeas.nullMeasurableSet,
     Measure.restrict_restrict_of_subset hSsub] at key
   exact key
 
@@ -596,7 +596,8 @@ theorem exists_holderOnWith_mollify [CompleteSpace F] (hE : Module.finrank ℝ E
         rw [mem_ball] at hy ⊢
         linarith [dist_triangle w y c])).fderiv
   have hgB : MemLp ((ball c r).indicator G) (ENNReal.ofReal p) μ :=
-    (memLp_indicator_iff_restrict (f := G) (p := ENNReal.ofReal p) measurableSet_ball).mpr hG
+    (memLp_indicator_iff_restrict (f := G) (p := ENNReal.ofReal p)
+      measurableSet_ball.nullMeasurableSet).mpr hG
   have hbound : eLpNorm (fun y => ‖fderiv ℝ
       (ρ.normed μ ⋆[ContinuousLinearMap.lsmul ℝ ℝ, μ] (ball c r).indicator u) y‖)
       (ENNReal.ofReal p) (μ.restrict (ball c r'))
@@ -608,7 +609,7 @@ theorem exists_holderOnWith_mollify [CompleteSpace F] (hE : Module.finrank ℝ E
       ((eLpNorm_convolution_le_of_integral_eq_one hp1 ENNReal.ofReal_ne_top
         (fun x => ρ.nonneg_normed x) ρ.continuous_normed.aestronglyMeasurable ρ.integral_normed
         hgB.aestronglyMeasurable).trans_eq ?_)
-    exact eLpNorm_indicator_eq_eLpNorm_restrict measurableSet_ball
+    exact eLpNorm_indicator_eq_eLpNorm_restrict measurableSet_ball.nullMeasurableSet
   exact (hC _ hsmooth c hr').mono_const (mul_le_mul_right
     (ENNReal.toNNReal_mono hG.eLpNorm_lt_top.ne hbound) C)
 

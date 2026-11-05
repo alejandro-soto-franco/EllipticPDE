@@ -807,7 +807,7 @@ from the coordinate theorem through an orthonormal basis.
 ## Layout
 
 - `lean/` the formalisation. A standalone lake project pinned to Lean
-  `v4.35.0-rc3`.
+  `v4.35.0`.
 - `lean/AxiomAudit.lean` checks the axiom set of each headline result with
   `assert_classical_axioms` and builds as a target of its own.
 - `lean/Challenge.lean` and `lean/Solution.lean` are the Palomar submission pair for the
@@ -866,7 +866,7 @@ The pair at commit `ae5e339` is registered in the [Palomar registry](https://pal
 
 ## Toolchain
 
-Lean `v4.35.0-rc3` with Mathlib `v4.35.0-rc3`.
+Lean `v4.35.0` with Mathlib `v4.35.0`.
 
 ## Licence
 

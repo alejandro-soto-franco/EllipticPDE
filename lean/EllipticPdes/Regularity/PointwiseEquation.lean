@@ -10,6 +10,7 @@ public import EllipticPdes.Regularity.ClassicalSolvability
 public import EllipticPdes.Regularity.LocalWeakForm
 public import EllipticPdes.Embedding.WeakGradUnique
 public import EllipticPdes.Extension.GlobalApproximation
+public import Mathlib.Analysis.Distribution.AEEqOfIntegralContDiff
 
 /-!
 # Pointwise equation of a smooth representative
