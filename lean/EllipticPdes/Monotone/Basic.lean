@@ -49,7 +49,8 @@ def IsStrictlyMonotoneOp (K : Set X) (A : X → StrongDual ℝ X) : Prop :=
 /-- An operator `A : X → X*` is coercive on `K` when some `v₀ ∈ K` makes
 `⟨A v - A v₀, v - v₀⟩ / ‖v‖` tend to infinity as `‖v‖ → ∞` within `K`. The filter is
 `cobounded X ⊓ 𝓟 K` and the quotient is plain real division (Ferreira–Gomes–Üçer,
-Definition 2.15(b), p. 11). -/
+Definition 2.15(b), p. 11). On a bounded `K` the filter is trivial, so the condition holds
+vacuously and the coercive existence theorem contains the bounded one. -/
 def IsCoerciveOp (K : Set X) (A : X → StrongDual ℝ X) : Prop :=
   ∃ v₀ ∈ K, Tendsto (fun v => (A v - A v₀) (v - v₀) / ‖v‖)
     (Bornology.cobounded X ⊓ 𝓟 K) atTop

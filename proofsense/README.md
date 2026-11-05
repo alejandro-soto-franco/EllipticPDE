@@ -160,10 +160,11 @@ Fernández-Real form.
 
 ## Monotone-operator results
 
-Five declarations of `EllipticPdes.Monotone` have Brezis warrants, each with a
+Six declarations of `EllipticPdes.Monotone` have Brezis warrants, each with a
 recorded divergence. `isClosed_toWeakSpace_of_convex` and
 `isCompact_toWeakSpace_closedBall` state one direction of the equivalences in
-Theorems 3.7 (Mazur) and 3.17 (Kakutani). Every Brezis statement takes a Banach
+Theorems 3.7 (Mazur) and 3.17 (Kakutani).
+`isCompact_toWeakSpace_of_bounded_convex_closed` states Corollary 3.22. Every Brezis statement takes a Banach
 space, and the declarations take a real normed space, with reflexivity as the
 predicate `IsReflexive`. The two direct-method declarations state Corollary 3.23
 for a real-valued function, where the source allows values in

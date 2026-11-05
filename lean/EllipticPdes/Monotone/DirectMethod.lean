@@ -43,7 +43,7 @@ theorem exists_isMinOn_of_convex_of_bounded (hX : Analysis.IsReflexive X) {K : S
     (hKcl : IsClosed K) (hKne : K.Nonempty) {J : X → ℝ}
     (hJc : ConvexOn ℝ K J) (hJl : LowerSemicontinuousOn J K) (hKb : Bornology.IsBounded K) :
     ∃ u ∈ K, IsMinOn J K u := by
-  set e := toWeakSpace ℝ X with he
+  set e := toWeakSpace ℝ X
   have hS : IsCompact (e '' K) :=
     isCompact_toWeakSpace_of_bounded_convex_closed hX hJc.1 hKcl hKb
   have hlsc : LowerSemicontinuousOn (fun y => J (e.symm y)) (e '' K) := by
@@ -72,7 +72,8 @@ theorem exists_isMinOn_of_convex_of_bounded (hX : Analysis.IsReflexive X) {K : S
 /-- **Direct method.** A convex, lower semicontinuous and coercive function attains its minimum on
 a non-empty closed convex subset of a reflexive Banach space (Brezis, Corollary 3.23, p. 71).
 Convexity of `K` comes from `ConvexOn ℝ K J`. `K.Nonempty` is required: on `K = ∅`
-the conclusion `∃ u ∈ K, ...` is false. -/
+the conclusion `∃ u ∈ K, ...` is false. The coercivity hypothesis is vacuous when `K` is bounded,
+so this theorem generalises `exists_isMinOn_of_convex_of_bounded`. -/
 theorem exists_isMinOn_of_convex (hX : Analysis.IsReflexive X) {K : Set X}
     (hKcl : IsClosed K) (hKne : K.Nonempty) {J : X → ℝ}
     (hJc : ConvexOn ℝ K J) (hJl : LowerSemicontinuousOn J K)

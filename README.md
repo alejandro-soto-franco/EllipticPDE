@@ -795,19 +795,20 @@ $C^{k,\alpha}$ estimates remain a roadmap item.
 
 ## Monotone operators
 
-An operator $A : X \to X^*$ on a reflexive space is the Gateaux derivative of a convex
-lower semicontinuous functional $J$. If $A$ is coercive, the direct method applied to
-$J - f$ gives a solution of $A u = f$ for every $f \in X^*$, and strict convexity of $J$ gives
-uniqueness. The screened $p$-Laplacian is the case $X = W_0^{1,p}(\Omega)$ with
-$1 < p < \infty$, $\mu(\Omega) < \infty$ and $J(u) = \tfrac1p \int \|\nabla u\|^p + \tfrac{c}{p} \int |u|^p$.
-The screening coefficient $c > 0$ supplies coercivity. The case $c = 0$ needs a
-$p$-Poincaré inequality on $W_0^{1,p}$, which the library does not have. The space $E$ is a
-finite-dimensional real inner-product space, since $\|\cdot\|^p$ on $E^*$ is differentiable
-only for a smooth norm.
+Let $A : X \to X^*$ be the Gateaux derivative of a convex lower semicontinuous $J$ on a
+reflexive space. If $A$ is coercive, the direct method applied to $J - f$ gives a solution of
+$A u = f$ for every $f \in X^*$, and uniqueness follows from strict monotonicity of $A$, which
+strict convexity of $J$ gives (`isStrictlyMonotoneOp_of_strictConvex_gateaux`). The screened
+$p$-Laplacian is the case $X = W_0^{1,p}(\Omega)$ with $1 < p < \infty$, $\mu(\Omega) < \infty$
+and $J(u) = \tfrac1p \int \|\nabla u\|^p + \tfrac{c}{p} \int |u|^p$. The screening
+coefficient $c > 0$ supplies coercivity. The case $c = 0$ needs a $p$-Poincaré inequality on
+$W_0^{1,p}$, which the library does not have. The space $E$ is a finite-dimensional real
+inner-product space. The proof takes $E$ to be an inner-product space so that $\|\cdot\|^p$ is
+differentiable.
 
 | Result | Declaration |
 |---|---|
-| Reflexivity of $L^p$ and of its closed subspaces | `Analysis.isReflexive_Lp`, `Analysis.IsReflexive.submodule` |
+| Reflexivity of $L^p$ for $1 < p < \infty$ on a finite measure, and of its closed subspaces | `Analysis.isReflexive_Lp`, `Analysis.IsReflexive.submodule` |
 | Reflexivity of $W_0^{1,p}(\Omega)$ | `isReflexive_W1p0` |
 | Existence of a minimiser of a coercive convex functional | `exists_isMinOn_of_convex` |
 | A coercive potential operator is onto the dual | `exists_eq_of_potential` |
