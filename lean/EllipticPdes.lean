@@ -159,6 +159,8 @@ public import EllipticPdes.Monotone.ReflexiveCompact
 public import EllipticPdes.Monotone.DirectMethod
 public import EllipticPdes.Monotone.Potential
 public import EllipticPdes.Monotone.ReflexiveLp
+public import EllipticPdes.SobolevP.Graph
+public import EllipticPdes.SobolevP.Reflexive
 public import EllipticPdes.Analysis.WeakConvergence
 public import EllipticPdes.Analysis.FunctionSpaces
 public import EllipticPdes.Analysis.HolderSpace

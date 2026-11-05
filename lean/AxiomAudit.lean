@@ -579,3 +579,9 @@ assert_classical_axioms
   EllipticPdes.Analysis.IsReflexive.continuousLinearEquiv
   EllipticPdes.Analysis.IsReflexive.prod
   EllipticPdes.Analysis.isReflexive_Lp_finiteDimensional
+
+/-! ### The `W^{1,p}` graph space -/
+
+assert_classical_axioms
+  EllipticPdes.isClosed_W1p0
+  EllipticPdes.isReflexive_W1p0

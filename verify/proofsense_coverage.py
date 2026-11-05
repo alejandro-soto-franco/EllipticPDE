@@ -71,6 +71,17 @@ EXEMPT = {
         "closed-subspace and L^p cases, and the product is a routine consequence of the "
         "decomposition of a functional on the product along the two factors"
     ),
+    "EllipticPdes.isClosed_W1p0": (
+        "the closure of the span of the test graphs is closed in the graph space, which is the "
+        "definition of topological closure; W_0^{1,p} is defined this way here and no "
+        "transcribed statement asserts it"
+    ),
+    "EllipticPdes.isReflexive_W1p0": (
+        "W_0^{1,p}(Omega) is reflexive for 1 < p < infinity and a set of finite measure, by "
+        "reflexivity of the product L^p x L^p(E*) and of its closed subspaces. Evans and Brezis "
+        "give this for the Sobolev space on a bounded domain through a different embedding "
+        "into a product, and none of the verified locators states the graph-space form"
+    ),
     "EllipticPdes.Analysis.isReflexive_Lp_finiteDimensional": (
         "L^p with values in a finite-dimensional space is reflexive, by a basis of the codomain "
         "and the scalar case. Brezis Theorem 4.10 is scalar and no transcribed statement covers "
