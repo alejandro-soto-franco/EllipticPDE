@@ -49,7 +49,7 @@ jobs:
     # from its directory and which need not agree with this library's.
     env:
       CONLECHE_REV: 725f0f39be7f59cff1979c1a530c4ac84ac6d0fc
-      LEAN4EXPORT_REV: 66f1fb4bc256072069767fce52d39480e4524869
+      LEAN4EXPORT_REV: 5a9a355dc6c5fd82b69058d433e2ae2e8dfbf8fe
     steps:
       - uses: actions/checkout@v7
 
