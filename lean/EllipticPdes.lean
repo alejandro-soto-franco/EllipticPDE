@@ -167,6 +167,7 @@ public import EllipticPdes.Monotone.BrowderMinty
 public import EllipticPdes.SobolevP.Graph
 public import EllipticPdes.SobolevP.PLaplacian
 public import EllipticPdes.SobolevP.Reflexive
+public import EllipticPdes.SobolevP.SkewPLaplacian
 public import EllipticPdes.Analysis.WeakConvergence
 public import EllipticPdes.Analysis.FunctionSpaces
 public import EllipticPdes.Analysis.HolderSpace

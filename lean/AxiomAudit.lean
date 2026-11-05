@@ -630,3 +630,9 @@ assert_classical_axioms
   EllipticPdes.pEnergy_gateaux
   EllipticPdes.exists_weakSolution_pLaplacian
   EllipticPdes.existsUnique_weakSolution_pLaplacian
+
+/-! ### The `p`-Laplacian with a skew principal part -/
+
+assert_classical_axioms
+  EllipticPdes.continuous_apply_add_smul_of_convex_gateaux
+  EllipticPdes.existsUnique_weakSolution_skewPLaplacian

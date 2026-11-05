@@ -124,6 +124,17 @@ EXEMPT = {
         "uniqueness of that solution from strict convexity of the energy. No transcribed "
         "theorem states it"
     ),
+    "EllipticPdes.continuous_apply_add_smul_of_convex_gateaux": (
+        "the Gateaux derivative of a convex continuous functional is continuous along a line, "
+        "by the gradient inequality and continuity of the difference quotients. No transcribed "
+        "statement asserts it"
+    ),
+    "EllipticPdes.existsUnique_weakSolution_skewPLaplacian": (
+        "existence and uniqueness for the screened p-Laplacian plus a skew principal part "
+        "-div (S grad u) on W_0^{1,p}, by the Browder-Minty theorem. Brezis Theorem 5.16 (p. 145) "
+        "states the abstract bijectivity, which EllipticPdes.bijective_of_strictlyMonotone "
+        "warrants, and no transcribed theorem states this instance"
+    ),
     "EllipticPdes.isMonotoneOp_of_convex_gateaux": (
         "the Gateaux derivative of a convex functional is a monotone operator, which is classical. "
         "Ferreira-Gomes-Ucer Definition 2.15(a) defines monotonicity and Remark 2.17 treats an "
