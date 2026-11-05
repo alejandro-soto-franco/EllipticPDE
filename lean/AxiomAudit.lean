@@ -583,6 +583,15 @@ assert_classical_axioms
   EllipticPdes.IsMonotoneOp.exists_le_pairing_centerMass
   EllipticPdes.exists_minty_convexHull_finset
 
+/-! ### The weak variational inequality (Ferreira–Gomes–Üçer, Theorem 2.16) -/
+
+assert_classical_axioms
+  EllipticPdes.IsCoerciveOp.of_isBounded
+  EllipticPdes.exists_weakVI_closure
+  EllipticPdes.exists_weakVI
+  EllipticPdes.exists_weakVI_of_isBounded
+  EllipticPdes.not_exists_weakVI_Ioc
+
 /-! ### Reflexivity of `L^p` and of closed subspaces -/
 
 assert_classical_axioms

@@ -161,6 +161,7 @@ public import EllipticPdes.Monotone.Potential
 public import EllipticPdes.Monotone.ReflexiveLp
 public import EllipticPdes.Monotone.KKM
 public import EllipticPdes.Monotone.DebrunnerFlorFinite
+public import EllipticPdes.Monotone.DebrunnerFlor
 public import EllipticPdes.SobolevP.Graph
 public import EllipticPdes.SobolevP.PLaplacian
 public import EllipticPdes.SobolevP.Reflexive

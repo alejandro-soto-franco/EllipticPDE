@@ -56,6 +56,31 @@ EXEMPT = {
         "the Debrunner-Flor inequality on the convex hull of a finite set. Ferreira-Gomes-Ucer cite "
         "it without stating it, and no source in the library states the finite-dimensional lemma"
     ),
+    "EllipticPdes.IsCoerciveOp.of_isBounded": (
+        "coercivity is vacuous on a bounded set, because the filter cobounded inf principal K is "
+        "trivial. No transcribed statement asserts it"
+    ),
+    "EllipticPdes.exists_weakVI_closure": (
+        "Ferreira-Gomes-Ucer Theorem 2.16 (p. 11) with the conclusion u in closure K, which the "
+        "convex-set hypothesis supports. The printed conclusion u in K needs K closed. The "
+        "transcription of ferreira-2025-sol-mea-gam was not in the library when this was written, "
+        "so no locator has been checked"
+    ),
+    "EllipticPdes.exists_weakVI": (
+        "Ferreira-Gomes-Ucer Theorem 2.16 (p. 11) for closed K. The transcription of "
+        "ferreira-2025-sol-mea-gam was not in the library when this was written, so the warrant "
+        "waits for a checked locator"
+    ),
+    "EllipticPdes.exists_weakVI_of_isBounded": (
+        "the Debrunner-Flor theorem on a bounded closed convex set, with no coercivity "
+        "hypothesis. Ferreira-Gomes-Ucer cite it in the proof of Theorem 2.16 and state no such "
+        "result"
+    ),
+    "EllipticPdes.not_exists_weakVI_Ioc": (
+        "the counterexample X = R, K = (0, 1], A = id to the printed conclusion u in K of "
+        "Ferreira-Gomes-Ucer Theorem 2.16 (p. 11). It contradicts the printed statement, so no "
+        "source states it"
+    ),
     "EllipticPdes.pEnergy_convex": (
         "the convexity of the p-energy (1/p) int |grad u|^p + (c/p) int |u|^p on W_0^{1,p}, which "
         "is the convexity of the norm to the power p. Evans 8.1.2 asks convexity of the "
