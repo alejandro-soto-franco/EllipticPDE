@@ -47,6 +47,15 @@ EXEMPT = {
         "the Knaster-Kuratowski-Mazurkiewicz lemma on the convex hull of finitely many points of a "
         "normed space. No source in the library states it"
     ),
+    "EllipticPdes.IsMonotoneOp.exists_le_pairing_centerMass": (
+        "the averaging step of the Debrunner-Flor lemma: for a convex combination of points of K, "
+        "some vertex of positive weight has a non-negative pairing. Ferreira-Gomes-Ucer cite "
+        "Debrunner-Flor in the proof of Theorem 2.16 (p. 11) and state no such lemma"
+    ),
+    "EllipticPdes.exists_minty_convexHull_finset": (
+        "the Debrunner-Flor inequality on the convex hull of a finite set. Ferreira-Gomes-Ucer cite "
+        "it without stating it, and no source in the library states the finite-dimensional lemma"
+    ),
     "EllipticPdes.pEnergy_convex": (
         "the convexity of the p-energy (1/p) int |grad u|^p + (c/p) int |u|^p on W_0^{1,p}, which "
         "is the convexity of the norm to the power p. Evans 8.1.2 asks convexity of the "

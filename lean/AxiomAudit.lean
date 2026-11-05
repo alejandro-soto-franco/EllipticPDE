@@ -577,6 +577,12 @@ assert_classical_axioms
   EllipticPdes.kkm_stdSimplex
   EllipticPdes.kkm
 
+/-! ### The Debrunner–Flor inequality on a polytope -/
+
+assert_classical_axioms
+  EllipticPdes.IsMonotoneOp.exists_le_pairing_centerMass
+  EllipticPdes.exists_minty_convexHull_finset
+
 /-! ### Reflexivity of `L^p` and of closed subspaces -/
 
 assert_classical_axioms
