@@ -355,6 +355,24 @@ EXEMPT = {
         "finite-dimensional real normed space with an additive Haar measure; the cited source states it in coordinates, "
         "so the warrant sits at the coordinate declaration"
     ),
+    "EllipticPdes.Extension.exists_aboveGraph_of_fderiv_pos": (
+        "the graph lemma: the positive set of a C1 function with nonzero derivative along e_j at a zero is locally the region above a C1 graph; an instance of the implicit function theorem with no separate source statement"
+    ),
+    "EllipticPdes.Extension.C1Chart.graph_motion_eq_of_mem_frontier": (
+        "a chart passes through the boundary point it describes; infrastructure with no source statement"
+    ),
+    "EllipticPdes.Extension.HasC1Boundary.image_linearEquiv": (
+        "invariance of a C1 boundary under a continuous linear equivalence of R^d; Evans states the definition (C.1, p. 710) but not this invariance, and no source in the library states it"
+    ),
+    "EllipticPdes.Extension.hasC1BoundaryNormed_iff": (
+        "independence of the C1-boundary notion on a normed space from the linear identification with R^d; infrastructure with no source statement"
+    ),
+    "EllipticPdes.Extension.HasC1BoundaryNormed.image_linearEquiv": (
+        "invariance of a C1 boundary on a normed space under a continuous linear equivalence; no source statement"
+    ),
+    "EllipticPdes.Extension.hasC1BoundaryNormed_halfSpace": (
+        "a half space has C1 boundary on a normed space; records that the hypothesis is satisfiable; no source statement"
+    ),
     "EllipticPdes.DivForm.FullEllipticOp.interior_smooth": (
         "the theorem warranted at EllipticPdes.Regularity.interior_smooth, stated over a finite-dimensional real "
         "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
