@@ -25,7 +25,7 @@ on `F` for the pushforward measure, with coefficient `a' y w = L (a (L⁻¹ y) (
 * `EllipticPdes.NormedDivForm.EllipticCoeff`, `EllipticPdes.NormedDivForm.FullEllipticOp`: the
   coefficients.
 * `EllipticPdes.NormedDivForm.FullEllipticOp.transfer`: the transferred operator on `F`.
-* `EllipticPdes.NormedDivForm.FullEllipticOp.transferEquiv`: `W1p0 2 μ Ω ≃L H01 (μ.map L) (L '' Ω)`.
+* `EllipticPdes.NormedDivForm.transferEquiv`: `W1p0 2 μ Ω ≃L H01 (μ.map L) (L '' Ω)`.
 * `EllipticPdes.NormedDivForm.FullEllipticOp.formOn`: the bilinear form on `W1p0 2 μ Ω`.
 * `EllipticPdes.NormedDivForm.FullEllipticOp.formOn_eq_integral`: its integral formula.
 * `EllipticPdes.NormedDivForm.FullEllipticOp.formOn_transfer`: `B_E[u, v] = B_F[T u, T v]`.
@@ -97,33 +97,33 @@ local notation "𝔽" => EuclideanSpace ℝ (Fin (finrank ℝ E))
 local notation "𝓛" => (toEuclidean (E := E))
 local notation "𝓛'" => ContinuousLinearEquiv.symm (toEuclidean (E := E))
 
-/-- The pullback of a vector of `F = EuclideanSpace ℝ (Fin (finrank ℝ E))`, read as a covector
-through the Riesz map, to a covector on `E` along `toEuclidean`. -/
-def pullback : 𝔽 →L[ℝ] StrongDual ℝ E :=
+/-- The covector on `E` given by a vector of `F = EuclideanSpace ℝ (Fin (finrank ℝ E))`. The
+vector is read as a covector on `F` through the Riesz map and pulled back along `toEuclidean`. -/
+def toEuclideanCovector : 𝔽 →L[ℝ] StrongDual ℝ E :=
   ((ContinuousLinearMap.compL ℝ E 𝔽 ℝ).flip (𝓛 : E →L[ℝ] 𝔽)).comp RieszBridge.rieszC'
 
 omit [MeasurableSpace E] in
-lemma pullback_apply (w : 𝔽) (z : E) : pullback w z = inner ℝ w (𝓛 z) := rfl
+lemma toEuclideanCovector_apply (w : 𝔽) (z : E) : toEuclideanCovector w z = inner ℝ w (𝓛 z) := rfl
 
-/-- The matrix `L ∘ A ∘ pullback` on `F` that a coefficient value `A` transfers to. -/
+/-- The matrix `L ∘ A ∘ toEuclideanCovector` on `F` that a coefficient value `A` transfers to. -/
 def transferMat (A : StrongDual ℝ E →L[ℝ] E) : 𝔽 →L[ℝ] 𝔽 :=
-  (𝓛 : E →L[ℝ] 𝔽).comp (A.comp pullback)
+  (𝓛 : E →L[ℝ] 𝔽).comp (A.comp toEuclideanCovector)
 
 omit [MeasurableSpace E] in
 lemma transferMat_apply (A : StrongDual ℝ E →L[ℝ] E) (w : 𝔽) :
-    transferMat A w = 𝓛 (A (pullback w)) := rfl
+    transferMat A w = 𝓛 (A (toEuclideanCovector w)) := rfl
 
 omit [MeasurableSpace E] in
-lemma pullback_toDual_symm (ξ : StrongDual ℝ E) :
-    pullback ((InnerProductSpace.toDual ℝ 𝔽).symm (ξ.comp (𝓛' : 𝔽 →L[ℝ] E))) = ξ := by
+lemma toEuclideanCovector_toDual_symm (ξ : StrongDual ℝ E) :
+    toEuclideanCovector ((InnerProductSpace.toDual ℝ 𝔽).symm (ξ.comp (𝓛' : 𝔽 →L[ℝ] E))) = ξ := by
   ext z
-  rw [pullback_apply, InnerProductSpace.toDual_symm_apply]
+  rw [toEuclideanCovector_apply, InnerProductSpace.toDual_symm_apply]
   simp
 
 omit [MeasurableSpace E] in
-lemma norm_pullback_le (w : 𝔽) : ‖pullback w‖ ≤ ‖(𝓛 : E →L[ℝ] 𝔽)‖ * ‖w‖ := by
+lemma norm_toEuclideanCovector_le (w : 𝔽) : ‖toEuclideanCovector w‖ ≤ ‖(𝓛 : E →L[ℝ] 𝔽)‖ * ‖w‖ := by
   refine ContinuousLinearMap.opNorm_le_bound _ (by positivity) fun z => ?_
-  rw [pullback_apply]
+  rw [toEuclideanCovector_apply]
   calc ‖inner ℝ w (𝓛 z)‖ ≤ ‖w‖ * ‖𝓛 z‖ := norm_inner_le_norm _ _
     _ ≤ ‖w‖ * (‖(𝓛 : E →L[ℝ] 𝔽)‖ * ‖z‖) := by
         gcongr
@@ -135,66 +135,67 @@ lemma norm_transferMat_le (A : StrongDual ℝ E →L[ℝ] E) :
     ‖transferMat A‖ ≤ ‖(𝓛 : E →L[ℝ] 𝔽)‖ * ‖A‖ * ‖(𝓛 : E →L[ℝ] 𝔽)‖ := by
   refine ContinuousLinearMap.opNorm_le_bound _ (by positivity) fun w => ?_
   rw [transferMat_apply]
-  calc ‖𝓛 (A (pullback w))‖ ≤ ‖(𝓛 : E →L[ℝ] 𝔽)‖ * ‖A (pullback w)‖ :=
+  calc ‖𝓛 (A (toEuclideanCovector w))‖ ≤ ‖(𝓛 : E →L[ℝ] 𝔽)‖ * ‖A (toEuclideanCovector w)‖ :=
         (𝓛 : E →L[ℝ] 𝔽).le_opNorm _
-    _ ≤ ‖(𝓛 : E →L[ℝ] 𝔽)‖ * (‖A‖ * ‖pullback w‖) := by gcongr; exact A.le_opNorm _
+    _ ≤ ‖(𝓛 : E →L[ℝ] 𝔽)‖ * (‖A‖ * ‖toEuclideanCovector w‖) := by gcongr; exact A.le_opNorm _
     _ ≤ ‖(𝓛 : E →L[ℝ] 𝔽)‖ * (‖A‖ * (‖(𝓛 : E →L[ℝ] 𝔽)‖ * ‖w‖)) := by
-        gcongr; exact norm_pullback_le w
+        gcongr; exact norm_toEuclideanCovector_le w
     _ = _ := by ring
 
 omit [MeasurableSpace E] in
-lemma inner_transferMat_self (A : StrongDual ℝ E →L[ℝ] E) (w : 𝔽) :
-    inner ℝ (transferMat A w) w = pullback w (A (pullback w)) := by
-  rw [transferMat_apply, real_inner_comm, pullback_apply]
+lemma Internal.inner_transferMat_self (A : StrongDual ℝ E →L[ℝ] E) (w : 𝔽) :
+    inner ℝ (transferMat A w) w = toEuclideanCovector w (A (toEuclideanCovector w)) := by
+  rw [transferMat_apply, real_inner_comm, toEuclideanCovector_apply]
 
 omit [MeasurableSpace E] in
-lemma norm_le_pullback (w : 𝔽) :
-    ‖w‖ ≤ max ‖(𝓛' : 𝔽 →L[ℝ] E)‖ 1 * ‖pullback w‖ := by
+lemma Internal.norm_le_toEuclideanCovector (w : 𝔽) :
+    ‖w‖ ≤ max ‖(𝓛' : 𝔽 →L[ℝ] E)‖ 1 * ‖toEuclideanCovector w‖ := by
   rcases eq_or_lt_of_le (norm_nonneg w) with h | h
   · rw [← h]; positivity
-  · have h1 : ‖w‖ * ‖w‖ ≤ (max ‖(𝓛' : 𝔽 →L[ℝ] E)‖ 1 * ‖pullback w‖) * ‖w‖ := by
+  · have h1 : ‖w‖ * ‖w‖ ≤ (max ‖(𝓛' : 𝔽 →L[ℝ] E)‖ 1 * ‖toEuclideanCovector w‖) * ‖w‖ := by
       calc ‖w‖ * ‖w‖ = inner ℝ w w := (real_inner_self_eq_norm_mul_norm w).symm
-        _ = pullback w (𝓛' w) := by rw [pullback_apply]; simp
-        _ ≤ ‖pullback w‖ * ‖𝓛' w‖ := (le_abs_self _).trans ((pullback w).le_opNorm _)
-        _ ≤ ‖pullback w‖ * (‖(𝓛' : 𝔽 →L[ℝ] E)‖ * ‖w‖) := by
+        _ = toEuclideanCovector w (𝓛' w) := by rw [toEuclideanCovector_apply]; simp
+        _ ≤ ‖toEuclideanCovector w‖ * ‖𝓛' w‖ :=
+            (le_abs_self _).trans ((toEuclideanCovector w).le_opNorm _)
+        _ ≤ ‖toEuclideanCovector w‖ * (‖(𝓛' : 𝔽 →L[ℝ] E)‖ * ‖w‖) := by
             gcongr; exact (𝓛' : 𝔽 →L[ℝ] E).le_opNorm w
-        _ ≤ ‖pullback w‖ * (max ‖(𝓛' : 𝔽 →L[ℝ] E)‖ 1 * ‖w‖) := by
+        _ ≤ ‖toEuclideanCovector w‖ * (max ‖(𝓛' : 𝔽 →L[ℝ] E)‖ 1 * ‖w‖) := by
             gcongr; exact le_max_left _ _
         _ = _ := by ring
     exact le_of_mul_le_mul_right h1 h
 
 omit [MeasurableSpace E] in
-lemma coercive_transferMat (A : StrongDual ℝ E →L[ℝ] E) {lam : ℝ} (hlam : 0 < lam)
+lemma Internal.coercive_transferMat (A : StrongDual ℝ E →L[ℝ] E) {lam : ℝ} (hlam : 0 < lam)
     (h : ∀ ξ : StrongDual ℝ E, lam * ‖ξ‖ ^ 2 ≤ ξ (A ξ)) (w : 𝔽) :
     lam / (max ‖(𝓛' : 𝔽 →L[ℝ] E)‖ 1) ^ 2 * ‖w‖ ^ 2 ≤ inner ℝ (transferMat A w) w := by
   have hM : 0 < max ‖(𝓛' : 𝔽 →L[ℝ] E)‖ 1 := lt_of_lt_of_le one_pos (le_max_right _ _)
-  rw [inner_transferMat_self]
-  refine le_trans ?_ (h (pullback w))
+  rw [Internal.inner_transferMat_self]
+  refine le_trans ?_ (h (toEuclideanCovector w))
   rw [div_mul_eq_mul_div, div_le_iff₀ (by positivity)]
-  have h2 : ‖w‖ ^ 2 ≤ (max ‖(𝓛' : 𝔽 →L[ℝ] E)‖ 1 * ‖pullback w‖) ^ 2 := by
-    gcongr; exact norm_le_pullback w
+  have h2 : ‖w‖ ^ 2 ≤ (max ‖(𝓛' : 𝔽 →L[ℝ] E)‖ 1 * ‖toEuclideanCovector w‖) ^ 2 := by
+    gcongr; exact Internal.norm_le_toEuclideanCovector w
   nlinarith
 
 omit [MeasurableSpace E] in
-lemma inner_transferMat (A : StrongDual ℝ E →L[ℝ] E) (ξ η : StrongDual ℝ E) :
+lemma Internal.inner_transferMat (A : StrongDual ℝ E →L[ℝ] E) (ξ η : StrongDual ℝ E) :
     inner ℝ (transferMat A ((InnerProductSpace.toDual ℝ 𝔽).symm (ξ.comp (𝓛' : 𝔽 →L[ℝ] E))))
       ((InnerProductSpace.toDual ℝ 𝔽).symm (η.comp (𝓛' : 𝔽 →L[ℝ] E))) = η (A ξ) := by
-  rw [transferMat_apply, pullback_toDual_symm, real_inner_comm,
+  rw [transferMat_apply, toEuclideanCovector_toDual_symm, real_inner_comm,
     InnerProductSpace.toDual_symm_apply]
   simp
 
 omit [MeasurableSpace E] in
-lemma inner_transferVec (x : E) (ξ : StrongDual ℝ E) :
+lemma Internal.inner_transferVec (x : E) (ξ : StrongDual ℝ E) :
     inner ℝ (𝓛 x) ((InnerProductSpace.toDual ℝ 𝔽).symm (ξ.comp (𝓛' : 𝔽 →L[ℝ] E))) = ξ x := by
   rw [real_inner_comm, InnerProductSpace.toDual_symm_apply]
   simp
 
 omit [MeasurableSpace E] in
-lemma inner_transferMat_comm (A : StrongDual ℝ E →L[ℝ] E)
+lemma Internal.inner_transferMat_comm (A : StrongDual ℝ E →L[ℝ] E)
     (hA : ∀ ξ η : StrongDual ℝ E, η (A ξ) = ξ (A η)) (v w : 𝔽) :
     inner ℝ (transferMat A v) w = inner ℝ v (transferMat A w) := by
-  rw [transferMat_apply, transferMat_apply, real_inner_comm, ← pullback_apply, ← pullback_apply,
-    hA]
+  rw [transferMat_apply, transferMat_apply, real_inner_comm, ← toEuclideanCovector_apply,
+    ← toEuclideanCovector_apply, hA]
 
 end Transfer
 
@@ -219,6 +220,35 @@ followed by the Riesz bridge. -/
 def transferEquiv (Ω : Set E) : W1p0 2 μ Ω ≃L[ℝ] H1Graph.H01 (μ.map 𝓛) (𝓛 '' Ω) :=
   (W1p0.mapEquiv 𝓛).trans W1p0.toH01
 
+section TransferLemmas
+
+variable (Ω : Set E)
+
+/-- The function part of `transferEquiv w` is `w ∘ L.symm`, read back through `L`. -/
+lemma fnL_transferEquiv_ae (w : W1p0 2 μ Ω) :
+    (⇑(H1Graph.fnL (transferEquiv μ Ω w : H1Graph (μ.map 𝓛) (𝓛 '' Ω))) ∘ 𝓛) =ᵐ[μ.restrict Ω]
+      ⇑(W1p0.fnL w) := by
+  have hmp := measurePreserving_restrict_image 𝓛 μ Ω
+  filter_upwards [hmp.quasiMeasurePreserving.ae_eq_comp (W1p0.fnL_mapEquiv 𝓛 w)] with x hx
+  exact hx.trans (by simp)
+
+/-- The gradient of `transferEquiv w` at `L x` is the Riesz vector of `∇w x ∘ L.symm`. -/
+lemma gradL_transferEquiv_ae (w : W1p0 2 μ Ω) :
+    (fun x => H1Graph.gradL (transferEquiv μ Ω w : H1Graph (μ.map 𝓛) (𝓛 '' Ω)) (𝓛 x))
+      =ᵐ[μ.restrict Ω] fun x => (InnerProductSpace.toDual ℝ 𝔽).symm
+        ((W1p0.gradL w x).comp (𝓛' : 𝔽 →L[ℝ] E)) := by
+  have hmp := measurePreserving_restrict_image 𝓛 μ Ω
+  have h : ⇑(H1Graph.gradL (transferEquiv μ Ω w : H1Graph (μ.map 𝓛) (𝓛 '' Ω)))
+      =ᵐ[(μ.map 𝓛).restrict (𝓛 '' Ω)] fun y => (InnerProductSpace.toDual ℝ 𝔽).symm
+        ((W1p0.gradL w (𝓛' y)).comp (𝓛' : 𝔽 →L[ℝ] E)) := by
+    filter_upwards [W1p0.gradL_toH01 (W1p0.mapEquiv 𝓛 w), W1p0.gradL_mapEquiv 𝓛 w]
+      with y h1 h2
+    exact h1.trans (by rw [h2])
+  filter_upwards [hmp.quasiMeasurePreserving.ae_eq_comp h] with x hx
+  simpa using hx
+
+end TransferLemmas
+
 namespace FullEllipticOp
 
 /-- **Transferred operator.** The coefficient is `a' y w = L (a (L⁻¹ y) (⟪w, ·⟫ ∘ L))`, the
@@ -235,7 +265,8 @@ def transfer (Op : FullEllipticOp μ) : DivForm.FullEllipticOp (μ.map 𝓛) whe
   Λ_nonneg := mul_nonneg (mul_nonneg (norm_nonneg _) Op.Λ_nonneg) (norm_nonneg _)
   aestronglyMeasurable :=
     (continuous_const.clm_comp (continuous_id.clm_comp continuous_const) :
-      Continuous fun g : StrongDual ℝ E →L[ℝ] E => (𝓛 : E →L[ℝ] 𝔽).comp (g.comp pullback)
+      Continuous fun g : StrongDual ℝ E →L[ℝ] E =>
+        (𝓛 : E →L[ℝ] 𝔽).comp (g.comp toEuclideanCovector)
       ).comp_aestronglyMeasurable
       (Op.aestronglyMeasurable.comp_measurePreserving measurePreserving_symm_map)
   norm_le := by
@@ -244,7 +275,7 @@ def transfer (Op : FullEllipticOp μ) : DivForm.FullEllipticOp (μ.map 𝓛) whe
     gcongr
   coercive := by
     filter_upwards [measurePreserving_symm_map.quasiMeasurePreserving.ae Op.coercive] with y hy w
-    exact coercive_transferMat _ Op.lam_pos hy w
+    exact Internal.coercive_transferMat _ Op.lam_pos hy w
   b y := 𝓛 (Op.b (𝓛' y))
   c y := Op.c (𝓛' y)
   Bsup := ‖(𝓛 : E →L[ℝ] 𝔽)‖ * Op.Bsup
@@ -305,29 +336,8 @@ lemma transfer_form_eq_integral (U V : H1Graph (μ.map 𝓛) (𝓛 '' Ω)) :
   have h3 := DivForm.FullEllipticOp.form_apply Op.transfer U V
   exact (h3.trans (congrArg₂ (· + ·) h1 h2)).trans (integral_add hP hR).symm
 
-lemma fnL_transferEquiv_ae (w : W1p0 2 μ Ω) :
-    (⇑(H1Graph.fnL (transferEquiv μ Ω w : H1Graph (μ.map 𝓛) (𝓛 '' Ω))) ∘ 𝓛) =ᵐ[μ.restrict Ω]
-      ⇑(W1p0.fnL w) := by
-  have hmp := measurePreserving_restrict_image 𝓛 μ Ω
-  filter_upwards [hmp.quasiMeasurePreserving.ae_eq_comp (W1p0.fnL_mapEquiv 𝓛 w)] with x hx
-  exact hx.trans (by simp)
-
-lemma gradL_transferEquiv_ae (w : W1p0 2 μ Ω) :
-    (fun x => H1Graph.gradL (transferEquiv μ Ω w : H1Graph (μ.map 𝓛) (𝓛 '' Ω)) (𝓛 x))
-      =ᵐ[μ.restrict Ω] fun x => (InnerProductSpace.toDual ℝ 𝔽).symm
-        ((W1p0.gradL w x).comp (𝓛' : 𝔽 →L[ℝ] E)) := by
-  have hmp := measurePreserving_restrict_image 𝓛 μ Ω
-  have h : ⇑(H1Graph.gradL (transferEquiv μ Ω w : H1Graph (μ.map 𝓛) (𝓛 '' Ω)))
-      =ᵐ[(μ.map 𝓛).restrict (𝓛 '' Ω)] fun y => (InnerProductSpace.toDual ℝ 𝔽).symm
-        ((W1p0.gradL w (𝓛' y)).comp (𝓛' : 𝔽 →L[ℝ] E)) := by
-    filter_upwards [W1p0.gradL_toH01 (W1p0.mapEquiv 𝓛 w), W1p0.gradL_mapEquiv 𝓛 w]
-      with y h1 h2
-    exact h1.trans (by rw [h2])
-  filter_upwards [hmp.quasiMeasurePreserving.ae_eq_comp h] with x hx
-  simpa using hx
-
 omit [μ.IsAddHaarMeasure] in
-lemma transfer_integrand (x : E) (ξ η : StrongDual ℝ E) (s t : ℝ) :
+lemma Internal.transfer_integrand (x : E) (ξ η : StrongDual ℝ E) (s t : ℝ) :
     inner ℝ (Op.transfer.a (𝓛 x) ((InnerProductSpace.toDual ℝ 𝔽).symm
         (ξ.comp (𝓛' : 𝔽 →L[ℝ] E)))) ((InnerProductSpace.toDual ℝ 𝔽).symm
         (η.comp (𝓛' : 𝔽 →L[ℝ] E))) +
@@ -338,7 +348,7 @@ lemma transfer_integrand (x : E) (ξ η : StrongDual ℝ E) (s t : ℝ) :
     simp [transfer]
   have e2 : Op.transfer.b (𝓛 x) = 𝓛 (Op.b x) := by simp [transfer]
   have e3 : Op.transfer.c (𝓛 x) = Op.c x := by simp [transfer]
-  rw [e1, e2, e3, inner_transferMat, inner_transferVec]
+  rw [e1, e2, e3, Internal.inner_transferMat, Internal.inner_transferVec]
   ring
 
 /-- **Integral formula.** `B[u, v] = ∫_Ω ∇v (a ∇u) + ∇u (b) v + c u v`. -/
@@ -356,7 +366,7 @@ theorem formOn_eq_integral (u v : W1p0 2 μ Ω) :
   have h2' : H1Graph.fnL (transferEquiv μ Ω v : H1Graph (μ.map 𝓛) (𝓛 '' Ω)) (𝓛 x) =
     W1p0.fnL v x := h2
   simp only [h1', h2', h3, h4]
-  exact transfer_integrand Op x _ _ _ _
+  exact Internal.transfer_integrand Op x _ _ _ _
 
 omit [μ.IsAddHaarMeasure] in
 /-- If the coefficient is almost everywhere symmetric, the transferred coefficient is almost
@@ -366,7 +376,7 @@ theorem transfer_adjoint (h : ∀ᵐ x ∂μ, ∀ ξ η : StrongDual ℝ E, η (
   filter_upwards [measurePreserving_symm_map.quasiMeasurePreserving.ae h] with y hy
   refine ContinuousLinearMap.ext fun w => ext_inner_right ℝ fun v => ?_
   rw [ContinuousLinearMap.adjoint_inner_left]
-  exact (inner_transferMat_comm _ hy w v).symm
+  exact (Internal.inner_transferMat_comm _ hy w v).symm
 
 end FullEllipticOp
 

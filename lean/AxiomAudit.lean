@@ -641,6 +641,11 @@ assert_classical_axioms
 /-! ### The weak theory on a normed space -/
 
 assert_classical_axioms
+  EllipticPdes.W1p0.mapEquiv
+  EllipticPdes.W1p0.toH01
+  EllipticPdes.NormedDivForm.FullEllipticOp.formOn_eq_integral
+  EllipticPdes.NormedDivForm.FullEllipticOp.formOn_transfer
+  EllipticPdes.NormedDivForm.FullEllipticOp.transfer_adjoint
   EllipticPdes.NormedDivForm.FullEllipticOp.weak_solution_of_nonneg_zeroth_of_bounded
   EllipticPdes.NormedDivForm.FullEllipticOp.garding
   EllipticPdes.NormedDivForm.FullEllipticOp.fredholm_alternative_of_bounded_haar
@@ -654,6 +659,5 @@ assert_classical_axioms
 /-! ### The weak maximum principle on a normed space -/
 
 assert_classical_axioms
-  EllipticPdes.NormedDivForm.FullEllipticOp.weak_maximum_principle
   EllipticPdes.NormedDivForm.FullEllipticOp.weak_maximum_principle_H01
   EllipticPdes.NormedDivForm.FullEllipticOp.eq_zero_of_weakSolution_H01
