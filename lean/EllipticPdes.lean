@@ -167,6 +167,7 @@ public import EllipticPdes.Monotone.LionsStampacchia
 public import EllipticPdes.Monotone.BrowderMinty
 public import EllipticPdes.SobolevP.Graph
 public import EllipticPdes.SobolevP.PLaplacian
+public import EllipticPdes.SobolevP.RieszBridge
 public import EllipticPdes.SobolevP.Reflexive
 public import EllipticPdes.SobolevP.SkewPLaplacian
 public import EllipticPdes.SobolevP.Transfer
