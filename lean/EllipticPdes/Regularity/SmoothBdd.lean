@@ -91,6 +91,21 @@ lemma comp_isometry {f : E → F} (hf : IsSmoothBdd f) (g : G ≃ₗᵢ[ℝ] E) 
     have h := g.norm_iteratedFDeriv_comp_right f x m
     exact (le_of_eq h).trans (hf.norm_iteratedFDeriv_le m _)⟩
 
+/-- The derivative of order `m` of `f ∘ L` is at most that of `f` at `L x` times `‖L‖ ^ m`. -/
+lemma norm_iteratedFDeriv_comp_clm_le {f : E → F} (hf : IsSmoothBdd f) (L : G →L[ℝ] E) (m : ℕ)
+    (x : G) : ‖iteratedFDeriv ℝ m (fun y => f (L y)) x‖ ≤ ‖iteratedFDeriv ℝ m f (L x)‖ * ‖L‖ ^ m :=
+  (L.iteratedFDeriv_comp_right hf.contDiff x (by exact_mod_cast le_top)).symm ▸
+    ((iteratedFDeriv ℝ m f (L x)).norm_compContinuousLinearMap_le _).trans_eq (by simp)
+
+/-- **Composition with a continuous linear map on the right preserves the property.** This
+generalises `comp_isometry` to maps that are not isometric. -/
+lemma comp_clm {f : E → F} (hf : IsSmoothBdd f) (L : G →L[ℝ] E) :
+    IsSmoothBdd (fun x => f (L x)) where
+  contDiff := hf.contDiff.comp L.contDiff
+  bdd m := ⟨hf.bound m * ‖L‖ ^ m, fun x =>
+    (hf.norm_iteratedFDeriv_comp_clm_le L m x).trans
+      (by gcongr; exact hf.norm_iteratedFDeriv_le m _)⟩
+
 end IsSmoothBdd
 
 end Regularity

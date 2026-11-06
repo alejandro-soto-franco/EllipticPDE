@@ -311,6 +311,30 @@ EXEMPT = {
         "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
         "source states it in coordinates, so the warrant sits at the coordinate declaration"
     ),
+    "EllipticPdes.Regularity.IsSmoothBdd.comp_clm": (
+        "smooth maps with bounded derivatives are stable under composition with a continuous linear map on the right; infrastructure with no source statement"
+    ),
+    "EllipticPdes.DivForm.FullEllipticOp.form_ofSmul": (
+        "the form of a divergence-form operator scales with the measure; infrastructure with no source statement"
+    ),
+    "EllipticPdes.DivForm.FullEllipticOp.weak_ofSmul": (
+        "weak solutions correspond under rescaling the measure; infrastructure with no source statement"
+    ),
+    "EllipticPdes.DivForm.FullEllipticOp.interior_smooth_haar": (
+        "the theorem warranted at EllipticPdes.Regularity.interior_smooth, stated over a finite-dimensional real "
+        "inner product space with any additive Haar measure in place of EuclideanSpace R (Fin d) with volume; the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.interior_smooth": (
+        "the theorem warranted at EllipticPdes.Regularity.interior_smooth, transferred along toEuclidean to a "
+        "divergence-form operator on a finite-dimensional real normed space with an additive Haar measure; the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.exists_weakSolution_interior_smooth": (
+        "the theorem warranted at EllipticPdes.Regularity.exists_weakSolution_interior_smooth, on a finite-dimensional real "
+        "normed space with an additive Haar measure, from the normed existence theorem and interior smoothness; the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
     "EllipticPdes.DivForm.FullEllipticOp.interior_smooth": (
         "the theorem warranted at EllipticPdes.Regularity.interior_smooth, stated over a finite-dimensional real "
         "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
