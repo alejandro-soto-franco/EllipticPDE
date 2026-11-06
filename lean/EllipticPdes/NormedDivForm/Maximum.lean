@@ -7,6 +7,7 @@ Authors: Alejandro Soto Franco
 module
 
 public import EllipticPdes.NormedDivForm.Theorems
+public import EllipticPdes.NormedDivForm.Graph
 public import EllipticPdes.Existence.DivFormMaximum
 
 /-!
@@ -14,16 +15,15 @@ public import EllipticPdes.Existence.DivFormMaximum
 
 The weak maximum principle of `DivFormMaximum.lean` for a divergence-form operator on a
 finite-dimensional real normed space `E` with an additive Haar measure `μ`, proved by transfer
-along `toEuclidean` for a subsolution in `W₀^{1,2}(Ω)`, the space on which `Op.formOn` is defined.
-`transferEquiv_posPart` states that the transfer commutes with the truncation `(u - k)⁺`. The proof
-uses that `toEuclidean.symm` is measure-preserving.
-
-The graph-space form with a subsolution in `W^{1,2}(Ω)` and a boundary bound `k` waits for a
-normed `W^{1,2}(Ω)` and will take the name `weak_maximum_principle`.
+along `toEuclidean`. `weak_maximum_principle` takes a subsolution in the normed `W^{1,2}(Ω)` and a
+boundary bound `k`; `weak_maximum_principle_H01` takes a subsolution in `W₀^{1,2}(Ω)`, the space on
+which `Op.formOn` is defined. `transferEquiv_posPart` states that the transfer commutes with the
+truncation `(u - k)⁺`. The proofs use that `toEuclidean.symm` is measure-preserving.
 
 ## Main declarations
 
 * `EllipticPdes.NormedDivForm.transferEquiv_posPart`
+* `EllipticPdes.NormedDivForm.FullEllipticOp.weak_maximum_principle`
 * `EllipticPdes.NormedDivForm.FullEllipticOp.weak_maximum_principle_H01`
 * `EllipticPdes.NormedDivForm.FullEllipticOp.eq_zero_of_weakSolution_H01`
 -/
@@ -130,11 +130,68 @@ lemma Internal.form_nonpos_of_sub (U : W1p0 2 μ Ω)
         (V : H1Graph (μ.map 𝓛) (𝓛 '' Ω)) := rfl
   exact (e2.symm.trans e.symm).trans_le h1
 
+/-- A transferred element of `H₀¹(L '' Ω)` with nonnegative function part pulls back to an
+element of `W₀^{1,2}(Ω)` with nonnegative function part. -/
+lemma Internal.ae_nonneg_transferEquiv_symm (V : H1Graph.H01 (μ.map 𝓛) (𝓛 '' Ω))
+    (hV : ∀ᵐ y ∂(μ.map 𝓛).restrict (𝓛 '' Ω), 0 ≤ H1Graph.fnL (V : H1Graph (μ.map 𝓛) (𝓛 '' Ω)) y) :
+    ∀ᵐ x ∂μ.restrict Ω, 0 ≤ W1p0.fnL ((transferEquiv μ Ω).symm V) x :=
+  (ae_nonneg_iff_transfer Ω _).2 (by rwa [ContinuousLinearEquiv.apply_symm_apply])
+
+/-- The subsolution inequality on the graph space transfers. -/
+lemma Internal.form_nonpos_of_sub_graph (U : W1pGraph 2 μ Ω)
+    (hsub : ∀ V : W1p0 2 μ Ω, (∀ᵐ x ∂μ.restrict Ω, 0 ≤ W1p0.fnL V x) → Op.form Ω U V ≤ 0)
+    (V : H1Graph.H01 (μ.map 𝓛) (𝓛 '' Ω))
+    (hV : ∀ᵐ y ∂(μ.map 𝓛).restrict (𝓛 '' Ω), 0 ≤ H1Graph.fnL (V : H1Graph (μ.map 𝓛) (𝓛 '' Ω)) y) :
+    Op.transfer.form (𝓛 '' Ω) (graphTransfer μ Ω U) (V : H1Graph (μ.map 𝓛) (𝓛 '' Ω)) ≤ 0 :=
+  calc Op.transfer.form (𝓛 '' Ω) (graphTransfer μ Ω U) (V : H1Graph (μ.map 𝓛) (𝓛 '' Ω))
+      = Op.transfer.form (𝓛 '' Ω) (graphTransfer μ Ω U)
+          (transferEquiv μ Ω ((transferEquiv μ Ω).symm V) : H1Graph (μ.map 𝓛) (𝓛 '' Ω)) :=
+        congrArg (fun W : H1Graph.H01 (μ.map 𝓛) (𝓛 '' Ω) => Op.transfer.form (𝓛 '' Ω)
+          (graphTransfer μ Ω U) (W : H1Graph (μ.map 𝓛) (𝓛 '' Ω)))
+          ((transferEquiv μ Ω).apply_symm_apply V).symm
+    _ = Op.form Ω U ((transferEquiv μ Ω).symm V) :=
+        (FullEllipticOp.form_coe Ω Op U _).symm
+    _ ≤ 0 := hsub _ (Internal.ae_nonneg_transferEquiv_symm Ω V hV)
+
+omit [μ.IsAddHaarMeasure] in
+/-- A transport-free operator transfers to a transport-free operator. -/
+lemma Internal.transfer_b_eq_zero (hb : ∀ x, Op.b x = 0) (y : 𝔽) : Op.transfer.b y = 0 := by
+  simp [FullEllipticOp.transfer, hb]
+
+omit [μ.IsAddHaarMeasure] in
+/-- A nonnegative zeroth-order coefficient transfers to a nonnegative one. -/
+lemma Internal.transfer_c_nonneg (hc : ∀ᵐ x ∂μ, 0 ≤ Op.c x) :
+    ∀ᵐ y ∂(μ.map 𝓛), 0 ≤ Op.transfer.c y :=
+  measurePreserving_symm_map.quasiMeasurePreserving.ae hc
+
 end SubsolutionTransfer
 
 namespace FullEllipticOp
 
 variable (Op : FullEllipticOp μ) {Ω : Set E}
+
+/-- **Weak maximum principle** (Gilbarg and Trudinger Theorem 8.1, in the transport-free case),
+on a finite-dimensional real normed space. Let `Ω` be a bounded open set in a nontrivial space,
+`L` a divergence-form operator with no transport term and nonnegative zeroth-order coefficient,
+and `U ∈ W^{1,2}(Ω)` a weak subsolution, meaning the bilinear pairing of `U` against every
+nonnegative `V ∈ W₀^{1,2}(Ω)` is nonpositive. If `k ≥ 0` and `(u - k)⁺` is the function part of
+some element of `W₀^{1,2}(Ω)`, then `u ≤ k` almost everywhere on `Ω`. -/
+theorem weak_maximum_principle [Nontrivial E] (hΩ : IsOpen Ω) (hΩb : Bornology.IsBounded Ω)
+    (hb : ∀ x, Op.b x = 0) (hc : ∀ᵐ x ∂μ, 0 ≤ Op.c x) {U : W1pGraph 2 μ Ω}
+    (hU : U ∈ W1pGraph.W12 μ Ω)
+    (hsub : ∀ V : W1p0 2 μ Ω, (∀ᵐ x ∂μ.restrict Ω, 0 ≤ W1p0.fnL V x) → Op.form Ω U V ≤ 0)
+    {k : ℝ} (hk : 0 ≤ k)
+    (hbd : ∃ V : W1p0 2 μ Ω, ⇑(W1p0.fnL V) =ᵐ[μ.restrict Ω]
+      fun x => max (W1pGraph.fnL U x - k) 0) :
+    ∀ᵐ x ∂μ.restrict Ω, W1pGraph.fnL U x ≤ k := by
+  obtain ⟨V, hV⟩ := hbd
+  have : Nontrivial 𝔽 := (toEuclidean (E := E)).symm.surjective.nontrivial
+  exact (ae_iff_graphTransfer Ω U U (fun a _ => a ≤ k)).2
+    (Op.transfer.weak_maximum_principle ((toEuclidean (E := E)).toHomeomorph.isOpenMap _ hΩ)
+      (isBounded_toEuclidean_image hΩb) (Internal.transfer_b_eq_zero Op hb)
+      (Internal.transfer_c_nonneg Op hc) (graphTransfer_mem_W12 Ω hU)
+      (Internal.form_nonpos_of_sub_graph Op Ω U hsub) hk
+      ⟨transferEquiv μ Ω V, (ae_iff_graphTransfer Ω U V (fun a b => b = max (a - k) 0)).1 hV⟩)
 
 /-- **Weak maximum principle for a subsolution in `W₀^{1,2}`.** A subsolution of a
 transport-free operator with nonnegative zeroth-order coefficient on a bounded open set is

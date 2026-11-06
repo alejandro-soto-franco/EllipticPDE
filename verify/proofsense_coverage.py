@@ -421,6 +421,35 @@ EXEMPT = {
     "EllipticPdes.W1p0.toH01": (
         "the Riesz bridge between W01 of an inner product space and H01; infrastructure with no source statement"
     ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.weak_maximum_principle": (
+        "transferred along toEuclidean from the twin warranted at EllipticPdes.Sobolev.weak_maximum_principle to a divergence-form operator on a "
+        "finite-dimensional real normed space, with the subsolution in the normed W^{1,2}(Omega) of W1pGraph.W12; the cited source states it in coordinates, so the warrant "
+        "sits at the coordinate declaration"
+    ),
+    "EllipticPdes.W1pGraph.mem_W12_iff": (
+        "W^{1,2}(Omega) on a normed space is the space of graphs satisfying the weak derivative identity; this is the definition, and no source states it as a theorem"
+    ),
+    "EllipticPdes.W1pGraph.isClosed_W12": (
+        "W^{1,2}(Omega) on a normed space is closed in the graph space; infrastructure with no source statement"
+    ),
+    "EllipticPdes.W1pGraph.W1p0_le_W12": (
+        "W_0^{1,2}(Omega) lies in W^{1,2}(Omega) on a normed space, by integration by parts against test functions; infrastructure with no source statement"
+    ),
+    "EllipticPdes.W1pGraph.mapEquiv": (
+        "the change of variables on the graph space along a continuous linear equivalence; infrastructure with no source statement"
+    ),
+    "EllipticPdes.W1pGraph.mapL_mem_W12": (
+        "the change of variables preserves W^{1,2}(Omega); infrastructure with no source statement"
+    ),
+    "EllipticPdes.W1pGraph.toH1Graph_mem_W12_iff": (
+        "the Riesz bridge identifies W^{1,2}(Omega) of the graph space with H1Graph.W12 on an inner product space; infrastructure with no source statement"
+    ),
+    "EllipticPdes.NormedDivForm.graphTransfer_mem_W12": (
+        "the graph transfer along toEuclidean sends W^{1,2}(Omega) into W^{1,2} of the image; infrastructure with no source statement"
+    ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.form_eq_integral": (
+        "the integral formula for the form on the graph space of a normed space; infrastructure with no source statement"
+    ),
     "EllipticPdes.NormedDivForm.FullEllipticOp.weak_maximum_principle_H01": (
         "transferred along toEuclidean from the twin warranted at EllipticPdes.Sobolev.weak_maximum_principle_H01 to a divergence-form operator on a "
         "finite-dimensional real normed space; the cited source states it in coordinates, so the warrant "
