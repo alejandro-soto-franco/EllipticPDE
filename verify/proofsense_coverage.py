@@ -406,6 +406,24 @@ EXEMPT = {
         "divergence-form operator on a finite-dimensional real normed space by transfer; the cited "
         "source states it in coordinates, so the warrant sits at the coordinate declaration"
     ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.weak_maximum_principle": (
+        "the transfer along toEuclidean to the twin warranted at EllipticPdes.Sobolev.weak_maximum_principle, stated for a "
+        "divergence-form operator on a finite-dimensional real normed space by transfer, with the "
+        "subsolution in W01 in place of W12; the cited source states it in coordinates, so the "
+        "warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.weak_maximum_principle_H01": (
+        "the transfer along toEuclidean to the twin warranted at EllipticPdes.Sobolev.weak_maximum_principle_H01, stated for a "
+        "divergence-form operator on a finite-dimensional real normed space by transfer, with the "
+        "subsolution in W01 in place of W12; the cited source states it in coordinates, so the "
+        "warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.eq_zero_of_weakSolution_H01": (
+        "the transfer along toEuclidean to the twin warranted at EllipticPdes.Sobolev.eq_zero_of_weakSolution_H01, stated for a "
+        "divergence-form operator on a finite-dimensional real normed space by transfer, with the "
+        "subsolution in W01 in place of W12; the cited source states it in coordinates, so the "
+        "warrant sits at the coordinate declaration"
+    ),
     "EllipticPdes.H1Graph.mem_H01_of_hasCompactSupport": (
         "the theorem warranted at EllipticPdes.Sobolev.mem_H01_of_hasCompactSupport, stated over a finite-dimensional real "
         "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "

@@ -650,3 +650,10 @@ assert_classical_axioms
   EllipticPdes.NormedDivForm.FullEllipticOp.existence_three_of_bounded_haar
   EllipticPdes.NormedDivForm.FullEllipticOp.resolvent_bound_of_bounded_haar
   EllipticPdes.NormedDivForm.FullEllipticOp.symmetric_spectral_of_bounded_haar
+
+/-! ### The weak maximum principle on a normed space -/
+
+assert_classical_axioms
+  EllipticPdes.NormedDivForm.FullEllipticOp.weak_maximum_principle
+  EllipticPdes.NormedDivForm.FullEllipticOp.weak_maximum_principle_H01
+  EllipticPdes.NormedDivForm.FullEllipticOp.eq_zero_of_weakSolution_H01

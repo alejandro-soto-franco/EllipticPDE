@@ -173,6 +173,7 @@ public import EllipticPdes.SobolevP.SkewPLaplacian
 public import EllipticPdes.SobolevP.Transfer
 public import EllipticPdes.NormedDivForm.Basic
 public import EllipticPdes.NormedDivForm.Theorems
+public import EllipticPdes.NormedDivForm.Maximum
 public import EllipticPdes.Analysis.WeakConvergence
 public import EllipticPdes.Analysis.FunctionSpaces
 public import EllipticPdes.Analysis.HolderSpace
