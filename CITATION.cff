@@ -5,6 +5,7 @@ type: software
 authors:
   - family-names: "Soto Franco"
     given-names: "Alejandro"
+    orcid: "https://orcid.org/0009-0002-3461-2841"
 version: "0.3.0"
 date-released: "2026-11-06"
 license: Apache-2.0
