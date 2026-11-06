@@ -902,6 +902,8 @@ The transfer preserves the $L^q$ seminorms of the function part and enlarges the
 | Sobolev inequality on an inner product space for any additive Haar measure | `EllipticPdes.H1Graph.exists_eLpNorm_le_of_mem_H01_haar` |
 | Rellich on $W^{1,2}(\Omega)$ for a bounded open set with `C¹` boundary (`Extension.HasC1BoundaryNormed`) | `EllipticPdes.NormedDivForm.isCompactOperator_fnL_W12` |
 | Rellich on $W^{1,2}(\Omega)$ on $\mathbb{R}^d$ for any additive Haar measure | `EllipticPdes.H1Graph.embW12G_isCompact_haar` |
+| Poincaré with the mean subtracted on $W^{1,2}(\Omega)$ for a bounded connected open set with `C¹` boundary | `EllipticPdes.NormedDivForm.poincare_wirtinger` |
+| Poincaré with the mean subtracted on $\mathbb{R}^d$ for any additive Haar measure | `EllipticPdes.H1Graph.poincare_wirtinger_haar` |
 | Extension operator $W^{1,2}(\Omega) \to W^{1,2}(E)$ for a bounded open set with `C¹` boundary (Evans §5.4 Theorem 1) | `EllipticPdes.NormedDivForm.exists_extW12` |
 | Extension operator on $\mathbb{R}^d$ for any additive Haar measure | `EllipticPdes.H1Graph.exists_extW12G_haar` |
 

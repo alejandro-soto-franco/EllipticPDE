@@ -740,3 +740,13 @@ assert_classical_axioms
   EllipticPdes.H1Graph.exists_extW12G
   EllipticPdes.H1Graph.exists_extW12G_haar
   EllipticPdes.NormedDivForm.exists_extW12
+
+/-! ### Poincaré's inequality with the mean subtracted for a Haar measure and on a normed space -/
+
+assert_classical_axioms
+  EllipticPdes.norm_sub_proj_le
+  EllipticPdes.L2Mean.mean_eq
+  EllipticPdes.L2Mean.norm_sub_mean_le
+  EllipticPdes.H1Graph.poincare_wirtinger_haar
+  EllipticPdes.NormedDivForm.norm_gradL_graphTransfer_le
+  EllipticPdes.NormedDivForm.poincare_wirtinger
