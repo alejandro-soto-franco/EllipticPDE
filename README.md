@@ -878,6 +878,16 @@ A non-divergence-form operator on $E$ is $Lu = -\operatorname{tr}(D^2u(x) \circ 
 
 The strong maximum principle bounds $\|A(x)\|$ in operator norm in place of the trace bound of its twin, since the trace of $A(x) : E^* \to E$ needs an identification of $E$ with $E^*$. Hopf's lemma stays on inner product spaces. Its barrier $e^{-\lambda\|x - y\|^2}$ needs a smooth norm, and its interior ball transfers to an ellipsoid.
 
+### Interior regularity
+
+`EllipticPdes.DivForm.FullEllipticOp.interior_smooth_haar` states interior smoothness on an inner product space for any additive Haar measure. A Haar measure is $c \cdot \mathrm{vol}$, the form and the $L^2$ pairing both scale by $c$, and weak solutions correspond under the identity on representatives (`form_ofSmul`, `weak_ofSmul`). On a normed space the transferred coefficients stay smooth with bounded derivatives, since `Regularity.IsSmoothBdd.comp_clm` allows composition with any continuous linear map.
+
+| Result | Declaration |
+|---|---|
+| Interior smoothness for any additive Haar measure on an inner product space | `EllipticPdes.DivForm.FullEllipticOp.interior_smooth_haar` |
+| Interior smoothness on a normed space (Evans §6.3.1 Theorem 3) | `EllipticPdes.NormedDivForm.FullEllipticOp.interior_smooth` |
+| Solvability with a smooth interior representative on a normed space | `EllipticPdes.NormedDivForm.FullEllipticOp.exists_weakSolution_interior_smooth` |
+
 ## Dependency chain
 
 The analytic content of the solvability theory reduces to the one-dimensional Poincaré

@@ -691,3 +691,13 @@ assert_classical_axioms
   EllipticPdes.NormedClassical.nondivOperator.not_isLocalMax_of_neg
   EllipticPdes.NormedClassical.nondivOperator.strong_maximum_principle
   EllipticPdes.NormedClassical.nondivOperator.strong_maximum_principle_of_nonneg
+
+/-! ### Interior smoothness for a Haar measure and on a normed space -/
+
+assert_classical_axioms
+  EllipticPdes.Regularity.IsSmoothBdd.comp_clm
+  EllipticPdes.DivForm.FullEllipticOp.form_ofSmul
+  EllipticPdes.DivForm.FullEllipticOp.weak_ofSmul
+  EllipticPdes.DivForm.FullEllipticOp.interior_smooth_haar
+  EllipticPdes.NormedDivForm.FullEllipticOp.interior_smooth
+  EllipticPdes.NormedDivForm.FullEllipticOp.exists_weakSolution_interior_smooth

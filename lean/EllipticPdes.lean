@@ -177,6 +177,7 @@ public import EllipticPdes.NormedDivForm.Graph
 public import EllipticPdes.NormedDivForm.Theorems
 public import EllipticPdes.NormedDivForm.Maximum
 public import EllipticPdes.NormedDivForm.ClassicalMaximum
+public import EllipticPdes.NormedDivForm.InteriorSmooth
 public import EllipticPdes.Analysis.WeakConvergence
 public import EllipticPdes.Analysis.FunctionSpaces
 public import EllipticPdes.Analysis.HolderSpace
@@ -249,6 +250,7 @@ public import EllipticPdes.Form.DivFormIsometry
 public import EllipticPdes.Form.DivFormCoord
 public import EllipticPdes.Regularity.SmoothBdd
 public import EllipticPdes.Regularity.InteriorSmoothGeneral
+public import EllipticPdes.Regularity.InteriorSmoothHaar
 public import EllipticPdes.Sobolev.GraphHaar
 public import EllipticPdes.Spectrum.RellichHaar
 public import EllipticPdes.DivFormHaar
