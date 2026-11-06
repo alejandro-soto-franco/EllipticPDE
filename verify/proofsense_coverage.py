@@ -524,6 +524,16 @@ EXEMPT = {
     "EllipticPdes.NormedClassical.isUniformlyElliptic_canonicalCoeff": (
         "an explicit uniformly elliptic coefficient on every finite-dimensional real normed space, recording that the hypothesis is satisfiable; no source statement"
     ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.weak_maximum_principle_transport": (
+        "transferred along toEuclidean from the twin warranted at EllipticPdes.Sobolev.weak_maximum_principle_transport to a "
+        "divergence-form operator on a finite-dimensional real normed space with an additive Haar measure; the cited source "
+        "states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.exists_mem_W1p0_posPart_sub_const": (
+        "transferred along toEuclidean from EllipticPdes.H1Graph.exists_mem_H01_posPart_sub_const, the inner-product form of "
+        "the theorem at EllipticPdes.Sobolev.exists_mem_H01_posPart_sub_const, to W_0^{1,2} of a finite-dimensional real "
+        "normed space with an additive Haar measure; the warrant sits at the coordinate declaration"
+    ),
     "EllipticPdes.NormedDivForm.FullEllipticOp.weak_maximum_principle": (
         "transferred along toEuclidean from the twin warranted at EllipticPdes.Sobolev.weak_maximum_principle to a divergence-form operator on a "
         "finite-dimensional real normed space, with the subsolution in the normed W^{1,2}(Omega) of W1pGraph.W12; the cited source states it in coordinates, so the warrant "

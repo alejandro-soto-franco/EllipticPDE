@@ -857,8 +857,10 @@ Declarations in the operator rows are in `EllipticPdes.NormedDivForm.FullEllipti
 | Resolvent bound in $L^2$ | `resolvent_bound_of_bounded_haar` |
 | Spectral theorem for a symmetric operator: eigenspaces span $L^2$ | `symmetric_spectral_of_bounded_haar` |
 | Weak maximum principle for a subsolution in $W^{1,2}(\Omega)$ with boundary bound $k \ge 0$, transport-free with $c \ge 0$ | `weak_maximum_principle` |
+| Weak maximum principle with a bounded transport term, in dimension at least two | `weak_maximum_principle_transport` |
 | Weak maximum principle for a subsolution in $W_0^{1,2}(\Omega)$, transport-free with $c \ge 0$ | `weak_maximum_principle_H01` |
 | Uniqueness of the generalised Dirichlet problem | `eq_zero_of_weakSolution_H01` |
+| Truncation $(v - k)^+$ in $W_0^{1,2}(\Omega)$ with its gradient | `EllipticPdes.NormedDivForm.exists_mem_W1p0_posPart_sub_const` |
 
 Two limitations apply. The bound in the existence theorem has an existential constant, because the transfer changes the $W^{1,2}$ norm by an equivalence of unspecified constant. The spectral theorem has a different shape from its twin. Its conclusion replaces `Variational.solOp` by an operator $G$ on $L^2$ that sends $f$ to the function part of every weak solution, since $W_0^{1,2}(\Omega)$ on a normed space has no inner product.
 
