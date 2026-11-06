@@ -421,6 +421,65 @@ EXEMPT = {
     "EllipticPdes.W1p0.toH01": (
         "the Riesz bridge between W01 of an inner product space and H01; infrastructure with no source statement"
     ),
+    "EllipticPdes.NormedClassical.nondivOperator.weak_maximum_principle": (
+        "transferred along toEuclidean from the inner-product twin of EllipticPdes.Classical.weak_maximum_principle to a non-divergence-form operator on a "
+        "finite-dimensional real normed space with coefficient StrongDual E -> E; the cited source states it in coordinates, so the warrant "
+        "sits at the coordinate statement"
+    ),
+    "EllipticPdes.NormedClassical.nondivOperator.weak_minimum_principle": (
+        "transferred along toEuclidean from the inner-product twin of EllipticPdes.Classical.weak_minimum_principle to a non-divergence-form operator on a "
+        "finite-dimensional real normed space with coefficient StrongDual E -> E; the cited source states it in coordinates, so the warrant "
+        "sits at the coordinate statement"
+    ),
+    "EllipticPdes.NormedClassical.nondivOperator.weak_maximum_principle_of_nonneg": (
+        "transferred along toEuclidean from the inner-product twin of EllipticPdes.Classical.weak_maximum_principle_of_nonneg to a non-divergence-form operator on a "
+        "finite-dimensional real normed space with coefficient StrongDual E -> E; the cited source states it in coordinates, so the warrant "
+        "sits at the coordinate statement"
+    ),
+    "EllipticPdes.NormedClassical.nondivOperator.weak_minimum_principle_of_nonneg": (
+        "transferred along toEuclidean from the inner-product twin of EllipticPdes.Classical.weak_minimum_principle_of_nonneg to a non-divergence-form operator on a "
+        "finite-dimensional real normed space with coefficient StrongDual E -> E; the cited source states it in coordinates, so the warrant "
+        "sits at the coordinate statement"
+    ),
+    "EllipticPdes.NormedClassical.nondivOperator.comparison_principle": (
+        "transferred along toEuclidean from the inner-product twin of EllipticPdes.Classical.comparison_principle to a non-divergence-form operator on a "
+        "finite-dimensional real normed space with coefficient StrongDual E -> E; the cited source states it in coordinates, so the warrant "
+        "sits at the coordinate statement"
+    ),
+    "EllipticPdes.NormedClassical.nondivOperator.dirichlet_unique": (
+        "transferred along toEuclidean from the inner-product twin of EllipticPdes.Classical.dirichlet_unique to a non-divergence-form operator on a "
+        "finite-dimensional real normed space with coefficient StrongDual E -> E; the cited source states it in coordinates, so the warrant "
+        "sits at the coordinate statement"
+    ),
+    "EllipticPdes.NormedClassical.nondivOperator.abs_le_of_eq_zero": (
+        "transferred along toEuclidean from the inner-product twin of EllipticPdes.Classical.abs_le_of_nondivOp_eq_zero to a non-divergence-form operator on a "
+        "finite-dimensional real normed space with coefficient StrongDual E -> E; the cited source states it in coordinates, so the warrant "
+        "sits at the coordinate statement"
+    ),
+    "EllipticPdes.NormedClassical.nondivOperator.not_isLocalMax_of_neg": (
+        "transferred along toEuclidean from the inner-product twin of EllipticPdes.Classical.not_isLocalMax_of_nondivOp_neg to a non-divergence-form operator on a "
+        "finite-dimensional real normed space with coefficient StrongDual E -> E; the cited source states it in coordinates, so the warrant "
+        "sits at the coordinate statement, itself exempt"
+    ),
+    "EllipticPdes.NormedClassical.nondivOperator.strong_maximum_principle": (
+        "transferred along toEuclidean from the inner-product twin of EllipticPdes.Classical.strong_maximum_principle to a non-divergence-form operator on a "
+        "finite-dimensional real normed space with coefficient StrongDual E -> E; the cited source states it in coordinates, so the warrant "
+        "sits at the coordinate statement"
+    ),
+    "EllipticPdes.NormedClassical.nondivOperator.strong_maximum_principle_of_nonneg": (
+        "transferred along toEuclidean from the inner-product twin of EllipticPdes.Classical.strong_maximum_principle_of_nonneg to a non-divergence-form operator on a "
+        "finite-dimensional real normed space with coefficient StrongDual E -> E; the cited source states it in coordinates, so the warrant "
+        "sits at the coordinate statement"
+    ),
+    "EllipticPdes.NormedClassical.traceHessian_transfer": (
+        "the identity between the normed trace tr(D^2 u o A) and the inner-product trace of the transferred data; infrastructure with no source statement"
+    ),
+    "EllipticPdes.NormedClassical.nondivOperator_transfer": (
+        "the identity between the normed non-divergence operator and the inner-product operator of the transferred data; infrastructure with no source statement"
+    ),
+    "EllipticPdes.NormedClassical.isUniformlyElliptic_canonicalCoeff": (
+        "an explicit uniformly elliptic coefficient on every finite-dimensional real normed space, recording that the hypothesis is satisfiable; no source statement"
+    ),
     "EllipticPdes.NormedDivForm.FullEllipticOp.weak_maximum_principle": (
         "transferred along toEuclidean from the twin warranted at EllipticPdes.Sobolev.weak_maximum_principle to a divergence-form operator on a "
         "finite-dimensional real normed space, with the subsolution in the normed W^{1,2}(Omega) of W1pGraph.W12; the cited source states it in coordinates, so the warrant "

@@ -862,6 +862,22 @@ Declarations in the operator rows are in `EllipticPdes.NormedDivForm.FullEllipti
 
 Two limitations apply. The bound in the existence theorem has an existential constant, because the transfer changes the $W^{1,2}$ norm by an equivalence of unspecified constant. The spectral theorem has a different shape from its twin. Its conclusion replaces `Variational.solOp` by an operator $G$ on $L^2$ that sends $f$ to the function part of every weak solution, since $W_0^{1,2}(\Omega)$ on a normed space has no inner product.
 
+### Classical maximum principles
+
+A non-divergence-form operator on $E$ is $Lu = -\operatorname{tr}(D^2u(x) \circ A(x)) + Du(x)\,b(x) + c(x)\,u$ with $A(x) : E^* \to E$. The trace is that of $D^2u(x) \circ A(x)$ as an endomorphism of $E^*$. Uniform ellipticity reads $\theta \|\xi\|^2 \le \xi(A(x)\,\xi)$ with $A$ symmetric, and the transport bound is $\ell(b(x)) \le B$ for a nonzero covector $\ell$. `traceHessian_transfer` identifies the trace with the inner-product trace of the transferred coefficient on the image of `toEuclidean`, and each theorem is the inner-product theorem pulled back. Declarations are in `EllipticPdes.NormedClassical.nondivOperator` unless a namespace is shown.
+
+| Result | Declaration |
+|---|---|
+| The operator and its identity with the transferred operator | `EllipticPdes.NormedClassical.nondivOperator`, `EllipticPdes.NormedClassical.traceHessian_transfer`, `EllipticPdes.NormedClassical.nondivOperator_transfer` |
+| A uniformly elliptic coefficient on every finite-dimensional normed space | `EllipticPdes.NormedClassical.isUniformlyElliptic_canonicalCoeff` |
+| Weak maximum and minimum principles with $c = 0$ | `weak_maximum_principle`, `weak_minimum_principle` |
+| Weak maximum and minimum principles with $c \ge 0$ | `weak_maximum_principle_of_nonneg`, `weak_minimum_principle_of_nonneg` |
+| Comparison, the bound by boundary values, and uniqueness for the Dirichlet problem | `comparison_principle`, `abs_le_of_eq_zero`, `dirichlet_unique` |
+| No interior maximum of a strict subsolution | `not_isLocalMax_of_neg` |
+| Strong maximum principle on a connected open set | `strong_maximum_principle`, `strong_maximum_principle_of_nonneg` |
+
+The strong maximum principle bounds $\|A(x)\|$ in operator norm in place of the trace bound of its twin, since the trace of $A(x) : E^* \to E$ needs an identification of $E$ with $E^*$. Hopf's lemma stays on inner product spaces. Its barrier $e^{-\lambda\|x - y\|^2}$ needs a smooth norm, and its interior ball transfers to an ellipsoid.
+
 ## Dependency chain
 
 The analytic content of the solvability theory reduces to the one-dimensional Poincaré
