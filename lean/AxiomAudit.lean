@@ -659,5 +659,35 @@ assert_classical_axioms
 /-! ### The weak maximum principle on a normed space -/
 
 assert_classical_axioms
+  EllipticPdes.NormedDivForm.FullEllipticOp.weak_maximum_principle
   EllipticPdes.NormedDivForm.FullEllipticOp.weak_maximum_principle_H01
   EllipticPdes.NormedDivForm.FullEllipticOp.eq_zero_of_weakSolution_H01
+
+/-! ### `W^{1,2}(Ω)` and the form on the graph space of a normed space -/
+
+assert_classical_axioms
+  EllipticPdes.W1pGraph.mem_W12_iff
+  EllipticPdes.W1pGraph.isClosed_W12
+  EllipticPdes.W1pGraph.W1p0_le_W12
+  EllipticPdes.W1pGraph.mapEquiv
+  EllipticPdes.W1pGraph.mapL_mem_W12
+  EllipticPdes.W1pGraph.toH1Graph_mem_W12_iff
+  EllipticPdes.NormedDivForm.graphTransfer_mem_W12
+  EllipticPdes.NormedDivForm.FullEllipticOp.form_eq_integral
+
+/-! ### Classical maximum principles on a normed space -/
+
+assert_classical_axioms
+  EllipticPdes.NormedClassical.traceHessian_transfer
+  EllipticPdes.NormedClassical.nondivOperator_transfer
+  EllipticPdes.NormedClassical.isUniformlyElliptic_canonicalCoeff
+  EllipticPdes.NormedClassical.nondivOperator.weak_maximum_principle
+  EllipticPdes.NormedClassical.nondivOperator.weak_minimum_principle
+  EllipticPdes.NormedClassical.nondivOperator.weak_maximum_principle_of_nonneg
+  EllipticPdes.NormedClassical.nondivOperator.weak_minimum_principle_of_nonneg
+  EllipticPdes.NormedClassical.nondivOperator.comparison_principle
+  EllipticPdes.NormedClassical.nondivOperator.dirichlet_unique
+  EllipticPdes.NormedClassical.nondivOperator.abs_le_of_eq_zero
+  EllipticPdes.NormedClassical.nondivOperator.not_isLocalMax_of_neg
+  EllipticPdes.NormedClassical.nondivOperator.strong_maximum_principle
+  EllipticPdes.NormedClassical.nondivOperator.strong_maximum_principle_of_nonneg
