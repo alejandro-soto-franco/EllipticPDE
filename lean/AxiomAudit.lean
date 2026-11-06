@@ -729,3 +729,14 @@ assert_classical_axioms
   EllipticPdes.H1Graph.embW12G_isCompact
   EllipticPdes.H1Graph.embW12G_isCompact_haar
   EllipticPdes.NormedDivForm.isCompactOperator_fnL_W12
+
+/-! ### Extension operator for a Haar measure and on a normed space -/
+
+assert_classical_axioms
+  EllipticPdes.W1pGraph.mapOfMP_mem_W12
+  EllipticPdes.W1pGraph.mapEquiv_symm_mem_W12
+  EllipticPdes.NormedDivForm.graphTransfer_symm_mem_W12
+  EllipticPdes.H1Graph.opNorm_embL2_le_one
+  EllipticPdes.H1Graph.exists_extW12G
+  EllipticPdes.H1Graph.exists_extW12G_haar
+  EllipticPdes.NormedDivForm.exists_extW12
