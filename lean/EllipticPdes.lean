@@ -124,6 +124,7 @@ public import EllipticPdes.Extension.Operator
 public import EllipticPdes.Extension.LinearOperator
 public import EllipticPdes.Extension.GlobalApproximation
 public import EllipticPdes.Extension.GraphOperator
+public import EllipticPdes.Extension.GraphOperatorHaar
 public import EllipticPdes.Extension.Reflect
 public import EllipticPdes.Extension.Translate
 public import EllipticPdes.Analysis.LpTranslationContinuity

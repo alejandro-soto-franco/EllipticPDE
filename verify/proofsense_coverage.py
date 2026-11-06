@@ -385,6 +385,27 @@ EXEMPT = {
     "EllipticPdes.NormedDivForm.isCompactOperator_fnL_W12": (
         "the theorem warranted at EllipticPdes.Sobolev.embW12_isCompact, transferred along toEuclidean to W^{1,2} of a finite-dimensional real normed space with an additive Haar measure and HasC1BoundaryNormed; the cited source states it in coordinates, so the warrant sits at the coordinate declaration"
     ),
+    "EllipticPdes.W1pGraph.mapOfMP_mem_W12": (
+        "the general change of variables preserves W^{1,2}; infrastructure with no source statement"
+    ),
+    "EllipticPdes.W1pGraph.mapEquiv_symm_mem_W12": (
+        "the inverse change of variables preserves W^{1,2}; infrastructure with no source statement"
+    ),
+    "EllipticPdes.NormedDivForm.graphTransfer_symm_mem_W12": (
+        "the inverse graph transfer preserves W^{1,2}; infrastructure with no source statement"
+    ),
+    "EllipticPdes.H1Graph.opNorm_embL2_le_one": (
+        "the inclusion H_0^1 into L^2 has operator norm at most one; infrastructure with no source statement"
+    ),
+    "EllipticPdes.H1Graph.exists_extW12G": (
+        "the theorem warranted at EllipticPdes.Extension.exists_extW12, read in the graph space H1Graph.W12 volume through w12Equiv; the cited source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.H1Graph.exists_extW12G_haar": (
+        "the theorem warranted at EllipticPdes.Extension.exists_extW12, for any additive Haar measure on R^d in place of volume; the cited source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.exists_extW12": (
+        "the theorem warranted at EllipticPdes.Extension.exists_extW12, transferred along toEuclidean to W^{1,2} of a finite-dimensional real normed space with an additive Haar measure and HasC1BoundaryNormed; the cited source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
     "EllipticPdes.DivForm.FullEllipticOp.interior_smooth": (
         "the theorem warranted at EllipticPdes.Regularity.interior_smooth, stated over a finite-dimensional real "
         "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "

@@ -201,6 +201,11 @@ def mapEquiv (L : E ≃L[ℝ] F) : W1pGraph p μ Ω ≃L[ℝ] W1pGraph p (μ.map
 @[simp] lemma mapEquiv_apply (L : E ≃L[ℝ] F) (U : W1pGraph p μ Ω) :
     mapEquiv L U = mapL L U := rfl
 
+lemma mapEquiv_symm_apply (L : E ≃L[ℝ] F) (U : W1pGraph p (μ.map L) (L '' Ω)) :
+    (mapEquiv (p := p) (μ := μ) (Ω := Ω) L).symm U =
+      mapOfMP (μ := μ.map L) (Ω := L '' Ω) (μ' := μ) (Ω' := Ω) L.symm
+        (measurePreserving_restrict_image L μ Ω) U := rfl
+
 omit [MeasurableSpace E] [BorelSpace E] [MeasurableSpace F] [BorelSpace F] in
 /-- Precomposition with `L` sends a test function on `L '' Ω` to a test function on `Ω`. -/
 lemma Internal.comp_mem_testFunctionsNormed (L : E ≃L[ℝ] F) (φ : testFunctionsNormed (L '' Ω)) :
@@ -253,6 +258,74 @@ theorem mapL_mem_W12 (L : E ≃L[ℝ] F) {U : W1pGraph 2 μ Ω} (hU : U ∈ W12 
     mapL L U ∈ W12 (μ.map L) (L '' Ω) :=
   (mem_W12_iff_constraintL _).2 fun φ w =>
     (Internal.constraintL_mapL L φ w U).trans ((mem_W12_iff_constraintL U).1 hU _ _)
+
+section General
+
+variable {μ' : Measure F} {Ω' : Set F}
+
+omit [MeasurableSpace E] [BorelSpace E] [MeasurableSpace F] [BorelSpace F] in
+/-- Precomposition with `L` sends a test function on `Ω'` to a test function on `Ω`, once
+`L.symm '' Ω' ⊆ Ω`. -/
+lemma Internal.comp_mem_testFunctionsNormed_of_subset (L : E ≃L[ℝ] F)
+    (hΩ : L.symm '' Ω' ⊆ Ω) (φ : testFunctionsNormed Ω') :
+    (φ : F → ℝ) ∘ L ∈ testFunctionsNormed Ω := by
+  simpa using comp_symm_mem_testFunctionsNormed L.symm hΩ φ.2
+
+omit [BorelSpace E] [BorelSpace F] [IsFiniteMeasureOnCompacts μ] in
+/-- The function part of `mapOfMP L h U`, read back through `L`. -/
+lemma Internal.fnL_mapOfMP_comp (L : E ≃L[ℝ] F)
+    (h : MeasurePreserving L.symm (μ'.restrict Ω') (μ.restrict Ω))
+    (h' : MeasurePreserving L (μ.restrict Ω) (μ'.restrict Ω')) (U : W1pGraph p μ Ω) :
+    (fun x => fnL (mapOfMP L h U) (L x)) =ᵐ[μ.restrict Ω] ⇑(fnL U) := by
+  filter_upwards [h'.quasiMeasurePreserving.ae_eq_comp (coeFn_fnL_mapOfMP L h U)] with x hx
+  exact hx.trans (by simp)
+
+omit [BorelSpace E] [BorelSpace F] [IsFiniteMeasureOnCompacts μ] in
+/-- The gradient part of `mapOfMP L h U`, read back through `L`. -/
+lemma Internal.gradL_mapOfMP_comp (L : E ≃L[ℝ] F)
+    (h : MeasurePreserving L.symm (μ'.restrict Ω') (μ.restrict Ω))
+    (h' : MeasurePreserving L (μ.restrict Ω) (μ'.restrict Ω')) (U : W1pGraph p μ Ω) :
+    (fun x => gradL (mapOfMP L h U) (L x)) =ᵐ[μ.restrict Ω] fun x => dualMap L (gradL U x) := by
+  filter_upwards [h'.quasiMeasurePreserving.ae_eq_comp (coeFn_gradL_mapOfMP L h U)] with x hx
+  exact hx.trans (by simp)
+
+variable [IsFiniteMeasureOnCompacts μ']
+
+/-- The constraint functional of `mapOfMP L h U` for `(φ, w)` is the constraint functional of `U`
+for `(φ ∘ L, L.symm w)`. -/
+lemma Internal.constraintL_mapOfMP (L : E ≃L[ℝ] F)
+    (h : MeasurePreserving L.symm (μ'.restrict Ω') (μ.restrict Ω))
+    (h' : MeasurePreserving L (μ.restrict Ω) (μ'.restrict Ω')) (hΩ : L.symm '' Ω' ⊆ Ω)
+    (φ : testFunctionsNormed Ω') (w : F) (U : W1pGraph 2 μ Ω) :
+    constraintL μ' Ω' φ w (mapOfMP L h U) =
+      constraintL μ Ω ⟨_, Internal.comp_mem_testFunctionsNormed_of_subset L hΩ φ⟩
+        (L.symm w) U := by
+  rw [constraintL_eq_integral, constraintL_eq_integral,
+    ← h'.integral_comp L.toHomeomorph.toMeasurableEquiv.measurableEmbedding,
+    ← h'.integral_comp L.toHomeomorph.toMeasurableEquiv.measurableEmbedding]
+  congr 1 <;> refine integral_congr_ae ?_
+  · filter_upwards [Internal.fnL_mapOfMP_comp L h h' U] with x hx
+    simp [hx, Internal.fderiv_comp_apply L (φ.2.1.differentiable (by simp))]
+  · filter_upwards [Internal.gradL_mapOfMP_comp L h h' U] with x hx
+    simp [hx]
+
+/-- **The general change of variables preserves `W^{1,2}`.** -/
+theorem mapOfMP_mem_W12 (L : E ≃L[ℝ] F)
+    (h : MeasurePreserving L.symm (μ'.restrict Ω') (μ.restrict Ω))
+    (h' : MeasurePreserving L (μ.restrict Ω) (μ'.restrict Ω')) (hΩ : L.symm '' Ω' ⊆ Ω)
+    {U : W1pGraph 2 μ Ω} (hU : U ∈ W12 μ Ω) : mapOfMP L h U ∈ W12 μ' Ω' :=
+  (mem_W12_iff_constraintL _).2 fun φ w =>
+    (Internal.constraintL_mapOfMP L h h' hΩ φ w U).trans ((mem_W12_iff_constraintL U).1 hU _ _)
+
+/-- **The inverse change of variables preserves `W^{1,2}`.** -/
+theorem mapEquiv_symm_mem_W12 (L : E ≃L[ℝ] F)
+    {V : W1pGraph 2 (μ.map L) (L '' Ω)} (hV : V ∈ W12 (μ.map L) (L '' Ω)) :
+    (mapEquiv L).symm V ∈ W12 μ Ω := by
+  rw [mapEquiv_symm_apply]
+  exact mapOfMP_mem_W12 L.symm _ (measurePreserving_symm_restrict_image L μ Ω)
+    (by rintro _ ⟨y, hy, rfl⟩; simpa using hy) hV
+
+end General
 
 end Map
 

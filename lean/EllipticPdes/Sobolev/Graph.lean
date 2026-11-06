@@ -413,6 +413,10 @@ lemma embL2_apply (U : H01 μ Ω) : embL2 μ Ω U = fnL (U : H1Graph μ Ω) := r
 /-- The inclusion `H₀¹(Ω) → L²(Ω)` has norm at most one. -/
 lemma norm_embL2_le (U : H01 μ Ω) : ‖embL2 μ Ω U‖ ≤ ‖U‖ := norm_fnL_le (U : H1Graph μ Ω)
 
+/-- The inclusion `H₀¹(Ω) → L²(Ω)` has operator norm at most one. -/
+theorem opNorm_embL2_le_one : ‖embL2 μ Ω‖ ≤ 1 :=
+  ContinuousLinearMap.opNorm_le_bound _ zero_le_one fun U => by simpa using norm_embL2_le U
+
 omit [FiniteDimensional ℝ E] in
 /-- The pairing of a constraint vector against `U` extracts the weak derivative relation. -/
 lemma inner_constraintVec (φ : testFunctions Ω) (v : E) (U : H1Graph μ Ω) :
