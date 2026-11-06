@@ -236,6 +236,7 @@ public import EllipticPdes.Extension.Basic
 public import EllipticPdes.Extension.Descent
 public import EllipticPdes.Poincare.Slab
 public import EllipticPdes.Sobolev.Graph
+public import EllipticPdes.Sobolev.GraphDense
 public import EllipticPdes.Form.DivForm
 public import EllipticPdes.Sobolev.GraphEuclidean
 public import EllipticPdes.Sobolev.GraphIsometry

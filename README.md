@@ -54,6 +54,7 @@ measure otherwise. Declarations are named without their `EllipticPdes.` prefix.
 | A continuous weak derivative is the Fréchet derivative | `HasWeakFDerivOn.hasFDerivAt` |
 | Weak derivative, uniqueness and bridges to the coordinate predicates | `HasWeakFDerivOn`, `HasWeakFDerivOn.ae_eq`, `Sobolev/WeakDeriv.lean` |
 | Graph space, `W^{1,2}` and `H_0^1` | `H1Graph`, `H1Graph.W12`, `H1Graph.H01` |
+| `H_0^1` dense in $L^2(\Omega)$ for open $\Omega$, and the graph space second countable | `H1Graph.denseRange_embL2`, `H1Graph.secondCountableTopology` |
 | Poincaré inequality on a slab and on a bounded set | `Poincare.integral_sq_le_of_tsupport_subset_slab`, `H1Graph.poincare_H01_of_bounded` |
 | Rellich-Kondrachov on a bounded set | `H1Graph.embL2_isCompact` |
 | Gårding inequality | `DivForm.FullEllipticOp.garding` |
