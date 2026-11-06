@@ -808,7 +808,7 @@ differentiable.
 
 | Result | Declaration |
 |---|---|
-| The Knaster–Kuratowski–Mazurkiewicz lemma, from Brouwer's fixed-point theorem (the `fixed-point-theorems` package, MIT) | `kkm_stdSimplex`, `kkm` |
+| The Knaster–Kuratowski–Mazurkiewicz lemma, from Brouwer's fixed-point theorem (`EllipticPdes.Brouwer`, MIT) | `kkm_stdSimplex`, `kkm` |
 | The Debrunner–Flor inequality on the convex hull of a finite set | `exists_minty_convexHull_finset` |
 | Ferreira–Gomes–Üçer Theorem 2.16 for a convex set, concluding $u \in \overline{K}$ | `exists_weakVI_closure` |
 | The same for a closed convex set, concluding $u \in K$, and for a bounded one with no coercivity hypothesis | `exists_weakVI`, `exists_weakVI_of_isBounded` |
@@ -827,7 +827,7 @@ differentiable.
 | Uniqueness of that weak solution | `existsUnique_weakSolution_pLaplacian` |
 | Existence and uniqueness for the screened $p$-Laplacian with a skew principal part $-\operatorname{div}(S \nabla u)$ | `existsUnique_weakSolution_skewPLaplacian` |
 
-The Brouwer fixed-point theorem comes from the `fixed-point-theorems` package (MIT), which `lean/lakefile.toml` requires alongside Mathlib. Ferreira, Gomes and Üçer Theorem 2.16 (p. 11) concludes $u \in \overline{K}$ for a convex $K$. The conclusion $u \in K$ needs $K$ closed, and `weakVI_Ioc_counterexample` shows that convexity alone does not give it.
+`EllipticPdes.Brouwer` is a namespaced copy of [harfe/fixed-point-theorems-lean4](https://github.com/harfe/fixed-point-theorems-lean4) (MIT) containing Brouwer's fixed-point theorem, with the licence in `LICENSE-fixed-point-theorems`. Ferreira, Gomes and Üçer Theorem 2.16 (p. 11) concludes $u \in \overline{K}$ for a convex $K$. The conclusion $u \in K$ needs $K$ closed, and `weakVI_Ioc_counterexample` shows that convexity alone does not give it.
 
 ## Dependency chain
 

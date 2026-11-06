@@ -6,7 +6,7 @@ Authors: Alejandro Soto Franco
 
 module
 
-public import FixedPointTheorems.brouwer
+public import EllipticPdes.Brouwer.Brouwer
 public import Mathlib.Analysis.Convex.Combination
 public import Mathlib.Analysis.Convex.StdSimplex
 public import Mathlib.Analysis.Normed.Module.FiniteDimension
@@ -16,8 +16,9 @@ public import Mathlib.Analysis.Normed.Module.FiniteDimension
 
 Closed sets `C i` indexed by the vertices of a simplex cover it in the KKM sense when every face is
 covered by the sets of its own vertices. The lemma states that such a family has a common point.
-This file derives it from Brouwer's fixed-point theorem (`brouwer_fixed_point` of
-`FixedPointTheorems.brouwer`): a common-point-free family gives a continuous self-map of the
+This file derives it from Brouwer's fixed-point theorem
+(`EllipticPdes.Brouwer.brouwer_fixed_point` of
+`EllipticPdes.Brouwer.Brouwer`): a common-point-free family gives a continuous self-map of the
 simplex whose fixed point contradicts the covering condition.
 
 The lemma is the input to the Debrunner–Flor theorem and the Browder–Minty theorem. It is the
@@ -82,7 +83,7 @@ theorem kkm_stdSimplex {ι : Type*} [Fintype ι] [Nonempty ι]
     refine Continuous.div ((hdc i).comp continuous_subtype_val)
       (continuous_finsetSum _ fun j _ => (hdc j).comp continuous_subtype_val)
       fun x => (hS x x.2).ne'
-  obtain ⟨x, hx⟩ := brouwer_fixed_point (stdSimplex ℝ ι) (convex_stdSimplex ℝ ι)
+  obtain ⟨x, hx⟩ := Brouwer.brouwer_fixed_point (stdSimplex ℝ ι) (convex_stdSimplex ℝ ι)
     (isCompact_stdSimplex ℝ ι) (⟨Pi.single (Classical.arbitrary ι) 1,
       single_mem_stdSimplex ℝ _⟩) ⟨F, hFc⟩
   have hxi : ∀ i, (x : ι → ℝ) i = d i x / ∑ j, d j x := fun i => by

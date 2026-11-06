@@ -574,6 +574,7 @@ assert_classical_axioms
 /-! ### The KKM lemma -/
 
 assert_classical_axioms
+  EllipticPdes.Brouwer.brouwer_fixed_point
   EllipticPdes.kkm_stdSimplex
   EllipticPdes.kkm
 

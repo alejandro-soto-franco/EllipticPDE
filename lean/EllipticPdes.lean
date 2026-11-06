@@ -154,6 +154,7 @@ public import EllipticPdes.BoundedInstances
 public import EllipticPdes.DivFormInstances
 public import EllipticPdes.Analysis.WeakCompactness
 public import EllipticPdes.Analysis.OperatorBackground
+public import EllipticPdes.Brouwer.Brouwer
 public import EllipticPdes.Monotone.Basic
 public import EllipticPdes.Monotone.ReflexiveCompact
 public import EllipticPdes.Monotone.DirectMethod

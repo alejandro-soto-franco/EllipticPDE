@@ -39,6 +39,9 @@ MANIFEST = ROOT / "proofsense" / "manifest.json"
 # that no transcribed statement matches it, which the README under
 # proofsense/ has to justify in prose.
 EXEMPT = {
+    "EllipticPdes.Brouwer.brouwer_fixed_point": (
+        "Brouwer's fixed-point theorem, copied from harfe/fixed-point-theorems-lean4 (MIT)"
+    ),
     "EllipticPdes.kkm_stdSimplex": (
         "the Knaster-Kuratowski-Mazurkiewicz lemma on the standard simplex, derived from Brouwer's "
         "fixed-point theorem. No source in the library states it"
