@@ -103,17 +103,11 @@ lemma Internal.transferDatum_ae_eq {f : Lp ℝ 2 (μ.restrict Ω)} {g : E → �
   (Lp.coeFn_compMeasurePreserving _ _).trans
     ((measurePreserving_symm_restrict_image 𝓛 μ Ω).quasiMeasurePreserving.ae_eq_comp hfg)
 
-/-- The function part of a transferred element is the transfer of its function part. -/
-lemma Internal.embL2_transferEquiv (v : W1p0 2 μ Ω) :
-    H1Graph.embL2 (μ.map 𝓛) (𝓛 '' Ω) (transferEquiv μ Ω v) =
-      Lp.compMeasurePreserving 𝓛' (measurePreserving_symm_restrict_image 𝓛 μ Ω) (W1p0.fnL v) :=
-  Lp.ext ((W1p0.fnL_mapEquiv 𝓛 v).trans (Lp.coeFn_compMeasurePreserving _ _).symm)
-
 /-- The transfer preserves the pairing of the datum with a function part. -/
 lemma Internal.inner_transferDatum (f : Lp ℝ 2 (μ.restrict Ω)) (v : W1p0 2 μ Ω) :
     ⟪transferDatum f, H1Graph.embL2 (μ.map 𝓛) (𝓛 '' Ω) (transferEquiv μ Ω v)⟫ =
       ⟪f, W1p0.fnL v⟫ := by
-  rw [Internal.embL2_transferEquiv]
+  rw [embL2_transferEquiv, transferLp_apply]
   exact (Lp.compMeasurePreservingₗᵢ ℝ 𝓛'
     (measurePreserving_symm_restrict_image 𝓛 μ Ω)).inner_map_map f (W1p0.fnL v)
 

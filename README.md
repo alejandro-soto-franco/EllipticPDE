@@ -888,6 +888,17 @@ The strong maximum principle bounds $\|A(x)\|$ in operator norm in place of the 
 | Interior smoothness on a normed space (Evans §6.3.1 Theorem 3) | `EllipticPdes.NormedDivForm.FullEllipticOp.interior_smooth` |
 | Solvability with a smooth interior representative on a normed space | `EllipticPdes.NormedDivForm.FullEllipticOp.exists_weakSolution_interior_smooth` |
 
+### Embedding theorems
+
+The transfer preserves the $L^q$ seminorms of the function part and enlarges the $L^2$ norm of the gradient by at most $\|L^{-1}\|$. Each embedding theorem of the inner-product theory therefore comes back to $E$. The Sobolev inequality is stated for the canonical volume in the inner-product theory, and `EllipticPdes.H1Graph.exists_eLpNorm_le_of_mem_H01_haar` first rescales it to any additive Haar measure.
+
+| Result | Declaration |
+|---|---|
+| Rellich: $W_0^{1,2}(\Omega) \hookrightarrow L^2(\Omega)$ is compact on a bounded measurable set | `EllipticPdes.NormedDivForm.isCompactOperator_fnL` |
+| Poincaré inequality on a bounded set | `EllipticPdes.NormedDivForm.poincare_W1p0_of_bounded` |
+| Sobolev inequality into $L^q$ for some $q > 2$, in dimension at least two | `EllipticPdes.NormedDivForm.exists_eLpNorm_le_of_mem_W1p0` |
+| Sobolev inequality on an inner product space for any additive Haar measure | `EllipticPdes.H1Graph.exists_eLpNorm_le_of_mem_H01_haar` |
+
 ## Dependency chain
 
 The analytic content of the solvability theory reduces to the one-dimensional Poincaré

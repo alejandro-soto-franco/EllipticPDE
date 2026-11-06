@@ -16,8 +16,8 @@ public import EllipticPdes.Spectrum.RellichHaar
 real inner product space. An additive Haar measure is `c • volume` for some `c > 0`
 (`H1Graph.exists_eq_smul_volume`). An operator given for `c • ν` is the same operator for `ν`
 (`FullEllipticOp.ofSmul`), its form scales by `c` (`form_ofSmul`), and so does the `L²` pairing
-(`H1Graph.inner_eq_smul_inner_lpSmulL`). Weak solutions therefore correspond under the identity on
-representatives, and the volume theorem applies.
+(`H1Graph.inner_eq_smul_inner_lpSmulL` in `Sobolev/GraphHaar.lean`). Weak solutions therefore
+correspond under the identity on representatives, and the volume theorem applies.
 
 ## Main declarations
 
@@ -34,86 +34,6 @@ noncomputable section
 
 namespace EllipticPdes
 
-namespace H1Graph
-
-section LpRescale
-
-variable {α : Type*} [MeasurableSpace α] {ρ ρ' : Measure α} {c : ℝ≥0}
-
-/-- An integral against `c • ρ` is `c` times the integral against `ρ`. -/
-lemma Internal.integral_smul_measure_eq (F : α → ℝ) (h : ρ' = c • ρ) :
-    ∫ x, F x ∂ρ' = c * ∫ x, F x ∂ρ := by
-  rw [h, integral_smul_nnreal_measure, NNReal.smul_def, smul_eq_mul]
-
-/-- **Rescaling the measure rescales the `L²` inner product.** -/
-lemma inner_eq_smul_inner_lpSmulL (hc : c ≠ 0) (h : ρ' = c • ρ) (f g : Lp ℝ 2 ρ') :
-    ⟪f, g⟫ = c * ⟪lpSmulL hc h f, lpSmulL hc h g⟫ := by
-  rw [L2.inner_def, L2.inner_def, Internal.integral_smul_measure_eq _ h]
-  congr 1
-  refine integral_congr_ae ?_
-  filter_upwards [coeFn_lpSmulL hc h f, coeFn_lpSmulL hc h g] with x h1 h2
-  rw [h1, h2]
-
-/-- A statement true almost everywhere for `ρ` on `s` is true almost everywhere for `c • ρ`
-on `s`. -/
-lemma Internal.ae_restrict_smul {p : α → Prop} {s : Set α} (h : ∀ᵐ x ∂ρ.restrict s, p x) :
-    ∀ᵐ x ∂(c • ρ).restrict s, p x :=
-  Measure.restrict_smul c ρ s ▸ Measure.smul_absolutelyContinuous.ae_le h
-
-/-- The rescaled datum is still the restriction of `g`. -/
-lemma Internal.lpSmulL_ae_eq (hc : c ≠ 0) {Ω : Set α} {f : Lp ℝ 2 ((c • ρ).restrict Ω)} {g : α → ℝ}
-    (hfg : f =ᵐ[(c • ρ).restrict Ω] g) :
-    ⇑(lpSmulL hc (Measure.restrict_smul c ρ Ω) f) =ᵐ[ρ.restrict Ω] g :=
-  (coeFn_lpSmulL hc (Measure.restrict_smul c ρ Ω) f).trans
-    ((absolutelyContinuous_of_smul hc (Measure.restrict_smul c ρ Ω)).ae_eq hfg)
-
-end LpRescale
-
-section Graph
-
-variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
-  [MeasurableSpace E] [BorelSpace E] {ν : Measure E} {Ω : Set E} (c : ℝ≥0) (hc : c ≠ 0)
-
-omit [FiniteDimensional ℝ E] [BorelSpace E] in
-lemma fnL_smulMeasureL (U : H1Graph (c • ν) Ω) :
-    fnL (smulMeasureL ν Ω c hc U) = lpSmulL hc (Measure.restrict_smul c ν Ω) (fnL U) := rfl
-
-omit [FiniteDimensional ℝ E] [BorelSpace E] in
-lemma gradL_smulMeasureL (U : H1Graph (c • ν) Ω) :
-    gradL (smulMeasureL ν Ω c hc U) = lpSmulL hc (Measure.restrict_smul c ν Ω) (gradL U) := rfl
-
-omit [FiniteDimensional ℝ E] [BorelSpace E] in
-lemma smulMeasureL_smulMeasureInvL (U : H1Graph ν Ω) :
-    smulMeasureL ν Ω c hc (smulMeasureInvL ν Ω c U) = U :=
-  (smulMeasureEquiv ν Ω c hc).apply_symm_apply U
-
-variable [IsFiniteMeasureOnCompacts ν]
-
-include hc in
-/-- The inverse rescaling sends the graph of a test function to the graph of the same test
-function. -/
-lemma smulMeasureInvL_testGraphₗ (φ : testFunctions Ω) :
-    smulMeasureInvL ν Ω c (testGraphₗ ν Ω φ) = testGraphₗ (c • ν) Ω φ :=
-  ((smulMeasureEquiv ν Ω c hc).symm_apply_eq).2 (smulMeasureL_testGraphₗ c hc φ).symm
-
-include hc in
-/-- The inverse rescaling maps `H₀¹(ν, Ω)` into `H₀¹(c • ν, Ω)`. -/
-lemma smulMeasureInvL_mem_H01 {U : H1Graph ν Ω} (hU : U ∈ H01 ν Ω) :
-    smulMeasureInvL ν Ω c U ∈ H01 (c • ν) Ω :=
-  mem_H01_of_map_testGraphₗ _ (smulMeasureInvL_testGraphₗ c hc) hU
-
-/-- The inverse rescaling restricted to `H₀¹`. -/
-def smulMeasureInvH01 (hc : c ≠ 0) : H01 ν Ω →L[ℝ] H01 (c • ν) Ω :=
-  ((smulMeasureInvL ν Ω c).comp (H01 ν Ω).subtypeL).codRestrict _ fun U =>
-    smulMeasureInvL_mem_H01 c hc U.2
-
-lemma smulMeasureH01_smulMeasureInvH01 (U : H01 ν Ω) :
-    smulMeasureH01 c hc (smulMeasureInvH01 c hc U) = U :=
-  Subtype.ext (smulMeasureL_smulMeasureInvL c hc (U : H1Graph ν Ω))
-
-end Graph
-
-end H1Graph
 
 namespace DivForm.FullEllipticOp
 
