@@ -829,6 +829,33 @@ differentiable.
 
 `EllipticPdes.Brouwer` is a namespaced copy of [harfe/fixed-point-theorems-lean4](https://github.com/harfe/fixed-point-theorems-lean4) (MIT) containing Brouwer's fixed-point theorem, with the licence in `LICENSE-fixed-point-theorems`. Ferreira, Gomes and Üçer Theorem 2.16 (p. 11) concludes $u \in \overline{K}$ for a convex $K$. The conclusion $u \in K$ needs $K$ closed, and `weakVI_Ioc_counterexample` shows that convexity alone does not give it.
 
+## Normed spaces
+
+Let $E$ be a finite-dimensional real normed space with an additive Haar measure $\mu$ and $\Omega \subseteq E$ a set. A divergence-form operator on $E$ has coefficients $a(x) : E^* \to E$, $b(x) \in E$ and $c(x) \in \mathbb{R}$, and the ellipticity convention is $\lambda \|\xi\|^2 \le \xi(a(x)\,\xi)$ for every $\xi \in E^*$. The linear equivalence `toEuclidean` maps $E$ onto a Euclidean space. `EllipticPdes.W1p0.mapEquiv` moves $W_0^{1,2}(\Omega)$ to the image, and the Riesz bridge `EllipticPdes.W1p0.toH01` identifies it there with $H_0^1$. Their composite is `EllipticPdes.NormedDivForm.transferEquiv`. `FullEllipticOp.transfer` pushes the operator and the measure forward along `toEuclidean`, and each inner-product theorem is applied to the result and pulled back along `transferEquiv`.
+
+Declarations in the operator rows are in `EllipticPdes.NormedDivForm.FullEllipticOp` unless a namespace is shown, and each is stated for `W1p0 2 μ Ω` with no inner product on $E$. The rows on the Riesz bridge and the change of variables concern an inner product space $F$ or any continuous linear equivalence, and say so in their namespace.
+
+| Result | Declaration |
+|---|---|
+| Change of variables on $W_0^{1,p}$ along a continuous linear equivalence | `EllipticPdes.W1p0.mapEquiv`, `EllipticPdes.W1p0.fnL_mapEquiv`, `EllipticPdes.W1p0.gradL_mapEquiv` |
+| The Riesz bridge $W_0^{1,2}(\Omega) \cong H_0^1(\Omega)$ on an inner product space | `EllipticPdes.W1p0.toH01`, `EllipticPdes.W1pGraph.toH1Graph`, `EllipticPdes.W1pGraph.norm_toH1Graph` |
+| The equivalence of energy spaces | `EllipticPdes.NormedDivForm.transferEquiv` |
+| The transferred operator and its ellipticity constant | `transfer` |
+| The bilinear form as a bounded form on $W_0^{1,2}(\Omega)$, its integral formula and its identity with the transferred form | `formOn`, `formOn_eq_integral`, `formOn_transfer` |
+| Symmetry of the transferred coefficient | `transfer_adjoint` |
+| Gårding inequality with the constants $\lambda/2$ and `gardingγ` | `garding` |
+| Existence of a weak solution for $b = 0$ and $c \ge 0$ on a bounded set | `weak_solution_of_nonneg_zeroth_of_bounded` |
+| The Fredholm alternative, with uniqueness implying existence | `fredholm_alternative_of_bounded_haar`, `fredholm_unique_imp_exists_of_bounded_haar` |
+| Solvability if and only if the datum is orthogonal to the kernel of the transpose | `solvable_iff_orthogonal_transpose_of_bounded_haar` |
+| The exceptional set $\Sigma$ and solvability off it | `sigmaSet`, `notMem_sigmaSet_iff_solvable_of_bounded_haar` |
+| Existence III: three alternatives for the shifted problem | `existence_three_of_bounded_haar` |
+| Resolvent bound in $L^2$ | `resolvent_bound_of_bounded_haar` |
+| Spectral theorem for a symmetric operator: eigenspaces span $L^2$ | `symmetric_spectral_of_bounded_haar` |
+| Weak maximum principle for a subsolution in $W_0^{1,2}(\Omega)$, transport-free with $c \ge 0$ | `weak_maximum_principle_H01` |
+| Uniqueness of the generalised Dirichlet problem | `eq_zero_of_weakSolution_H01` |
+
+Three limitations apply. The maximum principle takes the subsolution in $W_0^{1,2}(\Omega)$, and the form with a subsolution in $W^{1,2}(\Omega)$ and a boundary bound waits for a normed $W^{1,2}(\Omega)$. The bound in the existence theorem has an existential constant, because the transfer changes the $W^{1,2}$ norm by an equivalence of unspecified constant. The spectral theorem has a different shape from its twin. Its conclusion replaces `Variational.solOp` by an operator $G$ on $L^2$ that sends $f$ to the function part of every weak solution, since $W_0^{1,2}(\Omega)$ on a normed space has no inner product.
+
 ## Dependency chain
 
 The analytic content of the solvability theory reduces to the one-dimensional Poincaré

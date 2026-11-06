@@ -637,3 +637,27 @@ assert_classical_axioms
 assert_classical_axioms
   EllipticPdes.continuous_apply_add_smul_of_convex_gateaux
   EllipticPdes.existsUnique_weakSolution_skewPLaplacian
+
+/-! ### The weak theory on a normed space -/
+
+assert_classical_axioms
+  EllipticPdes.W1p0.mapEquiv
+  EllipticPdes.W1p0.toH01
+  EllipticPdes.NormedDivForm.FullEllipticOp.formOn_eq_integral
+  EllipticPdes.NormedDivForm.FullEllipticOp.formOn_transfer
+  EllipticPdes.NormedDivForm.FullEllipticOp.transfer_adjoint
+  EllipticPdes.NormedDivForm.FullEllipticOp.weak_solution_of_nonneg_zeroth_of_bounded
+  EllipticPdes.NormedDivForm.FullEllipticOp.garding
+  EllipticPdes.NormedDivForm.FullEllipticOp.fredholm_alternative_of_bounded_haar
+  EllipticPdes.NormedDivForm.FullEllipticOp.fredholm_unique_imp_exists_of_bounded_haar
+  EllipticPdes.NormedDivForm.FullEllipticOp.solvable_iff_orthogonal_transpose_of_bounded_haar
+  EllipticPdes.NormedDivForm.FullEllipticOp.notMem_sigmaSet_iff_solvable_of_bounded_haar
+  EllipticPdes.NormedDivForm.FullEllipticOp.existence_three_of_bounded_haar
+  EllipticPdes.NormedDivForm.FullEllipticOp.resolvent_bound_of_bounded_haar
+  EllipticPdes.NormedDivForm.FullEllipticOp.symmetric_spectral_of_bounded_haar
+
+/-! ### The weak maximum principle on a normed space -/
+
+assert_classical_axioms
+  EllipticPdes.NormedDivForm.FullEllipticOp.weak_maximum_principle_H01
+  EllipticPdes.NormedDivForm.FullEllipticOp.eq_zero_of_weakSolution_H01

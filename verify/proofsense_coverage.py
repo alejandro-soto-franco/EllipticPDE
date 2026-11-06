@@ -361,6 +361,76 @@ EXEMPT = {
         "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
         "source states it in coordinates, so the warrant sits at the coordinate declaration"
     ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.weak_solution_of_nonneg_zeroth_of_bounded": (
+        "transferred along toEuclidean from the twin warranted at EllipticPdes.Sobolev.FullEllipticOp.weak_solution_L2_of_nonneg_zeroth_of_bounded to a divergence-form operator on a "
+        "finite-dimensional real normed space; the bound has an existential constant; the cited source states it in coordinates, so the warrant "
+        "sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.garding": (
+        "the theorem warranted at EllipticPdes.Sobolev.FullEllipticOp.garding, proved on a divergence-form operator on a "
+        "finite-dimensional real normed space directly from the integral formula with the constants of the twin; the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.fredholm_alternative_of_bounded_haar": (
+        "transferred along toEuclidean from the twin warranted at EllipticPdes.Sobolev.FullEllipticOp.fredholm_alternative_of_bounded to a divergence-form operator on a "
+        "finite-dimensional real normed space; the cited source states it in coordinates, so the warrant "
+        "sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.fredholm_unique_imp_exists_of_bounded_haar": (
+        "transferred along toEuclidean from the twin warranted at EllipticPdes.Sobolev.FullEllipticOp.fredholm_alternative_of_bounded to a divergence-form operator on a "
+        "finite-dimensional real normed space; the cited source states it in coordinates, so the warrant "
+        "sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.solvable_iff_orthogonal_transpose_of_bounded_haar": (
+        "transferred along toEuclidean from the twin warranted at EllipticPdes.Sobolev.FullEllipticOp.solvable_iff_orthogonal_solSpaceStar to a divergence-form operator on a "
+        "finite-dimensional real normed space; the cited source states it in coordinates, so the warrant "
+        "sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.notMem_sigmaSet_iff_solvable_of_bounded_haar": (
+        "transferred along toEuclidean from the twin warranted at EllipticPdes.Sobolev.FullEllipticOp.existence_three_of_bounded to a divergence-form operator on a "
+        "finite-dimensional real normed space; the cited source states it in coordinates, so the warrant "
+        "sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.existence_three_of_bounded_haar": (
+        "transferred along toEuclidean from the twin warranted at EllipticPdes.Sobolev.FullEllipticOp.existence_three_of_bounded to a divergence-form operator on a "
+        "finite-dimensional real normed space; the cited source states it in coordinates, so the warrant "
+        "sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.resolvent_bound_of_bounded_haar": (
+        "transferred along toEuclidean from the twin warranted at EllipticPdes.Sobolev.FullEllipticOp.resolvent_bound_of_bounded to a divergence-form operator on a "
+        "finite-dimensional real normed space; the cited source states it in coordinates, so the warrant "
+        "sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.symmetric_spectral_of_bounded_haar": (
+        "transferred along toEuclidean from the twin warranted at EllipticPdes.Sobolev.symmetric_fullElliptic_spectral to a divergence-form operator on a "
+        "finite-dimensional real normed space; the conclusion replaces Variational.solOp by an operator G on L2 characterised by its action on data, since W01 on a normed space has no inner product; the cited source states it in coordinates, so the warrant "
+        "sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.formOn_eq_integral": (
+        "the integral formula for the form on W01 of a normed space; infrastructure with no source statement"
+    ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.formOn_transfer": (
+        "the identity between the form on a normed space and the form of the transferred operator; infrastructure with no source statement"
+    ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.transfer_adjoint": (
+        "symmetry of the coefficient is preserved by the transfer; infrastructure with no source statement"
+    ),
+    "EllipticPdes.W1p0.mapEquiv": (
+        "the change of variables on W01 along a continuous linear equivalence; infrastructure with no source statement"
+    ),
+    "EllipticPdes.W1p0.toH01": (
+        "the Riesz bridge between W01 of an inner product space and H01; infrastructure with no source statement"
+    ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.weak_maximum_principle_H01": (
+        "transferred along toEuclidean from the twin warranted at EllipticPdes.Sobolev.weak_maximum_principle_H01 to a divergence-form operator on a "
+        "finite-dimensional real normed space; the cited source states it in coordinates, so the warrant "
+        "sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.eq_zero_of_weakSolution_H01": (
+        "transferred along toEuclidean from the twin warranted at EllipticPdes.Sobolev.eq_zero_of_weakSolution_H01 to a divergence-form operator on a "
+        "finite-dimensional real normed space; the cited source states it in coordinates, so the warrant "
+        "sits at the coordinate declaration"
+    ),
     "EllipticPdes.H1Graph.mem_H01_of_hasCompactSupport": (
         "the theorem warranted at EllipticPdes.Sobolev.mem_H01_of_hasCompactSupport, stated over a finite-dimensional real "
         "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
