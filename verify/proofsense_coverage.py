@@ -373,6 +373,24 @@ EXEMPT = {
     "EllipticPdes.Extension.hasC1BoundaryNormed_halfSpace": (
         "a half space has C1 boundary on a normed space; records that the hypothesis is satisfiable; no source statement"
     ),
+    "EllipticPdes.norm_sub_proj_le": (
+        "projection onto a line in a real inner product space minimises distance; infrastructure with no source statement"
+    ),
+    "EllipticPdes.L2Mean.mean_eq": (
+        "the projection coefficient onto the constants is the integral over the total mass; infrastructure with no source statement"
+    ),
+    "EllipticPdes.L2Mean.norm_sub_mean_le": (
+        "the mean is the constant closest in L^2; infrastructure with no source statement"
+    ),
+    "EllipticPdes.H1Graph.poincare_wirtinger_haar": (
+        "the theorem warranted at EllipticPdes.Sobolev.poincare_wirtinger, read in the graph space for any additive Haar measure on R^d in place of volume; the cited source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.norm_gradL_graphTransfer_le": (
+        "the gradient norm grows by at most the norm of the inverse identification under the graph transfer; infrastructure with no source statement"
+    ),
+    "EllipticPdes.NormedDivForm.poincare_wirtinger": (
+        "the theorem warranted at EllipticPdes.Sobolev.poincare_wirtinger, transferred along toEuclidean to W^{1,2} of a finite-dimensional real normed space with an additive Haar measure and HasC1BoundaryNormed; the cited source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
     "EllipticPdes.H1Graph.smulMeasureL_mem_W12_iff": (
         "rescaling the measure preserves W^{1,2}; infrastructure with no source statement"
     ),
