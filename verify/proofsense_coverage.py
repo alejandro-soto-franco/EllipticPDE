@@ -373,6 +373,15 @@ EXEMPT = {
     "EllipticPdes.Extension.hasC1BoundaryNormed_halfSpace": (
         "a half space has C1 boundary on a normed space; records that the hypothesis is satisfiable; no source statement"
     ),
+    "EllipticPdes.H1Graph.denseRange_embL2": (
+        "test functions are dense in L^2 of an open set, from the fundamental lemma of the calculus of variations in Mathlib; infrastructure with no source statement"
+    ),
+    "EllipticPdes.H1Graph.secondCountableTopology": (
+        "second countability of the graph space from Mathlib's Lp.SecondCountableTopology; infrastructure with no source statement"
+    ),
+    "EllipticPdes.H1Graph.secondCountableTopology_H01": (
+        "second countability of H_0^1 as a subspace of the graph space; infrastructure with no source statement"
+    ),
     "EllipticPdes.norm_sub_proj_le": (
         "projection onto a line in a real inner product space minimises distance; infrastructure with no source statement"
     ),

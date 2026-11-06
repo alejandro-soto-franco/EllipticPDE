@@ -750,3 +750,10 @@ assert_classical_axioms
   EllipticPdes.H1Graph.poincare_wirtinger_haar
   EllipticPdes.NormedDivForm.norm_gradL_graphTransfer_le
   EllipticPdes.NormedDivForm.poincare_wirtinger
+
+/-! ### Density of `H₀¹(Ω)` in `L²(Ω)` and separability of the graph space -/
+
+assert_classical_axioms
+  EllipticPdes.H1Graph.denseRange_embL2
+  EllipticPdes.H1Graph.secondCountableTopology
+  EllipticPdes.H1Graph.secondCountableTopology_H01
