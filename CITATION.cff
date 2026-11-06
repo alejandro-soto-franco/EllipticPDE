@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use EllipticPDE, please cite it as below."
+title: "EllipticPDE: second-order elliptic partial differential equations in Lean 4"
+type: software
+authors:
+  - family-names: "Soto Franco"
+    given-names: "Alejandro"
+version: "0.3.0"
+date-released: "2026-11-06"
+license: Apache-2.0
+repository-code: "https://github.com/alejandro-soto-franco/EllipticPDE"
+keywords:
+  - Lean 4
+  - Mathlib
+  - formal verification
+  - elliptic partial differential equations
+  - monotone operators
+  - Sobolev spaces
