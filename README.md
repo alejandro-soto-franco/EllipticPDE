@@ -901,6 +901,18 @@ The transfer preserves the $L^q$ seminorms of the function part and enlarges the
 | Sobolev inequality into $L^q$ for some $q > 2$, in dimension at least two | `EllipticPdes.NormedDivForm.exists_eLpNorm_le_of_mem_W1p0` |
 | Sobolev inequality on an inner product space for any additive Haar measure | `EllipticPdes.H1Graph.exists_eLpNorm_le_of_mem_H01_haar` |
 
+### `C¹` boundaries
+
+`EllipticPdes.Extension.HasC1Boundary` follows Evans (§C.1): near each boundary point the domain is, after a rigid motion, the region above a `C¹` graph. A continuous linear equivalence of $\mathbb{R}^d$ that is not an isometry tilts such a graph. Near a boundary point the domain is the positive set of a `C¹` function with nonzero derivative, and the implicit function theorem turns that set back into the region above a `C¹` graph after a reflection. On a finite-dimensional normed space a set has `C¹` boundary when its image under `toEuclidean` does, and the invariance shows that every other linear identification with $\mathbb{R}^d$ gives the same notion.
+
+| Result | Declaration |
+|---|---|
+| The positive set of a `C¹` function near a regular zero as a region above a `C¹` graph | `EllipticPdes.Extension.exists_aboveGraph_of_fderiv_pos` |
+| Invariance of a `C¹` boundary under a continuous linear equivalence of $\mathbb{R}^d$ | `EllipticPdes.Extension.HasC1Boundary.image_linearEquiv` |
+| `C¹` boundary on a normed space and its independence of the identification with $\mathbb{R}^d$ | `EllipticPdes.Extension.HasC1BoundaryNormed`, `EllipticPdes.Extension.hasC1BoundaryNormed_iff` |
+| Invariance of a `C¹` boundary on a normed space under a linear equivalence | `EllipticPdes.Extension.HasC1BoundaryNormed.image_linearEquiv` |
+| A half space has `C¹` boundary on a normed space | `EllipticPdes.Extension.hasC1BoundaryNormed_halfSpace` |
+
 ## Dependency chain
 
 The analytic content of the solvability theory reduces to the one-dimensional Poincaré

@@ -711,3 +711,13 @@ assert_classical_axioms
   EllipticPdes.NormedDivForm.poincare_W1p0_of_bounded
   EllipticPdes.H1Graph.exists_eLpNorm_le_of_mem_H01_haar
   EllipticPdes.NormedDivForm.exists_eLpNorm_le_of_mem_W1p0
+
+/-! ### Invariance of a `C¹` boundary under linear equivalences -/
+
+assert_classical_axioms
+  EllipticPdes.Extension.exists_aboveGraph_of_fderiv_pos
+  EllipticPdes.Extension.C1Chart.graph_motion_eq_of_mem_frontier
+  EllipticPdes.Extension.HasC1Boundary.image_linearEquiv
+  EllipticPdes.Extension.hasC1BoundaryNormed_iff
+  EllipticPdes.Extension.HasC1BoundaryNormed.image_linearEquiv
+  EllipticPdes.Extension.hasC1BoundaryNormed_halfSpace
