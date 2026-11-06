@@ -701,3 +701,11 @@ assert_classical_axioms
   EllipticPdes.DivForm.FullEllipticOp.interior_smooth_haar
   EllipticPdes.NormedDivForm.FullEllipticOp.interior_smooth
   EllipticPdes.NormedDivForm.FullEllipticOp.exists_weakSolution_interior_smooth
+
+/-! ### Embedding theorems on a normed space -/
+
+assert_classical_axioms
+  EllipticPdes.NormedDivForm.isCompactOperator_fnL
+  EllipticPdes.NormedDivForm.poincare_W1p0_of_bounded
+  EllipticPdes.H1Graph.exists_eLpNorm_le_of_mem_H01_haar
+  EllipticPdes.NormedDivForm.exists_eLpNorm_le_of_mem_W1p0

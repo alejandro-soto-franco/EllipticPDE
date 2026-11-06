@@ -178,6 +178,7 @@ public import EllipticPdes.NormedDivForm.Theorems
 public import EllipticPdes.NormedDivForm.Maximum
 public import EllipticPdes.NormedDivForm.ClassicalMaximum
 public import EllipticPdes.NormedDivForm.InteriorSmooth
+public import EllipticPdes.NormedDivForm.Embedding
 public import EllipticPdes.Analysis.WeakConvergence
 public import EllipticPdes.Analysis.FunctionSpaces
 public import EllipticPdes.Analysis.HolderSpace
@@ -212,6 +213,7 @@ public import EllipticPdes.Embedding.ChainRule
 public import EllipticPdes.Existence.WeakMaximum
 public import EllipticPdes.Sobolev.H01Lattice
 public import EllipticPdes.Embedding.H01SobolevTwo
+public import EllipticPdes.Embedding.H01SobolevHaar
 public import EllipticPdes.Existence.WeakMaximumTransport
 public import EllipticPdes.Existence.ClassicalMaximum
 public import EllipticPdes.Existence.StrongMaximum

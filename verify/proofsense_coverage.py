@@ -335,6 +335,26 @@ EXEMPT = {
         "normed space with an additive Haar measure, from the normed existence theorem and interior smoothness; the cited "
         "source states it in coordinates, so the warrant sits at the coordinate declaration"
     ),
+    "EllipticPdes.NormedDivForm.isCompactOperator_fnL": (
+        "the theorem warranted at EllipticPdes.Sobolev.embL2_isCompact, transferred along toEuclidean to W_0^{1,2} of a "
+        "finite-dimensional real normed space with an additive Haar measure; the cited source states it in coordinates, "
+        "so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.poincare_W1p0_of_bounded": (
+        "the theorem warranted at EllipticPdes.Poincare.poincare_H01_of_bounded, transferred along toEuclidean to W_0^{1,2} of a "
+        "finite-dimensional real normed space with an additive Haar measure; the cited source states it in coordinates, "
+        "so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.H1Graph.exists_eLpNorm_le_of_mem_H01_haar": (
+        "the theorem warranted at EllipticPdes.Embedding.eLpNorm_le_of_mem_H01, stated over a finite-dimensional real "
+        "inner product space with any additive Haar measure in place of EuclideanSpace R (Fin d) with volume; the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.exists_eLpNorm_le_of_mem_W1p0": (
+        "the theorem warranted at EllipticPdes.Embedding.eLpNorm_le_of_mem_H01, transferred along toEuclidean to W_0^{1,2} of a "
+        "finite-dimensional real normed space with an additive Haar measure; the cited source states it in coordinates, "
+        "so the warrant sits at the coordinate declaration"
+    ),
     "EllipticPdes.DivForm.FullEllipticOp.interior_smooth": (
         "the theorem warranted at EllipticPdes.Regularity.interior_smooth, stated over a finite-dimensional real "
         "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
