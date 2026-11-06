@@ -721,3 +721,11 @@ assert_classical_axioms
   EllipticPdes.Extension.hasC1BoundaryNormed_iff
   EllipticPdes.Extension.HasC1BoundaryNormed.image_linearEquiv
   EllipticPdes.Extension.hasC1BoundaryNormed_halfSpace
+
+/-! ### Rellich on `W^{1,2}(Ω)` for a Haar measure and on a normed space -/
+
+assert_classical_axioms
+  EllipticPdes.H1Graph.smulMeasureL_mem_W12_iff
+  EllipticPdes.H1Graph.embW12G_isCompact
+  EllipticPdes.H1Graph.embW12G_isCompact_haar
+  EllipticPdes.NormedDivForm.isCompactOperator_fnL_W12
