@@ -829,6 +829,32 @@ differentiable.
 
 `EllipticPdes.Brouwer` is a namespaced copy of [harfe/fixed-point-theorems-lean4](https://github.com/harfe/fixed-point-theorems-lean4) (MIT) containing Brouwer's fixed-point theorem, with the licence in `LICENSE-fixed-point-theorems`. Ferreira, Gomes and Üçer Theorem 2.16 (p. 11) concludes $u \in \overline{K}$ for a convex $K$. The conclusion $u \in K$ needs $K$ closed, and `weakVI_Ioc_counterexample` shows that convexity alone does not give it.
 
+## Normed spaces
+
+Let $E$ be a finite-dimensional real normed space with an additive Haar measure $\mu$ and $\Omega \subseteq E$ a domain. A divergence-form operator on $E$ has coefficients $a(x) : E^* \to E$, $b(x) \in E$ and $c(x) \in \mathbb{R}$, and the ellipticity convention is $\lambda \|\xi\|^2 \le \xi(a(x)\,\xi)$ for every $\xi \in E^*$. The linear equivalence `toEuclidean` maps $E$ onto a Euclidean space, and the Riesz bridge identifies $W_0^{1,2}(\Omega)$ on $E$ with $H_0^1$ of the image. `FullEllipticOp.transfer` pushes the operator and the measure forward along `toEuclidean`, and each inner-product theorem is applied to the result and pulled back along `transferEquiv`.
+
+All declarations below are in `EllipticPdes.NormedDivForm.FullEllipticOp` unless a namespace is shown. Each is stated for `W1p0 2 μ Ω`, with no inner product on $E$ in any statement.
+
+| Result | Declaration |
+|---|---|
+| Change of variables on $W_0^{1,p}$ along a continuous linear equivalence | `W1p0.mapEquiv`, `W1p0.fnL_mapEquiv`, `W1p0.gradL_mapEquiv` |
+| The Riesz bridge $W_0^{1,2}(\Omega) \cong H_0^1(\Omega)$ | `W1p0.toH01`, `W1pGraph.toH1Graph`, `W1pGraph.norm_toH1Graph` |
+| The transferred operator, its ellipticity constant and the equivalence of energy spaces | `transfer`, `transferEquiv` |
+| The bilinear form as a bounded form on $W_0^{1,2}(\Omega)$, its integral formula and its identity with the transferred form | `formOn`, `formOn_eq_integral`, `formOn_transfer` |
+| Symmetry of the transferred coefficient | `transfer_adjoint` |
+| Gårding inequality | `garding` |
+| Existence of a weak solution for $c \ge 0$ on a bounded set | `weak_solution_of_nonneg_zeroth_of_bounded` |
+| The Fredholm alternative, with uniqueness implying existence | `fredholm_alternative_of_bounded_haar`, `fredholm_unique_imp_exists_of_bounded_haar` |
+| Solvability if and only if the datum is orthogonal to the kernel of the transpose | `solvable_iff_orthogonal_transpose_of_bounded_haar` |
+| The exceptional set $\Sigma$ and solvability off it | `sigmaSet`, `notMem_sigmaSet_iff_solvable_of_bounded_haar` |
+| Existence III: three alternatives for the shifted problem | `existence_three_of_bounded_haar` |
+| Resolvent bound in $L^2$ | `resolvent_bound_of_bounded_haar` |
+| Spectral theorem for a symmetric operator: eigenspaces span $L^2$ | `symmetric_spectral_of_bounded_haar` |
+| Weak maximum principle for a transport-free operator with $c \ge 0$ | `weak_maximum_principle`, `weak_maximum_principle_H01` |
+| Uniqueness of the generalised Dirichlet problem | `eq_zero_of_weakSolution_H01` |
+
+Two limitations apply. The weak maximum principle takes the subsolution in $W_0^{1,2}(\Omega)$, because the normed setting has no space $W^{1,2}(\Omega)$ yet. The transfer changes the $W^{1,2}$ norm. The Gårding inequality and the existence theorem therefore give their constants existentially.
+
 ## Dependency chain
 
 The analytic content of the solvability theory reduces to the one-dimensional Poincaré

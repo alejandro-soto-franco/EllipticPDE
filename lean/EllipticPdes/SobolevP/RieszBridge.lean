@@ -39,82 +39,87 @@ variable {F : Type*} [NormedAddCommGroup F] [InnerProductSpace ℝ F] [FiniteDim
   [MeasurableSpace F] {ν : Measure F} {Ω : Set F}
 
 /-- The Riesz map `StrongDual ℝ F → F` as a real-linear isometry equivalence. -/
-def rieszL : StrongDual ℝ F ≃ₗᵢ[ℝ] F :=
+def RieszBridge.rieszL : StrongDual ℝ F ≃ₗᵢ[ℝ] F :=
   { (InnerProductSpace.toDual ℝ F).symm with
     map_smul' := fun c x => by simp }
 
-/-- `rieszL` as a continuous linear map. -/
-def rieszC : StrongDual ℝ F →L[ℝ] F := rieszL.toContinuousLinearEquiv.toContinuousLinearMap
+/-- `RieszBridge.rieszL` as a continuous linear map. -/
+def RieszBridge.rieszC : StrongDual ℝ F →L[ℝ] F :=
+    RieszBridge.rieszL.toContinuousLinearEquiv.toContinuousLinearMap
 
-/-- The inverse of `rieszL` as a continuous linear map. -/
-def rieszC' : F →L[ℝ] StrongDual ℝ F :=
-  rieszL.symm.toContinuousLinearEquiv.toContinuousLinearMap
+/-- The inverse of `RieszBridge.rieszL` as a continuous linear map. -/
+def RieszBridge.rieszC' : F →L[ℝ] StrongDual ℝ F :=
+  RieszBridge.rieszL.symm.toContinuousLinearEquiv.toContinuousLinearMap
 
 omit [MeasurableSpace F] in
-lemma rieszL_apply (ξ : StrongDual ℝ F) :
-    rieszL ξ = (InnerProductSpace.toDual ℝ F).symm ξ := rfl
+lemma RieszBridge.rieszL_apply (ξ : StrongDual ℝ F) :
+    RieszBridge.rieszL ξ = (InnerProductSpace.toDual ℝ F).symm ξ := rfl
 
-lemma norm_compLp_rieszL (g : Lp (StrongDual ℝ F) 2 (ν.restrict Ω)) :
-    ‖rieszC.compLp g‖ = ‖g‖ := by
-  have h : ∀ᵐ x ∂(ν.restrict Ω), ‖(rieszC.compLp g : F → F) x‖ = ‖g x‖ := by
-    filter_upwards [ContinuousLinearMap.coeFn_compLp rieszC g] with x hx
+lemma RieszBridge.norm_compLp_rieszL (g : Lp (StrongDual ℝ F) 2 (ν.restrict Ω)) :
+    ‖RieszBridge.rieszC.compLp g‖ = ‖g‖ := by
+  have h : ∀ᵐ x ∂(ν.restrict Ω), ‖(RieszBridge.rieszC.compLp g : F → F) x‖ = ‖g x‖ := by
+    filter_upwards [ContinuousLinearMap.coeFn_compLp RieszBridge.rieszC g] with x hx
     rw [hx]
-    exact rieszL.norm_map _
+    exact RieszBridge.rieszL.norm_map _
   rw [Lp.norm_def, Lp.norm_def, 
     eLpNorm_congr_norm_ae (Lp.aestronglyMeasurable _) (Lp.aestronglyMeasurable _) h]
 
 namespace W1pGraph
 
 /-- The gradient component of the forward map. -/
-def gradFwd : Lp (StrongDual ℝ F) 2 (ν.restrict Ω) →L[ℝ] Lp F 2 (ν.restrict Ω) :=
-  rieszC.compLpL 2 (ν.restrict Ω)
+def RieszBridge.gradFwd : Lp (StrongDual ℝ F) 2 (ν.restrict Ω) →L[ℝ] Lp F 2 (ν.restrict Ω) :=
+  RieszBridge.rieszC.compLpL 2 (ν.restrict Ω)
 
 /-- The gradient component of the backward map. -/
-def gradBwd : Lp F 2 (ν.restrict Ω) →L[ℝ] Lp (StrongDual ℝ F) 2 (ν.restrict Ω) :=
-  rieszC'.compLpL 2 (ν.restrict Ω)
+def RieszBridge.gradBwd : Lp F 2 (ν.restrict Ω) →L[ℝ] Lp (StrongDual ℝ F) 2 (ν.restrict Ω) :=
+  RieszBridge.rieszC'.compLpL 2 (ν.restrict Ω)
 
 /-- The forward map: identity on the function, Riesz postcomposition on the gradient. -/
-def toH1GraphFwd : W1pGraph 2 ν Ω →L[ℝ] H1Graph ν Ω :=
+def RieszBridge.toH1GraphFwd : W1pGraph 2 ν Ω →L[ℝ] H1Graph ν Ω :=
   (WithLp.prodContinuousLinearEquiv 2 ℝ (Lp ℝ 2 (ν.restrict Ω))
     (Lp F 2 (ν.restrict Ω))).symm.toContinuousLinearMap.comp
-    ((fnL (p := 2) (μ := ν) (Ω := Ω)).prod (gradFwd.comp (gradL (p := 2) (μ := ν) (Ω := Ω))))
+    ((fnL (p := 2) (μ := ν) (Ω := Ω)).prod (RieszBridge.gradFwd.comp (gradL (p := 2) (μ := ν) (Ω
+    := Ω))))
 
 /-- The backward map: identity on the function, inverse Riesz postcomposition on the gradient. -/
-def toH1GraphBwd : H1Graph ν Ω →L[ℝ] W1pGraph 2 ν Ω :=
+def RieszBridge.toH1GraphBwd : H1Graph ν Ω →L[ℝ] W1pGraph 2 ν Ω :=
   (WithLp.prodContinuousLinearEquiv 2 ℝ (Lp ℝ 2 (ν.restrict Ω))
     (Lp (StrongDual ℝ F) 2 (ν.restrict Ω))).symm.toContinuousLinearMap.comp
-    ((H1Graph.fnL (μ := ν) (Ω := Ω)).prod (gradBwd.comp (H1Graph.gradL (μ := ν) (Ω := Ω))))
+    ((H1Graph.fnL (μ := ν) (Ω := Ω)).prod (RieszBridge.gradBwd.comp (H1Graph.gradL (μ := ν) (Ω :=
+    Ω))))
 
-lemma coeFn_gradL_toH1GraphFwd (U : W1pGraph 2 ν Ω) :
-    ⇑(H1Graph.gradL (toH1GraphFwd U)) =ᵐ[ν.restrict Ω]
+lemma RieszBridge.coeFn_gradL_toH1GraphFwd (U : W1pGraph 2 ν Ω) :
+    ⇑(H1Graph.gradL (RieszBridge.toH1GraphFwd U)) =ᵐ[ν.restrict Ω]
       fun x => (InnerProductSpace.toDual ℝ F).symm (gradL U x) :=
   ContinuousLinearMap.coeFn_compLp
-    rieszC (gradL U)
+    RieszBridge.rieszC (gradL U)
 
-lemma coeFn_gradL_toH1GraphBwd (U : H1Graph ν Ω) :
-    ⇑(gradL (toH1GraphBwd U)) =ᵐ[ν.restrict Ω]
+lemma RieszBridge.coeFn_gradL_toH1GraphBwd (U : H1Graph ν Ω) :
+    ⇑(gradL (RieszBridge.toH1GraphBwd U)) =ᵐ[ν.restrict Ω]
       fun x => InnerProductSpace.toDual ℝ F (H1Graph.gradL U x) :=
   ContinuousLinearMap.coeFn_compLp
-    rieszC' (H1Graph.gradL U)
+    RieszBridge.rieszC' (H1Graph.gradL U)
 
-lemma toH1GraphBwd_Fwd (U : W1pGraph 2 ν Ω) : toH1GraphBwd (toH1GraphFwd U) = U := by
+lemma RieszBridge.toH1GraphBwd_Fwd (U : W1pGraph 2 ν Ω) : RieszBridge.toH1GraphBwd
+    (RieszBridge.toH1GraphFwd U) = U := by
   refine WithLp.ofLp_injective 2 (Prod.ext rfl ?_)
   refine Lp.ext ?_
-  filter_upwards [coeFn_gradL_toH1GraphBwd (toH1GraphFwd U),
-    coeFn_gradL_toH1GraphFwd U] with x a c
-  change ⇑(gradL (toH1GraphBwd (toH1GraphFwd U))) x = _
+  filter_upwards [RieszBridge.coeFn_gradL_toH1GraphBwd (RieszBridge.toH1GraphFwd U),
+    RieszBridge.coeFn_gradL_toH1GraphFwd U] with x a c
+  change ⇑(gradL (RieszBridge.toH1GraphBwd (RieszBridge.toH1GraphFwd U))) x = _
   rw [a]
-  change InnerProductSpace.toDual ℝ F (H1Graph.gradL (toH1GraphFwd U) x) = _
+  change InnerProductSpace.toDual ℝ F (H1Graph.gradL (RieszBridge.toH1GraphFwd U) x) = _
   rw [c]
   simp
   rfl
 
-lemma toH1GraphFwd_Bwd (U : H1Graph ν Ω) : toH1GraphFwd (toH1GraphBwd U) = U := by
+lemma RieszBridge.toH1GraphFwd_Bwd (U : H1Graph ν Ω) : RieszBridge.toH1GraphFwd
+    (RieszBridge.toH1GraphBwd U) = U := by
   refine WithLp.ofLp_injective 2 (Prod.ext rfl ?_)
   refine Lp.ext ?_
-  filter_upwards [coeFn_gradL_toH1GraphFwd (toH1GraphBwd U),
-    coeFn_gradL_toH1GraphBwd U] with x a c
-  change ⇑(H1Graph.gradL (toH1GraphFwd (toH1GraphBwd U))) x = _
+  filter_upwards [RieszBridge.coeFn_gradL_toH1GraphFwd (RieszBridge.toH1GraphBwd U),
+    RieszBridge.coeFn_gradL_toH1GraphBwd U] with x a c
+  change ⇑(H1Graph.gradL (RieszBridge.toH1GraphFwd (RieszBridge.toH1GraphBwd U))) x = _
   rw [a]
   rw [c]
   simp
@@ -123,13 +128,15 @@ lemma toH1GraphFwd_Bwd (U : H1Graph ν Ω) : toH1GraphFwd (toH1GraphBwd U) = U :
 /-- **Riesz bridge on graph spaces.** The identity on the function and `g ↦ (toDual ℝ F).symm
 ∘ g` on the gradient give a continuous linear equivalence from `W1pGraph 2 ν Ω` to `H1Graph ν Ω`. -/
 def toH1Graph : W1pGraph 2 ν Ω ≃L[ℝ] H1Graph ν Ω :=
-  ContinuousLinearEquiv.equivOfInverse toH1GraphFwd toH1GraphBwd toH1GraphBwd_Fwd
-    toH1GraphFwd_Bwd
+  ContinuousLinearEquiv.equivOfInverse RieszBridge.toH1GraphFwd RieszBridge.toH1GraphBwd
+      RieszBridge.toH1GraphBwd_Fwd
+    RieszBridge.toH1GraphFwd_Bwd
 
-@[simp] lemma toH1Graph_apply (U : W1pGraph 2 ν Ω) : toH1Graph (ν := ν) U = toH1GraphFwd U := rfl
+@[simp] lemma toH1Graph_apply (U : W1pGraph 2 ν Ω) : toH1Graph (ν := ν) U =
+    RieszBridge.toH1GraphFwd U := rfl
 
 @[simp] lemma toH1Graph_symm_apply (U : H1Graph ν Ω) :
-    (toH1Graph (ν := ν) (Ω := Ω)).symm U = toH1GraphBwd U := rfl
+    (toH1Graph (ν := ν) (Ω := Ω)).symm U = RieszBridge.toH1GraphBwd U := rfl
 
 /-- The function part of `toH1Graph U` is the function part of `U`. -/
 lemma fnL_toH1Graph (U : W1pGraph 2 ν Ω) : H1Graph.fnL (toH1Graph U) = fnL U := rfl
@@ -138,12 +145,12 @@ lemma fnL_toH1Graph (U : W1pGraph 2 ν Ω) : H1Graph.fnL (toH1Graph U) = fnL U :
 lemma coeFn_gradL_toH1Graph (U : W1pGraph 2 ν Ω) :
     ⇑(H1Graph.gradL (toH1Graph U)) =ᵐ[ν.restrict Ω]
       fun x => (InnerProductSpace.toDual ℝ F).symm (gradL U x) :=
-  coeFn_gradL_toH1GraphFwd U
+  RieszBridge.coeFn_gradL_toH1GraphFwd U
 
 /-- The Riesz bridge preserves the `ℓ²` product norm. -/
 theorem norm_toH1Graph (U : W1pGraph 2 ν Ω) : ‖toH1Graph U‖ = ‖U‖ := by
   rw [WithLp.prod_norm_eq_of_L2, WithLp.prod_norm_eq_of_L2]
-  have h : ‖(H1Graph.gradL (toH1Graph U))‖ = ‖gradL U‖ := norm_compLp_rieszL _
+  have h : ‖(H1Graph.gradL (toH1Graph U))‖ = ‖gradL U‖ := RieszBridge.norm_compLp_rieszL _
   have h' : ‖(H1Graph.fnL (toH1Graph U))‖ = ‖fnL U‖ := rfl
   exact congrArg₂ (fun a b => Real.sqrt (a ^ 2 + b ^ 2)) h' h
 
@@ -167,7 +174,7 @@ namespace W1p0
 
 variable [BorelSpace F] [IsFiniteMeasureOnCompacts ν]
 
-lemma toH1Graph_mem {U : W1pGraph 2 ν Ω} (hU : U ∈ W1p0 2 ν Ω) :
+lemma RieszBridge.toH1Graph_mem {U : W1pGraph 2 ν Ω} (hU : U ∈ W1p0 2 ν Ω) :
     W1pGraph.toH1Graph U ∈ H1Graph.H01 ν Ω := by
   have hcl : IsClosed ((W1pGraph.toH1Graph (ν := ν) (Ω := Ω)) ⁻¹'
       (H1Graph.H01 ν Ω : Set (H1Graph ν Ω))) :=
@@ -182,7 +189,7 @@ lemma toH1Graph_mem {U : W1pGraph 2 ν Ω} (hU : U ∈ W1p0 2 ν Ω) :
   rw [W1p0, ← SetLike.mem_coe, Submodule.topologicalClosure_coe] at hU
   exact closure_minimal hsub hcl hU
 
-lemma toH1Graph_symm_mem {U : H1Graph ν Ω} (hU : U ∈ H1Graph.H01 ν Ω) :
+lemma RieszBridge.toH1Graph_symm_mem {U : H1Graph ν Ω} (hU : U ∈ H1Graph.H01 ν Ω) :
     (W1pGraph.toH1Graph (ν := ν) (Ω := Ω)).symm U ∈ W1p0 2 ν Ω := by
   have hcl : IsClosed (((W1pGraph.toH1Graph (ν := ν) (Ω := Ω)).symm) ⁻¹'
       (W1p0 2 ν Ω : Set (W1pGraph 2 ν Ω))) :=
@@ -193,25 +200,29 @@ lemma toH1Graph_symm_mem {U : H1Graph ν Ω} (hU : U ∈ H1Graph.H01 ν Ω) :
   exact W1pGraph.toH1Graph_testGraph φ
 
 /-- The Riesz bridge restricted to `W1p0`. -/
-def toH01Fwd : W1p0 2 ν Ω →L[ℝ] H1Graph.H01 ν Ω :=
+def RieszBridge.toH01Fwd : W1p0 2 ν Ω →L[ℝ] H1Graph.H01 ν Ω :=
   ((W1pGraph.toH1Graph : W1pGraph 2 ν Ω ≃L[ℝ] H1Graph ν Ω).toContinuousLinearMap.comp
-    (W1p0 2 ν Ω).subtypeL).codRestrict (H1Graph.H01 ν Ω) (fun U => toH1Graph_mem U.2)
+    (W1p0 2 ν Ω).subtypeL).codRestrict (H1Graph.H01 ν Ω) (fun U => RieszBridge.toH1Graph_mem U.2)
 
 /-- The inverse Riesz bridge restricted to `H01`. -/
-def toH01Bwd : H1Graph.H01 ν Ω →L[ℝ] W1p0 2 ν Ω :=
+def RieszBridge.toH01Bwd : H1Graph.H01 ν Ω →L[ℝ] W1p0 2 ν Ω :=
   ((W1pGraph.toH1Graph : W1pGraph 2 ν Ω ≃L[ℝ] H1Graph ν Ω).symm.toContinuousLinearMap.comp
-    (H1Graph.H01 ν Ω).subtypeL).codRestrict (W1p0 2 ν Ω) (fun U => toH1Graph_symm_mem U.2)
+    (H1Graph.H01 ν Ω).subtypeL).codRestrict (W1p0 2 ν Ω) (fun U => RieszBridge.toH1Graph_symm_mem
+    U.2)
 
-lemma toH01Bwd_Fwd (U : W1p0 2 ν Ω) : toH01Bwd (toH01Fwd U) = U :=
+lemma RieszBridge.toH01Bwd_Fwd (U : W1p0 2 ν Ω) : RieszBridge.toH01Bwd (RieszBridge.toH01Fwd U) =
+    U :=
   Subtype.ext ((W1pGraph.toH1Graph (ν := ν) (Ω := Ω)).symm_apply_apply (U : W1pGraph 2 ν Ω))
 
-lemma toH01Fwd_Bwd (U : H1Graph.H01 ν Ω) : toH01Fwd (toH01Bwd U) = U :=
+lemma RieszBridge.toH01Fwd_Bwd (U : H1Graph.H01 ν Ω) : RieszBridge.toH01Fwd (RieszBridge.toH01Bwd
+    U) = U :=
   Subtype.ext ((W1pGraph.toH1Graph (ν := ν) (Ω := Ω)).apply_symm_apply (U : H1Graph ν Ω))
 
 /-- **`W^{1,2}_0 = H^1_0`.** The Riesz bridge restricts to a continuous linear equivalence from
 `W1p0 2 ν Ω` to `H1Graph.H01 ν Ω`. -/
 def toH01 : W1p0 2 ν Ω ≃L[ℝ] H1Graph.H01 ν Ω :=
-  ContinuousLinearEquiv.equivOfInverse toH01Fwd toH01Bwd toH01Bwd_Fwd toH01Fwd_Bwd
+  ContinuousLinearEquiv.equivOfInverse RieszBridge.toH01Fwd RieszBridge.toH01Bwd
+      RieszBridge.toH01Bwd_Fwd RieszBridge.toH01Fwd_Bwd
 
 lemma coe_toH01 (U : W1p0 2 ν Ω) :
     (toH01 U : H1Graph ν Ω) = W1pGraph.toH1Graph (U : W1pGraph 2 ν Ω) := rfl

@@ -100,7 +100,7 @@ local notation "𝓛'" => ContinuousLinearEquiv.symm (toEuclidean (E := E))
 /-- The pullback of a vector of `F = EuclideanSpace ℝ (Fin (finrank ℝ E))`, read as a covector
 through the Riesz map, to a covector on `E` along `toEuclidean`. -/
 def pullback : 𝔽 →L[ℝ] StrongDual ℝ E :=
-  ((ContinuousLinearMap.compL ℝ E 𝔽 ℝ).flip (𝓛 : E →L[ℝ] 𝔽)).comp rieszC'
+  ((ContinuousLinearMap.compL ℝ E 𝔽 ℝ).flip (𝓛 : E →L[ℝ] 𝔽)).comp RieszBridge.rieszC'
 
 omit [MeasurableSpace E] in
 lemma pullback_apply (w : 𝔽) (z : E) : pullback w z = inner ℝ w (𝓛 z) := rfl

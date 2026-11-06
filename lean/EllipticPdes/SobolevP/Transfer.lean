@@ -216,7 +216,7 @@ variable [BorelSpace E] [BorelSpace F] {p : ℝ≥0∞} [Fact (1 ≤ p)] {μ : M
 
 /-- The change of variables sends `W1p0` into `W1p0`, because it sends test graphs to test
 graphs and is continuous. -/
-lemma mapOfMP_mem (L : E ≃L[ℝ] F)
+lemma Transfer.mapOfMP_mem (L : E ≃L[ℝ] F)
     (h : MeasurePreserving L.symm (μ'.restrict Ω') (μ.restrict Ω)) (hΩ : L '' Ω ⊆ Ω')
     {U : W1pGraph p μ Ω} (hU : U ∈ W1p0 p μ Ω) : W1pGraph.mapOfMP L h U ∈ W1p0 p μ' Ω' := by
   have hcl : IsClosed (W1pGraph.mapOfMP L h ⁻¹' (W1p0 p μ' Ω' : Set (W1pGraph p μ' Ω'))) :=
@@ -231,39 +231,41 @@ lemma mapOfMP_mem (L : E ≃L[ℝ] F)
   exact closure_minimal hsub hcl hU
 
 /-- The forward change of variables, as a map `W₀^{1,p}(Ω) → W₀^{1,p}(L '' Ω)`. -/
-def mapFwd (L : E ≃L[ℝ] F) : W1p0 p μ Ω →L[ℝ] W1p0 p (μ.map L) (L '' Ω) :=
+def Transfer.mapFwd (L : E ≃L[ℝ] F) : W1p0 p μ Ω →L[ℝ] W1p0 p (μ.map L) (L '' Ω) :=
   ((W1pGraph.mapL (p := p) (μ := μ) (Ω := Ω) L).comp (W1p0 p μ Ω).subtypeL).codRestrict
     (W1p0 p (μ.map L) (L '' Ω))
-    (fun U => mapOfMP_mem (μ' := μ.map L) L (measurePreserving_symm_restrict_image L μ Ω)
+    (fun U => Transfer.mapOfMP_mem (μ' := μ.map L) L (measurePreserving_symm_restrict_image L μ Ω)
       subset_rfl U.2)
 
 /-- The inverse change of variables, as a map `W₀^{1,p}(L '' Ω) → W₀^{1,p}(Ω)`. -/
-def mapBwd (L : E ≃L[ℝ] F) : W1p0 p (μ.map L) (L '' Ω) →L[ℝ] W1p0 p μ Ω :=
+def Transfer.mapBwd (L : E ≃L[ℝ] F) : W1p0 p (μ.map L) (L '' Ω) →L[ℝ] W1p0 p μ Ω :=
   ((W1pGraph.mapOfMP (p := p) (μ := μ.map L) (Ω := L '' Ω) (μ' := μ) (Ω' := Ω) L.symm
       (measurePreserving_restrict_image L μ Ω)).comp
     (W1p0 p (μ.map L) (L '' Ω)).subtypeL).codRestrict (W1p0 p μ Ω)
-    (fun U => mapOfMP_mem (μ := μ.map L) (Ω := L '' Ω) (μ' := μ) (Ω' := Ω) L.symm
+    (fun U => Transfer.mapOfMP_mem (μ := μ.map L) (Ω := L '' Ω) (μ' := μ) (Ω' := Ω) L.symm
       (measurePreserving_restrict_image L μ Ω)
       (by rintro _ ⟨_, ⟨x, hx, rfl⟩, rfl⟩; simpa using hx) U.2)
 
-lemma coe_mapFwd (L : E ≃L[ℝ] F) (U : W1p0 p μ Ω) :
-    (mapFwd L U : W1pGraph p (μ.map L) (L '' Ω)) = W1pGraph.mapL L (U : W1pGraph p μ Ω) := rfl
+lemma Transfer.coe_mapFwd (L : E ≃L[ℝ] F) (U : W1p0 p μ Ω) :
+    (Transfer.mapFwd L U : W1pGraph p (μ.map L) (L '' Ω)) = W1pGraph.mapL L (U : W1pGraph p μ Ω)
+    := rfl
 
-lemma coe_mapBwd (L : E ≃L[ℝ] F) (U : W1p0 p (μ.map L) (L '' Ω)) :
-    (mapBwd L U : W1pGraph p μ Ω) =
+lemma Transfer.coe_mapBwd (L : E ≃L[ℝ] F) (U : W1p0 p (μ.map L) (L '' Ω)) :
+    (Transfer.mapBwd L U : W1pGraph p μ Ω) =
       W1pGraph.mapOfMP (p := p) (μ := μ.map L) (Ω := L '' Ω) (μ' := μ) (Ω' := Ω) L.symm
         (measurePreserving_restrict_image L μ Ω) (U : W1pGraph p (μ.map L) (L '' Ω)) := rfl
 
-lemma mapBwd_mapFwd (L : E ≃L[ℝ] F) (U : W1p0 p μ Ω) : mapBwd L (mapFwd L U) = U := by
+lemma Transfer.mapBwd_mapFwd (L : E ≃L[ℝ] F) (U : W1p0 p μ Ω) : Transfer.mapBwd L
+    (Transfer.mapFwd L U) = U := by
   refine Subtype.ext ?_
-  rw [coe_mapBwd, coe_mapFwd]
+  rw [Transfer.coe_mapBwd, Transfer.coe_mapFwd]
   exact W1pGraph.mapOfMP_comp L (measurePreserving_symm_restrict_image L μ Ω)
     (measurePreserving_restrict_image L μ Ω) _
 
-lemma mapFwd_mapBwd (L : E ≃L[ℝ] F) (U : W1p0 p (μ.map L) (L '' Ω)) :
-    mapFwd L (mapBwd L U) = U := by
+lemma Transfer.mapFwd_mapBwd (L : E ≃L[ℝ] F) (U : W1p0 p (μ.map L) (L '' Ω)) :
+    Transfer.mapFwd L (Transfer.mapBwd L U) = U := by
   refine Subtype.ext ?_
-  rw [coe_mapFwd, coe_mapBwd]
+  rw [Transfer.coe_mapFwd, Transfer.coe_mapBwd]
   exact W1pGraph.mapOfMP_comp (μ := μ.map L) (Ω := L '' Ω) (μ' := μ) (Ω' := Ω) L.symm
     (measurePreserving_restrict_image L μ Ω) (measurePreserving_symm_restrict_image L μ Ω) _
 
@@ -272,8 +274,9 @@ continuous linear equivalence `W₀^{1,p}(Ω) ≃L W₀^{1,p}(L '' Ω)`, with re
 measure. -/
 def mapEquiv (L : E ≃L[ℝ] F) :
     W1p0 p μ Ω ≃L[ℝ] W1p0 p (μ.map L) (L '' Ω) :=
-  ContinuousLinearEquiv.equivOfInverse (mapFwd L) (mapBwd L) (mapBwd_mapFwd L)
-    (mapFwd_mapBwd L)
+  ContinuousLinearEquiv.equivOfInverse (Transfer.mapFwd L) (Transfer.mapBwd L)
+      (Transfer.mapBwd_mapFwd L)
+    (Transfer.mapFwd_mapBwd L)
 
 /-- The function part of `mapEquiv L U` is `u ∘ L.symm`. -/
 theorem fnL_mapEquiv (L : E ≃L[ℝ] F) (U : W1p0 p μ Ω) :

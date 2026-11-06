@@ -64,7 +64,13 @@ lemma isBounded_image {Ω : Set E} (hΩ : Bornology.IsBounded Ω) :
     Bornology.IsBounded (𝓛 '' Ω) :=
   (toEuclidean (E := E) : E →L[ℝ] 𝔽).lipschitzWith.isBounded_image hΩ
 
-namespace Transport
+/-! ### Internal transport lemmas
+
+The namespace `Internal.Transport` is an implementation detail of the transfer proofs. Its lemmas
+are abstract over any continuous linear equivalence intertwining two forms and are not part of the
+supported interface. -/
+
+namespace Internal.Transport
 
 variable {A B L₁ L₂ : Type*} [NormedAddCommGroup A] [NormedSpace ℝ A]
   [NormedAddCommGroup B] [NormedSpace ℝ B]
@@ -250,9 +256,9 @@ lemma garding {l γ : ℝ} (hl : 0 < l) (eA' : A → L₁) (eB' : B → L₂)
     _ = l / 2 * ‖T u‖ ^ 2 := by field_simp
     _ ≤ _ := h2
 
-end Transport
+end Internal.Transport
 
-namespace Transport
+namespace Internal.Transport
 
 /-- **Spectral transfer.** If the solution operator of a coercive symmetric form on a Hilbert space
 `H` has eigenspaces spanning `L₂`, and `A ≃L H` intertwines the forms and the embeddings up to a
@@ -260,7 +266,7 @@ unitary `L₁ ≃ L₂`, then the solution operator of the form on `A`, defined 
 has eigenspaces spanning `L₁`. -/
 lemma spectral {A H L₁ L₂ : Type*} [NormedAddCommGroup A] [NormedSpace ℝ A]
     [NormedAddCommGroup H] [InnerProductSpace ℝ H] [CompleteSpace H]
-    [NormedAddCommGroup L₁] [InnerProductSpace ℝ L₁] [CompleteSpace L₁]
+    [NormedAddCommGroup L₁] [InnerProductSpace ℝ L₁]
     [NormedAddCommGroup L₂] [InnerProductSpace ℝ L₂] [CompleteSpace L₂]
     (T : A ≃L[ℝ] H) {BA : A →L[ℝ] A →L[ℝ] ℝ} {BB : H →L[ℝ] H →L[ℝ] ℝ}
     (hform : ∀ u v, BA u v = BB (T u) (T v)) (Q : L₁ ≃ₗᵢ[ℝ] L₂) (eA : A → L₁)
@@ -312,7 +318,7 @@ lemma spectral {A H L₁ L₂ : Type*} [NormedAddCommGroup A] [NormedSpace ℝ A
     have : Q x = 0 := (Submodule.mem_bot ℝ).1 hmem
     simpa using this
 
-end Transport
+end Internal.Transport
 
 variable (μ) in
 /-- The isometry `L²(Ω) ≃ L²(L '' Ω)` along the measure-preserving map `toEuclidean`. -/
@@ -363,7 +369,7 @@ lemma norm_embL2_transferEquiv (u : W1p0 2 μ Ω) :
 lemma isCoercive_formOn_of_transfer
     (h : IsCoercive (Op.transfer.formOn (𝓛 '' Ω) (H1Graph.H01 (μ.map 𝓛) (𝓛 '' Ω)))) :
     IsCoercive (Op.formOn Ω) :=
-  Transport.isCoercive (transferEquiv μ Ω) (formOn_transfer Op Ω) h
+  Internal.Transport.isCoercive (transferEquiv μ Ω) (formOn_transfer Op Ω) h
 
 variable {Ω}
 
@@ -372,7 +378,7 @@ variable {Ω}
 transfer changes the `W₀^{1,2}` norm by an equivalence of unspecified constant. -/
 theorem garding (Ω : Set E) : ∃ β γ : ℝ, 0 < β ∧ ∀ U : W1p0 2 μ Ω,
     β * ‖U‖ ^ 2 ≤ Op.formOn Ω U U + γ * ‖W1p0.fnL U‖ ^ 2 :=
-  Transport.garding (transferEquiv μ Ω) (formOn_transfer Op Ω) Op.transfer.lam_pos
+  Internal.Transport.garding (transferEquiv μ Ω) (formOn_transfer Op Ω) Op.transfer.lam_pos
     (fun u => W1p0.fnL u)
     (fun U : H1Graph.H01 (μ.map 𝓛) (𝓛 '' Ω) => H1Graph.fnL (U : H1Graph (μ.map 𝓛) (𝓛 '' Ω)))
     (norm_embL2_transferEquiv Ω) (Op.transfer.garding (𝓛 '' Ω))
@@ -401,7 +407,7 @@ theorem weak_solution_of_nonneg_zeroth_of_bounded [Nontrivial E]
     DivForm.FullEllipticOp.weak_solution_of_nonneg_zeroth_of_bounded Op.transfer
       (isBounded_image hΩb) hb' hc'
   have hl := Op.transfer.lam_pos
-  exact Transport.weak_solution (transferEquiv μ Ω) (formOn_transfer Op Ω) (lpEquiv μ Ω)
+  exact Internal.Transport.weak_solution (transferEquiv μ Ω) (formOn_transfer Op Ω) (lpEquiv μ Ω)
     (fun u => W1p0.fnL u) (fun U => H1Graph.embL2 (μ.map 𝓛) (𝓛 '' Ω) U)
     (embL2_transferEquiv Ω) (M := (CP + 1) / Op.transfer.lam) (by positivity) hex
 
@@ -411,7 +417,7 @@ theorem fredholm_alternative_of_bounded_haar (hΩm : MeasurableSet Ω)
     (hΩb : Bornology.IsBounded Ω) :
     (∃ u : W1p0 2 μ Ω, u ≠ 0 ∧ ∀ v, Op.formOn Ω u v = 0) ∨
       ∀ f : StrongDual ℝ (W1p0 2 μ Ω), ∃! u, ∀ v, Op.formOn Ω u v = f v :=
-  Transport.fredholm_alternative (transferEquiv μ Ω) (formOn_transfer Op Ω)
+  Internal.Transport.fredholm_alternative (transferEquiv μ Ω) (formOn_transfer Op Ω)
     (Op.transfer.fredholm_alternative_of_bounded_haar (measurableSet_image hΩm)
       (isBounded_image hΩb))
 
@@ -422,7 +428,7 @@ theorem fredholm_unique_imp_exists_of_bounded_haar (hΩm : MeasurableSet Ω)
     (huniq : ∀ u : W1p0 2 μ Ω, (∀ v, Op.formOn Ω u v = 0) → u = 0)
     (f : StrongDual ℝ (W1p0 2 μ Ω)) :
     ∃! u, ∀ v, Op.formOn Ω u v = f v :=
-  Transport.unique_imp_exists (transferEquiv μ Ω) (formOn_transfer Op Ω)
+  Internal.Transport.unique_imp_exists (transferEquiv μ Ω) (formOn_transfer Op Ω)
     (fun hu f' => Op.transfer.fredholm_unique_imp_exists_of_bounded_haar
       (measurableSet_image hΩm) (isBounded_image hΩb) hu f') huniq f
 
@@ -432,7 +438,7 @@ theorem solvable_iff_orthogonal_transpose_of_bounded_haar (hΩm : MeasurableSet 
     (hΩb : Bornology.IsBounded Ω) (f : StrongDual ℝ (W1p0 2 μ Ω)) :
     (∃ u, ∀ v, Op.formOn Ω u v = f v) ↔
       ∀ w, (∀ v, Op.formOn Ω v w = 0) → f w = 0 :=
-  Transport.solvable_iff (transferEquiv μ Ω) (formOn_transfer Op Ω)
+  Internal.Transport.solvable_iff (transferEquiv μ Ω) (formOn_transfer Op Ω)
     (fun f' => Op.transfer.solvable_iff_orthogonal_transpose_of_bounded_haar
       (measurableSet_image hΩm) (isBounded_image hΩb) f') f
 
@@ -451,7 +457,7 @@ theorem notMem_sigmaSet_iff_solvable_of_bounded_haar (hΩm : MeasurableSet Ω)
         lam * ⟪W1p0.fnL u, W1p0.fnL v⟫ + ⟪f, W1p0.fnL v⟫ :=
   (Op.transfer.notMem_sigmaSet_iff_solvable_of_bounded_haar
     (measurableSet_image hΩm) (isBounded_image hΩb) lam).trans
-    (Transport.notMem_iff (transferEquiv μ Ω) (formOn_transfer Op Ω) (lpEquiv μ Ω)
+    (Internal.Transport.notMem_iff (transferEquiv μ Ω) (formOn_transfer Op Ω) (lpEquiv μ Ω)
       (fun u => W1p0.fnL u) (fun U => H1Graph.embL2 (μ.map 𝓛) (𝓛 '' Ω) U)
       (embL2_transferEquiv Ω) lam)
 
@@ -479,7 +485,8 @@ theorem resolvent_bound_of_bounded_haar (hΩm : MeasurableSet Ω) (hΩb : Bornol
         ‖W1p0.fnL u‖ ≤ C * ‖f‖ := by
   obtain ⟨C, hC, h⟩ := Op.transfer.resolvent_bound_of_bounded_haar (measurableSet_image hΩm)
     (isBounded_image hΩb) hlam
-  exact ⟨C, hC, fun f u hu => Transport.resolvent (transferEquiv μ Ω) (formOn_transfer Op Ω)
+  exact ⟨C, hC, fun f u hu => Internal.Transport.resolvent (transferEquiv μ Ω) (formOn_transfer
+      Op Ω)
     (lpEquiv μ Ω) (fun u => W1p0.fnL u) (fun U => H1Graph.embL2 (μ.map 𝓛) (𝓛 '' Ω) U)
     (embL2_transferEquiv Ω) h f u hu⟩
 
@@ -511,7 +518,7 @@ theorem symmetric_spectral_of_bounded_haar [Nontrivial E] (hΩm : MeasurableSet 
   obtain ⟨hco', hspec⟩ := Op.transfer.symmetric_spectral_of_bounded_haar (measurableSet_image hΩm)
     (isBounded_image hΩb) (Op.transfer_adjoint ha) hb' hc'
   exact ⟨isCoercive_formOn_of_transfer Op Ω hco',
-    Transport.spectral (transferEquiv μ Ω) (formOn_transfer Op Ω) (lpEquiv μ Ω)
+    Internal.Transport.spectral (transferEquiv μ Ω) (formOn_transfer Op Ω) (lpEquiv μ Ω)
       (fun u => W1p0.fnL u) (H1Graph.embL2 (μ.map 𝓛) (𝓛 '' Ω)) (embL2_transferEquiv Ω) hco'
       hspec⟩
 
