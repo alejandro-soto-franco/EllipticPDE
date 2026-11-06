@@ -659,7 +659,9 @@ assert_classical_axioms
 /-! ### The weak maximum principle on a normed space -/
 
 assert_classical_axioms
+  EllipticPdes.NormedDivForm.exists_mem_W1p0_posPart_sub_const
   EllipticPdes.NormedDivForm.FullEllipticOp.weak_maximum_principle
+  EllipticPdes.NormedDivForm.FullEllipticOp.weak_maximum_principle_transport
   EllipticPdes.NormedDivForm.FullEllipticOp.weak_maximum_principle_H01
   EllipticPdes.NormedDivForm.FullEllipticOp.eq_zero_of_weakSolution_H01
 

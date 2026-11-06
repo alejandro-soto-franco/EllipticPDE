@@ -8,6 +8,7 @@ module
 
 public import EllipticPdes.NormedDivForm.Theorems
 public import EllipticPdes.NormedDivForm.Graph
+public import EllipticPdes.Embedding.H01SobolevHaar
 public import EllipticPdes.Existence.DivFormMaximum
 
 /-!
@@ -23,7 +24,11 @@ truncation `(u - k)⁺`. The proofs use that `toEuclidean.symm` is measure-prese
 ## Main declarations
 
 * `EllipticPdes.NormedDivForm.transferEquiv_posPart`
+* `EllipticPdes.NormedDivForm.exists_mem_W1p0_posPart_sub_const`
 * `EllipticPdes.NormedDivForm.FullEllipticOp.weak_maximum_principle`
+* `EllipticPdes.NormedDivForm.FullEllipticOp.weak_maximum_principle_transport`: the form with a
+  bounded transport term, in dimension at least two, from the Sobolev inequality for a Haar
+  measure.
 * `EllipticPdes.NormedDivForm.FullEllipticOp.weak_maximum_principle_H01`
 * `EllipticPdes.NormedDivForm.FullEllipticOp.eq_zero_of_weakSolution_H01`
 -/
@@ -94,6 +99,51 @@ lemma ae_nonneg_iff_transfer (u : W1p0 2 μ Ω) :
       ∀ᵐ y ∂(μ.map 𝓛).restrict (𝓛 '' Ω),
         0 ≤ H1Graph.fnL (transferEquiv μ Ω u : H1Graph (μ.map 𝓛) (𝓛 '' Ω)) y :=
   ae_iff_transfer Ω u u (fun a _ => 0 ≤ a)
+
+omit [MeasurableSpace E] [BorelSpace E] [μ.IsAddHaarMeasure] in
+/-- The covector map `ξ ↦ Riesz (ξ ∘ L.symm)` is injective. -/
+lemma Internal.riesz_comp_injective {ξ η : StrongDual ℝ E}
+    (h : (InnerProductSpace.toDual ℝ 𝔽).symm (ξ.comp (𝓛' : 𝔽 →L[ℝ] E)) =
+      (InnerProductSpace.toDual ℝ 𝔽).symm (η.comp (𝓛' : 𝔽 →L[ℝ] E))) : ξ = η :=
+  ContinuousLinearMap.ext fun z => by
+    simpa using DFunLike.congr_fun ((InnerProductSpace.toDual ℝ 𝔽).symm.injective h) (𝓛 z)
+
+/-- The transfer of `(transferEquiv).symm W` is `W`. -/
+lemma Internal.coe_transferEquiv_symm (W : H1Graph.H01 (μ.map 𝓛) (𝓛 '' Ω)) :
+    (transferEquiv μ Ω ((transferEquiv μ Ω).symm W) : H1Graph (μ.map 𝓛) (𝓛 '' Ω)) = W := by
+  rw [ContinuousLinearEquiv.apply_symm_apply]
+
+/-- The gradient of a truncation pulls back from the image. -/
+lemma Internal.gradL_posPart_pullback (v w : W1p0 2 μ Ω) {k : ℝ}
+    (W : H1Graph (μ.map 𝓛) (𝓛 '' Ω))
+    (hWw : (transferEquiv μ Ω w : H1Graph (μ.map 𝓛) (𝓛 '' Ω)) = W)
+    (hg : ⇑(H1Graph.gradL W) =ᵐ[(μ.map 𝓛).restrict (𝓛 '' Ω)] fun y =>
+      if k < H1Graph.fnL (transferEquiv μ Ω v : H1Graph (μ.map 𝓛) (𝓛 '' Ω)) y then
+        H1Graph.gradL (transferEquiv μ Ω v : H1Graph (μ.map 𝓛) (𝓛 '' Ω)) y else 0) :
+    ⇑(W1p0.gradL w) =ᵐ[μ.restrict Ω]
+      fun x => if k < W1p0.fnL v x then W1p0.gradL v x else 0 := by
+  subst hWw
+  filter_upwards [gradL_transferEquiv_ae Ω w, gradL_transferEquiv_ae Ω v, fnL_transferEquiv_ae Ω v,
+    (measurePreserving_restrict_image 𝓛 μ Ω).quasiMeasurePreserving.ae hg] with x h1 h2 h3 h4
+  refine Internal.riesz_comp_injective (h1.symm.trans (h4.trans ?_))
+  simp only [Function.comp_apply] at h3
+  rw [h3, h2]
+  split_ifs <;> simp
+
+/-- **Truncation in `W₀^{1,2}` on a normed space.** For `v ∈ W₀^{1,2}(Ω)` and `k ≥ 0`, the
+truncation `(v - k)⁺` is the function part of an element of `W₀^{1,2}(Ω)` whose gradient is `∇v` on
+`{v > k}` and `0` elsewhere. -/
+theorem exists_mem_W1p0_posPart_sub_const (hΩ : IsOpen Ω) (v : W1p0 2 μ Ω) {k : ℝ}
+    (hk : 0 ≤ k) :
+    ∃ w : W1p0 2 μ Ω, ⇑(W1p0.fnL w) =ᵐ[μ.restrict Ω] (fun x => max (W1p0.fnL v x - k) 0) ∧
+      ⇑(W1p0.gradL w) =ᵐ[μ.restrict Ω]
+        fun x => if k < W1p0.fnL v x then W1p0.gradL v x else 0 := by
+  obtain ⟨W, hW, hf, hg⟩ := H1Graph.exists_mem_H01_posPart_sub_const
+    (show IsOpen (𝓛 '' Ω) from (toEuclidean (E := E)).toHomeomorph.isOpenMap _ hΩ)
+    (transferEquiv μ Ω v).2 hk
+  refine ⟨(transferEquiv μ Ω).symm ⟨W, hW⟩, (transferEquiv_posPart Ω v _ k).2 (by
+    rw [Internal.coe_transferEquiv_symm Ω ⟨W, hW⟩]; exact hf), ?_⟩
+  exact Internal.gradL_posPart_pullback Ω v _ W (Internal.coe_transferEquiv_symm Ω ⟨W, hW⟩) hg
 
 end Lattice
 
@@ -190,6 +240,31 @@ theorem weak_maximum_principle [Nontrivial E] (hΩ : IsOpen Ω) (hΩb : Bornolog
     (Op.transfer.weak_maximum_principle ((toEuclidean (E := E)).toHomeomorph.isOpenMap _ hΩ)
       (isBounded_toEuclidean_image hΩb) (Internal.transfer_b_eq_zero Op hb)
       (Internal.transfer_c_nonneg Op hc) (graphTransfer_mem_W12 Ω hU)
+      (Internal.form_nonpos_of_sub_graph Op Ω U hsub) hk
+      ⟨transferEquiv μ Ω V, (ae_iff_graphTransfer Ω U V (fun a b => b = max (a - k) 0)).1 hV⟩)
+
+/-- **Weak maximum principle with a transport term** (Gilbarg and Trudinger Theorem 8.1, in
+dimension at least two), on a finite-dimensional real normed space. Let `Ω` be a bounded open set,
+`L` a divergence-form operator with bounded transport term and nonnegative zeroth-order
+coefficient, and `U ∈ W^{1,2}(Ω)` a weak subsolution, meaning the bilinear pairing of `U` against
+every nonnegative `V ∈ W₀^{1,2}(Ω)` is nonpositive. If `k ≥ 0` and `(u - k)⁺` is the function part
+of some element of `W₀^{1,2}(Ω)`, then `u ≤ k` almost everywhere on `Ω`. -/
+theorem weak_maximum_principle_transport (hn : 2 ≤ finrank ℝ E) (hΩ : IsOpen Ω)
+    (hΩb : Bornology.IsBounded Ω) (hc : ∀ᵐ x ∂μ, 0 ≤ Op.c x) {U : W1pGraph 2 μ Ω}
+    (hU : U ∈ W1pGraph.W12 μ Ω)
+    (hsub : ∀ V : W1p0 2 μ Ω, (∀ᵐ x ∂μ.restrict Ω, 0 ≤ W1p0.fnL V x) → Op.form Ω U V ≤ 0)
+    {k : ℝ} (hk : 0 ≤ k)
+    (hbd : ∃ V : W1p0 2 μ Ω, ⇑(W1p0.fnL V) =ᵐ[μ.restrict Ω]
+      fun x => max (W1pGraph.fnL U x - k) 0) :
+    ∀ᵐ x ∂μ.restrict Ω, W1pGraph.fnL U x ≤ k := by
+  obtain ⟨V, hV⟩ := hbd
+  obtain ⟨q, hq, C, hC, hsob⟩ := H1Graph.exists_eLpNorm_le_of_mem_H01_haar (μ.map 𝓛)
+    (by simpa using hn) (measurableSet_toEuclidean_image hΩ.measurableSet)
+    (isBounded_toEuclidean_image hΩb)
+  exact (ae_iff_graphTransfer Ω U U (fun a _ => a ≤ k)).2
+    (Op.transfer.weak_maximum_principle_transport_of_sobolev
+      ((toEuclidean (E := E)).toHomeomorph.isOpenMap _ hΩ) (isBounded_toEuclidean_image hΩb)
+      (Internal.transfer_c_nonneg Op hc) hq hC hsob (graphTransfer_mem_W12 Ω hU)
       (Internal.form_nonpos_of_sub_graph Op Ω U hsub) hk
       ⟨transferEquiv μ Ω V, (ae_iff_graphTransfer Ω U V (fun a b => b = max (a - k) 0)).1 hV⟩)
 
