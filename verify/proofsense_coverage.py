@@ -361,6 +361,51 @@ EXEMPT = {
         "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
         "source states it in coordinates, so the warrant sits at the coordinate declaration"
     ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.weak_solution_of_nonneg_zeroth_of_bounded": (
+        "the transfer along toEuclidean to the twin warranted at EllipticPdes.Sobolev.FullEllipticOp.weak_solution_L2_of_nonneg_zeroth_of_bounded, stated for a "
+        "divergence-form operator on a finite-dimensional real normed space by transfer; the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.garding": (
+        "the transfer along toEuclidean to the twin warranted at EllipticPdes.Sobolev.FullEllipticOp.garding, stated for a "
+        "divergence-form operator on a finite-dimensional real normed space by transfer; the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.fredholm_alternative_of_bounded_haar": (
+        "the transfer along toEuclidean to the twin warranted at EllipticPdes.Sobolev.FullEllipticOp.fredholm_alternative_of_bounded, stated for a "
+        "divergence-form operator on a finite-dimensional real normed space by transfer; the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.fredholm_unique_imp_exists_of_bounded_haar": (
+        "the transfer along toEuclidean to the twin warranted at EllipticPdes.Sobolev.FullEllipticOp.fredholm_alternative_of_bounded, stated for a "
+        "divergence-form operator on a finite-dimensional real normed space by transfer; the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.solvable_iff_orthogonal_transpose_of_bounded_haar": (
+        "the transfer along toEuclidean to the twin warranted at EllipticPdes.Sobolev.FullEllipticOp.solvable_iff_orthogonal_solSpaceStar, stated for a "
+        "divergence-form operator on a finite-dimensional real normed space by transfer; the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.notMem_sigmaSet_iff_solvable_of_bounded_haar": (
+        "the transfer along toEuclidean to the twin warranted at EllipticPdes.Sobolev.FullEllipticOp.existence_three_of_bounded, stated for a "
+        "divergence-form operator on a finite-dimensional real normed space by transfer; the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.existence_three_of_bounded_haar": (
+        "the transfer along toEuclidean to the twin warranted at EllipticPdes.Sobolev.FullEllipticOp.existence_three_of_bounded, stated for a "
+        "divergence-form operator on a finite-dimensional real normed space by transfer; the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.resolvent_bound_of_bounded_haar": (
+        "the transfer along toEuclidean to the twin warranted at EllipticPdes.Sobolev.FullEllipticOp.resolvent_bound_of_bounded, stated for a "
+        "divergence-form operator on a finite-dimensional real normed space by transfer; the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.FullEllipticOp.symmetric_spectral_of_bounded_haar": (
+        "the transfer along toEuclidean to the twin warranted at EllipticPdes.Sobolev.symmetric_fullElliptic_spectral, stated for a "
+        "divergence-form operator on a finite-dimensional real normed space by transfer; the cited "
+        "source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
     "EllipticPdes.H1Graph.mem_H01_of_hasCompactSupport": (
         "the theorem warranted at EllipticPdes.Sobolev.mem_H01_of_hasCompactSupport, stated over a finite-dimensional real "
         "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
