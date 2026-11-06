@@ -180,6 +180,7 @@ public import EllipticPdes.NormedDivForm.Maximum
 public import EllipticPdes.NormedDivForm.ClassicalMaximum
 public import EllipticPdes.NormedDivForm.InteriorSmooth
 public import EllipticPdes.NormedDivForm.Embedding
+public import EllipticPdes.NormedDivForm.EmbeddingW12
 public import EllipticPdes.Analysis.WeakConvergence
 public import EllipticPdes.Analysis.FunctionSpaces
 public import EllipticPdes.Analysis.HolderSpace
@@ -207,6 +208,7 @@ public import EllipticPdes.Spectrum.Multiplicity
 public import EllipticPdes.Spectrum.BallDimension
 public import EllipticPdes.Embedding.ConstOfGradZero
 public import EllipticPdes.Spectrum.RellichW12
+public import EllipticPdes.Spectrum.RellichW12Haar
 public import EllipticPdes.Spectrum.PoincareWirtinger
 public import EllipticPdes.Spectrum.PoincareBall
 public import EllipticPdes.Embedding.WeakDerivChain

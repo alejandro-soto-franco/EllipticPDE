@@ -900,6 +900,8 @@ The transfer preserves the $L^q$ seminorms of the function part and enlarges the
 | Poincaré inequality on a bounded set | `EllipticPdes.NormedDivForm.poincare_W1p0_of_bounded` |
 | Sobolev inequality into $L^q$ for some $q > 2$, in dimension at least two | `EllipticPdes.NormedDivForm.exists_eLpNorm_le_of_mem_W1p0` |
 | Sobolev inequality on an inner product space for any additive Haar measure | `EllipticPdes.H1Graph.exists_eLpNorm_le_of_mem_H01_haar` |
+| Rellich on $W^{1,2}(\Omega)$ for a bounded open set with `C¹` boundary (`Extension.HasC1BoundaryNormed`) | `EllipticPdes.NormedDivForm.isCompactOperator_fnL_W12` |
+| Rellich on $W^{1,2}(\Omega)$ on $\mathbb{R}^d$ for any additive Haar measure | `EllipticPdes.H1Graph.embW12G_isCompact_haar` |
 
 ### `C¹` boundaries
 

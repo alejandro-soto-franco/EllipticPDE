@@ -373,6 +373,18 @@ EXEMPT = {
     "EllipticPdes.Extension.hasC1BoundaryNormed_halfSpace": (
         "a half space has C1 boundary on a normed space; records that the hypothesis is satisfiable; no source statement"
     ),
+    "EllipticPdes.H1Graph.smulMeasureL_mem_W12_iff": (
+        "rescaling the measure preserves W^{1,2}; infrastructure with no source statement"
+    ),
+    "EllipticPdes.H1Graph.embW12G_isCompact": (
+        "the theorem warranted at EllipticPdes.Sobolev.embW12_isCompact, read in the graph space H1Graph.W12 volume through w12Equiv; the cited source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.H1Graph.embW12G_isCompact_haar": (
+        "the theorem warranted at EllipticPdes.Sobolev.embW12_isCompact, for any additive Haar measure on R^d in place of volume; the cited source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
+    "EllipticPdes.NormedDivForm.isCompactOperator_fnL_W12": (
+        "the theorem warranted at EllipticPdes.Sobolev.embW12_isCompact, transferred along toEuclidean to W^{1,2} of a finite-dimensional real normed space with an additive Haar measure and HasC1BoundaryNormed; the cited source states it in coordinates, so the warrant sits at the coordinate declaration"
+    ),
     "EllipticPdes.DivForm.FullEllipticOp.interior_smooth": (
         "the theorem warranted at EllipticPdes.Regularity.interior_smooth, stated over a finite-dimensional real "
         "inner product space or normed space in place of EuclideanSpace R (Fin d); the cited "
