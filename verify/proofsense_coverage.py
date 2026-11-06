@@ -39,6 +39,60 @@ MANIFEST = ROOT / "proofsense" / "manifest.json"
 # that no transcribed statement matches it, which the README under
 # proofsense/ has to justify in prose.
 EXEMPT = {
+    "EllipticPdes.Brouwer.brouwer_fixed_point": (
+        "Brouwer's fixed-point theorem, copied from harfe/fixed-point-theorems-lean4 (MIT)"
+    ),
+    "EllipticPdes.kkm_stdSimplex": (
+        "the Knaster-Kuratowski-Mazurkiewicz lemma on the standard simplex, derived from Brouwer's "
+        "fixed-point theorem. No source in the library states it"
+    ),
+    "EllipticPdes.kkm": (
+        "the Knaster-Kuratowski-Mazurkiewicz lemma on the convex hull of finitely many points of a "
+        "normed space. No source in the library states it"
+    ),
+    "EllipticPdes.IsMonotoneOp.exists_le_pairing_sum_smul": (
+        "the averaging step of the Debrunner-Flor lemma: for a convex combination of points of K, "
+        "some vertex of positive weight has a non-negative pairing. Ferreira-Gomes-Ucer cite "
+        "Debrunner-Flor in the proof of Theorem 2.16 (p. 11) and state no such lemma"
+    ),
+    "EllipticPdes.exists_minty_convexHull_finset": (
+        "the Debrunner-Flor inequality on the convex hull of a finite set. Ferreira-Gomes-Ucer cite "
+        "it without stating it, and no source in the library states the finite-dimensional lemma"
+    ),
+    "EllipticPdes.IsCoerciveOp.of_isBounded": (
+        "coercivity is vacuous on a bounded set, because the filter cobounded inf principal K is "
+        "trivial. No transcribed statement asserts it"
+    ),
+    "EllipticPdes.exists_weakVI_of_isBounded": (
+        "the Debrunner-Flor theorem on a bounded closed convex set, with no coercivity "
+        "hypothesis. Ferreira-Gomes-Ucer cite it in the proof of Theorem 2.16 and state no such "
+        "result"
+    ),
+    "EllipticPdes.weakVI_Ioc_counterexample": (
+        "the counterexample X = R, K = (0, 1], A = id, which shows that the conclusion u in K "
+        "cannot replace u in the closure of K in Ferreira-Gomes-Ucer Theorem 2.16 (p. 11) for a "
+        "convex set. No source states it"
+    ),
+    "EllipticPdes.IsMonotoneOp.weakVI_of_strongVI": (
+        "the converse of Minty's lemma: a monotone operator satisfies the weak inequality wherever it "
+        "satisfies the strong one. Ferreira-Gomes-Ucer Remark 2.17 (p. 12) states only the forward "
+        "direction"
+    ),
+    "EllipticPdes.exists_strongVI": (
+        "the Lions-Stampacchia theorem for a monotone hemicontinuous coercive operator and a datum f "
+        "in the dual, obtained from Ferreira-Gomes-Ucer Theorem 2.16 applied to A - f and Remark 2.17. "
+        "Brezis Theorem 5.6 (Stampacchia) states the linear case on a Hilbert space and no "
+        "transcribed statement is the nonlinear reflexive form"
+    ),
+    "EllipticPdes.existsUnique_strongVI": (
+        "uniqueness of that solution under strict monotonicity, by adding the two inequalities. "
+        "No transcribed statement asserts it"
+    ),
+    "EllipticPdes.surjective_of_monotone": (
+        "the Browder-Minty theorem for a monotone hemicontinuous coercive operator, onto the dual. "
+        "Brezis Theorem 5.16 (p. 145) assumes strict monotonicity and states the bijective form, "
+        "which EllipticPdes.bijective_of_strictlyMonotone warrants"
+    ),
     "EllipticPdes.pEnergy_convex": (
         "the convexity of the p-energy (1/p) int |grad u|^p + (c/p) int |u|^p on W_0^{1,p}, which "
         "is the convexity of the norm to the power p. Evans 8.1.2 asks convexity of the "
@@ -61,6 +115,17 @@ EXEMPT = {
     "EllipticPdes.existsUnique_weakSolution_pLaplacian": (
         "uniqueness of that solution from strict convexity of the energy. No transcribed "
         "theorem states it"
+    ),
+    "EllipticPdes.continuous_apply_add_smul_of_convex_gateaux": (
+        "the Gateaux derivative of a convex continuous functional is continuous along a line, "
+        "by the gradient inequality and continuity of the difference quotients. No transcribed "
+        "statement asserts it"
+    ),
+    "EllipticPdes.existsUnique_weakSolution_skewPLaplacian": (
+        "existence and uniqueness for the screened p-Laplacian plus a skew principal part "
+        "-div (S grad u) on W_0^{1,p}, by the Browder-Minty theorem. Brezis Theorem 5.16 (p. 145) "
+        "states the abstract bijectivity, which EllipticPdes.bijective_of_strictlyMonotone "
+        "warrants, and no transcribed theorem states this instance"
     ),
     "EllipticPdes.isMonotoneOp_of_convex_gateaux": (
         "the Gateaux derivative of a convex functional is a monotone operator, which is classical. "

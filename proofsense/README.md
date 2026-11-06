@@ -6,9 +6,9 @@ they cite, so a claim of the form "this formalises Evans Theorem N" is checkable
 rather than asserted. Three sources supply warrants: Evans for the existence,
 Fredholm, spectral and interior-regularity chain, Fernández-Real and
 Ros-Oton for Campanato's characterisation of Hölder continuity, and Brezis for
-the weak compactness, direct-method and symmetric Lax–Milgram results of
-`EllipticPdes.Monotone`. Ferreira, Gomes and Üçer is registered as a source for
-the monotone-operator definitions; no warrant cites it.
+the weak compactness, direct-method and Lax–Milgram results of
+`EllipticPdes.Monotone`, and Ferreira, Gomes and Üçer for Theorem 2.16 and
+Remark 2.17 of the same layer.
 
 proofsense supplies the formal verdict: a Lean declaration against the
 literature statement it cites, yielding a relation, a trust rung and any defect.
@@ -160,28 +160,50 @@ Fernández-Real form.
 
 ## Monotone-operator results
 
-Six declarations of `EllipticPdes.Monotone` have Brezis warrants, each with a
-recorded divergence. `isClosed_toWeakSpace_of_convex` and
-`isCompact_toWeakSpace_closedBall` state one direction of the equivalences in
-Theorems 3.7 (Mazur) and 3.17 (Kakutani).
-`isCompact_toWeakSpace_of_bounded_convex_closed` states Corollary 3.22. Every Brezis statement takes a Banach
-space, and the declarations take a real normed space, with reflexivity as the
-predicate `IsReflexive`. The two direct-method declarations state Corollary 3.23
-for a real-valued function, where the source allows values in
-`(-∞, +∞]`. `laxMilgram_symm_of_potential` assumes symmetry, which Corollary 5.8 asks
-only for its clause (18), and states clause (17) alone.
+Eleven declarations of `EllipticPdes.Monotone` have warrants, each with a
+recorded divergence. Eight cite Brezis.
+`isClosed_toWeakSpace_of_convex` and `isCompact_toWeakSpace_closedBall` state
+one direction of the equivalences in Theorems 3.7 (Mazur) and 3.17 (Kakutani).
+`isCompact_toWeakSpace_of_bounded_convex_closed` states Corollary 3.22. Every
+Brezis statement takes a Banach space, and the declarations take a real normed
+space, with reflexivity as the predicate `IsReflexive`. The two direct-method
+declarations state Corollary 3.23 for a real-valued function, where the source
+allows values in `(-∞, +∞]`. `laxMilgram_symm_of_potential` assumes symmetry,
+which Corollary 5.8 asks only for its clause (18), and states clause (17) alone.
+`bijective_of_strictlyMonotone` states Theorem 5.16 with hemicontinuity in place
+of continuity, and `laxMilgram_of_reflexive` states clause (17) of Corollary 5.8
+on a reflexive Banach space with no symmetry.
 
-Four declarations are exempt, because no transcribed statement matches them.
-Ferreira, Gomes and Üçer Remark 2.17 (p. 12) begins from a hemicontinuous
-monotone operator and a solution of the weak inequality of Theorem 2.16. It
-neither states that the Gateaux derivative of a convex functional is monotone
-(`isMonotoneOp_of_convex_gateaux`), nor starts from a minimiser
-(`variationalInequality_of_isMinOn`). Theorem 2.16 concludes a weak variational
-inequality on a convex set, and no source statement asserts that a coercive
-potential operator is onto the dual (`exists_eq_of_potential`) or that strict
-monotonicity makes the preimage unique (`existsUnique_eq_of_potential`). The
-docstrings of the first two cite Remark 2.17 for the setting they work in,
-which the remark does not state for them.
+Three cite Ferreira, Gomes and Üçer. `exists_weakVI_closure` states Theorem 2.16
+(printed p. 11, checked against the rendered page): a monotone coercive
+operator on a nonempty convex subset of a reflexive Banach space has a point
+`u` in the closure of the set with `0 ≤ ⟨A v, v - u⟩` for every `v` in the set.
+`exists_weakVI` adds closedness of the set to conclude `u` in the set, the form
+that Remark 2.17 (p. 12) assumes. The divergence recorded for both is that the
+declarations take the operator on all of `X`, with monotonicity and coercivity
+on the set. `weakVI_Ioc_counterexample` proves that the closure cannot be dropped on
+a convex set. `IsHemicontinuousOp.strongVI_of_weakVI` states Remark 2.17.
+
+The remaining declarations of the layer are exempt, because no transcribed
+statement matches them. No source in the library states the
+Knaster–Kuratowski–Mazurkiewicz lemma. `kkm_stdSimplex` and `kkm` are exempt.
+The proof of Theorem 2.16 cites the Debrunner–Flor theorem without stating it.
+The exempt declarations are `exists_le_pairing_sum_smul`, `exists_minty_convexHull_finset`,
+`IsCoerciveOp.of_isBounded` and `exists_weakVI_of_isBounded`, with the
+counterexample `weakVI_Ioc_counterexample`. Remark 2.17 states Minty's lemma in one
+direction only. The converse `weakVI_of_strongVI` is exempt, with
+`exists_strongVI` and `existsUnique_strongVI` (Lions–Stampacchia) and
+`surjective_of_monotone` (Browder–Minty without strictness, where Brezis
+Theorem 5.16 assumes it). No source statement asserts
+that a coercive potential operator is onto the dual (`exists_eq_of_potential`)
+or that strict monotonicity makes the preimage unique
+(`existsUnique_eq_of_potential`). The skew p-Laplacian
+`existsUnique_weakSolution_skewPLaplacian` is an instance of Theorem 5.16 that
+no transcribed theorem states. The docstrings of `isMonotoneOp_of_convex_gateaux`
+and `variationalInequality_of_isMinOn` cite Remark 2.17 for the setting they
+work in. Remark 2.17 begins from a solution of the weak inequality. It states
+neither that the Gateaux derivative of a convex functional is monotone nor that
+a minimiser satisfies the strong inequality.
 
 ## Reflexivity results
 

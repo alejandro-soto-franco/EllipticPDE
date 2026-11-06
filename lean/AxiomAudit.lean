@@ -571,6 +571,43 @@ assert_classical_axioms
   EllipticPdes.existsUnique_eq_of_potential
   EllipticPdes.laxMilgram_symm_of_potential
 
+/-! ### The KKM lemma -/
+
+assert_classical_axioms
+  EllipticPdes.Brouwer.brouwer_fixed_point
+  EllipticPdes.kkm_stdSimplex
+  EllipticPdes.kkm
+
+/-! ### The Debrunner–Flor inequality on a polytope -/
+
+assert_classical_axioms
+  EllipticPdes.IsMonotoneOp.exists_le_pairing_sum_smul
+  EllipticPdes.exists_minty_convexHull_finset
+
+/-! ### The weak variational inequality (Ferreira–Gomes–Üçer, Theorem 2.16) -/
+
+assert_classical_axioms
+  EllipticPdes.IsCoerciveOp.of_isBounded
+  EllipticPdes.exists_weakVI_closure
+  EllipticPdes.exists_weakVI
+  EllipticPdes.exists_weakVI_of_isBounded
+  EllipticPdes.weakVI_Ioc_counterexample
+
+/-! ### Minty's lemma and the Lions–Stampacchia theorem -/
+
+assert_classical_axioms
+  EllipticPdes.IsHemicontinuousOp.strongVI_of_weakVI
+  EllipticPdes.IsMonotoneOp.weakVI_of_strongVI
+  EllipticPdes.exists_strongVI
+  EllipticPdes.existsUnique_strongVI
+
+/-! ### The Browder–Minty theorem and Lax–Milgram without symmetry -/
+
+assert_classical_axioms
+  EllipticPdes.surjective_of_monotone
+  EllipticPdes.bijective_of_strictlyMonotone
+  EllipticPdes.laxMilgram_of_reflexive
+
 /-! ### Reflexivity of `L^p` and of closed subspaces -/
 
 assert_classical_axioms
@@ -594,3 +631,9 @@ assert_classical_axioms
   EllipticPdes.pEnergy_gateaux
   EllipticPdes.exists_weakSolution_pLaplacian
   EllipticPdes.existsUnique_weakSolution_pLaplacian
+
+/-! ### The `p`-Laplacian with a skew principal part -/
+
+assert_classical_axioms
+  EllipticPdes.continuous_apply_add_smul_of_convex_gateaux
+  EllipticPdes.existsUnique_weakSolution_skewPLaplacian
