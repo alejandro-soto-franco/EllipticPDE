@@ -563,7 +563,7 @@ named without their `EllipticPdes.` prefix.
   Hölder's inequality then bound the measure of $\Gamma_k$ below by a constant
   independent of $k$ whenever $v \ne 0$. In dimension two the Sobolev inequality is the
   embedding into $L^4$ through the inequality at $p = 3/2$ as
-  `EllipticPdes.Embedding.eLpNorm_le_of_mem_H01_two`, which is the remark on $n = 2$ in
+  `EllipticPdes.Embedding.eLpNorm_le_of_mem_H01_two`; this is the remark on $n = 2$ in
   their proof. As $k$ increases to the supremum $T$ of the levels with nonzero
   truncation, the sets $\Gamma_k$ shrink into $\{u \ge T\}$ with nonvanishing gradient.
   That set is null because $\{u > T\}$ is null by the choice of $T$ and the gradient
